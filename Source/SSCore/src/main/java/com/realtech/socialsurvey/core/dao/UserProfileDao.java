@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -35,4 +37,10 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     public Map<String, Long> findPrimaryUserProfileByAgentId( long entityId );
+    
+
+    public Set<Long> findUserIdsByBranch( long branchId );
+
+
+    public Set<Long> findUserIdsByRegion( long regionId );
 }

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -83,8 +84,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                         links.append( "<br/>For " ).append( site ).append( " : " )
                             .append( "<a href=" + generateQueryParams( survey, site ) + ">Click here</a>" );
                         agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
-                        user  = userManagementService.getUserByUserId( survey.getAgentId() );
-                        
+                        user = userManagementService.getUserByUserId( survey.getAgentId() );
+
                     } catch ( InvalidInputException e ) {
                         LOG.error( "InvalidInputException occured while generating URL for " + site + ". Nested exception is ",
                             e );
@@ -207,14 +208,15 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
     {
         LOG.debug( "Method to get settings of agent and admins in the hierarchy getSocialSitesWithSettingsConfigured() started." );
         OrganizationUnitSettings agentSettings = userManagementService.getUserSettings( agentId );
-        List<OrganizationUnitSettings> hierarchySettings = socialManagementService
+        Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
             .getSettingsForBranchesAndRegionsInHierarchy( agentId );
-        List<OrganizationUnitSettings> settings;
-        if ( hierarchySettings != null ) {
-            settings = new ArrayList<>( hierarchySettings );
-        } else {
-            settings = new ArrayList<>();
-        }
+        List<OrganizationUnitSettings> companySettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> regionSettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> branchSettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> settings = new ArrayList<OrganizationUnitSettings>();
         Set<String> socialSitesWithSettings = new HashSet<>();
 
         // Enabling Google+ and Yelp only if agent has configured it.
@@ -230,6 +232,45 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
         // Enabling Facebook / Linkedin / Twitter if agent or anybody in the hierarchy has
         // configured in settings.
+        for ( OrganizationUnitSettings setting : companySettings ) {
+            if ( setting.getSocialMediaTokens() != null ) {
+                if ( setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null ) {
+                    socialSitesWithSettings.add( "facebook" );
+                }
+                if ( setting.getSocialMediaTokens().getTwitterToken() != null ) {
+                    socialSitesWithSettings.add( "twitter" );
+                }
+                if ( setting.getSocialMediaTokens().getLinkedInToken() != null ) {
+                    socialSitesWithSettings.add( "linkedin" );
+                }
+            }
+        }
+        for ( OrganizationUnitSettings setting : regionSettings ) {
+            if ( setting.getSocialMediaTokens() != null ) {
+                if ( setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null ) {
+                    socialSitesWithSettings.add( "facebook" );
+                }
+                if ( setting.getSocialMediaTokens().getTwitterToken() != null ) {
+                    socialSitesWithSettings.add( "twitter" );
+                }
+                if ( setting.getSocialMediaTokens().getLinkedInToken() != null ) {
+                    socialSitesWithSettings.add( "linkedin" );
+                }
+            }
+        }
+        for ( OrganizationUnitSettings setting : branchSettings ) {
+            if ( setting.getSocialMediaTokens() != null ) {
+                if ( setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null ) {
+                    socialSitesWithSettings.add( "facebook" );
+                }
+                if ( setting.getSocialMediaTokens().getTwitterToken() != null ) {
+                    socialSitesWithSettings.add( "twitter" );
+                }
+                if ( setting.getSocialMediaTokens().getLinkedInToken() != null ) {
+                    socialSitesWithSettings.add( "linkedin" );
+                }
+            }
+        }
         for ( OrganizationUnitSettings setting : settings ) {
             if ( setting.getSocialMediaTokens() != null ) {
                 if ( setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null ) {

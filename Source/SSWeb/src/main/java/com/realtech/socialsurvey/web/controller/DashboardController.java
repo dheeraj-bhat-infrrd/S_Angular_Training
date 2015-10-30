@@ -31,6 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +55,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
@@ -114,6 +116,9 @@ public class DashboardController
 
     @Autowired
     private EmailFormatHelper emailFormatHelper;
+    
+    @Autowired
+    BatchTrackerService batchTrackerService;
 
     @Value ( "${ENABLE_KAFKA}")
     private String enableKafka;
@@ -133,7 +138,6 @@ public class DashboardController
     private final String EXCEL_FORMAT = "application/vnd.ms-excel";
     private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private final String EXCEL_FILE_EXTENSION = ".xlsx";
-
 
     /*
      * Method to initiate dashboard
@@ -214,6 +218,7 @@ public class DashboardController
                 }
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+
                 try {
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
@@ -228,6 +233,7 @@ public class DashboardController
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
                 model.addAttribute( "company", user.getCompany().getCompany() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+
                 try {
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
@@ -270,16 +276,24 @@ public class DashboardController
             throw e;
         }
 
-        if ( realtechAdmin )
+        if ( realtechAdmin ){
             columnName = null;
+        }
+        LOG.debug("Getting the survey score.");
         double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
             realtechAdmin ) * 1000.0 ) / 1000.0;
+        LOG.debug("Getting the sent surveys count.");
         int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays );
-        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays );
+        LOG.debug("Getting the social posts count with hierarchy.");
+        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
+            numberOfDays );
+        LOG.debug("Getting the social posts count.");
+        socialPostsCount += (int) dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays );
         int profileCompleteness = 0;
-        if ( !realtechAdmin )
+        if ( !realtechAdmin ){
+        	LOG.debug("Getting profile completeness.");
             profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
-
+        }
         model.addAttribute( "socialScore", surveyScore );
         if ( sentSurveyCount > 999 )
             model.addAttribute( "surveyCount", "1K+" );
@@ -292,6 +306,7 @@ public class DashboardController
             model.addAttribute( "socialPosts", socialPostsCount );
 
         model.addAttribute( "profileCompleteness", profileCompleteness );
+        LOG.debug("Getting the badges.");
         model.addAttribute( "badges",
             dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
 
@@ -315,6 +330,10 @@ public class DashboardController
         long columnValue = 0;
         User user = sessionHelper.getCurrentUser();
         boolean realtechAdmin = user.isSuperAdmin();
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
         try {
             String columnValueStr = request.getParameter( "columnValue" );
             columnValue = Long.parseLong( columnValueStr );
@@ -343,8 +362,8 @@ public class DashboardController
             dashboardService.getCompletedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
         model.addAttribute( "clickedSurvey",
             dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model
-            .addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays ) );
+        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays )
+            + dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
 
         LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() finished" );
         return JspResolver.DASHBOARD_SURVEYSTATUS;
@@ -1422,8 +1441,8 @@ public class DashboardController
 
             try {
                 Date date = new Date();
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, fetchAbusive , startDate,
-                    endDate, null );
+                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, fetchAbusive,
+                    startDate, endDate, null );
                 String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
                     + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName );
@@ -1460,110 +1479,6 @@ public class DashboardController
     }
 
 
-/*    
-     * Method to download file containing incomplete surveys
-     
-    @RequestMapping ( value = "/downloaddashboardsocialmonitor")
-    public void getSocialMonitorFile( Model model, HttpServletRequest request, HttpServletResponse response )
-    {
-        LOG.info( "Method to get file containg Social Monitors list getSocialMonitorFile() started." );
-        User user = sessionHelper.getCurrentUser();
-        boolean realTechAdmin = user.isSuperAdmin();
-        List<SurveyDetails> surveyDetails = new ArrayList<>();
-
-        try {
-            String columnName = request.getParameter( "columnName" );
-            if ( !realTechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
-            }
-
-            String startDateStr = request.getParameter( "startDate" );
-            String endDateStr = request.getParameter( "endDate" );
-
-            Date startDate = null;
-            Date endDate = Calendar.getInstance().getTime();
-            if ( startDateStr != null && !startDateStr.isEmpty() ) {
-                try {
-                    startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error( "ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
-                        e );
-                }
-            }
-            if ( endDateStr != null && !endDateStr.isEmpty() ) {
-                try {
-                    endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
-                } catch ( ParseException e ) {
-                    LOG.error( "ParseException caught in getSocialMonitorFile() while parsing startDate. Nested exception is ",
-                        e );
-                }
-            }
-
-            String profileLevel = getProfileLevel( columnName );
-            long iden = 0;
-
-            if ( realTechAdmin ) {
-                profileLevel = CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN;
-            }
-
-            if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
-                iden = user.getCompany().getCompanyId();
-            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-                iden = user.getUserId();
-            } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
-                    try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatExcept;ion caught while parsing columnValue in getSocialMonitorFile(). Nested exception is ",
-                            e );
-                        throw e;
-                    }
-                }
-            }
-
-            try {
-                Date date = new Date();
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
-                    endDate, null );
-                String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-                    + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( surveyDetails, fileName );
-                response.setContentType( EXCEL_FORMAT );
-                String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
-                // write into file
-                OutputStream responseStream = null;
-                try {
-                    responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
-                } finally {
-                    try {
-                        responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
-                    }
-                }
-                response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getSocialMonitorFile(). Nested exception is ", e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getSocialMonitorFile(). Nested exception is ", e );
-            }
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getSocialMonitorFile(). Nested exception is ", e );
-        }
-        LOG.info( "Method getSocialMonitorFile() finished." );
-    }
-*/
     /*
      * Method to download file containing incomplete surveys
      */
@@ -1631,7 +1546,8 @@ public class DashboardController
 
             try {
                 Date date = new Date();
-                socialPosts = profileManagementService.getCumulativeSocialPosts( iden, columnName, -1, -1, profileLevel, startDate, endDate );
+                socialPosts = profileManagementService.getCumulativeSocialPosts( iden, columnName, -1, -1, profileLevel,
+                    startDate, endDate );
                 String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
                     + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( socialPosts, fileName );
@@ -1666,7 +1582,8 @@ public class DashboardController
         }
         LOG.info( "Method getSocialMonitorFile() finished." );
     }
-    
+
+  
     /*
      * Method to download file containing incomplete surveys
      */
@@ -1789,17 +1706,17 @@ public class DashboardController
             } catch ( SelfSurveyInitiationException e ) {
                 errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
                     DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                throw new NonFatalException( e.getMessage() , e.getErrorCode() );
+                throw new NonFatalException( e.getMessage(), e.getErrorCode() );
             } catch ( DuplicateSurveyRequestException e ) {
                 errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
                     DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                throw new NonFatalException( e.getMessage() , e.getErrorCode() );
+                throw new NonFatalException( e.getMessage(), e.getErrorCode() );
             }
 
 
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendSurveyInvitation(). Nested exception is ", e );
-            if (errorMsg == null)
+            if ( errorMsg == null )
                 errorMsg = "error";
             return errorMsg;
         }
@@ -1869,25 +1786,27 @@ public class DashboardController
                     } else {
                         throw new InvalidInputException( "Agent id can not be null" );
                     }
-                    
+
+
                     try {
                         surveyHandler.initiateSurveyRequest( currentAgentId, recipient.getEmailId(), recipient.getFirstname(),
                             recipient.getLastname(), source );
                     } catch ( SelfSurveyInitiationException e ) {
                         errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
                             DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                        throw new NonFatalException( e.getMessage() , e.getErrorCode() );
+                        throw new NonFatalException( e.getMessage(), e.getErrorCode() );
                     } catch ( DuplicateSurveyRequestException e ) {
                         errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
                             DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                        throw new NonFatalException( e.getMessage() , e.getErrorCode() );
+                        throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+
                     }
-                    
+
                 }
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ", e );
-            if (errorMsg == null)
+            if ( errorMsg == null )
                 errorMsg = "error";
             return errorMsg;
 

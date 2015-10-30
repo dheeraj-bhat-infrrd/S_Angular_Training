@@ -805,7 +805,8 @@ function validateComplaintRegistraionForm(){
 		if(rating == 0 && mood =='') {
 			// reset the check box if score is 0 and mood not selected
 			$('#compl-checkbox').addClass('bd-check-img-checked');
-			$('input[name="enabled]').prop( "checked" , false);
+			$('input[name="enabled"]').prop( "checked" , false);
+			$('input[name="enabled"]').val("");
 		}	
 		
 	}

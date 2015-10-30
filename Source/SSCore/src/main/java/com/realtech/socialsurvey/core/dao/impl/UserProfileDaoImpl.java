@@ -3,9 +3,12 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -16,6 +19,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -202,5 +206,49 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         }
         LOG.info( "Method deleteUserProfilesByCompany() finished." );
         return hierarchyMap;
+    }
+
+
+    @Override
+    public Set<Long> findUserIdsByBranch( long branchId )
+    {
+        LOG.info( "Method call started for findUserIdsByBranch for branch : " + branchId );
+        Set<Long> userIds = new HashSet<Long>();
+
+        LOG.info( "Fetching users for branch : " + branchId );
+        Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and BRANCH_ID = ?" );
+        query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
+        query.setParameter( 1, branchId );
+
+        List<Integer> rows = (List<Integer>) query.list();
+        for ( Integer row : rows ) {
+            userIds.add( Long.valueOf( row.intValue() ) );
+        }
+
+        LOG.info( "Fetched " + userIds.size() + " users for branch : " + branchId );
+        LOG.info( "Method call ended for findUserIdsByBranch for branch : " + branchId );
+        return userIds;
+    }
+
+
+    @Override
+    public Set<Long> findUserIdsByRegion( long regionId )
+    {
+        LOG.info( "Method call started for findUserIdsByRegion for region : " + regionId );
+        Set<Long> userIds = new HashSet<Long>();
+
+        LOG.info( "Fetching users for region : " + regionId );
+        Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and REGION_ID = ?" );
+        query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
+        query.setParameter( 1, regionId );
+
+        List<Integer> rows = (List<Integer>) query.list();
+        for ( Integer row : rows ) {
+            userIds.add( Long.valueOf( row.intValue() ) );
+        }
+
+        LOG.info( "Fetched " + userIds.size() + " users for region : " + regionId );
+        LOG.info( "Method call ended for findUserIdsByRegion for region : " + regionId );
+        return userIds;
     }
 }

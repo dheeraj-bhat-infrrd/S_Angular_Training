@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -14,9 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -29,7 +32,7 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyPreInitiationServiceImpl.class);
 
 	@Autowired
-	private GenericDao<UserProfile, Long> userProfileDao;
+	private UserProfileDao userProfileDao;
 
 	@Autowired
 	private SurveyPreInitiationDao surveyPreInitiationDao;
@@ -77,28 +80,20 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 		}
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		List<UserProfile> users = null;
 		Set<Long> userIds = new HashSet<>();
 		switch (profileLevel) {
 			case CommonConstants.PROFILE_LEVEL_REGION:
-				queries.put("regionId", iden);
-				users = userProfileDao.findByKeyValue(UserProfile.class, queries);
-				break;
+			    userIds = userProfileDao.findUserIdsByRegion( iden );
+                return userIds;
 			case CommonConstants.PROFILE_LEVEL_BRANCH:
-				queries.put("branchId", iden);
-				users = userProfileDao.findByKeyValue(UserProfile.class, queries);
-				break;
+			    userIds = userProfileDao.findUserIdsByBranch( iden );
+			    return userIds;
 			case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
 				userIds.add(iden);
 				return userIds;
 			default:
 				throw new InvalidInputException("Invalid profile level while getting iden column name");
 		}
-		for (UserProfile user : users) {
-			userIds.add(user.getUser().getUserId());
-		}
-
-		return userIds;
 	}
 	
 	@Transactional

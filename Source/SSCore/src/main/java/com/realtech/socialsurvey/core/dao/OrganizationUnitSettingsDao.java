@@ -1,12 +1,15 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -194,4 +197,12 @@ public interface OrganizationUnitSettingsDao
 	 * @throws NoRecordsFetchedException
 	 */
 	public List<OrganizationUnitSettings> getOrganizationUnitListWithCRMSource(String source, String collectionName) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    void updateKeyOrganizationUnitSettingsByInCriteria( String keyToUpdate, Object updatedRecord, String criteriaKey,
+        List<Object> criteriaValue, String collectionName );
+
+
+    List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
+        throws InvalidInputException;
 }

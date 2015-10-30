@@ -161,12 +161,15 @@ public interface CommonConstants
     public static final String SURVEY_SOURCE_ID_COLUMN = "sourceId";
     public static final String VERTICAL_NAME = "verticalName";
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
+    public static final String BATCH_TYPE_COLUMN = "batchType";
+    public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
 
     /**
      * Mongo entities and column name constants
      */
     public static final String AGENT_ID_COLUMN = "agentId";
     public static final String AGENT_EMAIL_ID_COLUMN = "emailId";
+    public static final String SURVEY_AGENT_EMAIL_ID_COLUMN = "agentEmailId";
     public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
     public static final String CREATED_ON = "createdOn";
     public static final String CREATED_BY = "createdBy";
@@ -188,13 +191,14 @@ public interface CommonConstants
     public static final String REVIEW_COUNT_MONGO = "reviewCount";
     public static final String EDITABLE_SURVEY_COLUMN = "editable";
     public static final String AGREE_SHARE_COLUMN = "agreedToShare";
+    public static final String SOCIAL_MEDIA_POST_DETAILS_COLUMN = "socialMediaPostDetails";
     public static final String SUBSCRIPTION_ID_SOURCE_BRAINTREE = "Braintree";
     public static final String SURVEY_ID_COLUMN = "surveyId";
     public static final String ABUSE_REPORTERS_COLUMN = "abuseReporters";
     public static final String UNDER_RESOLUTION_COLUMN = "underResolution";
     public static final String IS_ABUSIVE_REPORTED_BY_USER_COLUMN = "isAbuseRepByUser";
     public static final String IS_UNDER_RESOLUTION_COLUMN = "underResolution";
-
+    public static final String IDEN = "iden";
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
      */
@@ -228,7 +232,7 @@ public interface CommonConstants
 
     public static final String RESTART_SURVEY_MAIL_BODY_IN_SESSION = "restartsurveymailbody";
     public static final String RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION = "restartsurveymailsubject";
-    
+
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION = "surveycompletionunpleasantmailbody";
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION = "surveycompletionunpleasantmailsubject";
 
@@ -341,6 +345,7 @@ public interface CommonConstants
     public static final String REGION_PROFILE_FIXED_URL = "pages";
     public static final String COMPANY_PROFILE_FIXED_URL = "pages/company";
     public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
+    public static final float DEFAULT_COMPLAINT_RES_SCORE = 2.5f;
     public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
     public static final String USER_SELECTION_TYPE_SINGLE = "single";
     public static final String USER_SELECTION_TYPE_MULTIPLE = "multiple";
@@ -361,7 +366,7 @@ public interface CommonConstants
     public static final String SOCIAL_POST_REMINDER_MAIL_FILENAME = "EmailTemplates/SocialPostReminderMailBody.html";
     public static final String RESTART_SURVEY_MAIL_FILENAME = "EmailTemplates/SurveyRestartMailBody.html";
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_FILENAME = "EmailTemplates/SurveyCompletionUnpleasantMailBody.html";
-    
+
     /**
      * Logo related config
      */
@@ -390,6 +395,7 @@ public interface CommonConstants
     public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
+    public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
 
     // mail content
@@ -399,7 +405,7 @@ public interface CommonConstants
     public static final String SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY = "SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY";
     public static final String RESTART_SURVEY_MAIL_BODY_CATEGORY = "RESTART_SURVEY_MAIL_BODY_CATEGORY";
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY = "SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY";
-    
+
     // regular expressions
     public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,}$";
     public static final int PASSWORD_LENGTH = 6;
@@ -455,7 +461,7 @@ public interface CommonConstants
     public static final String POSTED_BY_SOLR = "postedBy";
     public static final String POST_URL_SOLR = "postUrl";
     public static final String ID_SOLR = "id";
-
+    public static final String LUKE_LAST_MODIFIED = "lastModified";
     /*
      * Payment detail constants
      */
@@ -639,7 +645,7 @@ public interface CommonConstants
     public static final long DEFAULT_VERTICAL_CRM_ID = -1;
     public static final Integer DEFAULT_VERTICAL_ID = -1;
 
-    public static final int EXPIRE_AFTER_DAYS = 3;
+    public static final int EXPIRE_AFTER_DAYS = -1;
     public static final int DECIMALS_TO_ROUND_OFF = 3;
 
     //Constants for survey request send type
@@ -744,6 +750,15 @@ public interface CommonConstants
     // file upload types
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
-    
 
+
+    public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
+    public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
+    public static final String COMPANY_MEDIA_POST_DETAILS_COLUMN = "companyMediaPostDetails";
+    public static final String REGION_MEDIA_POST_DETAILS_COLUMN = "regionMediaPostDetailsList";
+
+
+    public static final String BULK_SURVEY_VALID = "Valid";
+
+    public static final String BULK_SURVEY_INVALID = "Invalid";
 }

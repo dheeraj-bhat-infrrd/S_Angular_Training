@@ -6,17 +6,18 @@ import java.util.List;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 
 
-public class ComplaintRegistrationSettings
+public class ComplaintResolutionSettings
 {
 
     private float rating;
     private String mailId;
     private String mood;
     private boolean enabled;
-    
-    public ComplaintRegistrationSettings()
+
+
+    public ComplaintResolutionSettings()
     {
-        rating = CommonConstants.DEFAULT_AUTOPOST_SCORE;
+        rating = CommonConstants.DEFAULT_COMPLAINT_RES_SCORE;
         mailId = "";
         mood = "";
         enabled = false;
@@ -81,10 +82,13 @@ public class ComplaintRegistrationSettings
             moodList.add( "unpleasant" );
         return moodList;
     }
-    
+
+
     @Override
-    public String toString() {
-        return "mail_id: " + mailId + "\tcut_off_rating: " + rating + "\tcut_off_review_mood: " + mood + "\tcomplaint_handling_enabled" + enabled;
-        
+    public String toString()
+    {
+        return "mail_id: " + mailId + "\tcut_off_rating: " + rating + "\tcut_off_review_mood: " + mood
+            + "\tcomplaint_handling_enabled" + enabled;
+
     }
 }

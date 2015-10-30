@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -33,6 +35,8 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -59,6 +63,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
 
     @Autowired
     private SurveyPreInitiationService surveyPreInitiationService;
@@ -592,6 +597,138 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
+    @Override
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue )
+    {
+        LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
+        long socialPostCount = 0;
+        Date endDate = Calendar.getInstance().getTime();
+        Date startDate = getNdaysBackDate( numberOfDays );
+        Query query = new Query();
+        if ( columnName == null ) {
+        } else {
+            query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
+            if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.COMPANY_ID_COLUMN ).is( columnValue ) );
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.REGION_ID_COLUMN ).is( columnValue ) );
+
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.BRANCH_ID_COLUMN ).is( columnValue ) );
+            } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN )
+                    .ne( null ) );
+                query.addCriteria( Criteria.where(
+                    CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN
+                        + "." + CommonConstants.AGENT_ID_COLUMN ).is( columnValue ) );
+
+            }
+
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+
+            List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+
+            if ( surveyDetails != null ) {
+                for ( SurveyDetails survey : surveyDetails ) {
+                    if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnAgent != null ) {
+                            socialPostCount += sharedOnAgent.size();
+                        }
+                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getBranchMediaPostDetailsList() ) {
+                                if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
+                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getRegionMediaPostDetailsList() ) {
+                                if ( regionMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null ) {
+                            List<String> sharedOnCompany = survey.getSocialMediaPostDetails().getCompanyMediaPostDetails()
+                                .getSharedOn();
+                            if ( sharedOnCompany != null ) {
+                                socialPostCount += sharedOnCompany.size();
+                            }
+                        }
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnAgent != null ) {
+                            socialPostCount += sharedOnAgent.size();
+                        }
+                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
+                            for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getRegionMediaPostDetailsList() ) {
+                                if ( regionMediaPostDetails.getSharedOn() != null ) {
+                                    socialPostCount += regionMediaPostDetails.getSharedOn().size();
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                            for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                                .getBranchMediaPostDetailsList() ) {
+                                if ( branchMediaPostDetails.getRegionId() == columnValue ) {
+                                    if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                        socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                                    }
+                                }
+                            }
+                        }
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                        List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnAgent != null ) {
+                            socialPostCount += sharedOnAgent.size();
+                        }
+                        for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                            .getBranchMediaPostDetailsList() ) {
+                            socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                        }
+
+                    } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+
+                        List<String> sharedOn = survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn();
+                        if ( sharedOn != null ) {
+                            socialPostCount += sharedOn.size();
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return socialPostCount;
+    }
+
+
     // Method to get count of surveys initiated by customers and agents separately.
     // Columns can only be from : {agentId/branchId/regionId}
 
@@ -643,7 +780,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
          * fetching only completed surveys
          */
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-
+        query.fields().exclude( "surveyResponse" );
         if ( startDate != null && endDate != null ) {
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
@@ -896,13 +1033,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Date startDate = getNdaysBackDate( noOfPastDaysToConsider );
         if ( realtechAdmin && columnName == null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                CommonConstants.CREATED_ON ).gte( startDate ) ), Aggregation.project( CommonConstants.CREATED_ON )
-                .andExpression( criteriaColumn + "(" + CommonConstants.CREATED_ON + ")" ).as( "groupCol" ), Aggregation
-                .group( "groupCol" ).count().as( "count" ) );
+                CommonConstants.CREATED_ON ).gte( startDate ) ), Aggregation.match( Criteria.where(
+                CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation
+                .project( CommonConstants.CREATED_ON ).andExpression( criteriaColumn + "(" + CommonConstants.CREATED_ON + ")" )
+                .as( "groupCol" ), Aggregation.group( "groupCol" ).count().as( "count" ) );
         } else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
                 CommonConstants.CREATED_ON ).gte( startDate ) ), Aggregation.match( Criteria.where( columnName ).is(
-                columnValue ) ), Aggregation.project( CommonConstants.CREATED_ON )
+                columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is(
+                CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.project( CommonConstants.CREATED_ON )
                 .andExpression( criteriaColumn + "(" + CommonConstants.CREATED_ON + ")" ).as( "groupCol" ), Aggregation
                 .group( "groupCol" ).count().as( "count" ) );
         }
@@ -946,6 +1085,50 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             Date currDate = calendar.getTime();
             @SuppressWarnings ( "unchecked") List<BasicDBObject> sent = (List<BasicDBObject>) result.getRawResults().get(
                 "result" );
+
+            if ( criteriaColumn == "dayOfMonth" ) {
+                for ( String date : sentSurveys.keySet() ) {
+                    calendar.setTime( new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( date ) );
+                    /*  if ( calendar.get( Calendar.DAY_OF_MONTH ) == Integer.parseInt( sentSurvey.get(
+                          CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ) )
+                          sentSurveys.put( date, Long.parseLong( sentSurvey.get( "count" ).toString() ) );*/
+                }
+            }
+            if ( criteriaColumn == "week" ) {
+                int reductionInDate = 7;
+                LOG.info( "Size: " + sentSurveys.keySet().size() );
+                for ( String date : sentSurveys.keySet() ) {
+                    calendar.setTime( new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( date ) );
+
+                    Date startDay = getNdaysBackDate( currDate, Calendar.DATE, reductionInDate );
+                    long noOfSurveys = noOfPreInitiatedSurveys( columnName, columnValue, startDay, currDate );
+                    currDate = startDay;
+
+                    /* if ( calendar.get( Calendar.WEEK_OF_YEAR ) == Integer.parseInt( sentSurvey.get(
+                         CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ) + 1 ) {
+                         noOfSurveys += Long.parseLong( sentSurvey.get( "count" ).toString() );
+                     }*/
+                    sentSurveys.put( date, noOfSurveys );
+                }
+            }
+            if ( criteriaColumn == "month" ) {
+                int reductionInMonth = -1;
+                currDate = getNdaysBackDate( currDate, Calendar.YEAR, 1 );
+                for ( String date : sentSurveys.keySet() ) {
+                    calendar.setTime( new SimpleDateFormat( "MMM" ).parse( date ) );
+
+                    Date endMonth = getNdaysBackDate( currDate, Calendar.MONTH, reductionInMonth );
+                    long noOfSurveys = noOfPreInitiatedSurveys( columnName, columnValue, currDate, endMonth );
+                    currDate = endMonth;
+
+                    /*if ( calendar.get( Calendar.MONTH ) + 1 == Integer.parseInt( sentSurvey.get(
+                        CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ) ) {
+                        noOfSurveys += Long.parseLong( sentSurvey.get( "count" ).toString() );
+                    }*/
+                    sentSurveys.put( date, noOfSurveys );
+                }
+            }
+
             for ( BasicDBObject sentSurvey : sent ) {
                 if ( criteriaColumn == "dayOfMonth" ) {
                     for ( String date : sentSurveys.keySet() ) {
@@ -962,12 +1145,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         calendar.setTime( new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( date ) );
 
                         Date startDay = getNdaysBackDate( currDate, Calendar.DATE, reductionInDate );
-                        long noOfSurveys = noOfPreInitiatedSurveys( columnName, columnValue, startDay, currDate );
-                        currDate = startDay;
 
+                        currDate = startDay;
+                        long noOfSurveys = 0;
                         if ( calendar.get( Calendar.WEEK_OF_YEAR ) == Integer.parseInt( sentSurvey.get(
                             CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ) + 1 ) {
-                            noOfSurveys += Long.parseLong( sentSurvey.get( "count" ).toString() );
+                            noOfSurveys = Long.parseLong( sentSurvey.get( "count" ).toString() );
                         }
                         sentSurveys.put( date, noOfSurveys + sentSurveys.get( date ) );
                     }
@@ -979,9 +1162,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         calendar.setTime( new SimpleDateFormat( "MMM" ).parse( date ) );
 
                         Date endMonth = getNdaysBackDate( currDate, Calendar.MONTH, reductionInMonth );
-                        long noOfSurveys = noOfPreInitiatedSurveys( columnName, columnValue, currDate, endMonth );
                         currDate = endMonth;
-
+                        long noOfSurveys = 0;
                         if ( calendar.get( Calendar.MONTH ) + 1 == Integer.parseInt( sentSurvey.get(
                             CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ) ) {
                             noOfSurveys += Long.parseLong( sentSurvey.get( "count" ).toString() );
@@ -990,6 +1172,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     }
                 }
             }
+
         }
         LOG.info( "Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly) getSentSurveyByCriteria() finished." );
         return sentSurveys;
@@ -1390,21 +1573,24 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
-                startDate ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-                .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-        } else if ( startDate != null && endDate == null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
-                startDate ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
-        else if ( startDate == null && endDate != null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
                 Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
                     .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+        } else if ( startDate != null && endDate == null )
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
+                Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+        else if ( startDate == null && endDate != null )
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
+                .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ),Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
+                fetchAbusive ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
@@ -1631,6 +1817,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
+    public void updateSurveyDetails( SurveyDetails surveyDetails )
+    {
+        LOG.info( "Method insertSurveyDetails() to insert details of survey started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( surveyDetails.getAgentId() ) );
+        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( surveyDetails.getCustomerEmail() ) );
+        Update update = new Update();
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, surveyDetails.getSocialMediaPostDetails() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
+    }
+
+
     public void updateSurveyAsUnderResolution( String surveyId )
     {
         LOG.info( "Method updateSurveyAsUnderResolution() to mark survey as under resolution started." );
@@ -1648,7 +1848,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive for a company started." );
         Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
-        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.DEFAULT_MONGO_ID_COLUMN ) );
         if ( start > -1 ) {
             query.skip( start );
@@ -1683,14 +1883,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             if ( absReporterDetails != null && absReporterDetails.size() > 0 ) {
                 boolean reporterDetailsFound = false;
                 for ( AbuseReporterDetails absReporterDetail : absReporterDetails ) {
-                    if ( absReporterDetail.getSurveyId().equals(survey.get_id()) ) {
+                    if ( absReporterDetail.getSurveyId().equals( survey.get_id() ) ) {
                         abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetail ) );
                         reporterDetailsFound = true;
                         break;
                     }
                 }
-                if(!reporterDetailsFound)
-                 // to handle existing surveys where reporter info not saved
+                if ( !reporterDetailsFound )
+                    // to handle existing surveys where reporter info not saved
                     abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
             } else {
                 // to handle existing surveys where reporter info not saved
@@ -1704,10 +1904,22 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
+    public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId )
+    {
+        LOG.info( "Method getSurveyDetailsByAgentAndCompany() to insert details of survey started." );
+        List<SurveyDetails> surveys = new ArrayList<SurveyDetails>();
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+
+        surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        return surveys;
+    }
+
+
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int start, int rows )
     {
         Query query = new Query( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
-        query.addCriteria(  Criteria.where( CommonConstants.IS_UNDER_RESOLUTION_COLUMN ).is( true ) );
+        query.addCriteria( Criteria.where( CommonConstants.IS_UNDER_RESOLUTION_COLUMN ).is( true ) );
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.DEFAULT_MONGO_ID_COLUMN ) );
         if ( start > -1 ) {
             query.skip( start );
@@ -1729,22 +1941,93 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as under resolution for a company started." );
         Query query = new Query( Criteria.where( CommonConstants.UNDER_RESOLUTION_COLUMN ).is( true ) );
-        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) ); 
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
         long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
         LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as under resolution for a company finished." );
         return count;
-    
+
     }
-    
+
+
     @Override
     public long getSurveysReporetedAsAbusiveCount( long companyId )
     {
         LOG.info( "Method getSurveysReporetedAsAbusiveCount() to get count of surveys marked as abusive for a company started." );
         Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
-        query.addCriteria(  Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) ); 
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
         long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
         LOG.info( "Method getSurveysUnderResolutionCount() to get count of surveys marked as abusive for a company finished." );
         return count;
-    
+    }
+
+
+    @Override
+    public List<Long> getEntityIdListForModifiedReview( String columnName, long modifiedAfter )
+    {
+        LOG.debug( "method getEntityIdListForModifiedReview() started" );
+        //TODO change the date to time stamp
+        Date startDate = new Date( modifiedAfter );
+
+        Query query = new Query( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+
+
+        query.fields().include( columnName );
+
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+
+
+        List<Long> entityIdList = new ArrayList<Long>();
+        long idToAdd = 0l;
+        for ( SurveyDetails survey : surveys ) {
+            if ( columnName.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                idToAdd = survey.getAgentId();
+            } else if ( columnName.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                idToAdd = survey.getBranchId();
+            } else if ( columnName.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                idToAdd = survey.getRegionId();
+            } else if ( columnName.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                idToAdd = survey.getCompanyId();
+            }
+
+            if ( !entityIdList.contains( idToAdd ) && idToAdd > 0l )
+                entityIdList.add( idToAdd );
+        }
+
+        LOG.debug( "method getEntityIdListForModifiedReview() ended" );
+        return entityIdList;
+    }
+
+
+    /*
+     * 
+     */
+    @Override
+    public Map<Long, Integer> getSurveyCountForAgents( List<Long> agentIdList, boolean fetchAbusive ) throws ParseException
+    {
+        LOG.info( "Method to get getSurveyCountForAgents called" );
+        TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
+            Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
+            Aggregation.match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( agentIdList ) ), Aggregation
+                .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        Map<Long, Integer> surveyCountForEntities = new HashMap<>();
+        //inserting count as zero for all records. aggregation doesn't return group with zero record.
+        for ( Long agentId : agentIdList ) {
+            surveyCountForEntities.put( agentId, 0 );
+        }
+
+        @SuppressWarnings ( "unchecked") List<BasicDBObject> surveyCountList = (List<BasicDBObject>) result.getRawResults()
+            .get( "result" );
+
+        for ( BasicDBObject o : surveyCountList ) {
+            surveyCountForEntities.put( new Double( o.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ).longValue(),
+                Integer.parseInt( o.get( "count" ).toString() ) );
+        }
+
+        return surveyCountForEntities;
     }
 }

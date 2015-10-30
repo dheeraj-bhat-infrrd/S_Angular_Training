@@ -22,11 +22,18 @@ public class SiteMapGenerator implements Runnable {
 	public static final Logger LOG = LoggerFactory.getLogger(SiteMapGenerator.class);
 
 	public static final String DAILY_CONTENT = "daily";
-
+	
 	public static final String ORG_COMPANY = "company";
 	public static final String ORG_REGION = "region";
 	public static final String ORG_BRANCH = "branch";
 	public static final String ORG_INDIVIDUAL = "individual";
+	
+	private static final String HOURLY_FREQUENCY = "hourly";
+	
+	private static final float COMPANY_PRIORITY = 0.2f;
+	private static final float REGION_PRIORITY = 0.4f;
+	private static final float BRANCH_PRIORITY = 0.6f;
+	private static final float USERS_PRIORITY = 0.8f;
 
 	private String interval; // one of the three types possible
 	private String organizationUnit;
@@ -67,6 +74,8 @@ public class SiteMapGenerator implements Runnable {
 					LOG.debug("Getting sitemap content for company");
 					companyFetcher.setInterval(DAILY_CONTENT);
 					companyFetcher.setCollectionName(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+					companyFetcher.setChangeFrequency(HOURLY_FREQUENCY);
+					companyFetcher.setPriority(COMPANY_PRIORITY);
 					SiteMapWriter siteMapWriter = new SiteMapWriter(companySiteMapPath, companyFetcher);
 					siteMapWriter.writeSiteMap();
 				}
@@ -76,6 +85,8 @@ public class SiteMapGenerator implements Runnable {
 					LOG.debug("Getting sitemap content for region");
 					regionFetcher.setInterval(DAILY_CONTENT);
 					regionFetcher.setCollectionName(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+					regionFetcher.setChangeFrequency(HOURLY_FREQUENCY);
+					regionFetcher.setPriority(REGION_PRIORITY);
 					SiteMapWriter siteMapWriter = new SiteMapWriter(regionSiteMapPath, regionFetcher);
 					siteMapWriter.writeSiteMap();
 				}
@@ -85,6 +96,8 @@ public class SiteMapGenerator implements Runnable {
 					LOG.debug("Getting sitemap content for branches");
 					branchFetcher.setInterval(DAILY_CONTENT);
 					branchFetcher.setCollectionName(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+					branchFetcher.setChangeFrequency(HOURLY_FREQUENCY);
+					branchFetcher.setPriority(BRANCH_PRIORITY);
 					SiteMapWriter siteMapWriter = new SiteMapWriter(branchSiteMapPath, branchFetcher);
 					siteMapWriter.writeSiteMap();
 				}
@@ -94,6 +107,8 @@ public class SiteMapGenerator implements Runnable {
 					LOG.debug("Getting sitemap content for agents");
 					agentFetcher.setInterval(DAILY_CONTENT);
 					agentFetcher.setCollectionName(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+					branchFetcher.setChangeFrequency(HOURLY_FREQUENCY);
+					branchFetcher.setPriority(USERS_PRIORITY);
 					SiteMapWriter siteMapWriter = new SiteMapWriter(individualSiteMapPath, agentFetcher);
 					siteMapWriter.writeSiteMap();
 				}

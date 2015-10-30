@@ -24,7 +24,7 @@
 	href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 <c:if test="${not empty averageRating}">
 	<fmt:formatNumber var="floatingAverageRating" type="number"
-		value="${averageRating}" maxFractionDigits="2" minFractionDigits="3" />
+		value="${averageRating}" maxFractionDigits="1" minFractionDigits="1" />
 	<fmt:formatNumber var="floatingAverageGoogleRating" type="number"
 		value="${averageRating}" maxFractionDigits="1" minFractionDigits="1" />
 	<fmt:formatNumber var="integerAverageRating" type="number"
@@ -36,16 +36,6 @@
 		<c:set var="integerAverageRating" value="1"></c:set>
 	</c:if>
 </c:if>
-<c:choose>
-	<c:when test="${ floatingAverageRating % 1 == 0 }">
-		<fmt:formatNumber var="floatingAverageRating" type="number"
-			value="${averageRating}" maxFractionDigits="0" />
-	</c:when>
-	<c:otherwise>
-		<fmt:formatNumber var="floatingAverageRating" type="number"
-			value="${averageRating}" maxFractionDigits="3" minFractionDigits="3" />
-	</c:otherwise>
-</c:choose>
 <style type="text/css">
 .review-item {
     padding: 10px 0;
@@ -79,15 +69,15 @@
 				</div>
 			</div>
 			<div class="float-left widget-review-score">
-				<span id="rating">${floatingAverageRating}</span>
+				<a  href = "${ profileLink }" target="_blank"><span id="rating">${floatingAverageRating}</span></a>
 			</div>
 		</div>
 	</div>
-	<div class="clearfix widget-review-block">
-		<div class="float-left review-count-left"
-			id="prof-company-review-count">
+	<div class="clearfix widget-review-block ">
+		<a class="float-left review-count-left  cursor-pointer"
+			id="prof-company-review-count"  href="${ profileLink }" target="_blank">
 			<span>${reviewsCount}</span> Review(s)
-		</div>
+		</a>
 		<div class="float-left">
 			<c:choose>
 				<c:when test="${profileLevel == 'INDIVIDUAL'}">
@@ -130,6 +120,17 @@
 	<script
 		src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 	<script type="text/javascript">
+		//all content including images has been loaded
+		window.onload = function() {
+		    // post our message to the parent
+		    window.parent.postMessage(
+		        // get height of the content
+		        document.body.scrollHeight
+		        // set target domain
+		        ,"*"
+		    )
+		};
+		
 		function changeWidgetRatingPattern(rating, ratingParent) {
 			var counter = 0;
 			var integerRating = parseInt(rating * 2);
@@ -149,6 +150,7 @@
 		}
 		var rating = document.getElementById("rating").innerText;
 		changeWidgetRatingPattern(rating, $('#wdg-rating-cont'));
+		var url = "${ profileLink }";
 		$('.review-item').each(function(i){
 			var container = document.getElementById("review-" + i);
 			if(container.scrollHeight > container.offsetHeight){

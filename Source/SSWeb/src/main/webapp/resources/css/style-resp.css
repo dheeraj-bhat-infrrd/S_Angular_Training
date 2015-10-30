@@ -1898,9 +1898,6 @@
 	.web-addr-header {
 		padding-left: 10px;
 	}
-	.social-item-icon {
-		width: 32px;
-	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -2162,7 +2159,7 @@
     #recent-post-container,#reviews-container,
     #prof-company-intro,#prof-agent-container,#ppl-post-cont,
     #contact-wrapper,#intro-about-me{
-        display: block !important;
+        display: block;
     }
     .mob-contact-btn-wrapper{
         display: none;
