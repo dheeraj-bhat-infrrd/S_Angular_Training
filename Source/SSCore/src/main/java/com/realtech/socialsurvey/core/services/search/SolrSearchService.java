@@ -258,7 +258,7 @@ public interface SolrSearchService
     public void addUsersToSolr( List<User> users ) throws SolrException;
 
 
-    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount ) throws SolrException;
+    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount) throws SolrException, NoRecordsFetchedException;
 
 
     public Map<String, String> getCompanyAdmin( long companyId ) throws SolrException;
@@ -323,5 +323,8 @@ public interface SolrSearchService
 
 
     Date getLastBuildTimeForSocialPosts() throws SolrException;
+    
+    
+    public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
