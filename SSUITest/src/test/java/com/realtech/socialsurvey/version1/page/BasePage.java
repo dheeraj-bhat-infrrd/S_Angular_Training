@@ -29,7 +29,7 @@ public class BasePage
 {
     private static final Logger LOG = LoggerFactory.getLogger( BasePage.class );
     protected WebDriver driver;
-    
+
     public static final String ERROR_LOCATOR = "id=err-nw-txt";
     public static final String TOAST_MESSAGE_LOCATOR = "id=overlay-toast";
 
@@ -508,18 +508,59 @@ public class BasePage
             Assert.fail( "Could not find message : " + message );
         }
     }
-    
+
+
     public String getErrorMessage()
     {
         WebElement message = getElement( ERROR_LOCATOR );
         return message.getText();
     }
 
-    
+
     public String getToastMessage()
     {
         WebElement toastMessage = getElement( TOAST_MESSAGE_LOCATOR );
         return toastMessage.getText();
     }
-    
+
+
+    /**
+     * 
+     * 
+     * @param locators
+     * @return
+     */
+    public boolean navigateToPage( String... locators )
+    {
+
+        //now process the locators      
+        for ( int index = 0; index < locators.length; index++ ) {
+            //Get current element locator
+            String locator = locators[index];
+
+            //check if current element is clickable
+            if ( !isElementClickable( locator ) ) {
+                return false;
+            }
+
+            //check if there's a child element
+            if ( index < ( locators.length - 1 ) ) {
+                //if there is, check if it is visible
+                WebElement childElement = getElement( locators[index + 1] );
+
+                //if it is, then don't click on the current element, just continue with the for loop
+                if ( isVisible( childElement ) ) {
+                    continue;
+                }
+            }
+
+            //if there are no more child elements, or if the child isn't visible, then click on the current element
+            waitForElementToAppear( locator ).click();
+        }
+
+        waitForAjax();
+
+        return true;
+    }
+
 }

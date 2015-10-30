@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -1207,26 +1210,37 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
-    @Transactional
     @Override
-    public void removeUserProfile( long profileIdToDelete ) throws InvalidInputException, SolrException
+    @Transactional
+    public void removeUserProfile( long profileIdToDelete ) throws InvalidInputException
     {
         LOG.info( "Method to delete a profile called for user profile: " + profileIdToDelete );
 
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToDelete );
+        
         if ( userProfile == null ) {
             throw new InvalidInputException( "No user profile present for the specified profileId" );
         }
 
-        long userId = userProfile.getUser().getUserId();
         userProfileDao.delete( userProfile );
-        //update user in solr
-        User user = userDao.findById( User.class, userId );
-        solrSearchService.addUserToSolr( user );
-
+        //calling method to remove user profile from database
 
         LOG.info( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
+    
+    
+    @Override
+    @Transactional
+    public void updateUserInSolr(User user) throws InvalidInputException, SolrException{
+
+        LOG.info( "Method to updateUserInSolr started" );
+        //update user in solr
+        if(user == null){
+            throw new InvalidInputException( "Method to updateUserInSolr ended" );
+        }
+        solrSearchService.addUserToSolr( user );
+    }
+    
 
 
     /*
