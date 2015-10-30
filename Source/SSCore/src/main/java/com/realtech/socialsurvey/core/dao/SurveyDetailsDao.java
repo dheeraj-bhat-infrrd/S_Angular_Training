@@ -103,6 +103,18 @@ public interface SurveyDetailsDao
      */
     public Map<Integer, Integer> getCompletedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException;
     
+    /**
+     * Get the aggregation of clicked surveys
+     * @param organizationUnitColumn
+     * @param organizationUnitColumnValue
+     * @param startDate
+     * @param endDate
+     * @param aggregateBy
+     * @return
+     * @throws InvalidInputException
+     */
+    public Map<Integer, Integer> getClickedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException;
+    
     public Map<String, Long> getSentSurveyByCriteria( String columnName, long columnValue, int noOfDays,
         int noOfPastDaysToConsider, String criteriaColumn, boolean realtechAdmin ) throws ParseException;
 
