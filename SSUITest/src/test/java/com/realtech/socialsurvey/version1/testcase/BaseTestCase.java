@@ -48,7 +48,9 @@ public abstract class BaseTestCase
                 TimeUnit.SECONDS );
         driver.manage().window().maximize();
         log.info( "-- Testing on: " + GlobalConstants.SERVER_URL );
-        driver.get( GlobalConstants.SERVER_URL );
+        
+        if(driver.getCurrentUrl() == null || driver.getCurrentUrl().isEmpty())
+            driver.get( GlobalConstants.SERVER_URL );
 
         log.info( "-- Finished Setting up" );
     }
