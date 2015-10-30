@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -121,11 +122,11 @@ public interface SurveyDetailsDao
 
 
     public void getAverageScore( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String columnName, long columnValue , boolean fetchAbusive );
+        String columnName, long columnValue, boolean fetchAbusive );
 
 
     public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
-        String colunmName, long columnValue, boolean fetchAbusive  );
+        String colunmName, long columnValue, boolean fetchAbusive );
 
 
     public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate );
@@ -165,17 +166,25 @@ public interface SurveyDetailsDao
 
 
     public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId );
+
+
     public void updateSurveyAsUnderResolution( String surveyId );
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( long companyId, int start, int rows );
 
-    
+
     public long getSurveysUnderResolutionCount( long companyId );
-    
-    
+
+
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int start, int rows );
 
 
     long getSurveysReporetedAsAbusiveCount( long companyId );
+
+
+    public Map<Long, Integer> getSurveyCountForAgents( List<Long> agentIdList, boolean fetchAbusive ) throws ParseException;
+
+
+    public List<Long> getEntityIdListForModifiedReview( String columnName, long modifiedAfter );
 }
