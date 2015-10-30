@@ -29,6 +29,9 @@ public class BasePage
 {
     private static final Logger LOG = LoggerFactory.getLogger( BasePage.class );
     protected WebDriver driver;
+    
+    public static final String ERROR_LOCATOR = "id=err-nw-txt";
+    public static final String TOAST_MESSAGE_LOCATOR = "id=overlay-toast";
 
 
     public BasePage( WebDriver driver )
@@ -505,5 +508,18 @@ public class BasePage
             Assert.fail( "Could not find message : " + message );
         }
     }
+    
+    public String getErrorMessage()
+    {
+        WebElement message = getElement( ERROR_LOCATOR );
+        return message.getText();
+    }
 
+    
+    public String getToastMessage()
+    {
+        WebElement toastMessage = getElement( TOAST_MESSAGE_LOCATOR );
+        return toastMessage.getText();
+    }
+    
 }
