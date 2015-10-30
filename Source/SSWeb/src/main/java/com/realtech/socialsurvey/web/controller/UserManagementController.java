@@ -7,8 +7,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -1731,10 +1734,12 @@ public class UserManagementController
 
                 userManagementService.updateUserProfile( user, profileId, status );
                 userManagementService.updateUserProfilesStatus( user, profileId );
-                userManagementService.removeUserProfile( profileId );
+                userManagementService.removeUserProfile( profileId  );
+                
                 userManagementService.updatePrimaryProfileOfUser( updatedUser );
-
                 updatedUser = userManagementService.getUserByUserId( updatedUser.getUserId() );
+                userManagementService.updateUserInSolr( updatedUser );
+                
                 if ( user.getUserId() == updatedUser.getUserId() ) {
                     try {
                         sessionHelper.processAssignments( request.getSession( false ), user );
