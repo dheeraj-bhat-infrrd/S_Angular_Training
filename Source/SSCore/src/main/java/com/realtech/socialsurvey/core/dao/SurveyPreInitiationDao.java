@@ -38,4 +38,18 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 	public void getIncompleteSurveysCount(Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData);
 
 	public void deleteSurveysWithIds(Set<Long> incompleteSurveyIds);
+	
+	/**
+	 * Gets a aggregated result of incomplete surveys
+	 * @param companyId
+	 * @param agentId
+	 * @param status
+	 * @param startDate
+	 * @param endDate
+	 * @param agentIds
+	 * @param aggregateBy
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public Map<Integer, Integer> getIncompletSurveyAggregationCount(long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate, Set<Long> agentIds, String aggregateBy) throws InvalidInputException;
 }
