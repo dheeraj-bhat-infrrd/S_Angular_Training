@@ -7799,6 +7799,6 @@ label.url-change-input-label {
 	background: #333;
 }
 
-.ui-autocomplete.ui-front.ui-menu.ui-widget.ui-widget-content {
+.social-monitor-autocomplete {
 	width: 215px !important;
 }

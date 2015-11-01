@@ -1,4 +1,4 @@
-var offset=new Date().getTimezoneOffset()*60*1000;
+var offset = new Date().getTimezoneOffset() * 60 * 1000;
 function convertUTCToUserDate(date) {
 	return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date
 			.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
@@ -10,21 +10,27 @@ function convertUserDateToUTC(date) {
 			.getUTCSeconds());
 }
 
-function convertUserDateToLocale(date){
-	var convertedTimestamp= date.getTime() - offset ;
+function convertUserDateToLocale(date) {
+	var convertedTimestamp = date.getTime() - offset;
 	return new Date(convertedTimestamp);
 }
-function convertUserDateToLocalWeekFormt(date){
-	var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-	var convertedTimestamp= date.getTime() - offset;
-	var date3= new Date(convertedTimestamp);
-	var dayOftheweek = days[ date3.getDay() ];
-	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
-	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
-	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
-	var hours= (date3.getHours()<10) ? "0"+(date3.getHours()) : (date3.getHours());
-	var sec=  (date3.getSeconds()<10) ? "0"+(date3.getSeconds()) : (date3.getSeconds());
-	var date4=   dayOftheweek +" "+month+" "+day+" " + date3.getFullYear() +" "+hours+":"+minutes+":"+sec;
+function convertUserDateToLocalWeekFormt(date) {
+	var days = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+	var convertedTimestamp = date.getTime() - offset;
+	var date3 = new Date(convertedTimestamp);
+	var dayOftheweek = days[date3.getDay()];
+	var month = ((date3.getMonth() + 1) < 10) ? "0" + (date3.getMonth() + 1)
+			: (date3.getMonth() + 1);
+	var day = (date3.getDate() < 10) ? "0" + (date3.getDate()) : (date3
+			.getDate());
+	var minutes = (date3.getMinutes() < 10) ? "0" + (date3.getMinutes())
+			: (date3.getMinutes());
+	var hours = (date3.getHours() < 10) ? "0" + (date3.getHours()) : (date3
+			.getHours());
+	var sec = (date3.getSeconds() < 10) ? "0" + (date3.getSeconds()) : (date3
+			.getSeconds());
+	var date4 = dayOftheweek + " " + month + " " + day + " "
+			+ date3.getFullYear() + " " + hours + ":" + minutes + ":" + sec;
 	return date4;
 }
 
@@ -48,15 +54,40 @@ function convertUserDateToWeekFormt(date) {
 	return date4;
 }
 
-function  convertTimeStampToLocalTimeStamp(generalTimestamp){
-	var convertedTimestamp= generalTimestamp.getTime() - offset;
-	var date3=new Date(convertedTimestamp);	
-	var month=((date3.getMonth() + 1)<10)? "0"+(date3.getMonth() + 1) : (date3.getMonth() + 1);
-	var day=(date3.getDate()<10) ? "0"+(date3.getDate()) : (date3.getDate());
-	var minutes= (date3.getMinutes()<10) ? "0"+(date3.getMinutes()) : (date3.getMinutes());
-	var hours= (date3.getHours()<10) ? "0"+(date3.getHours()) : (date3.getHours());
-	var sec=  (date3.getSeconds()<10) ? "0"+(date3.getSeconds()) : (date3.getSeconds());
-	var date4= month +'-'+day+'-'+ date3.getFullYear() +" "+hours+":"+ minutes +":"+ sec+"."+date3.getMilliseconds() ;
+function convertTimeStampToLocalTimeStamp(generalTimestamp) {
+	var convertedTimestamp = generalTimestamp.getTime() - offset;
+	var date3 = new Date(convertedTimestamp);
+	var month = ((date3.getMonth() + 1) < 10) ? "0" + (date3.getMonth() + 1)
+			: (date3.getMonth() + 1);
+	var day = (date3.getDate() < 10) ? "0" + (date3.getDate()) : (date3
+			.getDate());
+	var minutes = (date3.getMinutes() < 10) ? "0" + (date3.getMinutes())
+			: (date3.getMinutes());
+	var hours = (date3.getHours() < 10) ? "0" + (date3.getHours()) : (date3
+			.getHours());
+	var sec = (date3.getSeconds() < 10) ? "0" + (date3.getSeconds()) : (date3
+			.getSeconds());
+	var date4 = month + '-' + day + '-' + date3.getFullYear() + " " + hours
+			+ ":" + minutes + ":" + sec + "." + date3.getMilliseconds();
 	return date4;
 }
 
+/**
+ * Find first day of the week (Monday)
+ * 
+ * @param week
+ *            number
+ * @param year
+ *            number
+ * 
+ * @returns date
+ * 
+ */
+function getDateFromWeekAndYear(year, weekNumber) {
+	var jan10 = new Date(year, 0, 10, 12, 0, 0);
+	var jan4 = new Date(year, 0, 4, 12, 0, 0);
+	var mon1 = jan4.getTime() - jan10.getDay() * 86400000;
+	var date = new Date(mon1 + ((weekNumber - 1) * 7 + 0) * 86400000);
+	date = date.toString("MMM d, yyyy");
+	return date;
+}

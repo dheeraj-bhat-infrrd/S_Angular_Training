@@ -749,50 +749,6 @@ function paintSurveyGraph() {
 	var completedSurveys = [];
 	var index = 0;
 
-	$.each(graphData.clicked, function(key, value) {
-		allTimeslots[index] = key;
-		clickedSurveys[index] = value;
-		index++;
-	});
-	
-	index = 0;
-	if (timeslots.length > allTimeslots.length) {
-		allTimeslots = timeslots;
-		timeslots = [];
-	}
-	$.each(graphData.sent, function(key, value) {
-		timeslots[index] = key;
-		sentSurveys[index] = value;
-		index++;
-	});
-	
-	index = 0;
-	if (timeslots.length > allTimeslots.length) {
-		allTimeslots = timeslots;
-		timeslots = [];
-	}
-	$.each(graphData.complete, function(key, value) {
-		timeslots[index] = key;
-		completedSurveys[index] = value;
-		index++;
-	});
-	
-	index = 0;
-	if (timeslots.length > allTimeslots.length) {
-		allTimeslots = timeslots;
-		timeslots = [];
-	}
-	$.each(graphData.socialposts, function(key, value) {
-		timeslots[index] = key;
-		socialPosts[index] = value;
-		index++;
-	});
-	
-	if (timeslots.length > allTimeslots.length) {
-		allTimeslots = timeslots;
-		timeslots = [];
-	}
-	
 	var element = document.getElementById("dsh-grph-format");
 	if(element == null){
 		return;
@@ -809,15 +765,27 @@ function paintSurveyGraph() {
 	} else if (format == '365') {
 		type = 'Month';
 	}
-
-	if (format != '365') {
-		allTimeslots.reverse();
-		clickedSurveys.reverse();
-		sentSurveys.reverse();
-		completedSurveys.reverse();
-		socialPosts.reverse();
-	}
 	
+	var keys = getKeysFromGraphFormat(format);
+	
+	
+	for (var i = 0; i < keys.length; i++) {
+		if(format == '365') {
+			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);	
+		} else {
+			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
+		}
+		if(graphData != undefined) {
+			if(graphData.clicked != undefined)
+				clickedSurveys[i] = graphData.clicked[keys[i]] || 0;
+			if(graphData.sent != undefined)
+				sentSurveys[i] = graphData.sent[keys[i]] || 0;
+			if(graphData.complete != undefined)
+				completedSurveys[i] = graphData.complete[keys[i]] || 0;
+			if(graphData.socialposts != undefined)
+				socialPosts[i] = graphData.socialposts[keys[i]] || 0;
+		}
+	}
 	var internalData = [];
 	var nestedInternalData = [];
 	nestedInternalData.push(type, 'No. of surveys sent',
@@ -874,6 +842,48 @@ function paintSurveyGraph() {
 
 	var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 	chart.draw(data, options);
+}
+
+function convertYearWeekKeyToDate(key) {
+	var year = parseInt(key.substr(0, 4));
+	var weekNumber = key.substr(4);
+	return getDateFromWeekAndYear(year, parseInt(weekNumber) + 1);
+}
+
+function convertYearMonthKeyToDate(key) {
+	var year = parseInt(key.substr(0, 4));
+	var monthNumber = parseInt(key.substr(4)) - 1;
+	return Date.today().set({
+		day : 1,
+		month : monthNumber,
+		year : year
+	}).toString("MMM d, yyyy");
+}
+
+function getKeysFromGraphFormat(format) {
+	var firstDate = Date.today().add({days:-parseInt(format)});
+	var keys = [];
+	if(format == '365') {
+		var key = firstDate.getFullYear().toString() + (firstDate.getMonth()+1).toString();
+		keys.push(key);
+		for (var i=1; i<12; i++){
+			var date = Date.today().add({days:-parseInt(format)}).addMonths(i);
+			keys.push(date.getFullYear().toString() + (date.getMonth()+1).toString());
+		}
+		
+	} else {
+		var count = parseInt(parseInt(format) / 7);
+		if(parseInt(format) % 7 != 0) {
+			count += 1;
+		}
+		var key = firstDate.getFullYear().toString() + (firstDate.getWeek() - 1).toString();
+		keys.push(key);
+		for (var i=1; i<count; i++){
+			var date = firstDate.add({days:7});
+			keys.push(date.getFullYear().toString() + (date.getWeek() - 1).toString());
+		}
+	}
+	return keys;
 }
 
 //Being called from dashboard.jsp on key up event.
@@ -5474,7 +5484,7 @@ function showMasterQuestionPage(){
 			}
 		}
 		
-		if ($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
+		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			if(isAbusive == false){
 				postToSocialMedia(feedback , isAbusive);
 			}
@@ -9401,6 +9411,7 @@ $(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
 function getRelevantEntities(){
 	//Remove pre-existing options
 	$('#select-entity-id').val("");
+	$("#selected-entity-id-hidden").val("");
 	$("#entity-selection-panel").show();
 	//Get the entity type
 	var entityType = $("#select-hierarchy-level").val();
@@ -9434,6 +9445,7 @@ function getRelevantEntities(){
 			        $('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
 				return $('<li>').append(item.label).appendTo(ul);
 		  	};
 		  	$("#select-entity-id").off('focus');
@@ -9472,6 +9484,7 @@ function getRelevantEntities(){
 			        $('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
 				return $("<li>").append(item.label).appendTo(ul);
 		  	};
 		  	$("#select-entity-id").off('focus');
@@ -9512,6 +9525,7 @@ function getRelevantEntities(){
 			        $('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
 				return $("<li>").append(item.label).appendTo(ul);
 		  	};
 		  	$("#select-entity-id").off('focus');
