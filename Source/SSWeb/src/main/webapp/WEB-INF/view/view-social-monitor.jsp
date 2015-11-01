@@ -30,16 +30,15 @@
 		<div class="v-um-header">
 			<div id="search-panel" class="float-left">
 				<div id="hierarchy-selection-panel" class="float-left clearfix">
-					<select id="select-hierarchy-level" class="float-left dash-sel-item">
-						<option value="companyId" data-entity="user"><spring:message code="label.company.key" /></option>
+ 					<select id="select-hierarchy-level" class="float-left dash-sel-item">
+						<option value="companyId" data-entity="company"><spring:message code="label.company.key" /></option>
 						<option value="userId" data-entity="user"><spring:message code="label.user.key" /></option>
-						<option value="branchId" data-entity="branch"><spring:message code="label.office.key" /></option>
+						<option value="branchId" data-entity="office"><spring:message code="label.office.key" /></option>
 						<option value="regionId" data-entity="region"><spring:message code="label.region.key" /></option>
 					</select>
 				</div>
 				<div id="entity-selection-panel" class="float-left clearfix">
-					<input id="select-entity-id" class="float-left dash-sel-item">
-					<ul id="autocomplete-ul"></ul>
+					<input id="select-entity-id" class="float-left dash-sel-item v-ed-txt-dd" placeholder="<spring:message code="label.starttyping.key" />">
 					<input type="hidden" name="entity-id" id="selected-entity-id-hidden"/>
 				</div>
 				<div class="v-um-hdr-right v-um-hdr-search float-left clearfix search-panel-item">
@@ -95,9 +94,13 @@
 			var entityType = $("#select-hierarchy-level").val();
 			var entityId;
 			entityId = $("#selected-entity-id-hidden").val();
-			if(entityType == undefined || entityId == undefined || entityId <= 0 || entityType == "companyId"){
+			if(entityType == undefined || entityType == "companyId"){
 				entityType = "companyId";
 				entityId = "${ entityId }";
+			} else if(entityId == undefined || entityId <= 0 ){
+				$('#overlay-toast').html("Please select a valid " + $("#select-hierarchy-level").find(':selected').data('entity'));
+				showToast();
+				return;
 			}
 			showSearchedPostsSolr(true, entityType, entityId, $("#post-search-query").val());
 		}

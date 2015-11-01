@@ -9411,6 +9411,7 @@ $(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
 function getRelevantEntities(){
 	//Remove pre-existing options
 	$('#select-entity-id').val("");
+	$("#selected-entity-id-hidden").val("");
 	$("#entity-selection-panel").show();
 	//Get the entity type
 	var entityType = $("#select-hierarchy-level").val();
@@ -9444,6 +9445,7 @@ function getRelevantEntities(){
 			        $('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
 				return $('<li>').append(item.label).appendTo(ul);
 		  	};
 		  	$("#select-entity-id").off('focus');
@@ -9482,6 +9484,7 @@ function getRelevantEntities(){
 			        $('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
 				return $("<li>").append(item.label).appendTo(ul);
 		  	};
 		  	$("#select-entity-id").off('focus');
@@ -9522,6 +9525,7 @@ function getRelevantEntities(){
 			        $('.ui-helper-hidden-accessible').remove();
 				}
 			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
 				return $("<li>").append(item.label).appendTo(ul);
 		  	};
 		  	$("#select-entity-id").off('focus');
