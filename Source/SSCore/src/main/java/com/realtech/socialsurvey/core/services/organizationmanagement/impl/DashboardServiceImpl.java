@@ -112,6 +112,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
         }
     	long incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds);
+    	LOG.debug("Completed survey: "+completedSurveyCount);
+    	LOG.debug("Incomplete survey: "+incompleteSurveyCount);
     	return completedSurveyCount+incompleteSurveyCount;
     }
     
