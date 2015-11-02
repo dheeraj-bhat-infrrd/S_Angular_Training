@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -18,6 +19,8 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
@@ -40,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -71,6 +75,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
     @Value ( "${SOLR_USER_URL}")
     private String solrUserUrl;
 
+    @Value ( "${SOLR_SOCIAL_POST_URL}")
+    private String solrSocialPostUrl;
+    
     @Autowired
     private SolrSearchUtils solrSearchUtils;
 
@@ -401,6 +408,37 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     /**
+<<<<<<< HEAD
+     * Method to get solr input document from social post
+     * @param socialPost
+     * @return
+     */
+    private SolrInputDocument getSolrDocumentFromSocialPost( SocialPost socialPost )
+    {
+        LOG.debug( "Method getSolrDocumentFromSocialPost called for social post " + socialPost );
+
+        SolrInputDocument document = new SolrInputDocument();
+
+        document.addField( CommonConstants.ID_SOLR, socialPost.get_id() );
+        document.addField( CommonConstants.SOURCE_SOLR, socialPost.getSource() );
+        document.addField( CommonConstants.COMPANY_ID_SOLR, socialPost.getCompanyId() );
+        document.addField( CommonConstants.REGION_ID_SOLR, socialPost.getRegionId() );
+        document.addField( CommonConstants.BRANCH_ID_SOLR, socialPost.getBranchId() );
+        document.addField( CommonConstants.USER_ID_SOLR, socialPost.getAgentId() );
+        document.addField( CommonConstants.TIME_IN_MILLIS_SOLR, socialPost.getTimeInMillis() );
+        document.addField( CommonConstants.POST_ID_SOLR, socialPost.getPostId() );
+        document.addField( CommonConstants.POST_TEXT_SOLR, socialPost.getPostText() );
+        document.addField( CommonConstants.POSTED_BY_SOLR, socialPost.getPostedBy() );
+        document.addField( CommonConstants.POST_URL_SOLR, socialPost.getPostUrl() );
+
+        LOG.debug( "Method getSolrDocumentFromSocialPost finished for social post " + socialPost );
+        return document;
+    }
+
+
+    /**
+=======
+>>>>>>> upstream/devel
      * Method to get solr document from a region
      * 
      * @param region
@@ -522,6 +560,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
     }
 
 
+    /**
+     * Method to search for users given their first and/or last name
+     */
     @Override
     public SolrDocumentList searchUsersByFirstOrLastName( String patternFirst, String patternLast, int startIndex, int noOfRows )
         throws InvalidInputException, SolrException, MalformedURLException
@@ -608,6 +649,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
     }
 
 
+    /**
+     * Method to find the number of users in a given company
+     */
     @Override
     public long countUsersByCompany( long companyId, int startIndex, int noOfRows ) throws InvalidInputException,
         SolrException, MalformedURLException
@@ -669,6 +713,13 @@ public class SolrSearchServiceImpl implements SolrSearchService
     }
 
 
+    /**
+     * Method to generate a SolrInputDocument given a User object
+     * 
+     * @param user
+     * @param document
+     * @return
+     */
     private SolrInputDocument getSolrInputDocumentFromUser( User user, SolrInputDocument document )
     {
         if ( user.getLastName() != null && !( user.getLastName().equals( "" ) ) ) {
@@ -1167,6 +1218,70 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return regionsResult;
     }
 
+    /**
+     * Method to fetch social posts from solr given the entity
+     */
+    @Override
+    public SolrDocumentList fetchSocialPostsByEntity( String entityType, long entityId, int startIndex, int noOfRows )
+        throws InvalidInputException, SolrException, MalformedURLException
+    {
+        if ( entityId < 0 ) {
+            throw new InvalidInputException( "Pattern is null or empty while fetching social posts" );
+        }
+        LOG.info( "Method fetchSocialPostsByEntity() called for entity id : " + entityId + " and entity type : " + entityType );
+        SolrDocumentList results = null;
+        try {
+            SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
+            SolrQuery solrQuery = new SolrQuery();
+            solrQuery.setQuery( entityType + ":" + entityId );
+            solrQuery.setStart( startIndex );
+            solrQuery.setRows( noOfRows );
+            solrQuery.addSort( CommonConstants.TIME_IN_MILLIS_SOLR, ORDER.desc );
+
+            LOG.debug( "Querying solr for searching social posts" );
+            results = solrServer.query( solrQuery ).getResults();
+        } catch ( SolrServerException e ) {
+            LOG.error( "SolrServerException while fetching social posts" );
+            throw new SolrException( "Exception while fetching social posts. Reason : " + e.getMessage(), e );
+        }
+
+        LOG.info( "Method fetchSocialPostsByEntity() finished for entity id : " + entityId + " and entity type : " + entityType );
+        return results;
+    }
+
+
+    /**
+     * Method to search social posts based on the post text
+     */
+    @Override
+    public SolrDocumentList searchPostText( String entityType, long entityId, int startIndex, int noOfRows, String searchQuery )
+        throws InvalidInputException, SolrException, MalformedURLException
+    {
+        if ( entityId < 0 ) {
+            throw new InvalidInputException( "Pattern is null or empty while fetching social posts" );
+        }
+        LOG.info( "Method searchPostText() called for entity id : " + entityId + " and entity type : " + entityType );
+        SolrDocumentList results = null;
+        try {
+            SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
+            SolrQuery solrQuery = new SolrQuery();
+            solrQuery.setQuery( entityType + ":" + entityId + " AND " + CommonConstants.POST_TEXT_SOLR + ":" + "*"
+                + searchQuery + "*" );
+            solrQuery.setStart( startIndex );
+            solrQuery.setRows( noOfRows );
+            solrQuery.addSort( CommonConstants.TIME_IN_MILLIS_SOLR, ORDER.desc );
+            LOG.debug( "Solr Search Query : " + solrQuery.getQuery() );
+            LOG.debug( "Querying solr for searching social posts" );
+            results = solrServer.query( solrQuery ).getResults();
+            LOG.debug( "Number of matches found : " + results.getNumFound() );
+        } catch ( SolrServerException e ) {
+            LOG.error( "SolrServerException while fetching social posts" );
+            throw new SolrException( "Exception while fetching social posts. Reason : " + e.getMessage(), e );
+        }
+
+        LOG.info( "Method searchPostText() finished for entity id : " + entityId + " and entity type : " + entityType );
+        return results;
+    }
 
     @Override
     public String fetchBranchesByCompany( long companyId, int size ) throws InvalidInputException, SolrException,
@@ -1434,6 +1549,37 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method to add branches to solr finshed" );
     }
 
+    /**
+     * Method to index a list of social posts in Solr
+     */
+    @Override
+    public void addSocialPostsToSolr( List<SocialPost> socialPosts ) throws SolrException
+    {
+        LOG.info( "Method to add social posts to solr called" );
+        SolrServer solrServer;
+
+        try {
+            solrServer = new HttpSolrServer( solrSocialPostUrl );
+
+            List<SolrInputDocument> documents = new ArrayList<SolrInputDocument>();
+            SolrInputDocument document;
+
+            for ( SocialPost post : socialPosts ) {
+                document = getSolrDocumentFromSocialPost( post );
+                documents.add( document );
+            }
+            UpdateResponse response = solrServer.add( documents );
+            solrServer.commit();
+            LOG.debug( "response while adding social posts is : " + response );
+        } catch ( MalformedURLException e ) {
+            LOG.error( "Exception while adding social posts to solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while adding social posts to solr. Reason : " + e.getMessage(), e );
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Exception while adding social posts to solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while adding social posts to solr. Reason : " + e.getMessage(), e );
+        }
+        LOG.info( "Method to add social posts to solr finshed" );
+    }
 
     @Override
     public void addUsersToSolr( List<User> users ) throws SolrException
@@ -1837,6 +1983,68 @@ public class SolrSearchServiceImpl implements SolrSearchService
     }
 
 
+    /**
+     * Method to get a list of social posts given the Solr document.
+     */
+    @Override
+    public List<SocialPost> getSocialPostsFromSolrDocuments( SolrDocumentList documentList )
+    {
+        LOG.info( "Method getSocialPostsFromSolrDocuments() started" );
+        List<SocialPost> matchedSocialPosts = new ArrayList<SocialPost>();
+        for ( SolrDocument document : documentList ) {
+            SocialPost post = new SocialPost();
+            if ( document.get( CommonConstants.SOURCE_SOLR ) != null
+                && !( document.get( CommonConstants.SOURCE_SOLR ).toString().isEmpty() ) ) {
+                post.setSource( document.get( CommonConstants.SOURCE_SOLR ).toString() );
+            } else {
+                post.setSource( "" );
+            }
+            if ( document.get( CommonConstants.COMPANY_ID_SOLR ) != null
+                && !( document.get( CommonConstants.COMPANY_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setCompanyId( Long.parseLong( document.get( CommonConstants.COMPANY_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.REGION_ID_SOLR ) != null
+                && !( document.get( CommonConstants.REGION_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.BRANCH_ID_SOLR ) != null
+                && !( document.get( CommonConstants.BRANCH_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.USER_ID_SOLR ) != null
+                && !( document.get( CommonConstants.USER_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setAgentId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ) != null
+                && !( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ).toString().isEmpty() ) ) {
+                post.setTimeInMillis( Long.parseLong( document.get( CommonConstants.TIME_IN_MILLIS_SOLR ).toString() ) );
+            }
+            if ( document.get( CommonConstants.POST_ID_SOLR ) != null
+                && !( document.get( CommonConstants.POST_ID_SOLR ).toString().isEmpty() ) ) {
+                post.setPostId( document.get( CommonConstants.POST_ID_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.POST_TEXT_SOLR ) != null
+                && !( document.get( CommonConstants.POST_TEXT_SOLR ).toString().isEmpty() ) ) {
+                post.setPostText( document.get( CommonConstants.POST_TEXT_SOLR ).toString() );
+            }
+
+            if ( document.get( CommonConstants.POST_URL_SOLR ) != null ) {
+                post.setPostUrl( document.get( CommonConstants.POST_URL_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.POSTED_BY_SOLR ) != null
+                && !( document.get( CommonConstants.POSTED_BY_SOLR ).toString().isEmpty() ) ) {
+                post.setPostedBy( document.get( CommonConstants.POSTED_BY_SOLR ).toString() );
+            }
+            if ( document.get( CommonConstants.ID_SOLR ) != null
+                && !( document.get( CommonConstants.ID_SOLR ).toString().isEmpty() ) ) {
+                post.set_id( document.get( CommonConstants.ID_SOLR ).toString() );
+            }
+            matchedSocialPosts.add( post );
+        }
+        LOG.info( "Method getSocialPostsFromSolrDocuments() finished" );
+        return matchedSocialPosts;
+    }
+
     @SuppressWarnings ( "unchecked")
     public Collection<UserFromSearch> getUsersFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException
     {
@@ -1876,5 +2084,43 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
 
         return matchedUsers.values();
+    }
+    
+
+    /**
+     * Method to get last build time for social posts in Solr(Social Monitor)
+     * @return
+     * @throws SolrException 
+     * @throws SolrServerException 
+     */
+    @Override
+    public Date getLastBuildTimeForSocialPosts() throws SolrException
+    {
+        LOG.info( "Method getLastBuildTimeForSocialPosts() started" );
+        LukeResponse response = null;
+        Date lastBuildTime = null;
+        //Luke request handler gives the last commitTimeMSec
+        SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
+        LukeRequest luke = new LukeRequest();
+        luke.setShowSchema( false );
+        try {
+            response = luke.process( solrServer );
+            if ( response != null ) {
+                //Get the lastModified field from the luke response
+                lastBuildTime = (Date) response.getIndexInfo().get( CommonConstants.LUKE_LAST_MODIFIED );
+                if ( lastBuildTime != null ) {
+                    LOG.debug( "Last Build Time : " + lastBuildTime );
+                } else {
+                    throw new SolrException( "The lastModified field is empty" );
+                }
+            } else {
+                throw new SolrException( "The response is empty" );
+            }
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Error getting response from LukeRequest" );
+            throw new SolrException( "Error getting response from LukeRequest" );
+        }
+        LOG.info( "Method getLastBuildTimeForSocialPosts() finished" );
+        return lastBuildTime;
     }
 }

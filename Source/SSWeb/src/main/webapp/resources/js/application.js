@@ -109,7 +109,8 @@ var companyLogo;
 //Verticals master
 var verticalsMasterList;
 
-
+//Variables for social monitor
+var autocompleteData;
 /**
  * js functions for landing page
  */
@@ -9128,6 +9129,134 @@ function getImageandCaptionProfile(loop) {
 
 }
 
+function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
+	if(fromstart){
+		proPostStartIndex = 0;
+	}
+	var payload = {
+			"entityType" : entityType,
+			"entityId" : entityId,
+			"batchSize" : proPostBatchSize,
+			"startIndex" : proPostStartIndex,
+			"searchQuery" : searchQuery
+		};
+	callAjaxGetWithPayloadData("./searchSocialPosts.do", function(response) {
+		var data = $.parseJSON(response);
+		if (fromstart) {
+			proPostStartIndex = 0;
+			proPostCount = data.count + 1;
+		}
+		paintPostsSolr(data, entityType, entityId, searchQuery);
+		proPostStartIndex += proPostBatchSize;
+	}, payload, true);
+}
+
+function paintPostsSolr(data, entityType, entityId, searchQuery) {
+	var posts = data.socialMonitorPosts;
+	var profilePics = data.profileImageUrlDataList;
+	var divToPopulate = "";
+	var profImgClass = "sm-default-img";
+	var profImgStyle = "";
+	$.each(posts, function(i, post) {
+		var iconClass = "";
+		var href="javascript:void(0)";
+		if(post.source == "google"){
+			iconClass = "icn-gplus";
+		}
+		else if(post.source == "SocialSurvey")
+			iconClass = "icn-ss";
+		else if(post.source == "facebook"){
+			iconClass = "icn-fb";
+			href="http://www.facebook.com/"+post.postId;
+		}
+		else if(post.source == "twitter"){
+			iconClass = "icn-twit";
+			var res = post.postText.split("http");
+			href="http"+res[1];
+		}
+		else if(post.source == "linkedin"){
+			iconClass = "icn-lin";
+		}
+		if(typeof post.postUrl!=  "undefined" ){
+			 href= post.postUrl;
+		}
+		var profileImg = "";
+		$.each(profilePics,  function(i, pic){
+			if(post.companyId > 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
+				profileImg = pic.profileImageUrl;
+			}
+		});
+		if(profileImg != ""){
+			profImgClass = "sm-custom-img";
+			profImgStyle = 'style="background:url(' + profileImg + ') no-repeat center; background-size: 50px;"';
+		}
+		
+		var hrefComplet='<a href='+href+' target="_blank">';
+		divToPopulate += '<div class="tweet-panel-item bord-bot-dc sm-tweet-item clearfix">';
+		var profName = "";
+		if (post.companyName != undefined && post.companyName != "") {
+			profName = post.companyName;
+		}
+		if (post.regionName != undefined && post.regionName != "") {
+			profName = post.regionName;
+		}
+		if (post.branchName != undefined && post.branchName != "") {
+			profName = post.branchName;
+		}
+		if (post.agentName != undefined && post.agentName != "") {
+			profName = post.agentName;
+		}
+		divToPopulate += '<div class="float-left ' + profImgClass + '" ' + profImgStyle + ' ></div>';
+		divToPopulate += '<div class="sm-prof-name">' + profName + '</div>'
+				+ '<div class="sm-post-row float-left">'
+				+ hrefComplet
+				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
+				+"</a>"
+				+ '<div class="tweet-txt float-left">'
+				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
+				+ '<div class="tweet-text-link"><em>' + post.postedBy
+				+ '</em></div>' + '<div class="tweet-text-time"><em>'
+				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
+		divToPopulate += '</div>';
+		
+		divToPopulate += '</div>';
+		divToPopulate += '</div>';
+		
+		
+	});
+	if (proPostStartIndex == 0){
+		$('#prof-posts').html(divToPopulate);
+		$('#prof-posts').perfectScrollbar({
+			suppressScrollX : true
+		});
+		$('#prof-posts').perfectScrollbar('update');
+	}
+	else{
+		$('#prof-posts').append(divToPopulate);
+		$('#prof-posts').perfectScrollbar('update');
+	}
+
+	$('#prof-posts').on('scroll',function(){
+		var scrollContainer = this;
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
+					- scrollContainer.clientHeight) {
+				if (proPostStartIndex < proPostCount)
+					showSearchedPostsSolr(false, entityType, entityId, searchQuery);
+		}
+	});
+}
+
+function setColDetails(currentProfileName, currentProfileValue){
+	colName = currentProfileName;
+	colValue = currentProfileValue;
+}
+
 //complaint registration event binding
 $(document).on('click','#comp-reg-form-submit',function(){
 	if(validateComplaintRegistraionForm()) {
@@ -9278,3 +9407,141 @@ $(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
 });
+
+function getRelevantEntities(){
+	//Remove pre-existing options
+	$('#select-entity-id').val("");
+	$("#selected-entity-id-hidden").val("");
+	$("#entity-selection-panel").show();
+	//Get the entity type
+	var entityType = $("#select-hierarchy-level").val();
+	//If branch
+	if (entityType == "branchId" ) {
+		callAjaxGET("/fetchbranches.do", function(data) {
+			var branchList = [];
+			if(data != undefined && data != "")
+			branchList = $.parseJSON(data);
+			var searchData = [];
+			for(var i=0,j=0; i<branchList.length; i++) {
+				if(branchList[i].isDefaultBySystem == 0) {
+					searchData[j] = {};
+					searchData[j].label = branchList[i].branchName;
+					searchData[j].branchId = branchList[i].branchId;
+					j++;
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.branchId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
+				return $('<li>').append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        });
+			
+		},true);
+	} else if (entityType == "regionId") {
+		callAjaxGET("/fetchregions.do", function(data) {
+			var regionList = [];
+			if(data != undefined && data != "")
+				regionList = $.parseJSON(data);
+			autocompleteData = data;
+			var searchData = [];
+			for(var i=0, j=0; i<regionList.length; i++) {
+				if(regionList[i].isDefaultBySystem == 0) {
+					searchData[j] = {};
+					searchData[j].label = regionList[i].regionName;
+					searchData[j].regionId = regionList[i].regionId;
+					j++;				
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.regionId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
+				return $("<li>").append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        }); 
+			
+		}, true);
+	} else if (entityType == "userId") {
+		callAjaxGET("/fetchusers.do", function(data) {
+			var userList = [];
+			if(data != undefined && data != "")
+				userList = $.parseJSON(data);
+			autocompleteData = data;
+			var searchData = [];
+			for(var i=0, j=0; i<userList.length; i++) {
+				if(userList[i].isOwner == 0) {
+					searchData[j] = {};
+					searchData[j].label = userList[i].firstName;
+					if(userList[i].lastName != undefined)
+						searchData[j].label += " " + userList[i].lastName;
+					searchData[j].userId = userList[i].userId;
+					j++;				
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.userId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
+				return $("<li>").append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        }); 
+			
+		}, true);
+	} else if (entityType == "companyId") {
+		$("#entity-selection-panel").hide();
+	}
+}
+
+$(document).keyup("#post-search-query", function(e) {
+    if(e.which == 13) {
+    	postsSearch();
+    }
+});
+

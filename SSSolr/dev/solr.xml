@@ -4,5 +4,6 @@
 		<core default="true" instanceDir="ss-regions" name="ss-regions"/>
 		<core default="false" instanceDir="ss-branches" name="ss-branches"/>
 		<core default="false" instanceDir="ss-users" name="ss-users"/>
+		<core default="false" instanceDir="ss-socialposts" name="ss-socialposts"/>
 	</cores>
 </solr>

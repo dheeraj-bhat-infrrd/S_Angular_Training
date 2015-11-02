@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -38,12 +40,15 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 
@@ -70,7 +75,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
-    
+
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
+
     @Autowired
     private UserProfileDao userProfileDao;
 
@@ -403,12 +411,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         return workbook;
     }
 
-
     /*
      * Method to create excel file for Social posts.
      */
     @Override
-    public XSSFWorkbook downloadSocialMonitorData( List<SurveyDetails> surveyDetails, String fileName )
+    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName )
     {
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -421,34 +428,65 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         Integer counter = 1;
 
         // Sorting SurveyResults
-        Collections.sort( surveyDetails, new SurveyResultsComparator() );
+        Collections.sort( socialPosts, new SocialPostsComparator() );
 
         // This data needs to be written (List<Object>)
         Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> surveyDetailsToPopulate = new ArrayList<>();
-        for ( SurveyDetails survey : surveyDetails ) {
-            if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
-                surveyDetailsToPopulate.add( survey.getReview() );
-                surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getModifiedOn() ) );
-                surveyDetailsToPopulate.add( StringUtils.join( survey.getSharedOn(), "," ) );
+        List<Object> socialPostsToPopulate = new ArrayList<>();
+        for ( SocialPost post : socialPosts ) {
+            if ( post.getSource() != null && !post.getSource().isEmpty() ) {
+                socialPostsToPopulate.add( post.getPostText() );
+                socialPostsToPopulate.add( DATE_FORMATTER.format( new Date( post.getTimeInMillis() ) ) );
+                socialPostsToPopulate.add( post.getSource() );
+                try {
+                    if ( post.getAgentId() > 0 ) {
+                        socialPostsToPopulate.add( "user" );
 
-                String agentName = survey.getAgentName();
-                surveyDetailsToPopulate.add( agentName.substring( 0, agentName.lastIndexOf( ' ' ) ) );
-                surveyDetailsToPopulate.add( agentName.substring( agentName.lastIndexOf( ' ' ) + 1 ) );
+                        socialPostsToPopulate.add( organizationManagementService.getAgentSettings( post.getAgentId() )
+                            .getProfileName() );
 
-                data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
-                surveyDetailsToPopulate = new ArrayList<>();
+                    } else if ( post.getBranchId() > 0 ) {
+                        socialPostsToPopulate.add( "branch" );
+                        socialPostsToPopulate.add( organizationManagementService.getBranchSettingsDefault( post.getBranchId() )
+                            .getProfileName() );
+                    } else if ( post.getRegionId() > 0 ) {
+                        socialPostsToPopulate.add( "region" );
+                        socialPostsToPopulate.add( organizationManagementService.getRegionSettings( post.getRegionId() )
+                            .getProfileName() );
+                    } else if ( post.getCompanyId() > 0 ) {
+                        socialPostsToPopulate.add( "company" );
+                        socialPostsToPopulate.add( organizationManagementService.getCompanySettings( post.getCompanyId() )
+                            .getProfileName() );
+                    } else {
+                        socialPostsToPopulate.add( "unavailable" );
+                        socialPostsToPopulate.add( "unavailable" );
+                    }
+                    socialPostsToPopulate.add( post.getPostedBy() );
+                    socialPostsToPopulate.add( post.getPostUrl() );
+                } catch ( InvalidInputException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch ( NoRecordsFetchedException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                data.put( ( ++counter ).toString(), socialPostsToPopulate );
+                socialPostsToPopulate = new ArrayList<>();
             }
         }
 
         // Setting up headers
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_POST_COMMENT );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_POST_DATE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_POST_SOURCE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_AGENT_FIRST_NAME );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_AGENT_LAST_NAME );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_COMMENT );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_DATE );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_SOURCE );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_LEVEL );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_LEVEL_NAME );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POSTED_BY );
+        socialPostsToPopulate.add( CommonConstants.HEADER_POST_URL );
 
-        data.put( "1", surveyDetailsToPopulate );
+
+        data.put( "1", socialPostsToPopulate );
 
         // Iterate over data and write to sheet
         Set<String> keyset = data.keySet();
@@ -474,7 +512,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         return workbook;
     }
 
-
+    
     /*
      * Method to create excel file from all the completed survey data.
      */

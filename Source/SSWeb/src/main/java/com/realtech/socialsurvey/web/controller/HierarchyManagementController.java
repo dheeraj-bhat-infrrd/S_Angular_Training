@@ -1401,7 +1401,46 @@ public class HierarchyManagementController {
 		LOG.info("Method to search branches completed successfully.");
 		return searchBranchJson;
 	}
-	
+
+
+    /**
+     * Method to fetch all the users in a company
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/fetchusers", method = RequestMethod.GET)
+    public String fetchUsers( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to search users called in controller" );
+        User user = sessionHelper.getCurrentUser();
+        String searchUserJson = "";
+        HttpSession session = request.getSession( false );
+        try {
+            int highestRole = (int) session.getAttribute( CommonConstants.HIGHEST_ROLE_ID_IN_SESSION );
+            //Get all users in the company only if the highest role is company admin
+            try {
+                if ( highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                    searchUserJson = organizationManagementService.getAllUsersUnderCompanyFromSolr( user.getCompany() );
+                }
+            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                LOG.error( "Exception occured while getting userIds for user.Reason:" + e.getMessage() );
+                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            //TODO : Add for region and branch selective fetch
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while searching users. Reason : " + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+        }
+
+        LOG.info( "Method to search users completed successfully." );
+        return searchUserJson;
+    }
+
+
 	/**
 	 * Method to fetch a region details based on id
 	 * 
