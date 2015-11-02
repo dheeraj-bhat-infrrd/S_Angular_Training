@@ -581,7 +581,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
                 surveyDetailsToPopulate.add( survey.getMood() );
                 surveyDetailsToPopulate.add( survey.getReview() );
-                if(survey.getMood().equals(CommonConstants.SURVEY_MOOD_GREAT) && survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty()){
+                if(survey.getMood()!= null && survey.getMood().equals(CommonConstants.SURVEY_MOOD_GREAT) && survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty()){
                 	String status = survey.getAgreedToShare();
                     if ( status.equals( "true" ) ) {
                         surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
