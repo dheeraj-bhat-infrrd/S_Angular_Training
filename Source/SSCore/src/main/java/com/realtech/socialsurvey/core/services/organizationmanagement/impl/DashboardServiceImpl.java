@@ -82,35 +82,62 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Autowired
     private UserProfileDao userProfileDao;
 
-
-
+    @Transactional
     @Override
-    public long getAllSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays )
-    {
-        LOG.info( "Sent Survey Count for columnName: " + columnName + ", columnValue: " + columnValue );
-        long noOfPreInitiatedSurveys = surveyDetailsDao.noOfPreInitiatedSurveys( columnName, columnValue, null, null );
-        return noOfPreInitiatedSurveys + surveyDetailsDao.getSentSurveyCount( columnName, columnValue, numberOfDays );
+    public long getAllSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException{
+    	LOG.info("Get all survey count for "+columnName+" and value "+columnValue+" with number of days: "+numberOfDays);
+    	Timestamp endDate = new Timestamp(System.currentTimeMillis());
+    	Calendar startTime =  Calendar.getInstance();
+    	startTime.add(Calendar.DATE, -1*numberOfDays);
+        // strip the time component of start time
+        startTime.set(Calendar.HOUR_OF_DAY, 0);
+        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.SECOND, 0);
+        startTime.set(Calendar.MILLISECOND, 0);
+        Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
+    	long completedSurveyCount = getCompletedSurveyCount(columnName, columnValue, startDate, endDate);
+    	// TODO: remove hard coding
+        long companyId = -1;
+        long agentId = -1;
+        Set<Long> agentIds = null;
+        if(columnName.equals("companyId")){
+        	// agent list will be null
+        	companyId = columnValue;
+        }else if(columnName.equals("agentId")){
+        	// agent list will have one element, the agent id
+        	agentId = columnValue;
+        }else if(columnName.equals("regionId")){
+        	agentIds = userProfileDao.findUserIdsByRegion(columnValue);
+        }else if(columnName.equals("branchId")){
+        	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
+        }
+    	long incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds);
+    	return completedSurveyCount+incompleteSurveyCount;
     }
-
-
+    
     @Override
-    public long getCompletedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays )
-    {
-        return surveyDetailsDao.getCompletedSurveyCount( columnName, columnValue, numberOfDays );
+    public long getCompleteSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException{
+    	LOG.info("Get completed survey count for "+columnName+" and value "+columnValue+" with number of days: "+numberOfDays);
+    	Timestamp endDate = new Timestamp(System.currentTimeMillis());
+    	Calendar startTime =  Calendar.getInstance();
+    	startTime.add(Calendar.DATE, -1*numberOfDays);
+        // strip the time component of start time
+        startTime.set(Calendar.HOUR_OF_DAY, 0);
+        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.SECOND, 0);
+        startTime.set(Calendar.MILLISECOND, 0);
+        Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
+    	return getCompletedSurveyCount(columnName, columnValue, startDate, endDate);
     }
-
-
+    
+    private long getCompletedSurveyCount(String columnName, long columnValue, Timestamp startDate, Timestamp endDate) throws InvalidInputException{
+    	return surveyDetailsDao.getCompletedSurveyCount(columnName, columnValue, startDate, endDate);
+    }
+    
     @Override
     public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays )
     {
         return surveyDetailsDao.getClickedSurveyCount( columnName, columnValue, numberOfDays );
-    }
-
-
-    @Override
-    public long getSocialPostsForPastNdays( String columnName, long columnValue, int numberOfDays )
-    {
-        return surveyDetailsDao.getSocialPostsCount( columnName, columnValue, numberOfDays );
     }
 
 
@@ -222,7 +249,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     {
     	LOG.info("Getting survey details for graph for "+columnName+" with value "+columnValue+" for number of days "+numberOfDays+". Reatech admin flag: "+realtechAdmin);
         String criteria = "";
-        Calendar currentTime = Calendar.getInstance();
         Calendar startTime = Calendar.getInstance();
         switch ( numberOfDays ) {
             case 30:
@@ -249,7 +275,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         startTime.set(Calendar.MILLISECOND, 0);
         
         Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
-        Timestamp endDate = new Timestamp(currentTime.getTimeInMillis());
+        Timestamp endDate = new Timestamp(System.currentTimeMillis());
         LOG.debug("Getting sent surveys aggregation");
         Map<Integer, Integer> completedSurveys = surveyDetailsDao.getCompletedSurveyAggregationCount(columnName, columnValue, startDate, endDate, criteria);
         // Since the values will be modified while aggregating total surveys, copying the value to another map
@@ -273,7 +299,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }else if(columnName.equals("branchId")){
         	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
         }
-        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, new Timestamp(startTime.getTimeInMillis()), new Timestamp(currentTime.getTimeInMillis()), agentIds, criteria);
+        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds, criteria);
         LOG.debug("Aggregating completed and incomplete surveys");
         Map<Integer, Integer> allSurveysSent = aggregateAllSurveysSent(incompleteSurveys, completedSurveyToBeProcessed);
         
@@ -690,5 +716,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         return workbook;
     }
+
 }
 // JIRA SS-137 BY RM05:EOC
