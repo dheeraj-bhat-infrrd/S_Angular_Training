@@ -7806,3 +7806,6 @@ label.url-change-input-label {
 .ui-hdr-agent-dropdown li {
 	word-break: break-all !important;
 }
+.v-sm-container {
+	min-height: 400px;
+}

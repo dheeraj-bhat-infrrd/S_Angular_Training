@@ -26,7 +26,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="container v-um-container">
+	<div class="container v-sm-container">
 		<div class="v-um-header">
 			<div id="search-panel" class="float-left">
 				<div id="hierarchy-selection-panel" class="float-left clearfix">
@@ -105,7 +105,7 @@
 			entityId = $("#selected-entity-id-hidden").val();
 			if(entityType == undefined || entityType == "companyId"){
 				entityType = "companyId";
-				entityId = "${ entityId }";
+				entityId = "${ user.company.companyId }";
 			} else if(entityId == undefined || entityId <= 0 ){
 				$('#overlay-toast').html("Please select a valid " + $("#select-hierarchy-level").find(':selected').data('entity'));
 				showToast();
