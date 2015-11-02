@@ -343,7 +343,7 @@
 	<bean id="socialpostimportcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialpostsimportjobdetail" />
-		<property name="cronExpression" value="0 0 0/2 1/1 * ? *" />
+		<property name="cronExpression" value="0 0/15 * * * ?" />
 	</bean>
 
 	<!-- setting cron for email reader -->
@@ -435,7 +435,7 @@
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
-				<!-- <ref bean="socialpostsimportjobdetail" />  -->
+				<!-- <ref bean="socialpostsimportjobdetail" /> -->
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="crmdataagentidmapperjobdetail" />
@@ -458,7 +458,7 @@
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
-				<!-- <ref bean="socialpostimportcron" />  -->
+				<!-- <ref bean="socialpostimportcron" /> -->
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
