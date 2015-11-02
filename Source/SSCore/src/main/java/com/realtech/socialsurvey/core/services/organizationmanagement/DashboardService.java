@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -20,15 +22,30 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
  */
 public interface DashboardService
 {
-    public long getAllSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays);
+	/**
+	 * Gets all survey count
+	 * @param columnName
+	 * @param columnValue
+	 * @param numberOfDays
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getAllSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException;
+	
+	/**
+	 * Gets completed survey count
+	 * @param columnName
+	 * @param columnValue
+	 * @param numberOfDays
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getCompleteSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException;
+	
+    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays );
 
-    public long getCompletedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays);
 
-    public long getClickedSurveyCountForPastNdays(String columnName, long columnValue, int numberOfDays);
-
-    public long getSocialPostsForPastNdays(String columnName, long columnValue, int numberOfDays);
-
-    public double getSurveyScore(String columnName, long columnValue, int numberOfDays, boolean realtechAdmin);
+    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin );
 
 
     public int getProfileCompletionPercentage( User user, String columnName, long columnValue,
@@ -46,6 +63,9 @@ public interface DashboardService
         throws IOException;
 
 
+    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName );
+
+
     public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileName )
         throws IOException;
 
@@ -53,8 +73,6 @@ public interface DashboardService
     public XSSFWorkbook downloadAgentRankingData( List<AgentRankingReport> agentDetails, String fileLocation )
         throws IOException;
 
-
-    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName );
 
     public long getSocialPostsForPastNdaysWithHierarchy( String coumnName, long columnValue, int numberOfDays );
 }
