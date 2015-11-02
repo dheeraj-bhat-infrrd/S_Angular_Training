@@ -741,12 +741,10 @@ function paintSurveyGraph() {
 	if (graphData == undefined)
 		return;
 	var allTimeslots = [];
-	var timeslots = [];
 	var clickedSurveys = [];
 	var sentSurveys = [];
 	var socialPosts = [];
 	var completedSurveys = [];
-	var index = 0;
 
 	var element = document.getElementById("dsh-grph-format");
 	if(element == null){
@@ -875,11 +873,11 @@ function getKeysFromGraphFormat(format) {
 		if(parseInt(format) % 7 != 0) {
 			count += 1;
 		}
-		var key = firstDate.getFullYear().toString() + (firstDate.getWeek() - 1).toString();
+		var key = firstDate.getFullYear().toString() + (firstDate.getWeek()).toString();
 		keys.push(key);
 		for (var i=1; i<count; i++){
 			var date = firstDate.add({days:7});
-			keys.push(date.getFullYear().toString() + (date.getWeek() - 1).toString());
+			keys.push(date.getFullYear().toString() + (date.getWeek()).toString());
 		}
 	}
 	return keys;

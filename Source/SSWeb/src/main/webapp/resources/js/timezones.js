@@ -87,7 +87,7 @@ function getDateFromWeekAndYear(year, weekNumber) {
 	var jan10 = new Date(year, 0, 10, 12, 0, 0);
 	var jan4 = new Date(year, 0, 4, 12, 0, 0);
 	var mon1 = jan4.getTime() - jan10.getDay() * 86400000;
-	var date = new Date(mon1 + ((weekNumber - 1) * 7 + 0) * 86400000);
+	var date = new Date(mon1 + ((weekNumber - 1) * 7 + 6) * 86400000);
 	date = date.toString("MMM d, yyyy");
 	return date;
 }
