@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +24,7 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.StateLookup;
@@ -1147,5 +1149,13 @@ public interface OrganizationManagementService
 
 
     public Boolean validateEmail( String emailId ) throws InvalidInputException;
+
+
+    String getAllUsersUnderCompanyFromSolr( Company company ) throws InvalidInputException, NoRecordsFetchedException,
+        SolrException;
+
+
+    List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
+        throws InvalidInputException;
 
 }

@@ -80,6 +80,7 @@ import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
@@ -4110,7 +4111,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         users = new Gson().fromJson( usersJson, searchedUsersList );
         return users;
     }
+    
 
+    /**
+     * Method to get all users under the company from solr
+     * 
+     * @param company
+     * @param start
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     */
+    @Override
+    @Transactional
+    public String getAllUsersUnderCompanyFromSolr( Company company ) throws InvalidInputException, NoRecordsFetchedException,
+        SolrException
+    {
+        if ( company == null ) {
+            throw new InvalidInputException( "company is null in getUsersUnderCompanyFromSolr" );
+        }
+        LOG.info( "Method getAllUsersUnderCompanyFromSolr called for company:" + company );
+        int usersCount = (int) solrSearchService.getUsersCountByIden( company.getCompanyId(), CommonConstants.COMPANY_ID_SOLR,
+            false );
+        Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden( company.getCompanyId(),
+            CommonConstants.COMPANY_ID_SOLR, false, 0, usersCount );
+        String usersJson = new Gson().toJson( usersResult );
+        LOG.debug( "Solr result returned for users of company is:" + usersJson );
+        return usersJson;
+    }
 
     @Override
     @Transactional
@@ -5171,5 +5200,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return organizationUnitSettingsList;
     }
 
+
+    /**
+     * Method to fetch profile image url for a list of entities
+     * 
+     * @param entityType
+     * @param entityList
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
+        throws InvalidInputException
+    {
+        LOG.info( "Method fetchProfileImageUrlsForEntityList() called" );
+        return organizationUnitSettingsDao.fetchProfileImageUrlsForEntityList( entityType, entityList );
+    }
 }
 // JIRA: SS-27: By RM05: EOC

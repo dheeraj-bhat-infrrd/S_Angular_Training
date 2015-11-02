@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -60,7 +63,7 @@ public interface DashboardService
         throws IOException;
 
 
-    public XSSFWorkbook downloadSocialMonitorData( List<SurveyDetails> surveyDetails, String fileName );
+    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName );
 
 
     public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileName )

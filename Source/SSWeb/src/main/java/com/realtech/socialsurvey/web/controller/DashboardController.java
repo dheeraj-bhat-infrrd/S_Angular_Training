@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
@@ -1483,7 +1484,7 @@ public class DashboardController
         LOG.info( "Method to get file containg Social Monitors list getSocialMonitorFile() started." );
         User user = sessionHelper.getCurrentUser();
         boolean realTechAdmin = user.isSuperAdmin();
-        List<SurveyDetails> surveyDetails = new ArrayList<>();
+        List<SocialPost> socialPosts = new ArrayList<>();
 
         try {
             String columnName = request.getParameter( "columnName" );
@@ -1541,11 +1542,11 @@ public class DashboardController
 
             try {
                 Date date = new Date();
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, true, startDate,
-                    endDate, null );
+                socialPosts = profileManagementService.getCumulativeSocialPosts( iden, columnName, -1, -1, profileLevel,
+                    startDate, endDate );
                 String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
                     + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( surveyDetails, fileName );
+                XSSFWorkbook workbook = dashboardService.downloadSocialMonitorData( socialPosts, fileName );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
                 String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
@@ -1578,7 +1579,7 @@ public class DashboardController
         LOG.info( "Method getSocialMonitorFile() finished." );
     }
 
-
+  
     /*
      * Method to download file containing incomplete surveys
      */

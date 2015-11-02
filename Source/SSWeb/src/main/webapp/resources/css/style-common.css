@@ -693,6 +693,12 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	/*    font-weight: bold !important;*/
 }
 
+.sm-header-row-left {
+	font-size: 16px;
+	line-height: 45px;
+	/*    font-weight: bold !important;*/
+}
+
 .padding-10 {
 	padding-top: 10px;
 }
@@ -1747,6 +1753,15 @@ button.paypal.is-active {
 
 .tweet-text-time {
 	font-size: 11px;
+}
+
+.sm-prof-name {
+	font-size: 15px;
+	line-height: 15px;
+	max-width : 120px;
+	float: left;
+	margin-left: 15px;
+	margin-top: 3%;
 }
 
 .tweet-panel-item,.posts-panel-item {
@@ -3159,6 +3174,10 @@ button.paypal.is-active {
 	width: 313px !important;
 }
 
+.autocomplete-sm {
+	width: 215px;
+}
+
 .ov-payment-container {
 	height: 100%;
 	overflow: auto;
@@ -4178,7 +4197,6 @@ img.prof-image {
 }
 
 .dash-btn-dl-sd-admin {
-	clear: both;
 	float: right;
 	margin-right: 10px;
 	color: #009FE0;
@@ -4187,6 +4205,23 @@ img.prof-image {
 	border: 1px solid #009FE0;
 	height: 32px;
 	width: 500px;
+	max-width: 90%;
+	max-width: calc(100% - 20px);
+	text-align: center;
+	font-size: 13px;
+	text-transform: initial;
+}
+
+.sm-btn-dl-sd-admin{
+	clear: both;
+	float: right;
+	margin-right: 10px;
+	color: #009FE0;
+	border-radius: 3px;
+	line-height: 32px;
+	border: 1px solid #009FE0;
+	height: 32px;
+	width: 360px;
 	max-width: 90%;
 	max-width: calc(100% - 20px);
 	text-align: center;
@@ -4703,6 +4738,30 @@ select.rfr_txt_fld,select.rfr_input_fld{
 .pers-default-img {
 	background: url(../images/place-holder-individual.png) no-repeat center;
 	background-size: 20px;
+}
+
+.sm-default-img {
+	clear: both;
+	background: url(../images/place-holder-individual.png) no-repeat center;
+	background-size: 32px;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	margin-top: 10px;
+}
+
+.sm-custom-img {
+	clear: both;
+	background-size: 50px;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	margin-top: 10px;
+}
+
+.sm-post-row {
+	padding-left: 35px;
+	margin-top: 18px;
 }
 
 .dsh-pers-default-img {
@@ -5502,6 +5561,11 @@ tr.u-tbl-header td {
 
 .v-um-tbl-wrapper {
 	margin-top: 15px;
+	padding: 0 10px;
+}
+
+.v-sm-tbl-wrapper {
+	margin-top: 75px;
 	padding: 0 10px;
 }
 
@@ -6339,6 +6403,12 @@ tr.u-tbl-header td {
 	padding-top: 10px;
 }
 
+.sm-tweet-item {
+	padding-left: 10px;
+	clear: none;
+	float: left;
+}
+
 .cs-gq-lbl {
 	font-size: 14px;
 	min-height: 40px;
@@ -7094,6 +7164,14 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
   height: 30px;
 }
 
+.sm-down-rep-button{
+  width: 40.5%;
+  float: right;
+  background-color: #009FE0;
+  color: white;
+  height: 30px;
+}
+
 .jcrop-img-upload {
 	max-width: 470px;
 	max-height: 470px;
@@ -7645,6 +7723,14 @@ label.url-change-input-label {
 	margin-top: 10px;
 }
 
+.sm-tweet-panel {
+	max-height: 700px;
+}
+
+.clear-none{
+	clear: none;
+}
+
 .complaint-cont {
 }
 
@@ -7701,6 +7787,18 @@ label.url-change-input-label {
 	line-height: 40px;
 }
 
+.search-panel-item {
+	margin-left: 10px;
+}
+
+.search-panel {
+	margin-bottom: 27px;
+}
+
 .compl-sq-smile-sad-text-disabled {
 	background: #333;
+}
+
+.social-monitor-autocomplete {
+	width: 215px !important;
 }
