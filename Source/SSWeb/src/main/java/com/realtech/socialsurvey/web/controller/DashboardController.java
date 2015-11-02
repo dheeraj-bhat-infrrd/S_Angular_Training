@@ -253,63 +253,61 @@ public class DashboardController
             } else if ( realtechAdminStr != null && !realtechAdminStr.isEmpty() ) {
                 realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
             }
+
+	        // calculating details for circles
+	        int numberOfDays = 30;
+	        try {
+	            if ( request.getParameter( "numberOfDays" ) != null ) {
+	                numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
+	            }
+	        } catch ( NumberFormatException e ) {
+	            LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
+	            throw e;
+	        }
+	
+	        if ( realtechAdmin ){
+	            columnName = null;
+	        }
+	        LOG.debug("Getting the survey score.");
+	        double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
+	            realtechAdmin ) * 1000.0 ) / 1000.0;
+	        LOG.debug("Getting the sent surveys count.");
+	        int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
+	        LOG.debug("Getting the social posts count with hierarchy.");
+	        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
+	            numberOfDays );
+	        int profileCompleteness = 0;
+	        if ( !realtechAdmin ){
+	        	LOG.debug("Getting profile completeness.");
+	            profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
+	        }
+	        model.addAttribute( "socialScore", surveyScore );
+	        if ( sentSurveyCount > 999 )
+	            model.addAttribute( "surveyCount", "1K+" );
+	        else
+	            model.addAttribute( "surveyCount", sentSurveyCount );
+	
+	        if ( socialPostsCount > 999 )
+	            model.addAttribute( "socialPosts", "1K+" );
+	        else
+	            model.addAttribute( "socialPosts", socialPostsCount );
+	
+	        model.addAttribute( "profileCompleteness", profileCompleteness );
+	        LOG.debug("Getting the badges.");
+	        model.addAttribute( "badges",
+	            dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
+	
+	        model.addAttribute( "columnName", columnName );
+	        model.addAttribute( "columnValue", columnValue );
+	
+	        LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
+	        return JspResolver.DASHBOARD_PROFILEDETAIL;
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
-
-        // calculating details for circles
-        int numberOfDays = 30;
-        try {
-            if ( request.getParameter( "numberOfDays" ) != null ) {
-                numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
-            }
-        } catch ( NumberFormatException e ) {
-            LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
-            throw e;
-        }
-
-        if ( realtechAdmin ){
-            columnName = null;
-        }
-        LOG.debug("Getting the survey score.");
-        double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
-            realtechAdmin ) * 1000.0 ) / 1000.0;
-        LOG.debug("Getting the sent surveys count.");
-        int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays );
-        LOG.debug("Getting the social posts count with hierarchy.");
-        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
-            numberOfDays );
-        LOG.debug("Getting the social posts count.");
-        socialPostsCount += (int) dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays );
-        int profileCompleteness = 0;
-        if ( !realtechAdmin ){
-        	LOG.debug("Getting profile completeness.");
-            profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
-        }
-        model.addAttribute( "socialScore", surveyScore );
-        if ( sentSurveyCount > 999 )
-            model.addAttribute( "surveyCount", "1K+" );
-        else
-            model.addAttribute( "surveyCount", sentSurveyCount );
-
-        if ( socialPostsCount > 999 )
-            model.addAttribute( "socialPosts", "1K+" );
-        else
-            model.addAttribute( "socialPosts", socialPostsCount );
-
-        model.addAttribute( "profileCompleteness", profileCompleteness );
-        LOG.debug("Getting the badges.");
-        model.addAttribute( "badges",
-            dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
-
-        model.addAttribute( "columnName", columnName );
-        model.addAttribute( "columnValue", columnValue );
-
-        LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
-        return JspResolver.DASHBOARD_PROFILEDETAIL;
     }
 
 
@@ -351,14 +349,16 @@ public class DashboardController
             throw e;
         }
 
-        model.addAttribute( "allSurveySent",
-            dashboardService.getAllSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model.addAttribute( "completedSurvey",
-            dashboardService.getCompletedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model.addAttribute( "clickedSurvey",
-            dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdays( columnName, columnValue, numberOfDays )
-            + dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
+        try{
+	        model.addAttribute( "allSurveySent", dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays ) );
+	        model.addAttribute( "completedSurvey", dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
+	        model.addAttribute( "clickedSurvey",
+	            dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
+	        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
+        }catch(InvalidInputException e){
+        	// TODO: implement
+        	LOG.error("Error: "+e.getMessage(), e);
+        }
 
         LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() finished" );
         return JspResolver.DASHBOARD_SURVEYSTATUS;

@@ -190,6 +190,76 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		query.executeUpdate();
 	}
 	
+	@Override
+	public long getIncompleteSurveyCount(long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate, Set<Long> agentIds){
+		LOG.info("getting incomplete survey count");
+		StringBuilder queryBuilder = new StringBuilder("SELECT COUNT(*) AS COUNT FROM SURVEY_PRE_INITIATION WHERE ");
+		boolean whereFlag = false; // used if where is
+		if(companyId > 0l){
+			queryBuilder.append(" COMPANY_ID = :companyId");
+			whereFlag = true;
+		}
+		if(whereFlag){
+			queryBuilder.append(" AND STATUS = :status");
+		}else{
+			queryBuilder.append(" STATUS = :status");
+			whereFlag = true;
+		}
+		if(startDate != null){
+			if(whereFlag){
+				queryBuilder.append(" AND CREATED_ON >= :startDate");
+			}else{
+				queryBuilder.append(" CREATED_ON >= :startDate");
+				whereFlag = true;
+			}
+		}
+		if(endDate != null){
+			if(whereFlag){
+				queryBuilder.append(" AND CREATED_ON <= :endDate");
+			}else{
+				queryBuilder.append(" CREATED_ON <= :endDate");
+				whereFlag = true;
+			}
+		}
+		if(agentId > 0l){
+			if(whereFlag){
+				queryBuilder.append(" AND AGENT_ID = :agentId");
+			}else{
+				queryBuilder.append(" AGENT_ID = :agentId");
+				whereFlag = true;
+			}
+		}else if(agentIds != null && agentIds.size() > 0){
+			if(whereFlag){
+				queryBuilder.append(" AND AGENT_ID IN (:agentIds)");
+			}else{
+				queryBuilder.append(" AGENT_ID IN (:agentIds)");
+				whereFlag = true;
+			}
+		}
+		Query query = null;
+		query = getSession().createSQLQuery(queryBuilder.toString());
+		if(companyId > 0l){
+			query.setParameter("companyId", companyId);
+		}
+		query.setParameter("status", status);
+		if(startDate != null){
+			query.setParameter("startDate", startDate);
+		}
+		if(endDate != null){
+			query.setParameter("endDate", endDate);
+		}
+		if(agentId > 0l){
+			query.setParameter("agentId", agentId);
+		}else if(agentIds != null && agentIds.size() > 0){
+			query.setParameterList("agentIds", agentIds);
+		}
+		List<BigInteger> results = query.list();
+		long count = 0l;
+		if(results != null && results.size() > 0){
+			count= results.get(0).longValue();
+		}
+		return count;
+	}
 	
 	@Override
 	public Map<Integer, Integer> getIncompletSurveyAggregationCount(long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate, Set<Long> agentIds, String aggregateBy) throws InvalidInputException{

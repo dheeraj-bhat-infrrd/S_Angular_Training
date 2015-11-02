@@ -40,6 +40,17 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 	public void deleteSurveysWithIds(Set<Long> incompleteSurveyIds);
 	
 	/**
+	 * Gets a count of incomplete sruvey
+	 * @param companyId
+	 * @param agentId
+	 * @param status
+	 * @param startDate
+	 * @param endDate
+	 * @param agentIds
+	 * @return
+	 */
+	public long getIncompleteSurveyCount(long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate, Set<Long> agentIds);
+	/**
 	 * Gets a aggregated result of incomplete surveys
 	 * @param companyId
 	 * @param agentId

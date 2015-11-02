@@ -242,31 +242,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
-    // JIRA SS-137 and 158 BY RM-05 : BOC
-
-    // -----Methods to get aggregated data from SURVEY_DETAILS collection starting-----
-
-    // This method returns all the surveys that have been sent to or started by customers so far.
-    // If columnName field is passed null value it returns count of all the survey.
-    // columnName field can contain either of "agentId/branchId/regionId/companyId".
-    // columnValue field can contain respective values for the columnName.
-
-    @Override
-    public long getSentSurveyCount( String columnName, long columnValue, int noOfDays )
-    {
-        LOG.info( "Method to get count of total number of surveys sent so far, getSentSurveyCount() started." );
-        Date startDate = getNdaysBackDate( noOfDays );
-
-        Query query = new Query();
-        if ( columnName != null ) {
-            query = new Query( Criteria.where( columnName ).is( columnValue ) );
-        }
-        query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
-        LOG.info( "Method to get count of total number of surveys sent so far, getSentSurveyCount() finished." );
-        return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
-    }
-
-
     // This method returns all the surveys that have been clicked by customers so far.
     // If columnName field is passed null value it returns count of all the survey.
     // "columnName" field can contain either of "agentId/branchId/regionId/companyId".
@@ -924,6 +899,35 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
     }
 
+    @Override
+    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate) throws InvalidInputException{
+    	LOG.info("Getting completed survey count for "+organizationUnitColumn+" with value "+organizationUnitColumnValue);
+    	if(organizationUnitColumn == null || organizationUnitColumn.isEmpty()){
+    		LOG.warn("organizationUnitColumn is empty");
+    		throw new InvalidInputException("organizationUnitColumn is empty");
+    	}
+    	if(organizationUnitColumnValue <= 0l){
+    		LOG.warn("organizationUnitColumnValue is invalid");
+    		throw new InvalidInputException("organizationUnitColumnValue is invalid");
+    	}
+    	Query query = new Query();
+    	query.addCriteria(Criteria.where(organizationUnitColumn).is(organizationUnitColumnValue));
+    	query.addCriteria(Criteria.where(CommonConstants.SURVEY_SOURCE_COLUMN).ne("Zillow"));
+    	query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
+    	if(startDate != null && endDate == null){
+    		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
+    	}
+    	if(endDate != null && startDate == null){
+    		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
+    	}
+    	if(startDate != null && endDate != null){
+    		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)));
+    	}
+    	LOG.debug("Query: "+query.toString());
+    	long count = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+    	LOG.info("Found "+count+" completed surveys");
+    	return count;
+    }
 
     @SuppressWarnings("unchecked")
 	@Override
@@ -944,6 +948,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	}
     	// match survey stage
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.STAGE_COLUMN,CommonConstants.SURVEY_STAGE_COMPLETE)));
+    	// match non zillow survey
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne","Zillow"))));
     	// match start date
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN,new BasicDBObject("$gte", new Date(startDate.getTime())))));
     	// match end date
@@ -1007,6 +1013,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     		// adding organization unit
     		pipeline.add(new BasicDBObject("$match", new BasicDBObject(organizationUnitColumn, organizationUnitColumnValue)));
     	}
+    	// match non zillow survey
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne","Zillow"))));
     	// match start date
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.CREATED_ON,new BasicDBObject("$gte", new Date(startDate.getTime())))));
     	// match end date
