@@ -3,7 +3,7 @@ USE `ss_user`;
 -- Table structure for table `BATCH_TRACKER`
 --
 
-CREATE TABLE `BATCH_TRACKER` (
+CREATE TABLE `ss_user`.`BATCH_TRACKER` (
   `BATCH_TRACKER_ID` int(11) NOT NULL AUTO_INCREMENT,
   `BATCH_TYPE` varchar(45) NOT NULL,
   `LAST_RUN_TIME` timestamp NOT NULL DEFAULT '1970-01-01 18:30:00',
