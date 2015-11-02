@@ -2458,7 +2458,7 @@ public class SocialManagementController
                     DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE ) );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(),
+            LOG.error( "NonFatalException in while showing social monitor. Reason : " + nonFatalException.getMessage(),
                 nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
