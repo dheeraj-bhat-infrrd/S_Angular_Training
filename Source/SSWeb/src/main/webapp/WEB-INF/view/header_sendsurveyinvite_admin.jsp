@@ -55,12 +55,3 @@
 		</div>
 	</div>
 </div>
-
-<script>
-$(document).ready(function(){
-	$('#wc-review-table').perfectScrollbar();
-	$('#wc-review-table').perfectScrollbar('update');
-
-	attachAutocompleteAgentSurveyInviteDropdown();
-});
-</script>

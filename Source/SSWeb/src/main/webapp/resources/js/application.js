@@ -8796,6 +8796,9 @@ function sendSurveyInvitationAdmin(columnName, columnValue) {
 			$('#overlay-send-survey').removeClass("hide");
 			$('#overlay-send-survey').show();
 		}
+		$('#wc-review-table').perfectScrollbar();
+		$('#wc-review-table').perfectScrollbar('update');
+		attachAutocompleteAgentSurveyInviteDropdown();
 	}, payload, true);
 }
 
