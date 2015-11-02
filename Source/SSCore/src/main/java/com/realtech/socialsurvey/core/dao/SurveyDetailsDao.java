@@ -66,9 +66,6 @@ public interface SurveyDetailsDao
     public long getCompletedSurveyCount( String columnName, long columnValue, int noOfDays );
 
 
-    public long getSentSurveyCount( String columnName, long columnValue, int noOfDays );
-
-
     public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays );
 
 
@@ -86,7 +83,16 @@ public interface SurveyDetailsDao
 
     public void updateReminderCount( long agentId, String customerEmail );
 
-
+    /**
+     * Get count for completed survey
+     * @param organizationUnitColumn
+     * @param organizationUnitColumnValue
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws InvalidInputException
+     */
+    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate) throws InvalidInputException;
     /**
      * Gets an aggregated count for completed survey
      * @param organizationUnitColumn

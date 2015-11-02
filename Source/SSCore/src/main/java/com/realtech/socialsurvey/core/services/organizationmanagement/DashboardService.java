@@ -19,16 +19,27 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
  */
 public interface DashboardService
 {
-    public long getAllSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays );
-
-
-    public long getCompletedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays );
-
-
+	/**
+	 * Gets all survey count
+	 * @param columnName
+	 * @param columnValue
+	 * @param numberOfDays
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getAllSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException;
+	
+	/**
+	 * Gets completed survey count
+	 * @param columnName
+	 * @param columnValue
+	 * @param numberOfDays
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getCompleteSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException;
+	
     public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays );
-
-
-    public long getSocialPostsForPastNdays( String columnName, long columnValue, int numberOfDays );
 
 
     public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin );
