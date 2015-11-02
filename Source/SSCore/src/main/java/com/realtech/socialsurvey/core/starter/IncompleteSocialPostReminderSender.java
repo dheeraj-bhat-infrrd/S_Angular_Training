@@ -191,7 +191,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         params.put( "customerEmail", survey.getCustomerEmail() );
         params.put( "feedback", survey.getReview() );
         LOG.debug( "Method to generate URL parameters for Facebook, generateUrlParamsForFacebook() finished." );
-        return urlGenerator.generateUrl( params, surveyHandler.getApplicationBaseUrl() + subUrl );
+        String url =  urlGenerator.generateUrl( params, surveyHandler.getApplicationBaseUrl() + subUrl );
+        return url;
     }
 
 

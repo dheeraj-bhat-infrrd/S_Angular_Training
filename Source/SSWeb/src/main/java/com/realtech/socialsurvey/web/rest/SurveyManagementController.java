@@ -1381,7 +1381,10 @@ public class SurveyManagementController
         LOG.info( "Method to get Google details, getGooglePlusLink() started." );
         Map<String, String> googleUrl = new HashMap<String, String>();
         try {
-            String agentIdStr = request.getParameter( "agentId" );
+            String encryptedUrl = request.getRequestURI()  + request.getQueryString();
+            Map<String , String>  urlparameters = urlGenerator.decryptUrl( encryptedUrl );
+            String agentIdStr = urlparameters.get( "agentId" );
+            //String agentIdStr = request.getParameter( "agentId" );
             if ( agentIdStr == null || agentIdStr.isEmpty() ) {
                 throw new InvalidInputException(
                     "InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty." );
