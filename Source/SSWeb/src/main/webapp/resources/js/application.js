@@ -1871,30 +1871,6 @@ function bindRegionSelectorEvents(){
             $(this).autocomplete('search');
         });
 	}, true);
-	
-	/*$("#selected-region-txt").keyup(function(e) {
-		if(e.which != 38 && e.which != 40 && e.which != 13) {
-			var text = $("#selected-region-txt").val();
-			if (text.length > 0) {
-				delay(function() {
-					populateRegionsSelector(text);
-				}, 500);
-			}else{
-				$("#regions-droplist").slideUp(200);
-			}
-		}
-	});
-	
-	$("#region-selector").click(function(e){
-		e.stopPropagation();
-		if(!$('#selected-region-txt').is(':disabled')){
-			var regionPattern = $("#selected-region-txt").val();
-			if(regionPattern == undefined) {
-				regionPattern = "";
-			}
-			populateRegionsSelector(regionPattern);
-		}		
-	});*/
 }
 
 /**
@@ -1938,28 +1914,6 @@ function bindOfficeSelectorEvents(){
             $(this).autocomplete('search');
         });
 	}, true);
-	
-	/*$("#office-selector").click(function(e){
-		e.stopPropagation();
-		if(!$('#selected-office-txt').is(':disabled')){
-			var officePattern = $("#selected-office-txt").val();
-			if(officePattern == undefined) {
-				officePattern = "";
-			}
-			populateOfficesSelector(officePattern);
-		}		
-	});
-	
-	$("#selected-office-txt").keyup(function() {
-		var text = $("#selected-office-txt").val();
-		if (text.length > 0) {
-			delay(function() {
-				populateOfficesSelector(text);
-			}, 500);
-		}else {
-			$("#offices-droplist").slideUp(200);
-		}
-	});*/
 }
 
 /**
@@ -8661,6 +8615,8 @@ $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', funct
 			$('#wc-review-table').perfectScrollbar();
 			$('#wc-review-table').perfectScrollbar('update');
 		}, 1000);
+		
+		attachAutocompleteAgentSurveyInviteDropdown();
 	}
 });
 
@@ -8751,6 +8707,9 @@ $(document).on('click', '#wc-send-survey', function() {
 		}
 	});
 	
+	if(exit) {
+		return false;
+	}
 	//Check if recievers list empty
 	if(receiversList.length == 0){
 		$('#overlay-toast').html('Add customers to send survey request!');
@@ -8837,6 +8796,9 @@ function sendSurveyInvitationAdmin(columnName, columnValue) {
 			$('#overlay-send-survey').removeClass("hide");
 			$('#overlay-send-survey').show();
 		}
+		$('#wc-review-table').perfectScrollbar();
+		$('#wc-review-table').perfectScrollbar('update');
+		attachAutocompleteAgentSurveyInviteDropdown();
 	}, payload, true);
 }
 
@@ -9537,9 +9499,53 @@ function getRelevantEntities(){
 	}
 }
 
-$(document).keyup("#post-search-query", function(e) {
+$(document).on("keyup", "#post-search-query", function(e) {
     if(e.which == 13) {
     	postsSearch();
     }
 });
 
+//send survey popup admin events
+function attachAutocompleteAgentSurveyInviteDropdown(){
+	$('.wc-review-agentname[data-name="agent-name"]').autocomplete({
+		source : function(request, response) {
+			$.ajax({
+				url : "/fetchagentsforadmin.do",
+				data : {
+					"searchKey" : request.term,
+					"columnName" : colName,
+					"columnValue" : colValue
+				},
+				success : function(data) {
+					var responseData = JSON.parse(data);
+					response($.map(responseData, function(item) {
+		 	    	  return {
+		 	    		   label:item.displayName + " <"  + item.emailId + ">",
+		 	    		   value:item.displayName + " <"  + item.emailId + ">",
+		 	    		   userId:item.userId,
+		 	    		   emailId:item.emailId	   
+						};
+		 	       }));
+				}
+			});
+		},
+		minLength : 1,
+		select : function (event, ui) {
+			event.stopPropagation();
+			var element = event.target;
+			$(element).attr('agent-id', ui.item.userId);
+			$(element).attr('column-name', colName);
+			$(element).attr('email-id', ui.item.emailId);
+		},
+		close: function(event, ui) {},
+		create: function(event, ui) {
+	        $('.ui-helper-hidden-accessible').remove();
+		},
+		open: function() {
+			$('.ui-autocomplete').addClass('ui-hdr-agent-dropdown').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	});
+}
