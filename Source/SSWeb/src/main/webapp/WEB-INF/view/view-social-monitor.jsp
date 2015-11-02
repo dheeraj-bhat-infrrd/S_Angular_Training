@@ -21,7 +21,7 @@
 					<spring:message code="label.socialmonitor.key" />
 				</div>
 				<div class="float-right sm-header-row-left text-center">
-					<spring:message code="label.lastbuild.key" /> : <span>${ lastBuild }</span>
+					<spring:message code="label.lastbuild.key" /> : <span id="last-build-date"></span>
 				</div>
 			</div>
 		</div>
@@ -84,6 +84,15 @@
 			}
 			autocompleteData = [];
 			getRelevantEntities();
+			
+			var lastBuild = new Date(Number("${ lastBuild }"));
+			if(lastBuild != null){
+				lastBuild = convertUserDateToLocale(lastBuild);
+				$("#last-build-date").html(lastBuild.toString("MMMM d, yyyy"));
+			} else {
+				$("#last-build-date").html("Last build date unavailable");
+			}
+			
 		});
 		$("#select-hierarchy-level").on('change', function(){
 			autocompleteData = [];

@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -2466,7 +2465,7 @@ public class SocialManagementController
         }
         try {
             //Get last build time from solr for social posts
-            Date lastBuild = solrSearchService.getLastBuildTimeForSocialPosts();
+            Long lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
             model.addAttribute( "lastBuild", lastBuild );
         } catch ( SolrException e ) {
             LOG.error( "SolrException while getting last build time. Reason", e );
