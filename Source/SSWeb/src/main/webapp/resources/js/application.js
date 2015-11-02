@@ -9499,7 +9499,7 @@ function getRelevantEntities(){
 	}
 }
 
-$(document).keyup("#post-search-query", function(e) {
+$(document).on("keyup", "#post-search-query", function(e) {
     if(e.which == 13) {
     	postsSearch();
     }
