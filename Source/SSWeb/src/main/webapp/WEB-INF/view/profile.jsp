@@ -558,7 +558,10 @@
 </div>
 <script src='//www.google.com/recaptcha/api.js'></script>
 <script type="text/javascript" src="https://apis.google.com/js/client:plusone.js" async="async"></script>
-<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+<script>
+	if (!window.jQuery) { document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>'); }
+</script>
 <script src="${initParam.resourcesPath}/resources/js/date.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
