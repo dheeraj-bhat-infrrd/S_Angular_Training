@@ -5485,15 +5485,17 @@ tr.u-tbl-header td {
 }
 
 .v-icn-rem-user {
-	background: url(../images/rem_user.png) no-repeat center;
+	
+	background: url('../images/delete.png') no-repeat center;
 }
 
 .v-icn-rem-userprofile {
-	background: url(../images/rem_user.png) no-repeat center;
+	background: url('../images/delete.png') no-repeat center;
 }
 
 .v-icn-edit-user {
-	background: url(../images/edit_user.png) no-repeat center;
+	background: url('../images/edit-1.png') no-repeat center;
+	 
 }
 
 .v-icn-wid {
