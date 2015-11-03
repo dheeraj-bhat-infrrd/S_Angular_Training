@@ -109,7 +109,8 @@ var companyLogo;
 //Verticals master
 var verticalsMasterList;
 
-
+//Variables for social monitor
+var autocompleteData;
 /**
  * js functions for landing page
  */
@@ -741,12 +742,10 @@ function paintSurveyGraph() {
 	if (graphData == undefined)
 		return;
 	var allTimeslots = [];
-	var timeslots = [];
 	var clickedSurveys = [];
 	var sentSurveys = [];
 	var socialPosts = [];
 	var completedSurveys = [];
-	var index = 0;
 
 	var element = document.getElementById("dsh-grph-format");
 	if(element == null){
@@ -875,11 +874,11 @@ function getKeysFromGraphFormat(format) {
 		if(parseInt(format) % 7 != 0) {
 			count += 1;
 		}
-		var key = firstDate.getFullYear().toString() + (firstDate.getWeek() - 1).toString();
+		var key = firstDate.getFullYear().toString() + (firstDate.getWeek()).toString();
 		keys.push(key);
 		for (var i=1; i<count; i++){
 			var date = firstDate.add({days:7});
-			keys.push(date.getFullYear().toString() + (date.getWeek() - 1).toString());
+			keys.push(date.getFullYear().toString() + (date.getWeek()).toString());
 		}
 	}
 	return keys;
@@ -1872,30 +1871,6 @@ function bindRegionSelectorEvents(){
             $(this).autocomplete('search');
         });
 	}, true);
-	
-	/*$("#selected-region-txt").keyup(function(e) {
-		if(e.which != 38 && e.which != 40 && e.which != 13) {
-			var text = $("#selected-region-txt").val();
-			if (text.length > 0) {
-				delay(function() {
-					populateRegionsSelector(text);
-				}, 500);
-			}else{
-				$("#regions-droplist").slideUp(200);
-			}
-		}
-	});
-	
-	$("#region-selector").click(function(e){
-		e.stopPropagation();
-		if(!$('#selected-region-txt').is(':disabled')){
-			var regionPattern = $("#selected-region-txt").val();
-			if(regionPattern == undefined) {
-				regionPattern = "";
-			}
-			populateRegionsSelector(regionPattern);
-		}		
-	});*/
 }
 
 /**
@@ -1939,28 +1914,6 @@ function bindOfficeSelectorEvents(){
             $(this).autocomplete('search');
         });
 	}, true);
-	
-	/*$("#office-selector").click(function(e){
-		e.stopPropagation();
-		if(!$('#selected-office-txt').is(':disabled')){
-			var officePattern = $("#selected-office-txt").val();
-			if(officePattern == undefined) {
-				officePattern = "";
-			}
-			populateOfficesSelector(officePattern);
-		}		
-	});
-	
-	$("#selected-office-txt").keyup(function() {
-		var text = $("#selected-office-txt").val();
-		if (text.length > 0) {
-			delay(function() {
-				populateOfficesSelector(text);
-			}, 500);
-		}else {
-			$("#offices-droplist").slideUp(200);
-		}
-	});*/
 }
 
 /**
@@ -8662,6 +8615,8 @@ $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', funct
 			$('#wc-review-table').perfectScrollbar();
 			$('#wc-review-table').perfectScrollbar('update');
 		}, 1000);
+		
+		attachAutocompleteAgentSurveyInviteDropdown();
 	}
 });
 
@@ -8752,6 +8707,9 @@ $(document).on('click', '#wc-send-survey', function() {
 		}
 	});
 	
+	if(exit) {
+		return false;
+	}
 	//Check if recievers list empty
 	if(receiversList.length == 0){
 		$('#overlay-toast').html('Add customers to send survey request!');
@@ -8838,6 +8796,9 @@ function sendSurveyInvitationAdmin(columnName, columnValue) {
 			$('#overlay-send-survey').removeClass("hide");
 			$('#overlay-send-survey').show();
 		}
+		$('#wc-review-table').perfectScrollbar();
+		$('#wc-review-table').perfectScrollbar('update');
+		attachAutocompleteAgentSurveyInviteDropdown();
 	}, payload, true);
 }
 
@@ -9128,6 +9089,134 @@ function getImageandCaptionProfile(loop) {
 
 }
 
+function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
+	if(fromstart){
+		proPostStartIndex = 0;
+	}
+	var payload = {
+			"entityType" : entityType,
+			"entityId" : entityId,
+			"batchSize" : proPostBatchSize,
+			"startIndex" : proPostStartIndex,
+			"searchQuery" : searchQuery
+		};
+	callAjaxGetWithPayloadData("./searchSocialPosts.do", function(response) {
+		var data = $.parseJSON(response);
+		if (fromstart) {
+			proPostStartIndex = 0;
+			proPostCount = data.count + 1;
+		}
+		paintPostsSolr(data, entityType, entityId, searchQuery);
+		proPostStartIndex += proPostBatchSize;
+	}, payload, true);
+}
+
+function paintPostsSolr(data, entityType, entityId, searchQuery) {
+	var posts = data.socialMonitorPosts;
+	var profilePics = data.profileImageUrlDataList;
+	var divToPopulate = "";
+	var profImgClass = "sm-default-img";
+	var profImgStyle = "";
+	$.each(posts, function(i, post) {
+		var iconClass = "";
+		var href="javascript:void(0)";
+		if(post.source == "google"){
+			iconClass = "icn-gplus";
+		}
+		else if(post.source == "SocialSurvey")
+			iconClass = "icn-ss";
+		else if(post.source == "facebook"){
+			iconClass = "icn-fb";
+			href="http://www.facebook.com/"+post.postId;
+		}
+		else if(post.source == "twitter"){
+			iconClass = "icn-twit";
+			var res = post.postText.split("http");
+			href="http"+res[1];
+		}
+		else if(post.source == "linkedin"){
+			iconClass = "icn-lin";
+		}
+		if(typeof post.postUrl!=  "undefined" ){
+			 href= post.postUrl;
+		}
+		var profileImg = "";
+		$.each(profilePics,  function(i, pic){
+			if(post.companyId > 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
+				profileImg = pic.profileImageUrl;
+			} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
+				profileImg = pic.profileImageUrl;
+			}
+		});
+		if(profileImg != ""){
+			profImgClass = "sm-custom-img";
+			profImgStyle = 'style="background:url(' + profileImg + ') no-repeat center; background-size: 50px;"';
+		}
+		
+		var hrefComplet='<a href='+href+' target="_blank">';
+		divToPopulate += '<div class="tweet-panel-item bord-bot-dc sm-tweet-item clearfix">';
+		var profName = "";
+		if (post.companyName != undefined && post.companyName != "") {
+			profName = post.companyName;
+		}
+		if (post.regionName != undefined && post.regionName != "") {
+			profName = post.regionName;
+		}
+		if (post.branchName != undefined && post.branchName != "") {
+			profName = post.branchName;
+		}
+		if (post.agentName != undefined && post.agentName != "") {
+			profName = post.agentName;
+		}
+		divToPopulate += '<div class="float-left ' + profImgClass + '" ' + profImgStyle + ' ></div>';
+		divToPopulate += '<div class="sm-prof-name">' + profName + '</div>'
+				+ '<div class="sm-post-row float-left">'
+				+ hrefComplet
+				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
+				+"</a>"
+				+ '<div class="tweet-txt float-left">'
+				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
+				+ '<div class="tweet-text-link"><em>' + post.postedBy
+				+ '</em></div>' + '<div class="tweet-text-time"><em>'
+				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
+		divToPopulate += '</div>';
+		
+		divToPopulate += '</div>';
+		divToPopulate += '</div>';
+		
+		
+	});
+	if (proPostStartIndex == 0){
+		$('#prof-posts').html(divToPopulate);
+		$('#prof-posts').perfectScrollbar({
+			suppressScrollX : true
+		});
+		$('#prof-posts').perfectScrollbar('update');
+	}
+	else{
+		$('#prof-posts').append(divToPopulate);
+		$('#prof-posts').perfectScrollbar('update');
+	}
+
+	$('#prof-posts').on('scroll',function(){
+		var scrollContainer = this;
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
+					- scrollContainer.clientHeight) {
+				if (proPostStartIndex < proPostCount)
+					showSearchedPostsSolr(false, entityType, entityId, searchQuery);
+		}
+	});
+}
+
+function setColDetails(currentProfileName, currentProfileValue){
+	colName = currentProfileName;
+	colValue = currentProfileValue;
+}
+
 //complaint registration event binding
 $(document).on('click','#comp-reg-form-submit',function(){
 	if(validateComplaintRegistraionForm()) {
@@ -9278,3 +9367,185 @@ $(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
 });
+
+function getRelevantEntities(){
+	//Remove pre-existing options
+	$('#select-entity-id').val("");
+	$("#selected-entity-id-hidden").val("");
+	$("#entity-selection-panel").show();
+	//Get the entity type
+	var entityType = $("#select-hierarchy-level").val();
+	//If branch
+	if (entityType == "branchId" ) {
+		callAjaxGET("/fetchbranches.do", function(data) {
+			var branchList = [];
+			if(data != undefined && data != "")
+			branchList = $.parseJSON(data);
+			var searchData = [];
+			for(var i=0,j=0; i<branchList.length; i++) {
+				if(branchList[i].isDefaultBySystem == 0) {
+					searchData[j] = {};
+					searchData[j].label = branchList[i].branchName;
+					searchData[j].branchId = branchList[i].branchId;
+					j++;
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.branchId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
+				return $('<li>').append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        });
+			
+		},true);
+	} else if (entityType == "regionId") {
+		callAjaxGET("/fetchregions.do", function(data) {
+			var regionList = [];
+			if(data != undefined && data != "")
+				regionList = $.parseJSON(data);
+			autocompleteData = data;
+			var searchData = [];
+			for(var i=0, j=0; i<regionList.length; i++) {
+				if(regionList[i].isDefaultBySystem == 0) {
+					searchData[j] = {};
+					searchData[j].label = regionList[i].regionName;
+					searchData[j].regionId = regionList[i].regionId;
+					j++;				
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.regionId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
+				return $("<li>").append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        }); 
+			
+		}, true);
+	} else if (entityType == "userId") {
+		callAjaxGET("/fetchusers.do", function(data) {
+			var userList = [];
+			if(data != undefined && data != "")
+				userList = $.parseJSON(data);
+			autocompleteData = data;
+			var searchData = [];
+			for(var i=0, j=0; i<userList.length; i++) {
+				if(userList[i].isOwner == 0) {
+					searchData[j] = {};
+					searchData[j].label = userList[i].firstName;
+					if(userList[i].lastName != undefined)
+						searchData[j].label += " " + userList[i].lastName;
+					searchData[j].userId = userList[i].userId;
+					j++;				
+				}
+			}
+			$("#select-entity-id").autocomplete({
+				source : searchData,
+				minLength: 0,
+				delay : 0,
+				autoFocus : true,
+				select: function(event, ui) {
+					$("#select-entity-id").val(ui.item.label);
+					$('#selected-entity-id-hidden').val(ui.item.userId);
+					return false;
+				},
+				close: function(event, ui) {},
+				create: function(event, ui) {
+			        $('.ui-helper-hidden-accessible').remove();
+				}
+			}).autocomplete("instance")._renderItem = function(ul, item) {
+				$(ul).addClass("social-monitor-autocomplete");
+				return $("<li>").append(item.label).appendTo(ul);
+		  	};
+		  	$("#select-entity-id").off('focus');
+			$("#select-entity-id").focus(function(){            
+	            $(this).autocomplete('search');
+	        }); 
+			
+		}, true);
+	} else if (entityType == "companyId") {
+		$("#entity-selection-panel").hide();
+	}
+}
+
+$(document).on("keyup", "#post-search-query", function(e) {
+    if(e.which == 13) {
+    	postsSearch();
+    }
+});
+
+//send survey popup admin events
+function attachAutocompleteAgentSurveyInviteDropdown(){
+	$('.wc-review-agentname[data-name="agent-name"]').autocomplete({
+		source : function(request, response) {
+			$.ajax({
+				url : "/fetchagentsforadmin.do",
+				data : {
+					"searchKey" : request.term,
+					"columnName" : colName,
+					"columnValue" : colValue
+				},
+				success : function(data) {
+					var responseData = JSON.parse(data);
+					response($.map(responseData, function(item) {
+		 	    	  return {
+		 	    		   label:item.displayName + " <"  + item.emailId + ">",
+		 	    		   value:item.displayName + " <"  + item.emailId + ">",
+		 	    		   userId:item.userId,
+		 	    		   emailId:item.emailId	   
+						};
+		 	       }));
+				}
+			});
+		},
+		minLength : 1,
+		select : function (event, ui) {
+			event.stopPropagation();
+			var element = event.target;
+			$(element).attr('agent-id', ui.item.userId);
+			$(element).attr('column-name', colName);
+			$(element).attr('email-id', ui.item.emailId);
+		},
+		close: function(event, ui) {},
+		create: function(event, ui) {
+	        $('.ui-helper-hidden-accessible').remove();
+		},
+		open: function() {
+			$('.ui-autocomplete').addClass('ui-hdr-agent-dropdown').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	});
+}

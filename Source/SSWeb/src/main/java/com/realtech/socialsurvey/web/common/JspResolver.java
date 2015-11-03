@@ -141,4 +141,7 @@ public interface JspResolver {
 	public static final String WIDGET_PAGE = "widget/widget";
 	public static final String WIDGET_CODE_PAGE = "widget/widgetcodepage";
 	public static final String WIDGET_SELECTION_PAGE = "widget/widgetselectionpage";
+	
+	//Social Monitor
+    public static final String SOCIAL_MONITOR = "view-social-monitor";
 }

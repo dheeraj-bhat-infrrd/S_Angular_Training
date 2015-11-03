@@ -1,12 +1,18 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -15,6 +21,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.solr.common.SolrDocumentList;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Verb;
@@ -27,11 +34,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -48,9 +57,13 @@ import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMonitorData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
@@ -58,6 +71,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -69,15 +83,19 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.Account;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -97,6 +115,12 @@ public class SocialManagementController
     @Autowired
     private SessionHelper sessionHelper;
 
+    @Autowired
+    private SolrSearchService solrSearchService;
+    
+    @Autowired
+    private MessageUtils messageUtils;
+    
     @Autowired
     private SocialAsyncService socialAsyncService;
 
@@ -183,6 +207,9 @@ public class SocialManagementController
 
     @Autowired
     private SocialPostDao socialPostDao;
+    
+    private final static int SOLR_BATCH_SIZE = 20;
+    
     /**
      * Returns the social authorization page
      * 
@@ -2400,5 +2427,208 @@ public class SocialManagementController
             return "failue";
         }
         return JspResolver.SOCIAL_MEDIA_TOKENS;
+    }
+
+
+    /**
+     * Method to show the social monitor page
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/showsocialmonitortpage", method = RequestMethod.GET)
+    public String initSocialMonitorPage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Social Monitor page started" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        //Validate user
+        try {
+            if ( user == null ) {
+                LOG.error( "No user found in session" );
+                throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
+            }
+            if ( user.getStatus() != CommonConstants.STATUS_ACTIVE ) {
+                LOG.error( "Inactive or unauthorized users can not access social monitor page" );
+                model.addAttribute( "message", messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE ) );
+            }
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException in while showing social monitor. Reason : " + nonFatalException.getMessage(),
+                nonFatalException );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+        }
+        try {
+            //Get last build time from solr for social posts
+            Long lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
+            model.addAttribute( "lastBuild", lastBuild );
+        } catch ( SolrException e ) {
+            LOG.error( "SolrException while getting last build time. Reason", e );
+        }
+        
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            model.addAttribute( "columnName", entityType );
+            model.addAttribute( "columnValue", entityId );
+            model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            model.addAttribute( "columnName", entityType );
+            model.addAttribute( "columnValue", entityId );
+            model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            model.addAttribute( "columnName", entityType );
+            model.addAttribute( "columnValue", entityId );
+            model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+        } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
+            model.addAttribute( "columnValue", entityId );
+        }
+        return JspResolver.SOCIAL_MONITOR;
+    }
+
+
+    /**
+     * Method to search for social posts given a search query
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/searchSocialPosts", method = RequestMethod.GET)
+    public String searchSocialPosts( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method searchSocialPosts() started." );
+        int startIndex = 0;
+        int batchSize = 0;
+        String posts = "";
+        long count = 0;
+        Set<Long> userIdSet = new HashSet<Long>();
+        Set<Long> branchIdSet = new HashSet<Long>();
+        Set<Long> regionIdSet = new HashSet<Long>();
+        Set<Long> companyIdSet = new HashSet<Long>();
+        try {
+            String startIndexStr = request.getParameter( "startIndex" );
+            String batchSizeStr = request.getParameter( "batchSize" );
+            String entityType = request.getParameter( "entityType" );
+            long entityId = Long.parseLong( request.getParameter( "entityId" ) );
+            try {
+                if ( startIndexStr == null || startIndexStr.isEmpty() ) {
+                    LOG.error( "Invalid value found in startIndex. It cannot be null or empty." );
+                    throw new InvalidInputException( "Invalid value found in startIndex. It cannot be null or empty." );
+                }
+                if ( batchSizeStr == null || batchSizeStr.isEmpty() ) {
+                    LOG.error( "Invalid value found in batchSizeStr. It cannot be null or empty." );
+                    batchSize = SOLR_BATCH_SIZE;
+                }
+
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException while finding social posts. Reason : " + e.getMessage(), e );
+                throw new NonFatalException( "NumberFormatException while searching for social posts", e );
+            }
+            String searchQuery = request.getParameter( "searchQuery" );
+            if ( searchQuery == null || searchQuery.isEmpty() ) {
+                LOG.error( "Invalid search key passed in method searchSocialPosts()." );
+                searchQuery = "";
+            } else {
+                model.addAttribute( "currentSearchQuery", searchQuery.trim() );
+            }
+            User admin = sessionHelper.getCurrentUser();
+            if ( admin == null ) {
+                LOG.error( "No user found in session" );
+                throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
+            }
+
+            // fetching users from solr
+            try {
+                SolrDocumentList results = solrSearchService.searchPostText( entityType, entityId, startIndex, batchSize,
+                    searchQuery.trim() );
+                count = results.getNumFound();
+                Collection<SocialPost> postlist = solrSearchService.getSocialPostsFromSolrDocuments( results );
+
+                //Store the posts, along with agent,branch,region and company names where present.
+                SocialMonitorData socialMonitorData = new SocialMonitorData();
+                Collection<SocialMonitorPost> socialMonitorPosts = new ArrayList<SocialMonitorPost>();
+                List<ProfileImageUrlData> profileImageUrlList = new ArrayList<ProfileImageUrlData>();
+                for ( SocialPost item : postlist ) {
+                    SocialMonitorPost socialMonitorPost = new SocialMonitorPost();
+
+                    socialMonitorPost.set_id( item.get_id() );
+                    socialMonitorPost.setCompanyId( item.getCompanyId() );
+                    socialMonitorPost.setRegionId( item.getRegionId() );
+                    socialMonitorPost.setBranchId( item.getBranchId() );
+                    socialMonitorPost.setAgentId( item.getAgentId() );
+                    socialMonitorPost.setTimeInMillis( item.getTimeInMillis() );
+                    socialMonitorPost.setPostId( item.getPostId() );
+                    socialMonitorPost.setPostedBy( item.getPostedBy() );
+                    socialMonitorPost.setPostText( item.getPostText() );
+                    socialMonitorPost.setPostUrl( item.getPostUrl() );
+                    socialMonitorPost.setSource( item.getSource() );
+                    if ( item.getCompanyId() > 0 ) {
+                        socialMonitorPost.setCompanyName( organizationManagementService
+                            .getCompanySettings( item.getCompanyId() ).getProfileName() );
+                        companyIdSet.add( item.getCompanyId() );
+                    }
+                    if ( item.getRegionId() > 0 ) {
+                        socialMonitorPost.setRegionName( organizationManagementService.getRegionSettings( item.getRegionId() )
+                            .getProfileName() );
+                        regionIdSet.add( item.getRegionId() );
+                    }
+                    if ( item.getBranchId() > 0 ) {
+                        socialMonitorPost.setBranchName( organizationManagementService.getBranchSettings( item.getBranchId() )
+                            .getRegionName() );
+                        branchIdSet.add( item.getBranchId() );
+                    }
+                    if ( item.getAgentId() > 0 ) {
+                        socialMonitorPost.setAgentName( organizationManagementService.getAgentSettings( item.getAgentId() )
+                            .getProfileName() );
+                        userIdSet.add( item.getAgentId() );
+                    }
+
+                    socialMonitorPosts.add( socialMonitorPost );
+                }
+                //Get profile Images
+                if ( !( companyIdSet.isEmpty() ) ) {
+                    profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
+                        CommonConstants.COMPANY_ID_COLUMN, (HashSet<Long>) companyIdSet ) );
+                }
+                if ( !( regionIdSet.isEmpty() ) ) {
+                    profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
+                        CommonConstants.REGION_ID_COLUMN, (HashSet<Long>) regionIdSet ) );
+                }
+                if ( !( branchIdSet.isEmpty() ) ) {
+                    profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
+                        CommonConstants.BRANCH_ID_COLUMN, (HashSet<Long>) branchIdSet ) );
+                }
+                if ( !( userIdSet.isEmpty() ) ) {
+                    profileImageUrlList.addAll( organizationManagementService.fetchProfileImageUrlsForEntityList(
+                        CommonConstants.USER_ID, (HashSet<Long>) userIdSet ) );
+                }
+                socialMonitorData.setSocialMonitorPosts( (List<SocialMonitorPost>) socialMonitorPosts );
+                socialMonitorData.setCount( count );
+                socialMonitorData.setProfileImageUrlDataList( profileImageUrlList );
+                posts = new Gson().toJson( socialMonitorData );
+
+            } catch ( MalformedURLException e ) {
+                LOG.error( "MalformedURLException while searching for social posts. Reason : " + e.getMessage(), e );
+                throw new NonFatalException( "MalformedURLException while searching for social posts.",
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while searching for social posts. Reason : " + nonFatalException.getStackTrace(),
+                nonFatalException );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        LOG.info( "Method searchSocialPosts() finished." );
+        return posts;
     }
 }

@@ -71,6 +71,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
+    @Transactional
     public T findById( Class<T> entityClass, ID id )
     {
         T entity;
@@ -86,6 +87,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<T> findAll( Class<T> entityClass )
     {
         try {
@@ -100,6 +102,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
+    @Transactional
     public List<T> findByExample( T exampleInstance, String[] excludeProperty )
     {
         Criteria crit = getSession().createCriteria( getPersistentClass() );
@@ -118,6 +121,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
+    @Transactional
     public T saveOrUpdate( T entity )
     {
         try {
@@ -145,6 +149,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
+    @Transactional
     public void update( T entity )
     {
         try {
@@ -157,6 +162,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
+    @Transactional
     public void delete( T entity )
     {
         try {
@@ -169,6 +175,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
+    @Transactional
     public void deleteByCondition( String entity, List<String> conditions )
     {
         String deleteQuery = "delete from " + entity + " where ";
@@ -215,6 +222,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
+    @Transactional
     public List<T> findByCriteria( Criterion... criterion )
     {
         Criteria crit = getSession().createCriteria( getPersistentClass() );
@@ -232,6 +240,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
+    @Transactional
     public List<T> findByKeyValue( Class<T> dataClass, Map<String, Object> queries )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -249,6 +258,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
+    @Transactional
     public List<T> findByColumn( Class<T> dataClass, String column, Object value )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -264,6 +274,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
+    @Transactional
     public List<T> findByColumnForMultipleValues( Class<T> dataClass, String column, List<?> values )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -278,6 +289,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
+    @Transactional
     public long findNumberOfRows( Class<T> dataClass )
     {
         try {
@@ -290,6 +302,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
+    @Transactional
     public long findNumberOfRowsByKeyValue( Class<T> dataClass, Map<String, Object> queries )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -306,6 +319,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
+    @Transactional
     public void merge( T entity )
     {
 
@@ -320,6 +334,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<T> findAllActive( Class<T> entityClass )
     {
         try {
@@ -335,6 +350,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
+    @Transactional
     public List<T> findByKeyValueAscending( Class<T> dataClass, Map<String, Object> queries, String ascendingColumn )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
@@ -353,6 +369,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @Override
     @SuppressWarnings ( "unchecked")
+    @Transactional
     public List<T> findByKeyValueAscendingWithAlias( Class<T> dataClass, Map<String, Object> queries, String ascendingColumn,
         String alias )
     {
@@ -373,6 +390,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<T> findProjectionsByKeyValue( Class<T> dataClass, List<String> columnNames, Map<String, Object> queries )
     {
         Criteria crit = null;
@@ -396,6 +414,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
     
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<T> findProjectionsAscOrderByKeyValue( Class<T> dataClass, List<String> columnNames, Map<String, Object> queries, String columnToOrder )
     {
         Criteria crit = null;
