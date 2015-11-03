@@ -194,13 +194,13 @@
 </div>
 
 <div id="profile-main-content" class="prof-main-content-wrapper margin-top-10 margin-bottom-25">
-    <div class="">
+    <div itemscope itemtype="https://schema.org/ProfilePage" class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
 			<c:if test="${not empty profile.profileImageUrl && not empty fn:trim(profile.profileImageUrl)}">
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 					<div class="prog-img-container">
-		            	<img id="prof-image" class="prof-image pos-relative" src="${profile.profileImageUrl}"></img>
+		            	<img itemprop="primaryImageOfPage" id="prof-image" class="prof-image pos-relative" src="${profile.profileImageUrl}"></img>
 		            </div>
 	            </div>
 			</c:if>
@@ -208,30 +208,45 @@
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 			</c:if>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper ${profileNameClass}">
-                <div itemscope itemtype="http://schema.org/Product" class="prof-name-container" id="prof-company-head-content">
+                <div class="prof-name-container" id="prof-company-head-content">
+                	<div  itemprop="about" itemscope="" itemtype="http://schema.org/Person">
                 	<div itemprop="name" class="prof-name">${profName}</div>
-                	<div class="prof-address">
-                		<c:if test="${not empty profile.contact_details &&  not empty profile.contact_details.title}">
-                			<div class="prof-addline2">${profile.contact_details.title}</div>
-                		</c:if>
-                		<div class="prof-addline1">
-                			<c:if test="${not empty profile.contact_details && not empty profile.contact_details.location}">
-                				${profile.contact_details.location}
-                				<c:set var="isLocationTrue" value="yes"></c:set>
-                			</c:if>
-                			<c:if test="${not empty profile.vertical}">
-                				<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
-	                			${profile.vertical}
+	                	<div class="prof-address">
+	                		<c:if test="${not empty profile.contact_details &&  not empty profile.contact_details.title}">
+	                			<div itemprop="jobTitle"  class="prof-addline2">${profile.contact_details.title}</div>
 	                		</c:if>
-                		</div>
+	                		<div class="prof-addline1">
+	                			<c:if test="${not empty profile.contact_details && not empty profile.contact_details.location}">
+	                				${profile.contact_details.location}
+	                				<c:set var="isLocationTrue" value="yes"></c:set>
+	                			</c:if>
+	                			<c:if test="${not empty profile.vertical}">
+	                				<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
+		                			${profile.vertical}
+		                		</c:if>
+	                		</div>
+	                	</div>
                 	</div>
-					<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="prof-rating clearfix">
-						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
-							<div class='rating-image float-left smiley-rat-${integerAverageRating}'></div>
-							<div class='rating-rounded float-left' data-score="${floatingAverageRating}"><span itemprop="ratingValue">${floatingAverageRating}</span> - </div>
+                	<c:choose>
+                	<c:when test="${reviewsCount > 0 }">
+						<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="prof-rating clearfix">
+							<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
+								<div class='rating-image float-left smiley-rat-${integerAverageRating}'></div>
+								<div class='rating-rounded float-left' data-score="${floatingAverageRating}"><span itemprop="ratingValue">${floatingAverageRating}</span> - </div>
+							</div>
+							<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span itemprop="reviewCount">${reviewsCount}</span> Review(s)</div>
 						</div>
-						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span itemprop="reviewCount">${reviewsCount}</span> Review(s)</div>
+					</c:when>
+					<c:otherwise>
+                		<div class="prof-rating clearfix">
+						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
+							<div class='rating-image float-left smiley-rat-1'></div>
+							<div class='rating-rounded float-left'><span>${floatingAverageRating}</span>  - </div>
+						</div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span>${reviewsCount}</span> Reviews(s)</div>
 					</div>
+                	</c:otherwise>
+					</c:choose>
 					<div class="prof-btn-wrapper clearfix">
 						<div class="prof-btn-contact float-left" onclick="focusOnContact()" >Contact
 						<c:choose>
@@ -486,7 +501,7 @@
                     <div class="main-con-header">About ${profName}</div>
                     <c:choose>
                     	<c:when test="${not empty profile.contact_details && not empty profile.contact_details.about_me }">
-                    		<div class="pe-whitespace intro-body">${profile.contact_details.about_me}</div>
+                    		<div itemprop="description" class="pe-whitespace intro-body">${profile.contact_details.about_me}</div>
                     	</c:when>
                     	<c:otherwise>
                     		<c:choose>
