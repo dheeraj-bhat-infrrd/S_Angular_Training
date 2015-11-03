@@ -216,7 +216,6 @@ function showMessage(data){
 }
 
 function adjustImage(){
-    $('.mobile-tabs').children('.mob-icn-active').click();
     var windW = $(window).width();
     if(windW < 768){
         var imgW = $('#prof-image').width();
