@@ -9537,6 +9537,7 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 			$(element).attr('agent-id', ui.item.userId);
 			$(element).attr('column-name', colName);
 			$(element).attr('email-id', ui.item.emailId);
+			$(element).attr('val', ui.item.value);
 		},
 		close: function(event, ui) {},
 		create: function(event, ui) {
@@ -9550,7 +9551,12 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 		}
 	});
 	
-	$('.wc-review-agentname[data-name="agent-name"]').keyup(function() {
+	$('.wc-review-agentname[data-name="agent-name"]').keyup(function(e) {
+		var oldVal = $(this).attr('val');
+		var cuurentVal = $(this).val();
+		if(oldVal == cuurentVal) {
+			return;
+		}
 		$(this).attr('agent-id', "");
 		$(this).attr('column-name', "");
 		$(this).attr('email-id', "");
