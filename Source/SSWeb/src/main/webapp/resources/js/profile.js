@@ -216,7 +216,6 @@ function showMessage(data){
 }
 
 function adjustImage(){
-    $('.mobile-tabs').children('.mob-icn-active').click();
     var windW = $(window).width();
     if(windW < 768){
         var imgW = $('#prof-image').width();
@@ -1007,7 +1006,8 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 	if (minScore != undefined) {
 		url = url + "&minScore=" + minScore;
 	}
-	callAjaxGET(url, fetchReviewsCallBack, false);
+	callAjaxGET(url, fetchReviewsCallBack, true);
+	//callAjaxGetWithPayloadData(url, fetchReviewsCallBack, {}, true);
 }
 
 function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
@@ -1035,7 +1035,7 @@ function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
 	if(notRecommended != undefined && typeof(notRecommended) === "boolean") {
 		url += '&notRecommended=' + notRecommended;
 	}
-	callAjaxGET(url, callbackFunction, false);
+	callAjaxGET(url, callbackFunction, true);
 }
 
 function fetchReviewsCallBack(data) {
