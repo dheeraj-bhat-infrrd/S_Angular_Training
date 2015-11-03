@@ -1967,7 +1967,8 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		hideAdminPrivilegesChk();
+		if($("#hr-individual-tab").hasClass("bd-hdr-active"))
+			hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
@@ -9185,8 +9186,7 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 				+"</a>"
 				+ '<div class="tweet-txt float-left">'
 				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
-				+ '<div class="tweet-text-link"><em>' + post.postedBy
-				+ '</em></div>' + '<div class="tweet-text-time"><em>'
+				+ '<div class="tweet-text-time"><em>'
 				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
 		divToPopulate += '</div>';
 		
