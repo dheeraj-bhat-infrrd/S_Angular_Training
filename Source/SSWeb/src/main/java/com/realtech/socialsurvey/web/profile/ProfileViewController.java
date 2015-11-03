@@ -137,8 +137,9 @@ public class ProfileViewController
                 CommonConstants.PROFILE_LEVEL_COMPANY, false );
             model.addAttribute( "averageRating", averageRating );
 
-            long reviewsCount = profileManagementService.getReviewsCount( companyId, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
+            // should show all review count
+            long reviewsCount = profileManagementService.getReviewsCount( companyId, -1,
+                -1, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -260,8 +261,8 @@ public class ProfileViewController
                 false );
             model.addAttribute( "averageRating", averageRating );
 
-            long reviewsCount = profileManagementService.getReviewsCount( regionId, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false );
+            long reviewsCount = profileManagementService.getReviewsCount( regionId, -1,
+                -1, CommonConstants.PROFILE_LEVEL_REGION, false, false );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -383,8 +384,8 @@ public class ProfileViewController
                 false );
             model.addAttribute( "averageRating", averageRating );
 
-            long reviewsCount = profileManagementService.getReviewsCount( branchId, CommonConstants.MIN_RATING_SCORE,
-                CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
+            long reviewsCount = profileManagementService.getReviewsCount( branchId, -1,
+                -1, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -564,8 +565,8 @@ public class ProfileViewController
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
                 model.addAttribute( "averageRating", averageRating );
 
-                long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
+                long reviewsCount = profileManagementService.getReviewsCount( agentId, -1,
+                    -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 if ( isBotRequest ) {
