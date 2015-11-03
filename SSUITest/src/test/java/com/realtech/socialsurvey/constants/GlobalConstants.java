@@ -54,6 +54,7 @@ public class GlobalConstants
     public static final String SERVER_URL = "http://" + GlobalConstants.get( SERVER_IP ) + ":"
         + GlobalConstants.get( SERVER_PORT );
     public static final String LOGIN_URL = SERVER_URL + "/login.do";
+    public static final String SIGNUP_URL = SERVER_URL + "/signup.do";
 
 
     /**
