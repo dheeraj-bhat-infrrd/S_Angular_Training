@@ -8688,6 +8688,11 @@ $(document).on('click', '#wc-send-survey', function() {
 						showToast();
 						exit = true;
 						return false;					
+					} else if(agentId.trim() == ""){
+						$('#overlay-toast').html('Please select valid agents for all survey requests');
+						showToast();
+						exit = true;
+						return false;					
 					}
 				}
 				//check if agent mail id is not same as recipient mail id
@@ -9509,14 +9514,7 @@ $(document).on("keyup", "#post-search-query", function(e) {
 function attachAutocompleteAgentSurveyInviteDropdown(){
 	$('.wc-review-agentname[data-name="agent-name"]').autocomplete({
 		source : function(request, response) {
-			$.ajax({
-				url : "/fetchagentsforadmin.do",
-				data : {
-					"searchKey" : request.term,
-					"columnName" : colName,
-					"columnValue" : colValue
-				},
-				success : function(data) {
+			callAjaxGetWithPayloadData("/fetchagentsforadmin.do", function(data) {
 					var responseData = JSON.parse(data);
 					response($.map(responseData, function(item) {
 		 	    	  return {
@@ -9526,8 +9524,11 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 		 	    		   emailId:item.emailId	   
 						};
 		 	       }));
-				}
-			});
+				}, {
+					"searchKey" : request.term,
+					"columnName" : colName,
+					"columnValue" : colValue
+				}, true);
 		},
 		minLength : 1,
 		select : function (event, ui) {
@@ -9547,5 +9548,11 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 			});
 			$('.ui-autocomplete').perfectScrollbar('update');
 		}
+	});
+	
+	$('.wc-review-agentname[data-name="agent-name"]').keyup(function() {
+		$(this).attr('agent-id', "");
+		$(this).attr('column-name', "");
+		$(this).attr('email-id', "");
 	});
 }
