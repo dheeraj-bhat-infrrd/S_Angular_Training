@@ -60,8 +60,20 @@
 			<c:if test="${not empty title}">
 				<div id="designation" class="dsh-txt-2">${title}</div>
 			</c:if>
+			<c:if test="${not empty location || not empty vertical}">
+				<div class="dsh-txt-3">
+					<c:if test="${not empty location}">
+						${location }
+						<c:set var="isLocationTrue" value="yes"></c:set>	
+					</c:if>
+					<c:if test="${not empty vertical }">
+						<c:if test="${isLocationTrue == 'yes'}"> | </c:if>
+						${vertical}
+					</c:if>
+				</div>
+			</c:if>
 			<c:if test="${not empty company}">
-				<div id="company" class="dsh-txt-3">${company}</div>
+				<div id="company" class="dsh-txt-3 hide">${company}</div>
 			</c:if>
 		</div>
 		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
