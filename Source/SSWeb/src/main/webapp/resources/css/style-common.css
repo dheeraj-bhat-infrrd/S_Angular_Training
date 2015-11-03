@@ -694,7 +694,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 }
 
 .sm-header-row-left {
-	font-size: 16px;
+	font-size: 13px;
 	line-height: 45px;
 	/*    font-weight: bold !important;*/
 }
@@ -1758,7 +1758,7 @@ button.paypal.is-active {
 .sm-prof-name {
 	font-size: 15px;
 	line-height: 15px;
-	max-width : 120px;
+	min-width : 120px;
 	float: left;
 	margin-left: 15px;
 	margin-top: 3%;
