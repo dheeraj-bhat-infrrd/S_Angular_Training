@@ -391,16 +391,6 @@ function paintProfilePage(result) {
     		}
     		window.open(returnValidWebAddress(link), '_blank');
     	});
-    	
-    	/*$("#read-write-share-btn").click(function(e){
-        	e.stopPropagation();
-        	findProList(result.iden,result.contact_details.name);
-        });*/
-        
-        /*$('#mob-review-btn').click(function(e) {
-        	e.stopPropagation();
-        	findProList(result.iden,result.contact_details.name);
-        });*/
 	}
 }
 
@@ -413,7 +403,6 @@ function paintBreadCrums(url) {
 		if(jsonData.entity) {
 			var entityJson = $.parseJSON(jsonData.entity);
 			var htmlContent = '<a target="_blank" class="brd-crm brd-crm-link" href="'
-					//+ window.location.origin
 					+ getLocationOrigin()
 					+ '/findcompany.do?verticalName='
 					+ entityJson[0].breadCrumbProfile
@@ -450,7 +439,6 @@ function focusOnContact() {
 }
 
 function fetchCompanyRegions() {
-	//var url = window.location.origin +'/rest/profile/'+companyProfileName+'/regions';
 	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/regions';
 	callAjaxGET(url, paintCompanyRegions, true);
 }
@@ -476,7 +464,6 @@ function paintCompanyRegions(data) {
 }
 
 function fetchBranchesForRegion(regionId) {
-	//var url = window.location.origin +'/rest/profile/region/'+regionId+'/branches';
 	var url = getLocationOrigin() +'/rest/profile/region/'+regionId+'/branches';
 	$("#regionid-hidden").val(regionId);
 	callAjaxGET(url, paintBranchesForRegion, true);
@@ -530,8 +517,6 @@ function bindClickToFetchBranchIndividuals(bindingClass) {
 function fetchIndividualsForBranch(branchId) {
 	var start = $('div[data-branchid="' + branchId + '"]').attr('data-start');
 	var rows = $('div[data-branchid="' + branchId + '"]').attr('data-batch');
-	//var url = window.location.origin + '/rest/profile/branch/' + branchId
-	//		+ '/individuals?start=' + start + "&rows=" + rows;
 	var url = getLocationOrigin() + '/rest/profile/branch/' + branchId
 			+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#branchid-hidden").val(branchId);
@@ -633,8 +618,6 @@ function fetchIndividualsForRegion(regionId) {
 			'data-start');
 	var rows = $('.comp-region[data-regionid="' + regionId + '"]').attr(
 			'data-batch');
-	//var url = window.location.origin + '/rest/profile/region/' + regionId
-	//		+ '/individuals?start=' + start + "&rows=" + rows;
 	var url = getLocationOrigin() + '/rest/profile/region/' + regionId
 	+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#regionid-hidden").val(regionId);
@@ -675,7 +658,6 @@ function paintIndividualsForRegion(data) {
 }
 
 function fetchCompanyIndividuals() {
-	//var url = window.location.origin +'/rest/profile/'+companyProfileName+'/individuals';
 	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/individuals';
 	callAjaxGET(url, paintCompanyIndividuals, true);
 }
@@ -709,7 +691,6 @@ function paintCompanyIndividuals(data) {
 }
 
 function fetchCompanyBranches() {
-	//var url = window.location.origin +'/rest/profile/'+companyProfileName+'/branches';
 	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/branches';
 	callAjaxGET(url, paintCompanyBranches, true);
 }
@@ -730,7 +711,6 @@ function paintCompanyBranches(data) {
 			});
 			$("#comp-hierarchy").show();
 			$("#comp-regions-content").append(compBranchesHtml);
-			//bindClickToFetchBranchIndividuals("comp-branch");
 		}
 	}
 }
@@ -767,11 +747,6 @@ function paintReviews(result){
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
 		reviewsHtml += '			<div class="ppl-head-1">'+custDispName+'</div>';
-		/* if(custNameArray[1] != undefined && custNameArray[1].trim() != ""){
-			reviewsHtml += ' '+custNameArray[1].substr(0,1)+'.</div>';
-		}else {
-			reviewsHtml += '</div>';
-		}*/
 		if (date != null) {
 			date = convertUserDateToLocale(date);
 			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
@@ -808,19 +783,6 @@ function paintReviews(result){
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + custDispName + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + custDispName + ' for ' + reviewItem.agentName +' at SocialSurvey - ' + reviewItem.review + '&source="></span>';
 		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + custDispName + ' for ' + reviewItem.agentName + ' at SocialSurvey - ' + reviewItem.review + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
-		
-		/*if (reviewItem.yelpProfileUrl != null && reviewItem.yelpProfileUrl != "") {
-			reviewsHtml += '		<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="' + returnValidWebAddress(reviewItem.yelpProfileUrl) + '"></span>';
-		}
-		if (reviewItem.zillowProfileUrl != null && reviewItem.zillowProfileUrl != "") {
-			reviewsHtml += '		<span class="float-left ppl-share-icns icn-zillow" title="Zillow" data-link="' + returnValidWebAddress(reviewItem.zillowProfileUrl) + '"></span>';
-		}
-		if (reviewItem.lendingTreeProfileUrl != null && reviewItem.lendingTreeProfileUrl != "") {
-			reviewsHtml += '		<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="' + returnValidWebAddress(reviewItem.lendingTreeProfileUrl) + '"></span>';
-		}
-		if (reviewItem.realtorProfileUrl != null && reviewItem.realtorProfileUrl != "") {
-			reviewsHtml += '		<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="' + returnValidWebAddress(reviewItem.realtorProfileUrl) + '"></span>';
-		}*/
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		if(reviewItem.source != "Zillow")
@@ -1007,7 +969,6 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 		url = url + "&minScore=" + minScore;
 	}
 	callAjaxGET(url, fetchReviewsCallBack, true);
-	//callAjaxGetWithPayloadData(url, fetchReviewsCallBack, {}, true);
 }
 
 function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
@@ -1285,7 +1246,6 @@ function findProList(iden,searchcritrianame){
 	if(profileLevel == 'INDIVIDUAL'){
 		initSurveyReview(iden);
 	}else {
-		 //url = window.location.origin +"/initfindapro.do?profileLevel="+profileLevel+"&iden="+iden+"&searchCriteria="+searchcritrianame;
 		url = getLocationOrigin() +"/initfindapro.do?profileLevel="+profileLevel+"&iden="+iden+"&searchCriteria="+searchcritrianame;
 		 window.open(url, "_blank");
 	}
@@ -1296,7 +1256,6 @@ function downloadVCard(agentName){
 	if(agentName == undefined || agentName == ""){
 		return;
 	}
-	//var url = window.location.origin + "/rest/profile/downloadvcard/"+agentName;
 	var url = getLocationOrigin() + "/rest/profile/downloadvcard/"+agentName;
 	window.open(url, "_blank");
 }
@@ -1306,7 +1265,6 @@ function paintPublicPosts() {
 	doStopPublicPostPagination = false;
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	
-	//var url = window.location.origin + "/rest/profile/";
 	var url = getLocationOrigin() + "/rest/profile/";
 	if(profileLevel == 'COMPANY'){
 		//Fectch the reviews for company
@@ -1401,7 +1359,6 @@ $('#prof-posts').on('scroll',function(){
 $('body').on('click',".branch-link",function(e) {
 	e.stopPropagation();
 	var branchProfileName = $(this).data("profilename");
-	//var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
 	var url = getLocationOrigin() +"/pages/office/"+companyProfileName+"/"+branchProfileName;
 	window.open(url, "_blank");
 });
@@ -1409,7 +1366,6 @@ $('body').on('click',".branch-link",function(e) {
 $('body').on('click',".individual-link",function(e) {
 	e.stopPropagation();
 	var agentProfileName = $(this).data("profilename");
-	//var url = window.location.origin +"/pages/"+agentProfileName;
 	var url = getLocationOrigin() +"/pages/"+agentProfileName;
 	window.open(url, "_blank");
 });
@@ -1417,7 +1373,6 @@ $('body').on('click',".individual-link",function(e) {
 $('body').on('click',".region-link",function(e) {
 	e.stopPropagation();
 	var regionProfileName = $(this).data("profilename");
-	//var url = window.location.origin +"/pages/region/"+companyProfileName+"/"+regionProfileName;
 	var url = getLocationOrigin() +"/pages/region/"+companyProfileName+"/"+regionProfileName;
 	window.open(url, "_blank");
 });
