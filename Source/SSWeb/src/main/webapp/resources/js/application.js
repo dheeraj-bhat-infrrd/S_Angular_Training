@@ -1967,7 +1967,8 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		hideAdminPrivilegesChk();
+		if($("#hr-individual-tab").hasClass("bd-hdr-active"))
+			hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
