@@ -120,6 +120,19 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+		<!-- Setting social posts job detail -->
+	<bean id="socialpostsimportjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.SolrSocialPostsImport" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="socialPostsFullImport" value-ref="socialPostsFullImport" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- Setting email reader job detail -->
 	<bean id="emailreaderjobdetail"
@@ -325,6 +338,13 @@
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
 		<property name="cronExpression" value="0 0 19,20,21,22,23,0,1,2,3,4,5,6,7 * * ?" />
 	</bean>
+	
+	<!-- setting cron for social post import -->
+	<bean id="socialpostimportcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="socialpostsimportjobdetail" />
+		<property name="cronExpression" value="0 0/15 * * * ?" />
+	</bean>
 
 	<!-- setting cron for email reader -->
 	<bean id="emailreadercron"
@@ -415,6 +435,7 @@
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
+				<!-- <ref bean="socialpostsimportjobdetail" /> -->
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="crmdataagentidmapperjobdetail" />
@@ -437,6 +458,7 @@
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
+				<!-- <ref bean="socialpostimportcron" /> -->
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
@@ -492,6 +514,11 @@
 	<!-- Social feed ingestor dependencies -->
 	<bean id="ingestor"
 		class="com.realtech.socialsurvey.core.feed.impl.SocialFeedIngestionKickStarter" />
+	
+	<!-- Social post import dependencies -->
+	<bean id="socialPostsFullImport"
+		class="com.realtech.socialsurvey.core.utils.solr.SocialPostsFullImport" />
+	
 	<!-- Email reader -->
 	<bean id="emailHandler" class="com.realtech.socialsurvey.core.handler.EmailHandler" />
 

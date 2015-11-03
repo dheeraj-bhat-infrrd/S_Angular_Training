@@ -47,11 +47,7 @@ public abstract class BaseTestCase
             .implicitlyWait( Integer.parseInt( GlobalConstants.get( GlobalConstants.DRIVER_IMPLICIT_WAIT_TIME_DEFAULT ) ),
                 TimeUnit.SECONDS );
         driver.manage().window().maximize();
-        log.info( "-- Testing on: " + GlobalConstants.SERVER_URL );
-        
-        if(driver.getCurrentUrl() == null || driver.getCurrentUrl().isEmpty())
-            driver.get( GlobalConstants.SERVER_URL );
-
+        log.info( "-- Testing on: " + driver.getCurrentUrl() );
         log.info( "-- Finished Setting up" );
     }
 

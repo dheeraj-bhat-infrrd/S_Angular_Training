@@ -1,8 +1,11 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.util.Date;
 import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 /**
  * This interface contains methods to interact
@@ -38,4 +41,8 @@ public interface SocialPostDao {
     void addActionToSocialConnectionHistory( SocialUpdateAction action );
 
     List<SocialUpdateAction> getSocialConnectionHistoryByEntity( String entityType, long entityId );
+
+    List<SocialPost> fetchSocialPostsPage( int offset, int pageSize ) throws NoRecordsFetchedException;
+
+    List<SocialPost> getSocialPosts( long iden, String key, int skip, int limit, Date startDate, Date endDate );
 }

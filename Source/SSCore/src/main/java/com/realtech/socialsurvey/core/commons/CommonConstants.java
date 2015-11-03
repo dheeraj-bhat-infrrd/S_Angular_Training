@@ -198,7 +198,7 @@ public interface CommonConstants
     public static final String UNDER_RESOLUTION_COLUMN = "underResolution";
     public static final String IS_ABUSIVE_REPORTED_BY_USER_COLUMN = "isAbuseRepByUser";
     public static final String IS_UNDER_RESOLUTION_COLUMN = "underResolution";
-
+    public static final String IDEN = "iden";
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
      */
@@ -422,6 +422,7 @@ public interface CommonConstants
     /**
      * Solr document related constants
      */
+    public static final String SOURCE_SOLR = "source";
     public static final String REGION_ID_SOLR = "regionId";
     public static final String COMPANY_ID_SOLR = "companyId";
     public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
@@ -454,7 +455,13 @@ public interface CommonConstants
     public static final String PROFILE_IMAGE_URL_SOLR = "profileImageUrl";
     public static final String REVIEW_COUNT_SOLR = "reviewCount";
     public static final String TITLE_SOLR = "title";
-
+    public static final String TIME_IN_MILLIS_SOLR = "timeInMillis";
+    public static final String POST_ID_SOLR = "postId";
+    public static final String POST_TEXT_SOLR = "postText";
+    public static final String POSTED_BY_SOLR = "postedBy";
+    public static final String POST_URL_SOLR = "postUrl";
+    public static final String ID_SOLR = "id";
+    public static final String LUKE_LAST_MODIFIED = "lastModified";
     /*
      * Payment detail constants
      */
@@ -675,6 +682,10 @@ public interface CommonConstants
     public static final String HEADER_POST_COMMENT = "Post Comment";
     public static final String HEADER_POST_DATE = "Post Date";
     public static final String HEADER_POST_SOURCE = "Source";
+    public static final String HEADER_POSTED_BY = "Posted By";
+    public static final String HEADER_POST_URL = "Post URL";
+    public static final String HEADER_POST_LEVEL = "Post Level";
+    public static final String HEADER_POST_LEVEL_NAME = "Post Level Name";
 
 
     public static final String VALID_USERS_LIST = "validUsersList";
@@ -756,4 +767,9 @@ public interface CommonConstants
     public static final String AGGREGATE_BY_WEEK = "week";
     public static final String AGGREGATE_BY_MONTH = "month";
     public static final String AGGREGATE_BY_YEAR = "year";
+    
+    // Survey mood constant
+    public static final String SURVEY_MOOD_GREAT = "Great";
+    public static final String SURVEY_MOOD_OK = "OK";
+    public static final String SURVEY_MOOD_UNPLEASANT = "Unpleasant";
 }

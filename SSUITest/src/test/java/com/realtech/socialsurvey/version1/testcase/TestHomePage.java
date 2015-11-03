@@ -21,6 +21,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testHomePage" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             new HomePage( driver );
         } catch ( Exception e ) {
             e.printStackTrace( System.out );
@@ -35,6 +36,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testForgotPasswordClick" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.clickForgotPasswordLink();
         } catch ( Exception e ) {
@@ -50,6 +52,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testUserLogin" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.loginUser( GlobalConstants.USER_NAME, GlobalConstants.USER_PASSWORD );
         } catch ( Exception e ) {
@@ -65,6 +68,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testUserLoginInvalid" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.loginUser( GlobalConstants.USER_NAME, GlobalConstants.USER_PASSWORD_INCORRECT );
         } catch ( Error e ) {
@@ -86,6 +90,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testUserLogout" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.logout();
         } catch ( Exception e ) {
@@ -101,6 +106,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testUserRegister" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.registerUser( GlobalConstants.REG_FIRST_NAME, GlobalConstants.REG_LAST_NAME, GlobalConstants.REG_EMAILID );
         } catch ( Exception e ) {
@@ -116,6 +122,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testProSearch" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.findAPro( GlobalConstants.PRO_FIRST_NAME, GlobalConstants.PRO_LAST_NAME );
         } catch ( Exception e ) {
@@ -131,6 +138,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testPricingLinkClick" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.clickPricingLink();
         } catch ( Exception e ) {
@@ -146,6 +154,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testPrivacyClick" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.clickPrivacyLink();
         } catch ( Exception e ) {
@@ -161,6 +170,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testFeaturesLinkClick" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.clickFeaturesLink();
         } catch ( Exception e ) {
@@ -176,6 +186,7 @@ public class TestHomePage extends BaseTestCase
     {
         LOG.trace( "\n\n*** Started Testing: testTermsLinkClick" );
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.clickTermsLink();
         } catch ( Exception e ) {
@@ -192,6 +203,7 @@ public class TestHomePage extends BaseTestCase
         LOG.trace( "\n\n*** Started Testing: testUserLoginInvalidEmailId" );
         HomePage homePage = null;
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             homePage = new HomePage( driver );
             homePage.loginUser( GlobalConstants.EMAILID_INCORRECT, GlobalConstants.USER_PASSWORD );
         } catch ( Error e ) {
@@ -213,6 +225,7 @@ public class TestHomePage extends BaseTestCase
         LOG.trace( "\n\n*** Started Testing: testUserLoginEmptyEmailId" );
         HomePage homePage = null;
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             homePage = new HomePage( driver );
             homePage.loginUser( "", GlobalConstants.USER_PASSWORD );
         } catch ( Error e ) {
@@ -234,6 +247,7 @@ public class TestHomePage extends BaseTestCase
         LOG.trace( "\n\n*** Started Testing: testUserLoginEmptyPassword" );
         HomePage homePage = null;
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             homePage = new HomePage( driver );
             homePage.loginUser( GlobalConstants.USER_NAME, "" );
         } catch ( Error e ) {
@@ -255,6 +269,7 @@ public class TestHomePage extends BaseTestCase
         LOG.trace( "\n\n*** Started Testing: testUserRegisterWithExistingEmail" );
 
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             HomePage homePage = new HomePage( driver );
             homePage.registerUser( GlobalConstants.REG_FIRST_NAME, GlobalConstants.REG_LAST_NAME,
                 GlobalConstants.REG_EXISTING_EMAILID );
@@ -279,6 +294,7 @@ public class TestHomePage extends BaseTestCase
 
         HomePage homePage = null;
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             homePage = new HomePage( driver );
             homePage.registerUser( "", GlobalConstants.REG_LAST_NAME, GlobalConstants.REG_EMAILID );
         } catch ( Error e ) {
@@ -301,6 +317,7 @@ public class TestHomePage extends BaseTestCase
 
         HomePage homePage = null;
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             homePage = new HomePage( driver );
             homePage.registerUser( GlobalConstants.REG_FIRST_NAME, "", GlobalConstants.REG_EMAILID );
         } catch ( Error e ) {
@@ -323,6 +340,7 @@ public class TestHomePage extends BaseTestCase
 
         HomePage homePage = null;
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             homePage = new HomePage( driver );
             homePage.registerUser( GlobalConstants.REG_FIRST_NAME, GlobalConstants.REG_LAST_NAME, "" );
         } catch ( Error e ) {
@@ -345,6 +363,7 @@ public class TestHomePage extends BaseTestCase
 
         HomePage homePage = null;
         try {
+            driver.get( GlobalConstants.SERVER_URL );
             homePage = new HomePage( driver );
             homePage.registerUser( GlobalConstants.REG_FIRST_NAME, GlobalConstants.REG_LAST_NAME,
                 GlobalConstants.EMAILID_INCORRECT );

@@ -4851,7 +4851,22 @@ public class ProfileManagementController
         return count + "";
     }
 
-
+    /*
+     * Method to fetch count of posts for the logged in user.
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/postscountforusersolr")
+    public String getPostsCountForUserSolr( HttpServletRequest request )
+    {
+        LOG.info( "Method to get posts for the user, getPostsCountForUser() started" );
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long count = profileManagementService.getPostsCountForUser( entityType, entityId );
+        LOG.info( "Method to get posts for the user, getPostsCountForUser() finished" );
+        return count + "";
+    }
+    
     /**
      * Method to update about profile details
      * 
