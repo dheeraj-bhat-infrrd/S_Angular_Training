@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.QueryParam;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
@@ -1785,6 +1786,24 @@ public class SurveyManagementController
             message = new Gson().toJson( list );
         }
         return message;
+    }
+    
+    @ResponseBody
+    @RequestMapping (value="/apicheck/abusivephrase", method = RequestMethod.GET)
+    public String getAbusivePhrase(@QueryParam (value = "feedback") String feedback){
+    	LOG.debug("Checking the abusive phrase for feedback "+feedback);
+    	String phrase = null;
+    	if(feedback != null && !feedback.isEmpty()){
+    		feedback = feedback.toLowerCase();
+    		String[] swearList = surveyHandler.getSwearList();
+    		for(String swearWord : swearList){
+    			if(feedback.contains(swearWord)){
+    				phrase = swearWord;
+    				break;
+    			}
+    		}
+    	}
+    	return phrase;
     }
 }
 // JIRA SS-119 by RM-05 : EOC
