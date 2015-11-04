@@ -46,6 +46,12 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
     public Set<Long> findUserIdsByRegion( long regionId );
 
 
+    public int getUsersUnderBranchAdminCount( User user );
+
+
+    public int getUsersUnderRegionAdminCount( User user );
+
+
     public List<UserFromSearch> findUsersUnderBranchAdmin( User user, int startIndex, int batchSize );
 
 
