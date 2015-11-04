@@ -1472,13 +1472,22 @@
 	}
 	.wc-btn-row{
 		margin-top: 10px;
+		    height: auto;
+    min-height: 40px;
 	}
 	.wc-sub-send-btn,.wc-sub-btn{
 	  	width: auto;
   		padding: 0 30px;
 	}
+	.wc-width {
+	width:100%;
+}
 	.wc-popup-body-cont{
 		padding: 10px 0;
+	}
+	
+	.wc-dash-btn{
+	margin-left:130px;
 	}
 	.wc-form-txt {
 		width: 100%;

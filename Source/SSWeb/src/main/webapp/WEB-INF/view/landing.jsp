@@ -12,6 +12,7 @@
 </script>
 <script src="${initParam.resourcesPath}/resources/js/activesession.js"></script>
 <script type="text/javascript" async src="//platform.twitter.com/widgets.js" async="async"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	// Show popup if any active session found
@@ -27,11 +28,18 @@ function landingFlow() {
 	var popupStatus = "${popupStatus}";
 	var showLinkedInPopup = "${showLinkedInPopup}";
 	var showSendSurveyPopup = "${showSendSurveyPopup}";
+	var disableCookie="false";
+	
+	var cookieValue= $.cookie("doNotShowPopup");
+	
+	if(!navigator.cookieEnabled){
+		var disableCookie="true";
+	}
 	
 	if (showLinkedInPopup == "true" && popupStatus == "Y") {
 		linkedInDataImport();
 	}
-	else if (showSendSurveyPopup == "true" && popupStatus == "Y") {
+	else if (cookieValue !="true" && showSendSurveyPopup == "true" && popupStatus == "Y") {
 		sendSurveyInvitation();
 	}
 	
