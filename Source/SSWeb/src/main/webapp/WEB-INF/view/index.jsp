@@ -77,8 +77,8 @@
                 <span class="txt-header-small">Social Survey is where </span>
                 <span class="txt-bold txt-header-small">Professionals</span> <span class="txt-header-small">and</span>
                 <span class="txt-bold txt-header-small">Customers </span><span class="txt-header-small">connect</span> -->
-                <span>Amplify the Voice of Your Customer</span><br/>
-                <span class="font-22 s-font-16">Engaging Customers and Enhancing Your Online Reputation</span>
+                <span>Enterprise Reputation Management</span><br/>
+                <span> <a target="_blank" class="anchor-home" style="font-size: 16px;" href="https://www.youtube.com/v/oDgAyRpjC2Y">To Learn More Click Here</a></span>
 			</div>
 			<div class="content-wrapper clearfix">
 				<div class="float-left c-pic-panel">
