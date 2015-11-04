@@ -442,5 +442,17 @@ public interface UserManagementService
 
     void updateUserInSolr( User user ) throws InvalidInputException, SolrException;
 
+
+    public int getUsersUnderBranchAdminCount( User user );
+
+
+    public int getUsersUnderRegionAdminCount( User user );
+
+
+    public List<UserFromSearch> getUsersUnderBranchAdmin( User user, int startIndex, int batchSize );
+
+
+    public List<UserFromSearch> getUsersUnderRegionAdmin( User admin, int startIndex, int batchSize );
+
 }
 // JIRA SS-34 BY RM02 BOC
