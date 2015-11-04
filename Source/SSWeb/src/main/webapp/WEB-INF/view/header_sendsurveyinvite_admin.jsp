@@ -47,11 +47,35 @@
 		</div>
 	</div>
 	<div class="wc-btn-row clearfix">
-		<div class="wc-btn-col float-left">
-			<div id="wc-skip-send-survey" class="wc-skip-btn float-right wc-final-skip"><spring:message code="label.skip.key" /></div>
-		</div>
-		<div class="wc-btn-col float-left">
-			<div id="wc-send-survey" class="wc-sub-send-btn float-left wc-final-submit"><spring:message code="label.send.key" /></div>
-		</div>
+
+	  <div class="float-left wc-width"  id="wc-popup<c:out value='_${disableCookie}'/>true">
+	    <input id="wc-dashboard-popup" class="float-left" type="checkbox" />
+	     <div class="float-left wc-dashboard-text"><spring:message code="label.donot.send.key"/></div>
+	 </div>
+	<div class="wc-btn-col float-left clearfix wc-dash-btn">
+		<div id="wc-skip-send-survey" class="wc-skip-btn float-left wc-final-skip"><spring:message code="label.skip.key" /></div>
+	<div id="wc-send-survey" class="wc-sub-send-btn float-left wc-final-submit"><spring:message code="label.send.key" /></div>
+	</div>
 	</div>
 </div>
+<script>
+$(document).ready(function(){
+	var cookieValue= $.cookie("doNotShowPopup");
+	if(cookieValue=="true"){
+		$('#wc-dashboard-popup').prop("checked",true);
+	}else{
+		$('#wc-dashboard-popup').prop("checked",false);
+	}
+	
+	$('#wc-popup').remove();
+	var doNotShowPopup ="false";
+	
+	$("#wc-dashboard-popup").change(function() {
+		if ($(this).is(":checked")) {
+			$.cookie("doNotShowPopup", "true",{ expires: 365 * 10 });
+		} else {
+			$.cookie("doNotShowPopup", "false");
+		}
+	});
+});
+</script>
