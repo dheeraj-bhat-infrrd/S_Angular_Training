@@ -9,11 +9,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -39,7 +39,9 @@ import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -112,6 +114,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
         }
     	long incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds);
+    	LOG.debug("Completed survey: "+completedSurveyCount);
+    	LOG.debug("Incomplete survey: "+incompleteSurveyCount);
     	return completedSurveyCount+incompleteSurveyCount;
     }
     
@@ -577,7 +581,17 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
                 surveyDetailsToPopulate.add( survey.getMood() );
                 surveyDetailsToPopulate.add( survey.getReview() );
-                if ( survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty() ) {
+                if(survey.getMood()!= null && survey.getMood().equals(CommonConstants.SURVEY_MOOD_GREAT) && survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty()){
+                	String status = survey.getAgreedToShare();
+                    if ( status.equals( "true" ) ) {
+                        surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
+                    } else {
+                        surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
+                    }
+                }else {
+                    surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
+                }
+                /*if ( survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty() ) {
                     String status = survey.getAgreedToShare();
                     if ( status.equals( "true" ) ) {
                         surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
@@ -588,9 +602,31 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
                 } else {
                     surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
+                }*/
+                if(survey.getSocialMediaPostDetails() != null){
+                	Set<String> socialMedia = new HashSet<>();
+                	if(survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null && survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() != null && !survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn().isEmpty()){
+                		socialMedia.addAll(survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn());
+                	}
+                	if(survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null && !survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn().isEmpty()){
+                		socialMedia.addAll(survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn());
+                	}
+                	if(survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null && !survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList().isEmpty()){
+                		for(RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList()){
+                			if(regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty()){
+                				socialMedia.addAll(regionMediaDetail.getSharedOn());
+                			}
+                		}
+                	}
+                	if(survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null && !survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList().isEmpty()){
+                		for(BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList()){
+                			if(branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty()){
+                				socialMedia.addAll(branchMediaDetail.getSharedOn());
+                			}
+                		}
+                	}
+                	 surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
                 }
-
-                surveyDetailsToPopulate.add( StringUtils.join( survey.getSharedOn(), "," ) );
 
                 data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
                 surveyDetailsToPopulate = new ArrayList<>();

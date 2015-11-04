@@ -74,10 +74,15 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                     continue;
                 }
 
-                if ( survey.getSharedOn() == null )
+                if ( survey.getSocialMediaPostDetails() != null
+                    && survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
+                    && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null ) {
+                    socialPosts = new HashSet<String>( survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                        .getSharedOn() );
+                } else {
                     socialPosts = new HashSet<>();
-                else
-                    socialPosts = new HashSet<String>( survey.getSharedOn() );
+                }
+
                 links = new StringBuilder();
                 for ( String site : getRemainingSites( socialPosts, socialSitesWithSettings ) ) {
                     try {
@@ -182,8 +187,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
         AgentSettings agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
         params.put( "agentName", survey.getAgentName() );
-        params
-            .put( "agentProfileLink", surveyHandler.getApplicationBaseUrl() + "rest/profile/" + agentSettings.getProfileUrl() );
+        params.put( "agentProfileLink", agentSettings.getProfileUrl() );
         params.put( "firstName", survey.getCustomerFirstName() );
         params.put( "lastName", survey.getCustomerLastName() );
         params.put( "agentId", survey.getAgentId() + "" );
@@ -191,7 +195,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         params.put( "customerEmail", survey.getCustomerEmail() );
         params.put( "feedback", survey.getReview() );
         LOG.debug( "Method to generate URL parameters for Facebook, generateUrlParamsForFacebook() finished." );
-        return urlGenerator.generateUrl( params, surveyHandler.getApplicationBaseUrl() + subUrl );
+        String url = urlGenerator.generateUrl( params, surveyHandler.getApplicationBaseUrl() + subUrl );
+        return url;
     }
 
 

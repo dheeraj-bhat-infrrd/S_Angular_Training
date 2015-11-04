@@ -752,7 +752,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
          * fetching only completed surveys
          */
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-        query.fields().exclude( "surveyResponse" );
+        // query.fields().exclude( "surveyResponse" );
         if ( startDate != null && endDate != null ) {
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );

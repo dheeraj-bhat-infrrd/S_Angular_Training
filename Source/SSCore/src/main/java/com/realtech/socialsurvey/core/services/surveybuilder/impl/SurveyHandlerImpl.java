@@ -563,9 +563,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( organizationUnitSettings != null ) {
             SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
-                if ( !surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0 ) {
-                    reminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
-                    maxReminders = surveySettings.getMax_number_of_survey_reminders();
+                if ( !surveySettings.getIsSocialPostReminderDisabled()
+                    && surveySettings.getSocial_post_reminder_interval_in_days() > 0 ) {
+                    reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
+                    maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
                     autopostScore = surveySettings.getShow_survey_above_score();
                 }
             }
@@ -1191,6 +1192,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         queries.put( "customerEmailId", customerEmail );
         queries.put( "customerFirstName", custFirstName );
         queries.put( "customerLastName", custLastName );
+
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
             queries );
         LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
@@ -1328,11 +1330,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 unavailableAgents.add( survey );
                 companies.add( survey.getCompanyId() );
-            } else if ( (survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty()) && ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() )) {
-                    LOG.error( "No Name found for customer, hence this is an invalid survey "
-                        + survey.getSurveyPreIntitiationId() );
-                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                    customersWithoutName.add( survey );
+            } else if ( ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() )
+                && ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) ) {
+                LOG.error( "No Name found for customer, hence this is an invalid survey " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                customersWithoutName.add( survey );
 
             } else if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
                 LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
@@ -1383,7 +1385,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Inside method validateUnitSettingsForDotloop " );
         int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
         if ( surveyPreInitiation != null ) {
-        	LOG.info( "Processing survey pre initiation id: "+surveyPreInitiation.getSurveyPreIntitiationId() );
+            LOG.info( "Processing survey pre initiation id: " + surveyPreInitiation.getSurveyPreIntitiationId() );
             boolean found = false;
             if ( surveyPreInitiation.getCompanyId() == user.getCompany().getCompanyId() ) {
                 LOG.debug( "Though the company id is same, the region or branch might be different " );
@@ -1936,31 +1938,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 if ( !found ) {
                     branchMediaPostDetails = new BranchMediaPostDetails();
                     branchMediaPostDetails.setBranchId( setting.getIden() );
-                }
 
-                LOG.debug( "Adding the region this branch belongs too " );
-                try {
-                    OrganizationUnitSettings regionSetting = profileManagementService.getRegionProfileByBranch( setting );
-                    boolean regionFound = false;
-                    for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
+                    LOG.debug( "Adding the region this branch belongs too " );
+                    try {
+                        OrganizationUnitSettings regionSetting = profileManagementService.getRegionProfileByBranch( setting );
+                        boolean regionFound = false;
+                        for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
 
-                        RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
-                        if ( regionMediaPostDetails.getRegionId() == regionSetting.getIden() ) {
-                            regionFound = true;
-                            break;
+                            RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
+                            if ( regionMediaPostDetails.getRegionId() == regionSetting.getIden() ) {
+                                regionFound = true;
+                                break;
+                            }
                         }
+                        if ( !regionFound ) {
+                            RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
+                            regionMediaPostDetails.setRegionId( regionSetting.getIden() );
+                            regionMediaPostDetailsList.add( regionMediaPostDetails );
+                        }
+                        branchMediaPostDetails.setRegionId( regionSetting.getIden() );
+                    } catch ( ProfileNotFoundException e ) {
+                        LOG.error( "Unable to find the profile", e );
                     }
-                    if ( !regionFound ) {
-                        RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
-                        regionMediaPostDetails.setRegionId( regionSetting.getIden() );
-                        regionMediaPostDetailsList.add( regionMediaPostDetails );
-                    }
-                    branchMediaPostDetails.setRegionId( regionSetting.getIden() );
-                } catch ( ProfileNotFoundException e ) {
-                    LOG.error( "Unable to find the profile", e );
+
+                    branchMediaPostDetailsList.add( branchMediaPostDetails );
                 }
 
-                branchMediaPostDetailsList.add( branchMediaPostDetails );
 
             }
             socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );

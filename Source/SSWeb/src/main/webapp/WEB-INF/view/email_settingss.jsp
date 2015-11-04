@@ -282,9 +282,12 @@
 				
 				
 				<!-- set the mail body details -->
-				<c:if test="${accountSettings != null && accountSettings.survey_settings!= null}">
-					<c:set var="reminderinterval" value="${accountSettings.survey_settings.survey_reminder_interval_in_days}" />
-					<c:set var="isreminderdisabled" value="${accountSettings.survey_settings.isReminderDisabled}"/>
+				<c:if test="${cannonicalusersettings.companySettings != null && cannonicalusersettings.companySettings.survey_settings!= null}">
+					<c:set var="reminderinterval" value="${cannonicalusersettings.companySettings.survey_settings.survey_reminder_interval_in_days}" />
+					<c:set var="isreminderdisabled" value="${cannonicalusersettings.companySettings.survey_settings.isReminderDisabled}"/>
+					<c:set var="postreminderinterval" value="${cannonicalusersettings.companySettings.survey_settings.social_post_reminder_interval_in_days}" />
+					<c:set var="ispostreminderdisabled" value="${cannonicalusersettings.companySettings.survey_settings.isSocialPostReminderDisabled}"/>
+				
 				</c:if>
 				<div class="clearfix st-bottom-wrapper st-reminder-wrapper">
 					<div class="float-left"><spring:message code="label.reminder.interval.key" /></div>
@@ -298,10 +301,46 @@
 					<div class="clearfix st-check-main float-left">
 						<div class="float-left st-check-wrapper">
 							<input type="hidden" name="reminder-needed-hidden" id="reminder-needed-hidden" value="${isreminderdisabled}">
-							<div id="st-reminder-on" class="st-checkbox st-checkbox-on hide"></div>
-							<div id="st-reminder-off" class="st-checkbox st-checkbox-off"></div>
+							<c:choose>
+							<c:when test="${isreminderdisabled == false}">
+								<div id="st-reminder-on" class="st-checkbox st-checkbox-on hide"></div>
+								<div id="st-reminder-off" class="st-checkbox st-checkbox-off"></div>
+							</c:when>
+							<c:otherwise>
+								<div id="st-reminder-on" class="st-checkbox st-checkbox-on"></div>
+								<div id="st-reminder-off" class="st-checkbox st-checkbox-off hide"></div>
+							</c:otherwise>
+							</c:choose>
+							
 						</div>
 						<div class="float-left st-check-txt-OR"><spring:message code="label.noreminder.key" /></div>
+					</div>
+				</div>
+				
+				<div class="clearfix st-bottom-wrapper st-reminder-wrapper">
+					<div class="float-left"><spring:message code="label.post.reminder.interval.key" /></div>
+					<div class="clearfix float-left">
+						<div class="float-left st-input-reminder">
+							<input class="st-rating-input" name="post-reminder-interval" id="post-reminder-interval" value="${postreminderinterval}">
+							<div id="post-reminder-interval-error" class="hm-item-err-2"></div>
+						</div>
+						<div class="float-left"><spring:message code="label.days.key" /></div>
+					</div>
+					<div class="clearfix st-check-main float-left">
+						<div class="float-left st-check-wrapper">
+							<input type="hidden" name="post-reminder-needed-hidden" id="post-reminder-needed-hidden" value="${ispostreminderdisabled}">
+							<c:choose>
+							<c:when test="${ispostreminderdisabled == false}">
+								<div id="post-reminder-on" class="st-checkbox st-checkbox-on hide"></div>
+								<div id="post-reminder-off" class="st-checkbox st-checkbox-off"></div>
+							</c:when>
+							<c:otherwise>
+								<div id="post-reminder-on" class="st-checkbox st-checkbox-on"></div>
+								<div id="post-reminder-off" class="st-checkbox st-checkbox-off hide"></div>
+							</c:otherwise>
+							</c:choose>
+						</div>
+						<div class="float-left st-check-txt-OR"><spring:message code="label.post.noreminder.key" /></div>
 					</div>
 				</div>
 			</form>
@@ -575,7 +614,7 @@
 		});
 		
 		
-		
+		//for survey reminder
 		$('#reminder-interval').change(function() {
 			$('#mailcategory').val('reminder-interval');
 			if(validateReminderInterval('reminder-interval')) {
@@ -601,6 +640,35 @@
 			$(this).hide();
 			
 			$('#reminder-interval').attr("disabled", true);
+			updateReminderSettings("mail-body-settings-form");
+		});
+		
+		//for social post reminder
+		$('#post-reminder-interval').change(function() {
+			$('#mailcategory').val('post-reminder-interval');
+			if(validateReminderInterval('post-reminder-interval')) {
+				updateReminderSettings("mail-body-settings-form");
+			}
+		});
+
+		$('#post-reminder-on').click(function() {
+			$('#mailcategory').val('post-reminder-needed');
+			
+			$('#post-reminder-needed-hidden').val('false');
+			$('#post-reminder-off').show();
+			$(this).hide();
+
+			$('#post-reminder-interval').removeAttr("disabled");
+			updateReminderSettings("mail-body-settings-form");
+		});
+		$('#post-reminder-off').click(function() {
+			$('#mailcategory').val('post-reminder-needed');
+
+			$('#post-reminder-needed-hidden').val('true');
+			$('#post-reminder-on').show();
+			$(this).hide();
+			
+			$('#post-reminder-interval').attr("disabled", true);
 			updateReminderSettings("mail-body-settings-form");
 		});
 

@@ -508,7 +508,6 @@ public class OrganizationManagementController
     public String showEmailSettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Method showEmailSettings of OrganizationManagementController called" );
-
         return JspResolver.EMAIL_SETTINGS;
     }
 
@@ -1320,6 +1319,34 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
+            
+            else if ( mailCategory != null && mailCategory.equals( "post-reminder-interval" ) ) {
+                int reminderInterval = Integer.parseInt( request.getParameter( "post-reminder-interval" ) );
+                if ( reminderInterval == 0 ) {
+                    LOG.warn( "Reminder Interval is 0." );
+                    throw new InvalidInputException( "Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setSocial_post_reminder_interval_in_days( reminderInterval );
+                }
+                LOG.info( "Updating Social Post Reminder Interval" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+
+            else if ( mailCategory != null && mailCategory.equals( "post-reminder-needed" ) ) {
+                boolean isReminderDisabled = Boolean.parseBoolean( request.getParameter( "post-reminder-needed-hidden" ) );
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setSocialPostReminderDisabled( isReminderDisabled );
+                }
+                LOG.info( "Updating Social Post Reminder Needed" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
 
             if ( organizationManagementService.updateSurveySettings( companySettings, originalSurveySettings ) ) {
                 companySettings.setSurvey_settings( originalSurveySettings );
@@ -1336,6 +1363,71 @@ public class OrganizationManagementController
         return message;
     }
 
+    
+    
+    /**
+     * Method to update Survey Reminder Settings
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/updatesocialpostremindersettings", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSocialPostReminderSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating Social Post Reminder Settings" );
+        String mailCategory = request.getParameter( "mailcategory" );
+        SurveySettings originalSurveySettings = null;
+        String message = "";
+
+        try {
+            User user = sessionHelper.getCurrentUser();
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+
+            if ( mailCategory != null && mailCategory.equals( "post-reminder-interval" ) ) {
+                int reminderInterval = Integer.parseInt( request.getParameter( "reminder-interval" ) );
+                if ( reminderInterval == 0 ) {
+                    LOG.warn( "Reminder Interval is 0." );
+                    throw new InvalidInputException( "Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setSocial_post_reminder_interval_in_days( reminderInterval );
+                }
+                LOG.info( "Updating Social Post Reminder Interval" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+
+            else if ( mailCategory != null && mailCategory.equals( "post-reminder-needed" ) ) {
+                boolean isReminderDisabled = Boolean.parseBoolean( request.getParameter( "reminder-needed-hidden" ) );
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setSocialPostReminderDisabled( isReminderDisabled );
+                }
+                LOG.info( "Updating Social Post Reminder Needed" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+
+            if ( organizationManagementService.updateSurveySettings( companySettings, originalSurveySettings ) ) {
+                companySettings.setSurvey_settings( originalSurveySettings );
+                LOG.info( "Updated Survey Settings" );
+            }
+        } catch ( NumberFormatException e ) {
+            LOG.error( "NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while updating survey settings. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
 
     /**
      * Method to update Other Company Settings
