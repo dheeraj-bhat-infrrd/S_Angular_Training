@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,7 +166,29 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
         LOG.info( "Fetching paginated social post results" );
 
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.POST_TEXT_SOLR ).regex( NON_SS_POSTS_REGEX ) );
+        //query.addCriteria( Criteria.where( CommonConstants.POST_TEXT_SOLR ).regex( NON_SS_POSTS_REGEX ) );
+        query.limit( pageSize );
+        query.skip( offset );
+        query.fields().exclude( "post" );
+        return mongoTemplate.find( query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION );
+    }
+    
+    /**
+     * Method to fetch social posts from mongodb for solr indexing
+     * 
+     * @param offset
+     * @param pageSize
+     * @param lastBuildTime 
+     * @return
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    public List<SocialPost> fetchSocialPostsPageforSolrIndexing( int offset, int pageSize, Date lastBuildTime  ) throws NoRecordsFetchedException
+    {
+        LOG.info( "Fetching paginated social post results for indexing in solr" );
+
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.POST_TEXT_SOLR ).regex( NON_SS_POSTS_REGEX ).and( KEY_MONGO_ID ).gt( new ObjectId( lastBuildTime ) ) );
         query.limit( pageSize );
         query.skip( offset );
         query.fields().exclude( "post" );

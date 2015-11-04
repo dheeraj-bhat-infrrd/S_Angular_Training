@@ -702,6 +702,8 @@ public interface CommonConstants
     //Session variable
     public static final String REALTECH_USER_ID = "realTechAdminId";
     public static final String COMPANY_ADMIN_SWITCH_USER_ID = "companyAdminSwitchId";
+    public static final String REGION_ADMIN_SWITCH_USER_ID = "regionAdminSwitchId";
+    public static final String BRANCH_ADMIN_SWITCH_USER_ID = "branchAdminSwitchId";
 
     public static final String PATTERN_FIRST = "patternFirst";
 
