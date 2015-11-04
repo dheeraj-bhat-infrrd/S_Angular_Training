@@ -111,6 +111,10 @@ var verticalsMasterList;
 
 //Variables for social monitor
 var autocompleteData;
+
+var defaultCountryCode = "US";
+var defaultCountry = "United States";
+
 /**
  * js functions for landing page
  */
@@ -2141,7 +2145,8 @@ function validateRegionForm() {
  * clear input fields within specified form/div
  */
 function resetInputFields(elementId) {
-	$("#"+elementId+" :input:not('.ignore-clear')").val("");
+	document.getElementById(elementId).reset();
+	//$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
 /**
@@ -2163,7 +2168,9 @@ function addRegion(formId) {
 function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	$('#region-state-city-row').hide();
+	//$('#region-state-city-row').hide();
+	$('#region-country').val(defaultCountry);
+	$('#region-country-code').val(defaultCountryCode);
 	resetInputFields("edit-region-form");
 	fetchCompleteHierarchy();
 }
@@ -2328,8 +2335,10 @@ function addOffice(formId) {
 function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	$('#office-state-city-row').hide();
+	//$('#office-state-city-row').hide();
 	resetInputFields("edit-office-form");
+	$('#office-country').val(defaultCountry);
+	$('#office-country-code').val(defaultCountryCode);
 	fetchCompleteHierarchy();
 }
 
