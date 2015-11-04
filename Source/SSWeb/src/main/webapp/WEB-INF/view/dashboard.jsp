@@ -222,8 +222,9 @@ $(document).ready(function() {
 	
 	var popupStatus = "${popupStatus}";
 	var showSendSurveyPopupAdmin = "${showSendSurveyPopupAdmin}";
+	var cookieValue = $.cookie("doNotShowPopup");
 	
-	if (showSendSurveyPopupAdmin == "true" && popupStatus == "Y") {
+	if (cookieValue != "true" && showSendSurveyPopupAdmin == "true" && popupStatus == "Y") {
 		sendSurveyInvitationAdmin(currentProfileName, currentProfileValue);
 	}
 	
