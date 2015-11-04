@@ -19,11 +19,13 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -250,5 +252,138 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         LOG.info( "Fetched " + userIds.size() + " users for region : " + regionId );
         LOG.info( "Method call ended for findUserIdsByRegion for region : " + regionId );
         return userIds;
+    }
+
+
+    @Override
+    @Transactional
+    public List<UserFromSearch> findUsersUnderBranchAdmin( User user, int startIndex, int batchSize )
+    {
+        List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
+        LOG.info( "Method call started for findUsersForBranchAdmin for branch admin id : " + user.getUserId() );
+        Query query = getSession()
+            .createSQLQuery(
+                "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, UP.BRANCH_ID, UP.REGION_ID, UP.PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, BRANCH_ID, REGION_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ?) AS subQuery_UP ON subQuery_UP.BRANCH_ID = UP.BRANCH_ID and subQuery_UP.REGION_ID = UP.REGION_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID" );
+        query.setParameter( 0, user.getUserId() );
+        query.setParameter( 1, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+        query.setParameter( 2, CommonConstants.STATUS_INACTIVE );
+        if ( startIndex > -1 ) {
+            query.setFirstResult( startIndex );
+        }
+        if ( batchSize > -1 ) {
+            query.setMaxResults( batchSize );
+        }
+
+        List<Object[]> rows = (List<Object[]>) query.list();
+
+        for ( Object[] row : rows ) {
+            UserFromSearch userFromSearch = new UserFromSearch();
+            userFromSearch.setUserId( Long.parseLong( String.valueOf( row[0] ) ) );
+            userFromSearch.setFirstName( String.valueOf( row[1] ) );
+            if ( row[2] != null )
+                userFromSearch.setLastName( String.valueOf( row[2] ) );
+            userFromSearch.setEmailId( String.valueOf( row[3] ) );
+            userFromSearch.setLoginName( String.valueOf( row[4] ) );
+            userFromSearch.setIsOwner( Integer.parseInt( String.valueOf( row[5] ) ) );
+            userFromSearch.setCompanyId( Long.parseLong( String.valueOf( row[6] ) ) );
+            userFromSearch.setStatus( Integer.parseInt( String.valueOf( row[7] ) ) );
+
+            List<Long> branchIds = new ArrayList<Long>();
+            branchIds.add( Long.parseLong( String.valueOf( row[8] ) ) );
+
+            List<Long> regionIds = new ArrayList<Long>();
+            regionIds.add( Long.parseLong( String.valueOf( row[9] ) ) );
+
+            userFromSearch.setBranches( branchIds );
+            userFromSearch.setRegions( regionIds );
+
+            setAdminLevelsForUserFromSearch( userFromSearch, Integer.parseInt( String.valueOf( row[10] ) ) );
+
+            userFromSearch
+                .setDisplayName( getCustomerDisplayName( userFromSearch.getFirstName(), userFromSearch.getLastName() ) );
+
+            userList.add( userFromSearch );
+        }
+
+        return userList;
+    }
+
+
+    @Override
+    @Transactional
+    public List<UserFromSearch> findUsersUnderRegionAdmin( User user, int startIndex, int batchSize )
+    {
+        List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
+        LOG.info( "Method call started for findUsersForBranchAdmin for branch admin id : " + user.getUserId() );
+        Query query = getSession()
+            .createSQLQuery(
+                "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, UP.BRANCH_ID, UP.REGION_ID, UP.PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, BRANCH_ID, REGION_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? ) AS subQuery_UP ON subQuery_UP.REGION_ID = UP.REGION_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID" );
+        query.setParameter( 0, user.getUserId() );
+        query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+        query.setParameter( 2, CommonConstants.STATUS_INACTIVE );
+        if ( startIndex > -1 ) {
+            query.setFirstResult( startIndex );
+        }
+        if ( batchSize > -1 ) {
+            query.setMaxResults( batchSize );
+        }
+
+        List<Object[]> rows = (List<Object[]>) query.list();
+
+        for ( Object[] row : rows ) {
+            UserFromSearch userFromSearch = new UserFromSearch();
+            userFromSearch.setUserId( Long.parseLong( String.valueOf( row[0] ) ) );
+            userFromSearch.setFirstName( String.valueOf( row[1] ) );
+            if ( row[2] != null )
+                userFromSearch.setLastName( String.valueOf( row[2] ) );
+            userFromSearch.setEmailId( String.valueOf( row[3] ) );
+            userFromSearch.setLoginName( String.valueOf( row[4] ) );
+            userFromSearch.setIsOwner( Integer.parseInt( String.valueOf( row[5] ) ) );
+            userFromSearch.setCompanyId( Long.parseLong( String.valueOf( row[6] ) ) );
+            userFromSearch.setStatus( Integer.parseInt( String.valueOf( row[7] ) ) );
+
+            List<Long> branchIds = new ArrayList<Long>();
+            branchIds.add( Long.parseLong( String.valueOf( row[8] ) ) );
+
+            List<Long> regionIds = new ArrayList<Long>();
+            regionIds.add( Long.parseLong( String.valueOf( row[9] ) ) );
+
+            userFromSearch.setBranches( branchIds );
+            userFromSearch.setRegions( regionIds );
+
+            setAdminLevelsForUserFromSearch( userFromSearch, Integer.parseInt( String.valueOf( row[10] ) ) );
+
+            userFromSearch
+                .setDisplayName( getCustomerDisplayName( userFromSearch.getFirstName(), userFromSearch.getLastName() ) );
+
+            userList.add( userFromSearch );
+        }
+
+        return userList;
+    }
+
+
+    private String getCustomerDisplayName( String firstName, String lastName )
+    {
+        String displayName = firstName;
+        if ( lastName != null && !lastName.isEmpty() )
+            displayName += " " + lastName;
+        return displayName;
+    }
+
+
+    private void setAdminLevelsForUserFromSearch( UserFromSearch userFromSearch, int profileMasterId )
+    {
+        switch ( profileMasterId ) {
+            case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                userFromSearch.setRegionAdmin( true );
+            case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                userFromSearch.setBranchAdmin( true );
+                break;
+            case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                userFromSearch.setAgent( true );
+                break;
+        }
+
     }
 }

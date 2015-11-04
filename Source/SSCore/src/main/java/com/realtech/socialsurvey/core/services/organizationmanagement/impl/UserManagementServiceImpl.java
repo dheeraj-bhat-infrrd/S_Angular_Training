@@ -2984,4 +2984,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    @Override
+    public List<UserFromSearch> getUsersUnderBranchAdmin( User user, int startIndex, int batchSize )
+    {
+        return userProfileDao.findUsersUnderBranchAdmin( user, startIndex, batchSize );
+    }
+
+
+    @Override
+    public List<UserFromSearch> getUsersUnderRegionAdmin( User user, int startIndex, int batchSize )
+    {
+        return userProfileDao.findUsersUnderRegionAdmin( user, startIndex, batchSize );
+    }
+
+
 }
