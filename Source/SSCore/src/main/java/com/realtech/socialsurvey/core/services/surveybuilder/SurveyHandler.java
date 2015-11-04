@@ -2,9 +2,7 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
 import java.util.Map;
-
 import org.apache.solr.client.solrj.SolrServerException;
-
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -257,4 +255,9 @@ public interface SurveyHandler
 
     public void updateModifiedOnColumnForEntity( String collectionName, long entityId );
 
+    /**
+     * Returns array of swear words. Its used only for testing. Not for development
+     * @return
+     */
+    public String[] getSwearList();
 }
