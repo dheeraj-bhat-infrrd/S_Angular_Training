@@ -348,24 +348,41 @@ public class UserManagementController
                 throw new NonFatalException( "SolrException while searching for user id.", e );
             }
 
-            // fetching users from solr
-            try {
-                SolrDocumentList results = solrSearchService.searchUsersByCompany( admin.getCompany().getCompanyId(),
-                    startIndex, batchSize );
+            if ( admin.isCompanyAdmin() ) {
+                // fetching users from solr
+                try {
+                    SolrDocumentList results = solrSearchService.searchUsersByCompany( admin.getCompany().getCompanyId(),
+                        startIndex, batchSize );
 
-                String users = new Gson().toJson( solrSearchService.getUsersFromSolrDocuments( results ) );
-                Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
-                List<UserFromSearch> usersList = new Gson().fromJson( users, searchedUsersList );
+                    String users = new Gson().toJson( solrSearchService.getUsersFromSolrDocuments( results ) );
+                    Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
+                    List<UserFromSearch> usersList = new Gson().fromJson( users, searchedUsersList );
 
-                usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
-                model.addAttribute( "userslist", usersList );
+                    usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
+                    model.addAttribute( "userslist", usersList );
 
-                model.addAttribute( "numFound", results.getNumFound() );
-                LOG.debug( "Users List: " + usersList.toString() );
-            } catch ( MalformedURLException e ) {
-                LOG.error( "MalformedURLException while searching for user id. Reason : " + e.getMessage(), e );
-                throw new NonFatalException( "MalformedURLException while searching for user id.",
-                    DisplayMessageConstants.GENERAL_ERROR, e );
+                    model.addAttribute( "numFound", results.getNumFound() );
+                    LOG.debug( "Users List: " + usersList.toString() );
+                } catch ( MalformedURLException e ) {
+                    LOG.error( "MalformedURLException while searching for user id. Reason : " + e.getMessage(), e );
+                    throw new NonFatalException( "MalformedURLException while searching for user id.",
+                        DisplayMessageConstants.GENERAL_ERROR, e );
+                }
+            } else {
+                if ( admin.isRegionAdmin() ) {
+                    List<UserFromSearch> usersList = userManagementService.getUsersUnderRegionAdmin( admin, startIndex,
+                        batchSize );
+                    usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
+                    model.addAttribute( "userslist", usersList );
+                    model.addAttribute( "numFound", usersList.size() );
+
+                } else if ( admin.isBranchAdmin() ) {
+                    List<UserFromSearch> usersList = userManagementService.getUsersUnderBranchAdmin( admin, startIndex,
+                        batchSize );
+                    usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
+                    model.addAttribute( "userslist", usersList );
+                    model.addAttribute( "numFound", usersList.size() );
+                }
             }
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
