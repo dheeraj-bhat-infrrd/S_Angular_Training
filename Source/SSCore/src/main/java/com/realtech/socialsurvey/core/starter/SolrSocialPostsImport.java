@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.realtech.socialsurvey.core.utils.solr.SocialPostsFullImport;
+import com.realtech.socialsurvey.core.utils.solr.SocialPostsDeltaImport;
 
 
 /**
@@ -16,7 +16,7 @@ import com.realtech.socialsurvey.core.utils.solr.SocialPostsFullImport;
 public class SolrSocialPostsImport extends QuartzJobBean
 {
     public static final Logger LOG = LoggerFactory.getLogger( SolrSocialPostsImport.class );
-    private SocialPostsFullImport socialPostsFullImport;
+    private SocialPostsDeltaImport socialPostsDeltaImport;
 
 
     @Override
@@ -24,7 +24,7 @@ public class SolrSocialPostsImport extends QuartzJobBean
     {
         LOG.info( "Executing SolrSocialPostsImport" );
         initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-        socialPostsFullImport.importSocialPostsIntoSolr();
+        socialPostsDeltaImport.importSocialPostsIntoSolr();
 
         LOG.info( "Finished the SolrSocialPostsImport" );
     }
@@ -32,6 +32,6 @@ public class SolrSocialPostsImport extends QuartzJobBean
 
     private void initializeDependencies( JobDataMap jobMap )
     {
-        socialPostsFullImport = (SocialPostsFullImport) jobMap.get( "socialPostsFullImport" );
+        socialPostsDeltaImport = (SocialPostsDeltaImport) jobMap.get( "socialPostsDeltaImport" );
     }
 }
