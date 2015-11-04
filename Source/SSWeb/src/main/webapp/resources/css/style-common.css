@@ -7802,3 +7802,10 @@ label.url-change-input-label {
 .social-monitor-autocomplete {
 	width: 215px !important;
 }
+
+.ui-hdr-agent-dropdown li {
+	word-break: break-all !important;
+}
+.v-sm-container {
+	min-height: 400px;
+}

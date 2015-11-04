@@ -767,4 +767,9 @@ public interface CommonConstants
     public static final String AGGREGATE_BY_WEEK = "week";
     public static final String AGGREGATE_BY_MONTH = "month";
     public static final String AGGREGATE_BY_YEAR = "year";
+    
+    // Survey mood constant
+    public static final String SURVEY_MOOD_GREAT = "Great";
+    public static final String SURVEY_MOOD_OK = "OK";
+    public static final String SURVEY_MOOD_UNPLEASANT = "Unpleasant";
 }

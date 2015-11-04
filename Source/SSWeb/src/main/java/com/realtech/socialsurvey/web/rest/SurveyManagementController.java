@@ -528,7 +528,7 @@ public class SurveyManagementController
                 String customerEmail = urlParams.get( CommonConstants.CUSTOMER_EMAIL_COLUMN );
                 String custFirstName = urlParams.get( CommonConstants.FIRST_NAME );
                 String custLastName = urlParams.get( CommonConstants.LAST_NAME );
-
+                
                 SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail,
                     custFirstName, custLastName );
                 if ( surveyPreInitiation == null ) {
@@ -633,15 +633,18 @@ public class SurveyManagementController
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
-            List<String> agentSocialList = new ArrayList<String>();
-
-            List<String> companySocialList = new ArrayList<String>();
+            
             if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
             if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
+            
+            List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
+            List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
+            
+            
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 if ( branchMediaPostDetails.getSharedOn() == null ) {
                     branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
@@ -885,6 +888,7 @@ public class SurveyManagementController
             String agentProfileLink = facebookDetails.get( "agentProfileLink" );
             String custLastName = facebookDetails.get( "lastName" );
             String agentIdStr = facebookDetails.get( "agentId" );
+            String feedback = facebookDetails.get( "feedback" );
             String ratingStr = facebookDetails.get( "rating" );
             String customerEmail = facebookDetails.get( "customerEmail" );
             String serverBaseUrl = requestUtils.getRequestServerName( request );
@@ -922,9 +926,7 @@ public class SurveyManagementController
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
-            List<String> agentSocialList = new ArrayList<String>();
 
-            List<String> companySocialList = new ArrayList<String>();
             if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
@@ -941,9 +943,14 @@ public class SurveyManagementController
                     regionMediaPostDetails.setSharedOn( new ArrayList<String>() );
                 }
             }
+            
+            List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
+            List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
+            
             String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
                 + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
                 + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            facebookMessage += "\n Feedback : " + feedback;
 
             // TODO: Bad code: DELETE: BEGIN
             // get the company id of the agent
@@ -952,7 +959,7 @@ public class SurveyManagementController
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl, user
                         .getCompany().getCompanyId() );
-                    // TODO: Bad code: Remove the comany id from the parameter: End
+                    // TODO: Bad code: Remove the company id from the parameter: End
                     agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                 }
             } catch ( FacebookException e ) {
@@ -1069,15 +1076,18 @@ public class SurveyManagementController
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
-            List<String> agentSocialList = new ArrayList<String>();
-
-            List<String> companySocialList = new ArrayList<String>();
+            
+            
             if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
             if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
+            
+            List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
+            List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
+            
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 if ( branchMediaPostDetails.getSharedOn() == null ) {
                     branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
@@ -1214,15 +1224,17 @@ public class SurveyManagementController
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
-            List<String> agentSocialList = new ArrayList<String>();
-
-            List<String> companySocialList = new ArrayList<String>();
+            
             if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
             if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
+            
+            List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
+            List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
+            
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 if ( branchMediaPostDetails.getSharedOn() == null ) {
                     branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
@@ -1381,6 +1393,11 @@ public class SurveyManagementController
         LOG.info( "Method to get Google details, getGooglePlusLink() started." );
         Map<String, String> googleUrl = new HashMap<String, String>();
         try {
+            //if url is encrypted. in case of incomplete social post reminder mail
+            /*String encryptedUrl = request.getRequestURI()  + request.getQueryString();
+            Map<String , String>  urlparameters = urlGenerator.decryptUrl( encryptedUrl );
+            String agentIdStr = urlparameters.get( "agentId" );*/
+            
             String agentIdStr = request.getParameter( "agentId" );
             if ( agentIdStr == null || agentIdStr.isEmpty() ) {
                 throw new InvalidInputException(
@@ -1441,16 +1458,22 @@ public class SurveyManagementController
 
 
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
-            SocialMediaPostDetails socialMediaPostDetails = null;
-            if ( surveyDetails.getSocialMediaPostDetails() == null ) {
-                socialMediaPostDetails = new SocialMediaPostDetails();
+            SocialMediaPostDetails socialMediaPostDetails;
+            if ( surveyDetails.getSocialMediaPostDetails() != null ) {
+                socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
 
+            }else{
+                socialMediaPostDetails = new SocialMediaPostDetails();
             }
-            AgentMediaPostDetails agentMediaPostDetails = socialMediaPostDetails.getAgentMediaPostDetails();
-            if ( agentMediaPostDetails == null ) {
+            
+            AgentMediaPostDetails agentMediaPostDetails;
+            if ( socialMediaPostDetails != null && socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
+                agentMediaPostDetails = socialMediaPostDetails.getAgentMediaPostDetails();
+            }else{
                 agentMediaPostDetails = new AgentMediaPostDetails();
                 agentMediaPostDetails.setAgentId( agentId );
             }
+            
             if ( agentMediaPostDetails.getSharedOn() == null ) {
                 agentMediaPostDetails.setSharedOn( new ArrayList<String>() );
             }
