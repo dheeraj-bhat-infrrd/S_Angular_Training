@@ -128,7 +128,7 @@
 			value="com.realtech.socialsurvey.core.starter.SolrSocialPostsImport" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="socialPostsFullImport" value-ref="socialPostsFullImport" />
+				<entry key="socialPostsDeltaImport" value-ref="socialPostsDeltaImport" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -435,7 +435,7 @@
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
-				<!-- <ref bean="socialpostsimportjobdetail" /> -->
+				<ref bean="socialpostsimportjobdetail" />
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="crmdataagentidmapperjobdetail" />
@@ -458,7 +458,7 @@
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
-				<!-- <ref bean="socialpostimportcron" /> -->
+				<ref bean="socialpostimportcron" />
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
@@ -516,8 +516,8 @@
 		class="com.realtech.socialsurvey.core.feed.impl.SocialFeedIngestionKickStarter" />
 	
 	<!-- Social post import dependencies -->
-	<bean id="socialPostsFullImport"
-		class="com.realtech.socialsurvey.core.utils.solr.SocialPostsFullImport" />
+	<bean id="socialPostsDeltaImport"
+		class="com.realtech.socialsurvey.core.utils.solr.SocialPostsDeltaImport" />
 	
 	<!-- Email reader -->
 	<bean id="emailHandler" class="com.realtech.socialsurvey.core.handler.EmailHandler" />

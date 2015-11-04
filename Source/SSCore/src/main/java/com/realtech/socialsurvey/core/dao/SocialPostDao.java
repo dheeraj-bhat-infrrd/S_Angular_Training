@@ -45,4 +45,7 @@ public interface SocialPostDao {
     List<SocialPost> fetchSocialPostsPage( int offset, int pageSize ) throws NoRecordsFetchedException;
 
     List<SocialPost> getSocialPosts( long iden, String key, int skip, int limit, Date startDate, Date endDate );
+
+    List<SocialPost> fetchSocialPostsPageforSolrIndexing( int offset, int pageSize, Date lastBuildTime )
+        throws NoRecordsFetchedException;
 }
