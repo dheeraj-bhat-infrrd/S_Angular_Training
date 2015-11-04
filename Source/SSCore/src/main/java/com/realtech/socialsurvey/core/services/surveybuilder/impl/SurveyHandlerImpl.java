@@ -1189,8 +1189,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.AGENT_ID_COLUMN, agentId );
         queries.put( "customerEmailId", customerEmail );
-        queries.put( "customerFirstName", custFirstName );
-        queries.put( "customerLastName", custLastName );
+
+        if ( custFirstName != null && !custFirstName.isEmpty() ) {
+            queries.put( "customerFirstName", custFirstName );
+        }
+        if ( custLastName != null && !custFirstName.isEmpty() ) {
+            queries.put( "customerLastName", custLastName );
+        }
+
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
             queries );
         LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
@@ -1328,11 +1334,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 unavailableAgents.add( survey );
                 companies.add( survey.getCompanyId() );
-            } else if ( (survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty()) && ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() )) {
-                    LOG.error( "No Name found for customer, hence this is an invalid survey "
-                        + survey.getSurveyPreIntitiationId() );
-                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                    customersWithoutName.add( survey );
+            } else if ( ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() )
+                && ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) ) {
+                LOG.error( "No Name found for customer, hence this is an invalid survey " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                customersWithoutName.add( survey );
 
             } else if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
                 LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
@@ -1383,7 +1389,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Inside method validateUnitSettingsForDotloop " );
         int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
         if ( surveyPreInitiation != null ) {
-        	LOG.info( "Processing survey pre initiation id: "+surveyPreInitiation.getSurveyPreIntitiationId() );
+            LOG.info( "Processing survey pre initiation id: " + surveyPreInitiation.getSurveyPreIntitiationId() );
             boolean found = false;
             if ( surveyPreInitiation.getCompanyId() == user.getCompany().getCompanyId() ) {
                 LOG.debug( "Though the company id is same, the region or branch might be different " );
