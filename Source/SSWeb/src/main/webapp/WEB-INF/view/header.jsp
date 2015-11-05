@@ -220,11 +220,11 @@
 						</div>
 					</div>
 				</c:if>
-				<!-- <c:if test="${ highestrole == 1 }">
+				<c:if test="${ highestrole == 1 }">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
 					</div>
-				</c:if> -->
+				</c:if>
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>
 				</div>
@@ -262,6 +262,16 @@
 								</div>
 							</c:when>
 							<c:when test="${not empty companyAdminSwitchId }">
+								<div class="initial-dd-item" onclick="userSwitchToCompAdmin();">
+									<spring:message code="label.switch.key" />
+								</div>
+							</c:when>
+							<c:when test="${not empty regionAdminSwitchId }">
+								<div class="initial-dd-item" onclick="userSwitchToCompAdmin();">
+									<spring:message code="label.switch.key" />
+								</div>
+							</c:when>
+							<c:when test="${not empty branchAdminSwitchId }">
 								<div class="initial-dd-item" onclick="userSwitchToCompAdmin();">
 									<spring:message code="label.switch.key" />
 								</div>
