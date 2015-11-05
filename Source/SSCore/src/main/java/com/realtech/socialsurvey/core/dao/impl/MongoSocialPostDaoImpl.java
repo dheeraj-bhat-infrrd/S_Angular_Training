@@ -11,12 +11,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialPostCompanyIdMapping;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 @Repository
@@ -193,5 +196,40 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
         query.skip( offset );
         query.fields().exclude( "post" );
         return mongoTemplate.find( query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION );
+    }
+    
+    /**
+     * Method to set companyIds for socialPosts 
+     * 
+     * @param socialPostCompanyIdMappings
+     * @throws InvalidInputException 
+     */
+    @Override
+    public void updateCompanyIdForSocialPosts( List<SocialPostCompanyIdMapping> socialPostCompanyIdMappings )
+        throws InvalidInputException
+    {
+        LOG.info( "Method updateCompanyIdForSocialPost() started" );
+
+        for ( SocialPostCompanyIdMapping socialPostCompanyIdMapping : socialPostCompanyIdMappings ) {
+            if ( socialPostCompanyIdMapping.getEntityType() == null
+                || socialPostCompanyIdMapping.getEntityType().isEmpty()
+                || !( socialPostCompanyIdMapping.getEntityType() == CommonConstants.REGION_ID_COLUMN
+                    || socialPostCompanyIdMapping.getEntityType() == CommonConstants.BRANCH_ID_COLUMN || socialPostCompanyIdMapping
+                    .getEntityType() == CommonConstants.AGENT_ID_COLUMN ) ) {
+                throw new InvalidInputException( "Invalid Entity Type" );
+            }
+            LOG.debug( "Updating social posts where entity type : " + socialPostCompanyIdMapping.getEntityType()
+                + " entity ID : " + socialPostCompanyIdMapping.getEntityId() + " with companyId : "
+                + socialPostCompanyIdMapping.getCompanyId() );
+            Query query = new Query();
+            query.addCriteria( Criteria.where( KEY_COMPANY_ID ).is( -1 ).and( socialPostCompanyIdMapping.getEntityType() ).is(
+                socialPostCompanyIdMapping.getEntityId() ) );
+
+            Update update = new Update();
+            update.set( KEY_COMPANY_ID, socialPostCompanyIdMapping.getCompanyId() );
+            mongoTemplate.updateMulti( query, update, CommonConstants.SOCIAL_POST_COLLECTION );
+
+        }
+        LOG.info( "Method updateCompanyIdForSocialPost() finished" );
     }
 }
