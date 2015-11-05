@@ -4,9 +4,36 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
-
+<c:choose>
+	<c:when test="${user.companyAdmin}">
+		<c:set value="1" var="sessionprofilemasterid"></c:set>
+	</c:when>
+	<c:when test="${user.regionAdmin}">
+		<c:set value="2" var="sessionprofilemasterid"></c:set>
+	</c:when>
+	<c:when test="${user.branchAdmin}">
+		<c:set value="3" var="sessionprofilemasterid"></c:set>
+	</c:when>
+	<c:when test="${user.agent}">
+		<c:set value="4" var="sessionprofilemasterid"></c:set>
+	</c:when>
+</c:choose>
 <c:if test ="${not empty users}">
 	<c:forEach var="branchUser" items="${users}">
+		<c:choose>
+			<c:when test="${branchUser.isOwner == 1}">
+				<c:set value="1" var="currentprofilemasterid"></c:set>
+			</c:when>
+			<c:when test="${branchUser.isRegionAdmin}">
+				<c:set value="2" var="currentprofilemasterid"></c:set>
+			</c:when>
+			<c:when test="${branchUser.isBranchAdmin}">
+				<c:set value="3" var="currentprofilemasterid"></c:set>
+			</c:when>
+			<c:when test="${branchUser.isAgent}">
+				<c:set value="4" var="currentprofilemasterid"></c:set>
+			</c:when>
+		</c:choose>
 		<tr id="user-row-${branchUser.userId}" clicked="false" data-userid="${branchUser.userId}"
 			class="v-tbl-row v-tbl-row-sel v-tbl-row-ind sel-r${regionId}-b${branchId}-u${branchUser.userId} user-row-${branchId}">
 			<td class="v-tbl-line"><div class="v-line-ind"></div></td>
@@ -57,7 +84,7 @@
 							<div class="float-left v-tbl-icn-disabled v-icn-edit"></div>
 						</c:otherwise>
 				   </c:choose>
-				   <c:if test="${user.userId != branchUser.userId}">
+				   <c:if test="${user.userId != branchUser.userId and sessionprofilemasterid < currentprofilemasterid}">
 				   		<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="${branchUser.userId}" title="login as"></div>
 				   </c:if>
                </div>

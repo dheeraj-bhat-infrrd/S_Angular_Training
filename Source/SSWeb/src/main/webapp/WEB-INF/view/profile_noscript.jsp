@@ -514,7 +514,7 @@
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-textarea-cont">
 	                    					<div class="float-left lp-textarea-icn lp-input-icn"></div>
-	                    					<textarea id="lp-input-message" type="email" class="lp-input"
+	                    					<textarea id="lp-input-message" class="lp-input"
 	                    						placeholder="I'd like to get in contact with you about.."></textarea>
 	                    				</div>
 	                    			</div>

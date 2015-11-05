@@ -2001,11 +2001,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             socialPost.setCompanyId( user.getCompany().getCompanyId() );
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             socialPost.setRegionId( entityId );
+            socialPost.setCompanyId( user.getCompany().getCompanyId() );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             socialPost.setBranchId( entityId );
+            socialPost.setCompanyId( user.getCompany().getCompanyId() );
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
             entityId = user.getUserId();
             socialPost.setAgentId( entityId );
+            socialPost.setCompanyId( user.getCompany().getCompanyId() );
         }
 
         socialPost.setTimeInMillis( System.currentTimeMillis() );
@@ -2255,7 +2258,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 // adding completeProfileUrl
                 try {
                     Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden( review.getAgentId(),
-                        CommonConstants.USER_ID_SOLR, true, 0, 1 );
+                        CommonConstants.USER_ID_SOLR, false, 0, 1 );
                     if ( documents != null && !documents.isEmpty() ) {
                         profileUrl = (String) documents.iterator().next().getProfileUrl();
                         review.setCompleteProfileUrl( baseProfileUrl + profileUrl );
