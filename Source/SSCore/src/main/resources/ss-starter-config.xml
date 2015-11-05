@@ -133,7 +133,20 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-
+	
+	<!-- Setting set companyId in mongo social posts job detail -->
+	<bean id="setcompanyidsinsocialpostsjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.SetCompanyIdsInSocialPosts" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="setCompanyIdInSocialPosts" value-ref="setCompanyIdInSocialPosts" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
 	<!-- Setting email reader job detail -->
 	<bean id="emailreaderjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -346,6 +359,13 @@
 		<property name="cronExpression" value="0 0/15 * * * ?" />
 	</bean>
 
+	<!-- setting cron for Set Company Ids In Social Posts -->
+	<bean id="setcompanyidsinsocialpostscron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="setcompanyidsinsocialpostsjobdetail" />
+		<property name="cronExpression" value="0 0/3 * * * ?" />
+	</bean>
+	
 	<!-- setting cron for email reader -->
 	<bean id="emailreadercron"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
@@ -444,6 +464,7 @@
 				<ref bean="dotloopjobdetail" />
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
+				<ref bean="setcompanyidsinsocialpostsjobdetail" />
 				<!-- <ref bean="imageprocessingjobdetail" />  -->
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<!-- <ref bean="zillowjobdetail" /> -->
@@ -467,6 +488,7 @@
 				<ref bean="dotloopcron" />
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
+				<ref bean="setcompanyidsinsocialpostscron" />
 				<!-- <ref bean="imageprocessingcron" /> -->
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<!-- <ref bean="zillowcron" /> -->
@@ -518,6 +540,10 @@
 	<!-- Social post import dependencies -->
 	<bean id="socialPostsDeltaImport"
 		class="com.realtech.socialsurvey.core.utils.solr.SocialPostsDeltaImport" />
+	
+	<!-- setCompanyIdsInSocialPosts dependencies -->
+	<bean id="setCompanyIdInSocialPosts"
+		class="com.realtech.socialsurvey.core.utils.mongo.SetCompanyIdInSocialPosts" />
 	
 	<!-- Email reader -->
 	<bean id="emailHandler" class="com.realtech.socialsurvey.core.handler.EmailHandler" />

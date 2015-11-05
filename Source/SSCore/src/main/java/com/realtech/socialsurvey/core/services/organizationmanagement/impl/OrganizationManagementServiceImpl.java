@@ -3974,6 +3974,54 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    /**
+     * Method to get a list of all the regions
+     * 
+     * @return
+     */
+    @Override
+    @Transactional
+    public List<Region> getAllRegions()
+    {
+        LOG.info( "Method getAllRegions started" );
+        List<Region> regions = regionDao.findAll( Region.class );
+        LOG.info( "Method getAllRegions finished" );
+        return regions;
+    }
+
+
+    /**
+     * Method to get a list of all the branches
+     * 
+     * @return
+     */
+    @Override
+    @Transactional
+    public List<Branch> getAllBranches()
+    {
+        LOG.info( "Method getAllBranches started" );
+        List<Branch> branches = branchDao.findAll( Branch.class );
+        LOG.info( "Method getAllBranches finished" );
+        return branches;
+    }
+
+
+    /**
+     * Method to get a list of all the users
+     * 
+     * @return
+     */
+    @Override
+    @Transactional
+    public List<User> getAllUsers()
+    {
+        LOG.info( "Method getAllUsers started" );
+        List<User> users = userDao.findAll( User.class );
+        LOG.info( "Method getAllUsers finished" );
+        return users;
+    }
+
+
     @Override
     public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId ) throws InvalidInputException, SolrException,
         MalformedURLException
