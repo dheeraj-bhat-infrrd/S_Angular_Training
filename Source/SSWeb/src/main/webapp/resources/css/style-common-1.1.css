@@ -1435,5 +1435,6 @@ span.footer-ul a:hover {
 /* anchor tag for home page
 .anchor-home
 {
-	font-size: 16px;
+	font-size: 20px;
+	color: #2a6496;
 }
