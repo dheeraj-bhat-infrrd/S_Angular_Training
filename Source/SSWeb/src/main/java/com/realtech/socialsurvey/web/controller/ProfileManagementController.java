@@ -180,6 +180,8 @@ public class ProfileManagementController
 
     @Autowired
     private SocialPostDao socialPostDao;
+
+
     @Transactional
     @RequestMapping ( value = "/showprofilepage", method = RequestMethod.GET)
     public String showProfileEditPage( Model model, HttpServletRequest request )
@@ -234,10 +236,10 @@ public class ProfileManagementController
             LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
             model
                 .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
-        }  catch (ProfileNotFoundException e) {
-       	 	LOG.error( "No profile found for the user " , e );
-			return JspResolver.NO_PROFILES_FOUND;
-		}
+        } catch ( ProfileNotFoundException e ) {
+            LOG.error( "No profile found for the user ", e );
+            return JspResolver.NO_PROFILES_FOUND;
+        }
 
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
@@ -287,10 +289,10 @@ public class ProfileManagementController
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
                         "Error occured while fetching region profile" ), e.getMessage() );
-                }  catch (ProfileNotFoundException e) {
-                	LOG.error( "No profile found for the user " , e );
-					return JspResolver.NO_PROFILES_FOUND;
-				}
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.error( "No profile found for the user ", e );
+                    return JspResolver.NO_PROFILES_FOUND;
+                }
 
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
@@ -308,7 +310,7 @@ public class ProfileManagementController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( regionId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false  );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -345,10 +347,10 @@ public class ProfileManagementController
                     throw new InternalServerException( new ProfileServiceErrorCode(
                         CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
                         "Error occured while fetching branch profile" ), e.getMessage() );
-                } catch (ProfileNotFoundException e) {
-                	 LOG.error( "No profile found for the user " , e );
- 					return JspResolver.NO_PROFILES_FOUND;
-				}
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.error( "No profile found for the user ", e );
+                    return JspResolver.NO_PROFILES_FOUND;
+                }
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, null, map );
@@ -364,7 +366,7 @@ public class ProfileManagementController
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( branchId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false  );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -403,10 +405,10 @@ public class ProfileManagementController
 
                 } catch ( InvalidSettingsStateException e ) {
                     LOG.error( "Error occured while fetching branch profile" + e.getMessage() );
-                } catch (ProfileNotFoundException e) {
-                	 LOG.error( "No profile found for the user " );
-					return JspResolver.NO_PROFILES_FOUND;
-				}
+                } catch ( ProfileNotFoundException e ) {
+                    LOG.error( "No profile found for the user " );
+                    return JspResolver.NO_PROFILES_FOUND;
+                }
 
                 if ( map == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
@@ -427,7 +429,7 @@ public class ProfileManagementController
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
                 model.addAttribute( "averageRating", averageRating );
                 long reviewsCount = profileManagementService.getReviewsCount( agentId, CommonConstants.MIN_RATING_SCORE,
-                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false  );
+                    CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 profileSettings = individualProfile;
@@ -618,7 +620,7 @@ public class ProfileManagementController
                                 .lockSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_WORK, false );
                         }
                     }
-                 
+
                     if ( fieldId.equalsIgnoreCase( "aboutme-lock" ) ) {
                         if ( fieldState ) {
                             settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.ABOUT_ME, true );
@@ -2262,7 +2264,7 @@ public class ProfileManagementController
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
                             settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.WEB_ADDRESS_PERSONAL,
                                 true );
-                        } 
+                        }
                     }
                     userManagementService.updateCompany( company );
                 }
@@ -2286,7 +2288,7 @@ public class ProfileManagementController
                         } else if ( key.equalsIgnoreCase( "personal" ) ) {
                             settingsSetter
                                 .setSettingsValueForRegion( region, SettingsForApplication.WEB_ADDRESS_PERSONAL, true );
-                        } 
+                        }
                     }
                     userManagementService.updateRegion( region );
                 }
@@ -2792,7 +2794,7 @@ public class ProfileManagementController
         long regionId = 0;
         long companyId = 0;
         long agentId = 0;
-        
+
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -2814,9 +2816,10 @@ public class ProfileManagementController
                 throw new InvalidInputException( "Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
                     ioException );
             }
-            
+
             try {
-                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                Map<String, Long> hierarchyDetails = profileManagementService
+                    .getHierarchyDetailsByEntity( entityType, entityId );
                 branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
                 regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
                 companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
@@ -2824,7 +2827,7 @@ public class ProfileManagementController
             } catch ( ProfileNotFoundException e ) {
                 LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
-            
+
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
                 if ( companySettings == null ) {
@@ -2935,7 +2938,7 @@ public class ProfileManagementController
             socialUpdateAction.setCompanyId( companyId );
             socialUpdateAction.setSocialMediaSource( CommonConstants.YELP_SOCIAL_SITE );
             socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
-            
+
             LOG.info( "YelpLinked in link updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.YELP_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3244,7 +3247,7 @@ public class ProfileManagementController
         long regionId = 0;
         long companyId = 0;
         long agentId = 0;
-        
+
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -3254,9 +3257,10 @@ public class ProfileManagementController
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
             }
-            
+
             try {
-                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                Map<String, Long> hierarchyDetails = profileManagementService
+                    .getHierarchyDetailsByEntity( entityType, entityId );
                 branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
                 regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
                 companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
@@ -3264,7 +3268,7 @@ public class ProfileManagementController
             } catch ( ProfileNotFoundException e ) {
                 LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
-            
+
             String realtorLink = request.getParameter( "realtorLink" );
             try {
                 if ( realtorLink == null || realtorLink.isEmpty() ) {
@@ -3356,9 +3360,9 @@ public class ProfileManagementController
             socialUpdateAction.setRegionId( regionId );
             socialUpdateAction.setCompanyId( companyId );
             socialUpdateAction.setSocialMediaSource( CommonConstants.REALTOR_SOCIAL_SITE );
-            
+
             socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
-            
+
             LOG.info( "realtor updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REALTOR_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3404,7 +3408,7 @@ public class ProfileManagementController
         long regionId = 0;
         long companyId = 0;
         long agentId = 0;
-        
+
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -3414,9 +3418,10 @@ public class ProfileManagementController
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
             }
-            
+
             try {
-                Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+                Map<String, Long> hierarchyDetails = profileManagementService
+                    .getHierarchyDetailsByEntity( entityType, entityId );
                 branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
                 regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
                 companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
@@ -3424,7 +3429,7 @@ public class ProfileManagementController
             } catch ( ProfileNotFoundException e ) {
                 LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
-            
+
             String lendingTreeLink = request.getParameter( "lendingTreeLink" );
             try {
                 if ( lendingTreeLink == null || lendingTreeLink.isEmpty() ) {
@@ -3517,9 +3522,9 @@ public class ProfileManagementController
             socialUpdateAction.setRegionId( regionId );
             socialUpdateAction.setCompanyId( companyId );
             socialUpdateAction.setSocialMediaSource( CommonConstants.LENDINGTREE_SOCIAL_SITE );
-            
+
             socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
-            
+
             LOG.info( "lendingTree updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -4050,7 +4055,8 @@ public class ProfileManagementController
 
 
     @ResponseBody
-    @RequestMapping ( value = "/findaproscroll", method = RequestMethod.POST, produces = {"text/plain; charset=UTF-8","*/*;charset=UTF-8"})
+    @RequestMapping ( value = "/findaproscroll", method = RequestMethod.POST, produces = { "text/plain; charset=UTF-8",
+        "*/*;charset=UTF-8" })
     public String findAProfileScroll( Model model, HttpServletRequest request )
     {
         LOG.info( "Method findAProfileScroll called." );
@@ -4098,7 +4104,7 @@ public class ProfileManagementController
 
                 userList.setUsers( users );
                 userList.setUserFound( results.getNumFound() );
-                
+
             } catch ( MalformedURLException e ) {
                 LOG.error( "Error occured while searching in findAProfileScroll(). Reason is ", e );
                 throw new NonFatalException( "Error occured while searching in findAProfileScroll()", e );
@@ -4851,6 +4857,7 @@ public class ProfileManagementController
         return count + "";
     }
 
+
     /*
      * Method to fetch count of posts for the logged in user.
      */
@@ -4866,7 +4873,8 @@ public class ProfileManagementController
         LOG.info( "Method to get posts for the user, getPostsCountForUser() finished" );
         return count + "";
     }
-    
+
+
     /**
      * Method to update about profile details
      * 
@@ -5006,6 +5014,7 @@ public class ProfileManagementController
         return JspResolver.PROFILE_URL_CHANGE;
     }
 
+
     /**
      * Method to show the widget popup
      * 
@@ -5031,7 +5040,8 @@ public class ProfileManagementController
         LOG.info( "Method to show widget page finished" );
         return JspResolver.WIDGET_CODE_PAGE;
     }
-    
+
+
     @ResponseBody
     @RequestMapping ( value = "/updatepositions")
     public String updatePositions( HttpServletRequest request, Model model )

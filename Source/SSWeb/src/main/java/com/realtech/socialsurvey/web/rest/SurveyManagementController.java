@@ -8,9 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
@@ -25,7 +27,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
 import twitter4j.TwitterException;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -73,6 +78,7 @@ import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
 import facebook4j.FacebookException;
 
 
@@ -648,18 +654,18 @@ public class SurveyManagementController
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
-            
+
             if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
             if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
-            
+
             List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
             List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
-            
-            
+
+
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 if ( branchMediaPostDetails.getSharedOn() == null ) {
                     branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
@@ -958,10 +964,10 @@ public class SurveyManagementController
                     regionMediaPostDetails.setSharedOn( new ArrayList<String>() );
                 }
             }
-            
+
             List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
             List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
-            
+
             String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
                 + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
                 + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
@@ -1091,18 +1097,18 @@ public class SurveyManagementController
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
-            
-            
+
+
             if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
             if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
-            
+
             List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
             List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
-            
+
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 if ( branchMediaPostDetails.getSharedOn() == null ) {
                     branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
@@ -1239,17 +1245,17 @@ public class SurveyManagementController
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
-            
+
             if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
             if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
-            
+
             List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
             List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
-            
+
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 if ( branchMediaPostDetails.getSharedOn() == null ) {
                     branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
@@ -1412,7 +1418,7 @@ public class SurveyManagementController
             /*String encryptedUrl = request.getRequestURI()  + request.getQueryString();
             Map<String , String>  urlparameters = urlGenerator.decryptUrl( encryptedUrl );
             String agentIdStr = urlparameters.get( "agentId" );*/
-            
+
             String agentIdStr = request.getParameter( "agentId" );
             if ( agentIdStr == null || agentIdStr.isEmpty() ) {
                 throw new InvalidInputException(
@@ -1448,6 +1454,146 @@ public class SurveyManagementController
 
 
     @ResponseBody
+    @RequestMapping ( value = "/posttogoogleplus", method = RequestMethod.GET)
+    public ModelAndView postToGooglePlus( HttpServletRequest request )
+    {
+        LOG.info( "Method to get Google details, postOnGooglePlus() started." );
+        String redirectUrl = null;
+        try {
+            Map<String, String> urlParameters = urlGenerator.decryptParameters( request.getParameter( "q" ) );
+            String agentIdStr = urlParameters.get( "agentId" );
+            String customerEmail = urlParameters.get( "customerEmail" );
+            if ( agentIdStr == null || agentIdStr.isEmpty() ) {
+                throw new InvalidInputException(
+                    "InvalidInputException caught in postOnGooglePlus(). Agent Id cannot be null or empty." );
+            }
+
+            long agentId = 0;
+            try {
+                agentId = Long.parseLong( agentIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while trying to convert agentId in postOnGooglePlus(). Nested exception is ",
+                    e );
+                throw e;
+            }
+
+            OrganizationUnitSettings settings = userManagementService.getUserSettings( agentId );
+            if ( settings.getProfileUrl() != null ) {
+                redirectUrl = surveyHandler.getGoogleShareUri() + surveyHandler.getApplicationBaseUrl() + "pages"
+                    + settings.getProfileUrl();
+            }
+
+            //update shared on
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
+            SocialMediaPostDetails socialMediaPostDetails = null;
+            if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+                socialMediaPostDetails = new SocialMediaPostDetails();
+
+            }
+            AgentMediaPostDetails agentMediaPostDetails = socialMediaPostDetails.getAgentMediaPostDetails();
+            if ( agentMediaPostDetails == null ) {
+                agentMediaPostDetails = new AgentMediaPostDetails();
+                agentMediaPostDetails.setAgentId( agentId );
+            }
+            if ( agentMediaPostDetails.getSharedOn() == null ) {
+                agentMediaPostDetails.setSharedOn( new ArrayList<String>() );
+            }
+            List<String> agentSocialList = agentMediaPostDetails.getSharedOn();
+            if ( !agentSocialList.contains( CommonConstants.GOOGLE_SOCIAL_SITE ) )
+                agentSocialList.add( CommonConstants.GOOGLE_SOCIAL_SITE );
+            agentMediaPostDetails.setSharedOn( agentSocialList );
+            socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );
+            surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
+            surveyHandler.updateSurveyDetails( surveyDetails );
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "Exception occured in postOnGooglePlus() while trying to post into Google." );
+            ErrorResponse response = new ErrorResponse();
+            response.setErrCode( "Error while trying to post on Google." );
+            response.setErrMessage( e.getMessage() );
+            return new ModelAndView( response.toString() );
+        }
+        LOG.info( "Method to get Google details, postOnGooglePlus() finished." );
+        return new ModelAndView( "redirect:" + redirectUrl );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/posttoyelp", method = RequestMethod.GET)
+    public ModelAndView postToYelp( HttpServletRequest request )
+    {
+        LOG.info( "Method to get Yelp details, postToYelp() started." );
+        String redirectUrl = null;
+        try {
+            Map<String, String> urlParameters = urlGenerator.decryptParameters( request.getParameter( "q" ) );
+            String agentIdStr = urlParameters.get( "agentId" );
+            String customerEmail = urlParameters.get( "customerEmail" );
+            if ( agentIdStr == null || agentIdStr.isEmpty() ) {
+                throw new InvalidInputException(
+                    "InvalidInputException caught in postToYelp(). Agent Id cannot be null or empty." );
+            }
+
+            long agentId = 0;
+            try {
+                agentId = Long.parseLong( agentIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e );
+                throw e;
+            }
+
+            OrganizationUnitSettings settings = userManagementService.getUserSettings( agentId );
+
+            if ( settings.getSocialMediaTokens() == null || settings.getSocialMediaTokens().getYelpToken() == null ) {
+
+            } else {
+                String validUrl = settings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
+                try {
+                    validUrl = urlValidationHelper.buildValidUrl( validUrl );
+                } catch ( IOException ioException ) {
+                    throw new InvalidInputException( "Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
+                        ioException );
+                }
+
+                redirectUrl = validUrl;
+
+                //update shared on
+                SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
+                SocialMediaPostDetails socialMediaPostDetails = null;
+                if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+                    socialMediaPostDetails = new SocialMediaPostDetails();
+
+                }
+                AgentMediaPostDetails agentMediaPostDetails = socialMediaPostDetails.getAgentMediaPostDetails();
+                if ( agentMediaPostDetails == null ) {
+                    agentMediaPostDetails = new AgentMediaPostDetails();
+                    agentMediaPostDetails.setAgentId( agentId );
+                }
+                if ( agentMediaPostDetails.getSharedOn() == null ) {
+                    agentMediaPostDetails.setSharedOn( new ArrayList<String>() );
+                }
+                List<String> agentSocialList = agentMediaPostDetails.getSharedOn();
+                if ( !agentSocialList.contains( CommonConstants.YELP_SOCIAL_SITE ) )
+                    agentSocialList.add( CommonConstants.YELP_SOCIAL_SITE );
+                agentMediaPostDetails.setSharedOn( agentSocialList );
+                socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );
+                surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
+                surveyHandler.updateSurveyDetails( surveyDetails );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Exception occured in postToYelp() while trying to post into Yelp." );
+            ErrorResponse response = new ErrorResponse();
+            response.setErrCode( "Error while trying to post on Yelp." );
+            response.setErrMessage( e.getMessage() );
+            return new ModelAndView( response.toString() );
+        }
+        LOG.info( "Method to get Yelp details, postToYelp() finished." );
+        return new ModelAndView( redirectUrl );
+    }
+
+
+    @ResponseBody
     @RequestMapping ( value = "/updatesharedon", method = RequestMethod.GET)
     public String updateSharedOn( HttpServletRequest request )
     {
@@ -1477,18 +1623,18 @@ public class SurveyManagementController
             if ( surveyDetails.getSocialMediaPostDetails() != null ) {
                 socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
 
-            }else{
+            } else {
                 socialMediaPostDetails = new SocialMediaPostDetails();
             }
-            
+
             AgentMediaPostDetails agentMediaPostDetails;
             if ( socialMediaPostDetails != null && socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
                 agentMediaPostDetails = socialMediaPostDetails.getAgentMediaPostDetails();
-            }else{
+            } else {
                 agentMediaPostDetails = new AgentMediaPostDetails();
                 agentMediaPostDetails.setAgentId( agentId );
             }
-            
+
             if ( agentMediaPostDetails.getSharedOn() == null ) {
                 agentMediaPostDetails.setSharedOn( new ArrayList<String>() );
             }
@@ -1810,23 +1956,25 @@ public class SurveyManagementController
         }
         return message;
     }
-    
+
+
     @ResponseBody
-    @RequestMapping (value="/apicheck/abusivephrase", method = RequestMethod.GET)
-    public String getAbusivePhrase(@QueryParam (value = "feedback") String feedback){
-    	LOG.debug("Checking the abusive phrase for feedback "+feedback);
-    	String phrase = null;
-    	if(feedback != null && !feedback.isEmpty()){
-    		feedback = feedback.toLowerCase();
-    		String[] swearList = surveyHandler.getSwearList();
-    		for(String swearWord : swearList){
-    			if(feedback.contains(swearWord)){
-    				phrase = swearWord;
-    				break;
-    			}
-    		}
-    	}
-    	return phrase;
+    @RequestMapping ( value = "/apicheck/abusivephrase", method = RequestMethod.GET)
+    public String getAbusivePhrase( @QueryParam ( value = "feedback") String feedback )
+    {
+        LOG.debug( "Checking the abusive phrase for feedback " + feedback );
+        String phrase = null;
+        if ( feedback != null && !feedback.isEmpty() ) {
+            feedback = feedback.toLowerCase();
+            String[] swearList = surveyHandler.getSwearList();
+            for ( String swearWord : swearList ) {
+                if ( feedback.contains( swearWord ) ) {
+                    phrase = swearWord;
+                    break;
+                }
+            }
+        }
+        return phrase;
     }
 }
 // JIRA SS-119 by RM-05 : EOC
