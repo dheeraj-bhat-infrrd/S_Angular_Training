@@ -374,14 +374,14 @@ public class UserManagementController
                         batchSize );
                     usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
                     model.addAttribute( "userslist", usersList );
-                    model.addAttribute( "numFound", usersList.size() );
+                    model.addAttribute( "numFound", userManagementService.getUsersUnderRegionAdminCount( admin ) );
 
                 } else if ( admin.isBranchAdmin() ) {
                     List<UserFromSearch> usersList = userManagementService.getUsersUnderBranchAdmin( admin, startIndex,
                         batchSize );
                     usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
                     model.addAttribute( "userslist", usersList );
-                    model.addAttribute( "numFound", usersList.size() );
+                    model.addAttribute( "numFound", userManagementService.getUsersUnderBranchAdminCount( admin ) );
                 }
             }
         } catch ( NonFatalException nonFatalException ) {
