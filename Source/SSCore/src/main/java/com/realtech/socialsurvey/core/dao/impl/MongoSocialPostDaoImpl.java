@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +11,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialPostCompanyIdMapping;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 @Repository
@@ -165,10 +169,67 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
         LOG.info( "Fetching paginated social post results" );
 
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.POST_TEXT_SOLR ).regex( NON_SS_POSTS_REGEX ) );
+        //query.addCriteria( Criteria.where( CommonConstants.POST_TEXT_SOLR ).regex( NON_SS_POSTS_REGEX ) );
         query.limit( pageSize );
         query.skip( offset );
         query.fields().exclude( "post" );
         return mongoTemplate.find( query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION );
+    }
+    
+    /**
+     * Method to fetch social posts from mongodb for solr indexing
+     * 
+     * @param offset
+     * @param pageSize
+     * @param lastBuildTime 
+     * @return
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    public List<SocialPost> fetchSocialPostsPageforSolrIndexing( int offset, int pageSize, Date lastBuildTime  ) throws NoRecordsFetchedException
+    {
+        LOG.info( "Fetching paginated social post results for indexing in solr" );
+
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.POST_TEXT_SOLR ).regex( NON_SS_POSTS_REGEX ).and( KEY_MONGO_ID ).gt( new ObjectId( lastBuildTime ) ) );
+        query.limit( pageSize );
+        query.skip( offset );
+        query.fields().exclude( "post" );
+        return mongoTemplate.find( query, SocialPost.class, CommonConstants.SOCIAL_POST_COLLECTION );
+    }
+    
+    /**
+     * Method to set companyIds for socialPosts 
+     * 
+     * @param socialPostCompanyIdMappings
+     * @throws InvalidInputException 
+     */
+    @Override
+    public void updateCompanyIdForSocialPosts( List<SocialPostCompanyIdMapping> socialPostCompanyIdMappings )
+        throws InvalidInputException
+    {
+        LOG.info( "Method updateCompanyIdForSocialPost() started" );
+
+        for ( SocialPostCompanyIdMapping socialPostCompanyIdMapping : socialPostCompanyIdMappings ) {
+            if ( socialPostCompanyIdMapping.getEntityType() == null
+                || socialPostCompanyIdMapping.getEntityType().isEmpty()
+                || !( socialPostCompanyIdMapping.getEntityType() == CommonConstants.REGION_ID_COLUMN
+                    || socialPostCompanyIdMapping.getEntityType() == CommonConstants.BRANCH_ID_COLUMN || socialPostCompanyIdMapping
+                    .getEntityType() == CommonConstants.AGENT_ID_COLUMN ) ) {
+                throw new InvalidInputException( "Invalid Entity Type" );
+            }
+            LOG.debug( "Updating social posts where entity type : " + socialPostCompanyIdMapping.getEntityType()
+                + " entity ID : " + socialPostCompanyIdMapping.getEntityId() + " with companyId : "
+                + socialPostCompanyIdMapping.getCompanyId() );
+            Query query = new Query();
+            query.addCriteria( Criteria.where( KEY_COMPANY_ID ).is( -1 ).and( socialPostCompanyIdMapping.getEntityType() ).is(
+                socialPostCompanyIdMapping.getEntityId() ) );
+
+            Update update = new Update();
+            update.set( KEY_COMPANY_ID, socialPostCompanyIdMapping.getCompanyId() );
+            mongoTemplate.updateMulti( query, update, CommonConstants.SOCIAL_POST_COLLECTION );
+
+        }
+        LOG.info( "Method updateCompanyIdForSocialPost() finished" );
     }
 }

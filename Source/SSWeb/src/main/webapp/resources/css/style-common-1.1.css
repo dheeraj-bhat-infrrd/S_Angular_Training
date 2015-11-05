@@ -849,6 +849,21 @@ input#find-pro-submit{
 	padding: 20px;
     padding-bottom: 30px;
 }
+.wc-dashboard-text{
+	line-height: 3;
+    margin-left: 3px;
+}
+.wc-width{
+	padding-right: 40px;
+}
+
+#wc-dashboard-popup{
+	height: 28px;
+}
+.wc-dash-btn{
+	width:300px;
+	
+}
 
 .wc-review-table {
 	padding: 15px;
@@ -911,6 +926,7 @@ span.txt-highlight {
     color: #fff;
     background: #009FE0;
     cursor: pointer;
+    margin-left: 15px;
 }
 
 .wl-import-btn:hover, .wc-sub-btn:hover{
@@ -1432,3 +1448,8 @@ span.footer-ul a:hover {
 	
 }
 
+/* anchor tag for home page
+.anchor-home
+{
+	font-size: 16px;
+}

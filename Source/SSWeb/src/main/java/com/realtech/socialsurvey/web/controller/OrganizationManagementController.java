@@ -2109,13 +2109,18 @@ public class OrganizationManagementController
 
             HttpSession session = request.getSession();
             Long superAdminUserId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
-            User companyAdminUser = sessionHelper.getCurrentUser();
-            session.invalidate();
-
+            User adminUser = sessionHelper.getCurrentUser();
             User newUser = userManagementService.getUserByUserId( id );
 
             HttpSession newSession = request.getSession( true );
-            newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, companyAdminUser.getUserId() );
+            if ( adminUser.isCompanyAdmin() ) {
+                newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, adminUser.getUserId() );
+            } else if ( adminUser.isRegionAdmin() ) {
+                newSession.setAttribute( CommonConstants.REGION_ADMIN_SWITCH_USER_ID, adminUser.getUserId() );
+            } else if ( adminUser.isBranchAdmin() ) {
+                newSession.setAttribute( CommonConstants.BRANCH_ADMIN_SWITCH_USER_ID, adminUser.getUserId() );
+            }
+
             if ( superAdminUserId != null )
                 newSession.setAttribute( CommonConstants.REALTECH_USER_ID, superAdminUserId );
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
@@ -2133,23 +2138,48 @@ public class OrganizationManagementController
     {
 
         HttpSession session = request.getSession();
-        Long companyAdminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
-
-        // Logout current user
-        session.invalidate();
-        SecurityContextHolder.clearContext();
-
-        session = request.getSession( true );
+        Long adminUserid = null;
+        if ( session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID ) != null ) {
+            adminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
+        } else if ( session.getAttribute( CommonConstants.REGION_ADMIN_SWITCH_USER_ID ) != null ) {
+            adminUserid = (Long) session.getAttribute( CommonConstants.REGION_ADMIN_SWITCH_USER_ID );
+        } else if ( session.getAttribute( CommonConstants.BRANCH_ADMIN_SWITCH_USER_ID ) != null ) {
+            adminUserid = (Long) session.getAttribute( CommonConstants.BRANCH_ADMIN_SWITCH_USER_ID );
+        }
 
         try {
-            User companyAdminUser = userManagementService.getUserByUserId( companyAdminUserid );
+            User adminUser = userManagementService.getUserByUserId( adminUserid );
 
-            // Added as details are fetched in lazy mode
-            int isOwnerValue = companyAdminUser.getIsOwner();
-            if ( isOwnerValue != 1 ) {
-                throw new InvalidInputException( "Admin user in session is not company admin" );
+            //This method did not set the profile levels as required
+            //userManagementService.setProfilesOfUser(adminUser);
+
+            //Added this code to find the highest profile level for the user
+            int profileMasterId = CommonConstants.PROFILES_MASTER_NO_PROFILE_ID;
+            for ( UserProfile userProfile : adminUser.getUserProfiles() ) {
+                switch ( userProfile.getProfilesMaster().getProfileId() ) {
+                    case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+                        profileMasterId = CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID;
+                        break;
+                    case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                        profileMasterId = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
+                        continue;
+                    case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                        if ( profileMasterId > CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                            profileMasterId = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
+                        }
+                }
             }
-            sessionHelper.loginAdminAs( companyAdminUser.getLoginName(), CommonConstants.BYPASS_PWD );
+
+            if ( profileMasterId == CommonConstants.PROFILES_MASTER_NO_PROFILE_ID ) {
+                throw new InvalidInputException( "User in session is not an admin" );
+            }
+
+            // Logout current user
+            session.invalidate();
+            SecurityContextHolder.clearContext();
+
+            session = request.getSession( true );
+            sessionHelper.loginAdminAs( adminUser.getLoginName(), CommonConstants.BYPASS_PWD );
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occurred in switchToAdminUser() method , reason : " + e.getMessage() );
             return "failure";

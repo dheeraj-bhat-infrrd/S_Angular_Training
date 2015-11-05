@@ -213,6 +213,8 @@ public class DashboardController
                     model.addAttribute( "name", unitSettings.getContact_details().getName() );
                 }
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
+                model.addAttribute( "location", unitSettings.getContact_details().getLocation() );
+                model.addAttribute( "vertical", unitSettings.getVertical() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
 
                 try {
@@ -228,6 +230,8 @@ public class DashboardController
                 }
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
                 model.addAttribute( "company", user.getCompany().getCompany() );
+                model.addAttribute( "location", unitSettings.getContact_details().getLocation() );
+                model.addAttribute( "vertical", unitSettings.getVertical() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
 
                 try {
@@ -243,6 +247,8 @@ public class DashboardController
                 }
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
                 model.addAttribute( "company", user.getCompany().getCompany() );
+                model.addAttribute( "location", unitSettings.getContact_details().getLocation() );
+                model.addAttribute( "vertical", unitSettings.getVertical() );
             } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
                 columnValue = user.getUserId();
 
@@ -251,6 +257,8 @@ public class DashboardController
                     .addAttribute( "name", user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
                 model.addAttribute( "title", unitSettings.getContact_details().getTitle() );
                 model.addAttribute( "company", user.getCompany().getCompany() );
+                model.addAttribute( "location", unitSettings.getContact_details().getLocation() );
+                model.addAttribute( "vertical", unitSettings.getVertical() );
             } else if ( realtechAdminStr != null && !realtechAdminStr.isEmpty() ) {
                 realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
             }

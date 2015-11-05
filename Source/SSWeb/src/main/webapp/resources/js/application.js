@@ -111,6 +111,10 @@ var verticalsMasterList;
 
 //Variables for social monitor
 var autocompleteData;
+
+var defaultCountryCode = "US";
+var defaultCountry = "United States";
+
 /**
  * js functions for landing page
  */
@@ -1967,7 +1971,8 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		hideAdminPrivilegesChk();
+		if($("#hr-individual-tab").hasClass("bd-hdr-active"))
+			hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
@@ -2140,7 +2145,8 @@ function validateRegionForm() {
  * clear input fields within specified form/div
  */
 function resetInputFields(elementId) {
-	$("#"+elementId+" :input:not('.ignore-clear')").val("");
+	document.getElementById(elementId).reset();
+	//$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
 /**
@@ -2162,7 +2168,9 @@ function addRegion(formId) {
 function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	$('#region-state-city-row').hide();
+	//$('#region-state-city-row').hide();
+	$('#region-country').val(defaultCountry);
+	$('#region-country-code').val(defaultCountryCode);
 	resetInputFields("edit-region-form");
 	fetchCompleteHierarchy();
 }
@@ -2327,8 +2335,10 @@ function addOffice(formId) {
 function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	$('#office-state-city-row').hide();
+	//$('#office-state-city-row').hide();
 	resetInputFields("edit-office-form");
+	$('#office-country').val(defaultCountry);
+	$('#office-country-code').val(defaultCountryCode);
 	fetchCompleteHierarchy();
 }
 
@@ -8688,6 +8698,11 @@ $(document).on('click', '#wc-send-survey', function() {
 						showToast();
 						exit = true;
 						return false;					
+					} else if(agentId.trim() == ""){
+						$('#overlay-toast').html('Please select valid agents for all survey requests');
+						showToast();
+						exit = true;
+						return false;					
 					}
 				}
 				//check if agent mail id is not same as recipient mail id
@@ -9180,8 +9195,7 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 				+"</a>"
 				+ '<div class="tweet-txt float-left">'
 				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
-				+ '<div class="tweet-text-link"><em>' + post.postedBy
-				+ '</em></div>' + '<div class="tweet-text-time"><em>'
+				+ '<div class="tweet-text-time"><em>'
 				+ convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>';
 		divToPopulate += '</div>';
 		
@@ -9509,14 +9523,7 @@ $(document).on("keyup", "#post-search-query", function(e) {
 function attachAutocompleteAgentSurveyInviteDropdown(){
 	$('.wc-review-agentname[data-name="agent-name"]').autocomplete({
 		source : function(request, response) {
-			$.ajax({
-				url : "/fetchagentsforadmin.do",
-				data : {
-					"searchKey" : request.term,
-					"columnName" : colName,
-					"columnValue" : colValue
-				},
-				success : function(data) {
+			callAjaxGetWithPayloadData("/fetchagentsforadmin.do", function(data) {
 					var responseData = JSON.parse(data);
 					response($.map(responseData, function(item) {
 		 	    	  return {
@@ -9526,8 +9533,11 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 		 	    		   emailId:item.emailId	   
 						};
 		 	       }));
-				}
-			});
+				}, {
+					"searchKey" : request.term,
+					"columnName" : colName,
+					"columnValue" : colValue
+				}, true);
 		},
 		minLength : 1,
 		select : function (event, ui) {
@@ -9536,6 +9546,7 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 			$(element).attr('agent-id', ui.item.userId);
 			$(element).attr('column-name', colName);
 			$(element).attr('email-id', ui.item.emailId);
+			$(element).attr('val', ui.item.value);
 		},
 		close: function(event, ui) {},
 		create: function(event, ui) {
@@ -9547,5 +9558,16 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 			});
 			$('.ui-autocomplete').perfectScrollbar('update');
 		}
+	});
+	
+	$('.wc-review-agentname[data-name="agent-name"]').keyup(function(e) {
+		var oldVal = $(this).attr('val');
+		var cuurentVal = $(this).val();
+		if(oldVal == cuurentVal) {
+			return;
+		}
+		$(this).attr('agent-id', "");
+		$(this).attr('column-name', "");
+		$(this).attr('email-id', "");
 	});
 }

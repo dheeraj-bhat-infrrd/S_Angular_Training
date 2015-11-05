@@ -2001,11 +2001,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             socialPost.setCompanyId( user.getCompany().getCompanyId() );
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             socialPost.setRegionId( entityId );
+            socialPost.setCompanyId( user.getCompany().getCompanyId() );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             socialPost.setBranchId( entityId );
+            socialPost.setCompanyId( user.getCompany().getCompanyId() );
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
             entityId = user.getUserId();
             socialPost.setAgentId( entityId );
+            socialPost.setCompanyId( user.getCompany().getCompanyId() );
         }
 
         socialPost.setTimeInMillis( System.currentTimeMillis() );

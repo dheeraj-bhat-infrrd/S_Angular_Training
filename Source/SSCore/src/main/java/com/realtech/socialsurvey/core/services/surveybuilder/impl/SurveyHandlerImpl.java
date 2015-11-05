@@ -1190,8 +1190,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.AGENT_ID_COLUMN, agentId );
         queries.put( "customerEmailId", customerEmail );
-        queries.put( "customerFirstName", custFirstName );
-        queries.put( "customerLastName", custLastName );
+
+        if ( custFirstName != null && !custFirstName.isEmpty() ) {
+            queries.put( "customerFirstName", custFirstName );
+        }
+        if ( custLastName != null && !custFirstName.isEmpty() ) {
+            queries.put( "customerLastName", custLastName );
+        }
 
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
             queries );
@@ -2086,12 +2091,24 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int startIndex, int numOfRows )
     {
         LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, started" );
         List<SurveyDetails> surveyDetails = surveyDetailsDao.getSurveysUnderResolution( companyId, startIndex, numOfRows );
         LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, finished" );
         return surveyDetails;
+    }
+    
+    /**
+     * Returns array of swear words. Its used only for testing. Not for development(non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler#getSwearList()
+     */
+    @Override
+    public String[] getSwearList(){
+    	LOG.debug("Returning swear list");
+    	String[] swearList = new Gson().fromJson(SWEAR_WORDS, String[].class);
+    	return swearList;
     }
 }
 // JIRA SS-119 by RM-05:EOC
