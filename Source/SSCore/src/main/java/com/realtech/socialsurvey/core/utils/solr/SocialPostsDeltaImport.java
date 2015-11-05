@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.utils.solr;
 
+import java.sql.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -19,9 +20,9 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
-public class SocialPostsFullImport
+public class SocialPostsDeltaImport
 {
-    public static final Logger LOG = LoggerFactory.getLogger( SocialPostsFullImport.class );
+    public static final Logger LOG = LoggerFactory.getLogger( SocialPostsDeltaImport.class );
     
 
     @Resource
@@ -42,15 +43,20 @@ public class SocialPostsFullImport
      */
     @Transactional
     public void importSocialPostsIntoSolr() {
-        LOG.info("Started run method of SocialPostsFullImport");
+        LOG.info("Started run method of SocialPostsDeltaImport");
         int pageNo = 1;
         List<SocialPost> socialPosts = null;
-        
+        Long lastBuild = null;
         do{
             try{
-                socialPosts = socialPostDao.fetchSocialPostsPage( pageSize * (pageNo - 1), pageSize );
+                lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
+                Date lastBuildTime = new Date( lastBuild );
+                socialPosts = socialPostDao.fetchSocialPostsPageforSolrIndexing( pageSize * (pageNo - 1), pageSize, lastBuildTime );
+                LOG.debug( "Fetched " + socialPosts.size() + " posts." );
             } catch (NoRecordsFetchedException e) {
-                LOG.info("NoRecordsFetchedException occurred while fetching social posts");
+                LOG.error("NoRecordsFetchedException occurred while fetching social posts");
+            } catch ( SolrException e ) {
+                LOG.error( "Unable to fetch last build time" );
             }
             
     
@@ -68,7 +74,7 @@ public class SocialPostsFullImport
             pageNo++;
         }
         while (!socialPosts.isEmpty());
-        LOG.info("Finished run method of SocialPostsFullImport");
+        LOG.info("Finished run method of SocialPostsDeltaImport");
         
     }
 }

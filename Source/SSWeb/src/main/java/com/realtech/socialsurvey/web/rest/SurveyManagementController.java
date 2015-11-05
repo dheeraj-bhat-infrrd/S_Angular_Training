@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.QueryParam;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
@@ -171,7 +172,7 @@ public class SurveyManagementController
     /*
      * Method to store final feedback of the survey from customer.
      */
-	@ResponseBody
+    @ResponseBody
     @RequestMapping ( value = "/data/storeFeedback")
     public String storeFeedbackAndCloseSurvey( HttpServletRequest request )
     {
@@ -205,9 +206,9 @@ public class SurveyManagementController
             SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, firstName,
                 lastName );
             surveyHandler.deleteSurveyPreInitiationDetailsPermanently( surveyPreInitiation );
-            
+
             // update the modified time of hierarchy for seo
-            surveyHandler.updateModifiedOnColumnForAgentHierachy(agentId);
+            surveyHandler.updateModifiedOnColumnForAgentHierachy( agentId );
             // TODO Search Engine Optimization
             if ( mood == null || mood.isEmpty() ) {
                 LOG.error( "Null/empty value found for mood in storeFeedback()." );
@@ -287,13 +288,13 @@ public class SurveyManagementController
                             customerName, surveyScore );
                     }
                 }
-                
+
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
                     .getCompanyId() );
-                
+
                 if ( companySettings == null )
                     throw new NonFatalException( "Company settings cannot be found for id : " + survey.getCompanyId() );
-                
+
                 if ( companySettings.getSurvey_settings() != null
                     && companySettings.getSurvey_settings().getComplaint_res_settings() != null ) {
                     ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
@@ -301,7 +302,8 @@ public class SurveyManagementController
 
                     if ( complaintRegistrationSettings.isEnabled()
                         && ( ( survey.getScore() > 0d && complaintRegistrationSettings.getRating() > 0d && survey.getScore() < complaintRegistrationSettings
-                            .getRating() ) || (!complaintRegistrationSettings.getMood().trim().isEmpty() && complaintRegistrationSettings.getMoodList().contains( mood.toLowerCase() ) ) ) ) {
+                            .getRating() ) || ( !complaintRegistrationSettings.getMood().trim().isEmpty() && complaintRegistrationSettings
+                            .getMoodList().contains( mood.toLowerCase() ) ) ) ) {
                         survey.setUnderResolution( true );
                         surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
                         emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), customerName,
@@ -528,7 +530,20 @@ public class SurveyManagementController
                 String customerEmail = urlParams.get( CommonConstants.CUSTOMER_EMAIL_COLUMN );
                 String custFirstName = urlParams.get( CommonConstants.FIRST_NAME );
                 String custLastName = urlParams.get( CommonConstants.LAST_NAME );
-                
+
+                if ( custFirstName != null && !custFirstName.isEmpty() ) {
+                    //check if name is null for dotloop data
+                    if ( custFirstName.equalsIgnoreCase( "null" ) ) {
+                        custFirstName = null;
+                    }
+                }
+                if ( custLastName != null && !custLastName.isEmpty() ) {
+                    //check if name is null for dotloop data
+                    if ( custLastName.equalsIgnoreCase( "null" ) ) {
+                        custLastName = null;
+                    }
+                }
+
                 SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail,
                     custFirstName, custLastName );
                 if ( surveyPreInitiation == null ) {
@@ -598,11 +613,11 @@ public class SurveyManagementController
                     e );
                 return e.getMessage();
             }
-            
-            if(isAbusive){
-                return "Can't post the review because it contains the swear words" ;
+
+            if ( isAbusive ) {
+                return "Can't post the review because it contains the swear words";
             }
-            
+
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
             if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
@@ -1794,6 +1809,24 @@ public class SurveyManagementController
             message = new Gson().toJson( list );
         }
         return message;
+    }
+    
+    @ResponseBody
+    @RequestMapping (value="/apicheck/abusivephrase", method = RequestMethod.GET)
+    public String getAbusivePhrase(@QueryParam (value = "feedback") String feedback){
+    	LOG.debug("Checking the abusive phrase for feedback "+feedback);
+    	String phrase = null;
+    	if(feedback != null && !feedback.isEmpty()){
+    		feedback = feedback.toLowerCase();
+    		String[] swearList = surveyHandler.getSwearList();
+    		for(String swearWord : swearList){
+    			if(feedback.contains(swearWord)){
+    				phrase = swearWord;
+    				break;
+    			}
+    		}
+    	}
+    	return phrase;
     }
 }
 // JIRA SS-119 by RM-05 : EOC

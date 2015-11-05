@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialPostCompanyIdMapping;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 /**
@@ -45,4 +47,10 @@ public interface SocialPostDao {
     List<SocialPost> fetchSocialPostsPage( int offset, int pageSize ) throws NoRecordsFetchedException;
 
     List<SocialPost> getSocialPosts( long iden, String key, int skip, int limit, Date startDate, Date endDate );
+
+    List<SocialPost> fetchSocialPostsPageforSolrIndexing( int offset, int pageSize, Date lastBuildTime )
+        throws NoRecordsFetchedException;
+
+    void updateCompanyIdForSocialPosts( List<SocialPostCompanyIdMapping> socialPostCompanyIdMappings )
+        throws InvalidInputException;
 }
