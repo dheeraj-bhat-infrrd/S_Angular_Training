@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +29,6 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
 @Component ( "userProfile")
