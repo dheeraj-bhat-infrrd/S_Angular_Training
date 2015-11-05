@@ -2985,30 +2985,44 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     @Override
-    public int getUsersUnderBranchAdminCount( User user )
+    public int getUsersUnderBranchAdminCount( User admin )
     {
-        return userProfileDao.getUsersUnderBranchAdminCount( user);
+        return userProfileDao.getUsersUnderBranchAdminCount( admin );
     }
 
 
     @Override
-    public int getUsersUnderRegionAdminCount( User user )
+    public int getUsersUnderRegionAdminCount( User admin )
     {
-        return userProfileDao.getUsersUnderRegionAdminCount( user);
+        return userProfileDao.getUsersUnderRegionAdminCount( admin );
     }
 
 
     @Override
-    public List<UserFromSearch> getUsersUnderBranchAdmin( User user, int startIndex, int batchSize )
+    public int getUsersUnderCompanyAdminCount( User admin )
     {
-        return userProfileDao.findUsersUnderBranchAdmin( user, startIndex, batchSize );
+        return userProfileDao.getUsersUnderCompanyAdminCount( admin );
     }
 
 
     @Override
-    public List<UserFromSearch> getUsersUnderRegionAdmin( User user, int startIndex, int batchSize )
+    public List<UserFromSearch> getUsersUnderBranchAdmin( User admin, int startIndex, int batchSize )
     {
-        return userProfileDao.findUsersUnderRegionAdmin( user, startIndex, batchSize );
+        return userProfileDao.findUsersUnderBranchAdmin( admin, startIndex, batchSize );
+    }
+
+
+    @Override
+    public List<UserFromSearch> getUsersUnderRegionAdmin( User admin, int startIndex, int batchSize )
+    {
+        return userProfileDao.findUsersUnderRegionAdmin( admin, startIndex, batchSize );
+    }
+
+
+    @Override
+    public List<UserFromSearch> getUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize )
+    {
+        return userProfileDao.findUsersUnderCompanyAdmin( admin, startIndex, batchSize );
     }
 
 
