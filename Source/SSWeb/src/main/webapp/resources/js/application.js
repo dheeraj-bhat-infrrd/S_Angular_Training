@@ -5341,8 +5341,13 @@ function showFeedbackPage(mood) {
 		}
 		rating = currResponse/(counter);
 		rating = parseFloat(rating).toFixed(3);
-		if((rating >= autoPostScore) && (Boolean(autoPost) == true))
+		if((rating >= autoPostScore)){
 			$("#pst-srvy-div").show();
+			if( (Boolean(autoPost) == false)){
+				$('#shr-pst-cb').val('false');
+				$('#shr-post-chk-box').addClass('bd-check-img-checked');
+			}
+		}
 		break;
 	case "OK":
 		question = neutralText;
