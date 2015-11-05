@@ -57,11 +57,6 @@
 								</div>
 								<div class="st-rating-txt float-left">
 									<!-- set the min rating -->
-									<c:set var="minpostscore" value="0"/>
-									<c:if test="${accountSettings != null && accountSettings.survey_settings!= null
-										&& accountSettings.survey_settings.show_survey_above_score != null}">
-										<c:set var="minpostscore" value="${accountSettings.survey_settings.show_survey_above_score}"/>
-									</c:if>
 									<input type="text" name="rating-min-post" id="rating-min-post" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${minpostscore}">
 									<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 								</div>
@@ -224,7 +219,6 @@ $(document).ready(function() {
 	} else {
 		$('#da-dd-wrapper').show();
 	}
-	
 	if("${autoPostEnabled}" == "false"){
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
