@@ -161,11 +161,11 @@
 						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
 					</div>
 				</c:if>
-				<!-- <c:if test="${ highestrole == 1 }">
+				<c:if test="${ highestrole == 1 }">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></a>
 					</div>
-				</c:if> -->
+				</c:if>
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></a>
 				</div>

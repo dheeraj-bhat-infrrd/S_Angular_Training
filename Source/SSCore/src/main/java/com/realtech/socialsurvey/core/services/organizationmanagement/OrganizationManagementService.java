@@ -1158,4 +1158,13 @@ public interface OrganizationManagementService
     List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
         throws InvalidInputException;
 
+
+    List<Region> getAllRegions();
+
+
+    List<Branch> getAllBranches();
+
+
+    List<User> getAllUsers();
+
 }
