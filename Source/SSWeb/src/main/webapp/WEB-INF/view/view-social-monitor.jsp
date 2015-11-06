@@ -32,9 +32,11 @@
 				<div id="hierarchy-selection-panel" class="float-left clearfix">
  					<select id="select-hierarchy-level" class="float-left dash-sel-item">
 						<option value="companyId" data-entity="company"><spring:message code="label.company.key" /></option>
-						<option value="userId" data-entity="user"><spring:message code="label.user.key" /></option>
-						<option value="branchId" data-entity="office"><spring:message code="label.office.key" /></option>
-						<option value="regionId" data-entity="region"><spring:message code="label.region.key" /></option>
+						<c:if test='${ accounttype != "INDIVIDUAL" }'>
+							<option value="userId" data-entity="user"><spring:message code="label.user.key" /></option>
+							<option value="branchId" data-entity="office"><spring:message code="label.office.key" /></option>
+							<option value="regionId" data-entity="region"><spring:message code="label.region.key" /></option>
+						</c:if>
 					</select>
 				</div>
 				<div id="entity-selection-panel" class="float-left clearfix">
@@ -77,8 +79,7 @@
 			$(document).attr("title", "Social Monitor");
 			var currentProfileName = "${columnName}";
 			var currentProfileValue = "${columnValue}";
-			setColDetails(currentProfileName, currentProfileValue);
-			showSearchedPostsSolr( true, "companyId", "${entityId}", "" );
+			setColDetails(currentProfileName, currentProfileValue, "${ user.company.companyId }");
 			if ($('#server-message>div').hasClass("error-message")) {
 				$('#server-message').show();
 			}
@@ -88,7 +89,7 @@
 			var lastBuild = new Date(Number("${ lastBuild }"));
 			if(lastBuild != null){
 				lastBuild = convertUserDateToLocale(lastBuild);
-				$("#last-build-date").html(lastBuild.toString("MMMM d, yyyy"));
+				$("#last-build-date").html(lastBuild.toString(" ddd, MMMM d, yyyy hh:mm"));
 			} else {
 				$("#last-build-date").html("Last build date unavailable");
 			}
@@ -98,21 +99,6 @@
 			autocompleteData = [];
 			getRelevantEntities();
 		});
-		
-		function postsSearch(){
-			var entityType = $("#select-hierarchy-level").val();
-			var entityId;
-			entityId = $("#selected-entity-id-hidden").val();
-			if(entityType == undefined || entityType == "companyId"){
-				entityType = "companyId";
-				entityId = "${ user.company.companyId }";
-			} else if(entityId == undefined || entityId <= 0 ){
-				$('#overlay-toast').html("Please select a valid " + $("#select-hierarchy-level").find(':selected').data('entity'));
-				showToast();
-				return;
-			}
-			showSearchedPostsSolr(true, entityType, entityId, $("#post-search-query").val());
-		}
 	</script>
 </body>
 </html>
