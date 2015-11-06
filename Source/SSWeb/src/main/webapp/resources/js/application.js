@@ -4321,6 +4321,17 @@ $(document).on('click', '.v-icn-fmail', function() {
     reinviteUser(firstName, lastName, emailId);
 });
 
+$(document).on('click', '.v-icn-femail', function() {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+	var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
+    reinviteUser(firstName, lastName, emailId);
+});
+
 /**
  * Method to send invite link
  */
@@ -7824,12 +7835,14 @@ function userSwitchToCompAdmin() {
 function bindUserLoginEvent() {
 	$('.user-login-icn').on('click', function(e) {
 		e.stopImmediatePropagation();
+		$('.user-login-icn').addClass('disable-click');
 		var payload = {
 			"colName" : "userId",
 			"colValue" : $(this).attr('data-iden')
 		};
 		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
 			// window.location = window.location.origin + '/userlogin.do';
+			$('.user-login-icn').removeClass('disable-click');
 			window.location = getLocationOrigin() + '/userlogin.do';
 		}, true, payload);
 	});
