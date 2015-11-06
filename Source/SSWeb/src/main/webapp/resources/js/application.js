@@ -9265,7 +9265,18 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 					- scrollContainer.clientHeight) && (smScrollTop < scrollContainer.scrollTop)) {
 				
 				if (proPostStartIndex < proPostCount){
-					showSearchedPostsSolr(false, entityType, entityId, searchQuery);
+					var entityType = $("#select-hierarchy-level").val();
+					var entityId;
+					entityId = $("#selected-entity-id-hidden").val();
+					if(entityType == undefined || entityType == "companyId"){
+						entityType = "companyId";
+						entityId = companyIdForSocialMonitor;
+					} else if(entityId == undefined || entityId <= 0 ){
+						$('#overlay-toast').html("Please select a valid " + $("#select-hierarchy-level").find(':selected').data('entity'));
+						showToast();
+						return;
+					}
+					showSearchedPostsSolr(false, entityType, entityId, $("#post-search-query").val());
 					smScrollTop = scrollContainer.scrollTop;
 				}
 		}
