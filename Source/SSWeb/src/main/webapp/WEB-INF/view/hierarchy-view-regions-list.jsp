@@ -32,8 +32,11 @@
            <td class="v-tbl-role"></td>
            <td class="v-tbl-btns">
                <div class="clearfix v-tbl-icn-wraper">
+              
+               <div class="float-left v-tbl-top-spacer"></div>
                    <div class="float-left v-tbl-icn v-icn-close region-del-icn" data-regionid="${region.regionId}"></div>
                    <div class="float-left v-tbl-icn v-icn-edit region-edit-icn" clicked="false" data-regionid="${region.regionId}"></div>
+               <div class="float-left v-tbl-top-spacer"></div>
                </div>
            </td>
            <td class="v-tbl-spacer"></td>
@@ -72,8 +75,10 @@
            <td class="v-tbl-role"></td>
            <td class="v-tbl-btns">
                <div class="clearfix v-tbl-icn-wraper">
+               <div class="float-left v-tbl-top-spacer"></div>
                    <div class="float-left v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}"></div>
                    <div class="float-left v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}"></div>
+              <div class="float-left v-tbl-top-spacer"></div>
                </div>
            </td>
            <td class="v-tbl-spacer"></td>
@@ -121,6 +126,11 @@
 			</td>
            	<td class="v-tbl-btns">
                <div class="clearfix v-tbl-icn-wraper">
+              
+               
+               <div class="float-left v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div>
+               
+               
                    <c:choose>
 						<c:when test="${compUser.canEdit && user.userId != compUser.userId}">
 						   <div class="float-left v-tbl-icn v-icn-close user-del-icn" data-userid="${compUser.userId}"></div>

@@ -1430,6 +1430,10 @@ span.footer-ul a:hover {
 	padding: 20px;
 }
 
+.disable-click{
+	pointer-events: none;
+}
+
 .dd-tl {
 	font-size: 12px;
 	line-height: 15px;
@@ -1454,3 +1458,4 @@ span.footer-ul a:hover {
 	font-size: 20px;
 	color: #2a6496;
 }
+
