@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -475,6 +476,73 @@ public class UserManagementController
             model
                 .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
+        }
+        return JspResolver.USER_LIST_FOR_MANAGEMENT;
+    }
+
+
+    @RequestMapping ( value = "/findusersunderadmin", method = RequestMethod.GET)
+    public String findUsersUnderAdminAndRedirectToPage( Model model, HttpServletRequest request ) throws NonFatalException
+    {
+        LOG.info( "Finding users under admin and redirecting to search page" );
+        int startIndex = 0;
+        int batchSize = 0;
+
+        try {
+            //            String users = findUserByEmail( model, request );
+
+            String searchKey = request.getParameter( "searchKey" );
+            if ( searchKey == null ) {
+                LOG.error( "Invalid search key passed in method findUserByEmail()." );
+                throw new InvalidInputException( "Invalid searchKey passed in method findUserByEmail()." );
+            }
+
+            String startIndexStr = request.getParameter( "startIndex" );
+            String batchSizeStr = request.getParameter( "batchSize" );
+            try {
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException while parsing the start index or batch size. Reason : " + e.getMessage(), e );
+            }
+
+            User admin = sessionHelper.getCurrentUser();
+            if ( admin == null ) {
+                throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
+            }
+
+            /**
+             * fetching admin details
+             */
+            UserFromSearch adminUser = null;
+            try {
+                String adminUserDoc = JSONUtil.toJSON( solrSearchService.getUserByUniqueId( admin.getUserId() ) );
+                Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+                adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
+            } catch ( SolrException e ) {
+                throw new NonFatalException( "SolrException while searching for user id.Reason:" + e.getMessage(),
+                    DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+            SolrDocumentList userIdList = solrSearchService.searchUsersByLoginNameOrNameUnderAdmin( searchKey, admin,
+                adminUser, startIndex, batchSize );
+            if ( userIdList != null && userIdList.size() != 0 ) {
+                Set<Long> userIds = solrSearchService.getUserIdsFromSolrDocumentList( userIdList );
+                List<UserFromSearch> usersList = userManagementService.getUsersByUserIds( userIds );
+                usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
+                model.addAttribute( "numFound", userIdList.getNumFound() );
+                model.addAttribute( "userslist", usersList );
+            } else {
+                LOG.error( "No users found under the admin id : " + admin.getUserId() );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException in findusers. Reason : " + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        } catch ( MalformedURLException e ) {
+            LOG.error( "Error occured while searching for users in findUsersUnderAdminAndRedirectToPage(). Reason is ", e );
+            throw new NonFatalException(
+                "Error occured while searching for users in findUsersUnderAdminAndRedirectToPage(). Reason is ", e );
         }
         return JspResolver.USER_LIST_FOR_MANAGEMENT;
     }

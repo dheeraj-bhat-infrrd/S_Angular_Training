@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -3026,4 +3027,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    @Override
+    public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException
+    {
+        LOG.info( "Method to find users on the basis of user ids started for user ids : " + userIds );
+        List<UserFromSearch> userList = userProfileDao.getUserFromSearchByUserIds( userIds );
+        if ( userList == null ) {
+            throw new InvalidInputException( "User not found for userId:" + userIds );
+        }
+        LOG.info( "Method to find users on the basis of user ids ended for user ids : " + userIds );
+        return userList;
+    }
 }
