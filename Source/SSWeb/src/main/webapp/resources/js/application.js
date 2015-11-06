@@ -7835,12 +7835,14 @@ function userSwitchToCompAdmin() {
 function bindUserLoginEvent() {
 	$('.user-login-icn').on('click', function(e) {
 		e.stopImmediatePropagation();
+		$('.user-login-icn').addClass('disable-click');
 		var payload = {
 			"colName" : "userId",
 			"colValue" : $(this).attr('data-iden')
 		};
 		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
 			// window.location = window.location.origin + '/userlogin.do';
+			$('.user-login-icn').removeClass('disable-click');
 			window.location = getLocationOrigin() + '/userlogin.do';
 		}, true, payload);
 	});
