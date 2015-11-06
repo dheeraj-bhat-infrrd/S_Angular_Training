@@ -84,6 +84,10 @@
 			</td>
            <td class="v-tbl-btns">
                <div class="clearfix v-tbl-icn-wraper">
+               
+               
+               
+                <div class="float-left  v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div> 
                    <c:choose>
 						<c:when test="${regionUser.canEdit && user.userId != regionUser.userId}">
 						   <div class="float-left v-tbl-icn v-icn-close user-del-icn" data-userid="${regionUser.userId}"></div>
