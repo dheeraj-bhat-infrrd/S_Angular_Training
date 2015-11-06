@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
@@ -32,6 +29,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
@@ -637,7 +635,15 @@ public class OrganizationManagementController
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
             }
 
-            SurveySettings surveySettings = unitSettings.getSurvey_settings();
+            SurveySettings surveySettings = null;
+            AgentSettings agentSettings = null; 
+            // In case of individual account, the survey settings should be taken from agent collection
+            if(accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
+            	agentSettings =  userManagementService.getUserSettings( user.getUserId() );
+            	surveySettings = agentSettings.getSurvey_settings();
+            }else{
+            	surveySettings = unitSettings.getSurvey_settings();
+            }
             if ( surveySettings == null ) {
                 surveySettings = new SurveySettings();
 
@@ -645,12 +651,28 @@ public class OrganizationManagementController
             if ( surveySettings.getShow_survey_above_score() == 0f ) {
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 surveySettings.setAutoPostEnabled( true );
-                unitSettings.setSurvey_settings( surveySettings );
-                organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
+                if(accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
+                	agentSettings.setSurvey_settings(surveySettings);
+                	organizationManagementService.updateScoreForSurvey( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, surveySettings );
+                }else{
+	                unitSettings.setSurvey_settings( surveySettings );
+	                organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
+                }
             }
 
             model.addAttribute( "columnName", entityType );
             model.addAttribute( "columnValue", entityId );
+            
+            model.addAttribute( "autoPostEnabled", false );
+            
+            if ( surveySettings != null ) {
+                model.addAttribute( "autoPostEnabled", surveySettings.isAutoPostEnabled() );
+                model.addAttribute("minpostscore", surveySettings.getShow_survey_above_score());
+            }
+            surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+            model.addAttribute( "defaultSurveyProperties", surveySettings );
+            session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
+            
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
@@ -658,13 +680,6 @@ public class OrganizationManagementController
             return JspResolver.MESSAGE_HEADER;
         }
 
-        model.addAttribute( "autoPostEnabled", false );
-        if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
-            model.addAttribute( "autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled() );
-        }
-        SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-        model.addAttribute( "defaultSurveyProperties", surveySettings );
-        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
         return JspResolver.EDIT_SETTINGS;
     }
 
@@ -2017,13 +2032,18 @@ public class OrganizationManagementController
 
             HttpSession session = request.getSession();
             Long superAdminUserId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
-            User companyAdminUser = sessionHelper.getCurrentUser();
-            session.invalidate();
-
+            User adminUser = sessionHelper.getCurrentUser();
             User newUser = userManagementService.getUserByUserId( id );
 
             HttpSession newSession = request.getSession( true );
-            newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, companyAdminUser.getUserId() );
+            if ( adminUser.isCompanyAdmin() ) {
+                newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, adminUser.getUserId() );
+            } else if ( adminUser.isRegionAdmin() ) {
+                newSession.setAttribute( CommonConstants.REGION_ADMIN_SWITCH_USER_ID, adminUser.getUserId() );
+            } else if ( adminUser.isBranchAdmin() ) {
+                newSession.setAttribute( CommonConstants.BRANCH_ADMIN_SWITCH_USER_ID, adminUser.getUserId() );
+            }
+
             if ( superAdminUserId != null )
                 newSession.setAttribute( CommonConstants.REALTECH_USER_ID, superAdminUserId );
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
@@ -2041,23 +2061,48 @@ public class OrganizationManagementController
     {
 
         HttpSession session = request.getSession();
-        Long companyAdminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
-
-        // Logout current user
-        session.invalidate();
-        SecurityContextHolder.clearContext();
-
-        session = request.getSession( true );
+        Long adminUserid = null;
+        if ( session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID ) != null ) {
+            adminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
+        } else if ( session.getAttribute( CommonConstants.REGION_ADMIN_SWITCH_USER_ID ) != null ) {
+            adminUserid = (Long) session.getAttribute( CommonConstants.REGION_ADMIN_SWITCH_USER_ID );
+        } else if ( session.getAttribute( CommonConstants.BRANCH_ADMIN_SWITCH_USER_ID ) != null ) {
+            adminUserid = (Long) session.getAttribute( CommonConstants.BRANCH_ADMIN_SWITCH_USER_ID );
+        }
 
         try {
-            User companyAdminUser = userManagementService.getUserByUserId( companyAdminUserid );
+            User adminUser = userManagementService.getUserByUserId( adminUserid );
 
-            // Added as details are fetched in lazy mode
-            int isOwnerValue = companyAdminUser.getIsOwner();
-            if ( isOwnerValue != 1 ) {
-                throw new InvalidInputException( "Admin user in session is not company admin" );
+            //This method did not set the profile levels as required
+            //userManagementService.setProfilesOfUser(adminUser);
+
+            //Added this code to find the highest profile level for the user
+            int profileMasterId = CommonConstants.PROFILES_MASTER_NO_PROFILE_ID;
+            for ( UserProfile userProfile : adminUser.getUserProfiles() ) {
+                switch ( userProfile.getProfilesMaster().getProfileId() ) {
+                    case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+                        profileMasterId = CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID;
+                        break;
+                    case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                        profileMasterId = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
+                        continue;
+                    case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                        if ( profileMasterId > CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                            profileMasterId = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
+                        }
+                }
             }
-            sessionHelper.loginAdminAs( companyAdminUser.getLoginName(), CommonConstants.BYPASS_PWD );
+
+            if ( profileMasterId == CommonConstants.PROFILES_MASTER_NO_PROFILE_ID ) {
+                throw new InvalidInputException( "User in session is not an admin" );
+            }
+
+            // Logout current user
+            session.invalidate();
+            SecurityContextHolder.clearContext();
+
+            session = request.getSession( true );
+            sessionHelper.loginAdminAs( adminUser.getLoginName(), CommonConstants.BYPASS_PWD );
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occurred in switchToAdminUser() method , reason : " + e.getMessage() );
             return "failure";

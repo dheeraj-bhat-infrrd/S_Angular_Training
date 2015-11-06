@@ -1756,7 +1756,8 @@ button.paypal.is-active {
 }
 
 .sm-prof-name {
-	font-size: 15px;
+	font-size: 14px;
+	height: 40px;
 	line-height: 15px;
 	min-width : 120px;
 	float: left;

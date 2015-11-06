@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 
 
@@ -43,4 +44,24 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     public Set<Long> findUserIdsByRegion( long regionId );
+
+
+    public int getUsersUnderBranchAdminCount( User admin );
+
+
+    public int getUsersUnderRegionAdminCount( User admin );
+
+
+    public int getUsersUnderCompanyAdminCount( User admin );
+
+
+    public List<UserFromSearch> findUsersUnderBranchAdmin( User admin, int startIndex, int batchSize );
+
+
+    public List<UserFromSearch> findUsersUnderRegionAdmin( User admin, int startIndex, int batchSize );
+
+
+    public List<UserFromSearch> findUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize );
+
+
 }
