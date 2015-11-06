@@ -111,6 +111,8 @@ var verticalsMasterList;
 
 //Variables for social monitor
 var autocompleteData;
+var companyIdForSocialMonitor;
+var smScrollTop = 0;
 
 var defaultCountryCode = "US";
 var defaultCountry = "United States";
@@ -9104,6 +9106,23 @@ function getImageandCaptionProfile(loop) {
 
 }
 
+function postsSearch(){
+	smScrollTop = 0;
+	$('#prof-posts').html("");
+	var entityType = $("#select-hierarchy-level").val();
+	var entityId;
+	entityId = $("#selected-entity-id-hidden").val();
+	if(entityType == undefined || entityType == "companyId"){
+		entityType = "companyId";
+		entityId = companyIdForSocialMonitor;
+	} else if(entityId == undefined || entityId <= 0 ){
+		$('#overlay-toast').html("Please select a valid " + $("#select-hierarchy-level").find(':selected').data('entity'));
+		showToast();
+		return;
+	}
+	showSearchedPostsSolr(true, entityType, entityId, $("#post-search-query").val());
+}
+
 function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
 	if(fromstart){
 		proPostStartIndex = 0;
@@ -9115,7 +9134,7 @@ function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
 			"startIndex" : proPostStartIndex,
 			"searchQuery" : searchQuery
 		};
-	callAjaxGetWithPayloadData("./searchSocialPosts.do", function(response) {
+	callAjaxGetWithPayloadData("./searchSocialPosts.do", function(response, e) {
 		var data = $.parseJSON(response);
 		if (fromstart) {
 			proPostStartIndex = 0;
@@ -9130,9 +9149,9 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 	var posts = data.socialMonitorPosts;
 	var profilePics = data.profileImageUrlDataList;
 	var divToPopulate = "";
-	var profImgClass = "sm-default-img";
-	var profImgStyle = "";
 	$.each(posts, function(i, post) {
+		var profImgClass = "sm-default-img";
+		var profImgStyle = "";
 		var iconClass = "";
 		var href="javascript:void(0)";
 		if(post.source == "google"){
@@ -9157,14 +9176,20 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 		}
 		var profileImg = "";
 		$.each(profilePics,  function(i, pic){
-			if(post.companyId > 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
-				profileImg = pic.profileImageUrl;
-			} else if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
-				profileImg = pic.profileImageUrl;
-			} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
-				profileImg = pic.profileImageUrl;
-			} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
-				profileImg = pic.profileImageUrl;
+			if(pic.profileImageUrl != ""){
+				//post by region
+				if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
+					profileImg = pic.profileImageUrl;
+					//post by branch
+				} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
+					profileImg = pic.profileImageUrl;
+					//post by agent
+				} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
+					profileImg = pic.profileImageUrl;
+					//post by company
+				} else if(post.companyId > 0 && post.regionId <=0 && post.branchId <= 0 && post.agentId <= 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
+					profileImg = pic.profileImageUrl;
+				}
 			}
 		});
 		if(profileImg != ""){
@@ -9218,17 +9243,21 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) {
-				if (proPostStartIndex < proPostCount)
+		if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
+					- scrollContainer.clientHeight) && (smScrollTop < scrollContainer.scrollTop)) {
+				
+				if (proPostStartIndex < proPostCount){
 					showSearchedPostsSolr(false, entityType, entityId, searchQuery);
+					smScrollTop = scrollContainer.scrollTop;
+				}
 		}
 	});
 }
 
-function setColDetails(currentProfileName, currentProfileValue){
+function setColDetails(currentProfileName, currentProfileValue, parentCompanyId){
 	colName = currentProfileName;
 	colValue = currentProfileValue;
+	companyIdForSocialMonitor = parentCompanyId;
 }
 
 //complaint registration event binding
@@ -9412,6 +9441,7 @@ function getRelevantEntities(){
 				select: function(event, ui) {
 					$("#select-entity-id").val(ui.item.label);
 					$('#selected-entity-id-hidden').val(ui.item.branchId);
+					postsSearch();
 					return false;
 				},
 				close: function(event, ui) {},
@@ -9451,6 +9481,7 @@ function getRelevantEntities(){
 				select: function(event, ui) {
 					$("#select-entity-id").val(ui.item.label);
 					$('#selected-entity-id-hidden').val(ui.item.regionId);
+					postsSearch();
 					return false;
 				},
 				close: function(event, ui) {},
@@ -9492,6 +9523,7 @@ function getRelevantEntities(){
 				select: function(event, ui) {
 					$("#select-entity-id").val(ui.item.label);
 					$('#selected-entity-id-hidden').val(ui.item.userId);
+					postsSearch();
 					return false;
 				},
 				close: function(event, ui) {},
@@ -9510,6 +9542,7 @@ function getRelevantEntities(){
 		}, true);
 	} else if (entityType == "companyId") {
 		$("#entity-selection-panel").hide();
+		postsSearch();
 	}
 }
 
