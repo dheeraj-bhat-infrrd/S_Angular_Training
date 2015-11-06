@@ -43,7 +43,7 @@
     <field name="userId" type="long" indexed="true" stored="true" />
     <field name="timeInMillis" type="long" indexed="true" stored="true" />
     <field name="postId" type="string" indexed="true" stored="true" />
-    <field name="postText" type="string" indexed="true" stored="true" />
+    <field name="postText" type="text" indexed="true" stored="true" />
     <field name="postedBy" type="string" indexed="true" stored="true" />
     <field name="postUrl" type="string" indexed="true" stored="true" />
     <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
