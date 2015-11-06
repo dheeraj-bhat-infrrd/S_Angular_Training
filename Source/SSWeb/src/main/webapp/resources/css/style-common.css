@@ -5140,7 +5140,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 .v-tbl-icn {
 	cursor: pointer;
 	height: 39px;
-	width: 33.33%;
+	width: 25%;
 }
 
 .v-tbl-icn-disabled {
@@ -5317,11 +5317,11 @@ td.v-tbl-img {
 
 
 td.v-tbl-name {
-	width: 26%;
+	width: 20%;
 }
 
 td.v-tbl-add {
-	width: 35%;
+	width: 33%;
 }
 
 tr.v-tbl-row-sel,.v-tbl-row-sel tr {
@@ -5337,11 +5337,15 @@ td.v-tbl-role {
 }
 
 td.v-tbl-btns {
-	width: 7.5%;
+	width: 15.5%;
 }
 
 td.v-tbl-spacer {
 	width: 2.5%;
+}
+.v-tbl-top-spacer{
+	width:25%;
+	height:39px;
 }
 
 .v-tbl-row-ind {
@@ -5520,6 +5524,9 @@ tr.u-tbl-header td {
 }
 
 .v-icn-fmail {
+	background: url(../images/fast_mail.png) no-repeat 85% center;
+}
+.v-icn-femail {
 	background: url(../images/fast_mail.png) no-repeat 85% center;
 }
 
