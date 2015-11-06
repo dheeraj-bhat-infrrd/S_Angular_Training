@@ -5,7 +5,20 @@
 
 <!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
-
+<c:choose>
+	<c:when test="${user.companyAdmin}">
+		<c:set value="1" var="sessionprofilemasterid"></c:set>
+	</c:when>
+	<c:when test="${user.regionAdmin}">
+		<c:set value="2" var="sessionprofilemasterid"></c:set>
+	</c:when>
+	<c:when test="${user.branchAdmin}">
+		<c:set value="3" var="sessionprofilemasterid"></c:set>
+	</c:when>
+	<c:when test="${user.agent}">
+		<c:set value="4" var="sessionprofilemasterid"></c:set>
+	</c:when>
+</c:choose>
 <c:if test="${not empty branches}">
 	<c:forEach var="branch" items="${branches}">
 		<tr id="tr-branch-row-${branch.branchId}" data-regionid="${branch.regionId}" data-branchid="${branch.branchId}" clicked="false"
@@ -48,6 +61,20 @@
 </c:if>
 <c:if test ="${not empty individuals}">
 	<c:forEach var="regionUser" items="${individuals}">
+		<c:choose>
+			<c:when test="${regionUser.isOwner == 1}">
+				<c:set value="1" var="currentprofilemasterid"></c:set>
+			</c:when>
+			<c:when test="${regionUser.isRegionAdmin}">
+				<c:set value="2" var="currentprofilemasterid"></c:set>
+			</c:when>
+			<c:when test="${regionUser.isBranchAdmin}">
+				<c:set value="3" var="currentprofilemasterid"></c:set>
+			</c:when>
+			<c:when test="${regionUser.isAgent}">
+				<c:set value="4" var="currentprofilemasterid"></c:set>
+			</c:when>
+		</c:choose>
 		<tr id="user-row-${regionUser.userId}" clicked="false" data-userid="${regionUser.userId}"
 			class="v-tbl-row v-tbl-row-sel edit-user v-tbl-row-ind sel-r${regionId}-u${regionUser.userId}">
            <td class="v-tbl-line">
@@ -104,7 +131,7 @@
 		                    <div class="float-left v-tbl-icn-disabled v-icn-edit"></div>
 						</c:otherwise>
 				   </c:choose>
-				   <c:if test="${user.userId != regionUser.userId}">
+				   <c:if test="${user.userId != regionUser.userId and sessionprofilemasterid < currentprofilemasterid}">
 				   		<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="${regionUser.userId}" title="login as"></div>
 				   </c:if>
 				</div>
