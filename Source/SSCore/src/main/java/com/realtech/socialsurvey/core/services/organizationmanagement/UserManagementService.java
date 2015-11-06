@@ -443,16 +443,22 @@ public interface UserManagementService
     void updateUserInSolr( User user ) throws InvalidInputException, SolrException;
 
 
-    public int getUsersUnderBranchAdminCount( User user );
+    public int getUsersUnderBranchAdminCount( User admin );
 
 
-    public int getUsersUnderRegionAdminCount( User user );
+    public int getUsersUnderRegionAdminCount( User admin );
 
 
-    public List<UserFromSearch> getUsersUnderBranchAdmin( User user, int startIndex, int batchSize );
+    public int getUsersUnderCompanyAdminCount( User admin );
+
+
+    public List<UserFromSearch> getUsersUnderBranchAdmin( User admin, int startIndex, int batchSize );
 
 
     public List<UserFromSearch> getUsersUnderRegionAdmin( User admin, int startIndex, int batchSize );
+
+
+    public List<UserFromSearch> getUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize );
 
 }
 // JIRA SS-34 BY RM02 BOC
