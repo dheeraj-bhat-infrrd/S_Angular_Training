@@ -302,7 +302,15 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
             //if last reminder time is null than set is as epoch time
             if(status.getReminderSentOn() == null){
-                status.setReminderSentOn( new Timestamp( 0l ) );
+            	SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
+            	try {
+					Timestamp remimderSentOn = new Timestamp(sdf.parse(CommonConstants.EPOCH_REMINDER_TIME).getTime());
+					status.setReminderSentOn( remimderSentOn );
+				}
+				catch (ParseException pe) {
+					pe.printStackTrace();
+				}
+                
             }
             
             Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
