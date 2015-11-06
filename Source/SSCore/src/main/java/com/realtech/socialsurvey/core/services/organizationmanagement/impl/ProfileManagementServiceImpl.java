@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
-
+import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,10 +28,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -1415,7 +1412,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( organizationUnitSettings != null ) {
             LOG.debug( "Found the setting. Converting into agent settings" );
             agentSettings = (AgentSettings) organizationUnitSettings;
-            user = userDao.findById( User.class, agentSettings.getIden() );
+            // handle the cases where record is present in the mongo but not in SQL
+            try{
+            	user = userDao.findById( User.class, agentSettings.getIden() );
+            }catch(HibernateException e){
+            	LOG.error( "No active agent found in SQL.", e );
+                throw new ProfileNotFoundException( "No active agent found in SQL." );
+            }
             if ( user == null || ( user.getStatus() == CommonConstants.STATUS_INACTIVE && checkStatus ) ) {
                 LOG.error( "No active agent found." );
                 throw new ProfileNotFoundException( "No active agent found." );
