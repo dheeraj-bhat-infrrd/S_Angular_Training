@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -460,5 +461,7 @@ public interface UserManagementService
 
     public List<UserFromSearch> getUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize );
 
+
+    public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

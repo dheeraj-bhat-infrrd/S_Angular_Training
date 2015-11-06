@@ -326,5 +326,12 @@ public interface SolrSearchService
     
     
     public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException;
+
+
+    public SolrDocumentList searchUsersByLoginNameOrNameUnderAdmin( String pattern, User admin, UserFromSearch adminFromSearch,
+        int startIndex, int batchSize ) throws InvalidInputException, SolrException, MalformedURLException;
+
+
+    public Set<Long> getUserIdsFromSolrDocumentList( SolrDocumentList userIdList );
 }
 // JIRA:SS-62 BY RM 02 EOC
