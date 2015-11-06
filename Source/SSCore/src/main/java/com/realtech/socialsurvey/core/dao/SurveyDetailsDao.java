@@ -89,10 +89,11 @@ public interface SurveyDetailsDao
      * @param organizationUnitColumnValue
      * @param startDate
      * @param endDate
+     * @param filterAbusive
      * @return
      * @throws InvalidInputException
      */
-    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate) throws InvalidInputException;
+    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive) throws InvalidInputException;
     /**
      * Gets an aggregated count for completed survey
      * @param organizationUnitColumn
