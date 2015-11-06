@@ -4048,7 +4048,7 @@ $(document).on('click', '#um-search-icn', function(e) {
 });
 
 function searchUsersByNameEmailLoginId(searchKey) {
-	var url = "./findusers.do";
+	var url = "./findusersunderadmin.do";
 	var payload = {
 		"searchKey" : searchKey,
 		"startIndex" : userStartIndex,

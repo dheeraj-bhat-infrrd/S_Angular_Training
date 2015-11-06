@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -2122,5 +2123,86 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
         LOG.info( "Method getLastBuildTimeForSocialPosts() finished" );
         return lastBuildTime;
+    }
+
+
+    @Override
+    public SolrDocumentList searchUsersByLoginNameOrNameUnderAdmin( String pattern, User admin, UserFromSearch adminFromSearch,
+        int startIndex, int batchSize ) throws InvalidInputException, SolrException, MalformedURLException
+    {
+
+        LOG.info( "Method searchUsersByLoginNameOrNameUnderAdmin called for pattern :" + pattern );
+        if ( pattern == null ) {
+            throw new InvalidInputException( "Pattern is null or empty while searching for Users" );
+        }
+        LOG.info( "Method searchUsersByLoginNameOrNameUnderAdmin() called for parameter : " + pattern );
+
+        SolrDocumentList results;
+        QueryResponse response = null;
+        pattern = pattern + "*";
+        try {
+            SolrServer solrServer = new HttpSolrServer( solrUserUrl );
+            SolrQuery solrQuery = new SolrQuery();
+            solrQuery.setQuery( "displayName:" + pattern + " OR " + CommonConstants.USER_FIRST_NAME_SOLR + ":" + pattern
+                + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":" + pattern + " OR " + CommonConstants.USER_LOGIN_NAME_SOLR
+                + ":" + pattern );
+            solrQuery.addFilterQuery( CommonConstants.COMPANY_ID_SOLR + ":" + adminFromSearch.getCompanyId() );
+            if ( !admin.isCompanyAdmin() ) {
+                if ( admin.isRegionAdmin() ) {
+                    solrQuery.addFilterQuery( CommonConstants.REGIONS_SOLR + ":"
+                        + getSolrSearchArrayStr( adminFromSearch.getRegions() ) );
+                } else if ( admin.isBranchAdmin() ) {
+                    solrQuery.addFilterQuery( CommonConstants.REGIONS_SOLR + ":"
+                        + getSolrSearchArrayStr( adminFromSearch.getRegions() ) );
+                    solrQuery.addFilterQuery( CommonConstants.BRANCHES_SOLR + ":"
+                        + getSolrSearchArrayStr( adminFromSearch.getBranches() ) );
+                }
+            }
+            solrQuery.addFilterQuery( CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR "
+                + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_NOT_VERIFIED + " OR "
+                + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE );
+            solrQuery.addSort( CommonConstants.USER_ID_SOLR, ORDER.asc );
+            solrQuery.addField( CommonConstants.USER_ID_SOLR );
+            LOG.debug( "Querying solr for searching users" );
+            if ( startIndex > -1 ) {
+                solrQuery.setStart( startIndex );
+            }
+            if ( batchSize > 0 ) {
+                solrQuery.setRows( batchSize );
+            }
+
+            LOG.info( "Running Solr query : " + solrQuery.getQuery() );
+            response = solrServer.query( solrQuery );
+            results = response.getResults();
+        } catch ( SolrServerException e ) {
+            LOG.error( "SolrServerException while performing User search" );
+            throw new SolrException( "Exception while performing search for user. Reason : " + e.getMessage(), e );
+        }
+
+        LOG.info( "Method searchUsersByLoginNameOrNameUnderAdmin finished for pattern :" + pattern + " returning : " + results );
+        return results;
+
+    }
+
+
+    @Override
+    public Set<Long> getUserIdsFromSolrDocumentList( SolrDocumentList userIdList )
+    {
+        Set<Long> userIds = new LinkedHashSet<Long>();
+        for ( SolrDocument userId : userIdList ) {
+            userIds.add( Long.parseLong( userId.get( CommonConstants.USER_ID_SOLR ).toString() ) );
+        }
+        return userIds;
+    }
+
+
+    private String getSolrSearchArrayStr( List<Long> ids )
+    {
+        String searchArrStr = "";
+        for ( Long id : ids ) {
+            if ( id != CommonConstants.DEFAULT_COMPANY_ID && id != CommonConstants.DEFAULT_REGION_ID )
+                searchArrStr += id + " ";
+        }
+        return "(" + searchArrStr.trim() + ")";
     }
 }
