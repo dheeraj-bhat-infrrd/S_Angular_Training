@@ -37,7 +37,14 @@
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">
-							${feedback.customerFirstName} ${feedback.customerLastName}
+							<c:choose>
+								<c:when test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
+									${feedback.customerFirstName}
+								</c:when>
+								<c:otherwise>
+									${feedback.customerFirstName} ${feedback.customerLastName}
+								</c:otherwise>
+							</c:choose>
 						</div>
 						<div class="ppl-head-2" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${feedback.modifiedOn}" />">
