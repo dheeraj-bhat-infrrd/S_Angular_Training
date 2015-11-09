@@ -8195,9 +8195,14 @@ function editProfileUrl() {
 }
 // Get all the required elements and show popup
 
-function generateWidget(iden, profileLevel) {
+function generateWidget(clickedAttr , iden, profileLevel) {
+	if($(clickedAttr).hasClass('v-tbl-icn-disabled')){
+		return;
+	}
+	else{
 	callAjaxGET("./showwidgetpage.do?profileLevel=" + profileLevel + "&iden="
 			+ iden, callBackShowWidget);
+	}
 }
 
 function callBackShowWidget(data) {
