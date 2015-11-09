@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -38,7 +40,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     private static final Logger LOG = LoggerFactory.getLogger( UserProfileDaoImpl.class );
     private final String regionUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
     private final String branchUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, BRANCH_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.BRANCH_ID = UP.BRANCH_ID and subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID  and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
-    private final String companyUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID  and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
+    private final String companyUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ? ) AS subQuery_UP ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID and REGION_ID != ? and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
 
 
     /*
@@ -300,7 +302,8 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
         query.setParameter( 2, user.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
+        query.setParameter( 3, CommonConstants.DEFAULT_COMPANY_ID );
+        query.setParameter( 4, CommonConstants.STATUS_INACTIVE );
 
         LOG.info( "Method call ended for getUsersUnderCompanyAdminCount for company admin id : " + user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
@@ -327,41 +330,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         List<Object[]> rows = (List<Object[]>) query.list();
 
-        for ( Object[] row : rows ) {
-            UserFromSearch userFromSearch = new UserFromSearch();
-            userFromSearch.setUserId( Long.parseLong( String.valueOf( row[0] ) ) );
-            userFromSearch.setFirstName( String.valueOf( row[1] ) );
-            if ( row[2] != null )
-                userFromSearch.setLastName( String.valueOf( row[2] ) );
-            userFromSearch.setEmailId( String.valueOf( row[3] ) );
-            userFromSearch.setLoginName( String.valueOf( row[4] ) );
-            userFromSearch.setIsOwner( Integer.parseInt( String.valueOf( row[5] ) ) );
-            userFromSearch.setCompanyId( Long.parseLong( String.valueOf( row[6] ) ) );
-            userFromSearch.setStatus( Integer.parseInt( String.valueOf( row[7] ) ) );
-
-            List<Long> branchIds = new ArrayList<Long>();
-
-            String[] bIds = String.valueOf( row[8] ).split( "," );
-            for ( String bId : bIds ) {
-                branchIds.add( Long.parseLong( String.valueOf( bId ) ) );
-            }
-
-            List<Long> regionIds = new ArrayList<Long>();
-            String[] rIds = String.valueOf( row[9] ).split( "," );
-            for ( String rId : rIds ) {
-                regionIds.add( Long.parseLong( String.valueOf( rId ) ) );
-            }
-
-            userFromSearch.setBranches( branchIds );
-            userFromSearch.setRegions( regionIds );
-
-            setAdminLevelsForUserFromSearch( userFromSearch, String.valueOf( row[10] ).split( "," ) );
-
-            userFromSearch
-                .setDisplayName( getCustomerDisplayName( userFromSearch.getFirstName(), userFromSearch.getLastName() ) );
-
-            userList.add( userFromSearch );
-        }
+        userList = buildUserFromSearch( rows );
 
         LOG.info( "Method call ended for findUsersUnderBranchAdmin for branch admin id : " + user.getUserId() );
         return userList;
@@ -389,41 +358,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         List<Object[]> rows = (List<Object[]>) query.list();
 
-        for ( Object[] row : rows ) {
-            UserFromSearch userFromSearch = new UserFromSearch();
-            userFromSearch.setUserId( Long.parseLong( String.valueOf( row[0] ) ) );
-            userFromSearch.setFirstName( String.valueOf( row[1] ) );
-            if ( row[2] != null )
-                userFromSearch.setLastName( String.valueOf( row[2] ) );
-            userFromSearch.setEmailId( String.valueOf( row[3] ) );
-            userFromSearch.setLoginName( String.valueOf( row[4] ) );
-            userFromSearch.setIsOwner( Integer.parseInt( String.valueOf( row[5] ) ) );
-            userFromSearch.setCompanyId( Long.parseLong( String.valueOf( row[6] ) ) );
-            userFromSearch.setStatus( Integer.parseInt( String.valueOf( row[7] ) ) );
-
-            List<Long> branchIds = new ArrayList<Long>();
-
-            String[] bIds = String.valueOf( row[8] ).split( "," );
-            for ( String bId : bIds ) {
-                branchIds.add( Long.parseLong( String.valueOf( bId ) ) );
-            }
-
-            List<Long> regionIds = new ArrayList<Long>();
-            String[] rIds = String.valueOf( row[9] ).split( "," );
-            for ( String rId : rIds ) {
-                regionIds.add( Long.parseLong( String.valueOf( rId ) ) );
-            }
-
-            userFromSearch.setBranches( branchIds );
-            userFromSearch.setRegions( regionIds );
-
-            setAdminLevelsForUserFromSearch( userFromSearch, String.valueOf( row[10] ).split( "," ) );
-
-            userFromSearch
-                .setDisplayName( getCustomerDisplayName( userFromSearch.getFirstName(), userFromSearch.getLastName() ) );
-
-            userList.add( userFromSearch );
-        }
+        userList = buildUserFromSearch( rows );
 
         LOG.info( "Method call ended for findUsersUnderRegionAdmin for region admin id : " + admin.getUserId() );
         return userList;
@@ -441,7 +376,8 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 0, admin.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
         query.setParameter( 2, admin.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
+        query.setParameter( 3, CommonConstants.DEFAULT_COMPANY_ID );
+        query.setParameter( 4, CommonConstants.STATUS_INACTIVE );
         if ( startIndex > -1 ) {
             query.setFirstResult( startIndex );
         }
@@ -451,6 +387,78 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         List<Object[]> rows = (List<Object[]>) query.list();
 
+        userList = buildUserFromSearch( rows );
+        LOG.info( "Method call ended for findUsersUnderCompanyAdmin for company admin id : " + admin.getUserId() );
+        return userList;
+    }
+
+
+    @Override
+    @Transactional
+    public List<UserFromSearch> getUserFromSearchByUserIds( Set<Long> userIds )
+    {
+        List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
+        Long[] defaultIds = new Long[] { CommonConstants.DEFAULT_REGION_ID, CommonConstants.DEFAULT_COMPANY_ID };
+        LOG.info( "Method call started for getUserFromSearchByUserIds for user ids : " + userIds );
+        String queryStr = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM USER_PROFILE UP JOIN USERS US ON US.USER_ID = UP.USER_ID WHERE UP.USER_ID IN ( :userIds ) AND UP.BRANCH_ID NOT IN ( :branchIds ) AND UP.REGION_ID NOT IN ( :regionIds ) GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameterList( "userIds", userIds );
+        query.setParameterList( "branchIds", defaultIds );
+        query.setParameterList( "regionIds", defaultIds );
+        List<Object[]> rows = (List<Object[]>) query.list();
+
+        userList = buildUserFromSearch( rows );
+        LOG.info( "Method call ended for getUserFromSearchByUserIds for user ids" );
+        return userList;
+    }
+
+    private String getCustomerDisplayName( String firstName, String lastName )
+    {
+        String displayName = firstName;
+        if ( lastName != null && !lastName.isEmpty() )
+            displayName += " " + lastName;
+        return displayName;
+    }
+
+
+    private void setAdminLevelsForUserFromSearch( UserFromSearch userFromSearch, String[] profileMasterIds )
+    {
+        List<Integer> profMasterIds = new ArrayList<Integer>();
+        for ( String profileMasterId : profileMasterIds ) {
+            profMasterIds.add( Integer.parseInt( profileMasterId ) );
+        }
+
+        setAdminLevelsForUserFromSearch( userFromSearch, ArrayUtils.toPrimitive( profMasterIds.toArray( new Integer[0] ) ) );
+    }
+
+
+    private void setAdminLevelsForUserFromSearch( UserFromSearch userFromSearch, int[] profileMasterIds )
+    {
+        if ( userFromSearch.getIsOwner() == CommonConstants.IS_OWNER ) {
+            userFromSearch.setRegionAdmin( true );
+            userFromSearch.setBranchAdmin( true );
+        }
+
+        for ( int profileMasterId : profileMasterIds ) {
+            switch ( profileMasterId ) {
+                case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                    userFromSearch.setRegionAdmin( true );
+                    break;
+                case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                    userFromSearch.setBranchAdmin( true );
+                    break;
+                case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                    userFromSearch.setAgent( true );
+                    break;
+            }
+        }
+    }
+
+
+    private List<UserFromSearch> buildUserFromSearch( List<Object[]> rows )
+    {
+        LOG.info( "Method call buildUserFromSearch started" );
+        List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
         for ( Object[] row : rows ) {
             UserFromSearch userFromSearch = new UserFromSearch();
             userFromSearch.setUserId( Long.parseLong( String.valueOf( row[0] ) ) );
@@ -490,40 +498,8 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
             userList.add( userFromSearch );
         }
-        LOG.info( "Method call ended for findUsersUnderCompanyAdmin for company admin id : " + admin.getUserId() );
+        LOG.info( "Method call buildUserFromSearch ended" );
         return userList;
     }
 
-
-    private String getCustomerDisplayName( String firstName, String lastName )
-    {
-        String displayName = firstName;
-        if ( lastName != null && !lastName.isEmpty() )
-            displayName += " " + lastName;
-        return displayName;
-    }
-
-
-    private void setAdminLevelsForUserFromSearch( UserFromSearch userFromSearch, String[] profileMasterIds )
-    {
-        if ( userFromSearch.getIsOwner() == CommonConstants.IS_OWNER ) {
-            userFromSearch.setRegionAdmin( true );
-            userFromSearch.setBranchAdmin( true );
-        }
-
-        for ( String pmId : profileMasterIds ) {
-            int profileMasterId = Integer.parseInt( pmId );
-            switch ( profileMasterId ) {
-                case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-                    userFromSearch.setRegionAdmin( true );
-                    break;
-                case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-                    userFromSearch.setBranchAdmin( true );
-                    break;
-                case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-                    userFromSearch.setAgent( true );
-                    break;
-            }
-        }
-    }
  }
