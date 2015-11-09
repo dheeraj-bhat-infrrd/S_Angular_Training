@@ -101,7 +101,7 @@
 				<c:set var="regstatustickclass" value="" />
 				<c:set var="userstatustickclass" value="v-icn-verified" />
 				<c:if test="${compUser.status == 2}">
-					<c:set var="regstatustickclass" value="v-icn-fmail" />
+					<c:set var="regstatustickclass" value="v-icn-femail" />
 					<c:set var="userstatustickclass" value="v-icn-notverified" />
 				</c:if>
 
