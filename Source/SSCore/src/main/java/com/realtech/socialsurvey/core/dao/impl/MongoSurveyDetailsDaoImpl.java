@@ -900,7 +900,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
     @Override
-    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate) throws InvalidInputException{
+    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive) throws InvalidInputException{
     	LOG.info("Getting completed survey count for "+organizationUnitColumn+" with value "+organizationUnitColumnValue);
     	if(organizationUnitColumn == null || organizationUnitColumn.isEmpty()){
     		LOG.warn("organizationUnitColumn is empty");
@@ -912,8 +912,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	}
     	Query query = new Query();
     	query.addCriteria(Criteria.where(organizationUnitColumn).is(organizationUnitColumnValue));
-    	query.addCriteria(Criteria.where(CommonConstants.SURVEY_SOURCE_COLUMN).ne("Zillow"));
+    	query.addCriteria(Criteria.where(CommonConstants.SURVEY_SOURCE_COLUMN).ne(CommonConstants.SURVEY_SOURCE_ZILLOW));
     	query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
+    	if(filterAbusive){
+    		query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(false));
+    	}
     	if(startDate != null && endDate == null){
     		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
     	}
@@ -949,7 +952,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	// match survey stage
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.STAGE_COLUMN,CommonConstants.SURVEY_STAGE_COMPLETE)));
     	// match non zillow survey
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne","Zillow"))));
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
+    	// match non abusive survey
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.IS_ABUSIVE_COLUMN,false)));
     	// match start date
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN,new BasicDBObject("$gte", new Date(startDate.getTime())))));
     	// match end date
@@ -1014,7 +1019,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     		pipeline.add(new BasicDBObject("$match", new BasicDBObject(organizationUnitColumn, organizationUnitColumnValue)));
     	}
     	// match non zillow survey
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne","Zillow"))));
+    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
     	// match start date
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.CREATED_ON,new BasicDBObject("$gte", new Date(startDate.getTime())))));
     	// match end date
@@ -1312,26 +1317,37 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte(
-                startDate ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
+            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ),
+            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         } else if ( startDate != null && endDate == null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
-                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
-                Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
+            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
+            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         else if ( startDate == null && endDate != null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
-                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-                .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
+            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), 
+            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         else {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
-                fetchAbusive ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN )
-                .as( "score" ) );
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
+            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
+            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
@@ -1366,25 +1382,37 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
-                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
-                Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
+            		Aggregation.match( Criteria.where(columnName ).is( columnValue ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), 
+            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         } else if ( startDate != null && endDate == null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
-                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
-                Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
+            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         else if ( startDate == null && endDate != null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
-                fetchAbusive ) ), Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
-                .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
+            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), 
+            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         else {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
-                columnName ).is( columnValue ) ), Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is(
-                fetchAbusive ) ), Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
+            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
+            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
+            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,

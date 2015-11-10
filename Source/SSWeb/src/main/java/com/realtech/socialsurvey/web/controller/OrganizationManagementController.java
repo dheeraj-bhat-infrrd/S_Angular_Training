@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
@@ -32,6 +29,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
@@ -636,7 +634,15 @@ public class OrganizationManagementController
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
             }
 
-            SurveySettings surveySettings = unitSettings.getSurvey_settings();
+            SurveySettings surveySettings = null;
+            AgentSettings agentSettings = null; 
+            // In case of individual account, the survey settings should be taken from agent collection
+            if(accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
+            	agentSettings =  userManagementService.getUserSettings( user.getUserId() );
+            	surveySettings = agentSettings.getSurvey_settings();
+            }else{
+            	surveySettings = unitSettings.getSurvey_settings();
+            }
             if ( surveySettings == null ) {
                 surveySettings = new SurveySettings();
 
@@ -644,12 +650,28 @@ public class OrganizationManagementController
             if ( surveySettings.getShow_survey_above_score() == 0f ) {
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 surveySettings.setAutoPostEnabled( true );
-                unitSettings.setSurvey_settings( surveySettings );
-                organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
+                if(accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
+                	agentSettings.setSurvey_settings(surveySettings);
+                	organizationManagementService.updateScoreForSurvey( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, surveySettings );
+                }else{
+	                unitSettings.setSurvey_settings( surveySettings );
+	                organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
+                }
             }
 
             model.addAttribute( "columnName", entityType );
             model.addAttribute( "columnValue", entityId );
+            
+            model.addAttribute( "autoPostEnabled", false );
+            
+            if ( surveySettings != null ) {
+                model.addAttribute( "autoPostEnabled", surveySettings.isAutoPostEnabled() );
+                model.addAttribute("minpostscore", surveySettings.getShow_survey_above_score());
+            }
+            surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+            model.addAttribute( "defaultSurveyProperties", surveySettings );
+            session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
+            
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
@@ -657,13 +679,6 @@ public class OrganizationManagementController
             return JspResolver.MESSAGE_HEADER;
         }
 
-        model.addAttribute( "autoPostEnabled", false );
-        if ( unitSettings != null && unitSettings.getSurvey_settings() != null ) {
-            model.addAttribute( "autoPostEnabled", unitSettings.getSurvey_settings().isAutoPostEnabled() );
-        }
-        SurveySettings surveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-        model.addAttribute( "defaultSurveyProperties", surveySettings );
-        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
         return JspResolver.EDIT_SETTINGS;
     }
 
