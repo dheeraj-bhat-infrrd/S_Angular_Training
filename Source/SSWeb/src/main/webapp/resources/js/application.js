@@ -2117,7 +2117,7 @@ function validateRegionForm() {
 		return isRegionValid;
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 	
 			if(!isFocussed){
@@ -2297,7 +2297,7 @@ function validateOfficeForm() {
 		return isOfficeValid;
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 			if(!isFocussed){
 				$('#selected-user-txt').focus();
@@ -2451,7 +2451,7 @@ function validateIndividualForm() {
 		}
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 		if(!validateIndividualSelection('selected-user-txt')) {
 			isIndividualValid = false;
