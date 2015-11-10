@@ -1815,7 +1815,7 @@ function bindSingleMultipleSelection() {
 
 function bindUserSelector() {
 	$("#selected-user-txt").click(function() {
-		getUsersList("",usersStartIndex,numOfRows);
+		getUsersList("", -1 , -1 );
 	});
 	$("#selected-user-txt").keydown(function(e) {
 		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
@@ -1826,12 +1826,12 @@ function bindUserSelector() {
 			usersStartIndex = 0;	
 			if (text.length > 0) {
 				delay(function() {
-					getUsersList(text,usersStartIndex,numOfRows);
+					getUsersList(text, -1 , -1);
 				}, 500);
 			}
 			else {
 				delay(function() {
-					getUsersList("",usersStartIndex,numOfRows);
+					getUsersList("", -1 , -1);
 				}, 500);
 			}
 		}
@@ -2208,6 +2208,7 @@ function paintUsersList(data) {
 			});
 		}
 	}
+	
 	if(htmlData != "") {
 		$("#users-droplist").html(htmlData).slideDown(200);
 	}

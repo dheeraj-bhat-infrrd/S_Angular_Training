@@ -78,7 +78,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Value ( "${SOLR_SOCIAL_POST_URL}")
     private String solrSocialPostUrl;
-    
+
     @Autowired
     private SolrSearchUtils solrSearchUtils;
 
@@ -409,7 +409,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     /**
-<<<<<<< HEAD
      * Method to get solr input document from social post
      * @param socialPost
      * @return
@@ -438,8 +437,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     /**
-=======
->>>>>>> upstream/devel
      * Method to get solr document from a region
      * 
      * @param region
@@ -550,6 +547,14 @@ public class SolrSearchServiceImpl implements SolrSearchService
             }
 
             response = solrServer.query( solrQuery );
+
+            // Change to get all matching records if batch size is not defined
+            if ( batchSize <= 0 ) {
+                int rows = (int) response.getResults().getNumFound();
+                solrQuery.setRows( rows );
+                response = solrServer.query( solrQuery );
+            }
+
             results = response.getResults();
         } catch ( SolrServerException e ) {
             LOG.error( "SolrServerException while performing User search" );
@@ -1219,6 +1224,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return regionsResult;
     }
 
+
     /**
      * Method to fetch social posts from solr given the entity
      */
@@ -1283,6 +1289,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method searchPostText() finished for entity id : " + entityId + " and entity type : " + entityType );
         return results;
     }
+
 
     @Override
     public String fetchBranchesByCompany( long companyId, int size ) throws InvalidInputException, SolrException,
@@ -1550,6 +1557,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method to add branches to solr finshed" );
     }
 
+
     /**
      * Method to index a list of social posts in Solr
      */
@@ -1581,6 +1589,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
         LOG.info( "Method to add social posts to solr finshed" );
     }
+
 
     @Override
     public void addUsersToSolr( List<User> users ) throws SolrException
@@ -2046,6 +2055,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return matchedSocialPosts;
     }
 
+
     @SuppressWarnings ( "unchecked")
     public Collection<UserFromSearch> getUsersFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException
     {
@@ -2086,7 +2096,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
         return matchedUsers.values();
     }
-    
+
 
     /**
      * Method to get last build time for social posts in Solr(Social Monitor)
