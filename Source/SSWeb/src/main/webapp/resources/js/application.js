@@ -2217,6 +2217,9 @@ function paintUsersList(data) {
 		
 	}
 	
+	$('#users-droplist').perfectScrollbar();
+	$('#users-droplist').perfectScrollbar('update');
+	
 	// bind the click event of selector
 	$(".hm-user-options").click(function() {
 		$('#selected-user-txt').val($(this).html());
