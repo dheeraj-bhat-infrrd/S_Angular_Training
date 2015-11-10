@@ -64,4 +64,5 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
     public List<UserFromSearch> findUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize );
 
 
+    public List<UserFromSearch> getUserFromSearchByUserIds( Set<Long> userIds );
 }

@@ -61,7 +61,7 @@ public class PostManuallyToSocialMedia {
 	
 	public static void main(String[] args){
 		PostManuallyToSocialMedia post = new PostManuallyToSocialMedia();
-		post.postToFacebook("5.0", "Tom", "Mary Ross", "https://socialsurvey.me/pages/mary-ross", "Excellent communications and a great job of pushing for a prompt and efficient closing.", "");
+		post.postToFacebook("5.0", "Don", "Nishit Kannan", "https://socialsurvey.me/pages/nishit-kannan", "Test Post", "");
 	}
 
 }
