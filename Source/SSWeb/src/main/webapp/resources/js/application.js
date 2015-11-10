@@ -1814,13 +1814,13 @@ function bindSingleMultipleSelection() {
 }
 
 function bindUserSelector() {
-	$("#selected-user-txt").click(function() {
+	/*$("#selected-user-txt").click(function() {
 		getUsersList("", -1 , -1 );
-	});
-	$("#selected-user-txt").keydown(function(e) {
+	});*/
+	/*$("#selected-user-txt").keydown(function(e) {
 		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
-	});
-	$("#selected-user-txt").keyup(function(e) {
+	});*/
+	/*$("#selected-user-txt").keyup(function(e) {
 		if(e.which != 38 && e.which != 40 && e.which != 13) {
 			var text = $(this).val();
 			usersStartIndex = 0;	
@@ -1835,7 +1835,11 @@ function bindUserSelector() {
 				}, 500);
 			}
 		}
-	});
+	});*/
+	
+	//using autocomplete instead of normal search
+	attachAutocompleteUserListDropdown();
+	
 }
 
 /**
@@ -9643,4 +9647,59 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 		$(this).attr('column-name', "");
 		$(this).attr('email-id', "");
 	});
+}
+
+
+//send survey popup admin events
+function attachAutocompleteUserListDropdown(){
+	$('#selected-user-txt').autocomplete({
+		source : function(request, response) {
+			var start = -1;
+			var rows = -1;
+			var url="./finduserbyemail.do?startIndex="+start+"&batchSize="+rows+"&searchKey="+request.term;
+			callAjaxGET(encodeURI(url), function(data) {
+				var responseData = JSON.parse(data);
+				response($.map(responseData, function(item) {
+					var displayName = item.firstName;
+					if(item.lastName != undefined) {
+						displayName = displayName +" "+ item.lastName;
+					}
+	 	    	  return {
+	 	    		   label:displayName,
+	 	    		   value:displayName,
+	 	    		   userId:item.userId  
+					};
+	 	       }));
+			}, true);
+		},
+		minLength : 0,
+		select : function (event, ui) {
+			event.stopPropagation();
+			var element = event.target;
+			
+			$('#selected-user-txt').val(ui.item.value);
+			$('#selected-user-txt').attr('val', ui.item.value);
+			$('#selected-userid-hidden').val(ui.item.userId);
+		},
+		close: function(event, ui) {},
+		create: function(event, ui) {
+		},
+		open: function() {
+			$('.ui-autocomplete').addClass('ui-hdr-agent-dropdown').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	});
+	
+	
+	$('#selected-user-txt').keyup(function(e) {
+		var oldVal = $(this).attr('val');
+		var cuurentVal = $(this).val();
+		if(oldVal == cuurentVal) {
+			return;
+		}
+		$('#selected-userid-hidden').val("");
+	});
+	
 }
