@@ -688,7 +688,8 @@ public class SurveyManagementController
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     if ( !socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl,
                         agent.getCompany().getCompanyId() ) ) {
-                        agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                        if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                            agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
 
                     }
                 }
@@ -705,7 +706,8 @@ public class SurveyManagementController
                     if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
                         if ( !socialManagementService.updateStatusIntoFacebookPage( companySetting, facebookMessage,
                             serverBaseUrl, companySetting.getIden() ) ) {
-                            companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
 
                         }
                     }
@@ -723,7 +725,8 @@ public class SurveyManagementController
                             if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
                                 serverBaseUrl, agent.getCompany().getCompanyId() ) ) {
                                 List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                                if ( !regionSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                    regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                                 regionMediaPostDetails.setSharedOn( regionSocialList );
                             }
                         }
@@ -743,7 +746,8 @@ public class SurveyManagementController
                                 if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
                                     serverBaseUrl, agent.getCompany().getCompanyId() ) ) {
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                                    if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                        branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                                     branchMediaPostDetails.setSharedOn( branchSocialList );
                                 }
                             }
@@ -765,7 +769,8 @@ public class SurveyManagementController
             if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                 if ( !socialManagementService.updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl,
                     linkedinMessageFeedback ) ) {
-                    agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                        agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                 }
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
@@ -773,7 +778,8 @@ public class SurveyManagementController
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
                             linkedinMessageFeedback ) ) {
-                            companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                            if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                         }
                     }
                 }
@@ -784,7 +790,8 @@ public class SurveyManagementController
                         if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
                             linkedinMessageFeedback ) ) {
                             List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                            regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                            if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                             regionMediaPostDetails.setSharedOn( regionSocialList );
                         }
                     }
@@ -798,7 +805,8 @@ public class SurveyManagementController
                             if ( !socialManagementService.updateLinkedin( setting, linkedinMessage, linkedinProfileUrl,
                                 linkedinMessageFeedback ) ) {
                                 List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                                if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                    branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                                 branchMediaPostDetails.setSharedOn( branchSocialList );
                             }
                         }
@@ -820,7 +828,8 @@ public class SurveyManagementController
             try {
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     if ( !socialManagementService.tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                        agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                        if ( !agentSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                            agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                     }
                 }
             } catch ( TwitterException e ) {
@@ -833,7 +842,8 @@ public class SurveyManagementController
                     try {
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !socialManagementService.tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                                companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                if ( !companySocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                    companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                             }
                         }
                     } catch ( TwitterException e ) {
@@ -849,7 +859,8 @@ public class SurveyManagementController
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !socialManagementService.tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                                 List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                if ( !regionSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                    regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                                 regionMediaPostDetails.setSharedOn( regionSocialList );
                             }
                         }
@@ -869,7 +880,8 @@ public class SurveyManagementController
                                 if ( !socialManagementService
                                     .tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                    if ( !branchSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                        branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                                     branchMediaPostDetails.setSharedOn( branchSocialList );
                                 }
                             }
@@ -985,7 +997,8 @@ public class SurveyManagementController
                     socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl, user
                         .getCompany().getCompanyId() );
                     // TODO: Bad code: Remove the company id from the parameter: End
-                    agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                        agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                 }
             } catch ( FacebookException e ) {
                 LOG.error(
@@ -996,7 +1009,8 @@ public class SurveyManagementController
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
                             .getCompany().getCompanyId() );
-                        companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                        if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                            companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                     }
                 } catch ( FacebookException e ) {
                     LOG.error(
@@ -1012,7 +1026,8 @@ public class SurveyManagementController
                         socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
                             .getCompany().getCompanyId() );
                         List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                        regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                        if ( !regionSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                            regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                         regionMediaPostDetails.setSharedOn( regionSocialList );
                     }
                 } catch ( FacebookException e ) {
@@ -1032,7 +1047,8 @@ public class SurveyManagementController
                             socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, user
                                 .getCompany().getCompanyId() );
                             List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                            branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                             branchMediaPostDetails.setSharedOn( branchSocialList );
                         }
                     }
@@ -1141,7 +1157,8 @@ public class SurveyManagementController
             try {
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     socialManagementService.tweet( agentSettings, twitterMessage, user.getCompany().getCompanyId() );
-                    agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    if ( !agentSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                        agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                 }
             } catch ( TwitterException e ) {
                 LOG.error( "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
@@ -1150,7 +1167,8 @@ public class SurveyManagementController
                 try {
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
-                        companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                        if ( !companySocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                            companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                     }
                 } catch ( TwitterException e ) {
                     LOG.error(
@@ -1165,7 +1183,8 @@ public class SurveyManagementController
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
                         List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                        regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                        if ( !regionSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                            regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                         regionMediaPostDetails.setSharedOn( regionSocialList );
                     }
                 } catch ( TwitterException e ) {
@@ -1182,7 +1201,8 @@ public class SurveyManagementController
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() );
                             List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                            branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                            if ( !branchSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                             branchMediaPostDetails.setSharedOn( branchSocialList );
                         }
                     }
@@ -1283,12 +1303,14 @@ public class SurveyManagementController
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
             if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                 socialManagementService.updateLinkedin( agentSettings, message, linkedinProfileUrl, linkedinMessageFeedback );
-                agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                    agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
             }
             for ( OrganizationUnitSettings setting : companySettings ) {
                 if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                     socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
-                    companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                        companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                 }
 
             }
@@ -1299,7 +1321,8 @@ public class SurveyManagementController
                     socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
 
                     List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                    regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                        regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                     regionMediaPostDetails.setSharedOn( regionSocialList );
                 }
             }
@@ -1311,7 +1334,8 @@ public class SurveyManagementController
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback );
                         List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                        branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                        if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                            branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                         branchMediaPostDetails.setSharedOn( branchSocialList );
                     }
                 }
