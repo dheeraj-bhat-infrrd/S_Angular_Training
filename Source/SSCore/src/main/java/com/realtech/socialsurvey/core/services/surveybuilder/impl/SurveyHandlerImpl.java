@@ -2100,6 +2100,25 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
+    public SurveyDetails getSurveyDetails( String surveyMongoId )
+    {
+        LOG.info( "Method getSurveyDetails() to return survey details by surveyMongoId started." );
+        SurveyDetails surveyDetails;
+        surveyDetails = surveyDetailsDao.getSurveyBySurveyMongoId( surveyMongoId );
+        LOG.info( "Method getSurveyDetails() to return survey details by surveyMongoId finished." );
+        return surveyDetails;
+    }
+    
+    
+    @Override
+    public void updateSurveyAsUnAbusive( String surveyId )
+    {
+        LOG.info( "Method unMarkAbusiveSurvey() started" );
+        surveyDetailsDao.updateSurveyAsUnAbusive( surveyId );
+        LOG.info( "Method unMarkAbusiveSurvey() finished" );
+    }
+    
     /**
      * Returns array of swear words. Its used only for testing. Not for development(non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler#getSwearList()

@@ -43,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -56,11 +57,13 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.util.RequestUtils;
 
 
 @Controller
@@ -98,6 +101,12 @@ public class AdminController
 
     @Autowired
     private EncryptionHelper encryptionHelper;
+
+    @Autowired
+    SocialManagementService socialManagementService;
+
+    @Autowired
+    private RequestUtils requestUtils;
 
 
     @RequestMapping ( value = "/admindashboard")
@@ -609,6 +618,51 @@ public class AdminController
         }
         LOG.info( "Method to get abusive surveys fetchSurveyByAbuse() finished." );
         return JspResolver.ADMIN_ABUSIVE_REPORTS;
+    }
+
+
+    @RequestMapping ( value = "/unmarkabusivereview", method = RequestMethod.GET)
+    public String unmarkAbusiveReview( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method unmarkAbusiveReview started." );
+
+        try {
+            String surveyId = request.getParameter( "surveyId" );
+            if ( surveyId == null || surveyId.isEmpty() ) {
+                throw new InvalidInputException( "Invalid input survey id in " );
+            }
+
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyId );
+            if ( surveyDetails == null ) {
+                throw new InvalidInputException( "No survey found for the survey id :  " + surveyId );
+            }
+
+            User user = userManagementService.getUserByUserId( surveyDetails.getAgentId() );
+            if ( user == null ) {
+                throw new InvalidInputException( "No user found for the survey id :  " + surveyId );
+            }
+
+            surveyHandler.updateSurveyAsUnAbusive( surveyId );
+
+            if ( surveyDetails.isAbuseRepByUser() ) {
+                if ( surveyDetails.getAgreedToShare().equalsIgnoreCase( CommonConstants.AGREE_SHARE_COLUMN_TRUE ) ) {
+                    LOG.debug( "Survey is reported bu user so auto posting on social media" );
+                    String serverBaseUrl = requestUtils.getRequestServerName( request );
+                    socialManagementService.postToSocialMedia( surveyDetails.getAgentName(), user.getProfileUrl(),
+                        surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName(), surveyDetails.getAgentId(),
+                        surveyDetails.getScore(), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), false,
+                        serverBaseUrl );
+                }
+            }
+
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInput exception caught in unmarkAbusiveReview(). Nested exception is ", e );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
+        }
+        LOG.info( "Method unmarkAbusiveReview finished." );
+        model.addAttribute( "message", messageUtils.getDisplayMessage(
+            DisplayMessageConstants.UNMARK_ABUSIVE_SURVEY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+        return JspResolver.MESSAGE_HEADER;
     }
 
 

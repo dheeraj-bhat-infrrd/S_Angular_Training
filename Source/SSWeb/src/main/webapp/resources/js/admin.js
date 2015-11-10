@@ -300,3 +300,21 @@ function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 
 $(document).on('scroll', '#dsh-inc-srvey', function() {
 });
+
+
+$(document).on('click', '.unmark-abusive-icn', function() {
+	var surveyMongoId = $(this).parent().parent().attr('data-iden');
+	unmarkAbusiveReview(surveyMongoId);
+});
+
+
+function unmarkAbusiveReview(surveyId){
+	var payload = {
+			"surveyId" : surveyId
+		};
+	
+	showOverlay();
+	callAjaxGetWithPayloadData("./unmarkabusivereview.do", function(data) {
+		displayMessage(data);
+	}, payload, false);
+}
