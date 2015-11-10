@@ -2115,9 +2115,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
             user.setStatus( Integer.parseInt( document.get( CommonConstants.STATUS_SOLR ).toString() ) );
             user.setFirstName( document.get( CommonConstants.USER_FIRST_NAME_SOLR ).toString() );
             if(document.get( CommonConstants.USER_LAST_NAME_SOLR ) != null)
-                user.setDisplayName( document.get( CommonConstants.USER_LAST_NAME_SOLR ).toString() );
+                user.setLastName( document.get( CommonConstants.USER_LAST_NAME_SOLR ).toString() );
             if(document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ) != null)
-                user.setLastName( document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ).toString() );
+                user.setDisplayName( document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ).toString() );
             userList.add( user );
         }
         LOG.debug( "method getUsersWithMetaDataFromSolrDocuments ended" );
