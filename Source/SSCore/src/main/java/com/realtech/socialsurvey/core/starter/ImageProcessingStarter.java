@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.util.List;
 import java.util.Map;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -30,8 +29,8 @@ public class ImageProcessingStarter extends QuartzJobBean {
 		if (images != null) {
 			for (long id : images.keySet()) {
 				try {
-					fileName = imageProcessor.processImage(images.get(id), ImageProcessor.IMAGE_TYPE_PROFILE);
-					updateImage(id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION, ImageProcessor.IMAGE_TYPE_PROFILE);
+					fileName = imageProcessor.processImage(images.get(id), CommonConstants.IMAGE_TYPE_PROFILE);
+					updateImage(id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_PROFILE);
 				}
 				catch (ImageProcessingException | InvalidInputException e) {
 					LOG.error("Skipping... Could not process image: " + id + " : " + images.get(id), e);
@@ -43,8 +42,8 @@ public class ImageProcessingStarter extends QuartzJobBean {
 		if (images != null) {
 			for (long id : images.keySet()) {
 				try {
-					fileName = imageProcessor.processImage(images.get(id), ImageProcessor.IMAGE_TYPE_PROFILE);
-					updateImage(id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION, ImageProcessor.IMAGE_TYPE_PROFILE);
+					fileName = imageProcessor.processImage(images.get(id), CommonConstants.IMAGE_TYPE_PROFILE);
+					updateImage(id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_PROFILE);
 				}
 				catch (ImageProcessingException | InvalidInputException e) {
 					LOG.error("Skipping... Could not process image: " + id + " : " + images.get(id), e);
@@ -56,8 +55,8 @@ public class ImageProcessingStarter extends QuartzJobBean {
 		if (images != null) {
 			for (long id : images.keySet()) {
 				try {
-					fileName = imageProcessor.processImage(images.get(id), ImageProcessor.IMAGE_TYPE_PROFILE);
-					updateImage(id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION, ImageProcessor.IMAGE_TYPE_PROFILE);
+					fileName = imageProcessor.processImage(images.get(id), CommonConstants.IMAGE_TYPE_PROFILE);
+					updateImage(id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_PROFILE);
 				}
 				catch (ImageProcessingException | InvalidInputException e) {
 					LOG.error("Skipping... Could not process image: " + id + " : " + images.get(id), e);
@@ -69,8 +68,8 @@ public class ImageProcessingStarter extends QuartzJobBean {
 		if (images != null) {
 			for (long id : images.keySet()) {
 				try {
-					fileName = imageProcessor.processImage(images.get(id), ImageProcessor.IMAGE_TYPE_PROFILE);
-					updateImage(id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION, ImageProcessor.IMAGE_TYPE_PROFILE);
+					fileName = imageProcessor.processImage(images.get(id), CommonConstants.IMAGE_TYPE_PROFILE);
+					updateImage(id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_PROFILE);
 				}
 				catch (ImageProcessingException | InvalidInputException e) {
 					LOG.error("Skipping... Could not process image: " + id + " : " + images.get(id), e);
@@ -83,8 +82,8 @@ public class ImageProcessingStarter extends QuartzJobBean {
 		if (images != null) {
 			for (long id : images.keySet()) {
 				try {
-					fileName = imageProcessor.processImage(images.get(id), ImageProcessor.IMAGE_TYPE_LOGO);
-					updateImage(id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION, ImageProcessor.IMAGE_TYPE_LOGO);
+					fileName = imageProcessor.processImage(images.get(id), CommonConstants.IMAGE_TYPE_LOGO);
+					updateImage(id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO);
 				}
 				catch (ImageProcessingException | InvalidInputException e) {
 					LOG.error("Skipping... Could not process image: " + id + " : " + images.get(id), e);
@@ -96,8 +95,8 @@ public class ImageProcessingStarter extends QuartzJobBean {
 		if (images != null) {
 			for (long id : images.keySet()) {
 				try {
-					fileName = imageProcessor.processImage(images.get(id), ImageProcessor.IMAGE_TYPE_LOGO);
-					updateImage(id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION, ImageProcessor.IMAGE_TYPE_LOGO);
+					fileName = imageProcessor.processImage(images.get(id), CommonConstants.IMAGE_TYPE_LOGO);
+					updateImage(id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO);
 				}
 				catch (ImageProcessingException | InvalidInputException e) {
 					LOG.error("Skipping... Could not process image: " + id + " : " + images.get(id), e);
@@ -109,8 +108,8 @@ public class ImageProcessingStarter extends QuartzJobBean {
 		if (images != null) {
 			for (long id : images.keySet()) {
 				try {
-					fileName = imageProcessor.processImage(images.get(id), ImageProcessor.IMAGE_TYPE_LOGO);
-					updateImage(id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION, ImageProcessor.IMAGE_TYPE_LOGO);
+					fileName = imageProcessor.processImage(images.get(id), CommonConstants.IMAGE_TYPE_LOGO);
+					updateImage(id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO);
 				}
 				catch (ImageProcessingException | InvalidInputException e) {
 					LOG.error("Skipping... Could not process image: " + id + " : " + images.get(id), e);
@@ -122,7 +121,7 @@ public class ImageProcessingStarter extends QuartzJobBean {
 			imageProcessor
 					.processImage(
 							"https://don7n2as2v6aa.cloudfront.net/userprofilepics/P-ae12f4d2e10a5437b18dbc58c55170737b409c7dd5aa3a5121f77757f94d5acd71b277130acdb9a08b3ea8169734c834aaee0c036840e20915ca0873e8d0ae19.png",
-							ImageProcessor.IMAGE_TYPE_PROFILE);
+							CommonConstants.IMAGE_TYPE_PROFILE);
 		}
 		catch (ImageProcessingException | InvalidInputException e) {
 			LOG.error("Could not process image", e);
@@ -135,6 +134,8 @@ public class ImageProcessingStarter extends QuartzJobBean {
 	}
 
 	private Map<Long, String> getUnprocessedProfileImages(String collection) {
+		LOG.debug("Getting unprocessed profile images for collection "+collection);
+		
 		return null;
 	}
 

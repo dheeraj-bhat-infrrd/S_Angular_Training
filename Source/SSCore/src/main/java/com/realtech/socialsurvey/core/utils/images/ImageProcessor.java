@@ -14,9 +14,6 @@ public interface ImageProcessor {
 	public static final int THUMBNAIL_WIDTH = 321;
 	public static final int THUMBNAIL_HEIGHT = 321;
 	
-	public static final String IMAGE_TYPE_PROFILE = "profile";
-	public static final String IMAGE_TYPE_LOGO = "logo";
-	
 	/**
 	 * Processes and updates the provided
 	 * @param imageFileName
