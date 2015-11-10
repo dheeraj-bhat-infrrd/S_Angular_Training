@@ -2185,7 +2185,8 @@ function addRegionCallBack(data) {
  */
 function getUsersList(searchKey,start,rows) {
 	var url="./finduserbyemail.do?startIndex="+start+"&batchSize="+rows+"&searchKey="+searchKey;
-	callAjaxGET(url, paintUsersList, true);
+	//encode the url so it can accept the special characters also
+	callAjaxGET(encodeURI(url), paintUsersList, true);
 }
 
 /**
