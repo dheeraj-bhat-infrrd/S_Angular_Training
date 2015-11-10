@@ -5141,15 +5141,22 @@ select.rfr_txt_fld,select.rfr_input_fld{
 .v-tbl-icn {
 	cursor: pointer;
 	height: 39px;
-	width: 25%;
+	width: 16.66%;
 }
 
 .v-tbl-icn-disabled {
 	cursor: auto;
 	opacity: 0.3;
 	height: 39px;
-	width: 33.33%;
+	width: 16.66%;
 }
+.v-tbl-icn-wid-disabled {
+	cursor: auto;
+	opacity: 0.3;
+	height: 39px;
+	width: 16.66%;
+}
+
 
 .hm-header-right {
 	background-color: #009FE0;
@@ -5345,7 +5352,7 @@ td.v-tbl-spacer {
 	width: 2.5%;
 }
 .v-tbl-top-spacer{
-	width:25%;
+	width:16.66%;
 	height:39px;
 }
 
