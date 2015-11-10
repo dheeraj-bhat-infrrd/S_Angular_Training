@@ -28,6 +28,7 @@
 		<td class="v-tbl-online"></td>
 		<td class="v-tbl-rem"></td>
 		<td class="v-tbl-edit"></td>
+		<td class="v-tbl-spacer"></td>
 	</tr>
 	<c:choose>
 		<c:when test="${not empty userslist}">
@@ -110,12 +111,21 @@
 					</c:choose>
 					<td class="v-tbl-rem ${admincanremoveclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>
 					<td class="v-tbl-edit ${admincaneditclass} v-icn-edit-user edit-user" title="<spring:message code="label.edit.key" />"></td>
+					<c:choose>
+					 <c:when test="${user.userId != userfromsearch.userId}">
+				   		<td class="v-tbl-online v-tbl-icn v-icn-login user-login-icn" data-iden="${userfromsearch.userId}" title="login as"></td>
+				   </c:when>
+				   <c:otherwise>
+							<td class="v-tbl-spacer" ></td>
+						</c:otherwise>
+				   </c:choose>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="10">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="11">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>
+				
 			</c:forEach>
 		</c:when>
 		<c:otherwise>
@@ -123,3 +133,6 @@
 		</c:otherwise>
 	</c:choose>
 </table>
+<script>
+	bindUserLoginEvent();
+</script>
