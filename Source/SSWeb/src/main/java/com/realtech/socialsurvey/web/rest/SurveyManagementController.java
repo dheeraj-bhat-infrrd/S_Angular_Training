@@ -127,9 +127,6 @@ public class SurveyManagementController
     @Qualifier ( "nocaptcha")
     private CaptchaValidation captchaValidation;
 
-    @Value ( "${ENABLE_KAFKA}")
-    private String enableKafka;
-
     @Value ( "${VALIDATE_CAPTCHA}")
     private String validateCaptcha;
 
@@ -208,8 +205,7 @@ public class SurveyManagementController
             surveyHandler.deleteSurveyPreInitiationDetailsPermanently( surveyPreInitiation );
 
             // update the modified time of hierarchy for seo
-            surveyHandler.updateModifiedOnColumnForAgentHierachy( agentId );
-            // TODO Search Engine Optimization
+            surveyHandler.updateModifiedOnColumnForAgentHierachy(agentId);
             if ( mood == null || mood.isEmpty() ) {
                 LOG.error( "Null/empty value found for mood in storeFeedback()." );
                 throw new InvalidInputException( "Null/empty value found for mood in storeFeedback()." );
@@ -246,18 +242,15 @@ public class SurveyManagementController
 
                 String logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser( agent.getUserId() );
                 LOG.info( "logourl is : " + logoUrl + " for user " + agent.getUserId() );
-                if ( enableKafka.equals( CommonConstants.YES ) ) {
-                    emailServices.queueSurveyCompletionMail( customerEmail, customerName, survey.getAgentName(),
-                        agent.getEmailId(), agent.getProfileName() );
-                } else {
-                    if ( survey.getMood().equalsIgnoreCase( "Unpleasant" ) )
-                        surveyHandler.sendSurveyCompletionUnpleasantMail( customerEmail, survey.getCustomerFirstName(),
-                            survey.getCustomerLastName(), agent );
-                    else
-                        surveyHandler.sendSurveyCompletionMail( customerEmail, survey.getCustomerFirstName(),
-                            survey.getCustomerLastName(), agent );
+                if ( survey.getMood().equalsIgnoreCase( "Unpleasant" ) ){
+                    surveyHandler.sendSurveyCompletionUnpleasantMail( customerEmail, survey.getCustomerFirstName(),
+                        survey.getCustomerLastName(), agent );
                 }
-
+                else{
+                    surveyHandler.sendSurveyCompletionMail( customerEmail, survey.getCustomerFirstName(),
+                        survey.getCustomerLastName(), agent );
+                }
+                
                 double surveyScoreValue = survey.getScore();
                 boolean allowCheckBox = true;
                 OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( agentId );
@@ -277,16 +270,9 @@ public class SurveyManagementController
                 // Generate the text as in mail
                 String surveyDetail = generateSurveyTextForMail( customerName, mood, survey, isAbusive, allowCheckBox );
                 String surveyScore = String.valueOf( survey.getScore() );
-                if ( enableKafka.equals( CommonConstants.YES ) ) {
-                    for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
-                        emailServices.queueSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(),
-                            surveyDetail, customerName, surveyScore );
-                    }
-                } else {
-                    for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
-                        emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
-                            customerName, surveyScore );
-                    }
+                for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
+                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
+                        customerName, surveyScore );
                 }
 
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey

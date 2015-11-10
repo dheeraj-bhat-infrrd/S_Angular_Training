@@ -154,9 +154,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
-    @Value ( "${ENABLE_KAFKA}")
-    private String enableKafka;
-
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
@@ -1247,7 +1244,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     /*
      * Method to update the given user as active based on profiles completed
      */
-    // TODO
     @Override
     @Transactional
     public void updateUserProfilesStatus( User admin, long profileIdToUpdate ) throws InvalidInputException
@@ -1371,11 +1367,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         // Send reset password link to the user email ID
-        if ( enableKafka.equals( CommonConstants.YES ) ) {
-            emailServices.queueRegistrationCompletionEmail( url, emailId, name, profileName, loginName );
-        } else {
-            emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName );
-        }
+        emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName );
     }
 
 
@@ -1462,15 +1454,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.debug( "Calling email services to send verification mail for user " + user.getEmailId() );
             String profileName = getUserSettings( user.getUserId() ).getProfileName();
 
-            if ( enableKafka.equals( CommonConstants.YES ) ) {
-                emailServices.queueVerificationMail( verificationUrl, user.getEmailId(),
-                    user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ), profileName,
-                    user.getLoginName() );
-            } else {
-                emailServices.sendVerificationMail( verificationUrl, user.getEmailId(),
-                    user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ), profileName,
-                    user.getLoginName() );
-            }
+            emailServices.sendVerificationMail( verificationUrl, user.getEmailId(),
+                user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ), profileName,
+                user.getLoginName() );
         } catch ( InvalidInputException e ) {
             throw new InvalidInputException( "Could not send mail for verification.Reason : " + e.getMessage(), e );
         }
@@ -1509,11 +1495,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         storeCompanyAdminInvitation( queryParam, emailId );
 
         LOG.debug( "Calling email services to send registration invitation mail" );
-        if ( enableKafka.equals( CommonConstants.YES ) ) {
-            emailServices.queueRegistrationInviteMail( url, emailId, firstName, lastName );
-        } else {
-            emailServices.sendRegistrationInviteMail( url, emailId, firstName, lastName );
-        }
+        emailServices.sendRegistrationInviteMail( url, emailId, firstName, lastName );
 
         LOG.debug( "Method inviteUser finished successfully" );
     }
@@ -2779,7 +2761,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 throw new FatalException( "Unable to fetch primary profile this user " + userId );
             }
         } catch ( InvalidSettingsStateException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
