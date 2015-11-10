@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.internal.util.reflection.Whitebox;
 
 public class UtilsTest {
 
@@ -38,5 +39,12 @@ public class UtilsTest {
 	@Test
 	public void testGenerateCompanyProfileUrl(){
 		assertEquals("Proper test", "/company/company", utils.generateCompanyProfileUrl("company"));
+	}
+	
+	@Test
+	public void testMaskEmailAddress(){
+		Whitebox.setInternalState(utils, "maskingPrefix", "test");
+		Whitebox.setInternalState(utils, "maskingSuffix", "@abc.com");
+		assertEquals("Proper Test", "test+my+example.com@abc.com", utils.maskEmailAddress("my@example.com"));
 	}
 }
