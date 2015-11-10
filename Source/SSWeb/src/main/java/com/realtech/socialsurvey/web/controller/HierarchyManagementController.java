@@ -95,12 +95,13 @@ public class HierarchyManagementController {
 		String profileName = null;
 		try {
 			try {
-				if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
-					LOG.error("Inactive or unauthorized users can not access build hierarchy page");
-					isUserAuthorized = false;
-					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.HIERARCHY_MANAGEMENT_NOT_AUTHORIZED,
-							DisplayMessageType.ERROR_MESSAGE, "javascript:resendVerificationMail()"));
-				}
+//			    Commented as this threw an error when adding team members under a non-verified admin
+//				if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
+//					LOG.error("Inactive or unauthorized users can not access build hierarchy page");
+//					isUserAuthorized = false;
+//					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.HIERARCHY_MANAGEMENT_NOT_AUTHORIZED,
+//							DisplayMessageType.ERROR_MESSAGE, "javascript:resendVerificationMail()"));
+//				}
 				LOG.debug("Calling service for checking the if the region addition is allowed");
 				isRegionAdditionAllowed = organizationManagementService.isRegionAdditionAllowed(user, accountType);
 
