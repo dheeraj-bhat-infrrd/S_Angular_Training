@@ -625,9 +625,11 @@ public class SurveyManagementController
             }
 
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            if ( rating % 1 == 0 ) {
+            /*if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }
+            }*/
+            ratingFormat.setMinimumFractionDigits( 1 );
+            ratingFormat.setMaximumFractionDigits( 1 );
             User agent = userManagementService.getUserByUserId( agentId );
             int accountMasterId = 0;
             String accountMasterName = "";
@@ -929,9 +931,11 @@ public class SurveyManagementController
             }
 
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            if ( rating % 1 == 0 ) {
+            /*if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }
+            }*/
+            ratingFormat.setMinimumFractionDigits( 1 );
+            ratingFormat.setMaximumFractionDigits( 1 );
 
 
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
@@ -1081,9 +1085,11 @@ public class SurveyManagementController
 
 
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            if ( rating % 1 == 0 ) {
+            /*if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }
+            }*/
+            ratingFormat.setMinimumFractionDigits( 1 );
+            ratingFormat.setMaximumFractionDigits( 1 );
 
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
@@ -1229,9 +1235,11 @@ public class SurveyManagementController
 
 
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            if ( rating % 1 == 0 ) {
+            /*if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }
+            }*/
+            ratingFormat.setMinimumFractionDigits( 1 );
+            ratingFormat.setMaximumFractionDigits( 1 );
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap

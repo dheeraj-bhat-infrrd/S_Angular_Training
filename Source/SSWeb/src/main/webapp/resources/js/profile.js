@@ -722,9 +722,9 @@ function paintReviews(result){
 	var reviewsHtml = "";
 	$.each(result, function(i, reviewItem) {
 		var scoreFixVal = 1;
-		if (reviewItem.score % 1 == 0) {
+		/*if (reviewItem.score % 1 == 0) {
 			scoreFixVal = 0;
-		}
+		}*/
 		var date = Date.parse(reviewItem.modifiedOn);
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {

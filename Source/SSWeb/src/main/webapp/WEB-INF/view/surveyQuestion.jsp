@@ -272,8 +272,8 @@
 						</div>
 	
 						<div id="pst-srvy-div" class="pst-srvy">
-							<div id="shr-post-chk-box" class="float-left bd-check-img bd-check-img-checked"></div>
-							<input type="hidden" id="shr-pst-cb" name="sharepost" value="false">
+							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
+-							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
 							<div class="float-left bd-check-txt"><spring:message code="label.survey.authorize.key"/></div>
 						</div>
 						<div class="sq-np-wrapper clearfix">

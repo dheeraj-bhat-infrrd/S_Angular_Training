@@ -183,7 +183,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setAgentName( agentName );
         surveyDetails.setBranchId( branchId );
         surveyDetails.setCustomerFirstName( firstName );
-        surveyDetails.setCustomerLastName( lastName );
+        if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
+            surveyDetails.setCustomerLastName( lastName );
         surveyDetails.setCompanyId( companyId );
         surveyDetails.setCustomerEmail( customerEmail );
         surveyDetails.setRegionId( regionId );
@@ -2099,16 +2100,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Method getSurveysUnderResolution() to retrieve surveys marked as under resolution for a company, finished" );
         return surveyDetails;
     }
-    
+
+
     /**
      * Returns array of swear words. Its used only for testing. Not for development(non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler#getSwearList()
      */
     @Override
-    public String[] getSwearList(){
-    	LOG.debug("Returning swear list");
-    	String[] swearList = new Gson().fromJson(SWEAR_WORDS, String[].class);
-    	return swearList;
+    public String[] getSwearList()
+    {
+        LOG.debug( "Returning swear list" );
+        String[] swearList = new Gson().fromJson( SWEAR_WORDS, String[].class );
+        return swearList;
     }
 }
 // JIRA SS-119 by RM-05:EOC

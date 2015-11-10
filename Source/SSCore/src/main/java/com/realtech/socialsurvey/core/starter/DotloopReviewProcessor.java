@@ -309,6 +309,7 @@ public class DotloopReviewProcessor extends QuartzJobBean {
 						surveyPreInitiation.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 						surveyPreInitiation.setCustomerEmailId(customerMappingKey);
 						surveyPreInitiation.setCustomerFirstName(customerMapping.get(customerMappingKey));
+						surveyPreInitiation.setCustomerLastName( null );
 						surveyPreInitiation.setLastReminderTime(utils.convertEpochDateToTimestamp());
 						surveyPreInitiation.setAgentEmailId(agentEmailId);
 						surveyPreInitiation.setEngagementClosedTime(new Timestamp(System.currentTimeMillis()));
