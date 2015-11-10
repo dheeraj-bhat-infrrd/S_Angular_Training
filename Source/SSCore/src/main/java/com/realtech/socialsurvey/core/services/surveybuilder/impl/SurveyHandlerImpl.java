@@ -811,7 +811,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -819,7 +819,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             emailServices.sendDefaultSurveyRestartMail( custEmail, logoUrl,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
-                user.getEmailId(), agentSignature );
+                user.getEmailId(), agentSignature, user.getUserId() );
         }
         LOG.info( "sendSurveyRestartMail() finished." );
     }
@@ -927,7 +927,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -935,7 +935,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             emailServices.sendDefaultSurveyCompletionMail( custEmail,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
-                user.getProfileName(), logoUrl );
+                user.getProfileName(), logoUrl, user.getUserId() );
         }
         LOG.info( "sendSurveyCompletionMail() finished." );
     }
@@ -1051,7 +1051,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -1059,7 +1059,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             emailServices.sendDefaultSurveyCompletionMail( custEmail,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
-                companyName, logoUrl );
+                companyName, logoUrl, user.getUserId() );
         }
         LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
     }
@@ -1168,7 +1168,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -1510,7 +1510,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -1518,7 +1518,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             emailServices.sendDefaultSurveyInvitationMail( custEmail, logoUrl,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
-                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
+                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress, user.getUserId() );
         }
         LOG.debug( "sendInvitationMailByAgent() finished." );
     }
@@ -1553,13 +1553,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
             try {
                 emailServices.sendSurveyInvitationMailByCustomer( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
             emailServices.sendDefaultSurveyInvitationMailByCustomer( custEmail, custFirstName,
-                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), link, user.getEmailId() );
+                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), link, user.getEmailId(), user.getUserId() );
         }
         LOG.debug( "sendInvitationMailByCustomer() finished." );
     }
