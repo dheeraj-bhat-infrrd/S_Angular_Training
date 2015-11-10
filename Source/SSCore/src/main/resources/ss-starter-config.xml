@@ -128,12 +128,25 @@
 			value="com.realtech.socialsurvey.core.starter.SolrSocialPostsImport" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="socialPostsFullImport" value-ref="socialPostsFullImport" />
+				<entry key="socialPostsDeltaImport" value-ref="socialPostsDeltaImport" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-
+	
+	<!-- Setting set companyId in mongo social posts job detail -->
+	<bean id="setcompanyidsinsocialpostsjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.SetCompanyIdsInSocialPosts" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="setCompanyIdInSocialPosts" value-ref="setCompanyIdInSocialPosts" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
 	<!-- Setting email reader job detail -->
 	<bean id="emailreaderjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -242,15 +255,6 @@
 		<property name="durability" value="true" />
 	</bean>
 
-	<!-- Setting zillow job detail -->
-	<!-- <bean id="zillowjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean"> 
-		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.ZillowReviewProcessor" 
-		/> <property name="jobDataAsMap"> <map> <entry key="zws-id" value="${ZILLOW_WEBSERVICE_ID}" 
-		/> <entry key="zillowIntegrationApiBuilder" value-ref="zillowIntegrationApiBuilder" 
-		/> <entry key="organizationManagementService" value-ref="organizationManagementService" 
-		/> <entry key="surveyHandler" value-ref="surveyHandler" /> </map> </property> 
-		<property name="durability" value="true" /> </bean> -->
-
 	<bean id="hierarchysettingsjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
@@ -346,6 +350,13 @@
 		<property name="cronExpression" value="0 0/15 * * * ?" />
 	</bean>
 
+	<!-- setting cron for Set Company Ids In Social Posts -->
+	<bean id="setcompanyidsinsocialpostscron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="setcompanyidsinsocialpostsjobdetail" />
+		<property name="cronExpression" value="0 0/3 * * * ?" />
+	</bean>
+	
 	<!-- setting cron for email reader -->
 	<bean id="emailreadercron"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
@@ -420,10 +431,6 @@
 		<property name="jobDetail" ref="imageprocessingjobdetail" />
 		<property name="cronExpression" value="0 0/1 * * * ?" />
 	</bean>
-	<!-- setting cron for loading image from linkedin to amazon server -->
-	<!-- <bean id="zillowcron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean"> 
-		<property name="jobDetail" ref="zillowjobdetail" /> <property name="cronExpression" 
-		value="0 25 0,2,4,6,8,10,12,14,16,18,20,22 * * ?" /> </bean> -->
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -435,7 +442,7 @@
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
-				<!-- <ref bean="socialpostsimportjobdetail" /> -->
+				<ref bean="socialpostsimportjobdetail" />
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="crmdataagentidmapperjobdetail" />
@@ -444,9 +451,9 @@
 				<ref bean="dotloopjobdetail" />
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
+				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
 				<!-- <ref bean="imageprocessingjobdetail" />  -->
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
-				<!-- <ref bean="zillowjobdetail" /> -->
 			</list>
 		</property>
 
@@ -458,7 +465,7 @@
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
-				<!-- <ref bean="socialpostimportcron" /> -->
+				<ref bean="socialpostimportcron" />
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
@@ -467,9 +474,9 @@
 				<ref bean="dotloopcron" />
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
+				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
 				<!-- <ref bean="imageprocessingcron" /> -->
 				<!-- <ref bean="hierarchysettingscron" /> -->
-				<!-- <ref bean="zillowcron" /> -->
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -516,8 +523,12 @@
 		class="com.realtech.socialsurvey.core.feed.impl.SocialFeedIngestionKickStarter" />
 	
 	<!-- Social post import dependencies -->
-	<bean id="socialPostsFullImport"
-		class="com.realtech.socialsurvey.core.utils.solr.SocialPostsFullImport" />
+	<bean id="socialPostsDeltaImport"
+		class="com.realtech.socialsurvey.core.utils.solr.SocialPostsDeltaImport" />
+	
+	<!-- setCompanyIdsInSocialPosts dependencies -->
+	<bean id="setCompanyIdInSocialPosts"
+		class="com.realtech.socialsurvey.core.utils.mongo.SetCompanyIdInSocialPosts" />
 	
 	<!-- Email reader -->
 	<bean id="emailHandler" class="com.realtech.socialsurvey.core.handler.EmailHandler" />

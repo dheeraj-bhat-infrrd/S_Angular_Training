@@ -300,6 +300,19 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
             status.setRetries( status.getRetries() + 1 );
             status.setLastFetchedPostId( lastFetchedPostId );
 
+            //if last reminder time is null than set is as epoch time
+            if(status.getReminderSentOn() == null){
+            	SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
+            	try {
+					Timestamp remimderSentOn = new Timestamp(sdf.parse(CommonConstants.EPOCH_REMINDER_TIME).getTime());
+					status.setReminderSentOn( remimderSentOn );
+				}
+				catch (ParseException pe) {
+					pe.printStackTrace();
+				}
+                
+            }
+            
             Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
             DateTime currentTime = new DateTime( timestamp.getTime() );
             DateTime sentTime = new DateTime( status.getReminderSentOn().getTime() );

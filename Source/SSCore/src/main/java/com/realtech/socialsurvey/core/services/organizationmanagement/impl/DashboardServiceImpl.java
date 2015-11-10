@@ -97,7 +97,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         startTime.set(Calendar.SECOND, 0);
         startTime.set(Calendar.MILLISECOND, 0);
         Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
-    	long completedSurveyCount = getCompletedSurveyCount(columnName, columnValue, startDate, endDate);
+    	long completedSurveyCount = getCompletedSurveyCount(columnName, columnValue, startDate, endDate, false);
     	// TODO: remove hard coding
         long companyId = -1;
         long agentId = -1;
@@ -131,11 +131,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         startTime.set(Calendar.SECOND, 0);
         startTime.set(Calendar.MILLISECOND, 0);
         Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
-    	return getCompletedSurveyCount(columnName, columnValue, startDate, endDate);
+    	return getCompletedSurveyCount(columnName, columnValue, startDate, endDate, true);
     }
     
-    private long getCompletedSurveyCount(String columnName, long columnValue, Timestamp startDate, Timestamp endDate) throws InvalidInputException{
-    	return surveyDetailsDao.getCompletedSurveyCount(columnName, columnValue, startDate, endDate);
+    private long getCompletedSurveyCount(String columnName, long columnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive) throws InvalidInputException{
+    	return surveyDetailsDao.getCompletedSurveyCount(columnName, columnValue, startDate, endDate, filterAbusive);
     }
     
     @Override
