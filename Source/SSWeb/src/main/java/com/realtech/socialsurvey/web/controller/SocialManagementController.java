@@ -1470,9 +1470,11 @@ public class SocialManagementController
             return e.getMessage();
         }
         DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-        if ( rating % 1 == 0 ) {
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
+        /*if ( rating % 1 == 0 ) {
             ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-        }
+        }*/
         
         User user = sessionHelper.getCurrentUser();
         List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
@@ -1538,9 +1540,11 @@ public class SocialManagementController
                 return e.getMessage();
             }
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            if ( rating % 1 == 0 ) {
+            /*if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }
+            }*/
+            ratingFormat.setMinimumFractionDigits( 1 );
+            ratingFormat.setMaximumFractionDigits( 1 );
             String agentProfileLink = "";
             AgentSettings agentSettings;
             try {
@@ -1612,9 +1616,11 @@ public class SocialManagementController
             return e.getMessage();
         }
         DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-        if ( rating % 1 == 0 ) {
+        /*if ( rating % 1 == 0 ) {
             ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-        }
+        }*/
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
         String agentProfileLink = "";
         AgentSettings agentSettings;
         try {
