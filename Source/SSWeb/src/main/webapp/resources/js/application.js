@@ -2185,7 +2185,8 @@ function addRegionCallBack(data) {
  */
 function getUsersList(searchKey,start,rows) {
 	var url="./finduserbyemail.do?startIndex="+start+"&batchSize="+rows+"&searchKey="+searchKey;
-	callAjaxGET(url, paintUsersList, true);
+	//encode the url so it can accept the special characters also
+	callAjaxGET(encodeURI(url), paintUsersList, true);
 }
 
 /**
@@ -2216,6 +2217,9 @@ function paintUsersList(data) {
 		$("#users-droplist").slideUp(200);
 		
 	}
+	
+	$('#users-droplist').perfectScrollbar();
+	$('#users-droplist').perfectScrollbar('update');
 	
 	// bind the click event of selector
 	$(".hm-user-options").click(function() {
