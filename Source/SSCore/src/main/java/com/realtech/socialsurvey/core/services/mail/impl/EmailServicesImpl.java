@@ -950,7 +950,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendDefaultSurveyCompletionMail( String recipientMailId, String displayName, String agentName,
-        String agentEmail, String agentProfileName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
+        String agentEmail, String agentProfileName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -962,7 +962,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.info( "Sending survey completion email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentEmail, agentName );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
 
@@ -987,7 +987,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String displayName, String agentName,
-        String agentEmail, String companyName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException
+        String agentEmail, String companyName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
@@ -1001,7 +1001,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.info( "Sending survey completion email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentEmail, agentName );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
 
@@ -1330,7 +1330,7 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendDefaultSurveyInvitationMail( String recipientMailId, String logoUrl, String firstName, String agentName,
         String link, String agentEmailId, String agentSignature, String companyName, String surveyInitiatedOn,
-        String currentYear, String fullAddress ) throws InvalidInputException, UndeliveredEmailException
+        String currentYear, String fullAddress, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1342,7 +1342,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentEmailId, agentName );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT;
 
@@ -1369,7 +1369,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendSurveyInvitationMail( String recipientMailId, String subject, String mailBody, String emailId, String name )
+    public void sendSurveyInvitationMail( String recipientMailId, String subject, String mailBody, String emailId, String name, long agentId )
         throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -1382,7 +1382,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, emailId, name );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, name );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody, false );
@@ -1555,7 +1555,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendDefaultSurveyInvitationMailByCustomer( String recipientMailId, String firstName, String agentName,
-        String link, String agentEmailId ) throws InvalidInputException, UndeliveredEmailException
+        String link, String agentEmailId, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1567,7 +1567,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentEmailId, agentName );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_CUSTOMER_SUBJECT;
 
@@ -1586,7 +1586,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyInvitationMailByCustomer( String recipientMailId, String subject, String mailBody, String emailId,
-        String name ) throws InvalidInputException, UndeliveredEmailException
+        String name, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1598,7 +1598,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.info( "Sending survey invitation email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, emailId, name );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, name );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody, false );
@@ -1609,7 +1609,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendDefaultSurveyRestartMail( String recipientMailId, String logoUrl, String displayName, String agentName,
-        String link, String agentEmailId, String agentSignature ) throws InvalidInputException, UndeliveredEmailException
+        String link, String agentEmailId, String agentSignature, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey restart mail " );
@@ -1621,7 +1621,7 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.info( "Sending survey restart email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentEmailId, agentName );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_RESTART_MAIL_SUBJECT;
 
@@ -1914,23 +1914,21 @@ public class EmailServicesImpl implements EmailServices
     }
 
 
-    private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId, String emailId, String name )
-    {
-        LOG.debug( "Preparing email entity for sending mail to " + recipientMailId + " agent email name: " + emailId
-            + " name: " + name );
-        List<String> recipients = new ArrayList<String>();
+    // creating email entity with senders email id as U<userid>@socialsurvey.me
+    private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId, long userId, String name){
+    	LOG.debug("Preparing email entity with recipent "+recipientMailId+" user id "+userId+" and name "+name);
+    	List<String> recipients = new ArrayList<String>();
         recipients.add( recipientMailId );
 
         EmailEntity emailEntity = new EmailEntity();
         emailEntity.setRecipients( recipients );
         emailEntity.setSenderName( name );
-        emailEntity.setSenderEmailId( emailId.substring( 0, emailId.indexOf( "@" ) + 1 ) + defaultEmailDomain );
+        emailEntity.setSenderEmailId( "u" + userId + "@" + defaultEmailDomain );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
 
         LOG.debug( "Prepared email entity for sending mail" );
         return emailEntity;
     }
-
 
     @Override
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
