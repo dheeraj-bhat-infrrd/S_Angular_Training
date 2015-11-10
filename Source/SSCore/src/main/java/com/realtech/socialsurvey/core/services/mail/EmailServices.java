@@ -146,7 +146,7 @@ public interface EmailServices
      * @throws InvalidInputException
      */
     public void sendDefaultSurveyCompletionMail( String recipientMailId, String displayName, String agentName,
-        String agentEmail, String agentProfileName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException;
+        String agentEmail, String agentProfileName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
@@ -213,7 +213,7 @@ public interface EmailServices
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      */
-    public void sendSurveyInvitationMail( String recipientMailId, String subject, String mailBody, String emailId, String name )
+    public void sendSurveyInvitationMail( String recipientMailId, String subject, String mailBody, String emailId, String name, long agentId )
         throws InvalidInputException, UndeliveredEmailException;
 
 
@@ -276,15 +276,15 @@ public interface EmailServices
 
     public void sendDefaultSurveyInvitationMail( String recipientMailId, String logoUrl, String displayName, String agentName,
         String link, String agentEmailId, String agentSignature, String companyName, String surveyInitiatedOn,
-        String currentYear, String fullAddress ) throws InvalidInputException, UndeliveredEmailException;
+        String currentYear, String fullAddress, long agentId ) throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendDefaultSurveyInvitationMailByCustomer( String recipientMailId, String displayName, String agentName,
-        String link, String agentEmailId ) throws InvalidInputException, UndeliveredEmailException;
+        String link, String agentEmailId, long agentId ) throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendSurveyInvitationMailByCustomer( String recipientMailId, String subject, String mailBody, String emailId,
-        String name ) throws InvalidInputException, UndeliveredEmailException;
+        String name, long agentId ) throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendFatalExceptionEmail( String recipientMailId, String stackTrace ) throws InvalidInputException,
@@ -296,7 +296,7 @@ public interface EmailServices
 
 
     public void sendDefaultSurveyRestartMail( String recipientMailId, String logoUrl, String displayName, String agentName,
-        String link, String agentEmailId, String agentSignature ) throws InvalidInputException, UndeliveredEmailException;
+        String link, String agentEmailId, String agentSignature, long agentId ) throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendSocialConnectMail( String recipientMailId, String displayName, String loginName, String account )
@@ -357,7 +357,7 @@ public interface EmailServices
 
 
     void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String displayName, String agentName,
-        String agentEmail, String companyName, String logoUrl ) throws InvalidInputException, UndeliveredEmailException;
+        String agentEmail, String companyName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException;
 
 
     void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood, String rating )
