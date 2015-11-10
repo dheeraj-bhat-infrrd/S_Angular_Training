@@ -112,12 +112,12 @@ public class ImageProcessorImpl implements ImageProcessor {
 		}
 		LOG.info("Uploading " + destFileName + " to cloud");
 		String cloudFrontUrl = null;
-		if (imageType.equals(ImageProcessor.IMAGE_TYPE_PROFILE)) {
+		if (imageType.equals(CommonConstants.IMAGE_TYPE_PROFILE)) {
 			LOG.debug("Uploading profile pic");
 			fileUploadService.uploadProfileImageFile(image, destFileName, true);
 			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + destFileName;
 		}
-		else if (imageType.equals(ImageProcessor.IMAGE_TYPE_LOGO)) {
+		else if (imageType.equals(CommonConstants.IMAGE_TYPE_LOGO)) {
 			LOG.debug("Uploading logo");
 			fileUploadService.uploadProfileImageFile(image, destFileName, true);
 			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR + destFileName;

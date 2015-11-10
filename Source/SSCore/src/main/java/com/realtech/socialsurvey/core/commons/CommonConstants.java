@@ -199,6 +199,10 @@ public interface CommonConstants
     public static final String IS_ABUSIVE_REPORTED_BY_USER_COLUMN = "isAbuseRepByUser";
     public static final String IS_UNDER_RESOLUTION_COLUMN = "underResolution";
     public static final String IDEN = "iden";
+    public static final String PROFILE_IMAGE_THUMBNAIL_COLUMN = "profileImageUrlThumbnail";
+    public static final String LOGO_THUMBNAIL_COLUMN = "logoThumbnail";
+    public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN ="isProfileImageProcessed";
+    public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN ="isLogoImageProcessed";
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
      */
@@ -453,6 +457,7 @@ public interface CommonConstants
     public static final String PROFILE_NAME_SOLR = "profileName";
     public static final String PROFILE_URL_SOLR = "profileUrl";
     public static final String PROFILE_IMAGE_URL_SOLR = "profileImageUrl";
+    public static final String LOGO_COLUMN = "logo";
     public static final String REVIEW_COUNT_SOLR = "reviewCount";
     public static final String TITLE_SOLR = "title";
     public static final String TIME_IN_MILLIS_SOLR = "timeInMillis";
@@ -774,4 +779,8 @@ public interface CommonConstants
     public static final String SURVEY_MOOD_GREAT = "Great";
     public static final String SURVEY_MOOD_OK = "OK";
     public static final String SURVEY_MOOD_UNPLEASANT = "Unpleasant";
+    
+    // image types
+    public static final String IMAGE_TYPE_LOGO = "logo";
+    public static final String IMAGE_TYPE_PROFILE = "profile";
 }
