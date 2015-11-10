@@ -2117,7 +2117,7 @@ function validateRegionForm() {
 		return isRegionValid;
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 	
 			if(!isFocussed){
@@ -2301,7 +2301,7 @@ function validateOfficeForm() {
 		return isOfficeValid;
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 			if(!isFocussed){
 				$('#selected-user-txt').focus();
@@ -2455,7 +2455,7 @@ function validateIndividualForm() {
 		}
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 		if(!validateIndividualSelection('selected-user-txt')) {
 			isIndividualValid = false;
@@ -7841,6 +7841,7 @@ function userSwitchToCompAdmin() {
 
 function bindUserLoginEvent() {
 	$('.user-login-icn').on('click', function(e) {
+		console.log("inside bind");
 		e.stopImmediatePropagation();
 		$('.user-login-icn').addClass('disable-click');
 		var payload = {
