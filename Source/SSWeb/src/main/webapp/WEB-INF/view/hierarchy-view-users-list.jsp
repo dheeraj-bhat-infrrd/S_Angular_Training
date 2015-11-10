@@ -95,7 +95,7 @@
 				
 				
 				
-				  
+			<%-- 	  
                <c:choose>
 						<c:when test="${not empty regstatustickclass}">
 							<div class="float-left v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
@@ -116,7 +116,7 @@
 							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
 						</c:otherwise>
 					</c:choose>
-				
+				 --%>
 				<!-- <div class="float-left v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div> -->
 					<c:choose>
 						<c:when test="${branchUser.canEdit && user.userId != branchUser.userId}">
@@ -135,7 +135,7 @@
 						</c:otherwise>
 				   </c:choose>
 				   <c:if test="${user.userId != branchUser.userId and sessionprofilemasterid < currentprofilemasterid}">
-				   		<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="${branchUser.userId}" title="login as"></div>
+				   		<div class="float-left v-tbl-icn v-icn-login user-login-icn" data-iden="${branchUser.userId}" title="login as"></div>
 				   </c:if>
                </div>
            </td>
