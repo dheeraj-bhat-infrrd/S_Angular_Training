@@ -6,7 +6,7 @@
 <c:if test="${not empty abusiveReviewReportList}">
 	<c:forEach items="${abusiveReviewReportList}" var="abusiveReviewReportItem">
 		<c:forEach items="${abusiveReviewReportItem.abuseReporterDetails.abuseReporters}" var="reporterDetailItem">
-			<div class="abuse-review-row row">
+			<div class="abuse-review-row row" data-iden="${abusiveReviewReportItem.survey._id}">
 				<div class="abuse-report-col capitalize col-lg-3 col-md-3 col-sm-3 col-xs-3">
 					<c:if test="${not empty abusiveReviewReportItem.survey.agentName }">
 						${abusiveReviewReportItem.survey.agentName}
@@ -17,8 +17,11 @@
 						${abusiveReviewReportItem.survey.review}
 					</c:if>
 				</div>
-				<div class="abuse-report-col capitalize col-lg-3 col-md-3 col-sm-3 col-xs-3">${reporterDetailItem.reporterName}</div>
+				<div class="abuse-report-col capitalize col-lg-2 col-md-2 col-sm-2 col-xs-2">${reporterDetailItem.reporterName}</div>
 				<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">${reporterDetailItem.reporterEmail}</div>
+				<div class="abuse-report-col col-lg-1 col-md-1 col-sm-1 col-xs-1">
+					<div class="v-tbl-icn v-icn-edit-user unmark-abusive-icn" title="Unmark Abusive"></div>
+				</div>
 			</div>
 		</c:forEach>
 	</c:forEach>
