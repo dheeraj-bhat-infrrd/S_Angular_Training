@@ -2117,7 +2117,7 @@ function validateRegionForm() {
 		return isRegionValid;
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 	
 			if(!isFocussed){
@@ -2185,7 +2185,8 @@ function addRegionCallBack(data) {
  */
 function getUsersList(searchKey,start,rows) {
 	var url="./finduserbyemail.do?startIndex="+start+"&batchSize="+rows+"&searchKey="+searchKey;
-	callAjaxGET(url, paintUsersList, true);
+	//encode the url so it can accept the special characters also
+	callAjaxGET(encodeURI(url), paintUsersList, true);
 }
 
 /**
@@ -2216,6 +2217,9 @@ function paintUsersList(data) {
 		$("#users-droplist").slideUp(200);
 		
 	}
+	
+	$('#users-droplist').perfectScrollbar();
+	$('#users-droplist').perfectScrollbar('update');
 	
 	// bind the click event of selector
 	$(".hm-user-options").click(function() {
@@ -2297,7 +2301,7 @@ function validateOfficeForm() {
 		return isOfficeValid;
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 			if(!isFocussed){
 				$('#selected-user-txt').focus();
@@ -2451,7 +2455,7 @@ function validateIndividualForm() {
 		}
 	}
 	
-	var userSelectionType = $('#user-selection-info').data('user-selection-type');
+	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
 		if(!validateIndividualSelection('selected-user-txt')) {
 			isIndividualValid = false;
@@ -7837,6 +7841,7 @@ function userSwitchToCompAdmin() {
 
 function bindUserLoginEvent() {
 	$('.user-login-icn').on('click', function(e) {
+		console.log("inside bind");
 		e.stopImmediatePropagation();
 		$('.user-login-icn').addClass('disable-click');
 		var payload = {
