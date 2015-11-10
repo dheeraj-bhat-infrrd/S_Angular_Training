@@ -415,7 +415,7 @@ public class UserManagementController
                 SolrDocumentList usersResult = solrSearchService.searchUsersByLoginNameOrName( searchKey, user.getCompany()
                     .getCompanyId(), startIndex, batchSize );
                 users = new Gson().toJson( solrSearchService.getUsersWithMetaDataFromSolrDocuments( usersResult ) );
-                LOG.debug( "User search result is : " + usersResult );
+                LOG.trace( "User search result is : " + usersResult );
                 model.addAttribute( "numFound", usersResult.getNumFound() );
             } catch ( InvalidInputException invalidInputException ) {
                 throw new InvalidInputException( invalidInputException.getMessage(), invalidInputException );
