@@ -199,9 +199,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${FB_CLIENT_ID}")
     private String facebookAppId;
 
-    @Value ( "${ENABLE_KAFKA}")
-    private String enableKafka;
-
     @Value ( "${GOOGLE_API_KEY}")
     private String googlePlusId;
 
@@ -1767,11 +1764,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String recipientName ) throws InvalidInputException, UndeliveredEmailException
     {
         String verficationUrl = urlGenerator.generateUrl( urlParams, applicationUrl );
-        if ( enableKafka.equals( CommonConstants.YES ) ) {
-            emailServices.queueEmailVerificationMail( verficationUrl, recipientMailId, recipientName );
-        } else {
-            emailServices.sendEmailVerificationMail( verficationUrl, recipientMailId, recipientName );
-        }
+        emailServices.sendEmailVerificationMail( verficationUrl, recipientMailId, recipientName );
     }
 
 
