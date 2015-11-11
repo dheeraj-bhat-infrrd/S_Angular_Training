@@ -63,9 +63,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
 
-	@Value("${ENABLE_KAFKA}")
-	private String enableKafka;
-
 	/**
 	 * Method to validate user
 	 * 
@@ -163,12 +160,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD);
 
 		// Send reset password link to the user email ID
-		if (enableKafka.equals(CommonConstants.YES)) {
-			emailServices.queueResetPasswordEmail(url, emailId, name, loginName);
-		}
-		else {
-			emailServices.sendResetPasswordEmail(url, emailId, name, loginName);
-		}
+		emailServices.sendResetPasswordEmail(url, emailId, name, loginName);
 	}
 
 	/**
