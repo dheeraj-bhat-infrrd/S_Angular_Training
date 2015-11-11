@@ -39,5 +39,19 @@ public class UserProfileComparatorTest {
 		profileB.getProfilesMaster().setProfileId(2);
 		assertEquals("Test", 1, comparator.compare(profileA, profileB));
 	}
+	
+	@Test
+	public void testComparingWithHigherSecondUserProfile() {
+		profileA.getProfilesMaster().setProfileId(2);
+		profileB.getProfilesMaster().setProfileId(4);
+		assertEquals("Test", -1, comparator.compare(profileA, profileB));
+	}
+	
+	@Test
+	public void testComparingWithEqualUserProfile() {
+		profileA.getProfilesMaster().setProfileId(2);
+		profileB.getProfilesMaster().setProfileId(2);
+		assertEquals("Test", 0, comparator.compare(profileA, profileB));
+	}
 
 }
