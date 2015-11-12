@@ -422,7 +422,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId )
+    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail )
         throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
     {
         if ( firstName == null || firstName.isEmpty() ) {
@@ -446,7 +446,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         String profileName = getUserSettings( user.getUserId() ).getProfileName();
         sendRegistrationCompletionLink( emailId, firstName, lastName, admin.getCompany().getCompanyId(), profileName,
-            user.getLoginName() );
+            user.getLoginName(), holdSendingMail );
         LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
         return user;
     }
@@ -1347,7 +1347,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Override
     public void sendRegistrationCompletionLink( String emailId, String firstName, String lastName, long companyId,
-        String profileName, String loginName ) throws InvalidInputException, UndeliveredEmailException
+        String profileName, String loginName, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method to send profile completion link to the user started." );
 
@@ -1367,7 +1367,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         // Send reset password link to the user email ID
-        emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName );
+        emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail );
     }
 
 

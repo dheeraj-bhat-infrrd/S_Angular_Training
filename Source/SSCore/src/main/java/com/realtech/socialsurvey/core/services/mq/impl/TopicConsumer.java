@@ -224,7 +224,7 @@ public class TopicConsumer implements Runnable {
 		} else if (header == EmailHeader.REGISTRATION_COMPLETE) {
 			LOG.debug("Sending registration complete mail");
 			emailServices.sendRegistrationCompletionEmail(url, recipient, name,
-					profileName, loginName);
+					profileName, loginName, false);
 		}
 	}
 

@@ -21,9 +21,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.annotation.Resource;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -39,7 +37,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -65,7 +62,6 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -356,7 +352,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Method createDefaultHierarchy started for user : " + user.getLoginName() );
 
         LOG.debug( "Adding the default region" );
-        // TODO:adding default comapany,state,city,zipcode as null
         Region region = addNewRegion( user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES, null, null, null, null,
             null, null, null );
 
@@ -372,7 +367,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         userProfileDao.save( userProfileRegionAdmin );
 
         LOG.debug( "Adding the default branch" );
-        // TODO:setting default country,state,city,zipcode null
         Branch branch = addNewBranch( user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
             null, null, null, null, null, null, null );
         profilesMaster = userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
@@ -2180,7 +2174,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UserAssignmentException
     {
         LOG.info( "Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:"
@@ -2213,7 +2207,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            userMap = getUsersFromEmailIds( emailIdsArray, user );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -2245,7 +2239,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Map<String, List<User>> getUsersFromEmailIds( String[] emailIdsArray, User adminUser ) throws InvalidInputException
+    private Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail ) throws InvalidInputException
     {
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
@@ -2366,7 +2360,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                      * if no user is present with the specified emailId, send an invite to register
                      */
                     try {
-                        user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId );
+                        user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId, holdSendingMail );
                     } catch ( UserAlreadyExistsException | UndeliveredEmailException e1 ) {
                         LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(), e1 );
                     }
@@ -2632,7 +2626,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem,
         String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
-        long selectedUserId, String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException,
+        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -2663,7 +2657,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            userMap = getUsersFromEmailIds( emailIdsArray, user );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -2787,7 +2781,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
         UserAssignmentException
     {
         LOG.info( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
@@ -2805,7 +2799,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers.add( assigneeUser );
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list for the email addresses provided" );
-            userMap = getUsersFromEmailIds( emailIdsArray, adminUser );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail );
             assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
@@ -4229,7 +4223,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateRegion( User user, long regionId, String regionName, String address1, String address2,
         String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -4289,7 +4283,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            userMap = getUsersFromEmailIds( emailIdsArray, user );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -4381,7 +4375,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -4466,7 +4460,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            userMap = getUsersFromEmailIds( emailIdsArray, user );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
