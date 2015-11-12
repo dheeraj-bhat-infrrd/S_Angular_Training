@@ -5,14 +5,18 @@ package com.realtech.socialsurvey.core.utils;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.braintreegateway.org.apache.commons.codec.binary.Base64;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl;
@@ -23,7 +27,7 @@ import com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl;
 @Component
 public class EncryptionHelper {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EncryptionHelper.class);
 
 	/**
 	 * Checks if String is null and returns blank String if it is null.
@@ -323,4 +327,25 @@ public class EncryptionHelper {
 		return byteArrayToHexString(key);
 	}
 
+
+    public String encodeBase64( String plainText )
+    {
+        LOG.debug( "Encoding the input into Base64, encodeBase64 called" );
+
+        String encryptedStr = Base64.encodeBase64URLSafeString( plainText.getBytes() );
+
+        LOG.debug( "encodeBase64 finished.Returning encrypted string" );
+        return encryptedStr;
+    }
+
+
+    public String decodeBase64( String encryptedText )
+    {
+        LOG.debug( "Decoding the input into Base64,decodeBase64 called" );
+
+        byte[] key = Base64.decodeBase64( encryptedText.getBytes() );
+
+        LOG.debug( "decodeBase64 finished.Returning decrypted string" );
+        return new String( key );
+    }
 }

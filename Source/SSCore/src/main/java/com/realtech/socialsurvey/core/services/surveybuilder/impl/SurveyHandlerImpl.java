@@ -59,6 +59,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -147,6 +148,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private Utils utils;
+
+    @Autowired
+    private UrlService urlService;
 
 
     /**
@@ -1246,7 +1250,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         urlParams.put( CommonConstants.FIRST_NAME, custFirstName );
         urlParams.put( CommonConstants.LAST_NAME, custLastName );
         LOG.debug( "Method composeLink() finished" );
-        return urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + "rest/survey/showsurveypageforurl" );
+        return urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
     }
 
 
@@ -1486,6 +1490,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             } else {
                 mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
             }
+
+            LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
+            surveyUrl = urlService.shortenUrl( surveyUrl );
+            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );

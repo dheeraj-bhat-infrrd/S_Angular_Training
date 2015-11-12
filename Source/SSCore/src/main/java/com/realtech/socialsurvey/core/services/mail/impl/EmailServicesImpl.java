@@ -8,12 +8,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -25,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -75,6 +78,9 @@ public class EmailServicesImpl implements EmailServices
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String applicationAdminName;
 
+    @Autowired
+    private UrlService urlService;
+
 
     /**
      * Method to send registration invite mail to a single recipient
@@ -101,6 +107,10 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "Firstname is empty or null for sending registration invite mail " );
             throw new InvalidInputException( "Firstname is empty or null for sending registration invite mail " );
         }
+
+        LOG.info( "Initiating URL Service to shorten the url " + url );
+        url = urlService.shortenUrl( url );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -178,6 +188,10 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "Recipients Name can not be null or empty" );
             throw new InvalidInputException( "Recipients Name can not be null or empty" );
         }
+
+        LOG.info( "Initiating URL Service to shorten the url " + url );
+        url = urlService.shortenUrl( url );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -264,6 +278,10 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Recipients Name can not be null or empty" );
         }
 
+        LOG.info( "Initiating URL Service to shorten the url " + url );
+        url = urlService.shortenUrl( url );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.EMAIL_VERIFICATION_MAIL_SUBJECT;
@@ -304,6 +322,10 @@ public class EmailServicesImpl implements EmailServices
         if ( recipientName == null || recipientName.isEmpty() ) {
             throw new InvalidInputException( "Recipients Name can not be null or empty" );
         }
+
+        LOG.info( "Initiating URL Service to shorten the url " + url );
+        url = urlService.shortenUrl( url );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
 
         // Fetching mail body
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
@@ -352,6 +374,10 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "Recipients Name can not be null or empty" );
             throw new InvalidInputException( "Recipients Name can not be null or empty" );
         }
+
+        LOG.info( "Initiating URL Service to shorten the url " + url );
+        url = urlService.shortenUrl( url );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -680,6 +706,10 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
         }
 
+        LOG.info( "Initiating URL Service to shorten the url " + link );
+        link = urlService.shortenUrl( link );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + link );
+
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
 
@@ -881,6 +911,10 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
         }
 
+        LOG.info( "Initiating URL Service to shorten the url " + link );
+        link = urlService.shortenUrl( link );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + link );
+
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -1071,6 +1105,10 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "link id is not present" );
         }
 
+        LOG.info( "Initiating URL Service to shorten the url " + link );
+        link = urlService.shortenUrl( link );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + link );
+
         LOG.info( "Sending manual registration email to : " + recipientId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -1105,6 +1143,10 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
             throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
         }
+
+        LOG.info( "Initiating URL Service to shorten the url " + link );
+        link = urlService.shortenUrl( link );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + link );
 
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
@@ -1159,6 +1201,10 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "displayName parameter is empty or null for sending survey restart mail " );
             throw new InvalidInputException( "displayName parameter is empty or null for sending survey restart mail " );
         }
+
+        LOG.info( "Initiating URL Service to shorten the url " + link );
+        link = urlService.shortenUrl( link );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + link );
 
         LOG.info( "Sending survey restart email to : " + recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
@@ -1502,6 +1548,9 @@ public class EmailServicesImpl implements EmailServices
                     "\\[Name\\]",
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                         survey.getCustomerLastName() ) );
+            LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+            surveyLink = urlService.shortenUrl( surveyLink );
+            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );
