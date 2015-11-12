@@ -29,6 +29,8 @@ public class EmailObject implements Serializable
     @Column ( name = "EMAIL_OBJECT")
     private byte[] emailBinaryObject;
 
+    @Column(name = "HOLD_SENDING_EMAIL")
+    private int holdSendingMail;
 
     @Column ( name = "MODIFIED_ON")
     private Timestamp modifiedOn;
