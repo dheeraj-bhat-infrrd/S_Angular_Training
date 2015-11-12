@@ -7845,7 +7845,6 @@ function userSwitchToCompAdmin() {
 
 function bindUserLoginEvent() {
 	$('.user-login-icn').on('click', function(e) {
-		console.log("inside bind");
 		e.stopImmediatePropagation();
 		$('.user-login-icn').addClass('disable-click');
 		var payload = {
