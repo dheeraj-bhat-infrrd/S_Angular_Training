@@ -50,7 +50,7 @@ public interface EmailServices
      * @throws UndeliveredEmailException
      */
     public void sendRegistrationCompletionEmail( String url, String recipientMailId, String name, String profileName,
-        String loginName ) throws InvalidInputException, UndeliveredEmailException;
+        String loginName, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**

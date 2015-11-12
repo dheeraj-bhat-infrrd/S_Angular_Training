@@ -68,7 +68,7 @@ public class EmailProcessor implements Runnable
     {
         Map<EmailEntity, String> errorEmails = new HashMap<EmailEntity, String>();
         while ( true ) {
-            List<EmailObject> emailObjectList = emailDao.findAllEmails();
+            List<EmailObject> emailObjectList = emailDao.findAllEmailsToBeSent();
             if ( emailObjectList.isEmpty() ) {
                 try {
                     Thread.sleep( 60000 );
