@@ -4,13 +4,16 @@ package com.realtech.socialsurvey.core.services.generator.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
