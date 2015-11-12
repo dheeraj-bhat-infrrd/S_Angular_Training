@@ -31,7 +31,7 @@ public class EmailFormatHelperTest {
 	}
 	
 	@Test
-	public void testCustomerDisplayNameForEmailWithFirst(){
+	public void testCustomerDisplayNameForEmailWithFirstName(){
 		assertEquals("test", "Nishit", emailFormatHelper.getCustomerDisplayNameForEmail("Nishit", null));
 	}
 
