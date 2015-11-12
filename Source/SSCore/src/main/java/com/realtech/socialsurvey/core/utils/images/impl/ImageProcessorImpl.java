@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Timestamp;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.ImagesCollection;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
@@ -42,7 +40,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 	private FileUploadService fileUploadService;
 
 	@Override
-	public ImagesCollection processAndUpdateImageForAllDimensions(String imageFileName, ImagesCollection imagesCollection, String imageType)
+	public String processImage(String imageFileName, String imageType)
 			throws ImageProcessingException, InvalidInputException {
 		LOG.info("Processing images for " + imageFileName);
 		// get the image
@@ -55,9 +53,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 		String thumbnailImageName = getThumbnailImageName(imageFileName, extension);
 		String uploadedFileName = writeImage(thumbnailImageName, processedImage, imageType);
 		deleteTempFile(processedImage);
-		imagesCollection.getThumbnailImage().setImageName(uploadedFileName);
-		imagesCollection.getThumbnailImage().setProcessedOn(new Timestamp(System.currentTimeMillis()));
-		return imagesCollection;
+		return uploadedFileName;
 	}
 
 	@Override
@@ -116,12 +112,12 @@ public class ImageProcessorImpl implements ImageProcessor {
 		}
 		LOG.info("Uploading " + destFileName + " to cloud");
 		String cloudFrontUrl = null;
-		if (imageType.equals(ImageProcessor.IMAGE_TYPE_PROFILE)) {
+		if (imageType.equals(CommonConstants.IMAGE_TYPE_PROFILE)) {
 			LOG.debug("Uploading profile pic");
 			fileUploadService.uploadProfileImageFile(image, destFileName, true);
 			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + destFileName;
 		}
-		else if (imageType.equals(ImageProcessor.IMAGE_TYPE_LOGO)) {
+		else if (imageType.equals(CommonConstants.IMAGE_TYPE_LOGO)) {
 			LOG.debug("Uploading logo");
 			fileUploadService.uploadProfileImageFile(image, destFileName, true);
 			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR + destFileName;

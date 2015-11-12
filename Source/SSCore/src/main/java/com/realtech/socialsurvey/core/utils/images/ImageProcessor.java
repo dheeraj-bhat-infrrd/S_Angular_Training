@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.utils.images;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import com.realtech.socialsurvey.core.entities.ImagesCollection;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.utils.images.impl.ImageProcessingException;
 
@@ -15,19 +14,15 @@ public interface ImageProcessor {
 	public static final int THUMBNAIL_WIDTH = 321;
 	public static final int THUMBNAIL_HEIGHT = 321;
 	
-	public static final String IMAGE_TYPE_PROFILE = "profile";
-	public static final String IMAGE_TYPE_LOGO = "logo";
-	
 	/**
 	 * Processes and updates the provided
 	 * @param imageFileName
-	 * @param imagesCollection
 	 * @param imageType
 	 * @return
 	 * @throws ImageProcessingException
 	 * @throws InvalidInputException
 	 */
-	public ImagesCollection processAndUpdateImageForAllDimensions(String imageFileName, ImagesCollection imagesCollection, String imageType)  throws ImageProcessingException, InvalidInputException;
+	public String processImage(String imageFileName, String imageType)  throws ImageProcessingException, InvalidInputException;
 	
 	/**
 	 * Processed the image and return a buffered image
