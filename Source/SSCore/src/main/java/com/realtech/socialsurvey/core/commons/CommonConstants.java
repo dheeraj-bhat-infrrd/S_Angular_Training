@@ -76,6 +76,8 @@ public interface CommonConstants
     public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
     public static final String PRE_PROCESSING_BEFORE_LOGIN_STAGE = "defaultbrandandregioncreation.do";
     public static final String START_SURVEY = "rest/survey/start";
+    public static final String SHOW_SURVEY_PAGE_FOR_URL = "rest/survey/showsurveypageforurl";
+    public static final String SHOW_SURVEY_PAGE = "rest/survey/showsurveypage";
 
     /**
      * Status constants
@@ -783,4 +785,26 @@ public interface CommonConstants
     // image types
     public static final String IMAGE_TYPE_LOGO = "logo";
     public static final String IMAGE_TYPE_PROFILE = "profile";
+
+    //URL Type constants
+    public static final String MANUAL_REGISTRATION_URL_TYPE = "Manual Registration";
+    public static final String SHOW_SURVEY_PAGE_FOR_URL_URL_TYPE = "Show Survey Page For Url";
+    public static final String EMAIL_VERIFICATION_URL_TYPE = "Email Verification";
+    public static final String SHOW_SURVEY_PAGE_URL_TYPE = "Show Survey Page";
+    public static final String SHOW_EMAIL_REGISTRATION_PAGE_URL_TYPE = "Registration Page";
+    public static final String SHOW_COMPLETE_REGISTRATION_PAGE_URL_TYPE = "Complete Registration Page";
+    public static final String RESET_PASSWORD_URL_TYPE = "Reset Password";
+    public static final String VERIFICATION_URL_TYPE = "Verification";
+    public static final String UNKNOWN_URL_TYPE = "Unknown";
+    public static final int STATUS_NOTACCESSED = 0;
+    public static final int STATUS_ACCESSED = 1;
+    public static final String SHORTENED_URL_SUFFIX = "mail.do";
+
+    // URL Type constants
+    public static final String URL_DETAILS_STATUS_COLUMN = "status";
+    public static final String URL_DETAILS_ACCESS_DATES_COLUMN = "accessDates";
+    public static final String URL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
+
+    //Url Details Mongo Column constants
+    public static final String URL_COLUMN = "url";
 }
