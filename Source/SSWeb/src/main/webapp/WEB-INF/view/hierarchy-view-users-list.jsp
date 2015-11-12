@@ -40,14 +40,14 @@
 		<!-- If status is 2, then user has not acted on invitation -->
 				<c:set var="regstatustickclass" value="" />
 				<c:set var="userstatustickclass" value="v-icn-verified" />
-				<c:if test="${regionUser.status == 2}">
+				<c:if test="${branchUser.status == 2}">
 					<c:set var="regstatustickclass" value="v-icn-femail" />
 					<c:set var="userstatustickclass" value="v-icn-notverified" />
 				</c:if>
 
 				<!-- if admin can edit -->
 				<c:choose>
-					<c:when test="${regionUser.canEdit}">
+					<c:when test="${branchUser.canEdit}">
 						<c:set var="admincaneditclass" value="v-tbl-icn" />
 					</c:when>
 					<c:otherwise>
@@ -96,7 +96,7 @@
 				
 				
 			  
-               <%-- <c:choose>
+                 <c:choose>
 						<c:when test="${not empty regstatustickclass}">
 							<div class="float-left v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
 								title="<spring:message code="label.resendmail.key" />"></div>
@@ -115,7 +115,7 @@
 						<c:otherwise>
 							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
 						</c:otherwise>
-					</c:choose> --%>
+					</c:choose>  
 				 
 				<!-- <div class="float-left v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div> -->
 					<c:choose>
