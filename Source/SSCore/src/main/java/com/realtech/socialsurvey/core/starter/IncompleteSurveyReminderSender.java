@@ -433,7 +433,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                         survey.getCustomerLastName() ),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyLink,
-                    user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
+                    user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress, user.getUserId() );
 
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
