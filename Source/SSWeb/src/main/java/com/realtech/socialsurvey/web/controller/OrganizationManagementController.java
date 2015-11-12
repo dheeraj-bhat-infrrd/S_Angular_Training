@@ -52,6 +52,7 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
@@ -153,6 +154,9 @@ public class OrganizationManagementController
     
     @Autowired
     private SurveyHandler surveyHandler;
+
+    @Autowired
+    private UrlService urlService;
 
 
     /**
@@ -2312,6 +2316,33 @@ public class OrganizationManagementController
         }
         LOG.info( "Method to get surveys under resolution for a company fetchSurveysUnderResolution() finished." );
         return JspResolver.REVIEWS_UNDER_RESOLUTION_REPORTS;
+    }
+
+
+    @RequestMapping ( value = "/mail", method = RequestMethod.GET)
+    public String mailUrlResolution( Model model, HttpServletRequest request ) throws InvalidInputException
+    {
+        LOG.info( "Method to resolve shortened url sent in mail,mailUrlResolution() started." );
+        LOG.info( "Parsing query string for ID" );
+        String encryptedIDStr = request.getParameter( "q" );
+        if ( encryptedIDStr == null || encryptedIDStr.isEmpty() ) {
+            LOG.error( "ID value is missing in the query string." );
+            throw new InvalidInputException( "ID value is missing in the query string." );
+        }
+        LOG.info( "Found encrypted ID : " + encryptedIDStr );
+
+        // Retrieve complete url based on the ID
+        LOG.info( "Retrieving complete url for the ID found." );
+        String completeUrl = urlService.retrieveCompleteUrlForID( encryptedIDStr );
+        if ( completeUrl == null || completeUrl.isEmpty() ) {
+            LOG.error( "No complete url found for " + encryptedIDStr + " ID." );
+            throw new InvalidInputException( "No complete url found for " + encryptedIDStr + " ID." );
+        }
+        LOG.info( "Retrieved complete url for the ID : " + completeUrl );
+        LOG.info( "Method to resolve shortened url sent in mail,mailUrlResolution() ended." );
+
+        // Redirect to complete url found based on the ID.
+        return "redirect:" + completeUrl;
     }
 
 }

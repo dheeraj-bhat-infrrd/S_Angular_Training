@@ -9,7 +9,7 @@ var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]
 var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
 var nameRegex = /^[a-zA-Z ]*$/;
 var lastNameRegEx = /^[a-zA-Z0-9 ]*$/;
-var companyNameRegEx = /^[a-zA-Z0-9 ]*$/;
+var companyNameRegEx = /^[a-zA-Z0-9\\/ ]*$/;
 var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
