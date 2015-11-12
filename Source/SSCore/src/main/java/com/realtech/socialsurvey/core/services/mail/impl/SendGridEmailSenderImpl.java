@@ -170,7 +170,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     }
 
 
-    private void saveEmail( EmailEntity emailEntity ) throws InvalidInputException, UndeliveredEmailException
+    private void saveEmail( EmailEntity emailEntity, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "Sending mail: " + emailEntity.toString() );
         if ( emailEntity.getRecipients() == null || emailEntity.getRecipients().isEmpty() ) {
@@ -198,6 +198,11 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         } catch ( IOException ie ) {
             LOG.error( "Exception caught " + ie.getMessage() );
         }
+        if(holdSendingMail){
+        	emailObject.setHoldSendingMail(CommonConstants.YES);
+        }else{
+        	emailObject.setHoldSendingMail(CommonConstants.NO);
+        }
         emailObject.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         emailObject.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         emailObject.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
@@ -210,7 +215,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
     @Override
     public void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
-        FileContentReplacements messageBodyReplacements, boolean isImmediate ) throws InvalidInputException,
+        FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail ) throws InvalidInputException,
         UndeliveredEmailException
     {
         LOG.info( "Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectFileName : "
@@ -242,7 +247,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
             if ( isImmediate ) {
                 sendEmailByEmailEntity( emailEntity );
             } else {
-                saveEmail( emailEntity );
+                saveEmail( emailEntity, holdSendingMail );
             }
 
         }
@@ -253,7 +258,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
     @Override
     public void sendEmailWithSubjectAndBodyReplacements( EmailEntity emailEntity, FileContentReplacements subjectReplacements,
-        FileContentReplacements messageBodyReplacements, boolean isImmediate ) throws InvalidInputException,
+        FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail ) throws InvalidInputException,
         UndeliveredEmailException
     {
         LOG.info( "Method sendEmailWithSubjectAndBodyReplacements called for emailEntity : " + emailEntity
@@ -284,7 +289,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
             if ( isImmediate ) {
                 sendEmailByEmailEntity( emailEntity );
             } else {
-                saveEmail( emailEntity );
+                saveEmail( emailEntity, holdSendingMail );
             }
             LOG.info( "Method sendEmailWithSubjectAndBodyReplacements completed successfully" );
         }
@@ -292,7 +297,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
 
     @Override
-    public void sendEmail( EmailEntity emailEntity, String subject, String mailBody, boolean isImmediate )
+    public void sendEmail( EmailEntity emailEntity, String subject, String mailBody, boolean isImmediate, boolean holdSendingMail )
         throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendEmail called for subject : " + subject );
@@ -312,7 +317,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
             if ( isImmediate ) {
                 sendEmailByEmailEntity( emailEntity );
             } else {
-                saveEmail( emailEntity );
+                saveEmail( emailEntity, holdSendingMail );
             }
         }
         LOG.info( "Method sendEmail completed successfully" );

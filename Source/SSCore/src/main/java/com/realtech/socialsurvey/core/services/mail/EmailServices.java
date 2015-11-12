@@ -59,8 +59,19 @@ public interface EmailServices
         String loginName ) throws InvalidInputException;
 
 
+    /**
+     * Sends registration completion mail to users invited by admin
+     * @param url
+     * @param recipientMailId
+     * @param name
+     * @param profileName
+     * @param loginName
+     * @param holdSendingMail
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
     public void sendRegistrationCompletionEmail( String url, String recipientMailId, String name, String profileName,
-        String loginName ) throws InvalidInputException, UndeliveredEmailException;
+        String loginName, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**

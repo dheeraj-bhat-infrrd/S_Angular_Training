@@ -205,7 +205,7 @@ public class UserManagementController
                         user = userManagementService.inviteUser( admin, firstName, lastName, emailId );
                         String profileName = userManagementService.getUserSettings( user.getUserId() ).getProfileName();
                         userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, admin.getCompany()
-                            .getCompanyId(), profileName, user.getLoginName() );
+                            .getCompanyId(), profileName, user.getLoginName(), false );
 
                         // If account type is team assign user to default branch
                         if ( accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM ) {
@@ -1708,7 +1708,7 @@ public class UserManagementController
                 String profileUrl = utils.generateAgentProfileUrl( profileName );
                 agentSettings.setProfileUrl( profileUrl );
                 userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, user.getCompany()
-                    .getCompanyId(), profileName, user.getLoginName() );
+                    .getCompanyId(), profileName, user.getLoginName(), false );
 
                 // Update the profile pic URL
                 organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -1859,7 +1859,7 @@ public class UserManagementController
             User invitedUser = userManagementService.getUserByEmail( emailId );
             String profileName = userManagementService.getUserSettings( invitedUser.getUserId() ).getProfileName();
             userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, user.getCompany()
-                .getCompanyId(), profileName, invitedUser.getLoginName() );
+                .getCompanyId(), profileName, invitedUser.getLoginName(), false );
 
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
