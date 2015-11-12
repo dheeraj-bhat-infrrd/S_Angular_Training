@@ -53,11 +53,12 @@ public interface UserManagementService
      * @param firstName
      * @param lastName
      * @param emailId
+     * @param holdSendingMail
      * @throws InvalidInputException
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
      */
-    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId )
+    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail )
         throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
 
 
@@ -182,12 +183,20 @@ public interface UserManagementService
     public void updateUserProfilesStatus( User admin, long profileIdToUpdate ) throws InvalidInputException;
 
 
-    /*
-     * Sends an email to user with the link to complete registration. User has to provide password
-     * to set. Also, user can choose to change name.
+    /**
+     * Sends registration completion mail
+     * @param emailId
+     * @param firstName
+     * @param lastName
+     * @param companyId
+     * @param profileName
+     * @param loginName
+     * @param holdSendingMail
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
      */
     public void sendRegistrationCompletionLink( String emailId, String firstName, String lastName, long companyId,
-        String profileName, String loginName ) throws InvalidInputException, UndeliveredEmailException;
+        String profileName, String loginName, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException;
 
 
     // Method to set properties of a user based upon active profiles available for the user.
