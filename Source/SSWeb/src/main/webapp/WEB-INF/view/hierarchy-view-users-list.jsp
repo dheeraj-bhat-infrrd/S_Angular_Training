@@ -96,7 +96,7 @@
 				
 				
 			  
-               <c:choose>
+               <%-- <c:choose>
 						<c:when test="${not empty regstatustickclass}">
 							<div class="float-left v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
 								title="<spring:message code="label.resendmail.key" />"></div>
@@ -115,7 +115,7 @@
 						<c:otherwise>
 							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
 						</c:otherwise>
-					</c:choose>
+					</c:choose> --%>
 				 
 				<!-- <div class="float-left v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div> -->
 					<c:choose>

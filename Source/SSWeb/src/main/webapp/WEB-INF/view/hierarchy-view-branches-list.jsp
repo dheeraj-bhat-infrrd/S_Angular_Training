@@ -138,7 +138,7 @@
                <div class="clearfix v-tbl-icn-wraper">
                
                
-               
+               <%-- 
                 <c:choose>
 						<c:when test="${not empty regstatustickclass}">
 							<div class="float-left v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
@@ -159,7 +159,7 @@
 						<c:otherwise>
 							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
 						</c:otherwise>
-					</c:choose>
+					</c:choose> --%>
                 
                
                
