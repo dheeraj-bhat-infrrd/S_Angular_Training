@@ -568,9 +568,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( organizationUnitSettings != null ) {
             SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
-                if ( !surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0 ) {
-                    reminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
-                    maxReminders = surveySettings.getMax_number_of_survey_reminders();
+                if ( !surveySettings.getIsSocialPostReminderDisabled()
+                    && surveySettings.getSocial_post_reminder_interval_in_days() > 0 ) {
+                    reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
+                    maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
                     autopostScore = surveySettings.getShow_survey_above_score();
                 }
             }
@@ -1951,31 +1952,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 if ( !found ) {
                     branchMediaPostDetails = new BranchMediaPostDetails();
                     branchMediaPostDetails.setBranchId( setting.getIden() );
-                }
 
-                LOG.debug( "Adding the region this branch belongs too " );
-                try {
-                    OrganizationUnitSettings regionSetting = profileManagementService.getRegionProfileByBranch( setting );
-                    boolean regionFound = false;
-                    for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
+                    LOG.debug( "Adding the region this branch belongs too " );
+                    try {
+                        OrganizationUnitSettings regionSetting = profileManagementService.getRegionProfileByBranch( setting );
+                        boolean regionFound = false;
+                        for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
 
-                        RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
-                        if ( regionMediaPostDetails.getRegionId() == regionSetting.getIden() ) {
-                            regionFound = true;
-                            break;
+                            RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
+                            if ( regionMediaPostDetails.getRegionId() == regionSetting.getIden() ) {
+                                regionFound = true;
+                                break;
+                            }
                         }
+                        if ( !regionFound ) {
+                            RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
+                            regionMediaPostDetails.setRegionId( regionSetting.getIden() );
+                            regionMediaPostDetailsList.add( regionMediaPostDetails );
+                        }
+                        branchMediaPostDetails.setRegionId( regionSetting.getIden() );
+                    } catch ( ProfileNotFoundException e ) {
+                        LOG.error( "Unable to find the profile", e );
                     }
-                    if ( !regionFound ) {
-                        RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
-                        regionMediaPostDetails.setRegionId( regionSetting.getIden() );
-                        regionMediaPostDetailsList.add( regionMediaPostDetails );
-                    }
-                    branchMediaPostDetails.setRegionId( regionSetting.getIden() );
-                } catch ( ProfileNotFoundException e ) {
-                    LOG.error( "Unable to find the profile", e );
+
+                    branchMediaPostDetailsList.add( branchMediaPostDetails );
                 }
 
-                branchMediaPostDetailsList.add( branchMediaPostDetails );
 
             }
             socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );
@@ -2108,6 +2110,25 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
+    public SurveyDetails getSurveyDetails( String surveyMongoId )
+    {
+        LOG.info( "Method getSurveyDetails() to return survey details by surveyMongoId started." );
+        SurveyDetails surveyDetails;
+        surveyDetails = surveyDetailsDao.getSurveyBySurveyMongoId( surveyMongoId );
+        LOG.info( "Method getSurveyDetails() to return survey details by surveyMongoId finished." );
+        return surveyDetails;
+    }
+    
+    
+    @Override
+    public void updateSurveyAsUnAbusive( String surveyId )
+    {
+        LOG.info( "Method unMarkAbusiveSurvey() started" );
+        surveyDetailsDao.updateSurveyAsUnAbusive( surveyId );
+        LOG.info( "Method unMarkAbusiveSurvey() finished" );
+    }
+    
     /**
      * Returns array of swear words. Its used only for testing. Not for development(non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler#getSwearList()
