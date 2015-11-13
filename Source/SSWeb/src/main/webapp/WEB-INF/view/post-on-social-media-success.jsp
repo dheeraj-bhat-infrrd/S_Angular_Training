@@ -7,7 +7,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Error</title>
+    <title>Thank You</title>
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
@@ -37,7 +37,8 @@
         </div>
 
         <div class="error-main-wrapper container">
-            <div class="err-line-1 text-center">Your review has been successfully posted on ${socialMedial}</div>            
+            <div class="err-line-1 text-center">Thank You</div>  
+            <div class="err-line-2 text-center">Your review has been successfully posted on ${socialMedia}.</div>
         </div>
 
         <div class="footer-main-wrapper">
