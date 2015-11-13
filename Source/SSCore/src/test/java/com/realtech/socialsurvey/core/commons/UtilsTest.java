@@ -28,23 +28,43 @@ public class UtilsTest {
 
 	@Test
 	public void testGenerateRegionProfileUrl(){
-		assertEquals("Proper test", "/region/company/region-name", utils.generateRegionProfileUrl("company", "region-name"));
+		assertEquals("Generated Region profile does not match expected", "/region/company/region-name", utils.generateRegionProfileUrl("company", "region-name"));
 	}
 	
 	@Test
 	public void testGenerateBranchProfileUrl(){
-		assertEquals("Proper test", "/office/company/office-name", utils.generateBranchProfileUrl("company", "office-name"));
+		assertEquals("Generated Branch profile does not match expected", "/office/company/office-name", utils.generateBranchProfileUrl("company", "office-name"));
 	}
 	
 	@Test
 	public void testGenerateCompanyProfileUrl(){
-		assertEquals("Proper test", "/company/company", utils.generateCompanyProfileUrl("company"));
+		assertEquals("Generated Company profile does not match expected", "/company/company", utils.generateCompanyProfileUrl("company"));
 	}
+
+	@Test
+    public void testGenerateAgentProfileUrl(){
+	    assertEquals("Generated Agent profile does not match expected", "/rijil-krishnan", utils.generateAgentProfileUrl("rijil-krishnan"));
+    }
+
+    @Test
+    public void testPrepareProfileNameWithInputHavingSpaces(){
+        assertEquals("Generated Profile Name does not match expected", "rijil-krishnan", utils.prepareProfileName("rijil krishnan"));
+    }
+
+    @Test
+    public void testPrepareProfileNameWithInputHavingHyphen(){
+        assertEquals("Generated Profile Name does not match expected", "rijil-krishnan", utils.prepareProfileName("rijil-krishnan"));
+    }
+
+    @Test
+    public void testAppendIdenToProfileName(){
+        assertEquals("Generated Profile Name with iden does not match expected", "rijil-krishnan-2", utils.appendIdenToProfileName("rijil-krishnan", 2));
+    }
 	
 	@Test
 	public void testMaskEmailAddress(){
 		Whitebox.setInternalState(utils, "maskingPrefix", "test");
 		Whitebox.setInternalState(utils, "maskingSuffix", "@abc.com");
-		assertEquals("Proper Test", "test+my+example.com@abc.com", utils.maskEmailAddress("my@example.com"));
+		assertEquals("Masked email address does not match expected", "test+my+example.com@abc.com", utils.maskEmailAddress("my@example.com"));
 	}
 }
