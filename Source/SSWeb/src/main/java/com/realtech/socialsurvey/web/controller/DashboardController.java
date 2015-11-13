@@ -1964,7 +1964,7 @@ public class DashboardController
             }
 
             //make survey as abusive
-            surveyHandler.updateSurveyAsAbusive( surveyMongoId, customerEmail, customerName );
+            surveyHandler.updateSurveyAsAbusive( surveyMongoId, customerEmail, customerName , true );
 
             // Calling email services method to send mail to the Application
             // level admin.

@@ -326,13 +326,13 @@ function unmarkReviewFromAbusive(surveyId){
 			"surveyId" : surveyId
 		};
 	
+	//close the popup
+	overlayRevert();
 	showOverlay();
-	$('.overlay-loader').removeClass('hide');
 	
 	callAjaxGetWithPayloadData("./unmarkabusivereview.do", function(data) {
-		//close the popup
-		$('#overlay-cancel').click();
+		
 		displayMessage(data);
 		showAbusiveReviews(0,10);
-	}, payload, false);
+	}, payload, true);
 }

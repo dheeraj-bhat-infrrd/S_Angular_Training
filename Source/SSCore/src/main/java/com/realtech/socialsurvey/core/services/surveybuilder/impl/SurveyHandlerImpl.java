@@ -307,10 +307,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName )
+    public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName , boolean isReportedByUser )
     {
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
-        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName );
+        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName , isReportedByUser);
         LOG.info( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
     }
 
