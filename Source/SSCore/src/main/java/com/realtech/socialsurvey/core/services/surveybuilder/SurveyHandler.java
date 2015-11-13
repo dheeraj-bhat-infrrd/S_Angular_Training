@@ -170,7 +170,7 @@ public interface SurveyHandler
     public void saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
-    void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName );
+    void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName , boolean isReportedByUser );
 
 
     /**

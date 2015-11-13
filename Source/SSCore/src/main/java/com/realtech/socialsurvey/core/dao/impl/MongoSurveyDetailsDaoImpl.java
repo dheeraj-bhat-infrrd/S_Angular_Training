@@ -213,7 +213,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName )
+    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName , boolean isReportedByUser )
     {
         LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive started." );
         Query query = new Query();
@@ -222,7 +222,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
         update.set( CommonConstants.CREATED_ON, new Date() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
-        update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
+        update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, isReportedByUser );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
