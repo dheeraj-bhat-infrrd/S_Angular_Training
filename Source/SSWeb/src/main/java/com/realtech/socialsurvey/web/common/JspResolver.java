@@ -144,4 +144,6 @@ public interface JspResolver {
 	
 	//Social Monitor
     public static final String SOCIAL_MONITOR = "view-social-monitor";
+    //social media
+    public static final String POST_ON_SOCIAL_MEDIA_SUCCESS = "post-on-social-media-success";
 }
