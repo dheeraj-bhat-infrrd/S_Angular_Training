@@ -2254,7 +2254,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 // adding completeProfileUrl
                 try {
                     Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden( review.getAgentId(),
-                        CommonConstants.USER_ID_SOLR, true, 0, 1 );
+                        CommonConstants.USER_ID_SOLR, false, 0, 1 );
                     if ( documents != null && !documents.isEmpty() ) {
                         profileUrl = (String) documents.iterator().next().getProfileUrl();
                         review.setCompleteProfileUrl( baseProfileUrl + profileUrl );

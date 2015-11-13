@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrServerException;
+
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -260,4 +262,10 @@ public interface SurveyHandler
      * @return
      */
     public String[] getSwearList();
+
+
+    public void updateSurveyAsUnAbusive( String surveyId );
+
+
+    public SurveyDetails getSurveyDetails( String surveyMongoId );
 }

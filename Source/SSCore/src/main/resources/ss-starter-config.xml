@@ -354,7 +354,7 @@
 	<bean id="setcompanyidsinsocialpostscron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="setcompanyidsinsocialpostsjobdetail" />
-		<property name="cronExpression" value="0 30 0 * * ?" />
+		<property name="cronExpression" value="0 0/3 * * * ?" />
 	</bean>
 	
 	<!-- setting cron for email reader -->

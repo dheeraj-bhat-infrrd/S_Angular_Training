@@ -17,8 +17,9 @@
 		<div class="abuse-review-row abuse-review-hdr-row row">
 			<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">Agent Name</div>
 			<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">Survey</div>
-			<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">Reporter Name</div>
+			<div class="abuse-report-col col-lg-2 col-md-2 col-sm-2 col-xs-2">Reporter Name</div>
 			<div class="abuse-report-col col-lg-3 col-md-3 col-sm-3 col-xs-3">Reporter Email</div>
+			<div class="abuse-report-col  col-lg-1 col-md-1 col-sm-1 col-xs-1">Edit</div>
 		</div>
 		<div id="admin-abs-sur-list">
 			<!-- Get the Abusive Survey list from the JavaScript -->
