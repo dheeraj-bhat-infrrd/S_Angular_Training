@@ -530,7 +530,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 							long lCellValue = (long) cell.getNumericCellValue();
 							cellValue = String.valueOf(lCellValue);
 						}
-						if (cellValue != null && !cellValue.isEmpty()) {
+						if (cellValue != null && !cellValue.isEmpty() && !cellValue.equalsIgnoreCase("No")) {
 							uploadedUser.setBranchAdmin(true);
 						}
 					}
@@ -545,7 +545,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 							long lCellValue = (long) cell.getNumericCellValue();
 							cellValue = String.valueOf(lCellValue);
 						}
-						if (cellValue != null && !cellValue.isEmpty()) {
+						if (cellValue != null && !cellValue.isEmpty() && !cellValue.equalsIgnoreCase("No")) {
 							uploadedUser.setRegionAdmin(true);
 						}
 					}
