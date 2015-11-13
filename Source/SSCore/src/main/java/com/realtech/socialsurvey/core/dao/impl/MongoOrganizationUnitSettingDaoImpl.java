@@ -587,4 +587,37 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.info( "Method fetchProfileImageUrlsForEntityList() finished" );
         return profileImageUrlList;
     }
+    
+    @Override
+    public Map<Long, String> getCollectionListOfUnprocessedImages(String collectionName, String imageType) throws InvalidInputException{
+    	LOG.info("Getting unprocessed "+imageType+" from collection name: "+collectionName);
+    	Map<Long, String> images = null;
+    	if(collectionName == null || collectionName.isEmpty() || imageType == null || imageType.isEmpty()){
+    		LOG.error("Invalid input getCollectionListOfUnprocessedImages");
+    		throw new InvalidInputException("Invalid input getCollectionListOfUnprocessedImages");
+    	}
+    	Query query = new Query();
+    	if(imageType.equals(CommonConstants.IMAGE_TYPE_LOGO)){
+    		query.addCriteria(Criteria.where(CommonConstants.PROFILE_IMAGE_URL_SOLR).exists(true)).addCriteria(Criteria.where(CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN).is(false));
+    	}else if(imageType.equals(CommonConstants.IMAGE_TYPE_LOGO)){
+    		query.addCriteria(Criteria.where(CommonConstants.LOGO_COLUMN).exists(true)).addCriteria(Criteria.where(CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN).is(false));
+    	}else{
+    		throw new InvalidInputException("Invalid image type");
+    	}
+    	query.fields().include(CommonConstants.PROFILE_IMAGE_URL_SOLR).include(CommonConstants.IDEN).include(CommonConstants.LOGO_COLUMN).exclude(CommonConstants.DEFAULT_MONGO_ID_COLUMN);
+    	LOG.debug("Query: "+query.toString());
+    	List<OrganizationUnitSettings> unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, collectionName);
+    	if(unitSettings != null && unitSettings.size() > 0){
+    		LOG.debug("Found "+unitSettings.size()+" records.");
+    		images = new HashMap<>();
+    		for(OrganizationUnitSettings unitSetting : unitSettings){
+    			if(imageType.equals(CommonConstants.IMAGE_TYPE_PROFILE)){
+    				images.put(unitSetting.getIden(), unitSetting.getProfileImageUrl());
+    			}else{
+    				images.put(unitSetting.getIden(), unitSetting.getLogo());
+    			}
+    		}
+    	}
+    	return images;
+    }
 }

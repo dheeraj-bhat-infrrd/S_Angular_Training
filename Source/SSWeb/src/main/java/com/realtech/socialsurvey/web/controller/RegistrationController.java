@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -205,27 +206,61 @@ public class RegistrationController
             }
 
             if ( invitedUser != null ) {
-                redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-                redirectAttributes.addFlashAttribute( "message", messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.INVALID_REGISTRATION_INVITE, DisplayMessageType.ERROR_MESSAGE ) );
-                return "redirect:/" + JspResolver.LOGIN + ".do";
+            	// check if password has been already set then take the user to the login page. otherwise take the user to complete registration page
+            	if(invitedUser.getPassword() != null && !invitedUser.getPassword().isEmpty()){
+	                redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
+	                redirectAttributes.addFlashAttribute( "message", messageUtils.getDisplayMessage(
+	                    DisplayMessageConstants.INVALID_REGISTRATION_INVITE, DisplayMessageType.ERROR_MESSAGE ) );
+	                return "redirect:/" + JspResolver.LOGIN + ".do";
+            	}else{
+            		// take to complete registration
+            		if ( invitedUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED ) {
+                        redirectAttributes.addFlashAttribute( CommonConstants.COMPANY, invitedUser.getCompany().getCompanyId() );
+                        redirectAttributes.addFlashAttribute( CommonConstants.FIRST_NAME, invitedUser.getFirstName() );
+                        redirectAttributes.addFlashAttribute( CommonConstants.EMAIL_ID, emailAddress );
+                        // Generate encrypted urlparams
+                        Map<String, String> params = new HashMap<>();
+                        params.put(CommonConstants.COMPANY, String.valueOf(invitedUser.getCompany().getCompanyId()));
+                        params.put(CommonConstants.EMAIL_ID, emailAddress);
+                        params.put(CommonConstants.FIRST_NAME, urlParams.get( CommonConstants.FIRST_NAME ));
+                        params.put(CommonConstants.LAST_NAME, urlParams.get( CommonConstants.LAST_NAME ));
+                        redirectAttributes.addFlashAttribute( "q", urlGenerator.generateCipher(params) );
+
+                        User user = userManagementService.getUserByEmail( emailAddress );
+                        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
+                        if ( agentSettings == null ) {
+                            throw new InvalidInputException( "Settings not found for the given user." );
+                        }
+                        redirectAttributes.addFlashAttribute( "profileUrl", agentSettings.getCompleteProfileUrl() );
+
+                        String lastName = urlParams.get( CommonConstants.LAST_NAME );
+                        if ( lastName != null && !lastName.isEmpty() ) {
+                            redirectAttributes.addFlashAttribute( CommonConstants.LAST_NAME, lastName );
+                        }
+                        LOG.debug( "Validation of url completed. Service returning params to be prepopulated in registration page" );
+                        return "redirect:/" + JspResolver.COMPLETE_REGISTRATION_PAGE + ".do";
+                    }else{
+                    	LOG.debug( "The registration url had been used earlier" );
+                        redirectAttributes.addFlashAttribute( "message", "The registration url is no longer valid" );
+                        redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
+                        return "redirect:/" + JspResolver.LOGIN + ".do";
+                    }
+            	}
+            }else{
+	            redirectAttributes.addFlashAttribute( "firstname", urlParams.get( CommonConstants.FIRST_NAME ) );
+	            redirectAttributes.addFlashAttribute( "lastname", urlParams.get( CommonConstants.LAST_NAME ) );
+	            redirectAttributes.addFlashAttribute( "emailid", emailAddress );
+	            redirectAttributes.addFlashAttribute( "uniqueIdentifier", urlParams.get( CommonConstants.UNIQUE_IDENTIFIER ) );
+	            redirectAttributes.addFlashAttribute( "isDirectRegistration", true );
+	            LOG.debug( "Validation of url completed. Service returning params to be prepopulated in registration page" );
+	            return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
             }
-
-            redirectAttributes.addFlashAttribute( "firstname", urlParams.get( CommonConstants.FIRST_NAME ) );
-            redirectAttributes.addFlashAttribute( "lastname", urlParams.get( CommonConstants.LAST_NAME ) );
-            redirectAttributes.addFlashAttribute( "emailid", emailAddress );
-            redirectAttributes.addFlashAttribute( "uniqueIdentifier", urlParams.get( CommonConstants.UNIQUE_IDENTIFIER ) );
-            redirectAttributes.addFlashAttribute( "isDirectRegistration", true );
-
-            LOG.debug( "Validation of url completed. Service returning params to be prepopulated in registration page" );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while showing registration page. Reason : " + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return "redirect:/" + JspResolver.LOGIN + ".do";
         }
-
-        return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
     }
 
 
