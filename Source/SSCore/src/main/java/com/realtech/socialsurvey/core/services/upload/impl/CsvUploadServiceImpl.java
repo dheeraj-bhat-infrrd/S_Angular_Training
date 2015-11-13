@@ -1072,7 +1072,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		if (user.isBelongsToCompany()) {
 			// He belongs to the company
 			LOG.debug("Adding user : " + user.getEmailId() + " belongs to company");
-			map = organizationManagementService.addIndividual(adminUser, 0, 0, 0, new String[] { user.getEmailId() }, false);
+			map = organizationManagementService.addIndividual(adminUser, 0, 0, 0, new String[] { user.getEmailId() }, false, true);
 			if (map != null) {
 				userList = (List<User>) map.get(CommonConstants.VALID_USERS_LIST);
 			}
@@ -1085,10 +1085,10 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			if (user.isBranchAdmin()) {
 				LOG.debug("User is the branch admin");
 				map = organizationManagementService.addIndividual(adminUser, 0, branch.getBranchId(), branch.getRegion().getRegionId(),
-						new String[] { user.getEmailId() }, true);
+						new String[] { user.getEmailId() }, true, true);
 				if (user.isAgent()) {
 					organizationManagementService.addIndividual(adminUser, 0, branch.getBranchId(), branch.getRegion().getRegionId(),
-							new String[] { user.getEmailId() }, false);
+							new String[] { user.getEmailId() }, false, true);
 				}
 				if (map != null) {
 					userList = (List<User>) map.get(CommonConstants.VALID_USERS_LIST);
@@ -1098,7 +1098,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			else {
 				LOG.debug("User is not the branch admin");
 				map = organizationManagementService.addIndividual(adminUser, 0, branch.getBranchId(), branch.getRegion().getRegionId(),
-						new String[] { user.getEmailId() }, false);
+						new String[] { user.getEmailId() }, false, true);
 				if (map != null) {
 					userList = (List<User>) map.get(CommonConstants.VALID_USERS_LIST);
 				}
@@ -1111,9 +1111,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			Region region = regionDao.findById(Region.class, user.getRegionId());
 			if (user.isRegionAdmin()) {
 				LOG.debug("User is the region admin.");
-				map = organizationManagementService.addIndividual(adminUser, 0, 0, region.getRegionId(), new String[] { user.getEmailId() }, true);
+				map = organizationManagementService.addIndividual(adminUser, 0, 0, region.getRegionId(), new String[] { user.getEmailId() }, true, true);
 				if (user.isAgent()) {
-					organizationManagementService.addIndividual(adminUser, 0, 0, region.getRegionId(), new String[] { user.getEmailId() }, false);
+					organizationManagementService.addIndividual(adminUser, 0, 0, region.getRegionId(), new String[] { user.getEmailId() }, false, true);
 				}
 				if (map != null) {
 					userList = (List<User>) map.get(CommonConstants.VALID_USERS_LIST);
@@ -1122,7 +1122,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			}
 			else {
 				LOG.debug("User is not the admin of the region");
-				map = organizationManagementService.addIndividual(adminUser, 0, 0, region.getRegionId(), new String[] { user.getEmailId() }, false);
+				map = organizationManagementService.addIndividual(adminUser, 0, 0, region.getRegionId(), new String[] { user.getEmailId() }, false, true);
 				if (map != null) {
 					userList = (List<User>) map.get(CommonConstants.VALID_USERS_LIST);
 				}
@@ -1154,7 +1154,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 		if (user.isBelongsToCompany()) {
 			LOG.debug("Assigning user id : " + assigneeUser.getUserId());
-			organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, 0, null, false);
+			organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, 0, null, false, true);
 		}
 		else if (user.getBranchId() > 0l) {
 			// User belongs to a branch
@@ -1163,17 +1163,17 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			if (user.isBranchAdmin()) {
 				LOG.debug("User is the branch admin");
 				organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), branch.getBranchId(), branch.getRegion()
-						.getRegionId(), null, true);
+						.getRegionId(), null, true, true);
 				if (user.isAgent()) {
 					organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), branch.getBranchId(), branch.getRegion()
-							.getRegionId(), null, false);
+							.getRegionId(), null, false, true);
 				}
 				LOG.debug("Added user : " + user.getEmailId());
 			}
 			else {
 				LOG.debug("User is not the branch admin");
 				organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), branch.getBranchId(), branch.getRegion()
-						.getRegionId(), null, false);
+						.getRegionId(), null, false, true);
 				LOG.debug("Added user : " + user.getEmailId());
 			}
 		}
@@ -1183,16 +1183,16 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			Region region = regionDao.findById(Region.class, user.getRegionId());
 			if (user.isRegionAdmin()) {
 				LOG.debug("User is the region admin.");
-				organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null, true);
+				organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null, true, true);
 				LOG.debug("Added user : " + user.getEmailId());
 				if (user.isAgent()) {
-					organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null, false);
+					organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null, false, true);
 				}
 
 			}
 			else {
 				LOG.debug("User is not the admin of the region");
-				organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null, false);
+				organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null, false, true);
 				LOG.debug("Added user : " + user.getEmailId());
 			}
 		}

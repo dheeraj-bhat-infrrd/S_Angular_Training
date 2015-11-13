@@ -114,9 +114,6 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
 
-	@Value("${ENABLE_KAFKA}")
-	private String enableKafka;
-
 	private static final Logger LOG = LoggerFactory.getLogger(BrainTreePaymentImpl.class);
 	
 	private static final DecimalFormat AMOUNT_FORMAT = new DecimalFormat("###.##"); 
@@ -709,14 +706,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("License table updated!");
 
 		LOG.info("Sending email to the customer!");
-		if (enableKafka.equals(CommonConstants.YES)) {
-			emailServices.queueSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
-					String.valueOf(retryDays));
-		}
-		else {
-			emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
-					String.valueOf(retryDays));
-		}
+		emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+				String.valueOf(retryDays));
 
 		LOG.info("Email sent successfully!");
 
@@ -1258,12 +1249,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 
 		LOG.info("Sending mail to the customer about the upgrade");
-		if (enableKafka.equals(CommonConstants.YES)) {
-			emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-		}
-		else {
-			emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-		}
+		emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 		LOG.info("Mail successfully sent");
 
 		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");
@@ -1561,21 +1547,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 
 		try {
-			if (enableKafka.equals(CommonConstants.YES)) {
-				if (retriesExceeded) {
-					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-				}
-				else {
-					emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-				}
+			if (retriesExceeded) {
+				emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 			}
 			else {
-				if (retriesExceeded) {
-					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-				}
-				else {
-					emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-				}
+				emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 			}
 		}
 		catch (InvalidInputException e1) {

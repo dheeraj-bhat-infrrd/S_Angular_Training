@@ -111,8 +111,8 @@ public interface SocialManagementService
     int fetchZillowCallCount();
 
 
-    String postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl );
+    public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
+        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl ) throws NonFatalException;
 
 }
 // JIRA SS-34 BY RM02 BOC

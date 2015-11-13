@@ -76,6 +76,8 @@ public interface CommonConstants
     public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
     public static final String PRE_PROCESSING_BEFORE_LOGIN_STAGE = "defaultbrandandregioncreation.do";
     public static final String START_SURVEY = "rest/survey/start";
+    public static final String SHOW_SURVEY_PAGE_FOR_URL = "rest/survey/showsurveypageforurl";
+    public static final String SHOW_SURVEY_PAGE = "rest/survey/showsurveypage";
 
     /**
      * Status constants
@@ -163,6 +165,7 @@ public interface CommonConstants
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
     public static final String BATCH_TYPE_COLUMN = "batchType";
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
+    public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
 
     /**
      * Mongo entities and column name constants
@@ -199,9 +202,13 @@ public interface CommonConstants
     public static final String IS_ABUSIVE_REPORTED_BY_USER_COLUMN = "isAbuseRepByUser";
     public static final String IS_UNDER_RESOLUTION_COLUMN = "underResolution";
     public static final String IDEN = "iden";
-    
     public static final String AGREE_SHARE_COLUMN_TRUE = "true";
     public static final String AGREE_SHARE_COLUMN_FALSE = "false";
+    public static final String PROFILE_IMAGE_THUMBNAIL_COLUMN = "profileImageUrlThumbnail";
+    public static final String LOGO_THUMBNAIL_COLUMN = "logoThumbnail";
+    public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN ="isProfileImageProcessed";
+    public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN ="isLogoImageProcessed";
+
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
      */
@@ -456,6 +463,7 @@ public interface CommonConstants
     public static final String PROFILE_NAME_SOLR = "profileName";
     public static final String PROFILE_URL_SOLR = "profileUrl";
     public static final String PROFILE_IMAGE_URL_SOLR = "profileImageUrl";
+    public static final String LOGO_COLUMN = "logo";
     public static final String REVIEW_COUNT_SOLR = "reviewCount";
     public static final String TITLE_SOLR = "title";
     public static final String TIME_IN_MILLIS_SOLR = "timeInMillis";
@@ -777,4 +785,30 @@ public interface CommonConstants
     public static final String SURVEY_MOOD_GREAT = "Great";
     public static final String SURVEY_MOOD_OK = "OK";
     public static final String SURVEY_MOOD_UNPLEASANT = "Unpleasant";
+    
+    // image types
+    public static final String IMAGE_TYPE_LOGO = "logo";
+    public static final String IMAGE_TYPE_PROFILE = "profile";
+
+    //URL Type constants
+    public static final String MANUAL_REGISTRATION_URL_TYPE = "Manual Registration";
+    public static final String SHOW_SURVEY_PAGE_FOR_URL_URL_TYPE = "Show Survey Page For Url";
+    public static final String EMAIL_VERIFICATION_URL_TYPE = "Email Verification";
+    public static final String SHOW_SURVEY_PAGE_URL_TYPE = "Show Survey Page";
+    public static final String SHOW_EMAIL_REGISTRATION_PAGE_URL_TYPE = "Registration Page";
+    public static final String SHOW_COMPLETE_REGISTRATION_PAGE_URL_TYPE = "Complete Registration Page";
+    public static final String RESET_PASSWORD_URL_TYPE = "Reset Password";
+    public static final String VERIFICATION_URL_TYPE = "Verification";
+    public static final String UNKNOWN_URL_TYPE = "Unknown";
+    public static final int STATUS_NOTACCESSED = 0;
+    public static final int STATUS_ACCESSED = 1;
+    public static final String SHORTENED_URL_SUFFIX = "mail.do";
+
+    // URL Type constants
+    public static final String URL_DETAILS_STATUS_COLUMN = "status";
+    public static final String URL_DETAILS_ACCESS_DATES_COLUMN = "accessDates";
+    public static final String URL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
+
+    //Url Details Mongo Column constants
+    public static final String URL_COLUMN = "url";
 }

@@ -52,6 +52,7 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
@@ -153,6 +154,9 @@ public class OrganizationManagementController
     
     @Autowired
     private SurveyHandler surveyHandler;
+
+    @Autowired
+    private UrlService urlService;
 
 
     /**
@@ -506,7 +510,6 @@ public class OrganizationManagementController
     public String showEmailSettings( Model model, HttpServletRequest request )
     {
         LOG.info( "Method showEmailSettings of OrganizationManagementController called" );
-
         return JspResolver.EMAIL_SETTINGS;
     }
 
@@ -1335,6 +1338,34 @@ public class OrganizationManagementController
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
+            
+            else if ( mailCategory != null && mailCategory.equals( "post-reminder-interval" ) ) {
+                int reminderInterval = Integer.parseInt( request.getParameter( "post-reminder-interval" ) );
+                if ( reminderInterval == 0 ) {
+                    LOG.warn( "Reminder Interval is 0." );
+                    throw new InvalidInputException( "Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setSocial_post_reminder_interval_in_days( reminderInterval );
+                }
+                LOG.info( "Updating Social Post Reminder Interval" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+
+            else if ( mailCategory != null && mailCategory.equals( "post-reminder-needed" ) ) {
+                boolean isReminderDisabled = Boolean.parseBoolean( request.getParameter( "post-reminder-needed-hidden" ) );
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setSocialPostReminderDisabled( isReminderDisabled );
+                }
+                LOG.info( "Updating Social Post Reminder Needed" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
 
             if ( organizationManagementService.updateSurveySettings( companySettings, originalSurveySettings ) ) {
                 companySettings.setSurvey_settings( originalSurveySettings );
@@ -1351,6 +1382,71 @@ public class OrganizationManagementController
         return message;
     }
 
+    
+    
+    /**
+     * Method to update Survey Reminder Settings
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/updatesocialpostremindersettings", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSocialPostReminderSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating Social Post Reminder Settings" );
+        String mailCategory = request.getParameter( "mailcategory" );
+        SurveySettings originalSurveySettings = null;
+        String message = "";
+
+        try {
+            User user = sessionHelper.getCurrentUser();
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+
+            if ( mailCategory != null && mailCategory.equals( "post-reminder-interval" ) ) {
+                int reminderInterval = Integer.parseInt( request.getParameter( "reminder-interval" ) );
+                if ( reminderInterval == 0 ) {
+                    LOG.warn( "Reminder Interval is 0." );
+                    throw new InvalidInputException( "Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setSocial_post_reminder_interval_in_days( reminderInterval );
+                }
+                LOG.info( "Updating Social Post Reminder Interval" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+
+            else if ( mailCategory != null && mailCategory.equals( "post-reminder-needed" ) ) {
+                boolean isReminderDisabled = Boolean.parseBoolean( request.getParameter( "reminder-needed-hidden" ) );
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setSocialPostReminderDisabled( isReminderDisabled );
+                }
+                LOG.info( "Updating Social Post Reminder Needed" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+
+            if ( organizationManagementService.updateSurveySettings( companySettings, originalSurveySettings ) ) {
+                companySettings.setSurvey_settings( originalSurveySettings );
+                LOG.info( "Updated Survey Settings" );
+            }
+        } catch ( NumberFormatException e ) {
+            LOG.error( "NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while updating survey settings. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
 
     /**
      * Method to update Other Company Settings
@@ -2312,6 +2408,33 @@ public class OrganizationManagementController
         }
         LOG.info( "Method to get surveys under resolution for a company fetchSurveysUnderResolution() finished." );
         return JspResolver.REVIEWS_UNDER_RESOLUTION_REPORTS;
+    }
+
+
+    @RequestMapping ( value = "/mail", method = RequestMethod.GET)
+    public String mailUrlResolution( Model model, HttpServletRequest request ) throws InvalidInputException
+    {
+        LOG.info( "Method to resolve shortened url sent in mail,mailUrlResolution() started." );
+        LOG.info( "Parsing query string for ID" );
+        String encryptedIDStr = request.getParameter( "q" );
+        if ( encryptedIDStr == null || encryptedIDStr.isEmpty() ) {
+            LOG.error( "ID value is missing in the query string." );
+            throw new InvalidInputException( "ID value is missing in the query string." );
+        }
+        LOG.info( "Found encrypted ID : " + encryptedIDStr );
+
+        // Retrieve complete url based on the ID
+        LOG.info( "Retrieving complete url for the ID found." );
+        String completeUrl = urlService.retrieveCompleteUrlForID( encryptedIDStr );
+        if ( completeUrl == null || completeUrl.isEmpty() ) {
+            LOG.error( "No complete url found for " + encryptedIDStr + " ID." );
+            throw new InvalidInputException( "No complete url found for " + encryptedIDStr + " ID." );
+        }
+        LOG.info( "Retrieved complete url for the ID : " + completeUrl );
+        LOG.info( "Method to resolve shortened url sent in mail,mailUrlResolution() ended." );
+
+        // Redirect to complete url found based on the ID.
+        return "redirect:" + completeUrl;
     }
 
 }

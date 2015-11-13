@@ -95,12 +95,13 @@ public class HierarchyManagementController {
 		String profileName = null;
 		try {
 			try {
-				if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
-					LOG.error("Inactive or unauthorized users can not access build hierarchy page");
-					isUserAuthorized = false;
-					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.HIERARCHY_MANAGEMENT_NOT_AUTHORIZED,
-							DisplayMessageType.ERROR_MESSAGE, "javascript:resendVerificationMail()"));
-				}
+//			    Commented as this threw an error when adding team members under a non-verified admin
+//				if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
+//					LOG.error("Inactive or unauthorized users can not access build hierarchy page");
+//					isUserAuthorized = false;
+//					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.HIERARCHY_MANAGEMENT_NOT_AUTHORIZED,
+//							DisplayMessageType.ERROR_MESSAGE, "javascript:resendVerificationMail()"));
+//				}
 				LOG.debug("Calling service for checking the if the region addition is allowed");
 				isRegionAdditionAllowed = organizationManagementService.isRegionAdditionAllowed(user, accountType);
 
@@ -499,7 +500,7 @@ public class HierarchyManagementController {
 			try {
 				Map<String, Object> map = organizationManagementService.addNewRegionWithUser(loggedInUser, regionName.trim(), CommonConstants.NO,
 						regionAddress1, regionAddress2, regionCountry, regionCountryCode, regionState, regionCity, regionZipcode, selectedUserId,
-						assigneeEmailIds, isAdmin);
+						assigneeEmailIds, isAdmin, false);
 				Region region = (Region) map.get(CommonConstants.REGION_OBJECT);
 				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
 				addOrUpdateRegionInSession(region, session);
@@ -659,7 +660,7 @@ public class HierarchyManagementController {
 				LOG.debug("Calling service to add a new branch");
 				Map<String, Object> map = organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO,
 						branchAddress1, branchAddress2, branchCountry, branchCountryCode, branchState, branchCity, branchZipcode, selectedUserId,
-						assigneeEmailIds, isAdmin);
+						assigneeEmailIds, isAdmin, false);
 				Branch branch = (Branch) map.get(CommonConstants.BRANCH_OBJECT);
 				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
 				LOG.debug("Successfully executed service to add a new branch");
@@ -753,8 +754,6 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 
-			// TODO To replace all the white spaces present in the string.
-			// selectedUserEmail = selectedUserEmail.replaceAll("[ \t\\x0B\f\r]+", "");
 			String[] assigneeEmailIds = validateAndParseIndividualDetails(user, selectedUserId, selectedUserEmail);
 
 			long regionId = 0l;
@@ -797,7 +796,7 @@ public class HierarchyManagementController {
 			try {
 				LOG.debug("Calling service to add/assign invidual(s)");
 				Map<String, Object> map = organizationManagementService.addIndividual(user, selectedUserId, branchId, regionId, assigneeEmailIds,
-						isAdmin);
+						isAdmin, false);
 				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
 				LOG.debug("Successfully executed service to add a new branch");
 				String invalidMessage = "These email address ";
@@ -943,7 +942,7 @@ public class HierarchyManagementController {
 				LOG.debug("Calling service to update branch with Id : " + branchId);
 				Map<String, Object> map = organizationManagementService.updateBranch(user, branchId, regionId, branchName, branchAddress1,
 						branchAddress2, branchCountry, branchCountryCode, branchState, branchCity, branchZipcode, selectedUserId, assigneeEmailIds,
-						isAdmin);
+						isAdmin, false);
 				Branch branch = (Branch) map.get(CommonConstants.BRANCH_OBJECT);
 				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
 				addOrUpdateBranchInSession(branch, session);
@@ -1099,7 +1098,7 @@ public class HierarchyManagementController {
 			try {
 				LOG.debug("Calling service to update region with Id : " + regionId);
 				Map<String, Object> map = organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2,
-						regionCountry, regionCountryCode, regionState, regionCity, regionZipcode, selectedUserId, assigneeEmailIds, isAdmin);
+						regionCountry, regionCountryCode, regionState, regionCity, regionZipcode, selectedUserId, assigneeEmailIds, isAdmin, false);
 				Region region = (Region) map.get(CommonConstants.REGION_OBJECT);
 				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
 				addOrUpdateRegionInSession(region, session);
@@ -2031,7 +2030,7 @@ public class HierarchyManagementController {
 								String firstName = (userEntity.getFirstName() != null) ? userEntity.getFirstName() : userEntity.getEmailId()
 										.substring(0, userEntity.getEmailId().indexOf("@"));
 								String lastName = (userEntity.getLastName() != null) ? userEntity.getLastName() : null;
-								userManagementService.inviteUserToRegister(admin, firstName, lastName, userEntity.getEmailId());
+								userManagementService.inviteUserToRegister(admin, firstName, lastName, userEntity.getEmailId(), false);
 
 								userEntity = new UserFromSearch();
 							}

@@ -59,6 +59,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -147,6 +148,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private Utils utils;
+
+    @Autowired
+    private UrlService urlService;
 
 
     /**
@@ -564,9 +568,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( organizationUnitSettings != null ) {
             SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
-                if ( !surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0 ) {
-                    reminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
-                    maxReminders = surveySettings.getMax_number_of_survey_reminders();
+                if ( !surveySettings.getIsSocialPostReminderDisabled()
+                    && surveySettings.getSocial_post_reminder_interval_in_days() > 0 ) {
+                    reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
+                    maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
                     autopostScore = surveySettings.getShow_survey_above_score();
                 }
             }
@@ -811,7 +816,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -819,7 +824,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             emailServices.sendDefaultSurveyRestartMail( custEmail, logoUrl,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
-                user.getEmailId(), agentSignature );
+                user.getEmailId(), agentSignature, user.getUserId() );
         }
         LOG.info( "sendSurveyRestartMail() finished." );
     }
@@ -927,7 +932,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -935,7 +940,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             emailServices.sendDefaultSurveyCompletionMail( custEmail,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
-                user.getProfileName(), logoUrl );
+                user.getProfileName(), logoUrl, user.getUserId() );
         }
         LOG.info( "sendSurveyCompletionMail() finished." );
     }
@@ -1051,7 +1056,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -1059,7 +1064,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             emailServices.sendDefaultSurveyCompletionMail( custEmail,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
-                companyName, logoUrl );
+                companyName, logoUrl, user.getUserId() );
         }
         LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
     }
@@ -1168,7 +1173,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -1246,7 +1251,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         urlParams.put( CommonConstants.FIRST_NAME, custFirstName );
         urlParams.put( CommonConstants.LAST_NAME, custLastName );
         LOG.debug( "Method composeLink() finished" );
-        return urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + "rest/survey/showsurveypageforurl" );
+        return urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
     }
 
 
@@ -1487,6 +1492,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
             }
 
+            LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
+            surveyUrl = urlService.shortenUrl( surveyUrl );
+            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
+
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
             mailBody = mailBody.replaceAll( "\\[Name\\]",
@@ -1510,7 +1519,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
@@ -1518,7 +1527,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             emailServices.sendDefaultSurveyInvitationMail( custEmail, logoUrl,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
-                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress );
+                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress, user.getUserId() );
         }
         LOG.debug( "sendInvitationMailByAgent() finished." );
     }
@@ -1553,13 +1562,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
             try {
                 emailServices.sendSurveyInvitationMailByCustomer( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) );
+                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
             emailServices.sendDefaultSurveyInvitationMailByCustomer( custEmail, custFirstName,
-                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), link, user.getEmailId() );
+                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), link, user.getEmailId(), user.getUserId() );
         }
         LOG.debug( "sendInvitationMailByCustomer() finished." );
     }
@@ -1943,31 +1952,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 if ( !found ) {
                     branchMediaPostDetails = new BranchMediaPostDetails();
                     branchMediaPostDetails.setBranchId( setting.getIden() );
-                }
 
-                LOG.debug( "Adding the region this branch belongs too " );
-                try {
-                    OrganizationUnitSettings regionSetting = profileManagementService.getRegionProfileByBranch( setting );
-                    boolean regionFound = false;
-                    for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
+                    LOG.debug( "Adding the region this branch belongs too " );
+                    try {
+                        OrganizationUnitSettings regionSetting = profileManagementService.getRegionProfileByBranch( setting );
+                        boolean regionFound = false;
+                        for ( int i = 0; i < regionMediaPostDetailsList.size(); i++ ) {
 
-                        RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
-                        if ( regionMediaPostDetails.getRegionId() == regionSetting.getIden() ) {
-                            regionFound = true;
-                            break;
+                            RegionMediaPostDetails regionMediaPostDetails = regionMediaPostDetailsList.get( i );
+                            if ( regionMediaPostDetails.getRegionId() == regionSetting.getIden() ) {
+                                regionFound = true;
+                                break;
+                            }
                         }
+                        if ( !regionFound ) {
+                            RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
+                            regionMediaPostDetails.setRegionId( regionSetting.getIden() );
+                            regionMediaPostDetailsList.add( regionMediaPostDetails );
+                        }
+                        branchMediaPostDetails.setRegionId( regionSetting.getIden() );
+                    } catch ( ProfileNotFoundException e ) {
+                        LOG.error( "Unable to find the profile", e );
                     }
-                    if ( !regionFound ) {
-                        RegionMediaPostDetails regionMediaPostDetails = new RegionMediaPostDetails();
-                        regionMediaPostDetails.setRegionId( regionSetting.getIden() );
-                        regionMediaPostDetailsList.add( regionMediaPostDetails );
-                    }
-                    branchMediaPostDetails.setRegionId( regionSetting.getIden() );
-                } catch ( ProfileNotFoundException e ) {
-                    LOG.error( "Unable to find the profile", e );
+
+                    branchMediaPostDetailsList.add( branchMediaPostDetails );
                 }
 
-                branchMediaPostDetailsList.add( branchMediaPostDetails );
 
             }
             socialMediaPostDetails.setAgentMediaPostDetails( agentMediaPostDetails );
