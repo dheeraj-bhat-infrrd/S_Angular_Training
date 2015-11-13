@@ -36,7 +36,6 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
-import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
@@ -781,13 +780,13 @@ public class SurveyManagementController
             LOG.error( "NonFatalException caught in postToFacebook(). Nested exception is ", e );
         }
         LOG.info( "Method to post feedback of customer to facebook finished." );
+        model.addAttribute( "socialMedia", CommonConstants.FACEBOOK_SOCIAL_SITE );
         return JspResolver.POST_ON_SOCIAL_MEDIA_SUCCESS;
     }
 
 
-    @ResponseBody
     @RequestMapping ( value = "/posttotwitter", method = RequestMethod.GET)
-    public String postToTwitter( HttpServletRequest request )
+    public String postToTwitter( Model model , HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to twitter started." );
         try {
@@ -938,13 +937,13 @@ public class SurveyManagementController
             LOG.error( "NonFatalException caught in postToTwitter(). Nested exception is ", e );
         }
         LOG.info( "Method to post feedback of customer to twitter finished." );
-        return "";
+        model.addAttribute( "socialMedia", CommonConstants.TWITTER_SOCIAL_SITE );
+        return JspResolver.POST_ON_SOCIAL_MEDIA_SUCCESS;
     }
 
 
-    @ResponseBody
     @RequestMapping ( value = "/posttolinkedin", method = RequestMethod.GET)
-    public String postToLinkedin( HttpServletRequest request )
+    public String postToLinkedin( Model model , HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to linkedin started." );
         try {
@@ -1074,7 +1073,8 @@ public class SurveyManagementController
             LOG.error( "NonFatalException caught in postToLinkedin(). Nested exception is ", e );
         }
         LOG.info( "Method to post feedback of customer to Linkedin finished." );
-        return "";
+        model.addAttribute( "socialMedia", CommonConstants.LINKEDIN_SOCIAL_SITE );
+        return JspResolver.POST_ON_SOCIAL_MEDIA_SUCCESS;
     }
 
 
