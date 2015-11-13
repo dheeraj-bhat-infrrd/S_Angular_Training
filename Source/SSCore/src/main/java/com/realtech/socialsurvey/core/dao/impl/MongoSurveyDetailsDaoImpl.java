@@ -89,6 +89,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return surveys.get( CommonConstants.INITIAL_INDEX );
     }
 
+    
+    @Override
+    public SurveyDetails getSurveyBySurveyMongoId( String surveyMongoId )
+    {
+        LOG.info( "Method getSurveyBySurveyMongoId() to insert details of survey started." );
+        SurveyDetails survey = mongoTemplate.findById( surveyMongoId, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method getSurveyBySurveyMongoId() finished" );
+        return survey;
+    }
 
     /*
      * Method to insert survey details into the SURVEY_DETAILS collection.
@@ -223,6 +232,26 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ) );
         mongoTemplate.upsert( query, update, ABS_REPORTER_DETAILS_COLLECTION );
         LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
+    }
+    
+    
+    @Override
+    public void updateSurveyAsUnAbusive( String surveyMongoId )
+    {
+        LOG.info( "Method updateSurveyAsUnAbusive() to mark survey as unAbusive started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.IS_ABUSIVE_COLUMN, false );
+        update.set( CommonConstants.CREATED_ON, new Date() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+
+        query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).is( surveyMongoId ) );
+        mongoTemplate.remove( query, ABS_REPORTER_DETAILS_COLLECTION );
+        
+        LOG.info( "Method updateSurveyAsUnAbusive() to mark survey as unAbusive finished." );
     }
 
 

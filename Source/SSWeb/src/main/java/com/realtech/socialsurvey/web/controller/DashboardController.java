@@ -471,8 +471,7 @@ public class DashboardController
             }
 
             try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
-                    null, null, "date" );
+                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false, null, null, "date" );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
