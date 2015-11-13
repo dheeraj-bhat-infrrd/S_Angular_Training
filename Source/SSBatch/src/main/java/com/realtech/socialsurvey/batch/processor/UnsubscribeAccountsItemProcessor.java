@@ -51,9 +51,6 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 
 	private Map<String, Object> writerObjectsMap = new HashMap<String, Object>();
 
-	@Value("${ENABLE_KAFKA}")
-	private String enableKafka;
-
 	private static final Logger LOG = LoggerFactory.getLogger(UnsubscribeAccountsItemProcessor.class);
 
 	@Override
@@ -71,12 +68,7 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 			// Sending mail to the respective user. We fetch the corporate admin for the company
 			User user = commonServices.getCorporateAdmin(company);
 			LOG.info("Sending mail to the respective corporate admin with email id : " + user.getEmailId());
-			if (enableKafka.equals(CommonConstants.YES)) {
-				emailServices.queueAccountDisabledMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-			}
-			else {
-				emailServices.sendAccountDisabledMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-			}
+			emailServices.sendAccountDisabledMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 			LOG.info("Email successfully sent!");
 
 			// Updating the company record to reflect changes

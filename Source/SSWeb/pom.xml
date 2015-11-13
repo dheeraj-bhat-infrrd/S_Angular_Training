@@ -39,8 +39,6 @@
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<!-- Dependency scope -->
-		<dependency.scope.val>${scope.dependency}</dependency.scope.val>
 	</properties>
 
 	<dependencies>
@@ -50,7 +48,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Other Web dependencies -->
@@ -58,7 +56,7 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>${jstl.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -78,19 +76,19 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Logging with SLF4J & LogBack -->
@@ -117,7 +115,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${hibernate.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 
@@ -147,7 +145,7 @@
 			<groupId>net.tanesha.recaptcha4j</groupId>
 			<artifactId>recaptcha4j</artifactId>
 			<version>0.0.7</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Spring Security -->
@@ -155,7 +153,7 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 			<version>${spring.security}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -171,7 +169,7 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 			<version>${spring.security}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -195,7 +193,7 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.security}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -207,7 +205,7 @@
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
 			<version>2.0-m01</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Dependency for writing data into excel file -->		
@@ -215,14 +213,14 @@
 			<groupId>org.apache.poi</groupId>		
 			<artifactId>poi-ooxml</artifactId>		
 			<version>3.9</version>		
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.java.openjfx.backport</groupId>
 			<artifactId>openjfx-78-backport-compat</artifactId>
 			<version>1.8.0.1</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>

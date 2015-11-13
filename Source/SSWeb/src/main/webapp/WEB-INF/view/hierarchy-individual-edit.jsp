@@ -91,7 +91,7 @@
 	    <div class="float-left bd-frm-right pos-relative">
 	        <input autocomplete="off" id="selected-user-txt" name="selectedUserEmail" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img" placeholder='<spring:message code="label.userselector.placeholder.key"/>'/>
 	        <input type="hidden" name="selectedUserId" id="selected-userid-hidden">
-	        <div id="users-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
+	        <div id="users-droplist" class="bd-frm-rt-dd-list dd-com-list ui-widget-content hide">
 	            <!-- list of users from solr gets displayed here   -->
 	        </div>
 	    </div>
