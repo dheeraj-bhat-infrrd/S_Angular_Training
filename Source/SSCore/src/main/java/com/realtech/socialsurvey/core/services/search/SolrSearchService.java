@@ -333,5 +333,8 @@ public interface SolrSearchService
 
 
     public Set<Long> getUserIdsFromSolrDocumentList( SolrDocumentList userIdList );
+
+
+    List<UserFromSearch> getUsersWithMetaDataFromSolrDocuments( SolrDocumentList documentList );
 }
 // JIRA:SS-62 BY RM 02 EOC

@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -205,4 +204,13 @@ public interface OrganizationUnitSettingsDao
 
     List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
         throws InvalidInputException;
+    
+    /**
+     * Gets a collection of unprocessed images
+     * @param collectionName
+     * @param imageType
+     * @return
+     * @throws InvalidInputException
+     */
+    public Map<Long, String> getCollectionListOfUnprocessedImages(String collectionName, String imageType) throws InvalidInputException;
 }

@@ -41,8 +41,6 @@
 
 		<dependency.path>/Users/nishit/work/lib</dependency.path>
 
-		<!-- Dependency scope -->
-		<dependency.scope.val>${scope.dependency}</dependency.scope.val>
 	</properties>
 
 
@@ -53,52 +51,52 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!-- Logging with SLF4J & LogBack -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
 			<version>${logback.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Hibernate -->
@@ -106,7 +104,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${hibernate.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- MySQL Connector -->
@@ -114,7 +112,7 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Test Artifacts -->
@@ -152,21 +150,21 @@
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4.7</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!--Commons codec For Base64 Encoding -->
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.2</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.tanesha.recaptcha4j</groupId>
 			<artifactId>recaptcha4j</artifactId>
 			<version>0.0.7</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 
@@ -174,7 +172,7 @@
 			<groupId>com.braintreepayments.gateway</groupId>
 			<artifactId>braintree-java</artifactId>
 			<version>2.41.2</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -201,7 +199,7 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
 			<version>1.6.0.RELEASE</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Dependency for Fileupload -->
@@ -209,14 +207,14 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring-framework.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.3</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Dependency for AmazonS3 Fileupload -->
@@ -224,14 +222,14 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 			<groupId>com.amazonaws</groupId>
 			<version>1.9.13</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
 			<version>8.0.15</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Dependency for solr java api -->
@@ -239,19 +237,19 @@
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
 			<version>4.9.0</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.3.6</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> 
 			<version>1.5.6</version> </dependency> -->
@@ -259,7 +257,7 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
 			<version>4.3.1</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Dependency for writing downloading data into excel file -->
@@ -267,7 +265,7 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.9</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- dependency for json -->
@@ -275,7 +273,7 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>${gson.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- kafka dependency -->
@@ -283,14 +281,14 @@
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.10</artifactId>
 			<version>0.8.1.1</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.4</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Spring Security Core -->
@@ -308,7 +306,7 @@
 					<artifactId>spring-expression</artifactId>
 				</exclusion>
 			</exclusions>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Social Network Connectors -->
@@ -318,26 +316,26 @@
 			<groupId>org.facebook4j</groupId>
 			<artifactId>facebook4j-core</artifactId>
 			<version>2.2.2</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.twitter4j</groupId>
 			<artifactId>twitter4j-core</artifactId>
 			<version>4.0.3</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.scribe</groupId>
 			<artifactId>scribe</artifactId>
 			<version>1.3.7</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!-- vcard dependency -->
 		<dependency>
 			<groupId>com.googlecode.ez-vcard</groupId>
 			<artifactId>ez-vcard</artifactId>
 			<version>0.9.6</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- sendgrid dependency -->
@@ -345,7 +343,7 @@
 			<groupId>com.sendgrid</groupId>
 			<artifactId>sendgrid-java</artifactId>
 			<version>2.1.0</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- retrofit dependency -->
@@ -353,7 +351,7 @@
 			<groupId>com.squareup.retrofit</groupId>
 			<artifactId>retrofit</artifactId>
 			<version>1.9.0</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Quartz framework -->
@@ -361,7 +359,7 @@
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<version>${quartz.version}</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Jsoup -->
@@ -369,7 +367,7 @@
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.8.2</version>
-			<scope>${dependency.scope.val}</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>

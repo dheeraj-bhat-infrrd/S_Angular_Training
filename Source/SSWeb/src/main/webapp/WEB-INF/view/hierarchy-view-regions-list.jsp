@@ -33,9 +33,9 @@
            <td class="v-tbl-btns">
                <div class="clearfix v-tbl-icn-wraper">
               
+              <!--  <div class="float-left v-tbl-top-spacer"></div>
                <div class="float-left v-tbl-top-spacer"></div>
-               <div class="float-left v-tbl-top-spacer"></div>
-               <div class="float-left v-tbl-top-spacer"></div>
+               <div class="float-left v-tbl-top-spacer"></div>  -->
                    <div class="float-left v-tbl-icn v-icn-close region-del-icn" data-regionid="${region.regionId}"></div>
                    <div class="float-left v-tbl-icn v-icn-edit region-edit-icn" clicked="false" data-regionid="${region.regionId}"></div>
                <div class="float-left v-tbl-top-spacer"></div>
@@ -76,10 +76,10 @@
            </td>
            <td class="v-tbl-role"></td>
            <td class="v-tbl-btns">
-               <div class="clearfix v-tbl-icn-wraper">
+                <div class="clearfix v-tbl-icn-wraper">
                <div class="float-left v-tbl-top-spacer"></div>
                <div class="float-left v-tbl-top-spacer"></div>
-               <div class="float-left v-tbl-top-spacer"></div>
+               <div class="float-left v-tbl-top-spacer"></div>  
                    <div class="float-left v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}"></div>
                    <div class="float-left v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}"></div>
               <div class="float-left v-tbl-top-spacer"></div>
@@ -173,7 +173,7 @@
 						<c:otherwise>
 							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
 						</c:otherwise>
-					</c:choose>
+					</c:choose>  
               
                
               <!--  <div class="float-left v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div> -->
@@ -196,7 +196,7 @@
 						</c:otherwise>
 				   </c:choose>
 				   <c:if test="${user.userId != compUser.userId}">
-				   		<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="${compUser.userId}" title="login as"></div>
+				   		<div class="float-left v-tbl-icn v-icn-login user-login-icn" data-iden="${compUser.userId}" title="login as"></div>
 				   </c:if>
 			   </div>
            </td>
