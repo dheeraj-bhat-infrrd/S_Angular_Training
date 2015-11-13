@@ -164,7 +164,7 @@ public interface SurveyDetailsDao
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 
 
-    void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName , boolean isReportedByUser);
+    void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName );
 
 
     void removeZillowSurveysByEntity( String entityType, long entityId );
