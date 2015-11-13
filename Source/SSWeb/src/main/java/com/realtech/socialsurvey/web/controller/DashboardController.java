@@ -116,9 +116,6 @@ public class DashboardController
     @Autowired
     BatchTrackerService batchTrackerService;
 
-    @Value ( "${ENABLE_KAFKA}")
-    private String enableKafka;
-
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
@@ -365,7 +362,6 @@ public class DashboardController
 	            dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
 	        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
         }catch(InvalidInputException e){
-        	// TODO: implement
         	LOG.error("Error: "+e.getMessage(), e);
         }
 
@@ -475,8 +471,7 @@ public class DashboardController
             }
 
             try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
-                    null, null, "date" );
+                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false, null, null, "date" );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
@@ -1051,49 +1046,41 @@ public class DashboardController
                     agentName = agentSettings.getContact_details().getName();
                 }
 
-                if ( enableKafka.equals( CommonConstants.YES ) ) {
-                    emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
-                        agentTitle, companyName );
-                } else {
-                    // TODO: add call to emailservice method.
-                    OrganizationUnitSettings companySettings = null;
-                    try {
-                        companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
-                    } catch ( InvalidInputException e ) {
-                        LOG.error( "InvalidInputException occured while trying to fetch company settings." );
-                    }
-
-                    OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                        logoUrl = companySettings.getLogo();
-                    } else if ( organizationUnit == OrganizationUnit.REGION ) {
-                        OrganizationUnitSettings regionSettings = null;
-                        try {
-                            regionSettings = organizationManagementService.getRegionSettings( regionId );
-                        } catch ( InvalidInputException e ) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        if ( regionSettings != null )
-                            logoUrl = regionSettings.getLogo();
-                    } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                        OrganizationUnitSettings branchSettings = null;
-                        try {
-                            branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        if ( branchSettings != null ) {
-                            logoUrl = branchSettings.getLogo();
-                        }
-                    } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                        logoUrl = agentSettings.getLogo();
-                    }
-
-                    emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
-                        agentTitle, companyName, survey, surveyLink, logoUrl );
+                OrganizationUnitSettings companySettings = null;
+                try {
+                    companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "InvalidInputException occured while trying to fetch company settings." );
                 }
+
+                OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+                if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                    logoUrl = companySettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                    OrganizationUnitSettings regionSettings = null;
+                    try {
+                        regionSettings = organizationManagementService.getRegionSettings( regionId );
+                    } catch ( InvalidInputException e ) {
+                        e.printStackTrace();
+                    }
+                    if ( regionSettings != null )
+                        logoUrl = regionSettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                    OrganizationUnitSettings branchSettings = null;
+                    try {
+                        branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                    } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                        e.printStackTrace();
+                    }
+                    if ( branchSettings != null ) {
+                        logoUrl = branchSettings.getLogo();
+                    }
+                } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                    logoUrl = agentSettings.getLogo();
+                }
+
+                emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
+                    agentTitle, companyName, survey, surveyLink, logoUrl );
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while trying to send survey reminder mail to : " + customerEmail );
                 throw e;
@@ -1186,60 +1173,51 @@ public class DashboardController
                                     + agentSettings.getIden() );
                             }
                         } catch ( InvalidInputException e ) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     } catch ( InvalidSettingsStateException e ) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
 
                     User user = userManagementService.getUserByUserId( agentId );
                     String companyName = user.getCompany().getCompany();
 
-                    if ( enableKafka.equals( CommonConstants.YES ) ) {
-                        emailServices.queueSurveyReminderMail( customerEmail, custFirstName, agentName, surveyLink, agentPhone,
-                            agentTitle, companyName );
-                    } else {
-                        OrganizationUnitSettings companySettings = null;
-                        try {
-                            companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                                .getCompanyId() );
-                        } catch ( InvalidInputException e ) {
-                            LOG.error( "InvalidInputException occured while trying to fetch company settings." );
-                        }
-
-                        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                        if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                            logoUrl = companySettings.getLogo();
-                        } else if ( organizationUnit == OrganizationUnit.REGION ) {
-                            OrganizationUnitSettings regionSettings = null;
-                            try {
-                                regionSettings = organizationManagementService.getRegionSettings( regionId );
-                            } catch ( InvalidInputException e ) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                            if ( regionSettings != null )
-                                logoUrl = regionSettings.getLogo();
-                        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                            OrganizationUnitSettings branchSettings = null;
-                            try {
-                                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                            if ( branchSettings != null ) {
-                                logoUrl = branchSettings.getLogo();
-                            }
-                        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                            logoUrl = agentSettings.getLogo();
-                        }
-
-                        emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
-                            agentTitle, companyName, survey, surveyLink, logoUrl );
+                    OrganizationUnitSettings companySettings = null;
+                    try {
+                        companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                            .getCompanyId() );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "InvalidInputException occured while trying to fetch company settings." );
                     }
+
+                    OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                        logoUrl = companySettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                        OrganizationUnitSettings regionSettings = null;
+                        try {
+                            regionSettings = organizationManagementService.getRegionSettings( regionId );
+                        } catch ( InvalidInputException e ) {
+                            e.printStackTrace();
+                        }
+                        if ( regionSettings != null )
+                            logoUrl = regionSettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                        OrganizationUnitSettings branchSettings = null;
+                        try {
+                            branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                            e.printStackTrace();
+                        }
+                        if ( branchSettings != null ) {
+                            logoUrl = branchSettings.getLogo();
+                        }
+                    } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                        logoUrl = agentSettings.getLogo();
+                    }
+
+                    emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
+                        agentTitle, companyName, survey, surveyLink, logoUrl );
 
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
                 } catch ( NumberFormatException e ) {

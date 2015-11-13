@@ -11,6 +11,12 @@ public interface EmailDao extends GenericDao<EmailObject, Long>
 
 
     public List<EmailObject> findAllEmails();
+    
+    /**
+     * Finds all the emails that need to be sent
+     * @return
+     */
+    public List<EmailObject> findAllEmailsToBeSent();
 
 
     public void deleteEmail( EmailObject emailObject );

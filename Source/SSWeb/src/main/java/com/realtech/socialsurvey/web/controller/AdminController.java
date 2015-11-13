@@ -658,6 +658,9 @@ public class AdminController
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInput exception caught in unmarkAbusiveReview(). Nested exception is ", e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
+        } catch (NonFatalException e) {
+            LOG.error( "NonFatal exception caught in unmarkAbusiveReview(). Nested exception is ", e );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Method unmarkAbusiveReview finished." );
         model.addAttribute( "message", messageUtils.getDisplayMessage(

@@ -622,24 +622,25 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public String postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl )
+    public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
+        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl ) throws NonFatalException
     {
 
         LOG.info( "Method to post feedback of customer to various pages of social networking sites started." );
-
+        boolean successfullyPosted = true;
         try {
-
             String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
 
             if ( isAbusive ) {
-                return "Can't post the review because it contains the swear words";
+                throw new InvalidInputException("Can't post an abusive survey");
             }
 
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            if ( rating % 1 == 0 ) {
+            /*if ( rating % 1 == 0 ) {
                 ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }
+            }*/
+            ratingFormat.setMinimumFractionDigits( 1 );
+            ratingFormat.setMaximumFractionDigits( 1 );
             User agent = userManagementService.getUserByUserId( agentId );
             int accountMasterId = 0;
             String accountMasterName = "";
@@ -651,6 +652,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             } catch ( NullPointerException e ) {
                 LOG.error( "NullPointerException caught in postToSocialMedia() while fetching account master id for agent "
                     + agent.getFirstName() );
+                successfullyPosted = false;
             }
 
             Map<String, List<OrganizationUnitSettings>> settingsMap = getSettingsForBranchesAndRegionsInHierarchy( agentId );
@@ -665,15 +667,18 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
-            List<String> agentSocialList = new ArrayList<String>();
 
-            List<String> companySocialList = new ArrayList<String>();
             if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
             if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
                 socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
             }
+
+            List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
+            List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
+
+
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 if ( branchMediaPostDetails.getSharedOn() == null ) {
                     branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
@@ -694,7 +699,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     if ( !updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl, agent.getCompany()
                         .getCompanyId() ) ) {
-                        agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                        if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                            agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
 
                     }
                 }
@@ -711,7 +717,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
                         if ( !updateStatusIntoFacebookPage( companySetting, facebookMessage, serverBaseUrl,
                             companySetting.getIden() ) ) {
-                            companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
 
                         }
                     }
@@ -729,7 +736,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             if ( !updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, agent.getCompany()
                                 .getCompanyId() ) ) {
                                 List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                                if ( !regionSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                    regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                                 regionMediaPostDetails.setSharedOn( regionSocialList );
                             }
                         }
@@ -749,7 +757,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                                 if ( !updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, agent.getCompany()
                                     .getCompanyId() ) ) {
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                                    if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                        branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                                     branchMediaPostDetails.setSharedOn( branchSocialList );
                                 }
                             }
@@ -771,14 +780,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
             if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                 if ( !updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
-                    agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                        agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                 }
             }
             if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 for ( OrganizationUnitSettings setting : companySettings ) {
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
-                            companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                            if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                         }
                     }
                 }
@@ -788,7 +799,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
                             List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                            regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                            if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                             regionMediaPostDetails.setSharedOn( regionSocialList );
                         }
                     }
@@ -801,7 +813,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
                                 List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                                if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                    branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                                 branchMediaPostDetails.setSharedOn( branchSocialList );
                             }
                         }
@@ -810,6 +823,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             }
 
             // Twitter
+            /*
+             * String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName
+             * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
+             * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+             */
             String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
                 customerDisplayName, agentName, "@SocialSurveyMe" )
                 + surveyHandler.getApplicationBaseUrl()
@@ -818,7 +836,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             try {
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     if ( !tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                        agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                        if ( !agentSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                            agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                     }
                 }
             } catch ( TwitterException e ) {
@@ -831,7 +850,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     try {
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                                companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                if ( !companySocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                    companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                             }
                         }
                     } catch ( TwitterException e ) {
@@ -847,7 +867,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                                 List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                if ( !regionSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                    regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                                 regionMediaPostDetails.setSharedOn( regionSocialList );
                             }
                         }
@@ -866,7 +887,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                                 if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                    if ( !branchSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                        branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                                     branchMediaPostDetails.setSharedOn( branchSocialList );
                                 }
                             }
@@ -888,10 +910,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             LOG.error(
                 "Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
                 e );
-            return e.getMessage();
+            successfullyPosted = false;
+            throw new NonFatalException(e.getMessage());
         }
         LOG.info( "Method to post feedback of customer to various pages of social networking sites finished." );
-        return "Successfully posted to all the places in hierarchy";
+        return successfullyPosted;
 
     }
 

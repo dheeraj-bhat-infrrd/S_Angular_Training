@@ -75,6 +75,31 @@
 				<c:set value="4" var="currentprofilemasterid"></c:set>
 			</c:when>
 		</c:choose>
+		
+		
+		
+		
+		<!-- If status is 2, then user has not acted on invitation -->
+				<c:set var="regstatustickclass" value="" />
+				<c:set var="userstatustickclass" value="v-icn-verified" />
+				<c:if test="${regionUser.status == 2}">
+					<c:set var="regstatustickclass" value="v-icn-femail" />
+					<c:set var="userstatustickclass" value="v-icn-notverified" />
+				</c:if>
+
+				<!-- if admin can edit -->
+				<c:choose>
+					<c:when test="${regionUser.canEdit}">
+						<c:set var="admincaneditclass" value="v-tbl-icn" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="admincaneditclass" value="v-tbl-icn-disabled" />
+					</c:otherwise>
+				</c:choose>
+		
+		
+		
+		
 		<tr id="user-row-${regionUser.userId}" clicked="false" data-userid="${regionUser.userId}"
 			class="v-tbl-row v-tbl-row-sel edit-user v-tbl-row-ind sel-r${regionId}-u${regionUser.userId}">
            <td class="v-tbl-line">
@@ -114,7 +139,37 @@
                
                
                
-                <div class="float-left  v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div> 
+                <c:choose>
+						<c:when test="${not empty regstatustickclass}">
+							<div class="float-left v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
+								title="<spring:message code="label.resendmail.key" />"></div>
+						</c:when>
+						<c:otherwise>
+							<div class="float-left v-tbl-icn  ${admincaneditclass}"></div>
+						</c:otherwise>
+					</c:choose>
+					 <div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
+						title="<spring:message code="label.widget.key" />"
+						onclick="generateWidget($(this),${regionUser .userId }, 'individual');"></div>  
+						 
+					<c:choose>
+						<c:when test="${regionUser.status == 2}">
+							<div class="float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>
+						</c:when>
+						<c:otherwise>
+							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
+						</c:otherwise>
+					</c:choose> 
+                
+               
+               
+               
+               
+               
+               
+               
+               
+              <!--   <div class="float-left  v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div>  -->
                    <c:choose>
 						<c:when test="${regionUser.canEdit && user.userId != regionUser.userId}">
 						   <div class="float-left v-tbl-icn v-icn-close user-del-icn" data-userid="${regionUser.userId}"></div>
@@ -132,7 +187,7 @@
 						</c:otherwise>
 				   </c:choose>
 				   <c:if test="${user.userId != regionUser.userId and sessionprofilemasterid < currentprofilemasterid}">
-				   		<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="${regionUser.userId}" title="login as"></div>
+				   		<div class="float-left v-tbl-icn v-icn-login user-login-icn" data-iden="${regionUser.userId}" title="login as"></div>
 				   </c:if>
 				</div>
            </td>

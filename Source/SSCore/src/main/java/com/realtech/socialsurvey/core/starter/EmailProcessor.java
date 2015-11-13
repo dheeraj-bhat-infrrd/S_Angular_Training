@@ -68,7 +68,7 @@ public class EmailProcessor implements Runnable
     {
         Map<EmailEntity, String> errorEmails = new HashMap<EmailEntity, String>();
         while ( true ) {
-            List<EmailObject> emailObjectList = emailDao.findAllEmails();
+            List<EmailObject> emailObjectList = emailDao.findAllEmailsToBeSent();
             if ( emailObjectList.isEmpty() ) {
                 try {
                     Thread.sleep( 60000 );
@@ -95,11 +95,15 @@ public class EmailProcessor implements Runnable
                 }
 
             }
-            if ( errorEmails.size() > 10 ) {
-                LOG.debug( "Send 10 invalid records at a time " );
-                sendInvalidEmails( errorEmails );
-                LOG.debug( "Clearing old exception emails " );
-                errorEmails.clear();
+            try{
+	            if ( errorEmails.size() > 10 ) {
+	                LOG.debug( "Send 10 invalid records at a time " );
+	                sendInvalidEmails( errorEmails );
+	                LOG.debug( "Clearing old exception emails " );
+	                errorEmails.clear();
+	            }
+            }catch(Exception ex){
+            	LOG.error("Exception while sending invalid mails to admin", ex);
             }
 
         }
