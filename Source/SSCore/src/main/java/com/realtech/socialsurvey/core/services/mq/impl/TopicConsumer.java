@@ -224,7 +224,7 @@ public class TopicConsumer implements Runnable {
 		} else if (header == EmailHeader.REGISTRATION_COMPLETE) {
 			LOG.debug("Sending registration complete mail");
 			emailServices.sendRegistrationCompletionEmail(url, recipient, name,
-					profileName, loginName);
+					profileName, loginName, false);
 		}
 	}
 
@@ -378,7 +378,7 @@ public class TopicConsumer implements Runnable {
 
 		LOG.debug("Sending account completion mail");
 		emailServices.sendDefaultSurveyCompletionMail(recipient, name, agentName,
-				agentEmail, agentProfile , null );
+				agentEmail, agentProfile , null, -1 );
 	}
 
 	private void parseMailWithRecipientAndAgentDetails(String message)

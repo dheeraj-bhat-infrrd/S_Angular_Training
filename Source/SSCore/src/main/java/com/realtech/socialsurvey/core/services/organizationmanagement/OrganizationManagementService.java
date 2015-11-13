@@ -377,6 +377,7 @@ public interface OrganizationManagementService
      * @param selectedUserId
      * @param emailIdsArray
      * @param isAdmin
+     * @param holdSendingMail - true value will not send mail to the user till the record is verified.
      * @return
      * @throws InvalidInputException
      * @throws SolrException
@@ -385,7 +386,7 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UserAssignmentException;
 
 
@@ -413,7 +414,7 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> updateRegion( User user, long regionId, String regionName, String address1, String address2,
         String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UserAssignmentException;
 
 
@@ -442,7 +443,7 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UserAssignmentException;
 
 
@@ -479,6 +480,7 @@ public interface OrganizationManagementService
      * @param selectedUserId
      * @param emailIdsArray
      * @param isAdmin
+     * @param holdSendingMail - true value will not send mail to the user till the record is verified.
      * @return
      * @throws InvalidInputException
      * @throws SolrException
@@ -487,7 +489,7 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem,
         String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
-        long selectedUserId, String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, SolrException,
+        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UserAssignmentException;
 
 
@@ -516,6 +518,7 @@ public interface OrganizationManagementService
      * @param regionId
      * @param emailIdsArray
      * @param isAdmin
+     * @param holdSendingMail - true value will not send mail to the user till the record is verified.
      * @return
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
@@ -523,7 +526,7 @@ public interface OrganizationManagementService
      * @throws UserAssignmentException
      */
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
         UserAssignmentException;
 
 

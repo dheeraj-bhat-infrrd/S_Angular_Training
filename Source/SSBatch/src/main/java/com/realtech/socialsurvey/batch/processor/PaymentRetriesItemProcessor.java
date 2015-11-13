@@ -57,9 +57,6 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
 	
-	@Value("${ENABLE_KAFKA}")
-	private String enableKafka;
-	
 	@Autowired
 	private BatchCommon commonServices;
 	
@@ -143,11 +140,7 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 		LOG.debug("Sending mail for retrying subscription charge.");
 
 		try {
-			if(enableKafka.equals(CommonConstants.YES)){
-				emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-			}else{
-				emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-			}
+			emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 		}
 		catch (InvalidInputException e1) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e1.getMessage());
@@ -305,13 +298,7 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 				// Now a mail regarding the same is sent to the user
 				LOG.info("Sending a mail regarding the blocking of subscription to the user.");
 				try {
-					if (enableKafka.equals(CommonConstants.YES)) {
-						emailServices
-								.queueRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-					}
-					else {
-						emailServices.sendRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
-					}
+					emailServices.sendRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), user.getLoginName());
 					LOG.info("Mail successfully sent.");
 				}
 				catch (InvalidInputException e1) {

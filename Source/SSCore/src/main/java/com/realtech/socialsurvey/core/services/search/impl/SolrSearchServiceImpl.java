@@ -2096,6 +2096,33 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
         return matchedUsers.values();
     }
+    
+    /**
+     * 
+     * @param documentList
+     * @return
+     */
+    @Override
+    public List<UserFromSearch> getUsersWithMetaDataFromSolrDocuments( SolrDocumentList documentList )
+    {
+        LOG.debug( "method getUsersWithMetaDataFromSolrDocuments started" );
+        List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
+        for ( SolrDocument document : documentList ) {
+            UserFromSearch user = new UserFromSearch();
+            
+            user.setUserId( Long.parseLong(document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
+            user.setAgent( Boolean.parseBoolean( document.get( CommonConstants.IS_AGENT_SOLR ).toString() ) );
+            user.setStatus( Integer.parseInt( document.get( CommonConstants.STATUS_SOLR ).toString() ) );
+            user.setFirstName( document.get( CommonConstants.USER_FIRST_NAME_SOLR ).toString() );
+            if(document.get( CommonConstants.USER_LAST_NAME_SOLR ) != null)
+                user.setLastName( document.get( CommonConstants.USER_LAST_NAME_SOLR ).toString() );
+            if(document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ) != null)
+                user.setDisplayName( document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ).toString() );
+            userList.add( user );
+        }
+        LOG.debug( "method getUsersWithMetaDataFromSolrDocuments ended" );
+        return userList;
+    }
 
 
     /**

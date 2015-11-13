@@ -139,7 +139,7 @@
                
                
                
-               <c:choose>
+                <c:choose>
 						<c:when test="${not empty regstatustickclass}">
 							<div class="float-left v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
 								title="<spring:message code="label.resendmail.key" />"></div>
@@ -151,9 +151,7 @@
 					 <div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
 						title="<spring:message code="label.widget.key" />"
 						onclick="generateWidget($(this),${regionUser .userId }, 'individual');"></div>  
-						 <%-- <div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
-						title="<spring:message code="label.widget.key" />"
-						></div>  --%>
+						 
 					<c:choose>
 						<c:when test="${regionUser.status == 2}">
 							<div class="float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>
@@ -161,8 +159,8 @@
 						<c:otherwise>
 							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
 						</c:otherwise>
-					</c:choose>
-               
+					</c:choose> 
+                
                
                
                
@@ -189,7 +187,7 @@
 						</c:otherwise>
 				   </c:choose>
 				   <c:if test="${user.userId != regionUser.userId and sessionprofilemasterid < currentprofilemasterid}">
-				   		<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="${regionUser.userId}" title="login as"></div>
+				   		<div class="float-left v-tbl-icn v-icn-login user-login-icn" data-iden="${regionUser.userId}" title="login as"></div>
 				   </c:if>
 				</div>
            </td>

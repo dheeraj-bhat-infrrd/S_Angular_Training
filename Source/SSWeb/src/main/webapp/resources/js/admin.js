@@ -202,6 +202,7 @@ $(document).on('click', '.comp-row', function(e) {
 });
 
 function bindUserLoginEvent() {
+	console.log("inside admin");
 	$('.user-login-icn').on('click', function(e) {
 		e.stopImmediatePropagation();
 		var payload = {
