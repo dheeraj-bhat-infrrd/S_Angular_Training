@@ -301,3 +301,38 @@ function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 
 $(document).on('scroll', '#dsh-inc-srvey', function() {
 });
+
+
+$(document).on('click', '.unmark-abusive-icn', function() {
+	var surveyMongoId = $(this).parent().parent().attr('data-iden');
+	confirmUnmarkAbusiveReview(surveyMongoId);
+});
+
+
+function confirmUnmarkAbusiveReview(surveyId){
+	
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Unmark");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Unmark review");
+	$('#overlay-text').html("Are you sure you want to unmark the review?");
+	$('#overlay-continue').attr("onclick", "unmarkReviewFromAbusive('" + surveyId + "');");
+	
+}
+
+function unmarkReviewFromAbusive(surveyId){
+	var payload = {
+			"surveyId" : surveyId
+		};
+	
+	showOverlay();
+	$('.overlay-loader').removeClass('hide');
+	
+	callAjaxGetWithPayloadData("./unmarkabusivereview.do", function(data) {
+		//close the popup
+		$('#overlay-cancel').click();
+		displayMessage(data);
+		showAbusiveReviews(0,10);
+	}, payload, false);
+}

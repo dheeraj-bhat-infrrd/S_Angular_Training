@@ -7,9 +7,15 @@ public class SurveySettings {
 
 	private float auto_post_score;
 	private float show_survey_above_score;
+	
 	private int survey_reminder_interval_in_days;
 	private int max_number_of_survey_reminders;
 	private boolean isReminderDisabled;
+	
+	private int social_post_reminder_interval_in_days;
+    private int max_number_of_social_pos_reminders;
+    private boolean isSocialPostReminderDisabled;
+	
 	private boolean autoPostEnabled;
 	private String happyText;
 	private String neutralText;
@@ -54,10 +60,40 @@ public class SurveySettings {
 	public boolean getIsReminderDisabled() {
 		return isReminderDisabled;
 	}
-
+	
 	public void setReminderDisabled(boolean isReminderDisabled) {
-		this.isReminderDisabled = isReminderDisabled;
-	}
+        this.isReminderDisabled = isReminderDisabled;
+    }
+
+	public int getSocial_post_reminder_interval_in_days()
+    {
+        return social_post_reminder_interval_in_days;
+    }
+
+    public void setSocial_post_reminder_interval_in_days( int social_post_reminder_interval_in_days )
+    {
+        this.social_post_reminder_interval_in_days = social_post_reminder_interval_in_days;
+    }
+
+    public int getMax_number_of_social_pos_reminders()
+    {
+        return max_number_of_social_pos_reminders;
+    }
+
+    public void setMax_number_of_social_pos_reminders( int max_number_of_social_pos_reminders )
+    {
+        this.max_number_of_social_pos_reminders = max_number_of_social_pos_reminders;
+    }
+
+    public boolean getIsSocialPostReminderDisabled()
+    {
+        return isSocialPostReminderDisabled;
+    }
+
+    public void setSocialPostReminderDisabled( boolean isSocialPostReminderDisabled )
+    {
+        this.isSocialPostReminderDisabled = isSocialPostReminderDisabled;
+    }
 
 	public boolean isAutoPostEnabled() {
 		return autoPostEnabled;
