@@ -216,7 +216,6 @@
 	$(document).ready(function() {
 		
 		$('.v-icn-femail').click( function() {
-			console.log("social survey");
 			if ($(this).hasClass('v-tbl-icn-disabled')) {
 				return;
 			}
