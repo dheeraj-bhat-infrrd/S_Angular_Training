@@ -24,7 +24,7 @@ public class SolrSocialPostsImport extends QuartzJobBean
     {
         LOG.info( "Executing SolrSocialPostsImport" );
         initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-        socialPostsDeltaImport.importSocialPostsIntoSolr();
+        socialPostsDeltaImport.importSocialPostsIntoSolr( false );
 
         LOG.info( "Finished the SolrSocialPostsImport" );
     }
