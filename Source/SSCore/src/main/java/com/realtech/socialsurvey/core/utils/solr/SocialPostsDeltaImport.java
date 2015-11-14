@@ -23,58 +23,66 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 public class SocialPostsDeltaImport
 {
     public static final Logger LOG = LoggerFactory.getLogger( SocialPostsDeltaImport.class );
-    
+
 
     @Resource
-    @Qualifier("solrimport")
+    @Qualifier ( "solrimport")
     private SolrImportDao solrImportDao;
 
     @Autowired
     private SolrSearchService solrSearchService;
 
-    @Value("${SOCIAL_POST_BATCH_SIZE}")
+    @Value ( "${SOCIAL_POST_BATCH_SIZE}")
     private int pageSize;
-    
+
     @Autowired
     private SocialPostDao socialPostDao;
-    
+
+
     /**
      * Method to fetch social posts from mongodb and index it into Solr
      */
     @Transactional
-    public void importSocialPostsIntoSolr() {
-        LOG.info("Started run method of SocialPostsDeltaImport");
+    public void importSocialPostsIntoSolr( boolean fromBeginning )
+    {
+        LOG.info( "Started run method of SocialPostsDeltaImport" );
         int pageNo = 1;
         List<SocialPost> socialPosts = null;
-        Long lastBuild = null;
-        do{
-            try{
-                lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
-                Date lastBuildTime = new Date( lastBuild );
-                socialPosts = socialPostDao.fetchSocialPostsPageforSolrIndexing( pageSize * (pageNo - 1), pageSize, lastBuildTime );
-                LOG.debug( "Fetched " + socialPosts.size() + " posts." );
-            } catch (NoRecordsFetchedException e) {
-                LOG.error("NoRecordsFetchedException occurred while fetching social posts");
+        Date lastBuildTime = null;
+        if ( fromBeginning ) {
+            lastBuildTime = new Date( 0l );
+        } else {
+            try {
+                Long lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
+                lastBuildTime = new Date( lastBuild );
             } catch ( SolrException e ) {
-                LOG.error( "Unable to fetch last build time" );
+                LOG.error( "SolrException occured while retrieving lastBuildTime via LukeRequestHandler.Reason : ", e );
             }
-            
-    
-            if (socialPosts == null || socialPosts.isEmpty()) {
+        }
+        do {
+            try {
+
+                socialPosts = socialPostDao.fetchSocialPostsPageforSolrIndexing( pageSize * ( pageNo - 1 ), pageSize,
+                    lastBuildTime );
+                LOG.debug( "Fetched " + socialPosts.size() + " posts." );
+            } catch ( NoRecordsFetchedException e ) {
+                LOG.error( "NoRecordsFetchedException occurred while fetching social posts" );
+            }
+
+
+            if ( socialPosts == null || socialPosts.isEmpty() ) {
                 break;
             }
-            
-            LOG.debug("Adding social posts to Solr");
+
+            LOG.debug( "Adding social posts to Solr" );
             try {
                 solrSearchService.addSocialPostsToSolr( socialPosts );
-            }
-            catch (SolrException e) {
-                LOG.error("SolrException occurred while adding social posts to solr");
+            } catch ( SolrException e ) {
+                LOG.error( "SolrException occurred while adding social posts to solr", e );
             }
             pageNo++;
-        }
-        while (!socialPosts.isEmpty());
-        LOG.info("Finished run method of SocialPostsDeltaImport");
-        
+        } while ( !socialPosts.isEmpty() );
+        LOG.info( "Finished run method of SocialPostsDeltaImport" );
+
     }
 }
