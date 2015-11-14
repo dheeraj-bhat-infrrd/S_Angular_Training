@@ -167,7 +167,7 @@
 						title="<spring:message code="label.widget.key" />"
 						onclick="generateWidget($(this), ${compUser.userId }, 'individual');"></div> 
 					<c:choose>
-						<c:when test="${regionUser.status == 2}">
+						<c:when test="${compUser.status == 2}">
 							<div class="float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>
 						</c:when>
 						<c:otherwise>
@@ -211,4 +211,19 @@
 </c:if> 
 <script>
 	bindUserLoginEvent();
+</script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		
+		$('.v-icn-femail').click( function() {
+			if ($(this).hasClass('v-tbl-icn-disabled')) {
+				return;
+			}
+
+			var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+			var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+		    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
+		    reinviteUser(firstName, lastName, emailId);
+		});
+	});
 </script>
