@@ -288,15 +288,20 @@ public class DashboardController
 	            profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
 	        }
 	        model.addAttribute( "socialScore", surveyScore );
-	        if ( sentSurveyCount > 999 )
-	            model.addAttribute( "surveyCount", "1K+" );
-	        else
+	        if ( sentSurveyCount > 999 ){
+	        	int quotient = sentSurveyCount / 1000;
+	            model.addAttribute( "surveyCount", quotient+"K+" );
+	        }
+	        else{
 	            model.addAttribute( "surveyCount", sentSurveyCount );
-	
-	        if ( socialPostsCount > 999 )
-	            model.addAttribute( "socialPosts", "1K+" );
-	        else
+	        }
+	        if ( socialPostsCount > 999 ){
+	        	int quotient = socialPostsCount / 1000;
+	            model.addAttribute( "socialPosts", quotient+"K+" );
+	        }
+	        else{
 	            model.addAttribute( "socialPosts", socialPostsCount );
+	        }
 	
 	        model.addAttribute( "profileCompleteness", profileCompleteness );
 	        LOG.debug("Getting the badges.");
