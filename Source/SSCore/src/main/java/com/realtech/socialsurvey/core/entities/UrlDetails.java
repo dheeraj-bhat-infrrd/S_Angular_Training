@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 public class UrlDetails
@@ -15,6 +16,7 @@ public class UrlDetails
     private String modifiedBy;
     private List<Date> accessDates;
     private int status;
+    private List<Map<String, String>> queryParamList;
 
 
     public String get_id()
@@ -125,10 +127,23 @@ public class UrlDetails
     }
 
 
+    public List<Map<String, String>> getQueryParamList()
+    {
+        return queryParamList;
+    }
+
+
+    public void setQueryParamList( List<Map<String, String>> queryParamList )
+    {
+        this.queryParamList = queryParamList;
+    }
+
+
     @Override
     public String toString()
     {
-        return "Url Details : [ URL Type : " + urlType + ", URL : " + url + ", " + ", Status : " + status + "]";
+        return "Url Details : [ URL Type : " + urlType + ", URL : " + url + ", " + ", Status : " + status
+            + " Query Param List : " + queryParamList + "]";
 
     }
 }
