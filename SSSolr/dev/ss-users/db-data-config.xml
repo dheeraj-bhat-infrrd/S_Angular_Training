@@ -1,14 +1,16 @@
 <dataConfig>
+    <dataSource name="mymongodb" type="MongoDataSource" database="ss_db" url="mongodb://localhost:27017"/>
     <dataSource type="JdbcDataSource" name="ss_user" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/ss_user" batchSize="-1" user="root" password="root"/>
    <document>
-        <entity name="User" dataSource="ss_user" query="SELECT u.USER_ID, u.COMPANY_ID, u.LOGIN_NAME, u.FIRST_NAME, u.LAST_NAME, u.EMAIL_ID, 
-u.STATUS, u.IS_OWNER, up.BRANCH_ID, up.REGION_ID, up.AGENT_ID, up.PROFILES_MASTER_ID FROM ss_user.USERS u
-Inner JOIN ss_user.USER_PROFILE up on u.USER_ID=up.USER_ID;" 
+        <entity name="User" dataSource="ss_user" query="SELECT u.USER_ID, u.COMPANY_ID, u.LOGIN_NAME, u.FIRST_NAME, u.LAST_NAME, u.EMAIL_ID,
+u.STATUS, u.IS_OWNER, group_concat(DISTINCT up.BRANCH_ID) as branches, group_concat(DISTINCT up.REGION_ID) as regions, up.AGENT_ID, group_concat(DISTINCT up.PROFILES_MASTER_ID) as profiles_master_ids FROM ss_user.USERS u
+Inner JOIN ss_user.USER_PROFILE up on u.USER_ID=up.USER_ID WHERE up.BRANCH_ID != 0 AND up.REGION_ID !=0 group by u.USER_ID;"
 
-          deltaImportQuery = "SELECT USER_ID, COMPANY_ID, LOGIN_NAME, FIRST_NAME, LAST_NAME, EMAIL_ID, STATUS, IS_OWNER FROM USERS WHERE COMPANY_ID = '${dataimporter.delta.companyId}';" 
+          deltaImportQuery = "SELECT USER_ID, COMPANY_ID, LOGIN_NAME, FIRST_NAME, LAST_NAME, EMAIL_ID, STATUS, IS_OWNER FROM USERS WHERE COMPANY_ID = '${dataimporter.delta.companyId}';"
 
-          deltaQuery = "SELECT USER_ID FROM USERS WHERE MODIFIED_ON &gt; DATE_FORMAT(DATE_ADD('${dataimporter.last_index_time}',INTERVAL -1 MINUTE), '%Y-%m-%d %H:%i');">
-         
+          deltaQuery = "SELECT USER_ID FROM USERS WHERE MODIFIED_ON &gt; DATE_FORMAT(DATE_ADD('${dataimporter.last_index_time}',INTERVAL -1 MINUTE), '%Y-%m-%d %H:%i');"
+          transformer="com.realtech.socialsurvey.solr.Transformers.UserTransformer">
+
             <field column="USER_ID" name="userId" />
             <field column="COMPANY_ID" name="companyId" />
             <field column="LOGIN_NAME" name="loginName" />
@@ -17,9 +19,13 @@ Inner JOIN ss_user.USER_PROFILE up on u.USER_ID=up.USER_ID;"
             <field column="EMAIL_ID" name="emailId" />
             <field column="STATUS" name="status" />
             <field column="IS_OWNER" name="isOwner" />
-            <field column="REGION_ID" name="regions" />
-            <field column="BRANCH_ID" name="branches" />
+            <field column="regions" name="regions" />
+            <field column="branches" name="branches" />
             <field column="AGENT_ID" name="agentIds" />
+            <!-- <field column="profiles_master_ids" name="profiles_master_ids" /> -->
+            <entity name="agentSetting" processor="MongoEntityProcessor" collection="AGENT_SETTINGS" dataSource="mymongodb" query="{iden : ${User.USER_ID}}" transformer="MongoMapperTransformer, com.realtech.socialsurvey.solr.Transformers.UserMongoTransformer">
+            </entity>
         </entity>
+
     </document>
 </dataConfig>
