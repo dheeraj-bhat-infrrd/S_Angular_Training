@@ -17,10 +17,10 @@
 -->
 
 <config>
-  
+
   <!--
     Controls what version of Lucene various components of Solr adhere to. Generally, you want
-    to use the latest version to get all bug fixes and improvements. It is highly recommended 
+    to use the latest version to get all bug fixes and improvements. It is highly recommended
     that you fully re-index after changing this setting as it can affect both how text is indexed
     and queried.
   -->
@@ -29,14 +29,16 @@
   <jmx />
 
   <lib dir="../lib/" regex="solr-dataimporthandler-.*\.jar" />
+  <lib dir="../lib/" regex="solr-mongo-importer-.*\.jar" />
+   <lib dir="../lib/" regex="mongo-java-driver-.*\.jar" />
 
   <updateHandler class="solr.DirectUpdateHandler2">
     <updateLog>
       <str name="dir">${solr.ss-regions.data.dir:}</str>
     </updateLog>
-    <autoCommit> 
-       <maxTime>${solr.autoCommit.maxTime:15000}</maxTime> 
-       <openSearcher>false</openSearcher> 
+    <autoCommit>
+       <maxTime>${solr.autoCommit.maxTime:15000}</maxTime>
+       <openSearcher>false</openSearcher>
      </autoCommit>
 
     <!-- softAutoCommit is like autoCommit except it causes a
@@ -45,8 +47,8 @@
          faster and more near-realtime friendly than a hard commit.
       -->
 
-     <autoSoftCommit> 
-       <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime> 
+     <autoSoftCommit>
+       <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
      </autoSoftCommit>
   </updateHandler>
 
@@ -87,7 +89,7 @@
     -->
     <enableLazyFieldLoading>false</enableLazyFieldLoading>
     <queryResultWindowSize>50</queryResultWindowSize>
-    
+
     <!-- Maximum number of documents to cache for any entry in the
          queryResultCache. -->
     <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
@@ -155,21 +157,21 @@
     </arr>
   </requestHandler>
 
-  <!-- realtime get handler, guaranteed to return the latest stored fields 
-    of any document, without the need to commit or open a new searcher. The current 
+  <!-- realtime get handler, guaranteed to return the latest stored fields
+    of any document, without the need to commit or open a new searcher. The current
     implementation relies on the updateLog feature being enabled. -->
   <requestHandler name="/get" class="solr.RealTimeGetHandler">
     <lst name="defaults">
       <str name="omitHeader">true</str>
     </lst>
   </requestHandler>
-  
-  <requestHandler name="/replication" class="solr.ReplicationHandler" startup="lazy" /> 
+
+  <requestHandler name="/replication" class="solr.ReplicationHandler" startup="lazy" />
 
   <requestDispatcher handleSelect="true" >
     <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" formdataUploadLimitInKB="2048" />
   </requestDispatcher>
-  
+
   <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
   <requestHandler name="/analysis/field" startup="lazy" class="solr.FieldAnalysisRequestHandler" />
   <requestHandler name="/update" class="solr.UpdateRequestHandler"  />
@@ -184,7 +186,7 @@
        </lst>
   </requestHandler>
   <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
-     
+
   <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
     <lst name="invariants">
       <str name="q">solrpingquery</str>
@@ -199,8 +201,8 @@
     <str name="config">db-data-config.xml</str>
   </lst>
 </requestHandler>
-   
-  <!-- config for the admin interface --> 
+
+  <!-- config for the admin interface -->
   <admin>
     <defaultQuery>*:*</defaultQuery>
   </admin>
