@@ -812,6 +812,7 @@ public interface CommonConstants
     public static final String URL_DETAILS_STATUS_COLUMN = "status";
     public static final String URL_DETAILS_ACCESS_DATES_COLUMN = "accessDates";
     public static final String URL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
+    public static final String URL_DETAILS_QUERY_PARAMS_COLUMN = "queryParamList";
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";
