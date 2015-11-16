@@ -8289,9 +8289,35 @@ function createEditProfileUrlPopup(header, body) {
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-function updateProfileUrl(){
-	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
+
+function createEditProfileUrlPopup2( body) {
+	/*$('#overlay-header').html(header);*/
+	$('#overlay-text').html(body);
+	/*$('#overlay-continue').html("Continue");
+	$('#overlay-cancel').html("Cancel");*/
+	/*$('#overlay-continue').off();
+	$('#overlay-continue').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		updateProfileUrl();
+		overlayRevert();
+	});*/
+	
+	$('#overlay-main').show();
+	disableBodyScroll();
 }
+/*function updateProfileUrl(){
+	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
+}*/
+
+function updateProfileUrl() {
+	callAjaxGET("/editprofileurl.do", function(data) {
+		createEditProfileUrlPopup2( data);
+	}, true);
+	
+}
+
+
 
 $(document).on('click', '.checkbox-iscurrent', function(e){
 	var isCurrent = $(this).attr('data-checked');

@@ -1442,6 +1442,10 @@ span.footer-ul a:hover {
 	color: #fff;
 	background-color: #A9A9A9;
 }
+.profileForm{
+	width: 45%;
+	margin-left: -4%;
+}
 
 /*changes for help page*/
 .help
@@ -1458,4 +1462,5 @@ span.footer-ul a:hover {
 	font-size: 20px;
 	color: #2a6496;
 }
+
 
