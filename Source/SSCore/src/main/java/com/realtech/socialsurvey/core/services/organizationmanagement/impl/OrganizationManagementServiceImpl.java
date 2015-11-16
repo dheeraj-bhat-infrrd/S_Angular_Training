@@ -602,6 +602,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
 
         surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
+        surveySettings.setMax_number_of_survey_reminders( CommonConstants.DEFAULT_MAX_REMINDER_COUNT );
+        
+        surveySettings.setSocial_post_reminder_interval_in_days( CommonConstants.DEFAULT_SOCIAL_POST_REMINDERMAIL_INTERVAL );
+        surveySettings.setMax_number_of_social_pos_reminders( CommonConstants.DEFAULT_MAX_SOCIAL_POST_REMINDER_COUNT );
+        
         companySettings.setSurvey_settings( surveySettings );
 
         // set seo content flag
