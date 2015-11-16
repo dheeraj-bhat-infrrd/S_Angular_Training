@@ -214,7 +214,6 @@
 </script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		
 		$('.v-icn-femail').click( function() {
 			if ($(this).hasClass('v-tbl-icn-disabled')) {
 				return;

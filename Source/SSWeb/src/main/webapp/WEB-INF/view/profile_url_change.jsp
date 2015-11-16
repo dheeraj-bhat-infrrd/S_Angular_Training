@@ -19,25 +19,28 @@
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
 <div class="overlay-loader hide"></div>
-<div class="login-main-wrapper padding-001">
+<div class="padding-001">
 	<div class="container login-container">
 		<div class="row login-row">
-			<div class="profile-url-wrapper padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
-				<div class="logo login-logo margin-bottom-25 margin-top-25"></div>
+			<div class=" padding-001 margin-top-25 margin-bottom-25 bg-fff margin-0-auto col-xs-12 col-md-10 col-sm-12 col-lg-8">
+				
 				<div class="login-txt text-center font-24 margin-bot-20">
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
 						<div>
-						<form id="profileUrlEditForm" action="/profileUrlSaveInfo.do" method="post">			
- 							<div class="url-input-container clearfix">
-								<label class="url-change-input-label"><spring:message code="label.profileurlchange.key"/></label>
-								<div>
+						<form id="profileUrlEditForm" action="/profileUrlSaveInfo.do" method="post" class="profileForm"  >			
+ 							<div class="url-input-container clearfix" style="width:438px;">
+								<label ><spring:message code="label.profileurlchange.key"/></label>
+								<div style="width: 500px;">
 									<span>${profileBaseUrl}</span>
 									<input class="profile-url-input" name="profileUrlBlock" type="text" autofocus="autofocus" value = "${profileSettings.getProfileName()}">
 									<span>/</span>
 								</div>
 							</div>
-							<div class="profile-url-sub-btn" onclick="saveProfileUrl()"><spring:message code="label.submit.key"/></div>
+							<div class="clearfix" style="width: 335px; margin-left: 60px;">
+							<div class="float-left profile-url-sub-btn" onclick="saveProfileUrl()"><spring:message code="label.submit.key"/></div>
+							<div class="float-left profile-url-sub-btn" onclick="hideActiveUserLogoutOverlay();" style="margin-left: 10px;"><spring:message code="label.cancel.key"/></div>
+							</div>
 						</form>
 						</div>
 						</div>
@@ -80,6 +83,7 @@ function validateprofileUrlEditForm() {
 		showToast();
 		return false;
 	}
+	
 	$.ajax({
 		url : "./updateprofileurl.do?searchKey=" + profileUrl,
 		type : "GET",
@@ -96,10 +100,12 @@ function validateprofileUrlEditForm() {
 			else{
 				$('#overlay-toast').text("Url updated successfully");
 				showToast();
-				window.opener.$("#prof-header-url").html(data);
+				/* window.opener.$("#prof-header-url").html(data);
 				setTimeout(function(){
 				    window.close();
-				},3000);
+				},3000); */
+				hideActiveUserLogoutOverlay();
+				 location.reload();
 				return true;
 			}
 		},
