@@ -248,7 +248,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     // "columnValue" field can contain respective values for the columnName.
 
     @Override
-    public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays )
+    public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays, boolean filterAbusive )
     {
         LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() started." );
         Date endDate = Calendar.getInstance().getTime();
@@ -258,6 +258,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
         }
+        if(filterAbusive){
+    		query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(false));
+    	}
         query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
         LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
