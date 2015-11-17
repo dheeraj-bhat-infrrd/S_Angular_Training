@@ -155,7 +155,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Override
     public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin )
     {
-        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, true, realtechAdmin );
+        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin );
     }
 
 
