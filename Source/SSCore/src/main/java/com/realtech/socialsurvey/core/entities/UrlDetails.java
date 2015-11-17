@@ -16,7 +16,7 @@ public class UrlDetails
     private String modifiedBy;
     private List<Date> accessDates;
     private int status;
-    private List<Map<String, String>> queryParamList;
+    private Map<String, String> queryParams;
 
 
     public String get_id()
@@ -127,15 +127,15 @@ public class UrlDetails
     }
 
 
-    public List<Map<String, String>> getQueryParamList()
+    public Map<String, String> getQueryParams()
     {
-        return queryParamList;
+        return queryParams;
     }
 
 
-    public void setQueryParamList( List<Map<String, String>> queryParamList )
+    public void setQueryParams( Map<String, String> queryParams )
     {
-        this.queryParamList = queryParamList;
+        this.queryParams = queryParams;
     }
 
 
@@ -143,7 +143,7 @@ public class UrlDetails
     public String toString()
     {
         return "Url Details : [ URL Type : " + urlType + ", URL : " + url + ", " + ", Status : " + status
-            + " Query Param List : " + queryParamList + "]";
+            + " Query Params : " + queryParams + "]";
 
     }
 }

@@ -61,40 +61,40 @@ public class AuthenticationServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testVerifyRegisteredUserWhenNullUserListFound() throws InvalidInputException {
         Mockito.when(userDao.findByColumn(Mockito.eq(User.class), Mockito.eq( CommonConstants.LOGIN_NAME ),Mockito.anyString())).thenReturn( null );
-        authenticationServiceImpl.verifyRegisteredUser( "" );
+        authenticationServiceImpl.verifyRegisteredUser( "test@testmail.com" );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testVerifyRegisteredUserWhenEmptyUserListFound() throws InvalidInputException {
         Mockito.when(userDao.findByColumn(Mockito.eq(User.class), Mockito.eq( CommonConstants.LOGIN_NAME ),Mockito.anyString())).thenReturn( new ArrayList<User>() );
-        authenticationServiceImpl.verifyRegisteredUser( "" );
+        authenticationServiceImpl.verifyRegisteredUser( "test@testmail.com" );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testGetUserWithLoginNameAndCompanyIdWhenNullUserListFound() throws InvalidInputException {
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
         Mockito.when( userDao.findByKeyValue( Mockito.eq( User.class ), Mockito.anyMap() ) ).thenReturn( null );
-        authenticationServiceImpl.getUserWithLoginNameAndCompanyId( "", 0 );
+        authenticationServiceImpl.getUserWithLoginNameAndCompanyId( "test", 0 );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testGetUserWithLoginNameAndCompanyIdWhenEmptyUserListFound() throws InvalidInputException {
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
         Mockito.when( userDao.findByKeyValue( Mockito.eq( User.class ), Mockito.anyMap() ) ).thenReturn( new ArrayList<User>() );
-        authenticationServiceImpl.getUserWithLoginNameAndCompanyId( "", 0 );
+        authenticationServiceImpl.getUserWithLoginNameAndCompanyId( "test", 0 );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testGetCompanyAdminProfileForUserWhenNullUserProfileListFound() throws InvalidInputException {
         Mockito.when( userManagementService.getProfilesMasterById( Mockito.anyInt() ) ).thenReturn( new ProfilesMaster() );
         Mockito.when( userProfileDao.findByKeyValue( Mockito.eq( UserProfile.class ), Mockito.anyMap() ) ).thenReturn( null );
-        authenticationServiceImpl.getUserWithLoginNameAndCompanyId( "", 0 );
+        authenticationServiceImpl.getUserWithLoginNameAndCompanyId( "test", 0 );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testGetCompanyAdminProfileForUserWhenEmptyUserProfileListFound() throws InvalidInputException {
         Mockito.when( userManagementService.getProfilesMasterById( Mockito.anyInt() ) ).thenReturn( new ProfilesMaster() );
         Mockito.when( userProfileDao.findByKeyValue( Mockito.eq( UserProfile.class ), Mockito.anyMap() ) ).thenReturn( null );
-        authenticationServiceImpl.getUserWithLoginNameAndCompanyId( "", 0 );
+        authenticationServiceImpl.getUserWithLoginNameAndCompanyId( "test", 0 );
     }
 }

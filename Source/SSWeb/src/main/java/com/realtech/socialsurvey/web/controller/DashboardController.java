@@ -996,8 +996,9 @@ public class DashboardController
             String custFirstName = survey.getCustomerFirstName();
             String custLastName = survey.getCustomerLastName();
             if ( survey != null ) {
-                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+//                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+//                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+                  surveyLink =  surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
             }
 
             try {
@@ -1137,8 +1138,9 @@ public class DashboardController
 
                     String surveyLink = "";
                     if ( survey != null ) {
-                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+//                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+//                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+                        surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
                     }
 
                     AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
