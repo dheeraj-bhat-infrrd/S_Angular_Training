@@ -1547,7 +1547,11 @@ public class EmailServicesImpl implements EmailServices
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                         survey.getCustomerLastName() ) );
             LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
-            surveyLink = urlService.shortenUrl( surveyLink );
+            try {
+                surveyLink = urlService.shortenUrl( surveyLink );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
+            }
             LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
