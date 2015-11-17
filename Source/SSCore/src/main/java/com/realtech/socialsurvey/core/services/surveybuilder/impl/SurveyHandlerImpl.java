@@ -198,7 +198,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setCreatedOn( new Date( System.currentTimeMillis() ) );
         surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
         surveyDetails.setCustRelationWithAgent( custRelationWithAgent );
-        surveyDetails.setUrl( getSurveyUrl( agentId, customerEmail, baseUrl ) );
+
+        String surveyUrl = ( baseUrl.contains( "\\?q=" ) ) ? baseUrl : getSurveyUrl( agentId, customerEmail, baseUrl );
+        surveyDetails.setUrl( surveyUrl );
         surveyDetails.setEditable( true );
         surveyDetails.setSource( source );
 

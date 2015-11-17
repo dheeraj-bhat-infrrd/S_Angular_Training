@@ -2,15 +2,14 @@ package com.realtech.socialsurvey.core.services.generator.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UrlDetailsDao;
 import com.realtech.socialsurvey.core.entities.UrlDetails;
@@ -39,8 +38,13 @@ public class UrlServiceImpl implements UrlService
 
 
     @Override
-    public String shortenUrl( String url )
+    public String shortenUrl( String url ) throws InvalidInputException
     {
+        if ( url == null || url.isEmpty() ) {
+            LOG.error( "URL passed in argument of shortenUrl() is null or empty" );
+            throw new InvalidInputException( "URL passed in argument of shortenUrl() is null or empty" );
+        }
+
         Date createdDate = new Date();
         String urlDetailsId = null;
         UrlDetails urlDetails = new UrlDetails();
@@ -55,7 +59,7 @@ public class UrlServiceImpl implements UrlService
             urlDetails.setCreatedOn( new Date() );
             urlDetails.setStatus( CommonConstants.STATUS_NOTACCESSED );
             if ( url.contains( "q=" ) )
-                urlDetails.setQueryParamList( getQueryParamsFromUrl( url ) );
+                urlDetails.setQueryParams( getQueryParamsFromUrl( url ) );
 
             LOG.info( "Inserting Url Details into mongo : " + urlDetails );
             urlDetailsId = urlDetailsDao.insertUrlDetails( urlDetails );
@@ -74,8 +78,8 @@ public class UrlServiceImpl implements UrlService
                 existingUrlDetails.setModifiedOn( modifiedDate );
             }
 
-            if ( url.contains( "q=" ) && existingUrlDetails.getQueryParamList() == null ) {
-                existingUrlDetails.setQueryParamList( getQueryParamsFromUrl( url ) );
+            if ( url.contains( "q=" ) && existingUrlDetails.getQueryParams() == null ) {
+                existingUrlDetails.setQueryParams( getQueryParamsFromUrl( url ) );
                 existingUrlDetails.setModifiedOn( modifiedDate );
             }
             LOG.info( "Updating Url Details : " + existingUrlDetails );
@@ -91,8 +95,13 @@ public class UrlServiceImpl implements UrlService
 
 
     @Override
-    public String retrieveCompleteUrlForID( String encryptedIDStr )
+    public String retrieveCompleteUrlForID( String encryptedIDStr ) throws InvalidInputException
     {
+        if ( encryptedIDStr == null || encryptedIDStr.isEmpty() ) {
+            LOG.error( "Encrypted ID passed in argument of retrieveCompleteUrlForID() is null or empty" );
+            throw new InvalidInputException( "Encrypted ID passed in argument of retrieveCompleteUrlForID() is null or empty" );
+        }
+
         LOG.info( "Decoding the encrypted ID" );
         String idStr = encryptionHelper.decodeBase64( encryptedIDStr );
         LOG.info( "Decoded encrypted ID to ID : " + idStr );
@@ -146,19 +155,18 @@ public class UrlServiceImpl implements UrlService
     }
 
 
-    private List<Map<String, String>> getQueryParamsFromUrl( String url )
+    private Map<String, String> getQueryParamsFromUrl( String url )
     {
         String urlParts[] = url.split( "\\?q=" );
-        List<Map<String, String>> queryParamList = new ArrayList<Map<String, String>>();
+        Map<String, String> queryParams = new HashMap<String, String>();
         try {
             if ( urlParts.length > 1 ) {
                 String queryParamParts[] = urlParts[1].split( "&q=" );
                 for ( int i = 0; i < queryParamParts.length; i++ ) {
-                    Map<String, String> queryParams = urlGenerator.decryptParameters( queryParamParts[i] );
-                    queryParamList.add( queryParams );
+                    queryParams.putAll( urlGenerator.decryptParameters( queryParamParts[i] ) );
                 }
             }
-            return queryParamList;
+            return queryParams;
         } catch ( Exception e ) {
             LOG.error( "Unable to decrypt params for the url : " + url + ", Reason : ", e );
             return null;
