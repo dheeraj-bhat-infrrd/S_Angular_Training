@@ -817,7 +817,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
             user.setReviewCount( reviewCount );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
-                CommonConstants.NO_LIMIT, true, false ) );
+                CommonConstants.NO_LIMIT, false, false ) );
             users.add( user );
         }
         LOG.info( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );
