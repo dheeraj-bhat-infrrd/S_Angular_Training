@@ -2153,6 +2153,7 @@ function validateRegionForm() {
 function resetInputFields(elementId) {
 	document.getElementById(elementId).reset();
 	$('#region-country').val(defaultCountry);
+	$('#region-country-code').val(defaultCountryCode);
 	//$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
