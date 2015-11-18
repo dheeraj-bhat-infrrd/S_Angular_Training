@@ -46,6 +46,9 @@
 		    <td class="v-tbl-role"></td>
 		    <td class="v-tbl-btns">
 		        <div class="clearfix v-tbl-icn-wraper">
+		         <div class="float-left v-tbl-top-spacer"></div>
+		          <div class="float-left v-tbl-top-spacer"></div>
+		           <div class="float-left v-tbl-top-spacer"></div>
 		            <div class="float-left v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}"></div>
 		            <div class="float-left v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}"></div>
 		        </div>
