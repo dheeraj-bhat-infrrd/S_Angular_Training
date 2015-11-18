@@ -97,7 +97,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         startTime.set(Calendar.SECOND, 0);
         startTime.set(Calendar.MILLISECOND, 0);
         Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
-    	long completedSurveyCount = getCompletedSurveyCount(columnName, columnValue, startDate, endDate, false);
+    	long completedSurveyCount = getCompletedSurveyCount(columnName, columnValue, startDate, endDate, true);
     	// TODO: remove hard coding
         long companyId = -1;
         long agentId = -1;
@@ -141,7 +141,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Override
     public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays )
     {
-        return surveyDetailsDao.getClickedSurveyCount( columnName, columnValue, numberOfDays );
+        return surveyDetailsDao.getClickedSurveyCount( columnName, columnValue, numberOfDays, true );
     }
 
 
@@ -155,7 +155,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Override
     public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin )
     {
-        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, true, realtechAdmin );
+        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin );
     }
 
 

@@ -208,6 +208,7 @@ public interface CommonConstants
     public static final String LOGO_THUMBNAIL_COLUMN = "logoThumbnail";
     public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN ="isProfileImageProcessed";
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN ="isLogoImageProcessed";
+    public static final String IS_UNMARKED_ABUSIVE_COLUMN ="isUnmarkedAbusive";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -357,6 +358,9 @@ public interface CommonConstants
     public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
     public static final float DEFAULT_COMPLAINT_RES_SCORE = 2.5f;
     public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
+    public static final int DEFAULT_MAX_REMINDER_COUNT = 1;
+    public static final int DEFAULT_SOCIAL_POST_REMINDERMAIL_INTERVAL = 1;
+    public static final int DEFAULT_MAX_SOCIAL_POST_REMINDER_COUNT = 1;
     public static final String USER_SELECTION_TYPE_SINGLE = "single";
     public static final String USER_SELECTION_TYPE_MULTIPLE = "multiple";
     public static final String REVIEWS_SORT_CRITERIA_DATE = "date";
@@ -808,7 +812,12 @@ public interface CommonConstants
     public static final String URL_DETAILS_STATUS_COLUMN = "status";
     public static final String URL_DETAILS_ACCESS_DATES_COLUMN = "accessDates";
     public static final String URL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
+    public static final String URL_DETAILS_QUERY_PARAMS_COLUMN = "queryParams";
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";
+    
+    //mark abusive by application constant
+    public static final String REPORT_ABUSE_BY_APPLICSTION_NAME = "Application";
+    public static final String REPORT_ABUSE_BY_APPLICSTION_EMAIL = "Reported By Application";
 }

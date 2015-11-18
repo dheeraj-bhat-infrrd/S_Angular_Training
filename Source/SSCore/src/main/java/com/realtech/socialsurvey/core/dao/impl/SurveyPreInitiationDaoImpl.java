@@ -199,10 +199,11 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 			queryBuilder.append(" COMPANY_ID = :companyId");
 			whereFlag = true;
 		}
+		// Change the incomplete count for status 1 and 2 - Important! Needs to be modified later to accomodate status list in input
 		if(whereFlag){
-			queryBuilder.append(" AND STATUS = :status");
+			queryBuilder.append(" AND STATUS IN (1,2)");
 		}else{
-			queryBuilder.append(" STATUS = :status");
+			queryBuilder.append(" STATUS IN (1,2)");
 			whereFlag = true;
 		}
 		if(startDate != null){
@@ -241,7 +242,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		if(companyId > 0l){
 			query.setParameter("companyId", companyId);
 		}
-		query.setParameter("status", status);
+		//query.setParameter("status", status);
 		if(startDate != null){
 			query.setParameter("startDate", startDate);
 		}
@@ -282,10 +283,11 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 			queryBuilder.append(" COMPANY_ID = :companyId");
 			whereFlag = true;
 		}
+		// Change the incomplete count for status 1 and 2 - Important! Needs to be modified later to accomodate status list in input
 		if(whereFlag){
-			queryBuilder.append(" AND STATUS = :status");
+			queryBuilder.append(" AND STATUS IN (1,2)");
 		}else{
-			queryBuilder.append(" STATUS = :status");
+			queryBuilder.append(" STATUS IN (1,2)");
 			whereFlag = true;
 		}
 		if(startDate != null){
@@ -331,7 +333,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		if(companyId > 0l){
 			query.setParameter("companyId", companyId);
 		}
-		query.setParameter("status", status);
+		//query.setParameter("status", status);
 		if(startDate != null){
 			query.setParameter("startDate", startDate);
 		}
