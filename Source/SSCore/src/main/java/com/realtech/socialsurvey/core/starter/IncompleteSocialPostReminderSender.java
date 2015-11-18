@@ -229,11 +229,13 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         // Enabling Google+ and Yelp only if agent has configured it.
         if ( agentSettings != null ) {
             settings.add( agentSettings );
-            if ( agentSettings.getSocialMediaTokens().getGoogleToken() != null ) {
-                socialSitesWithSettings.add( "google" );
-            }
-            if ( agentSettings.getSocialMediaTokens().getYelpToken() != null ) {
-                socialSitesWithSettings.add( "yelp" );
+            if ( agentSettings.getSocialMediaTokens() != null ) {
+                if ( agentSettings.getSocialMediaTokens().getGoogleToken() != null ) {
+                    socialSitesWithSettings.add( "google" );
+                }
+                if ( agentSettings.getSocialMediaTokens().getYelpToken() != null ) {
+                    socialSitesWithSettings.add( "yelp" );
+                }
             }
         }
 

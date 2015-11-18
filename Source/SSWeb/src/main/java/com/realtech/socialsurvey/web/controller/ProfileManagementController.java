@@ -4659,7 +4659,7 @@ public class ProfileManagementController
     {
         LOG.info( "Method fetchAverageRating() called from ProfileManagementController" );
 
-        boolean aggregateAbusive = true;
+        boolean aggregateAbusive = false;
         double averageRating = 0l;
         try {
             String entityType = (String) request.getSession( false ).getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );

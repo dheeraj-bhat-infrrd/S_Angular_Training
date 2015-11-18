@@ -198,7 +198,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setCreatedOn( new Date( System.currentTimeMillis() ) );
         surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
         surveyDetails.setCustRelationWithAgent( custRelationWithAgent );
-        surveyDetails.setUrl( getSurveyUrl( agentId, customerEmail, baseUrl ) );
+
+        String surveyUrl = ( baseUrl.contains( "\\?q=" ) ) ? baseUrl : getSurveyUrl( agentId, customerEmail, baseUrl );
+        surveyDetails.setUrl( surveyUrl );
         surveyDetails.setEditable( true );
         surveyDetails.setSource( source );
 
@@ -488,20 +490,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( organizationUnitSettings != null ) {
             SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
-                if ( !surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0 ) {
-                    reminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
-                    maxReminders = surveySettings.getMax_number_of_survey_reminders();
+                if ( !surveySettings.getIsSocialPostReminderDisabled() && surveySettings.getSocial_post_reminder_interval_in_days() > 0 ) {
+                    reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
+                    maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
                 }
             }
         }
 
         if ( maxReminders == 0 ) {
             LOG.debug( "No Reminder count found for company " + companyId + " hence setting default value" );
-            maxReminders = maxSurveyReminders;
+            maxReminders = maxSocialpostReminders;
         }
         if ( reminderInterval == 0 ) {
             LOG.debug( "No Reminder interval found for company " + companyId + " hence setting default value " );
-            reminderInterval = surveyReminderInterval;
+            reminderInterval = socialPostReminderInterval;
         }
 
         map.put( CommonConstants.SURVEY_REMINDER_COUNT, maxReminders );

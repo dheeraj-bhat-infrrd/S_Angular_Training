@@ -8,9 +8,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
@@ -243,6 +247,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, false );
+        update.set( CommonConstants.IS_UNMARKED_ABUSIVE_COLUMN, true );
         update.set( CommonConstants.CREATED_ON, new Date() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
@@ -277,7 +282,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     // "columnValue" field can contain respective values for the columnName.
 
     @Override
-    public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays )
+    public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays, boolean filterAbusive )
     {
         LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() started." );
         Date endDate = Calendar.getInstance().getTime();
@@ -287,6 +292,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
         }
+        if(filterAbusive){
+    		query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(false));
+    	}
         query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
         LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
@@ -1597,24 +1605,35 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         List<AbuseReporterDetails> absReporterDetails = mongoTemplate.find( query, AbuseReporterDetails.class,
             ABS_REPORTER_DETAILS_COLLECTION );
 
+        //create AbuseReporterDetails object for the surveys reported abusive by application
+        AbuseReporterDetails absReporterDetailForApp = new AbuseReporterDetails();
+        Set<ReporterDetail> abuseReportersForApp = new HashSet<ReporterDetail>();
+        abuseReportersForApp.add( new ReporterDetail( CommonConstants.REPORT_ABUSE_BY_APPLICSTION_NAME , CommonConstants.REPORT_ABUSE_BY_APPLICSTION_EMAIL ) );
+        absReporterDetailForApp.setAbuseReporters( abuseReportersForApp );
+        
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = new ArrayList<AbusiveSurveyReportWrapper>();
         for ( SurveyDetails survey : surveys ) {
-            if ( absReporterDetails != null && absReporterDetails.size() > 0 ) {
-                boolean reporterDetailsFound = false;
-                for ( AbuseReporterDetails absReporterDetail : absReporterDetails ) {
-                    if ( absReporterDetail.getSurveyId().equals( survey.get_id() ) ) {
-                        abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetail ) );
-                        reporterDetailsFound = true;
-                        break;
+            if(survey.isAbuseRepByUser()){
+                if ( absReporterDetails != null && absReporterDetails.size() > 0 ) {
+                    boolean reporterDetailsFound = false;
+                    for ( AbuseReporterDetails absReporterDetail : absReporterDetails ) {
+                        if ( absReporterDetail.getSurveyId().equals( survey.get_id() ) ) {
+                            abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetail ) );
+                            reporterDetailsFound = true;
+                            break;
+                        }
                     }
-                }
-                if ( !reporterDetailsFound )
+                    if ( !reporterDetailsFound )
+                        // to handle existing surveys where reporter info not saved
+                        abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
+                } else {
                     // to handle existing surveys where reporter info not saved
                     abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
-            } else {
-                // to handle existing surveys where reporter info not saved
-                abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
-            }
+                }
+            }else{
+                
+                abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetailForApp ) );
+            }            
         }
 
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive finished." );

@@ -2,17 +2,19 @@ package com.realtech.socialsurvey.core.services.generator.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UrlDetailsDao;
 import com.realtech.socialsurvey.core.entities.UrlDetails;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
@@ -31,10 +33,18 @@ public class UrlServiceImpl implements UrlService
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
+    @Autowired
+    private URLGenerator urlGenerator;
+
 
     @Override
-    public String shortenUrl( String url )
+    public String shortenUrl( String url ) throws InvalidInputException
     {
+        if ( url == null || url.isEmpty() ) {
+            LOG.error( "URL passed in argument of shortenUrl() is null or empty" );
+            throw new InvalidInputException( "URL passed in argument of shortenUrl() is null or empty" );
+        }
+
         Date createdDate = new Date();
         String urlDetailsId = null;
         UrlDetails urlDetails = new UrlDetails();
@@ -48,6 +58,8 @@ public class UrlServiceImpl implements UrlService
             urlDetails.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
             urlDetails.setCreatedOn( new Date() );
             urlDetails.setStatus( CommonConstants.STATUS_NOTACCESSED );
+            if ( url.contains( "q=" ) )
+                urlDetails.setQueryParams( getQueryParamsFromUrl( url ) );
 
             LOG.info( "Inserting Url Details into mongo : " + urlDetails );
             urlDetailsId = urlDetailsDao.insertUrlDetails( urlDetails );
@@ -57,16 +69,19 @@ public class UrlServiceImpl implements UrlService
             urlDetailsId = existingUrlDetails.get_id();
 
             Date modifiedDate = new Date();
-            List<Date> accessDates = new ArrayList<Date>();
-            if ( existingUrlDetails.getAccessDates() != null )
-                accessDates = existingUrlDetails.getAccessDates();
-            accessDates.add( modifiedDate );
-            existingUrlDetails.setAccessDates( accessDates );
-            if ( existingUrlDetails.getStatus() == CommonConstants.STATUS_NOTACCESSED ) {
-                existingUrlDetails.setStatus( CommonConstants.STATUS_ACCESSED );
+            if ( existingUrlDetails.getStatus() == CommonConstants.STATUS_ACCESSED ) {
+                List<Date> accessDates = new ArrayList<Date>();
+                if ( existingUrlDetails.getAccessDates() != null )
+                    accessDates = existingUrlDetails.getAccessDates();
+                accessDates.add( modifiedDate );
+                existingUrlDetails.setAccessDates( accessDates );
                 existingUrlDetails.setModifiedOn( modifiedDate );
             }
 
+            if ( url.contains( "q=" ) && existingUrlDetails.getQueryParams() == null ) {
+                existingUrlDetails.setQueryParams( getQueryParamsFromUrl( url ) );
+                existingUrlDetails.setModifiedOn( modifiedDate );
+            }
             LOG.info( "Updating Url Details : " + existingUrlDetails );
             urlDetailsDao.updateUrlDetails( urlDetailsId, existingUrlDetails );
             LOG.info( "Updated Url Details : " + existingUrlDetails );
@@ -80,8 +95,13 @@ public class UrlServiceImpl implements UrlService
 
 
     @Override
-    public String retrieveCompleteUrlForID( String encryptedIDStr )
+    public String retrieveCompleteUrlForID( String encryptedIDStr ) throws InvalidInputException
     {
+        if ( encryptedIDStr == null || encryptedIDStr.isEmpty() ) {
+            LOG.error( "Encrypted ID passed in argument of retrieveCompleteUrlForID() is null or empty" );
+            throw new InvalidInputException( "Encrypted ID passed in argument of retrieveCompleteUrlForID() is null or empty" );
+        }
+
         LOG.info( "Decoding the encrypted ID" );
         String idStr = encryptionHelper.decodeBase64( encryptedIDStr );
         LOG.info( "Decoded encrypted ID to ID : " + idStr );
@@ -134,4 +154,22 @@ public class UrlServiceImpl implements UrlService
         }
     }
 
+
+    private Map<String, String> getQueryParamsFromUrl( String url )
+    {
+        String urlParts[] = url.split( "\\?q=" );
+        Map<String, String> queryParams = new HashMap<String, String>();
+        try {
+            if ( urlParts.length > 1 ) {
+                String queryParamParts[] = urlParts[1].split( "&q=" );
+                for ( int i = 0; i < queryParamParts.length; i++ ) {
+                    queryParams.putAll( urlGenerator.decryptParameters( queryParamParts[i] ) );
+                }
+            }
+            return queryParams;
+        } catch ( Exception e ) {
+            LOG.error( "Unable to decrypt params for the url : " + url + ", Reason : ", e );
+            return null;
+        }
+    }
 }

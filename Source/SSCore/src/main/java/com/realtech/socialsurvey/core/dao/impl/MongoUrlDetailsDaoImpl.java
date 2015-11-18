@@ -68,7 +68,10 @@ public class MongoUrlDetailsDaoImpl implements UrlDetailsDao
         Update update = new Update();
         update.set( CommonConstants.URL_DETAILS_STATUS_COLUMN, urlDetails.getStatus() );
         update.set( CommonConstants.URL_DETAILS_MODIFIED_ON_COLUMN, urlDetails.getModifiedOn() );
-        update.set( CommonConstants.URL_DETAILS_ACCESS_DATES_COLUMN, urlDetails.getAccessDates() );
+        if ( urlDetails.getAccessDates() != null )
+            update.set( CommonConstants.URL_DETAILS_ACCESS_DATES_COLUMN, urlDetails.getAccessDates() );
+        if ( urlDetails.getQueryParams() != null )
+            update.set( CommonConstants.URL_DETAILS_QUERY_PARAMS_COLUMN, urlDetails.getQueryParams() );
 
         mongoTemplate.updateFirst( query, update, UrlDetails.class, URL_DETAILS_COLLECTION );
         LOG.info( "Method updateUrlDetails() to update url details finished." );
