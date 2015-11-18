@@ -2152,6 +2152,7 @@ function validateRegionForm() {
  */
 function resetInputFields(elementId) {
 	document.getElementById(elementId).reset();
+	$('#region-country').val(defaultCountry);
 	//$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
@@ -9727,4 +9728,58 @@ function attachAutocompleteUserListDropdown(){
 		$('#selected-userid-hidden').val("");
 	});
 	
+}
+
+//url change popup
+function saveProfileUrl() {
+	if(!validateprofileUrlEditForm()){
+		return false;
+	}
+
+}
+
+
+
+function validateprofileUrlEditForm() {
+	var profileUrl = $('input[name="profileUrlBlock"]').val();
+	if(profileUrl == undefined ||  profileUrl == "") {
+		$('#overlay-toast').text("Please enter a valid profile name");
+		showToast();
+		return false;
+	}
+	
+	$.ajax({
+		url : "./updateprofileurl.do?searchKey=" + profileUrl,
+		type : "GET",
+		cache : false,
+		dataType : "html",
+		async : true,
+		success : function(data) {
+			var profileExists = data;
+			if(profileExists == "true"){
+				$('#overlay-toast').text("The entered profile name already exists");
+				showToast();
+				return false;
+			}
+			else{
+				$('#overlay-toast').text("Url updated successfully");
+				showToast();
+				/* window.opener.$("#prof-header-url").html(data);
+				setTimeout(function(){
+				    window.close();
+				},3000); */
+				hideActiveUserLogoutOverlay();
+				console.log(data);
+				$("#prof-header-url").html(data);
+				return true;
+			}
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			//redirectErrorpage();
+		}
+	});
 }

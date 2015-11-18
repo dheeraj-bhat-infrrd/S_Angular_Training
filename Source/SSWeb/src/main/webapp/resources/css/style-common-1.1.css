@@ -1446,6 +1446,14 @@ span.footer-ul a:hover {
 	width: 45%;
 	margin-left: -4%;
 }
+.popupUrl{
+	width:438px;
+}
+.urlPopupButton{
+	width: 335px;
+	margin-left: 60px;
+}
+
 
 /*changes for help page*/
 .help
