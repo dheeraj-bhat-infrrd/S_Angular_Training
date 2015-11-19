@@ -681,8 +681,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Logo passed can not be null or empty" );
         }
         LOG.info( "Updating logo" );
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
-            logo, companySettings, collection );
+        /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
+            logo, companySettings, collection );*/
+        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
+            CommonConstants.IMAGE_TYPE_LOGO, false, false );
         LOG.info( "Logo updated successfully" );
     }
 
@@ -696,8 +698,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "image passed can not be null or empty" );
         }
         LOG.info( "Updating image" );
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image, companySettings, collection );
+        /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image, companySettings, collection );*/
+        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
+            CommonConstants.IMAGE_TYPE_PROFILE, false, false );
         LOG.info( "Image updated successfully" );
     }
 
