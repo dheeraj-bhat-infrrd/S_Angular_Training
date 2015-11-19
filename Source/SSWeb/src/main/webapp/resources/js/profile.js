@@ -243,7 +243,7 @@ function fetchCompanyProfile() {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
 	fetchReviewsCountBasedOnProfileLevel('COMPANY',result.iden,paintHiddenReviewsCount,0,minScore, true);
-	fetchReviewsBasedOnProfileLevel('COMPANY', result.iden,startIndex,numOfRows,minScore);	
+	fetchReviewsBasedOnProfileLevel('COMPANY', result.iden,startIndex,numOfRows,minScore , true);	
 	fetchZillowReviewsBasedOnProfile('COMPANY',result.iden);
 }
 
@@ -918,10 +918,11 @@ $(document).scroll(function(){
 		if(startIndex <= totalReviews) {
 			startIndex = startIndex + numOfRows;
 			var profileLevel = $("#profile-fetch-info").attr("profile-level");
+			showOverlay();
 			if(showAllReviews)
-				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0);
+				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true);
 			else
-				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore);
+				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore , true);
 		}
 	}
 });
@@ -949,7 +950,7 @@ function fetchZillowReviewsCallBack(data) {
 }
 
 function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
-		startIndex, numRows, minScore) {
+		startIndex, numRows, minScore , isAsync) {
 	if (currentProfileIden == undefined || currentProfileIden == "") {
 		return;
 	}
@@ -968,7 +969,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 	if (minScore != undefined) {
 		url = url + "&minScore=" + minScore;
 	}
-	callAjaxGET(url, fetchReviewsCallBack, true);
+	callAjaxGET(url, fetchReviewsCallBack, isAsync);
 }
 
 function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
@@ -1000,6 +1001,7 @@ function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
 }
 
 function fetchReviewsCallBack(data) {
+	isFetchingReviews = false;
 	var responseJson = $.parseJSON(data);
 	if (responseJson != undefined) {
 		var result = $.parseJSON(responseJson.entity);
@@ -1041,7 +1043,7 @@ function paintHiddenReviewsCount(data) {
 				$(window).scrollTop($('#reviews-container').offset().top);
 				showAllReviews = true;
 				var profileLevel = $("#profile-fetch-info").attr("profile-level");
-				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0);
+				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true);
 			});
 		}
 	}
@@ -1056,7 +1058,7 @@ $(document).on('click', '#sort-by-feature',function(e){
 	showAllReviews = false;
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	reviewsSortBy = 'feature';
-	fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore);
+	fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore , true);
 });
 
 $(document).on('click', '#sort-by-date',function(e){
@@ -1068,7 +1070,7 @@ $(document).on('click', '#sort-by-date',function(e){
 	showAllReviews = true;
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	reviewsSortBy = 'date';
-	fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0);
+	fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true);
 });
 
 function fetchRegionProfile() {
@@ -1081,7 +1083,7 @@ function fetchRegionProfile() {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
 	startIndex = 0;
-	fetchReviewsBasedOnProfileLevel('REGION', result.iden,startIndex,numOfRows,minScore);
+	fetchReviewsBasedOnProfileLevel('REGION', result.iden,startIndex,numOfRows,minScore , true);
 	fetchReviewsCountBasedOnProfileLevel('REGION',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	fetchZillowReviewsBasedOnProfile('REGION',result.iden);
 }
@@ -1232,7 +1234,7 @@ function fetchAgentProfile(){
 		minScore = result.survey_settings.show_survey_above_score;
 	}
 	startIndex = 0;
-	fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, minScore);
+	fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, minScore , true);
 	fetchReviewsCountBasedOnProfileLevel('INDIVIDUAL',result.iden, paintHiddenReviewsCount, 0, minScore, true);
 	fetchZillowReviewsBasedOnProfile('INDIVIDUAL',result.iden);
 }
