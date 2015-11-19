@@ -98,9 +98,16 @@
 							<td class="v-tbl-mail ${admincaneditclass}"></td>
 						</c:otherwise>
 					</c:choose>
-					<td class="v-tbl-wid v-icn-wid ${admincaneditclass}"
-						title="<spring:message code="label.widget.key" />"
-						onclick="generateWidget($(this),${ userfromsearch.userId }, 'individual');"></td>
+					<c:choose>
+						<c:when test="${userfromsearch.isAgent != null && userfromsearch.isAgent}">
+							<td class="v-tbl-wid v-icn-wid ${admincaneditclass}"
+								title="<spring:message code="label.widget.key" />"
+								onclick="generateWidget($(this),${ userfromsearch.userId }, 'individual');"></td>
+						</c:when>
+						<c:otherwise>
+							<td class="v-tbl-spacer" ></td>
+						</c:otherwise>
+					</c:choose>
 					<c:choose>
 						<c:when test="${userfromsearch.status == 2}">
 							<td class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></td>
