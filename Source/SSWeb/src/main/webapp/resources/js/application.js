@@ -8291,23 +8291,39 @@ function createEditProfileUrlPopup(header, body) {
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-
 function createEditProfileUrlPopup2( body) {
-	/*$('#overlay-header').html(header);*/
+	
 	$('#overlay-text').html(body);
-	/*$('#overlay-continue').html("Continue");
-	$('#overlay-cancel').html("Cancel");*/
-	/*$('#overlay-continue').off();
+	$('#overlay-continue').html("Submit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
 	$('#overlay-continue').click(function(){
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
-		updateProfileUrl();
+		saveProfileUrl();
 		overlayRevert();
-	});*/
+	});
 	
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
+function createZillowProfileUrlPopup(body){
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Submit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		saveZillowEmailAddress();
+		overlayRevert();
+	});
+	
+	$('#overlay-main').show();
+	disableBodyScroll();
+}
+
+
 /*function updateProfileUrl(){
 	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
 }*/
