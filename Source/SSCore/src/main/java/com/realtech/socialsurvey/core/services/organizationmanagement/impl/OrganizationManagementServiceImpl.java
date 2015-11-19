@@ -5303,8 +5303,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException
     {
         LOG.info( "Method updateImageForOrganizationUnitSetting called" );
+        LOG.debug( "updating mongodb" );
         organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType,
             flagValue, isThumbnail );
+        LOG.debug( "updated mongodb" );
+        if ( !( isThumbnail ) && imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
+            LOG.debug( "updating solr" );
+            Map<String, Object> updateMap = new HashMap<String, Object>();
+            updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
+            updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+            try {
+                solrSearchService.editUserInSolrWithMultipleValues( iden, updateMap );
+            } catch ( SolrException e ) {
+                LOG.error( "SolrException occured while updating user in solr. Reason : ", e );
+                throw new InvalidInputException( "SolrException occured while updating user in solr. Reason : ", e );
+            }
+        }
         LOG.info( "Method updateImageForOrganizationUnitSetting finished" );
     }
 }

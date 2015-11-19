@@ -477,6 +477,7 @@ public interface CommonConstants
     public static final String POST_URL_SOLR = "postUrl";
     public static final String ID_SOLR = "id";
     public static final String LUKE_LAST_MODIFIED = "lastModified";
+    public static final String IS_PROFILE_IMAGE_SET_SOLR = "isProfileImageSet";
     /*
      * Payment detail constants
      */

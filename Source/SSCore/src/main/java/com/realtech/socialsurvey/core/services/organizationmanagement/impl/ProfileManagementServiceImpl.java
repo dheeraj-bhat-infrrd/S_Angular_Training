@@ -683,8 +683,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Updating logo" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             logo, companySettings, collection );*/
-        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
+        organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
             CommonConstants.IMAGE_TYPE_LOGO, false, false );
+        /*organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
+            CommonConstants.IMAGE_TYPE_LOGO, false, false );*/
         LOG.info( "Logo updated successfully" );
     }
 
@@ -700,7 +702,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Updating image" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image, companySettings, collection );*/
-        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
+        /*organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
+            CommonConstants.IMAGE_TYPE_PROFILE, false, false );*/
+        organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
             CommonConstants.IMAGE_TYPE_PROFILE, false, false );
         LOG.info( "Image updated successfully" );
     }
