@@ -30,6 +30,9 @@ function callAjaxGET(url, callBackFunction, isAsync) {
 		async : isAsync,
 		cache : false,
 		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+			},
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);

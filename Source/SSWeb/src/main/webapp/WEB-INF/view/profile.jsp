@@ -113,6 +113,7 @@
     <div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
+    <div class="overlay-loader hide" style="display: none;"></div>
     <div id="report-abuse-overlay" class="overlay-main hide">
     	<div class="overlay-disable-wrapper">
     		<div id="overlay-header" class="ol-header"><spring:message code="label.publicprofile.reportabuse.title.key"/></div>
