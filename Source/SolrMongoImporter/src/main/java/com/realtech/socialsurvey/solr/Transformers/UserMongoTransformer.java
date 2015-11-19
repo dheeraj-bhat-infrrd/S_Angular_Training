@@ -33,6 +33,9 @@ public class UserMongoTransformer
         if ( row.get( "profileImageUrl" ) != null ) {
             String profileImageUrl = (String) row.get( "profileImageUrl" );
             row.put( "profileImageUrl", profileImageUrl );
+            row.put( "isProfileImageSet", true );
+        } else {
+            row.put( "isProfileImageSet", false );
         }
         //contact details
         BasicDBObject contactDetailsObject = (BasicDBObject) row.get( "contact_details" );
