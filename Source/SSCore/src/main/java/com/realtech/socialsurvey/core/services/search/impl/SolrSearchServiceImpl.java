@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -586,7 +587,12 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 CommonConstants.TITLE_SOLR, CommonConstants.ABOUT_ME_SOLR, CommonConstants.PROFILE_IMAGE_URL_SOLR,
                 CommonConstants.PROFILE_URL_SOLR, CommonConstants.REVIEW_COUNT_SOLR };
             solrQuery.setFields( fields );
-            solrQuery.setSort( CommonConstants.REVIEW_COUNT_SOLR, ORDER.desc );
+            List<SortClause> sortList = new ArrayList<SolrQuery.SortClause>();
+            sortList.add( new SortClause( CommonConstants.REVIEW_COUNT_SOLR, ORDER.desc ) );
+            sortList.add( new SortClause( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, ORDER.desc ) );
+            solrQuery.setSorts( sortList );
+            //solrQuery.setSort( CommonConstants.REVIEW_COUNT_SOLR, ORDER.desc );
+            //solrQuery.setSort( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, ORDER.desc );
             String query = "";
             if ( !patternFirst.equals( "" ) && !patternLast.equals( "" ) ) {
                 query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " AND "
