@@ -4,39 +4,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 public class UserTransformer
 {
-    public Object transformRow(Map<String, Object> row){
+    public Object transformRow( Map<String, Object> row )
+    {
         System.out.println( "Entered UserTransformer" );
+        System.out.println( "Row : " + row.toString() );
         //Set isAgent, isRegionAdmin and isBranchAdmin values based profiles master ids
         String profileMasterIdStr = (String) row.get( "profiles_master_ids" );
         if ( profileMasterIdStr == null || profileMasterIdStr.isEmpty() ) {
             System.out.println( "profileMasterIdStr is empty" );
-            return row;
-        }
-        System.out.println( "profileMasterIdStr : " + profileMasterIdStr );
-        String[] pmiArray = profileMasterIdStr.split( "," );
-        int profileMasterIds[] = new int[pmiArray.length];
-        boolean isAgent = false, isBranchAdmin = false, isRegionAdmin = false;
-        for ( int i = 0; i < pmiArray.length; i++ ) {
-            profileMasterIds[i] = Integer.parseInt( pmiArray[i] );
-            System.out.println( "profileMasterIds[" + i + "] : " + profileMasterIds[i] );
-            switch ( profileMasterIds[i] ) {
-                case 2:
-                    isRegionAdmin = true;
-                    break;
-                case 3:
-                    isBranchAdmin = true;
-                    break;
-                case 4:
-                    isAgent = true;
-                    break;
+        } else {
+            System.out.println( "profileMasterIdStr : " + profileMasterIdStr );
+            String[] pmiArray = profileMasterIdStr.split( "," );
+            int profileMasterIds[] = new int[pmiArray.length];
+            boolean isAgent = false, isBranchAdmin = false, isRegionAdmin = false;
+            for ( int i = 0; i < pmiArray.length; i++ ) {
+                profileMasterIds[i] = Integer.parseInt( pmiArray[i] );
+                System.out.println( "profileMasterIds[" + i + "] : " + profileMasterIds[i] );
+                switch ( profileMasterIds[i] ) {
+                    case 2:
+                        isRegionAdmin = true;
+                        break;
+                    case 3:
+                        isBranchAdmin = true;
+                        break;
+                    case 4:
+                        isAgent = true;
+                        break;
+                }
+                row.put( "isAgent", isAgent );
+                row.put( "isBranchAdmin", isBranchAdmin );
+                row.put( "isRegionAdmin", isRegionAdmin );
             }
-            row.put( "isAgent", isAgent );
-            row.put( "isBranchAdmin", isBranchAdmin );
-            row.put( "isRegionAdmin", isRegionAdmin );
         }
-
         //Change regions and branches to an array of long
         //For regions
         String regionsStr = (String) row.get( "regions" );
@@ -48,7 +50,7 @@ public class UserTransformer
             List<Long> regions = new ArrayList<Long>();
             for ( int i = 0; i < regionsStrArray.length; i++ ) {
                 regions.add( Long.parseLong( regionsStrArray[i] ) );
-                System.out.println("regions["+i+"] = " + regions.get( i ));
+                System.out.println( "regions[" + i + "] = " + regions.get( i ) );
             }
             System.out.println( "regions : " + regions );
             row.put( "regions", regions );
@@ -64,20 +66,23 @@ public class UserTransformer
             List<Long> branches = new ArrayList<Long>();
             for ( int i = 0; i < branchesStrArray.length; i++ ) {
                 branches.add( Long.parseLong( branchesStrArray[i] ) );
-                System.out.println("branches["+i+"] = " + branches.get( i ));
+                System.out.println( "branches[" + i + "] = " + branches.get( i ) );
             }
             row.put( "branches", branches );
         }
 
         //Set Display Name
-        String firstName = (String) row.get( "firstName" );
+        String firstName = (String) row.get( "FIRST_NAME" );
         if ( firstName != null && !firstName.isEmpty() ) {
             String displayName = firstName;
-            String lastName = (String) row.get( "lastName" );
+            String lastName = (String) row.get( "LAST_NAME" );
             if ( lastName != null && !lastName.isEmpty() ) {
-                displayName += lastName;
+                displayName += " " + lastName;
             }
             row.put( "displayName", displayName );
+            System.out.println( "displayName : " + displayName );
+        } else {
+            System.out.println( "displayName is empty" );
         }
         return row;
     }
