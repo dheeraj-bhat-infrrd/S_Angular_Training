@@ -1,7 +1,10 @@
 package com.realtech.socialsurvey.version1.page;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
 
 
@@ -9,6 +12,8 @@ public class DashboardPage extends BasePage
 {
 
     public static final String DASHBOARD_PAGE_TITLE = "Dashboard";
+
+    //Dashboard elements
     public static final String POPUP_CLOSE_LOCATOR = "xpath=//*[contains(@class, 'wc-final-skip')]";
     public static final String SENDSURVEY_BUTTON_LOCATOR = "id=dsh-btn1";
     public static final String CONNECTTO_LINKEDIN_BUTTON_LOCATOR = "xpath=//div[contains(text(), 'Connect to Linkedin')]";
@@ -30,6 +35,28 @@ public class DashboardPage extends BasePage
     public static final String MANAGE_TEAM_LOCATOR = "link=Manage Team";
     public static final String CONFIGURE_SETTINGS_LOCATOR = "link=Configure";
     public static final String HELP_LOCATOR = "link=Help";
+    public static final String UPDATE_PASSWORD_LOCATOR = "id=change-password";
+    public static final String COMPLAINT_RESOLUTION_LOCATOR = "xpath=//*[contains(text(), 'Complaint Resolution') and contains(@class, 'hdr-link-item-dropdown-item')]";
+    public static final String EMAIL_SETTINGS_LOCATOR = "xpath=//*[contains(text(), 'Emails') and contains(@class, 'hdr-link-item-dropdown-item')]";
+    public static final String APP_SETTINGS_LOCATOR = "xpath=//*[contains(text(), 'Apps') and contains(@class, 'hdr-link-item-dropdown-item')]";
+    public static final String USER_HEADER_IMAGE = "id=hdr-usr-img";
+    public static final String LOGOUT_BTN_LOCATOR = "id=user-logout";
+
+    //send survey popup
+    public static final String SURVEY_POPUP_CUSTOMER_FIRST_NAME_LOCATOR = "css=#wc-review-table-inner > div:nth-child(@RowNumber) > div.float-left > input.wc-review-fname";
+    public static final String SURVEY_POPUP_CUSTOMER_LAST_NAME_LOCATOR = "css=#wc-review-table-inner > div:nth-child(@RowNumber) > div.float-left > input.wc-review-lname";
+    public static final String SURVEY_POPUP_CUSTOMER_EMAIL_LOCATOR = "css=#wc-review-table-inner > div:nth-child(@RowNumber) > div.float-left > input.wc-review-email";
+    public static final String SURVEY_POPUP_AGENT_LOCATOR = "css=#wc-review-table-inner > div:nth-child(@RowNumber) > div.float-left > input.wc-review-agentname";
+    public static final String SEND_SURVEY_BTN = "id=wc-send-survey";
+
+    //Survey dashboard
+    public static final String RESEND_SURVEY_DASHBOARD = "css=#dsh-inc-srvey > div:nth-child(@RowNumber) > div.float-right.dash-lp-rt-img.cursor-pointer";
+    public static final String RETAKESURVEY_DASHBOARD = "css=#review-details > div:nth-child(@RowNumber) > div.ppl-header-wrapper.clearfix > div.float-right.ppl-header-right > div.report-resend-icn-container.clearfix.float-right > div.restart-survey-mail-txt.report-txt";
+
+    //Success messages
+    public static final String SEND_SURVEY_SUCCESSFUL = "Survey request sent successfully!";
+    public static final String RESEND_SURVEY_REQUEST_SUCCESSFUL = "Reminder Mail sent successfully to";
+    public static final String RETAKE_SURVEY_REQUEST_SUCCESSFUL = "Mail sent to @CustomerFirstName to retake the survey for you.";
 
 
     public DashboardPage( WebDriver driver )
@@ -203,7 +230,8 @@ public class DashboardPage extends BasePage
     {
         navigateToPage( CONFIGURE_SETTINGS_LOCATOR );
     }
-    
+
+
     public HelpPage clickHelpPage()
     {
         navigateToHelpPage();
@@ -214,6 +242,180 @@ public class DashboardPage extends BasePage
 
     public void navigateToHelpPage()
     {
-        navigateToPage( HELP_LOCATOR);
+        navigateToPage( HELP_LOCATOR );
+    }
+
+
+    public HelpPage clickUpdatePasswordPage()
+    {
+        clickUserIcon();
+        navigateToUpdatePasswordPage();
+        waitForAjax();
+        return new HelpPage( driver );
+    }
+
+
+    public void navigateToUpdatePasswordPage()
+    {
+        navigateToPage( UPDATE_PASSWORD_LOCATOR );
+    }
+
+
+    public HomePage clickLogoutButton()
+    {
+        clickUserIcon();
+        WebElement logoutBtn = getElement( LOGOUT_BTN_LOCATOR );
+        logoutBtn.click();
+        waitForAjax();
+        return new HomePage( driver );
+    }
+
+
+    public ComplaintResolutionPage clickComplaintResolutionPage()
+    {
+        Actions actions = new Actions( driver );
+        WebElement settingsIcn = getElement( CONFIGURE_SETTINGS_LOCATOR );
+        actions.moveToElement( settingsIcn );
+
+        WebElement compaintResolutionBtn = getElement( COMPLAINT_RESOLUTION_LOCATOR );
+        actions.moveToElement( compaintResolutionBtn );
+        actions.click().build().perform();
+
+        waitForAjax();
+        return new ComplaintResolutionPage( driver );
+    }
+
+
+    public EmailSettingsPage clickEmailSettingsPage()
+    {
+        Actions actions = new Actions( driver );
+        WebElement settingsIcn = getElement( CONFIGURE_SETTINGS_LOCATOR );
+        actions.moveToElement( settingsIcn );
+
+        WebElement emailSettingsBtn = getElement( EMAIL_SETTINGS_LOCATOR );
+        actions.moveToElement( emailSettingsBtn );
+        actions.click().build().perform();
+
+        waitForAjax();
+        return new EmailSettingsPage( driver );
+    }
+
+
+    public AppsPage clickAppSettingsPage()
+    {
+        Actions actions = new Actions( driver );
+        WebElement settingsIcn = getElement( CONFIGURE_SETTINGS_LOCATOR );
+        actions.moveToElement( settingsIcn );
+
+        WebElement appSettingsBtn = getElement( APP_SETTINGS_LOCATOR );
+        actions.moveToElement( appSettingsBtn );
+        actions.click().build().perform();
+
+        waitForAjax();
+        return new AppsPage( driver );
+    }
+
+
+    public void clickUserIcon()
+    {
+        WebElement userPicIcn = getElement( USER_HEADER_IMAGE );
+        userPicIcn.click();
+    }
+
+
+    /**
+     * Method to fill survey details on the survey popup
+     * @param rowNumber
+     * @param customerFirstName
+     * @param customerLastName
+     * @param customerEmailId
+     * @param agentName - null if agent sending survey for him/her self
+     */
+    public void fillSurveyDetails( Integer rowNumber, String customerFirstName, String customerLastName,
+        String customerEmailId, String agentName )
+    {
+        String rowStr = Integer.toString( rowNumber + 1 );
+
+        //Check if agent name is passed, if passed select the first agent matching with the agent name
+        if ( agentName != null ) {
+            WebElement agentNameInput = getElement( SURVEY_POPUP_AGENT_LOCATOR.replace( "@RowNumber", rowStr ) );
+            agentNameInput.clear();
+            agentNameInput.sendKeys( agentName );
+
+            //wait to load user list
+            waitForAjax();
+
+            //select the first element
+            agentNameInput.sendKeys( Keys.ARROW_DOWN );
+            agentNameInput.sendKeys( Keys.TAB );
+        }
+
+        WebElement custFirstNameInput = getElement( SURVEY_POPUP_CUSTOMER_FIRST_NAME_LOCATOR.replace( "@RowNumber", rowStr ) );
+        custFirstNameInput.clear();
+        custFirstNameInput.sendKeys( customerFirstName );
+
+        WebElement custLastNameInput = getElement( SURVEY_POPUP_CUSTOMER_LAST_NAME_LOCATOR.replace( "@RowNumber", rowStr ) );
+        custLastNameInput.clear();
+        custLastNameInput.sendKeys( customerLastName );
+
+        WebElement custEmailIdInput = getElement( SURVEY_POPUP_CUSTOMER_EMAIL_LOCATOR.replace( "@RowNumber", rowStr ) );
+        custEmailIdInput.clear();
+        custEmailIdInput.sendKeys( customerEmailId );
+    }
+
+
+    public void clickSendSurveyButton() throws Exception
+    {
+        WebElement sendSurveyBtn = getElement( SEND_SURVEY_BTN );
+        sendSurveyBtn.click();
+
+        //wait for the request to complete
+        waitForAjax();
+
+        if ( !getToastMessage().equalsIgnoreCase( SEND_SURVEY_SUCCESSFUL ) ) {
+            throw new Exception( "Survey request fail. Reason : " + getToastMessage() );
+        }
+    }
+
+
+    /**
+     * Method to resend survey request from dashboard
+     * 
+     * @param rowNumber
+     * @throws Exception 
+     */
+    public void clickResendSurveyFromDashbaord( int rowNumber ) throws Exception
+    {
+        WebElement resendBtn = getElement( RESEND_SURVEY_DASHBOARD.replace( "@RowNumber", Integer.toString( rowNumber ) ) );
+        resendBtn.click();
+
+        //wait for response
+        waitForAjax();
+
+        String customerName = resendBtn.getAttribute( "data-custname" );
+
+        if ( !getToastMessage().equalsIgnoreCase( RESEND_SURVEY_REQUEST_SUCCESSFUL + " " + customerName ) ) {
+            throw new Exception( "Resend survey request failed. Reason : " + getToastMessage() );
+        }
+    }
+
+
+    public void clickRetakeSurveyFromDashbaord( int rowNumber ) throws Exception
+    {
+        WebElement retakeBtn = getElement( RETAKESURVEY_DASHBOARD.replace( "@RowNumber", Integer.toString( rowNumber ) ) );
+        
+        String customerFirstName = retakeBtn.findElement( By.xpath( ".." ) ).findElement( By.xpath( ".." ) )
+            .findElement( By.xpath( ".." ) ).findElement( By.xpath( ".." ) ).getAttribute( "data-firstname" );
+        
+        retakeBtn.click();
+        clickOverlayContinue();
+
+        //wait for response
+        waitForAjax();
+
+        if ( !getToastMessage().equalsIgnoreCase(
+            RETAKE_SURVEY_REQUEST_SUCCESSFUL.replace( "@CustomerFirstName", customerFirstName ) ) ) {
+            throw new Exception( "Retake survey request failed. Reason : " + getToastMessage() );
+        }
     }
 }

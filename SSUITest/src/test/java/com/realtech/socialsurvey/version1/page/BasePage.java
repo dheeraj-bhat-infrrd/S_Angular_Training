@@ -32,6 +32,8 @@ public class BasePage
 
     public static final String ERROR_LOCATOR = "id=err-nw-txt";
     public static final String TOAST_MESSAGE_LOCATOR = "id=overlay-toast";
+    public static final String OVELAY_CONTINUE_LOCATOR = "id=overlay-continue";
+    public static final String OVELAY_CANCEL_LOCATOR = "id=overlay-cancel";
 
 
     public BasePage( WebDriver driver )
@@ -561,6 +563,20 @@ public class BasePage
         waitForAjax();
 
         return true;
+    }
+
+
+    public void clickOverlayContinue()
+    {
+        WebElement overlayContinueBtn = getElement( OVELAY_CONTINUE_LOCATOR );
+        overlayContinueBtn.click();
+    }
+
+
+    public void clickOverlayCancel()
+    {
+        WebElement overlayCancelBtn = getElement( OVELAY_CANCEL_LOCATOR );
+        overlayCancelBtn.click();
     }
 
 }

@@ -32,13 +32,13 @@ public class GlobalConstants
 
     public static final String STORE_SCREENSHOT_IN_USER_HOME = "store.screenshot.in.user.home";
     public static final String SCREENSHOT_FOLDER = "screenshot.folder";
-    
+
     //Default values
     public static final String USER_NAME = "shubham@raremile.com";
     public static final String EMAILID_INCORRECT = "shubham@rarem";
     public static final String USER_PASSWORD = "test12";
     public static final String USER_PASSWORD_INCORRECT = "blahblah";
-    
+
     //Credentials for different user roles
     public static final String COMPANY_USER_NAME = "shubham@raremile.com";
     public static final String COMPANY_USER_PASSWORD = "test12";
@@ -48,18 +48,24 @@ public class GlobalConstants
     public static final String BRANCH_USER_PASSWORD = "test12";
     public static final String INDIVIDUAL_USER_NAME = "agent@mailinator.com";
     public static final String INDIVIDUAL_USER_PASSWORD = "test12";
-    
+
     //Register New User
     public static final String REG_FIRST_NAME = "satish";
     public static final String REG_LAST_NAME = "patel";
     public static final String REG_EMAILID = "satish.patel@mailiantor.com";
     public static final String REG_EXISTING_EMAILID = "shubham@raremile.com";
-    
-    
+
+
     //Pro Name
     public static final String PRO_FIRST_NAME = "Sa";
     public static final String PRO_LAST_NAME = "";
-    
+
+    //Survey details
+    public static final String AGENT_NAME = "sachin";
+    public static final String CUSTOMER_FIRST_NAME = "Test";
+    public static final String CUSTOMER_LAST_NAME = "User";
+    public static final String CUSTOMER_EMAILID = "test.user" + Math.random() + "@mailinator.com";
+
     //Derived variable
     public static final String SERVER_URL = "http://" + GlobalConstants.get( SERVER_IP ) + ":"
         + GlobalConstants.get( SERVER_PORT );
