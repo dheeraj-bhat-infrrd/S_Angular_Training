@@ -5219,7 +5219,7 @@ function paintSurveyPageFromJson() {
 	if (companyLogo != undefined && companyLogo != "") {
 		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';
 		companylogoHtml += '<div class="float-left user-info-logo" style="background: url('
-			+ companyLogo + ') no-repeat center; background-size: 100% auto;"></div>';
+			+ companyLogo + ') no-repeat center; background-size: contain"></div>';
 		$('#header-user-info').html(companylogoHtml);
 	}
 }
