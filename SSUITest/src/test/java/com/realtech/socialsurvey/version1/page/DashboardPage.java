@@ -5,6 +5,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 
 
@@ -52,11 +53,20 @@ public class DashboardPage extends BasePage
     //Survey dashboard
     public static final String RESEND_SURVEY_DASHBOARD = "css=#dsh-inc-srvey > div:nth-child(@RowNumber) > div.float-right.dash-lp-rt-img.cursor-pointer";
     public static final String RETAKESURVEY_DASHBOARD = "css=#review-details > div:nth-child(@RowNumber) > div.ppl-header-wrapper.clearfix > div.float-right.ppl-header-right > div.report-resend-icn-container.clearfix.float-right > div.restart-survey-mail-txt.report-txt";
+    public static final String REPORTSURVEY_DASHBOARD = "css=#review-details > div:nth-child(@RowNumber) > div.ppl-header-wrapper.clearfix > div.float-right.ppl-header-right > div.report-resend-icn-container.clearfix.float-right > div.report-abuse-txt.report-txt";
+    public static final String REPORTSURVEY_DASHBOARD_TEXTBOX = "id=report-abuse-txtbox";
+    public static final String REPORTSURVEY_DASHBOARD_SUBMIT = "css=div.rpa-btn.rpa-report-btn";
+    public static final String REPORTSURVEY_DASHBOARD_CANCEL = "css=div.rpa-btn.rpa-cancel-btn";
+    public static final String DOWNLOAD_REPORT_LOCATOR = "id=dsh-dwnld-report-btn";
+    public static final String START_DATE_REPORT_LOCATOR = "id=dsh-start-date";
+    public static final String END_DATE_REPORT_LOCATOR = "id=dsh-end-date";
+    public static final String REPORT_SELECT = "id=download-survey-reports";
 
     //Success messages
     public static final String SEND_SURVEY_SUCCESSFUL = "Survey request sent successfully!";
     public static final String RESEND_SURVEY_REQUEST_SUCCESSFUL = "Reminder Mail sent successfully to";
     public static final String RETAKE_SURVEY_REQUEST_SUCCESSFUL = "Mail sent to @CustomerFirstName to retake the survey for you.";
+    public static final String REPORT_SURVEY_SUCCESSFUL = "Reported Successfully!";
 
 
     public DashboardPage( WebDriver driver )
@@ -403,10 +413,10 @@ public class DashboardPage extends BasePage
     public void clickRetakeSurveyFromDashbaord( int rowNumber ) throws Exception
     {
         WebElement retakeBtn = getElement( RETAKESURVEY_DASHBOARD.replace( "@RowNumber", Integer.toString( rowNumber ) ) );
-        
+
         String customerFirstName = retakeBtn.findElement( By.xpath( ".." ) ).findElement( By.xpath( ".." ) )
             .findElement( By.xpath( ".." ) ).findElement( By.xpath( ".." ) ).getAttribute( "data-firstname" );
-        
+
         retakeBtn.click();
         clickOverlayContinue();
 
@@ -417,5 +427,79 @@ public class DashboardPage extends BasePage
             RETAKE_SURVEY_REQUEST_SUCCESSFUL.replace( "@CustomerFirstName", customerFirstName ) ) ) {
             throw new Exception( "Retake survey request failed. Reason : " + getToastMessage() );
         }
+    }
+
+
+    public void clickReportSurveyFromDashbaord( int rowNumber, String reportAbuseText ) throws Exception
+    {
+        WebElement retakeBtn = getElement( REPORTSURVEY_DASHBOARD.replace( "@RowNumber", Integer.toString( rowNumber ) ) );
+
+        retakeBtn.click();
+
+        WebElement reportAbuseTextBox = getElement( REPORTSURVEY_DASHBOARD_TEXTBOX );
+        reportAbuseTextBox.clear();
+        reportAbuseTextBox.sendKeys( reportAbuseText );
+
+        WebElement reportAbuseSubmit = getElement( REPORTSURVEY_DASHBOARD_SUBMIT );
+        reportAbuseSubmit.click();
+
+        //wait for response
+        waitForAjax();
+
+        if ( !getToastMessage().equalsIgnoreCase( REPORT_SURVEY_SUCCESSFUL ) ) {
+            throw new Exception( "Report survey request failed. Reason : " + getToastMessage() );
+        }
+    }
+
+
+    public void clickDownloadReportButton( String startDateStr, String endDateStr )
+    {
+
+        WebElement startDate = getElement( START_DATE_REPORT_LOCATOR );
+        startDate.clear();
+        startDate.sendKeys( startDateStr );
+
+        WebElement endDate = getElement( END_DATE_REPORT_LOCATOR );
+        endDate.clear();
+        endDate.sendKeys( startDateStr );
+
+        WebElement downloadBtn = getElement( DOWNLOAD_REPORT_LOCATOR );
+        downloadBtn.click();
+    }
+
+
+    public void downloadUserRankingReport( String startDateStr, String endDateStr )
+    {
+        Select select = new Select( getElement( REPORT_SELECT ) );
+        select.selectByVisibleText( "User Ranking Report" );
+
+        clickDownloadReportButton( startDateStr, endDateStr );
+    }
+
+
+    public void downloadSurveyResultsReport( String startDateStr, String endDateStr )
+    {
+        Select select = new Select( getElement( REPORT_SELECT ) );
+        select.selectByVisibleText( "Survey Results Report" );
+
+        clickDownloadReportButton( startDateStr, endDateStr );
+    }
+
+
+    public void downloadSocialMonitorReport( String startDateStr, String endDateStr )
+    {
+        Select select = new Select( getElement( REPORT_SELECT ) );
+        select.selectByVisibleText( "Social Monitor Report" );
+
+        clickDownloadReportButton( startDateStr, endDateStr );
+    }
+
+
+    public void downloadIncompleteSurveyReport( String startDateStr, String endDateStr )
+    {
+        Select select = new Select( getElement( REPORT_SELECT ) );
+        select.selectByVisibleText( "Incomplete Survey Data" );
+
+        clickDownloadReportButton( startDateStr, endDateStr );
     }
 }
