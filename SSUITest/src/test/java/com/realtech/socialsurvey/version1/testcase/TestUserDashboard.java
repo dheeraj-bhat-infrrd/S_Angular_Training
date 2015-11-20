@@ -916,7 +916,7 @@ public class TestUserDashboard extends BaseTestCase
     }
 
 
-    //Test send survey after login with admin login
+    //Test retake survey
     @Test ( groups = "userdashboard", testName = "TCSSUD-47")
     public void testRetakeSurveyRequest()
     {
@@ -934,4 +934,105 @@ public class TestUserDashboard extends BaseTestCase
             Assert.fail( "Exception Occurred While Testing: testRetakeSurveyRequest: " + e.getMessage() );
         }
     }
+
+
+    //Test report survey
+    @Test ( groups = "userdashboard", testName = "TCSSUD-48")
+    public void testReportSurveyAbuse()
+    {
+        LOG.trace( "\n\n*** Started Testing: testRetakeSurveyRequest" );
+        try {
+            driver.get( GlobalConstants.SERVER_URL );
+            HomePage homePage = new HomePage( driver );
+            DashboardPage dashboardPage = homePage.loginUser( GlobalConstants.COMPANY_USER_NAME,
+                GlobalConstants.COMPANY_USER_PASSWORD );
+            dashboardPage.clickSendSurveyPopupClose();
+            dashboardPage.clickReportSurveyFromDashbaord( 1, GlobalConstants.SURVEY_REPORT_TEXT );
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testRetakeSurveyRequest" );
+            Assert.fail( "Exception Occurred While Testing: testRetakeSurveyRequest: " + e.getMessage() );
+        }
+    }
+
+
+    //Test download report
+    @Test ( groups = "userdashboard", testName = "TCSSUD-49")
+    public void testDownloadUserAgentReport()
+    {
+        LOG.trace( "\n\n*** Started Testing: testDownloadUserAgentReport" );
+        try {
+            driver.get( GlobalConstants.SERVER_URL );
+            HomePage homePage = new HomePage( driver );
+            DashboardPage dashboardPage = homePage.loginUser( GlobalConstants.COMPANY_USER_NAME,
+                GlobalConstants.COMPANY_USER_PASSWORD );
+            dashboardPage.clickSendSurveyPopupClose();
+            dashboardPage.downloadUserRankingReport( null, null );
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testDownloadUserAgentReport" );
+            Assert.fail( "Exception Occurred While Testing: testDownloadUserAgentReport: " + e.getMessage() );
+        }
+    }
+
+
+    //Test download report
+    @Test ( groups = "userdashboard", testName = "TCSSUD-50")
+    public void testDownloadSurveyResultsReport()
+    {
+        LOG.trace( "\n\n*** Started Testing: testDownloadSurveyResultsReport" );
+        try {
+            driver.get( GlobalConstants.SERVER_URL );
+            HomePage homePage = new HomePage( driver );
+            DashboardPage dashboardPage = homePage.loginUser( GlobalConstants.COMPANY_USER_NAME,
+                GlobalConstants.COMPANY_USER_PASSWORD );
+            dashboardPage.clickSendSurveyPopupClose();
+            dashboardPage.downloadSurveyResultsReport( null, null );
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testDownloadSurveyResultsReport" );
+            Assert.fail( "Exception Occurred While Testing: testDownloadSurveyResultsReport: " + e.getMessage() );
+        }
+    }
+
+
+    //Test download report
+    @Test ( groups = "userdashboard", testName = "TCSSUD-51")
+    public void testDownloadSocialMonitorReport()
+    {
+        LOG.trace( "\n\n*** Started Testing: testDownloadSocialMonitorReport" );
+        try {
+            driver.get( GlobalConstants.SERVER_URL );
+            HomePage homePage = new HomePage( driver );
+            DashboardPage dashboardPage = homePage.loginUser( GlobalConstants.COMPANY_USER_NAME,
+                GlobalConstants.COMPANY_USER_PASSWORD );
+            dashboardPage.clickSendSurveyPopupClose();
+            dashboardPage.downloadSocialMonitorReport( null, null );
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testDownloadSocialMonitorReport" );
+            Assert.fail( "Exception Occurred While Testing: testDownloadSocialMonitorReport: " + e.getMessage() );
+        }
+    }
+
+
+    //Test download report
+    @Test ( groups = "userdashboard", testName = "TCSSUD-52")
+    public void testDownloadIncompleteSurveyReport()
+    {
+        LOG.trace( "\n\n*** Started Testing: testDownloadIncompleteSurveyReport" );
+        try {
+            driver.get( GlobalConstants.SERVER_URL );
+            HomePage homePage = new HomePage( driver );
+            DashboardPage dashboardPage = homePage.loginUser( GlobalConstants.COMPANY_USER_NAME,
+                GlobalConstants.COMPANY_USER_PASSWORD );
+            dashboardPage.clickSendSurveyPopupClose();
+            dashboardPage.downloadIncompleteSurveyReport( null, null );
+        } catch ( Exception e ) {
+            e.printStackTrace( System.out );
+            LOG.error( "*** Exception While Testing: testDownloadIncompleteSurveyReport" );
+            Assert.fail( "Exception Occurred While Testing: testDownloadIncompleteSurveyReport: " + e.getMessage() );
+        }
+    }
+
 }

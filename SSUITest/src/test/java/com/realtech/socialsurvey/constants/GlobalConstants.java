@@ -65,6 +65,7 @@ public class GlobalConstants
     public static final String CUSTOMER_FIRST_NAME = "Test";
     public static final String CUSTOMER_LAST_NAME = "User";
     public static final String CUSTOMER_EMAILID = "test.user" + Math.random() + "@mailinator.com";
+    public static final String SURVEY_REPORT_TEXT = "This is test survey report text.";
 
     //Derived variable
     public static final String SERVER_URL = "http://" + GlobalConstants.get( SERVER_IP ) + ":"
