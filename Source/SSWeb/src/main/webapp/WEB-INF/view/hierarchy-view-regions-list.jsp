@@ -33,9 +33,9 @@
            <td class="v-tbl-btns">
                <div class="clearfix v-tbl-icn-wraper">
               
-              <!--  <div class="float-left v-tbl-top-spacer"></div>
                <div class="float-left v-tbl-top-spacer"></div>
-               <div class="float-left v-tbl-top-spacer"></div>  -->
+               <div class="float-left v-tbl-top-spacer"></div>
+               <div class="float-left v-tbl-top-spacer"></div>  
                    <div class="float-left v-tbl-icn v-icn-close region-del-icn" data-regionid="${region.regionId}"></div>
                    <div class="float-left v-tbl-icn v-icn-edit region-edit-icn" clicked="false" data-regionid="${region.regionId}"></div>
                <div class="float-left v-tbl-top-spacer"></div>
@@ -214,7 +214,6 @@
 </script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		
 		$('.v-icn-femail').click( function() {
 			if ($(this).hasClass('v-tbl-icn-disabled')) {
 				return;
