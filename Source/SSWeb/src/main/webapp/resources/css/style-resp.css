@@ -1586,6 +1586,10 @@
 	.bd-ans-star {
 		background: url(../csssprites/smileys.png) no-repeat -207px -66px;
 	}
+	
+	.profile-url-sub-btn{
+	width:150px
+	}
 }
 
 
