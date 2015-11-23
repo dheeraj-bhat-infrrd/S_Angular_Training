@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.core.services.batchTracker;
+package com.realtech.socialsurvey.core.services.batchtracker;
 
 import java.text.ParseException;
 import java.util.List;

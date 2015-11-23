@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.batchTracker.impl;
 
 import java.util.ArrayList;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -11,11 +10,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.BatchTracker;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl;
 
 public class BatchTrackerServiceImplTest
 {
