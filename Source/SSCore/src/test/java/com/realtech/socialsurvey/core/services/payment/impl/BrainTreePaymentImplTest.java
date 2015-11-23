@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.payment.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -10,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.braintreegateway.Subscription;
@@ -153,11 +151,6 @@ public class BrainTreePaymentImplTest
     }
     
     @Test ( expected = InvalidInputException.class)
-    public void testChangeLicenseToPastDueForEmptySubscription() throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException{
-             brainTreePaymentImpl.changeLicenseToPastDue( new Subscription( null ) );
-    }
-    
-    @Test ( expected = InvalidInputException.class)
     public void testRetrySubscriptionChargeForNullSubscriptionId() throws InvalidInputException, PaymentRetryUnsuccessfulException{
              brainTreePaymentImpl.retrySubscriptionCharge( null );
     }
@@ -285,28 +278,13 @@ public class BrainTreePaymentImplTest
     }
     
     @Test ( expected = InvalidInputException.class)
-    public void testGetBalacnceAmountForPlanUpgradeForEmptyCompany() throws InvalidInputException{
-             brainTreePaymentImpl.getBalacnceAmountForPlanUpgrade( new Company(), 2, 3 );
-    }
-    
-    @Test ( expected = InvalidInputException.class)
-    public void testGetBalacnceAmountForPlanUpgradeForInvalidFromAccountMasterIdLesser() throws InvalidInputException{
+    public void testGetBalacnceAmountForPlanUpgradeForInvalidFromAccountMasterId() throws InvalidInputException{
              brainTreePaymentImpl.getBalacnceAmountForPlanUpgrade( new Company(), 0, 3 );
     }
     
     @Test ( expected = InvalidInputException.class)
-    public void testGetBalacnceAmountForPlanUpgradeForInvalidFromAccountMasterIdHigher() throws InvalidInputException{
-             brainTreePaymentImpl.getBalacnceAmountForPlanUpgrade( new Company(), 10, 3 );
-    }
-    
-    @Test ( expected = InvalidInputException.class)
-    public void testGetBalacnceAmountForPlanUpgradeForInvalidToAccountMasterIdLesser() throws InvalidInputException{
+    public void testGetBalacnceAmountForPlanUpgradeForInvalidToAccountMasterId() throws InvalidInputException{
              brainTreePaymentImpl.getBalacnceAmountForPlanUpgrade( new Company(), 3, 1 );
-    }
-    
-    @Test ( expected = InvalidInputException.class)
-    public void testGetBalacnceAmountForPlanUpgradeForInvalidToAccountMasterIdHigher() throws InvalidInputException{
-             brainTreePaymentImpl.getBalacnceAmountForPlanUpgrade( new Company(), 3, 10 );
     }
     
     
@@ -327,62 +305,18 @@ public class BrainTreePaymentImplTest
     }
     
     @Test ( expected = InvalidInputException.class)
-    public void testIncrementRetriesAndSendMailForEmptySubscription() throws InvalidInputException, NoRecordsFetchedException{
-             brainTreePaymentImpl.incrementRetriesAndSendMail( new Subscription( null ) );
-    }
-    
-    @Test ( expected = NoRecordsFetchedException.class)
-    public void testIncrementRetriesAndSendMailForNullLicenceDetailList() throws InvalidInputException, NoRecordsFetchedException{
-             Mockito.when( licenseDetailDao.findByColumn( Mockito.eq(LicenseDetail.class), Mockito.anyString() , Mockito.anyString() )).thenReturn( null );
-             brainTreePaymentImpl.incrementRetriesAndSendMail( new Subscription( null ) );
-    }
-    
-    @Test ( expected = NoRecordsFetchedException.class)
-    public void testIncrementRetriesAndSendMailForEmptyLicenceDetailList() throws InvalidInputException, NoRecordsFetchedException{
-             Mockito.when( licenseDetailDao.findByColumn( Mockito.eq(LicenseDetail.class), Mockito.anyString() , Mockito.anyString() )).thenReturn( new ArrayList<LicenseDetail>() );
-             brainTreePaymentImpl.incrementRetriesAndSendMail( new Subscription( null ) );
-    }
-    
-    @Test ( expected = InvalidInputException.class)
     public void testCheckIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableItForNullSubscription() throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException{
              brainTreePaymentImpl.checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt( null );
-    }
-    
-    @Test ( expected = InvalidInputException.class)
-    public void testCheckIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableItForEmptySubscription() throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException{
-             brainTreePaymentImpl.checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt( new Subscription( null ) );
-    }
-    
-    @Test ( expected = NoRecordsFetchedException.class)
-    public void testCheckIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableItForNullLicenceDetail() throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException{
-        Mockito.when( licenseDetailDao.findByColumn( Mockito.eq(LicenseDetail.class), Mockito.anyString() , Mockito.anyString() )).thenReturn( null );
-        brainTreePaymentImpl.checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt( new Subscription( null ) );
-    }
-    
-    @Test ( expected = NoRecordsFetchedException.class)
-    public void testCheckIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableItForEmptyLicenceDetail() throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException{
-        Mockito.when( licenseDetailDao.findByColumn( Mockito.eq(LicenseDetail.class), Mockito.anyString(), Mockito.anyString() )).thenReturn( new ArrayList<LicenseDetail>() );
-        brainTreePaymentImpl.checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt( new Subscription( null ) );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testIntimateUserForNullSubscription() throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException{
         brainTreePaymentImpl.intimateUser( null, 10 );
     }
-    
-    @Test ( expected = InvalidInputException.class)
-    public void testIntimateUserForEmptySubscription() throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException{
-        brainTreePaymentImpl.intimateUser( new Subscription(null), 10 );
-    }
         
     @Test ( expected = InvalidInputException.class)
     public void testUpdateSubscriptionPriceBasedOnUsersCountForNullCompany() throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException{
         brainTreePaymentImpl.updateSubscriptionPriceBasedOnUsersCount( null );
-    }
-    
-    @Test ( expected = InvalidInputException.class)
-    public void testUpdateSubscriptionPriceBasedOnUsersCountForEmptyCompany() throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException{
-        brainTreePaymentImpl.updateSubscriptionPriceBasedOnUsersCount( new Company() );
     }
     
 
