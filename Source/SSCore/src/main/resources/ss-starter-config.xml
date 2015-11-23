@@ -453,7 +453,7 @@
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
-				<!-- <ref bean="imageprocessingjobdetail" />  -->
+				<ref bean="imageprocessingjobdetail" /> 
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 			</list>
 		</property>
@@ -476,7 +476,7 @@
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
-				<!-- <ref bean="imageprocessingcron" /> -->
+				<ref bean="imageprocessingcron" />
 				<!-- <ref bean="hierarchysettingscron" /> -->
 			</list>
 		</property>

@@ -3268,16 +3268,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
         Map<SettingsForApplication, OrganizationUnit> map )
     {
+        //Set logoThumbnail along with logo
         for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
             if ( entry.getKey() == SettingsForApplication.LOGO ) {
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     userProfile.setLogo( companyUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( companyUnitSettings.getLogoThumbnail() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
                     userProfile.setLogo( regionUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( regionUnitSettings.getLogoThumbnail() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
                     userProfile.setLogo( branchUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( branchUnitSettings.getLogoThumbnail() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     userProfile.setLogo( agentUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( agentUnitSettings.getLogoThumbnail() );
                 }
 
             } else if ( entry.getKey() == SettingsForApplication.LOCATION ) {

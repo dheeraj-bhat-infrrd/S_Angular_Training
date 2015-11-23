@@ -145,7 +145,7 @@ public class SessionHelper {
 		// check if company has a logo
 		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogo() != null) {
 			LOG.debug("Settings logo image from company settings");
-			String logoUrl = userSettings.getCompanySettings().getLogo();
+			String logoUrl = userSettings.getCompanySettings().getLogoThumbnail();
 			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
 		}
 		else {

@@ -128,7 +128,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		List<SurveyCompanyMapping> surveyCompanyMappingList = surveyCompanyMappingDao.findByKeyValue(SurveyCompanyMapping.class, queries);
 
 		LOG.info("Method checkForExistingSurvey() finished.");
-		if (!surveyCompanyMappingList.isEmpty()) {
+		//Added null check
+		if (surveyCompanyMappingList != null && !surveyCompanyMappingList.isEmpty()) {
 			SurveyCompanyMapping surveyCompanyMapping = surveyCompanyMappingList.get(CommonConstants.INITIAL_INDEX);
 			Survey survey = surveyCompanyMapping.getSurvey();
 			return survey;
