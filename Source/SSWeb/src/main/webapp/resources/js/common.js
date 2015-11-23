@@ -30,6 +30,9 @@ function callAjaxGET(url, callBackFunction, isAsync) {
 		async : isAsync,
 		cache : false,
 		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+			},
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -488,6 +491,22 @@ function openForgotPasswordPage(){
 function openAuthPage(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
 }
+function openAuthPageZillow() {
+	callAjaxGET("/socialauth.do?social=zillow", function(data) {
+		createZillowProfileUrlPopup( data);
+	}, true);
+}
+/*function updateProfileUrl(){
+window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
+}*/
+/*function updateProfileUrl() {
+	callAjaxGET("/editprofileurl.do", function(data) {
+		createEditProfileUrlPopup2( data);
+	}, true);
+	
+}
+ */
+
 function openAuthPageRegistration(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
 }

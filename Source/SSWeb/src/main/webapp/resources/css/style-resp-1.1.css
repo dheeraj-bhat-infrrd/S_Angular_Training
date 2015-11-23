@@ -303,6 +303,21 @@
 		text-align: center;
 		width: 100%;
 	}
+	.popupUrl{
+	
+	font-size: 14px;
+	width: 350px;
+}
+.urlPopupButton{
+	width: 335px;
+	margin-left: 30px;
+}
+
+.profileForm {
+   
+    margin-left: 2%;
+}
+	
 }
 
 
@@ -550,4 +565,16 @@
 		padding: 0px 8px;
 		font-size: 12px;
 	}
+	.urlPopupButton{
+	width: 335px;
+	margin-left: 0px;
+}
+.profile-url-sub-btn{
+	width:120px
+	}
+	.popupUrl{
+	
+	font-size: 14px;
+	width: 250px;
+}
 }

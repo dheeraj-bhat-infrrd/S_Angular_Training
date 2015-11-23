@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
 
@@ -48,11 +49,13 @@ public class SolrReviewCountUpdater extends QuartzJobBean
 
             //updating last run time for batch in database
             batchTrackerService.updateModifiedOnColumnByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER );
+        }catch ( InvalidInputException e ) {
+            LOG.error( "Invalid input exception caught" , e );
         } catch ( NoRecordsFetchedException e ) {
-            LOG.error( "No entry found for batch tracker in database" );
+            LOG.error( "No entry found for batch tracker in database" , e );
         } catch ( ParseException e ) {
-            LOG.error( "Error while parsing the data fetched from mongo for survey count" );
-        }
+            LOG.error( "Error while parsing the data fetched from mongo for survey count" , e );
+        } 
 
     }
 
