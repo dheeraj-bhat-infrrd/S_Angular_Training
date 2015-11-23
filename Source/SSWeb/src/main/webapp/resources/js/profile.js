@@ -12,6 +12,7 @@ var showAllReviews = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
 var profileJson;
+var isFetchReviewAjaxRequestRunning = false; //keeps checks of if the ajax request is running to fetch reviews.
 
 $(document).ajaxStop(function() {
 	adjustImage();
@@ -916,6 +917,7 @@ $(document).scroll(function(){
 	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height()) ){
 		var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
 		if(startIndex <= totalReviews) {
+			if( isFetchReviewAjaxRequestRunning ) return; //Return if ajax request is still running
 			startIndex = startIndex + numOfRows;
 			var profileLevel = $("#profile-fetch-info").attr("profile-level");
 			if(showAllReviews)
@@ -968,6 +970,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 	if (minScore != undefined) {
 		url = url + "&minScore=" + minScore;
 	}
+	isFetchReviewAjaxRequestRunning = true;
 	callAjaxGET(url, fetchReviewsCallBack, isAsync);
 }
 
@@ -1000,7 +1003,7 @@ function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
 }
 
 function fetchReviewsCallBack(data) {
-	isFetchingReviews = false;
+	isFetchReviewAjaxRequestRunning = false;
 	var responseJson = $.parseJSON(data);
 	if (responseJson != undefined) {
 		var result = $.parseJSON(responseJson.entity);
