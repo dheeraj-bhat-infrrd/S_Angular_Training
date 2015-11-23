@@ -45,6 +45,9 @@ public class POSIntegrationImpl implements POSIntegration {
 	@Override
 	public List<EngagementProcessingStatus> getProcessedRecords(String source, Timestamp lastRunTime) throws InvalidInputException{
 		LOG.info("Getting survey pre initiation records after "+lastRunTime);
+		if(source == null || source.isEmpty()){
+		    throw new InvalidInputException("passed parameter source is invalid");
+		}
 		List<EngagementProcessingStatus> recordsList = surveyPreInitiationDao.getProcessedIds(source, lastRunTime);
 		return recordsList;
 	}

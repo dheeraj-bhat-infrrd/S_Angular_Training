@@ -105,9 +105,16 @@
 							<div class="float-left v-tbl-icn  ${admincaneditclass}"></div>
 						</c:otherwise>
 					</c:choose>
-					 <div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
-						title="<spring:message code="label.widget.key" />"
-						onclick="generateWidget($(this),${branchUser.userId }, 'individual');"></div> 
+					<c:choose>
+						<c:when test="${branchUser.isAgent}">
+							<div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
+								title="<spring:message code="label.widget.key" />"
+								onclick="generateWidget($(this),${branchUser.userId }, 'individual');"></div>
+						</c:when>
+						<c:otherwise>
+							<div class="float-left v-tbl-top-spacer"></div>
+						</c:otherwise>
+					</c:choose>
 					<c:choose>
 						<c:when test="${regionUser.status == 2}">
 							<div class="float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>

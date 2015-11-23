@@ -771,6 +771,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
         document.addField( CommonConstants.STATUS_SOLR, user.getStatus() );
         Set<Long> branches = new HashSet<Long>();
         Set<Long> regions = new HashSet<Long>();
+        boolean isAgent = false;
+        boolean isBranchAdmin = false;
+        boolean isRegionAdmin = false;
         if ( user.getUserProfiles() != null )
             for ( UserProfile userProfile : user.getUserProfiles() ) {
                 if ( userProfile.getRegionId() != 0 ) {
@@ -779,12 +782,18 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 if ( userProfile.getBranchId() != 0 ) {
                     branches.add( userProfile.getBranchId() );
                 }
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID )
+                    isAgent = true;
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID )
+                    isBranchAdmin = true;
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID )
+                    isRegionAdmin = true;
             }
         document.addField( CommonConstants.BRANCHES_SOLR, branches );
         document.addField( CommonConstants.REGIONS_SOLR, regions );
-        document.addField( CommonConstants.IS_AGENT_SOLR, user.isAgent() );
-        document.addField( CommonConstants.IS_BRANCH_ADMIN_SOLR, user.isBranchAdmin() );
-        document.addField( CommonConstants.IS_REGION_ADMIN_SOLR, user.isRegionAdmin() );
+        document.addField( CommonConstants.IS_AGENT_SOLR, ( user.isAgent() ? user.isAgent() : isAgent ) );
+        document.addField( CommonConstants.IS_BRANCH_ADMIN_SOLR, ( user.isBranchAdmin() ? user.isBranchAdmin() : isBranchAdmin ) );
+        document.addField( CommonConstants.IS_REGION_ADMIN_SOLR, ( user.isRegionAdmin()? user.isRegionAdmin() : isRegionAdmin ) );
 
         return document;
     }
