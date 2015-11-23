@@ -1,13 +1,13 @@
 <dataConfig>
-    <dataSource type="JdbcDataSource" name="ss_user" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/ss_user" batchSize="-1" user="root" password=""/>
+    <dataSource type="JdbcDataSource" name="ss_user" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/ss_user" batchSize="-1" user="root" password="root"/>
+    <dataSource name="mymongodb" type="MongoDataSource" database="ss_db" url="mongodb://localhost:27017" />
    <document>
         <entity name="branch" dataSource="ss_user" query="SELECT B.BRANCH_ID, B.COMPANY_ID, B.REGION_ID, B.BRANCH, B.IS_DEFAULT_BY_SYSTEM, B.STATUS, B.CREATED_ON, B.CREATED_BY,
-        B.MODIFIED_ON, B.MODIFIED_BY,R.REGION FROM BRANCH AS B JOIN REGION AS R ON B.REGION_ID = R.REGION_ID;" 
-          
-          deltaImportQuery = "SELECT B.BRANCH_ID, B.COMPANY_ID, B.REGION_ID, B.BRANCH, B.IS_DEFAULT_BY_SYSTEM, B.STATUS, B.CREATED_ON, B.CREATED_BY,B.MODIFIED_ON, B.MODIFIED_BY,R.REGION FROM BRANCH AS B JOIN REGION AS R ON B.REGION_ID = R.REGION_ID WHERE B.BRANCH_ID = '${dataimporter.delta.branchId}';"
+        B.MODIFIED_ON, B.MODIFIED_BY,R.REGION FROM BRANCH AS B JOIN REGION AS R ON B.REGION_ID = R.REGION_ID;"
 
+          deltaImportQuery = "SELECT B.BRANCH_ID, B.COMPANY_ID, B.REGION_ID, B.BRANCH, B.IS_DEFAULT_BY_SYSTEM, B.STATUS, B.CREATED_ON, B.CREATED_BY,B.MODIFIED_ON, B.MODIFIED_BY,R.REGION FROM BRANCH AS B JOIN REGION AS R ON B.REGION_ID = R.REGION_ID WHERE B.BRANCH_ID = '${dataimporter.delta.branchId}';"
           deltaQuery = "SELECT BRANCH_ID FROM BRANCH WHERE MODIFIED_ON &gt; DATE_FORMAT(DATE_ADD('${dataimporter.last_index_time}',INTERVAL -1 MINUTE), '%Y-%m-%d %H:%i');">
-         
+
             <field column="BRANCH_ID" name="branchId" />
             <field column="COMPANY_ID" name="companyId" />
             <field column="REGION_ID" name="regionId" />
@@ -19,7 +19,8 @@
             <field column="MODIFIED_BY" name="modifiedBy" />
             <field column="CREATED_ON" name="createdOn" />
             <field column="CREATED_BY" name="createdBy" />
-          
+            <entity name="branchSetting" processor="MongoEntityProcessor" collection="BRANCH_SETTINGS" dataSource="mymongodb" query="{iden : ${branch.BRANCH_ID}}" transformer="MongoMapperTransformer, com.realtech.socialsurvey.solr.Transformers.AddressTransformer">
+            </entity>
         </entity>
     </document>
 </dataConfig>
