@@ -507,6 +507,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("subscribe : user parameter is null!");
 			throw new InvalidInputException("subscribe : user parameter is null!");
 		}
+		// Getting the company from the user
+        Company company = user.getCompany();
+        if(company== null){
+            LOG.error("subscribe : user parameter is invalid. It doesn't contains the company. ");
+            throw new InvalidInputException("subscribe : user parameter is invalid. It doesn't contains the company. ");
+        }
 		// Checking for the range of allowed account type, which is 1 to 5
 		if (accountsMasterId < CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL || accountsMasterId > CommonConstants.ACCOUNTS_MASTER_FREE) {
 			LOG.error("subscribe : accountsMasterId parameter is invalid! parameter value : " + String.valueOf(accountsMasterId));
@@ -518,8 +524,6 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new InvalidInputException("subscribe : nonce parameter is null or empty!");
 		}
 
-		// Getting the company from the user
-		Company company = user.getCompany();
 
 		if (accountsMasterId != CommonConstants.ACCOUNTS_MASTER_FREE) {
 			LOG.info("Making a subscription!");
@@ -622,7 +626,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new InvalidInputException("makePayment() : paymentMethodToken parameter is null or invalid!");
 		}
 
-		if (amount == null || amount.equals(0)) {
+		if (amount == null || amount.equals(BigDecimal.ZERO)) {
 			LOG.error("makePayment() : amount parameter is null or invalid!");
 			throw new InvalidInputException("makePayment() : amount parameter is null or invalid!");
 		}
@@ -1171,6 +1175,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("upgradePlanForSubscription : User parameter given is null.");
 			throw new InvalidInputException("upgradePlanForSubscription : User parameter given is null.");
 		}
+		
+		Company company = user.getCompany();
+        
+		if(company == null){
+            LOG.error("upgradePlanForSubscription : user parameter doesn't have company");
+            throw new InvalidInputException("upgradePlanForSubscription : user parameter doesn't have company");
+        }
 		if (newAccountsMasterId < 0) {
 			LOG.error("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
 			throw new InvalidInputException("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
@@ -1180,7 +1191,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new InvalidInputException("upgradePlanForSubscription : nonce parameter given is invalid");
 		}
 		LOG.info("upgradePlanForSubscription called!");
-		Company company = user.getCompany();
+		
 		// We need the subscription id in case of free account
 		String subscriptionId = null;
 		double originalPrice = 0.0; // holds the original price of the subscription
@@ -1355,6 +1366,10 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("changePaymentMethod : paymentNonce parameter is null or empty");
 			throw new InvalidInputException("getCurrentPaymentDetails : paymentNonce parameter is null or empty");
 		}
+		if (customerId == null || customerId.isEmpty()) {
+            LOG.error("changePaymentMethod : customerId parameter is null or empty");
+            throw new InvalidInputException("getCurrentPaymentDetails : customerId parameter is null or empty");
+        }
 
 		try {
 			// Firstly we get the subscription whose payment method we need
@@ -1433,9 +1448,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	@Override
 	public float getBalacnceAmountForPlanUpgrade(Company company, int fromAccountsMasterId, int toAccountsMasterId) throws InvalidInputException {
 
-		if (company == null) {
+		if (company == null ) {
 			LOG.error("getBalacnceAmountForPlanUpgrade : Invalid company parameter ");
-			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
+			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid company ");
 		}
 		if (fromAccountsMasterId <= 0) {
 			LOG.error("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
@@ -1468,7 +1483,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	@Override
 	public RetriedTransaction checkForExistingTransaction(LicenseDetail licenseDetail) throws InvalidInputException {
 
-		if (licenseDetail == null) {
+		if (licenseDetail == null || licenseDetail.getLicenseId() >= 0l) {
 			LOG.error("Null parameter given to checkForExistingTransactions!");
 			throw new InvalidInputException("Null parameter given to checkForExistingTransactions!");
 		}
