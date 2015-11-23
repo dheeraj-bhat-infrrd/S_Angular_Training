@@ -2152,6 +2152,8 @@ function validateRegionForm() {
  */
 function resetInputFields(elementId) {
 	document.getElementById(elementId).reset();
+	$('#region-country').val(defaultCountry);
+	$('#region-country-code').val(defaultCountryCode);
 	//$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
@@ -5217,7 +5219,7 @@ function paintSurveyPageFromJson() {
 	if (companyLogo != undefined && companyLogo != "") {
 		var companylogoHtml = '<div class="float-left user-info-seperator"></div>';
 		companylogoHtml += '<div class="float-left user-info-logo" style="background: url('
-			+ companyLogo + ') no-repeat center; background-size: 100% auto;"></div>';
+			+ companyLogo + ') no-repeat center; background-size: contain"></div>';
 		$('#header-user-info').html(companylogoHtml);
 	}
 }
@@ -8289,9 +8291,51 @@ function createEditProfileUrlPopup(header, body) {
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
-function updateProfileUrl(){
-	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
+function createEditProfileUrlPopup2( body) {
+	
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Submit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		saveProfileUrl();
+		overlayRevert();
+	});
+	
+	$('#overlay-main').show();
+	disableBodyScroll();
 }
+function createZillowProfileUrlPopup(body){
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Submit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		saveZillowEmailAddress();
+		overlayRevert();
+	});
+	
+	$('#overlay-main').show();
+	disableBodyScroll();
+}
+
+
+/*function updateProfileUrl(){
+	window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
+}*/
+
+function updateProfileUrl() {
+	callAjaxGET("/editprofileurl.do", function(data) {
+		createEditProfileUrlPopup2( data);
+	}, true);
+	
+}
+
+
 
 $(document).on('click', '.checkbox-iscurrent', function(e){
 	var isCurrent = $(this).attr('data-checked');
@@ -9701,4 +9745,58 @@ function attachAutocompleteUserListDropdown(){
 		$('#selected-userid-hidden').val("");
 	});
 	
+}
+
+//url change popup
+function saveProfileUrl() {
+	if(!validateprofileUrlEditForm()){
+		return false;
+	}
+
+}
+
+
+
+function validateprofileUrlEditForm() {
+	var profileUrl = $('input[name="profileUrlBlock"]').val();
+	if(profileUrl == undefined ||  profileUrl == "") {
+		$('#overlay-toast').text("Please enter a valid profile name");
+		showToast();
+		return false;
+	}
+	
+	$.ajax({
+		url : "./updateprofileurl.do?searchKey=" + profileUrl,
+		type : "GET",
+		cache : false,
+		dataType : "html",
+		async : true,
+		success : function(data) {
+			var profileExists = data;
+			if(profileExists == "true"){
+				$('#overlay-toast').text("The entered profile name already exists");
+				showToast();
+				return false;
+			}
+			else{
+				$('#overlay-toast').text("Url updated successfully");
+				showToast();
+				/* window.opener.$("#prof-header-url").html(data);
+				setTimeout(function(){
+				    window.close();
+				},3000); */
+				hideActiveUserLogoutOverlay();
+				console.log(data);
+				$("#prof-header-url").html(data);
+				return true;
+			}
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			//redirectErrorpage();
+		}
+	});
 }
