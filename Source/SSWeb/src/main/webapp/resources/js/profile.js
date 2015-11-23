@@ -716,7 +716,17 @@ function paintCompanyBranches(data) {
 	}
 }
 
-function paintReviews(result){
+function paintReviews(result, isResultFromBatch){
+	
+	//Check if result is from batch
+	if(isResultFromBatch) {
+		reviewsNextBatch = [];
+	}
+	
+	//Check if there are more reviews left
+	if(reviewsNextBatch == undefined || reviewsNextBatch.length <= 0)
+		fetchReviewsScroll(true);
+	
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 	
@@ -915,18 +925,23 @@ function confirmReportAbuse(payload) {
 
 $(document).scroll(function(){
 	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height()) ){
-		var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
-		if(startIndex <= totalReviews) {
-			if( isFetchReviewAjaxRequestRunning ) return; //Return if ajax request is still running
-			startIndex = startIndex + numOfRows;
-			var profileLevel = $("#profile-fetch-info").attr("profile-level");
-			if(showAllReviews)
-				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true);
-			else
-				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore , true);
-		}
+		fetchReviewsScroll(false);
 	}
 });
+
+
+function fetchReviewsScroll(isNextBatch) {
+	var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
+	if(startIndex <= totalReviews) {
+		if( isFetchReviewAjaxRequestRunning ) return; //Return if ajax request is still running
+		startIndex = startIndex + numOfRows;
+		var profileLevel = $("#profile-fetch-info").attr("profile-level");
+		if(showAllReviews)
+			fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true, isNextBatch);
+		else
+			fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore , true, isNextBatch);
+	}
+}
 
 function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
 	if (currentProfileIden == undefined || currentProfileIden == "") {
@@ -950,8 +965,15 @@ function fetchZillowReviewsCallBack(data) {
 	
 }
 
+var reviewsNextBatch;
 function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
-		startIndex, numRows, minScore , isAsync) {
+		startIndex, numRows, minScore , isAsync, isNextBatch) {
+	
+	//Check if next batch of reviews are present
+	if( reviewsNextBatch != undefined &&  reviewsNextBatch.length > 0 ) {
+		paintReviews( reviewsNextBatch, true );
+	}
+	
 	if (currentProfileIden == undefined || currentProfileIden == "") {
 		return;
 	}
@@ -971,7 +993,26 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 		url = url + "&minScore=" + minScore;
 	}
 	isFetchReviewAjaxRequestRunning = true;
-	callAjaxGET(url, fetchReviewsCallBack, isAsync);
+	callAjaxGET(url, function(data) {
+		isFetchReviewAjaxRequestRunning = false;
+		var responseJson = $.parseJSON(data);
+		if (responseJson != undefined) {
+			var result = $.parseJSON(responseJson.entity);
+			if (result != undefined && result.length > 0) {
+				if(isNextBatch) {
+					reviewsNextBatch = result;
+				} else {
+					paintReviews(result, false);				
+				}
+			} else {
+				if ($("#profile-fetch-info").attr("fetch-all-reviews") == "false"
+						&& parseInt($('#prof-hidden-review-count').attr("data-nr-review-count")) > 0) {
+					$("#prof-hidden-review-count").show();
+				}
+			}
+		}
+	}, isAsync);
+	
 }
 
 function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
@@ -1000,22 +1041,6 @@ function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
 		url += '&notRecommended=' + notRecommended;
 	}
 	callAjaxGET(url, callbackFunction, true);
-}
-
-function fetchReviewsCallBack(data) {
-	isFetchReviewAjaxRequestRunning = false;
-	var responseJson = $.parseJSON(data);
-	if (responseJson != undefined) {
-		var result = $.parseJSON(responseJson.entity);
-		if (result != undefined && result.length > 0) {
-			paintReviews(result);
-		} else {
-			if ($("#profile-fetch-info").attr("fetch-all-reviews") == "false"
-					&& parseInt($('#prof-hidden-review-count').attr("data-nr-review-count")) > 0) {
-				$("#prof-hidden-review-count").show();
-			}
-		}
-	}
 }
 
 /**
