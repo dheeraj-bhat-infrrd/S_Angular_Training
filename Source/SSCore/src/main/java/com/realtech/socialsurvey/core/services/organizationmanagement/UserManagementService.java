@@ -375,7 +375,7 @@ public interface UserManagementService
     public User getCompanyAdmin( long companyId ) throws InvalidInputException;
 
 
-    public void updateUser( User user, Map<String, Object> map ) throws SolrException;
+    public void updateUser( User user, Map<String, Object> map ) throws SolrException, InvalidInputException;
 
 
     public User inviteUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,

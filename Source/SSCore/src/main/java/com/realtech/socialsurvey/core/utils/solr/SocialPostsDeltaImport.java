@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SolrImportDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -79,6 +80,9 @@ public class SocialPostsDeltaImport
                 solrSearchService.addSocialPostsToSolr( socialPosts );
             } catch ( SolrException e ) {
                 LOG.error( "SolrException occurred while adding social posts to solr", e );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "SolrException occurred while adding social posts to solr", e );
+
             }
             pageNo++;
         } while ( !socialPosts.isEmpty() );
