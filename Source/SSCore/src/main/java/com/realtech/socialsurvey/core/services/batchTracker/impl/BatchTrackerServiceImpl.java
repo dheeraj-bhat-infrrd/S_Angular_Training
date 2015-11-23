@@ -47,7 +47,8 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
     {
         LOG.debug( "method getLastRunTimeByBatchType() started for batch type : " + batchType );
 
-        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class, CommonConstants.BATCH_TYPE_COLUMN, batchType );
+        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
+            CommonConstants.BATCH_TYPE_COLUMN, batchType );
         if ( batchTrackerList == null || batchTrackerList.isEmpty() ) {
             throw new NoRecordsFetchedException( "Invalid batch type" );
         }
@@ -64,13 +65,14 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
     public void updateModifiedOnColumnByBatchType( String batchType ) throws NoRecordsFetchedException, InvalidInputException
     {
         LOG.debug( "method updateModifiedOnColumnByBatchType() started for batch type : " + batchType );
-        if(batchType !=null && ! batchType.isEmpty()){
-            throw new InvalidInputException("passed parameter batchtype is incorrect");
+        if ( batchType != null && !batchType.isEmpty() ) {
+            throw new InvalidInputException( "passed parameter batchtype is incorrect" );
         }
 
         List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
             CommonConstants.BATCH_TYPE_COLUMN, batchType );
-        if ( batchTrackerList == null || batchTrackerList.size() <= 0 || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
+        if ( batchTrackerList == null || batchTrackerList.size() <= 0
+            || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
             throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
         }
 
@@ -122,7 +124,9 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
         try {
             solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
         } catch ( SolrException e ) {
-            LOG.error( "Error while updating review count" );
+            LOG.error( "Error while updating review count", e );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Error while updating review count", e );
         }
         LOG.debug( "method updateReviewCountForAgentsInSolr() ended" );
     }

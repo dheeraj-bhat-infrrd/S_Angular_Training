@@ -84,8 +84,9 @@ public interface SolrSearchService
      * 
      * @param region
      * @throws SolrException
+     * @throws InvalidInputException 
      */
-    public void addOrUpdateRegionToSolr( Region region ) throws SolrException;
+    public void addOrUpdateRegionToSolr( Region region ) throws SolrException, InvalidInputException;
 
 
     /**
@@ -93,19 +94,19 @@ public interface SolrSearchService
      * 
      * @param branch
      * @throws SolrException
+     * @throws InvalidInputException 
      */
-    public void addOrUpdateBranchToSolr( Branch branch ) throws SolrException;
+    public void addOrUpdateBranchToSolr( Branch branch ) throws SolrException, InvalidInputException;
 
 
     public String searchUsersByLoginNameAndCompany( String userNamePattern, Company company ) throws InvalidInputException,
-        SolrException, MalformedURLException;
+        SolrException;
 
 
-    public void addUserToSolr( User user ) throws SolrException;
+    public void addUserToSolr( User user ) throws SolrException, InvalidInputException;
 
 
-    public SolrDocumentList searchUsersByLoginNameOrName( String pattern, long companyId, int startIndex, int batchSize ) throws InvalidInputException, SolrException,
-        MalformedURLException;
+    public SolrDocumentList searchUsersByLoginNameOrName( String pattern, long companyId, int startIndex, int batchSize ) throws InvalidInputException, SolrException, MalformedURLException;
 
 
     /**
@@ -122,7 +123,7 @@ public interface SolrSearchService
 
 
     public SolrDocumentList searchUsersByCompany( long companyId, int startIndex, int noOfRows ) throws InvalidInputException,
-        SolrException, MalformedURLException;
+        SolrException;
 
 
     public long countUsersByCompany( long companyId, int startIndex, int noOfRows ) throws InvalidInputException,
@@ -138,7 +139,7 @@ public interface SolrSearchService
 
 
     
-    public void removeUserFromSolr( long userIdToRemove ) throws SolrException;
+    public void removeUserFromSolr( long userIdToRemove ) throws SolrException, InvalidInputException;
 
 
     /**
@@ -164,10 +165,10 @@ public interface SolrSearchService
     public SolrDocument getUserByUniqueId( long userId ) throws InvalidInputException, SolrException;
 
 
-    public void editUserInSolr( long userId, String key, String value ) throws SolrException;
+    public void editUserInSolr( long userId, String key, String value ) throws SolrException, InvalidInputException;
 
 
-    public void editUserInSolrWithMultipleValues( long userId, Map<String, Object> map ) throws SolrException;
+    public void editUserInSolrWithMultipleValues( long userId, Map<String, Object> map ) throws SolrException, InvalidInputException;
 
 
     /**
@@ -236,8 +237,9 @@ public interface SolrSearchService
      * 
      * @param regions
      * @throws SolrException
+     * @throws InvalidInputException 
      */
-    public void addRegionsToSolr( List<Region> regions ) throws SolrException;
+    public void addRegionsToSolr( List<Region> regions ) throws SolrException, InvalidInputException;
 
 
     /**
@@ -245,8 +247,9 @@ public interface SolrSearchService
      * 
      * @param branches
      * @throws SolrException
+     * @throws InvalidInputException 
      */
-    public void addBranchesToSolr( List<Branch> branches ) throws SolrException;
+    public void addBranchesToSolr( List<Branch> branches ) throws SolrException, InvalidInputException;
 
 
     /**
@@ -254,32 +257,33 @@ public interface SolrSearchService
      * 
      * @param users
      * @throws SolrException
+     * @throws InvalidInputException 
      */
-    public void addUsersToSolr( List<User> users ) throws SolrException;
+    public void addUsersToSolr( List<User> users ) throws SolrException, InvalidInputException;
 
 
-    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount) throws SolrException, NoRecordsFetchedException;
+    public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount) throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 
-    public Map<String, String> getCompanyAdmin( long companyId ) throws SolrException;
+    public Map<String, String> getCompanyAdmin( long companyId ) throws SolrException, InvalidInputException;
 
 
     public List<Long> searchUserIdsByCompany( long companyId ) throws InvalidInputException, SolrException;
 
 
-    public void removeUsersFromSolr( List<Long> agentIds ) throws SolrException;
+    public void removeUsersFromSolr( List<Long> agentIds ) throws SolrException, InvalidInputException;
 
 
     public List<Long> searchBranchIdsByCompany( long companyId ) throws SolrException, InvalidInputException;
 
 
-    public void removeBranchesFromSolr( List<Long> branchIds ) throws SolrException;
+    public void removeBranchesFromSolr( List<Long> branchIds ) throws SolrException, InvalidInputException;
 
 
     public List<Long> searchRegionIdsByCompany( long companyId ) throws InvalidInputException, SolrException;
 
 
-    public void removeRegionsFromSolr( List<Long> regionIds ) throws SolrException;
+    public void removeRegionsFromSolr( List<Long> regionIds ) throws SolrException, InvalidInputException;
 
 
     public long getRegionsCount( String regionPattern, Company company, Set<Long> regionIds ) throws InvalidInputException,
@@ -309,10 +313,10 @@ public interface SolrSearchService
     public Long fetchRegionCountByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
 
 
-    void addSocialPostsToSolr( List<SocialPost> socialPosts ) throws SolrException;
+    void addSocialPostsToSolr( List<SocialPost> socialPosts ) throws SolrException, InvalidInputException;
 
 
-    Collection<SocialPost> getSocialPostsFromSolrDocuments( SolrDocumentList documentList );
+    Collection<SocialPost> getSocialPostsFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException;
 
 
     SolrDocumentList fetchSocialPostsByEntity( String entityType, long entityId, int startIndex, int noOfRows )
@@ -325,16 +329,16 @@ public interface SolrSearchService
     Date getLastBuildTimeForSocialPosts() throws SolrException;
     
     
-    public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException;
+    public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException, InvalidInputException;
 
 
     public SolrDocumentList searchUsersByLoginNameOrNameUnderAdmin( String pattern, User admin, UserFromSearch adminFromSearch,
         int startIndex, int batchSize ) throws InvalidInputException, SolrException, MalformedURLException;
 
 
-    public Set<Long> getUserIdsFromSolrDocumentList( SolrDocumentList userIdList );
+    public Set<Long> getUserIdsFromSolrDocumentList( SolrDocumentList userIdList ) throws InvalidInputException;
 
 
-    List<UserFromSearch> getUsersWithMetaDataFromSolrDocuments( SolrDocumentList documentList );
+    List<UserFromSearch> getUsersWithMetaDataFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException;
 }
 // JIRA:SS-62 BY RM 02 EOC
