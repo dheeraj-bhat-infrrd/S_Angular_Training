@@ -1,13 +1,14 @@
 <dataConfig>
-    <dataSource type="JdbcDataSource" name="ss_user" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/ss_user" batchSize="-1" user="root" password=""/>
+    <dataSource type="JdbcDataSource" name="ss_user" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/ss_user" batchSize="-1" user="root" password="root"/>
+    <dataSource name="mymongodb" type="MongoDataSource" database="ss_db" url="mongodb://localhost:27017"/>
    <document>
         <entity name="region" dataSource="ss_user" query="SELECT REGION_ID, COMPANY_ID, REGION, IS_DEFAULT_BY_SYSTEM, STATUS, CREATED_ON, CREATED_BY,
-          MODIFIED_ON, MODIFIED_BY FROM REGION;" 
+          MODIFIED_ON, MODIFIED_BY FROM REGION;"
 
-          deltaImportQuery = "SELECT REGION_ID, COMPANY_ID, REGION, IS_DEFAULT_BY_SYSTEM, STATUS, CREATED_ON, CREATED_BY, MODIFIED_ON, MODIFIED_BY FROM REGION WHERE REGION_ID = '${dataimporter.delta.regionId}';" 
+          deltaImportQuery = "SELECT REGION_ID, COMPANY_ID, REGION, IS_DEFAULT_BY_SYSTEM, STATUS, CREATED_ON, CREATED_BY, MODIFIED_ON, MODIFIED_BY FROM REGION WHERE REGION_ID = '${dataimporter.delta.regionId}';"
 
           deltaQuery = "SELECT REGION_ID FROM REGION WHERE MODIFIED_ON &gt; DATE_FORMAT(DATE_ADD('${dataimporter.last_index_time}',INTERVAL -1 MINUTE), '%Y-%m-%d %H:%i');">
-         
+
       			<field column="REGION_ID" name="regionId" />
             <field column="COMPANY_ID" name="companyId" />
             <field column="REGION" name="regionName" />
@@ -17,7 +18,8 @@
             <field column="MODIFIED_BY" name="modifiedBy" />
             <field column="CREATED_ON" name="createdOn" />
             <field column="CREATED_BY" name="createdBy" />
-          
+            <entity name="regionSetting" processor="MongoEntityProcessor" collection="REGION_SETTINGS" dataSource="mymongodb" query="{iden : ${region.REGION_ID}}" transformer="MongoMapperTransformer, com.realtech.socialsurvey.solr.Transformers.AddressTransformer">
+            </entity>
         </entity>
     </document>
 </dataConfig>
