@@ -325,8 +325,12 @@ public class EncryptionHelper {
 	}
 
 
-    public String encodeBase64( String plainText )
+    public String encodeBase64( String plainText ) throws InvalidInputException
     {
+        if ( plainText == null || plainText.isEmpty() ) {
+            LOG.error( "Plain text passed in argument is empty" );
+            throw new InvalidInputException( "Plain text passed in argument is empty" );
+        }
         LOG.debug( "Encoding the input into Base64, encodeBase64 called" );
 
         String encryptedStr = Base64.encodeBase64URLSafeString( plainText.getBytes() );
@@ -336,8 +340,12 @@ public class EncryptionHelper {
     }
 
 
-    public String decodeBase64( String encryptedText )
+    public String decodeBase64( String encryptedText ) throws InvalidInputException
     {
+        if ( encryptedText == null || encryptedText.isEmpty() ) {
+            LOG.error( "Encrypted text passed in argument is empty" );
+            throw new InvalidInputException( "Encrypted text passed in argument is empty" );
+        }
         LOG.debug( "Decoding the input into Base64,decodeBase64 called" );
 
         byte[] key = Base64.decodeBase64( encryptedText.getBytes() );
