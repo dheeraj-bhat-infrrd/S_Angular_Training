@@ -2573,7 +2573,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public void updateUser( User user, Map<String, Object> map ) throws SolrException
+    public void updateUser( User user, Map<String, Object> map ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method updateUser() started to update user." );
         userDao.merge( user );

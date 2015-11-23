@@ -232,6 +232,8 @@ public class SocialAsyncServiceImpl implements SocialAsyncService
                     .getContact_details().getAbout_me() );
             } catch ( SolrException e ) {
                 LOG.error( "Could not update details in solr", e );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Could not update details in solr", e );
             }
         }
 
@@ -266,6 +268,8 @@ public class SocialAsyncServiceImpl implements SocialAsyncService
             solrSearchService.editUserInSolr( unitSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR,
                 unitSettings.getProfileImageUrl() );
         } catch ( SolrException e ) {
+            LOG.error( "Could not update details in solr", e );
+        } catch ( InvalidInputException e ) {
             LOG.error( "Could not update details in solr", e );
         }
 

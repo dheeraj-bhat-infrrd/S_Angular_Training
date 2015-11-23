@@ -260,6 +260,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public String searchBranchesByRegion( long regionId, int start, int rows ) throws InvalidInputException, SolrException
     {
         LOG.info( "Method searchBranchesByRegion() to search branches in a region started" );
+
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "Invalid parameter passed : region id is invalid" );
+        }
+
         String branchResult = null;
         QueryResponse response = null;
         try {
@@ -307,6 +312,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public long getBranchCountByRegion( long regionId ) throws InvalidInputException, SolrException
     {
         LOG.info( "Method searchBranchesByRegion() to search branches in a region started" );
+
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "Invalid parameter passed : region id is invalid" );
+        }
+
         String branchResult = null;
         QueryResponse response = null;
         try {
@@ -331,11 +341,17 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     /**
      * Method to add region into solr
+     * @throws InvalidInputException 
      */
     @Override
-    public void addOrUpdateRegionToSolr( Region region ) throws SolrException
+    public void addOrUpdateRegionToSolr( Region region ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method to add or update region to solr called for region : " + region );
+
+        if ( region == null ) {
+            throw new InvalidInputException( "Invalid parameter is passed : region parameter is null" );
+        }
+
         SolrServer solrServer;
         try {
 
@@ -358,11 +374,17 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     /**
      * Method to add branch into solr
+     * @throws InvalidInputException 
      */
     @Override
-    public void addOrUpdateBranchToSolr( Branch branch ) throws SolrException
+    public void addOrUpdateBranchToSolr( Branch branch ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method to add/update branch to solr called for branch : " + branch );
+
+        if ( branch == null ) {
+            throw new InvalidInputException( "Invalid parameter is passed : branch parameter is null" );
+        }
+
         SolrServer solrServer;
         try {
             solrServer = new HttpSolrServer( solrBranchUrl );
@@ -469,7 +491,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
      */
     @Override
     public String searchUsersByLoginNameAndCompany( String loginNamePattern, Company company ) throws InvalidInputException,
-        SolrException, MalformedURLException
+        SolrException
     {
         LOG.info( "Method searchUsers called for userNamePattern :" + loginNamePattern );
         if ( loginNamePattern == null || loginNamePattern.isEmpty() ) {
@@ -523,6 +545,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
         if ( pattern == null ) {
             throw new InvalidInputException( "Pattern is null or empty while searching for Users" );
         }
+
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid company id while searching for Users" );
+        }
+
         LOG.info( "Method searchUsersByLoginNameOrName() called for parameter : " + pattern );
         SolrDocumentList results;
         QueryResponse response = null;
@@ -624,10 +651,10 @@ public class SolrSearchServiceImpl implements SolrSearchService
      */
     @Override
     public SolrDocumentList searchUsersByCompany( long companyId, int startIndex, int noOfRows ) throws InvalidInputException,
-        SolrException, MalformedURLException
+        SolrException
     {
-        if ( companyId < 0 ) {
-            throw new InvalidInputException( "Pattern is null or empty while searching for Users" );
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "companyId is null or empty while searching for Users" );
         }
         LOG.info( "Method searchUsersByCompanyId() called for company id : " + companyId );
 
@@ -663,7 +690,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         SolrException, MalformedURLException
     {
         LOG.info( "Method countUsersByCompany() called for company id : " + companyId );
-        if ( companyId < 0 ) {
+        if ( companyId <= 0l ) {
             throw new InvalidInputException( "Pattern is null or empty while searching for Users" );
         }
 
@@ -694,10 +721,16 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     /**
      * Method to add User into solr
+     * @throws InvalidInputException 
      */
     @Override
-    public void addUserToSolr( User user ) throws SolrException
+    public void addUserToSolr( User user ) throws SolrException, InvalidInputException
     {
+        if ( user == null ) {
+            throw new InvalidInputException( "Invalid parameter passed : user pararmeter is null" );
+        }
+
+
         LOG.info( "Method to add user to solr called for user : " + user.getFirstName() );
         SolrServer solrServer;
         UpdateResponse response = null;
@@ -786,8 +819,10 @@ public class SolrSearchServiceImpl implements SolrSearchService
         document.addField( CommonConstants.BRANCHES_SOLR, branches );
         document.addField( CommonConstants.REGIONS_SOLR, regions );
         document.addField( CommonConstants.IS_AGENT_SOLR, ( user.isAgent() ? user.isAgent() : isAgent ) );
-        document.addField( CommonConstants.IS_BRANCH_ADMIN_SOLR, ( user.isBranchAdmin() ? user.isBranchAdmin() : isBranchAdmin ) );
-        document.addField( CommonConstants.IS_REGION_ADMIN_SOLR, ( user.isRegionAdmin()? user.isRegionAdmin() : isRegionAdmin ) );
+        document
+            .addField( CommonConstants.IS_BRANCH_ADMIN_SOLR, ( user.isBranchAdmin() ? user.isBranchAdmin() : isBranchAdmin ) );
+        document
+            .addField( CommonConstants.IS_REGION_ADMIN_SOLR, ( user.isRegionAdmin() ? user.isRegionAdmin() : isRegionAdmin ) );
 
         return document;
     }
@@ -797,9 +832,13 @@ public class SolrSearchServiceImpl implements SolrSearchService
      * Method to remove a user from Solr
      */
     @Override
-    public void removeUserFromSolr( long userIdToRemove ) throws SolrException
+    public void removeUserFromSolr( long userIdToRemove ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method removeUserFromSolr() to remove user id {} from solr started.", userIdToRemove );
+        if ( userIdToRemove <= 0l ) {
+            throw new InvalidInputException( "Invalid input pareameter : passed user id is not valid" );
+        }
+
         try {
             SolrServer solrServer = new HttpSolrServer( solrUserUrl );
             solrServer.deleteById( String.valueOf( userIdToRemove ) );
@@ -819,6 +858,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public String getUserDisplayNameById( long userId ) throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         LOG.info( "Method to fetch user from solr based upon user id, searchUserById() started." );
+
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "Invalid input pareameter : passed user id is not valid" );
+        }
+
         SolrDocument solrDocument = getUserByUniqueId( userId );
         if ( solrDocument == null || solrDocument.isEmpty() ) {
             throw new NoRecordsFetchedException( "No document found in solr for userId:" + userId );
@@ -866,11 +910,16 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     /**
      * Method to edit User in solr
+     * @throws InvalidInputException 
      */
     @Override
-    public void editUserInSolr( long userId, String key, String value ) throws SolrException
+    public void editUserInSolr( long userId, String key, String value ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method to edit user in solr called for user : " + userId );
+
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "userId is invalid for edit user in solr" );
+        }
 
         try {
             // Setting values to Map with instruction
@@ -894,9 +943,17 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void editUserInSolrWithMultipleValues( long userId, Map<String, Object> map ) throws SolrException
+    public void editUserInSolrWithMultipleValues( long userId, Map<String, Object> map ) throws SolrException,
+        InvalidInputException
     {
         LOG.info( "Method to edit user in solr called for user : " + userId );
+
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "userId is invalid for edit user in solr" );
+        }
+        if ( map == null ) {
+            throw new InvalidInputException( "empty map massed for edit user in solr" );
+        }
 
         try {
             // Setting values to Map with instruction
@@ -1061,7 +1118,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public String searchRegionById( long regionId ) throws InvalidInputException, SolrException
     {
         LOG.info( "Method searchRegionById called for regionId :" + regionId );
-        if ( regionId < 0 ) {
+        if ( regionId <= 0l ) {
             throw new InvalidInputException( "Region id is null while searching for region" );
         }
         String regionName = null;
@@ -1098,7 +1155,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public String searchBranchNameById( long branchId ) throws InvalidInputException, SolrException
     {
         LOG.info( "Method searchBrancNameById called for branchId :" + branchId );
-        if ( branchId < 0 ) {
+        if ( branchId <= 0l ) {
             throw new InvalidInputException( "Branch id is null while searching for Branch" );
         }
         String branchName = null;
@@ -1136,6 +1193,14 @@ public class SolrSearchServiceImpl implements SolrSearchService
         throws InvalidInputException, SolrException
     {
         LOG.info( "Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company started" );
+
+        if ( searchColumn == null || searchColumn.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed searchColumn is null or invalid" );
+        }
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed columnName is null or invalid" );
+        }
+
         List<SolrDocument> results = new ArrayList<SolrDocument>();
         QueryResponse response = null;
         searchKey = searchKey + "*";
@@ -1203,8 +1268,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public String fetchRegionsByCompany( long companyId, int size ) throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        if ( companyId < 0 ) {
-            throw new InvalidInputException( "Pattern is null or empty while searching for Regions" );
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "company id is null or empty while searching for Regions" );
         }
         LOG.info( "Method fetchRegionsByCompany() called for company id : " + companyId );
         String regionsResult = null;
@@ -1241,9 +1306,13 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public SolrDocumentList fetchSocialPostsByEntity( String entityType, long entityId, int startIndex, int noOfRows )
         throws InvalidInputException, SolrException, MalformedURLException
     {
-        if ( entityId < 0 ) {
+        if ( entityId <= 0l ) {
             throw new InvalidInputException( "Pattern is null or empty while fetching social posts" );
         }
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed entityType is null or invalid" );
+        }
+
         LOG.info( "Method fetchSocialPostsByEntity() called for entity id : " + entityId + " and entity type : " + entityType );
         SolrDocumentList results = null;
         try {
@@ -1273,9 +1342,16 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public SolrDocumentList searchPostText( String entityType, long entityId, int startIndex, int noOfRows, String searchQuery )
         throws InvalidInputException, SolrException, MalformedURLException
     {
-        if ( entityId < 0 ) {
+        if ( entityId <= 0l ) {
             throw new InvalidInputException( "Pattern is null or empty while fetching social posts" );
         }
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed entityType is null or invalid" );
+        }
+        if ( searchQuery == null ) {
+            throw new InvalidInputException( "Invalid input parameter : passed searchQuery is null" );
+        }
+
         LOG.info( "Method searchPostText() called for entity id : " + entityId + " and entity type : " + entityType );
         SolrDocumentList results = null;
         try {
@@ -1304,8 +1380,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public String fetchBranchesByCompany( long companyId, int size ) throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        if ( companyId < 0 ) {
-            throw new InvalidInputException( "Pattern is null or empty while searching for Branches" );
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "companyId is null or empty while searching for Branches" );
         }
         LOG.info( "Method fetchBranchesByCompany() called for company id : " + companyId );
         String branchesResult = null;
@@ -1334,8 +1410,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
     @Override
     public Long fetchBranchCountByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException
     {
-        if ( companyId < 0 ) {
-            throw new InvalidInputException( "Pattern is null or empty while searching for Branches" );
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "companyId is invalid while searching for Branches" );
         }
         LOG.info( "Method fetchBranchCountByCompany() called for company id : " + companyId );
         QueryResponse response = null;
@@ -1361,7 +1437,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
     @Override
     public Long fetchRegionCountByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException
     {
-        if ( companyId < 0 ) {
+        if ( companyId <= 0l ) {
             throw new InvalidInputException( "companyId is null or empty while searching for Regions" );
         }
         LOG.info( "Method fetchRegionCountByCompany() called for company id : " + companyId );
@@ -1482,9 +1558,14 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void addRegionsToSolr( List<Region> regions ) throws SolrException
+    public void addRegionsToSolr( List<Region> regions ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method to add regions to solr called" );
+
+        if ( regions == null || regions.size() <= 0 ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed region list is null or empty" );
+        }
+
         SolrServer solrServer;
 
         try {
@@ -1525,9 +1606,14 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void addBranchesToSolr( List<Branch> branches ) throws SolrException
+    public void addBranchesToSolr( List<Branch> branches ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method to add branches to solr called" );
+
+        if ( branches == null || branches.size() <= 0 ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed branche list is null or empty" );
+        }
+
         SolrServer solrServer;
 
         try {
@@ -1569,11 +1655,17 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     /**
      * Method to index a list of social posts in Solr
+     * @throws InvalidInputException 
      */
     @Override
-    public void addSocialPostsToSolr( List<SocialPost> socialPosts ) throws SolrException
+    public void addSocialPostsToSolr( List<SocialPost> socialPosts ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method to add social posts to solr called" );
+
+        if ( socialPosts == null || socialPosts.size() <= 0 ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed socialPost list is null or empty" );
+        }
+
         SolrServer solrServer;
 
         try {
@@ -1601,9 +1693,14 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void addUsersToSolr( List<User> users ) throws SolrException
+    public void addUsersToSolr( List<User> users ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method to add users to solr called" );
+
+        if ( users == null || users.size() <= 0 ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed user list is null or empty" );
+        }
+
         SolrServer solrServer;
 
         try {
@@ -1657,9 +1754,14 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Override
     public void updateCompletedSurveyCountForUserInSolr( long agentId, int incrementCount ) throws SolrException,
-        NoRecordsFetchedException
+        NoRecordsFetchedException, InvalidInputException
     {
         LOG.info( "Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished." );
+
+        if ( agentId <= 0l ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed agentId is invalid" );
+        }
+
         SolrServer solrServer;
         solrServer = new HttpSolrServer( solrUserUrl );
         SolrQuery solrQuery = new SolrQuery();
@@ -1695,9 +1797,15 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException
+    public void updateCompletedSurveyCountForMultipleUserInSolr( Map<Long, Integer> usersReviewCount ) throws SolrException,
+        InvalidInputException
     {
         LOG.info( "Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished." );
+
+        if ( usersReviewCount == null || usersReviewCount.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed usersReviewCount map is null or empty" );
+        }
+
         SolrServer solrServer;
         solrServer = new HttpSolrServer( solrUserUrl );
 
@@ -1729,9 +1837,14 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public Map<String, String> getCompanyAdmin( long companyId ) throws SolrException
+    public Map<String, String> getCompanyAdmin( long companyId ) throws SolrException, InvalidInputException
     {
         LOG.info( "Method getEmailIdOfCompanyAdmin() started" );
+
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed companyId is invalid" );
+        }
+
         try {
             SolrServer solrServer;
             solrServer = new HttpSolrServer( solrUserUrl );
@@ -1769,7 +1882,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
     @Override
     public List<Long> searchUserIdsByCompany( long companyId ) throws InvalidInputException, SolrException
     {
-        if ( companyId < 0 ) {
+        if ( companyId <= 0l ) {
             throw new InvalidInputException( "Pattern is null or empty while searching for Users" );
         }
         LOG.info( "Method searchUsersByCompanyId() called for company id : " + companyId );
@@ -1803,8 +1916,13 @@ public class SolrSearchServiceImpl implements SolrSearchService
      * Method to remove all the users from Solr based upon the list of ids provided.
      */
     @Override
-    public void removeUsersFromSolr( List<Long> agentIds ) throws SolrException
+    public void removeUsersFromSolr( List<Long> agentIds ) throws SolrException, InvalidInputException
     {
+
+        if ( agentIds == null || agentIds.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed agentIds list is null or empty" );
+        }
+
         SolrServer solrServer = new HttpSolrServer( solrUserUrl );
         if ( agentIds != null && !agentIds.isEmpty() ) {
             String agentIdsStr = getSpaceSeparatedStringFromIds( new HashSet<>( agentIds ) );
@@ -1830,7 +1948,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
     @Override
     public List<Long> searchBranchIdsByCompany( long companyId ) throws InvalidInputException, SolrException
     {
-        if ( companyId < 0 ) {
+        if ( companyId <= 0l ) {
             throw new InvalidInputException( "Company ID is null while searching for branches." );
         }
         LOG.info( "Method searchBranchIdsByCompany() called for company id : " + companyId );
@@ -1860,8 +1978,13 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void removeBranchesFromSolr( List<Long> branchIds ) throws SolrException
+    public void removeBranchesFromSolr( List<Long> branchIds ) throws SolrException, InvalidInputException
     {
+
+        if ( branchIds == null || branchIds.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed branchId list is null or empty" );
+        }
+
         SolrServer solrServer = new HttpSolrServer( solrBranchUrl );
         if ( branchIds != null && !branchIds.isEmpty() ) {
             String branchIdsStr = getSpaceSeparatedStringFromIds( new HashSet<>( branchIds ) );
@@ -1887,7 +2010,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
     @Override
     public List<Long> searchRegionIdsByCompany( long companyId ) throws InvalidInputException, SolrException
     {
-        if ( companyId < 0 ) {
+        if ( companyId <= 0l ) {
             throw new InvalidInputException( "Company ID is null while searching for regions." );
         }
         LOG.info( "Method searchBranchIdsByCompany() called for company id : " + companyId );
@@ -1917,8 +2040,13 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public void removeRegionsFromSolr( List<Long> regionIds ) throws SolrException
+    public void removeRegionsFromSolr( List<Long> regionIds ) throws SolrException, InvalidInputException
     {
+
+        if ( regionIds == null || regionIds.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed regionId list is null or empty" );
+        }
+
         SolrServer solrServer = new HttpSolrServer( solrRegionUrl );
         if ( regionIds != null && !regionIds.isEmpty() ) {
             String regionIdsStr = getSpaceSeparatedStringFromIds( new HashSet<>( regionIds ) );
@@ -2004,11 +2132,17 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     /**
      * Method to get a list of social posts given the Solr document.
+     * @throws InvalidInputException 
      */
     @Override
-    public List<SocialPost> getSocialPostsFromSolrDocuments( SolrDocumentList documentList )
+    public List<SocialPost> getSocialPostsFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException
     {
         LOG.info( "Method getSocialPostsFromSolrDocuments() started" );
+
+        if ( documentList == null ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter documentList is null" );
+        }
+
         List<SocialPost> matchedSocialPosts = new ArrayList<SocialPost>();
         for ( SolrDocument document : documentList ) {
             SocialPost post = new SocialPost();
@@ -2068,6 +2202,10 @@ public class SolrSearchServiceImpl implements SolrSearchService
     @SuppressWarnings ( "unchecked")
     public Collection<UserFromSearch> getUsersFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException
     {
+        if ( documentList == null ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter documentList is null" );
+        }
+
         Map<Long, UserFromSearch> matchedUsers = new LinkedHashMap<>();
         for ( SolrDocument document : documentList ) {
             UserFromSearch user = new UserFromSearch();
@@ -2105,27 +2243,34 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
         return matchedUsers.values();
     }
-    
+
+
     /**
      * 
      * @param documentList
      * @return
+     * @throws InvalidInputException 
      */
     @Override
     public List<UserFromSearch> getUsersWithMetaDataFromSolrDocuments( SolrDocumentList documentList )
+        throws InvalidInputException
     {
+        if ( documentList == null ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter documentList is null" );
+        }
+
         LOG.debug( "method getUsersWithMetaDataFromSolrDocuments started" );
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
         for ( SolrDocument document : documentList ) {
             UserFromSearch user = new UserFromSearch();
-            
-            user.setUserId( Long.parseLong(document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
+
+            user.setUserId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
             user.setAgent( Boolean.parseBoolean( document.get( CommonConstants.IS_AGENT_SOLR ).toString() ) );
             user.setStatus( Integer.parseInt( document.get( CommonConstants.STATUS_SOLR ).toString() ) );
             user.setFirstName( document.get( CommonConstants.USER_FIRST_NAME_SOLR ).toString() );
-            if(document.get( CommonConstants.USER_LAST_NAME_SOLR ) != null)
+            if ( document.get( CommonConstants.USER_LAST_NAME_SOLR ) != null )
                 user.setLastName( document.get( CommonConstants.USER_LAST_NAME_SOLR ).toString() );
-            if(document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ) != null)
+            if ( document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ) != null )
                 user.setDisplayName( document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ).toString() );
             userList.add( user );
         }
@@ -2181,7 +2326,12 @@ public class SolrSearchServiceImpl implements SolrSearchService
         if ( pattern == null ) {
             throw new InvalidInputException( "Pattern is null or empty while searching for Users" );
         }
-        LOG.info( "Method searchUsersByLoginNameOrNameUnderAdmin() called for parameter : " + pattern );
+        if ( admin == null ) {
+            throw new InvalidInputException( "admin is null or empty while searching for Users" );
+        }
+        if ( adminFromSearch == null ) {
+            throw new InvalidInputException( "adminFromSearch is null or empty while searching for Users" );
+        }
 
         SolrDocumentList results;
         QueryResponse response = null;
@@ -2232,8 +2382,12 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     @Override
-    public Set<Long> getUserIdsFromSolrDocumentList( SolrDocumentList userIdList )
+    public Set<Long> getUserIdsFromSolrDocumentList( SolrDocumentList userIdList ) throws InvalidInputException
     {
+        if ( userIdList == null ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter documentList is null" );
+        }
+
         Set<Long> userIds = new LinkedHashSet<Long>();
         for ( SolrDocument userId : userIdList ) {
             userIds.add( Long.parseLong( userId.get( CommonConstants.USER_ID_SOLR ).toString() ) );
