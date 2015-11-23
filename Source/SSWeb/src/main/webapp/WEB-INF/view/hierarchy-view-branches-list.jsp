@@ -24,20 +24,6 @@
 		<tr id="tr-branch-row-${branch.branchId}" data-regionid="${branch.regionId}" data-branchid="${branch.branchId}" clicked="false"
 			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-r${branch.regionId}-b${branch.branchId}">
 		    <td class="v-tbl-line"><div class="v-line-brnch"></div></td>
-		    <%-- <td class="v-tbl-img">
-           		<c:choose>
-    				<c:when test="${not empty branch.profileImageUrl}">
-        				<div  class="float-left profile-image-display" style="background: url(${branch.profileImageUrl}) 50% 50% / cover no-repeat;">
-							<span></span>
-						</div> 
-    				</c:when>    
-    				<c:otherwise>
-        				<div id="" class="float-left profile-image-display" style="">
-							<span id="">${fn:substring(branch.branchName, 0, 1)}</span>
-						</div> 
-    				</c:otherwise>
-				</c:choose>
-			</td> --%>
 		    <td class="v-tbl-name">${branch.branchName}</td>
 		    <td class="v-tbl-add">
 		    	<c:if test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;
@@ -66,16 +52,16 @@
 	<c:forEach var="regionUser" items="${individuals}">
 		<c:choose>
 			<c:when test="${regionUser.isOwner == 1}">
-				<c:set value="1" var="currentprofilemasterid"></c:set>
+				<c:set value="1" var="currentprofilemasterid" />
 			</c:when>
 			<c:when test="${regionUser.isRegionAdmin}">
-				<c:set value="2" var="currentprofilemasterid"></c:set>
+				<c:set value="2" var="currentprofilemasterid" />
 			</c:when>
 			<c:when test="${regionUser.isBranchAdmin}">
-				<c:set value="3" var="currentprofilemasterid"></c:set>
+				<c:set value="3" var="currentprofilemasterid" />
 			</c:when>
 			<c:when test="${regionUser.isAgent}">
-				<c:set value="4" var="currentprofilemasterid"></c:set>
+				<c:set value="4" var="currentprofilemasterid" />
 			</c:when>
 		</c:choose>
 		
@@ -151,10 +137,16 @@
 							<div class="float-left v-tbl-icn  ${admincaneditclass}"></div>
 						</c:otherwise>
 					</c:choose>
-					 <div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
-						title="<spring:message code="label.widget.key" />"
-						onclick="generateWidget($(this),${regionUser .userId }, 'individual');"></div>  
-						 
+					 <c:choose>
+						<c:when test="${regionUser.isAgent}">
+							 <div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
+								title="<spring:message code="label.widget.key" />"
+								onclick="generateWidget($(this),${regionUser.userId }, 'individual');"></div>  
+						</c:when>
+						<c:otherwise>
+							<div class="float-left v-tbl-top-spacer"></div>
+						</c:otherwise>
+					</c:choose>
 					<c:choose>
 						<c:when test="${regionUser.status == 2}">
 							<div class="float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>

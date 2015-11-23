@@ -40,7 +40,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     private static final Logger LOG = LoggerFactory.getLogger( UserProfileDaoImpl.class );
     private final String regionUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
     private final String branchUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, BRANCH_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.BRANCH_ID = UP.BRANCH_ID and subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID  and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
-    private final String companyUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ? ) AS subQuery_UP ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID and REGION_ID != ? and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
+    private final String companyUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ? ) AS subQuery_UP ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS";
 
 
     /*
@@ -302,8 +302,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
         query.setParameter( 2, user.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.DEFAULT_COMPANY_ID );
-        query.setParameter( 4, CommonConstants.STATUS_INACTIVE );
+        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
 
         LOG.info( "Method call ended for getUsersUnderCompanyAdminCount for company admin id : " + user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
@@ -376,8 +375,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 0, admin.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
         query.setParameter( 2, admin.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.DEFAULT_COMPANY_ID );
-        query.setParameter( 4, CommonConstants.STATUS_INACTIVE );
+        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
         if ( startIndex > -1 ) {
             query.setFirstResult( startIndex );
         }
