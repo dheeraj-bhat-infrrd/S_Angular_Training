@@ -634,8 +634,6 @@
         		'eventValue': gaName
         	});
 		}, 2000);
-    	
-    	$('.mobile-tabs').children('.mob-icn-active').click();
     });
 </script>
 </body>
