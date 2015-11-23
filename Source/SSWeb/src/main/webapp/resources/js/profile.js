@@ -918,7 +918,6 @@ $(document).scroll(function(){
 		if(startIndex <= totalReviews) {
 			startIndex = startIndex + numOfRows;
 			var profileLevel = $("#profile-fetch-info").attr("profile-level");
-			showOverlay();
 			if(showAllReviews)
 				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true);
 			else
