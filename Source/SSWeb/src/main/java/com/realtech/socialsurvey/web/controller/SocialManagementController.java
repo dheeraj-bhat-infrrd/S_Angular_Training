@@ -2469,13 +2469,14 @@ public class SocialManagementController
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
-        try {
+        //TODO: Fix issue : this Directory is closed
+/*        try {
             //Get last build time from solr for social posts
             Long lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
             model.addAttribute( "lastBuild", lastBuild );
         } catch ( SolrException e ) {
             LOG.error( "SolrException while getting last build time. Reason", e );
-        }
+        }*/
         
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             model.addAttribute( "columnName", entityType );
