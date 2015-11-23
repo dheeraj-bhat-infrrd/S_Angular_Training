@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.BatchTracker;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 public class BatchTrackerServiceImplTest
@@ -55,13 +56,13 @@ public class BatchTrackerServiceImplTest
     }
     
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpdateModifiedOnColumnByBatchTypeWhenEmptyListFound() throws NoRecordsFetchedException{
+    public void testUpdateModifiedOnColumnByBatchTypeWhenEmptyListFound() throws NoRecordsFetchedException, InvalidInputException{
         Mockito.when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString() , Mockito.anyObject() ) ).thenReturn( new ArrayList<BatchTracker>() );
         batchTrackerServiceImpl.updateModifiedOnColumnByBatchType( "" );
     }
     
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpdateModifiedOnColumnByBatchTypeWhenNoBatchTrackerFound() throws NoRecordsFetchedException{
+    public void testUpdateModifiedOnColumnByBatchTypeWhenNoBatchTrackerFound() throws NoRecordsFetchedException, InvalidInputException{
         Mockito.when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString() , Mockito.anyObject() ) ).thenReturn( null );
         batchTrackerServiceImpl.updateModifiedOnColumnByBatchType( "" );
     }

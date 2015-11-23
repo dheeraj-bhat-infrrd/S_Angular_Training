@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.BatchTracker;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -60,13 +61,16 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
 
     @Override
     @Transactional
-    public void updateModifiedOnColumnByBatchType( String batchType ) throws NoRecordsFetchedException
+    public void updateModifiedOnColumnByBatchType( String batchType ) throws NoRecordsFetchedException, InvalidInputException
     {
         LOG.debug( "method updateModifiedOnColumnByBatchType() started for batch type : " + batchType );
+        if(batchType !=null && ! batchType.isEmpty()){
+            throw new InvalidInputException("passed parameter batchtype is incorrect");
+        }
 
         List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
             CommonConstants.BATCH_TYPE_COLUMN, batchType );
-        if ( batchTrackerList.size() <= 0 || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
+        if ( batchTrackerList == null || batchTrackerList.size() <= 0 || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
             throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
         }
 
