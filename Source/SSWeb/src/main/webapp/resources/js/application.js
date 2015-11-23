@@ -9800,3 +9800,16 @@ function validateprofileUrlEditForm() {
 		}
 	});
 }
+
+function attachReInvitationClickEvent(){
+	$('.v-icn-femail').click( function() {
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
+			return;
+		}
+	
+		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
+	    reinviteUser(firstName, lastName, emailId);
+});
+}
