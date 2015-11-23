@@ -20,7 +20,8 @@
                <div class="clearfix v-tbl-icn-wraper">
               
 	               <div class="float-left v-tbl-top-spacer"></div>
-	               <div class="float-left v-tbl-top-spacer"></div>
+                   <div class="float-left v-tbl-icn v-icn-wid" title="<spring:message code="label.widget.key" />"
+							onclick="generateWidget($(this), ${region.regionId }, 'region');"></div> 
 	               <div class="float-left v-tbl-top-spacer"></div>  
                    <div class="float-left v-tbl-icn v-icn-close region-del-icn" data-regionid="${region.regionId}"></div>
                    <div class="float-left v-tbl-icn v-icn-edit region-edit-icn" clicked="false" data-regionid="${region.regionId}"></div>
