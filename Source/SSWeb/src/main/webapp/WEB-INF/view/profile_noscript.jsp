@@ -167,11 +167,11 @@
     <div itemscope itemtype="https://schema.org/ProfilePage" class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-			<c:if test="${not empty profile.profileImageUrl }">
+			<c:if test="${not empty profile.profileImageUrlThumbnail }">
 				<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 				<div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper prog-img-container">
 					<div class="prog-img-container">
-			            <img itemprop="primaryImageOfPage" class="prof-image pos-relative" src="${profile.profileImageUrl}" alt="Photo of ${profName}"></img>
+			            <img itemprop="primaryImageOfPage" class="prof-image pos-relative" src="${profile.profileImageUrlThumbnail}" alt="Photo of ${profName}"></img>
 		            </div>
 	            </div>
 			</c:if>
@@ -222,8 +222,8 @@
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
             	<c:choose>
-            		<c:when test="${not empty profile.logo }">
-            			<div class="prof-user-logo" id="prof-company-logo" style="background: url(${profile.logo}) no-repeat center; background-size: 100% auto;"></div>
+            		<c:when test="${not empty profile.logoThumbnail }">
+            			<div class="prof-user-logo" id="prof-company-logo" style="background: url(${profile.logoThumbnail}) no-repeat center; background-size: 100% auto;"></div>
             		</c:when>
             		<c:otherwise>
             			<div class="prof-user-logo" id="prof-company-logo"></div>

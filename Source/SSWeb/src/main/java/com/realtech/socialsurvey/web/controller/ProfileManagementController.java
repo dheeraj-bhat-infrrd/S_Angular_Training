@@ -1773,6 +1773,7 @@ public class ProfileManagementController
             }
 
             profileSettings.setProfileImageUrl( profileImageUrl );
+            profileSettings.setProfileImageUrlThumbnail( profileImageUrl );
             sessionHelper.setProfileImageInSession( session, userSettings );
 
             LOG.info( "Profile Image uploaded successfully" );

@@ -123,6 +123,20 @@ public class ImageProcessingStarter extends QuartzJobBean {
 				}
 			}
 		}
+		
+	    // get unprocessed branch logo images
+        images = getUnprocessedLogoImages(CommonConstants.AGENT_SETTINGS_COLLECTION);
+        if (images != null) {
+            for (long id : images.keySet()) {
+                try {
+                    fileName = imageProcessor.processImage(images.get(id), CommonConstants.IMAGE_TYPE_LOGO);
+                    updateImage(id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO);
+                }
+                catch (ImageProcessingException | InvalidInputException e) {
+                    LOG.error("Skipping... Could not process image: " + id + " : " + images.get(id), e);
+                }
+            }
+        }
 
 		/*try {
 			imageProcessor

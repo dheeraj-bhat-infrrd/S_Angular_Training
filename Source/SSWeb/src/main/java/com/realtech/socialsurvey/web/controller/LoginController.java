@@ -588,16 +588,20 @@ public class LoginController {
 			}
 			
 			if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-				imageUrl = organizationManagementService.getCompanySettings(user).getProfileImageUrl();
+				//imageUrl = organizationManagementService.getCompanySettings(user).getProfileImageUrl();
+			    imageUrl = organizationManagementService.getCompanySettings(user).getProfileImageUrlThumbnail();
 			}
 			else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-				imageUrl = organizationManagementService.getRegionSettings(entityId).getProfileImageUrl();
+				//imageUrl = organizationManagementService.getRegionSettings(entityId).getProfileImageUrl();
+			    imageUrl = organizationManagementService.getRegionSettings(entityId).getProfileImageUrlThumbnail();
 			}
 			else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-				imageUrl = organizationManagementService.getBranchSettingsDefault(entityId).getProfileImageUrl();
+				//imageUrl = organizationManagementService.getBranchSettingsDefault(entityId).getProfileImageUrl();
+			    imageUrl = organizationManagementService.getBranchSettingsDefault(entityId).getProfileImageUrlThumbnail();
 			}
 			else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-				imageUrl = userManagementService.getUserSettings(entityId).getProfileImageUrl();
+				//imageUrl = userManagementService.getUserSettings(entityId).getProfileImageUrl();
+			    imageUrl = userManagementService.getUserSettings(entityId).getProfileImageUrlThumbnail();
 			}
 		}
 		catch (NonFatalException e) {
