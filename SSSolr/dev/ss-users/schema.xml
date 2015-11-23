@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  
- This is the Social Survey Solr schema file for core ss-regions. This file should be named "schema.xml" and
+<!--
+ This is the Social Survey Solr schema file for core ss-users. This file should be named "schema.xml" and
  should be in the conf directory under the solr home
- (i.e. ./solr/socialsurvey/ss-regions/conf/schema.xml by default) 
+ (i.e. ./solr/socialsurvey/ss-users/conf/schema.xml by default)
  or located where the classloader for the Solr webapp can find it.
 -->
 
 <schema name="db" version="1.1">
-  <types> 
+  <types>
    <fieldType name="string"  class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
    <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
    <fieldType name="boolean" class="solr.BoolField" omitNorms="true"/>
@@ -20,7 +20,7 @@
 	<tokenizer class="solr.KeywordTokenizerFactory"/>
 	<filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
-   </fieldType>	
+   </fieldType>
    <fieldType name="textEmailId" class="solr.TextField" sortMissingLast="true" omitNorms="true" autoGeneratePhraseQueries="true">
       <analyzer type="index">
 	<tokenizer class="solr.KeywordTokenizerFactory"/>
@@ -35,7 +35,7 @@
   </types>
 
   <fields>
-    <field name="userId" type="long" indexed="true" stored="true" required="true" multiValued="false" /> 
+    <field name="userId" type="long" indexed="true" stored="true" required="true" multiValued="false" />
     <field name="companyId" type="long" indexed="true" stored="true" />
     <field name="loginName" type="text" indexed="true" stored="true" />
     <field name="firstName" type="text" indexed="true" stored="true" />
@@ -56,6 +56,7 @@
     <field name="branches" type="long" indexed="true" stored="true" multiValued="true" />
     <field name="agentIds" type="long" indexed="true" stored="true" multiValued="true" />
     <field name="reviewCount" type="long" indexed="true" stored="true" />
+    <field name="isProfileImageSet" type="boolean" indexed="true" stored="true" />
     <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
   </fields>
 
@@ -68,4 +69,3 @@
  <solrQueryParser defaultOperator="OR"/>
 
 </schema>
-

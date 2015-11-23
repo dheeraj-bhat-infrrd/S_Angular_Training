@@ -1,5 +1,5 @@
 <dataConfig>
-    <dataSource name="mymongodb" type="MongoDataSource" database="ss_db" />
+    <dataSource name="mymongodb" type="MongoDataSource" database="ss_db" url="mongodb://localhost:27017" />
   <document>
      <!-- if query="" then it imports everything -->
      <entity name="socialposts"
@@ -8,7 +8,7 @@
              deltaImportQuery='{ postText : { $not: { $regex: ".*Star Survey Response.*" } }, id : { $eq : "${dih.delta.id}" } }'
              deltaQuery='{ postText : { $not: { $regex: ".*Star Survey Response.*" } }, id : { $gt : "${dih.delta.id}" } }'
              collection="SOCIAL_POST"
-             datasource="mymongodb"
+             dataSource="mymongodb"
              transformer="MongoMapperTransformer">
              <field column="id"  name="id" mongoField="_id" />
              <field column="source" name="source" mongoField="source"/>
