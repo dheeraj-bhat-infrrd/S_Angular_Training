@@ -567,13 +567,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             }
             Query query = new Query();
             query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( id ) );
-            query.fields().include( CommonConstants.PROFILE_IMAGE_URL_SOLR ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+            query.fields().include( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
             String queryStr = query.toString();
             LOG.debug( "Query : " + queryStr );
             HashMap<String, String> imageUrlMap = mongoTemplate.findOne( query, HashMap.class, collectionName );
             String profileImageUrl = null;
             if ( imageUrlMap != null && !( imageUrlMap.isEmpty() ) ) {
-                profileImageUrl = imageUrlMap.get( "profileImageUrl" );
+                profileImageUrl = imageUrlMap.get( "profileImageUrlThumbnail" );
             }
             if ( profileImageUrl == null || profileImageUrl.isEmpty() ) {
                 profileImageUrl = "";
