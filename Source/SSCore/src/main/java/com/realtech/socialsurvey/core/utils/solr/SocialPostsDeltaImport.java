@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.utils.solr;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -16,6 +17,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SolrImportDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -55,9 +57,10 @@ public class SocialPostsDeltaImport
         List<SocialPost> socialPosts = null;
         Date lastBuildTime = null;
         boolean errorOccured = false;
-        Long nextLastBuild = 0l;
+        Timestamp nextLastBuildTime = null;
         if ( fromBeginning ) {
             lastBuildTime = new Date( 0l );
+            nextLastBuildTime = new Timestamp( System.currentTimeMillis() );
         } else {
             try {
                 //Long lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
@@ -66,7 +69,7 @@ public class SocialPostsDeltaImport
                 Long lastBuild = batchTrackerService
                     .getLastRunTimeByBatchType( CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD );
                 lastBuildTime = new Date( lastBuild );
-                nextLastBuild = System.currentTimeMillis();
+                nextLastBuildTime = new Timestamp( System.currentTimeMillis() );
             } catch ( NoRecordsFetchedException e ) {
                 LOG.error( "Unable to fetch lastBuildTime from Batch Tracker table. Reason : ", e );
                 errorOccured = true;
@@ -100,9 +103,11 @@ public class SocialPostsDeltaImport
         if ( !( errorOccured ) ) {
             try {
                 batchTrackerService.updateModifiedOnColumnByBatchTypeAndTime(
-                    CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD, nextLastBuild );
+                    CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD, nextLastBuildTime );
             } catch ( NoRecordsFetchedException e ) {
                 LOG.error( "Unable to update last build time in batch tracker. Reason : ", e );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "nextLastBuildTime is invalid. Reason : ", e );
             }
         }
         LOG.info( "Finished run method of SocialPostsDeltaImport" );
