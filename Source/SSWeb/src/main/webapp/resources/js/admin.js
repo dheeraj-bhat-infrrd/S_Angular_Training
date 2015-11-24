@@ -75,7 +75,7 @@ function searchAdminCompanies (element) {
 			
 			//showSelectedCompanyHierarchy(value);
 		});
-	}, payload, true);
+	}, payload, true,'');
 }
 
 function showSelectedCompanyHierarchy(companyId) {
@@ -212,7 +212,7 @@ function bindUserLoginEvent() {
 		callAjaxGETWithTextData("/loginadminas.do", function(data) {
 			// window.location = window.location.origin + '/userlogin.do';
 			window.location = getLocationOrigin() + '/userlogin.do';
-		}, true, payload);
+		}, true, payload,'.user-login-icn');
 	});
 }
 
@@ -221,7 +221,7 @@ $(document).on('click','#send-invite-form-submit',function(){
 	callAjaxGetWithPayloadData("/generateregistrationurl.do", function(data){
 		$('#overlay-toast').html(data);
 		showToast();
-	}, formData, true);
+	}, formData, true,'');
 });
 
 $(document).on('keyup','#send-invite-form',function(e){
@@ -296,7 +296,7 @@ function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 			$('#admin-abs-sur-list').append(data);
 		
 		startIndexCmp += batchSizeCmp;
-	}, payload, false);
+	}, payload, false,'');
 }
 
 $(document).on('scroll', '#dsh-inc-srvey', function() {
@@ -334,5 +334,5 @@ function unmarkReviewFromAbusive(surveyId){
 		
 		displayMessage(data);
 		showAbusiveReviews(0,10);
-	}, payload, true);
+	}, payload, true,'');
 }
