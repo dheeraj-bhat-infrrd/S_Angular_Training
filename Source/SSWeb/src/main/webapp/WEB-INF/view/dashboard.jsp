@@ -190,9 +190,7 @@ $(document).ready(function() {
 
 	$(document).scroll(function() {
 		if(window.location.hash.substr(1) == "dashboard") {
-			if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
-				showReviews(colName, colValue);
-			}			
+			dashbaordReviewScroll();		
 		}
 	});
 	

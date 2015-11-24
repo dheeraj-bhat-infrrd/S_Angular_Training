@@ -605,7 +605,7 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 		"columnValue" : columnValue
 	};
 	callAjaxGetWithPayloadData("./fetchdashboardreviewCount.do", function(totalReview) {
-		totalReviews = totalReview;
+		totalReviews = parseInt(totalReview);
 		callAjaxGetWithPayloadData("./fetchName.do", function(name) {
 			if (totalReview == 0) {
 				$("#review-desc").html("No reviews found for " + name);
@@ -635,70 +635,87 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 		}, payload, false);
 		
 		if (parseInt(totalReview) > 0) {
-			showReviews(columnName, columnValue);
+			fetchReviewsOnDashboard(columnName, columnValue, false);
 		}
 	}, payload, false);
 }
 
-function showReviews(columnName, columnValue) {
+var isDashboardReviewRequestRunning = false;
+function fetchReviewsOnDashboard(columnName, columnValue, isNextBatch) {
+	if(isDashboardReviewRequestRunning) return; //Return if ajax request is still running
+	
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
 		"startIndex" : startIndexCmp,
 		"batchSize" : batchSizeCmp
 	};
+	isDashboardReviewRequestRunning = true;
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
 		if (startIndexCmp == 0)
 			$('#review-details').html(data);
 		else
 			$('#review-details').append(data);
 		
-		$(".review-ratings").each(function() {
-			changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
-		});
-		/*$('.icn-fb').unbind('click');
-		$(".icn-fb").click(function() {
-			var firstName = $(this).parent().parent().parent().attr('data-firstname');
-			var lastName = $(this).parent().parent().parent().attr('data-lastname');
-			var agentName = $(this).parent().parent().parent().attr('data-agentname');
-			var review = $(this).parent().parent().parent().attr('data-review');
-			var score = $(this).parent().parent().parent().attr('data-score');
-			var agentId = $(this).parent().parent().parent().attr('data-agentid');
-			shareOnFacebook(firstName, lastName, agentName, review, score, agentId);
-		});
-		$('.icn-twit').unbind('click');
-		$(".icn-twit").click(function() {
-			var firstName = $(this).parent().parent().parent().attr('data-firstname');
-			var lastName = $(this).parent().parent().parent().attr('data-lastname');
-			var agentName = $(this).parent().parent().parent().attr('data-agentname');
-			var review = $(this).parent().parent().parent().attr('data-review');
-			var score = $(this).parent().parent().parent().attr('data-score');
-			var agentId = $(this).parent().parent().parent().attr('data-agentid');
-			shareOnTwitter(firstName, lastName, agentName, review, score, agentId);
-		});
-		$('.icn-lin').unbind('click');
-		$(".icn-lin").click(function() {
-			var firstName = $(this).parent().parent().parent().attr('data-firstname');
-			var lastName = $(this).parent().parent().parent().attr('data-lastname');
-			var agentName = $(this).parent().parent().parent().attr('data-agentname');
-			var review = $(this).parent().parent().parent().attr('data-review');
-			var score = $(this).parent().parent().parent().attr('data-score');
-			var agentId = $(this).parent().parent().parent().attr('data-agentid');
-			shareOnLinkedin(firstName, lastName, agentName, review, score, agentId);
-		});
-		$('.icn-yelp').unbind('click');
-		$(".icn-yelp").click(function() {
-			var agentId = $(this).parent().parent().parent().attr('data-agentid');
-			shareOnYelp(agentId, window.location.origin+"/rest/survey/");
-		});
-		$('.icn-gplus').unbind('click');
-		$(".icn-gplus").click(function() {
-			var agentId = $(this).parent().parent().parent().attr('data-agentid');
-			shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/");
-		});*/
-		
+		//Update events
+		updateEventOnDashboardPageForReviews();
 		startIndexCmp += batchSizeCmp;
+		
+		if(!isNextBatch) {
+			displayReviewOnDashboard();
+		}
+		isDashboardReviewRequestRunning = false;
+		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && startIndexCmp < totalReviews) {
+			fetchReviewsOnDashboard(colName, colValue, true);
+		}
 	}, payload, false);
+}
+
+function dashbaordReviewScroll() {
+	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+		if($('div.dsh-review-cont.hide').length > 0){
+			displayReviewOnDashboard();
+		} else{
+			fetchReviewsOnDashboard(colName, colValue, false);
+		}
+	}	
+}
+
+function displayReviewOnDashboard() {
+	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
+		if(index >= batchSizeCmp) {
+			return;
+		}
+		$(this).removeClass("hide");
+	});
+	
+	//Get the next batch
+	if($('div.dsh-review-cont.hide').length <= batchSizeCmp && startIndexCmp < totalReviews) {
+		fetchReviewsOnDashboard(colName, colValue, true);
+	}
+}
+
+function updateEventOnDashboardPageForReviews() {
+	$('.ppl-head-2[data-modified="false"]').each(function(index, currentElement) {
+		var dateSplit = $(this).attr('data-modifiedon').split('-');
+		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
+		$(this).html(date.toDateString()).attr("data-modified", "true");
+	});
+	
+	$('.review-ratings[data-modified="false"]').each(function() {
+		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
+		$(this).attr("data-modified", "true");
+	});
+	
+	$('.ppl-share-icns').unbind('click');
+	$('.ppl-share-icns').bind('click', function() {
+		var link = $(this).attr('data-link');
+		var title = $(this).attr('title');
+		if (link == undefined || link == "") {
+			return false;
+		}
+		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+	});
 }
 
 $(document).on('scroll', '#dsh-inc-srvey', function() {
