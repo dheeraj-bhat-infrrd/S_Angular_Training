@@ -13,6 +13,8 @@ var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
 var profileJson;
 var isFetchReviewAjaxRequestRunning = false; //keeps checks of if the ajax request is running to fetch reviews.
+var stopFetchReviewPagination = false;
+var reviewsNextBatch = []; //Reviews batch to store the next reviews
 
 $(document).ajaxStop(function() {
 	adjustImage();
@@ -716,15 +718,10 @@ function paintCompanyBranches(data) {
 	}
 }
 
-function paintReviews(result, isResultFromBatch){
-	
-	//Check if result is from batch
-	if(isResultFromBatch) {
-		reviewsNextBatch = [];
-	}
+function paintReviews(result){
 	
 	//Check if there are more reviews left
-	if(reviewsNextBatch == undefined || reviewsNextBatch.length <= 0)
+	if(reviewsNextBatch == undefined || reviewsNextBatch.length <= numOfRows)
 		fetchReviewsScroll(true);
 	
 	var resultSize = result.length;
@@ -760,7 +757,7 @@ function paintReviews(result, isResultFromBatch){
 		reviewsHtml += '			<div class="ppl-head-1">'+custDispName+'</div>';
 		if (date != null) {
 			date = convertUserDateToLocale(date);
-			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
+			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy HH:mm:ss") + '</div>'; 
 		}
 		
 		reviewsHtml += '		</div>';
@@ -924,22 +921,34 @@ function confirmReportAbuse(payload) {
 }
 
 $(document).scroll(function(){
-	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height()) ){
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75) ){
 		fetchReviewsScroll(false);
 	}
 });
 
 
 function fetchReviewsScroll(isNextBatch) {
-	var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
-	if(startIndex <= totalReviews) {
-		if( isFetchReviewAjaxRequestRunning ) return; //Return if ajax request is still running
-		startIndex = startIndex + numOfRows;
-		var profileLevel = $("#profile-fetch-info").attr("profile-level");
-		if(showAllReviews)
-			fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true, isNextBatch);
-		else
-			fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore , true, isNextBatch);
+	if (!stopFetchReviewPagination) {
+		if (isFetchReviewAjaxRequestRunning)
+			return; // Return if ajax request is still running
+		if(!isNextBatch && reviewsNextBatch != undefined && reviewsNextBatch.length > 0) {
+			var reviewsToShow = reviewsNextBatch.slice(0, 5);
+			if(reviewsNextBatch.length > 5) {
+				reviewsNextBatch = reviewsNextBatch.slice(5);
+			} else {
+				reviewsNextBatch = [];
+			}
+			paintReviews(reviewsToShow);
+		} else {
+			startIndex = startIndex + numOfRows;
+			var profileLevel = $("#profile-fetch-info").attr("profile-level");
+			if (showAllReviews)
+				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
+						startIndex, numOfRows, 0, true, isNextBatch);
+			else
+				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
+						startIndex, numOfRows, minScore, true, isNextBatch);
+		}
 	}
 }
 
@@ -965,13 +974,12 @@ function fetchZillowReviewsCallBack(data) {
 	
 }
 
-var reviewsNextBatch;
 function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 		startIndex, numRows, minScore , isAsync, isNextBatch) {
 	
-	//Check if next batch of reviews are present
-	if( reviewsNextBatch != undefined &&  reviewsNextBatch.length > 0 ) {
-		paintReviews( reviewsNextBatch, true );
+	if(startIndex == 0) {
+		stopFetchReviewPagination = false;
+		reviewsNextBatch = [];
 	}
 	
 	if (currentProfileIden == undefined || currentProfileIden == "") {
@@ -998,11 +1006,17 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 		var responseJson = $.parseJSON(data);
 		if (responseJson != undefined) {
 			var result = $.parseJSON(responseJson.entity);
+			if(result == undefined || result.length < numRows) {
+				stopFetchReviewPagination = true; //Stop pagination if reviews fetch are less than the batch size
+			}
 			if (result != undefined && result.length > 0) {
 				if(isNextBatch) {
-					reviewsNextBatch = result;
+					reviewsNextBatch = reviewsNextBatch.concat(result);
+					if(reviewsNextBatch.length <= numRows) {
+						fetchReviewsScroll(true);
+					}
 				} else {
-					paintReviews(result, false);				
+					paintReviews(result);				
 				}
 			} else {
 				if ($("#profile-fetch-info").attr("fetch-all-reviews") == "false"
