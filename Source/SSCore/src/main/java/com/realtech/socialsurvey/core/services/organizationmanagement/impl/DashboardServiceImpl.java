@@ -88,6 +88,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Override
     public long getAllSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException{
     	LOG.info("Get all survey count for "+columnName+" and value "+columnValue+" with number of days: "+numberOfDays);
+    	
+    	if(columnName == null || columnName.isEmpty()){
+    	    throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+    	}
+    	if(columnValue <= 0l ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        }
+    	
     	Timestamp endDate = new Timestamp(System.currentTimeMillis());
     	Calendar startTime =  Calendar.getInstance();
     	startTime.add(Calendar.DATE, -1*numberOfDays);
@@ -122,6 +130,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Override
     public long getCompleteSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException{
     	LOG.info("Get completed survey count for "+columnName+" and value "+columnValue+" with number of days: "+numberOfDays);
+    	
+    	if(columnName == null || columnName.isEmpty()){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        }
+        if(columnValue <= 0l ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        }
+        
     	Timestamp endDate = new Timestamp(System.currentTimeMillis());
     	Calendar startTime =  Calendar.getInstance();
     	startTime.add(Calendar.DATE, -1*numberOfDays);
@@ -139,31 +155,66 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
     
     @Override
-    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays )
+    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
     {
+        if(columnName == null || columnName.isEmpty()){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        }
+        if(columnValue <= 0l ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        }
+        
         return surveyDetailsDao.getClickedSurveyCount( columnName, columnValue, numberOfDays, true );
     }
 
 
     @Override
-    public long getSocialPostsForPastNdaysWithHierarchy( String columnName, long columnValue, int numberOfDays )
+    public long getSocialPostsForPastNdaysWithHierarchy( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
     {
+        if(columnName == null || columnName.isEmpty()){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        }
+        if(columnValue <= 0l ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        }
+        
         return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue );
     }
 
 
     @Override
-    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin )
+    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin ) throws InvalidInputException
     {
+        if(columnName == null || columnName.isEmpty()){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        }
+        if(columnValue <= 0l ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        }
+        
         return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin );
     }
 
 
     @Override
     public int getProfileCompletionPercentage( User user, String columnName, long columnValue,
-        OrganizationUnitSettings organizationUnitSettings )
+        OrganizationUnitSettings organizationUnitSettings ) throws InvalidInputException
     {
         LOG.info( "Method to calculate profile completion percentage started." );
+        
+        if(columnName == null || columnName.isEmpty()){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        }
+        if(columnValue <= 0l ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        }
+        if(user == null ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter user is null");
+        }
+        if(organizationUnitSettings == null ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter organizationUnitSettings is null");
+        }
+        
         int totalWeight = 0;
         double currentWeight = 0;
         if ( weightageColumns.containsKey( "email" ) ) {
@@ -221,9 +272,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      * profile completeness.
      */
     @Override
-    public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness )
+    public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness ) throws InvalidInputException
     {
         LOG.info( "Method to calculate number of badges started." );
+        if(surveyScore < 0 || surveyCount < 0 || socialPosts < 0 || profileCompleteness < 0){
+            throw new InvalidInputException("Invalid input parameter : should not be less than zero");
+        }
+        
         int badges = 0;
         double normalizedSurveyScore = surveyScore * 25 / CommonConstants.MAX_SURVEY_SCORE;
         double normalizedProfileCompleteness = profileCompleteness * 25 / 100;
@@ -252,7 +307,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         boolean realtechAdmin ) throws ParseException, InvalidInputException
     {
     	LOG.info("Getting survey details for graph for "+columnName+" with value "+columnValue+" for number of days "+numberOfDays+". Reatech admin flag: "+realtechAdmin);
-        String criteria = "";
+        
+    	if(columnName == null || columnName.isEmpty()){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        }
+        if(columnValue <= 0l ){
+            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        }
+    	
+    	String criteria = "";
         Calendar startTime = Calendar.getInstance();
         switch ( numberOfDays ) {
             case 30:
@@ -350,8 +413,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      */
     @Override
     public XSSFWorkbook downloadIncompleteSurveyData( List<SurveyPreInitiation> surveyDetails, String fileLocation )
-        throws IOException
+        throws IOException, InvalidInputException
     {
+        if(fileLocation == null || fileLocation.isEmpty()){
+            throw new InvalidInputException("Invalid input parameter : passed input parameter fileLocation is null or empty");
+        }
+        if(surveyDetails == null){
+            throw new InvalidInputException("Invalid input parameter : passed input parameter surveyDetails is null");
+        }
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -419,8 +488,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      * Method to create excel file for Social posts.
      */
     @Override
-    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName )
+    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName ) throws InvalidInputException
     {
+        if(fileName == null || fileName.isEmpty()){
+            throw new InvalidInputException("Invalid input parameter : passed input parameter fileName is null or empty");
+        }
+        if(socialPosts == null){
+            throw new InvalidInputException("Invalid input parameter : passed input parameter surveyDetails is null");
+        }
+        
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -522,8 +598,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      */
     @Override
     public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileLocation )
-        throws IOException
+        throws IOException, InvalidInputException
     {
+        if(fileLocation == null || fileLocation.isEmpty()){
+            throw new InvalidInputException("Invalid input parameter : passed input parameter fileLocation is null or empty");
+        }
+        if(surveyDetails == null){
+            throw new InvalidInputException("Invalid input parameter : passed input parameter surveyDetails is null");
+        }
+        
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -683,8 +766,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      */
     @Override
     public XSSFWorkbook downloadAgentRankingData( List<AgentRankingReport> agentDetails, String fileLocation )
-        throws IOException
+        throws IOException, InvalidInputException
     {
+        
+        if(fileLocation == null || fileLocation.isEmpty()){
+            throw new InvalidInputException("Invalid input parameter : passed input parameter fileLocation is null or empty");
+        }
+        if(agentDetails == null){
+            throw new InvalidInputException("Invalid input parameter : passed input parameter agentDetails is null");
+        }
+        
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
