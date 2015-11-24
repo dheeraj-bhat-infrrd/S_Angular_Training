@@ -192,7 +192,7 @@ $(document).on('click', '.lp-button', function(event){
 		data += "&g-recaptcha-response=" + $('#g-recaptcha-response').val();
 		//data += "&recaptcha_input=" + $('#captcha-text').val();
 		showOverlay();
-		callAjaxPostWithPayloadData(url,showMessage,data,true);
+		callAjaxPostWithPayloadData(url,showMessage,data,true,'');
 	}			
 });
 
@@ -419,7 +419,7 @@ function paintBreadCrums(url) {
 			
 			$('#bread-crum-cont').html(htmlContent);
 		}
-	}, true, {});
+	}, true, {},'');
 }
 
 
@@ -909,7 +909,7 @@ function confirmReportAbuse(payload) {
 		}
 		hideOverlay();
 		showToast();
-	}, payload, true);
+	}, payload, true,'');
 }
 
 $(document).scroll(function(){

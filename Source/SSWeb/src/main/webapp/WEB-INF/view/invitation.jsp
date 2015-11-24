@@ -146,7 +146,7 @@
 								showOverlay();
 								callAjaxFormSubmit(url,
 										submitInvitationFormCallBack,
-										"invitation-form");
+										"invitation-form",'');
 							}
 
 							/*

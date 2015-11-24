@@ -291,7 +291,7 @@ function retakeSurveyReminderMail(element) {
 		$('#overlay-cancel').click();
 		$(element).parent().parent().parent().parent().remove();
 		getIncompleteSurveyCount(colName, colValue);
-	}, payload, true);
+	}, payload, true,'');
 }
 
 $(document).on('click', '.report-abuse-txt', function(e) {
@@ -346,7 +346,7 @@ function confirmUserReportAbuse(payload) {
 		}
 		hideOverlay();
 		showToast();
-	}, payload, true);
+	}, payload, true,'');
 }
 
 $('body').click(function() {
@@ -458,7 +458,7 @@ function showProfileDetails(columnName, columnValue, numberOfDays) {
 	};
 	callAjaxGetWithPayloadData("./profiledetails.do", function(data) {
 		$('#dash-profile-detail-circles').html(data);
-	}, payload, false);
+	}, payload, false,'');
 }
 
 function bindSelectButtons() {
@@ -558,7 +558,7 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 	};
 	callAjaxGetWithPayloadData("./surveycount.do", function(data) {
 		$('#dash-survey-status').html(data);
-	}, payload, false);
+	}, payload, false,'');
 }
 
 function showIncompleteSurvey(columnName, columnValue) {
@@ -586,7 +586,7 @@ function showIncompleteSurvey(columnName, columnValue) {
 		}
 		$('#dsh-inc-srvey').perfectScrollbar();
 		startIndexInc += batchSizeInc;
-	}, payload, false);
+	}, payload, false,'');
 	
 }
 
@@ -632,12 +632,12 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				bindDatePickerforSurveyDownload();
 				bindDatePickerforIndividualSurveyDownload();
 			}
-		}, payload, false);
+		}, payload, false,'');
 		
 		if (parseInt(totalReview) > 0) {
 			showReviews(columnName, columnValue);
 		}
-	}, payload, false);
+	}, payload, false,'');
 }
 
 function showReviews(columnName, columnValue) {
@@ -698,7 +698,7 @@ function showReviews(columnName, columnValue) {
 		});*/
 		
 		startIndexCmp += batchSizeCmp;
-	}, payload, false);
+	}, payload, false,'');
 }
 
 $(document).on('scroll', '#dsh-inc-srvey', function() {
@@ -970,7 +970,7 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			}
 			$('.dsh-res-display').hide();
 		});
-	}, payload, false);
+	}, payload, false,'');
 }
 
 function sendSurveyReminderMail(surveyPreInitiationId, customerName) {
@@ -1244,7 +1244,7 @@ $(document).on('click', '.bd-q-btn-done', function() {
 							$('#bs-question-' + count).attr('data-state', 'new');
 							$('#bs-question-' + count).attr('data-status', 'edited');
 						}
-					}, 'bs-question-' + count);
+					}, 'bs-question-' + count,'');
 				}
 			}
 			// submit for modifying question
@@ -1268,7 +1268,7 @@ $(document).on('click', '.bd-q-btn-done', function() {
 						} else {
 							$('#bs-question-' + count).attr('data-status', 'edited');
 						}
-					}, 'bs-question-' + count);
+					}, 'bs-question-' + count,'');
 				}
 			}
 			count ++;
@@ -1337,7 +1337,7 @@ $(document).on('click', '.bd-q-btn-done-edit', function() {
 			} else {
 				showStatus('#bs-question-edit-' + questionId, 'Retry Saving');
 			}
-		}, 'bs-question-edit-' + questionId);
+		}, 'bs-question-edit-' + questionId,'');
 	}
 });
 
@@ -1421,7 +1421,7 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 					$('#bs-question-' + quesOrder).attr('data-status', 'edited');
 					showStatus('#bs-question-' + quesOrder, 'Retry Saving');
 				}
-			}, 'bs-question-' + quesOrder);
+			}, 'bs-question-' + quesOrder,'');
 		}
 	}
 	// submit for modifying question
@@ -1447,7 +1447,7 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 					showStatus('#bs-question-' + quesOrder, 'Retry Saving');
 					$('#bs-question-' + quesOrder).attr('data-status', 'edited');
 				}
-			}, 'bs-question-' + quesOrder);
+			}, 'bs-question-' + quesOrder,'');
 		}
 	}
 });
@@ -1757,7 +1757,7 @@ function paintEditSection(data) {
 	
 	$("#btn-region-save").click(function(e){
 		if(validateRegionForm()){
-			addRegion("edit-region-form");
+			addRegion("edit-region-form",'#btn-region-save');
 		}
 	});
 	
@@ -1776,7 +1776,7 @@ function paintEditSection(data) {
 	
 	$("#btn-office-save").click(function(e){
 		if(validateOfficeForm()){
-			addOffice("edit-office-form");
+			addOffice("edit-office-form",'#btn-office-save');
 		}
 	});
 	
@@ -1790,7 +1790,7 @@ function paintEditSection(data) {
 	
 	$("#btn-individual-save").click(function(e){
 		if(validateIndividualForm()){
-			addIndividual("edit-individual-form");
+			addIndividual("edit-individual-form",'#btn-individual-save');
 		}
 	});
 }
@@ -2160,12 +2160,12 @@ function resetInputFields(elementId) {
 /**
  * js function for adding a region
  */
-function addRegion(formId) {
+function addRegion(formId,disableEle) {
 	var url = "./addregion.do";
 	showOverlay();
 	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
 	$('input[name="userSelectionType"]').val(selectedType);
-	callAjaxFormSubmit(url, addRegionCallBack, formId);
+	callAjaxFormSubmit(url, addRegionCallBack, formId,disableEle);
 }
 
 /**
@@ -2332,12 +2332,12 @@ function validateOfficeForm() {
 /**
  * js function for adding a branch
  */
-function addOffice(formId) {
+function addOffice(formId,disableEle) {
 	var url = "./addbranch.do";
 	showOverlay();
 	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
 	$('input[name="userSelectionType"]').val(selectedType);
-	callAjaxFormSubmit(url, addOfficeCallBack, formId);
+	callAjaxFormSubmit(url, addOfficeCallBack, formId,disableEle);
 }
 
 /**
@@ -2497,12 +2497,12 @@ function validateIndividualForm() {
 	return isIndividualValid;
 }
 
-function addIndividual(formId) {
+function addIndividual(formId,disableEle) {
 	var url = "./addindividual.do";
 	showOverlay();
 	var selectedType = $('.bd-cust-rad-img-checked').attr("data-type");
 	$('input[name="userSelectionType"]').val(selectedType);
-	callAjaxFormSubmit(url, addIndividualCallBack, formId);
+	callAjaxFormSubmit(url, addIndividualCallBack, formId,disableEle);
 }
 
 function addIndividualCallBack(data) {
@@ -2816,7 +2816,7 @@ function updateRegion(formId,regionId) {
 	$('input[name="userSelectionType"]').val(selectedType);
 	callAjaxFormSubmit(url, function(data){
 		updateRegionCallBack(data, regionId);
-	}, formId);
+	}, formId,'');
 }
 
 function updateRegionCallBack(data,regionId) {
@@ -2833,7 +2833,7 @@ function updateBranch(formId,branchId) {
 		$('input[name="userSelectionType"]').val(selectedType);
 		callAjaxFormSubmit(url, function(data){
 			updateBranchCallBack(data,branchId);
-		}, formId);
+		}, formId,'');
 	}
 }
 
@@ -3068,7 +3068,7 @@ function saveEncompassDetailsCallBack(response) {
 function testEncompassConnection(formid) {
 	if (validateEncompassInput(formid)) {
 		var url = "./testencompassconnection.do";
-		callAjaxFormSubmit(url, testEncompassConnectionCallBack, formid);
+		callAjaxFormSubmit(url, testEncompassConnectionCallBack, formid,'');
 	}
 }
 
@@ -3174,7 +3174,7 @@ function saveDotloopDetails(formid) {
 			hideOverlay();
 			$("#overlay-toast").html(response);
 			showToast();
-		}, formid);
+		}, formid,'');
 	}
 }
 
@@ -3184,7 +3184,7 @@ function testDotloopConnection(formid) {
 		callAjaxFormSubmit(url, function(response) {
 			$("#overlay-toast").html(response);
 			showToast();
-		}, formid);
+		}, formid,'');
 	}
 }
 
@@ -3214,7 +3214,7 @@ function validateDotloopKey(elementId){
 // Mail content
 function updateMailContent(formid){
 	var url = "./savesurveyparticipationmail.do";
-	callAjaxFormSubmit(url, updateMailContentCallBack, formid);
+	callAjaxFormSubmit(url, updateMailContentCallBack, formid,'');
 }
 
 function updateMailContentCallBack(response){
@@ -3230,7 +3230,7 @@ function autoAppendReminderDropdown(reminderId, reminderDefault) {
 
 function updateReminderSettings(formid) {
 	var url = "./updatesurveyremindersettings.do";
-	callAjaxFormSubmit(url, updateReminderSettingsCallBack, formid);
+	callAjaxFormSubmit(url, updateReminderSettingsCallBack, formid,'');
 }
 
 function updateReminderSettingsCallBack(response){
@@ -3255,7 +3255,7 @@ function autoAppendRatingDropdownComplaint(ratingId, classes, maxPoint, minPoint
 
 function updatePostScore(formid) {
 	var url = "./updatesurveysettings.do";
-	callAjaxFormSubmit(url, updatePostScoreCallBack, formid);
+	callAjaxFormSubmit(url, updatePostScoreCallBack, formid,'');
 }
 function updatePostScoreCallBack(response) {
 	$('#ratingcategory').val('');
@@ -3276,7 +3276,7 @@ function autoSetCheckboxStatus(on, off, status) {
 
 function updateOtherSettings(formid) {
 	var url = "./updateothersettings.do";
-	callAjaxFormSubmit(url, updateOtherSettingsCallBack, formid);
+	callAjaxFormSubmit(url, updateOtherSettingsCallBack, formid,'');
 }
 function updateOtherSettingsCallBack(response) {
 	$('#othercategory').val('');
@@ -3428,7 +3428,7 @@ function resetTextForMoodFlow(mood, resetId){
 			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}
 		showToast();
-	}, payload, true);
+	}, payload, true,'');
 }
 
 function saveTextForMoodFlow(content, mood){
@@ -3443,7 +3443,7 @@ function saveTextForMoodFlow(content, mood){
 			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
 		}
 		showToast();
-	}, payload, true);
+	}, payload, true,'');
 }
 
 function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete){
@@ -3731,8 +3731,21 @@ function deleteUser(userId) {
 		"userIdToRemove" : userId
 	};
 	showOverlay();
-	
-	$.ajax({
+	callAjaxPostWithPayloadData("./removeexistinguser.do",  function(data) {
+		var map =  $.parseJSON(data);
+		if (map.status == "success") {
+			showInfo(map.message);
+		} else {
+			showError(map.message);
+		}
+		
+		// hide the row of the user deleted
+		$('#user-row-' + userId).next('.v-tbl-row').remove();
+		$('#user-row-' + userId).next('.u-tbl-row').remove();
+		$('#user-row-' + userId).remove();
+	}, payload,true,'');
+
+	/*$.ajax({
 		url : "./removeexistinguser.do",
 		type : "POST",
 		dataType : "html",
@@ -3759,7 +3772,7 @@ function deleteUser(userId) {
 				return;
 			}
 		}
-	});
+	});*/
 }
 
 
@@ -3782,7 +3795,7 @@ function deleteUserProfile(profileId) {
 			$('#overlay-toast').html(data);
 			showToast();
 		}
-	}, payload, true);
+	}, payload, true,'');
 } 
 /*
  * Paint the user details form in the user management page
@@ -4067,7 +4080,7 @@ function searchUsersByNameEmailLoginId(searchKey) {
 		"startIndex" : userStartIndex,
 		"batchSize" : userBatchSize
 	};
-	callAjaxGetWithPayloadData(url, searchUsersByNameEmailLoginIdCallBack, payload, true);
+	callAjaxGetWithPayloadData(url, searchUsersByNameEmailLoginIdCallBack, payload, true,'');
 }
 
 function searchUsersByNameEmailLoginIdCallBack(data) {
@@ -4220,7 +4233,7 @@ $(document).on('click','#user-assign-btn',function(e){
 	$("#user-edit-save").off('click');
 	$("#user-edit-save").on('click',function(e){
 		if(validateIndividualForm()){
-			saveUserAssignment("user-assignment-form");
+			saveUserAssignment("user-assignment-form",'#user-edit-save');
 			
 			// refreshing right section after assignment
 			setTimeout(function() {
@@ -4279,17 +4292,17 @@ function saveUserDetailsByAdmin() {
 		
 		$('#overlay-toast').html(data);
 		showToast();
-	}, payload, true);
+	}, payload, true,'#user-edit-save');
 }
 
 /**
  * Method to save the assignment of user with branch/region or company
  * @param formId
  */
-function saveUserAssignment(formId) {
+function saveUserAssignment(formId,disableEle) {
 	var url = "./addindividual.do";
 	showOverlay();
-	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId);
+	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId,disableEle);
 }
 
 /**
@@ -4331,7 +4344,7 @@ $(document).on('click', '.v-icn-fmail', function() {
 	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
     var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
     var emailId = $(this).parent().find('.fetch-email').html();
-    reinviteUser(firstName, lastName, emailId);
+    reinviteUser(firstName, lastName, emailId,'.v-icn-fmail');
 });
 
 $(document).on('click', '.v-icn-femail', function() {
@@ -4342,13 +4355,13 @@ $(document).on('click', '.v-icn-femail', function() {
 	var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
 	var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
     var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-    reinviteUser(firstName, lastName, emailId);
+    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
 });
 
 /**
  * Method to send invite link
  */
-function reinviteUser(firstName, lastName, emailId) {
+function reinviteUser(firstName, lastName, emailId,disableEle) {
 	var payload = {
 		"firstName" : firstName,
 		"lastName" : lastName,
@@ -4356,7 +4369,7 @@ function reinviteUser(firstName, lastName, emailId) {
 	};
 	var url="./reinviteuser.do";
 	showOverlay();
-	callAjaxGetWithPayloadData(url, reinviteUserCallBack, payload, true);
+	callAjaxGetWithPayloadData(url, reinviteUserCallBack, payload, true,disableEle);
 }
 
 function reinviteUserCallBack(data){
@@ -4407,7 +4420,7 @@ function updateUserProfile(profileId, profileStatus) {
 		} else {
 			showError(map.message);
 		}
-	}, payload, false);
+	}, payload, false,'');
 }
 
 function bindEditUserClick(){
@@ -4584,7 +4597,7 @@ $(document).on('blur', '#yelp-profile-url', function() {
 			$('#message-header').html(data);
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
-		}, payload);
+		}, payload,true,'');
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -5249,7 +5262,7 @@ function retakeSurveyRequest(){
 			"agentName" : agentName
 	};
 	//callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
-	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true);
+	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true,'');
 	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
 	showToast();
 }
@@ -6200,7 +6213,7 @@ function updateLockSettings(id, state) {
 			
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
-		}, payload);
+		}, payload,true,'');
 	}, 0);
 }
 
@@ -6238,7 +6251,7 @@ $(document).on('blur', '#intro-body-text-edit', function() {
 				"aboutMe" : aboutMe
 			};
 			callAjaxPostWithPayloadData("./addorupdateaboutme.do",
-					callBackOnEditAdboutMeDetails, payload);
+					callBackOnEditAdboutMeDetails, payload,true,'');
 		}, 0);
 	}
 });
@@ -6304,7 +6317,7 @@ $(document).on(
 					"phoneNumbers" : phoneNumbers
 				};
 				callAjaxPostWithPayloadData("./updatephonenumbers.do",
-						callBackOnUpdatePhoneNumbers, payload);
+						callBackOnUpdatePhoneNumbers, payload,true,'');
 			}, 0);
 		});
 
@@ -6363,7 +6376,7 @@ $(document).on(
 					"webAddresses" : webAddresses
 				};
 				callAjaxPostWithPayloadData("./updatewebaddresses.do",
-						callBackOnUpdateWebAddresses, payload);
+						callBackOnUpdateWebAddresses, payload,true,'');
 			}, 0);
 		});
 
@@ -6409,7 +6422,7 @@ function callBackEditAddressDetails(data) {
 				"zipCode" : zipCode
 			};*/
 			payload = $('#prof-edit-address-form').serialize();
-			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
+			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload,true,'');
 		}, 0);
 
 		$('#overlay-continue').unbind('click');
@@ -6501,7 +6514,7 @@ $(document).on('blur', '#prof-basic-container input', function() {
 			payload["profLocation"] = $('#prof-location').val().trim();
 		}
 		
-		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload);
+		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload,true,'');
 	}, 0);
 });
 
@@ -6705,7 +6718,7 @@ function updateAssociations() {
 		"associationList" : associationList
 	};
 	callAjaxPostWithPayloadData("./updateassociations.do",
-			callBackUpdateAssociations, payload);
+			callBackUpdateAssociations, payload,true,'');
 }
 
 function callBackUpdateAssociations(data) {
@@ -6779,7 +6792,7 @@ function updateAchievements() {
 		"achievementList" : achievementList
 	};
 	callAjaxPostWithPayloadData("./updateachievements.do",
-			callBackUpdateAchievements, payload);
+			callBackUpdateAchievements, payload,true,'');
 }
 
 function callBackUpdateAchievements(data) {
@@ -6853,7 +6866,7 @@ function updateLicenseAuthorizations() {
 		"licenceList" : licenceList
 	};
 	callAjaxPostWithPayloadData("./updatelicenses.do",
-			callBackUpdateLicenseAuthorizations, payload);
+			callBackUpdateLicenseAuthorizations, payload,true,'');
 }
 
 function callBackUpdateLicenseAuthorizations(data) {
@@ -6929,7 +6942,7 @@ function updateExpertise() {
 		"expertiseList" : expertiseList
 	};
 	callAjaxPostWithPayloadData("./updateexpertise.do",
-			callBackUpdateExpertise, payload);
+			callBackUpdateExpertise, payload,true,'');
 }
 
 function callBackUpdateExpertise(data) {
@@ -7003,7 +7016,7 @@ function updateHobbies() {
 		"hobbiesList" : hobbies
 	};
 	callAjaxPostWithPayloadData("./updatehobbies.do",
-			callBackUpdateHobbies, payload);
+			callBackUpdateHobbies, payload,true,'');
 }
 
 function callBackUpdateHobbies(data) {
@@ -7130,7 +7143,7 @@ function updateYelpLink(link) {
 		"yelplink" : link
 	};
 	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
+		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload,true,'');
 		showProfileLinkInEditProfilePage("yelp", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
@@ -7178,7 +7191,7 @@ function updateLendingTreeLink(link) {
 		"lendingTreeLink" : link
 	};
 	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload);
+		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload,true,'');
 		showProfileLinkInEditProfilePage("lendingtree", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
@@ -7201,7 +7214,7 @@ function updateRealtorLink(link) {
 		"realtorLink" : link
 	};
 	if (isValidUrl(link)) {
-		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload);
+		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload,true,'');
 		showProfileLinkInEditProfilePage("realtor", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
@@ -7494,7 +7507,7 @@ $(document).on('blur', '#contant-info-container input[data-email]', function() {
 		var payload = {
 			"mailIds" : mailIds
 		};
-		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds, payload);
+		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds, payload,true,'');
 	}, 0);
 });
 
@@ -7654,7 +7667,7 @@ function showDashboardButtons(columnName, columnValue){
 			"columnName" : columnName,
 			"columnValue" : columnValue
 	};
-	callAjaxGetWithPayloadData('./dashboardbuttonsorder.do', paintDashboardButtons, payload, true);
+	callAjaxGetWithPayloadData('./dashboardbuttonsorder.do', paintDashboardButtons, payload, true,'');
 }
 
 function paintDashboardButtons(data){
@@ -7788,7 +7801,7 @@ $(document).on('blur', '#disclaimer-text', function() {
 
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
-		}, payload);
+		}, payload,true,'');
 	}
 });
 
@@ -7848,16 +7861,15 @@ function userSwitchToCompAdmin() {
 function bindUserLoginEvent() {
 	$('.user-login-icn').on('click', function(e) {
 		e.stopImmediatePropagation();
-		$('.user-login-icn').addClass('disable-click');
 		var payload = {
 			"colName" : "userId",
 			"colValue" : $(this).attr('data-iden')
 		};
 		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
 			// window.location = window.location.origin + '/userlogin.do';
-			$('.user-login-icn').removeClass('disable-click');
+			/*$('.user-login-icn').removeClass('disable-click');*/
 			window.location = getLocationOrigin() + '/userlogin.do';
-		}, true, payload);
+		}, true, payload,'.user-login-icn');
 	});
 }
 
@@ -7914,7 +7926,7 @@ function getIncompleteSurveyCount(colName, colValue){
 		});
 		$('#dsh-inc-srvey').perfectScrollbar('update');
 		
-	}, payload, true);
+	}, payload, true,'');
 }
 
 $(document).on('click', '#sur-next.paginate-button',function(){
@@ -8014,7 +8026,7 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
 		} else {
 			$('#sur-next').removeClass('paginate-button');
 		}
-	}, payload, false);
+	}, payload, false,'');
 }
 
 function hideIncompleteSurveyListPopup() {
@@ -8607,7 +8619,7 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 			$("#subject-id").val("");
 			$("#user-message").val("");
 			showToast();
-	}, payload);
+	}, payload,true,'');
 });
 
 
@@ -8631,7 +8643,7 @@ function disconnectSocialMedia(socialMedia) {
 			$('#overlay-toast').html('Some error occurred while disconnecting ' + socialMedia);
 			showToast();
 		}
-	}, payload, true);	
+	}, payload, true,'');	
 }
 
 
@@ -8652,7 +8664,7 @@ function showSurveysUnderResolution(startIndexCmp, batchSizeCmp){
 				$('#sur-under-res-list').append(data);
 			
 			startIndexCmp += batchSizeCmp;
-		}, payload, false);
+		}, payload, false,'');
 }
 
 // Send Survey Agent
@@ -8858,7 +8870,7 @@ $(document).on('click', '#wc-send-survey', function() {
 		
 		showToast();
 		enableBodyScroll();
-	}, payload);
+	}, payload,true,'');
 });
 
 $(document).on('click', '#wc-skip-send-survey', function() {
@@ -8892,7 +8904,7 @@ function sendSurveyInvitationAdmin(columnName, columnValue) {
 		$('#wc-review-table').perfectScrollbar();
 		$('#wc-review-table').perfectScrollbar('update');
 		attachAutocompleteAgentSurveyInviteDropdown();
-	}, payload, true);
+	}, payload, true,'');
 }
 
 function linkedInDataImport() {
@@ -8917,7 +8929,7 @@ function revertMailContent(mailcategory) {
 		$('#overlay-main').hide();
 		$("#overlay-toast").html(data);
 		showToast();
-	}, payload, true);
+	}, payload, true,'');
 }
 
 
@@ -9218,7 +9230,7 @@ function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
 		}
 		paintPostsSolr(data, entityType, entityId, searchQuery);
 		proPostStartIndex += proPostBatchSize;
-	}, payload, true);
+	}, payload, true,'');
 }
 
 function paintPostsSolr(data, entityType, entityId, searchQuery) {
@@ -9390,7 +9402,7 @@ function removeUserPost(surveyMongoId) {
 			$('#overlay-toast').html(data.responseText);
 			showToast();
 		}
-	}, payload, true);
+	}, payload, true,'');
 }
 
 //Edit profile events
@@ -9412,7 +9424,7 @@ $(document).on('click', '#prof-post-btn', function() {
 		if (data.errCode == undefined) {
 			showPosts(true);
 		}
-	}, payload, true);
+	}, payload, true,'');
 });
 
 $(document).on('click', '.ppl-share-wrapper .icn-remove', function() {
@@ -9657,7 +9669,7 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 					"searchKey" : request.term,
 					"columnName" : colName,
 					"columnValue" : colValue
-				}, true);
+				}, true,'');
 		},
 		minLength : 1,
 		select : function (event, ui) {

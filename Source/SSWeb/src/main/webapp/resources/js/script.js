@@ -620,7 +620,7 @@ function loadDisplayPicture(profileMasterId){
 			
 		}
 		return data.responseJSON;
-	}, false, payload);
+	}, false, payload,'');
 }
 function displayPicCallback(data){
 	$("#hdr-usr-img").css("background", "");
@@ -639,7 +639,7 @@ function sendVerificationMail(emailUrl){
 	var payload = {
 			"emailUrl" : emailUrl
 	};
-	callAjaxGetWithPayloadData("./sendverificationmail", verificationCallback, payload, true);
+	callAjaxGetWithPayloadData("./sendverificationmail", verificationCallback, payload, true,'');
 }
 
 function verificationCallback(){
