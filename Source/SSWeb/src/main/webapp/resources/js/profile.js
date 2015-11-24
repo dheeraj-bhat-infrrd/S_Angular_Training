@@ -7,6 +7,7 @@ var publicPostStartIndex = 0;
 var publicPostNumRows = 5;
 var currentProfileName;
 var doStopPublicPostPagination = false;
+var isPublicPostAjaxRequestRunning = false;
 var reviewsSortBy = 'default';
 var showAllReviews = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
@@ -15,6 +16,7 @@ var profileJson;
 var isFetchReviewAjaxRequestRunning = false; //keeps checks of if the ajax request is running to fetch reviews.
 var stopFetchReviewPagination = false;
 var reviewsNextBatch = []; //Reviews batch to store the next reviews
+var publicPostsNextBatch = []; //Posts batch to store the next posts
 
 $(document).ajaxStop(function() {
 	adjustImage();
@@ -258,7 +260,7 @@ function paintProfilePage(result) {
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		
 		// paint public  posts
-		paintPublicPosts();
+		fetchPublicPosts();
 		
 		var breadCrumUrl = '/rest/breadcrumb/';
 		
@@ -757,7 +759,7 @@ function paintReviews(result){
 		reviewsHtml += '			<div class="ppl-head-1">'+custDispName+'</div>';
 		if (date != null) {
 			date = convertUserDateToLocale(date);
-			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy HH:mm:ss") + '</div>'; 
+			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
 		}
 		
 		reviewsHtml += '		</div>';
@@ -921,25 +923,30 @@ function confirmReportAbuse(payload) {
 }
 
 $(document).scroll(function(){
-	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75) ){
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height()) ){
 		fetchReviewsScroll(false);
 	}
 });
 
-
+/**
+ * Function to fetch the reviews on scroll 
+ * @param isNextBatch 
+ */
 function fetchReviewsScroll(isNextBatch) {
-	if (!stopFetchReviewPagination) {
+	//if pagination is stopped or next batch is not empty
+	if (!stopFetchReviewPagination || reviewsNextBatch.length > 0) {
 		if (isFetchReviewAjaxRequestRunning)
 			return; // Return if ajax request is still running
 		if(!isNextBatch && reviewsNextBatch != undefined && reviewsNextBatch.length > 0) {
-			var reviewsToShow = reviewsNextBatch.slice(0, 5);
-			if(reviewsNextBatch.length > 5) {
-				reviewsNextBatch = reviewsNextBatch.slice(5);
+			var reviewsToShow = reviewsNextBatch.slice(0, numOfRows);
+			if(reviewsNextBatch.length > numOfRows) {
+				reviewsNextBatch = reviewsNextBatch.slice(numOfRows);
 			} else {
 				reviewsNextBatch = [];
 			}
 			paintReviews(reviewsToShow);
 		} else {
+			if(stopFetchReviewPagination) return; //Return if pagination is stopped
 			startIndex = startIndex + numOfRows;
 			var profileLevel = $("#profile-fetch-info").attr("profile-level");
 			if (showAllReviews)
@@ -1303,9 +1310,33 @@ function downloadVCard(agentName){
 	window.open(url, "_blank");
 }
 
+$('#prof-posts').on('scroll',function(){
+	var scrollContainer = this;
+	if (scrollContainer.scrollTop === scrollContainer.scrollHeight
+				- scrollContainer.clientHeight) {
+		if(publicPostsNextBatch.length > 0) {
+			paintPublicPosts(publicPostsNextBatch.slice(0, publicPostNumRows));
+			if(publicPostsNextBatch.length > publicPostNumRows) {
+				publicPostsNextBatch = publicPostsNextBatch.slice(publicPostNumRows);
+			} else {
+				publicPostsNextBatch = [];
+			}
+			if(publicPostsNextBatch.length <= publicPostNumRows) {
+				fetchPublicPosts(true);
+			}
+		} else {
+			fetchPublicPosts(false);
+		}
+	}
+});
+
 //Function to paint posts
-function paintPublicPosts() {
-	doStopPublicPostPagination = false;
+function fetchPublicPosts(isNextBatch) {
+	
+	if(isPublicPostAjaxRequestRunning) return; // Return if request is running
+	
+	if(doStopPublicPostPagination) return; //If pagination has stopped return the request
+	
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	
 	var url = getLocationOrigin() + "/rest/profile/";
@@ -1325,12 +1356,30 @@ function paintPublicPosts() {
 		//Fetch the reviews for individual
 		url += currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
 	}
-	callAjaxGET(url, callBackPaintPublicPosts, true);
+	isPublicPostAjaxRequestRunning = true;
+	callAjaxGET(url, function(data) {
+		isPublicPostAjaxRequestRunning = false;
+		var posts = $.parseJSON(data);
+		posts = $.parseJSON(posts.entity);
+		
+		//Check if request is for next batch
+		if(isNextBatch) {
+			publicPostsNextBatch = publicPostsNextBatch.concat(posts);
+		} else {
+			paintPublicPosts(posts);
+		}
+		publicPostStartIndex += posts.length;
+		if (publicPostStartIndex < publicPostNumRows || posts.length < publicPostNumRows){
+			doStopPublicPostPagination = true;
+		}
+		
+		if(publicPostsNextBatch.length <= publicPostNumRows) {
+			fetchPublicPosts(true);
+		}
+	}, true);
 }
 
-function callBackPaintPublicPosts(data) {
-	var posts = $.parseJSON(data);
-	posts = $.parseJSON(posts.entity);
+function paintPublicPosts(posts) {
 	
 	var divToPopulate = "";
 	$.each(posts, function(i, post) {
@@ -1380,24 +1429,7 @@ function callBackPaintPublicPosts(data) {
 		$('#prof-posts').append(divToPopulate);
 		$('#prof-posts').perfectScrollbar('update');
 	}
-	
-	publicPostStartIndex += posts.length;
-	if (publicPostStartIndex < publicPostNumRows || posts.length < publicPostNumRows){
-		doStopPublicPostPagination = true;
-	}
 }
-
-$('#prof-posts').on('scroll',function(){
-	var scrollContainer = this;
-	if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-				- scrollContainer.clientHeight) {
-		setTimeout(function() {
-			if (!doStopPublicPostPagination) {
-				paintPublicPosts();					
-			}
-		}, 100);
-	}
-});
 
 $('body').on('click',".branch-link",function(e) {
 	e.stopPropagation();
