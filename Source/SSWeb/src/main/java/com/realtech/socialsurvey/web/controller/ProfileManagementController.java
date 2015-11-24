@@ -1774,8 +1774,10 @@ public class ProfileManagementController
                 userSettings.setAgentSettings( agentSettings );
 
                 // Modify Agent details in Solr
-                solrSearchService.editUserInSolr( agentSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR,
-                    profileImageUrl );
+                Map<String, Object> updateMap = new HashMap<String, Object>();
+                updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl );
+                updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                solrSearchService.editUserInSolrWithMultipleValues( agentSettings.getIden(), updateMap );
             } else {
                 throw new InvalidInputException( "Invalid input exception occurred while uploading profile image.",
                     DisplayMessageConstants.GENERAL_ERROR );
