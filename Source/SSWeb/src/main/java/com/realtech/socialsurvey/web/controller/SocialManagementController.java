@@ -78,7 +78,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
-import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
