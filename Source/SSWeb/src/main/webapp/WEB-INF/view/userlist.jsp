@@ -100,7 +100,7 @@
 					</c:choose>
 					<td class="v-tbl-wid v-icn-wid ${admincaneditclass}"
 						title="<spring:message code="label.widget.key" />"
-						onclick="generateWidget(${ userfromsearch.userId }, 'individual');"></td>
+						onclick="generateWidget($(this),${ userfromsearch.userId }, 'individual');"></td>
 					<c:choose>
 						<c:when test="${userfromsearch.status == 2}">
 							<td class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></td>
