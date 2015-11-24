@@ -78,13 +78,13 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -205,8 +205,12 @@ public class SocialManagementController
     @Autowired
 	private SurveyHandler surveyHandler;
 
+    //TODO : DAO must not be used in controllers
     @Autowired
     private SocialPostDao socialPostDao;
+    
+    @Autowired
+    private BatchTrackerService batchTrackerService;
     
     private final static int SOLR_BATCH_SIZE = 20;
     
@@ -2469,12 +2473,12 @@ public class SocialManagementController
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
+        //JIRA SS-1287
         try {
-            //Get last build time from solr for social posts
-            Long lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
+            Long lastBuild = batchTrackerService.getLastRunTimeByBatchType( CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD );
             model.addAttribute( "lastBuild", lastBuild );
-        } catch ( SolrException e ) {
-            LOG.error( "SolrException while getting last build time. Reason", e );
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "NoRecordsFetchedException while getting last build time. Reason  : ", e );
         }
         
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {

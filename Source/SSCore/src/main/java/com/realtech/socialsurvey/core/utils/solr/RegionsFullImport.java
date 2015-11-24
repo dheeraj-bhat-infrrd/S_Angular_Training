@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.utils.solr;
 
 import java.util.List;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.dao.SolrImportDao;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -55,8 +59,10 @@ public class RegionsFullImport implements Runnable {
 				solrSearchService.addRegionsToSolr(regions);
 			}
 			catch (SolrException e) {
-				LOG.error("SolrException occurred while adding region to solr");
-			}
+				LOG.error("SolrException occurred while adding region to solr" , e);
+			} catch ( InvalidInputException e ) {
+			    LOG.error("SolrException occurred while adding region to solr" , e);
+            }
 			pageNo++;
 		}
 		while (!regions.isEmpty());

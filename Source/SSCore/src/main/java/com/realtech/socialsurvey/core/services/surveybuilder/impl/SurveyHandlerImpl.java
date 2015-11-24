@@ -606,7 +606,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void increaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException
+    public void increaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException, InvalidInputException
     {
         LOG.info( "Method to increase survey count for agent started." );
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, 1 );
@@ -616,7 +616,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException
+    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException, InvalidInputException
     {
         LOG.info( "Method to decrease survey count for agent started." );
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, -1 );
