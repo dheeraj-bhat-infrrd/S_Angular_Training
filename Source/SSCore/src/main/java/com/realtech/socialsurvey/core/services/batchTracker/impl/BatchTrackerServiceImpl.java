@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.metamodel.relational.IllegalIdentifierException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.BatchTracker;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -78,6 +80,28 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
         LOG.debug( "method updateModifiedOnColumnByBatchType() ended for batch type : " + batchType );
     }
 
+
+    @Override
+    @Transactional
+    public void updateModifiedOnColumnByBatchTypeAndTime( String batchType, Timestamp time ) throws NoRecordsFetchedException, InvalidInputException
+    {
+        LOG.debug( "method updateModifiedOnColumnByBatchType() started for batch type : " + batchType );
+
+        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
+            CommonConstants.BATCH_TYPE_COLUMN, batchType );
+        if ( batchTrackerList.size() <= 0 || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
+            throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
+        }
+        if ( time == null ) {
+            throw new InvalidInputException( "Invalid Timestamp object pased. Timestamp is null" );
+        }
+        BatchTracker batchTracker = batchTrackerList.get( CommonConstants.INITIAL_INDEX );
+        batchTracker.setLastRunTime( time );
+        batchTracker.setModifiedOn( time );
+        batchTrackerDao.update( batchTracker );
+
+        LOG.debug( "method updateModifiedOnColumnByBatchType() ended for batch type : " + batchType );
+    }
 
     @Override
     @Transactional
