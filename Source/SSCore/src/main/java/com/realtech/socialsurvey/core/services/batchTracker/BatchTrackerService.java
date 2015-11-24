@@ -23,4 +23,7 @@ public interface BatchTrackerService
 
     public List<Long> getUserIdListToBeUpdated( long modifiedOn );
 
+
+    void updateModifiedOnColumnByBatchTypeAndTime( String batchType, long time ) throws NoRecordsFetchedException;
+
 }

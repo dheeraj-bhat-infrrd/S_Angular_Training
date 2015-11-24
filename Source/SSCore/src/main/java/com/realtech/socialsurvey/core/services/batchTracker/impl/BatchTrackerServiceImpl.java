@@ -81,6 +81,26 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
 
     @Override
     @Transactional
+    public void updateModifiedOnColumnByBatchTypeAndTime( String batchType, long time ) throws NoRecordsFetchedException
+    {
+        LOG.debug( "method updateModifiedOnColumnByBatchType() started for batch type : " + batchType );
+
+        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
+            CommonConstants.BATCH_TYPE_COLUMN, batchType );
+        if ( batchTrackerList.size() <= 0 || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
+            throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
+        }
+
+        BatchTracker batchTracker = batchTrackerList.get( CommonConstants.INITIAL_INDEX );
+        batchTracker.setLastRunTime( new Timestamp( time ) );
+        batchTracker.setModifiedOn( new Timestamp( time ) );
+        batchTrackerDao.update( batchTracker );
+
+        LOG.debug( "method updateModifiedOnColumnByBatchType() ended for batch type : " + batchType );
+    }
+
+    @Override
+    @Transactional
     public List<Long> getUserIdListToBeUpdated( long modifiedOn )
     {
         LOG.debug( "method getReviewCountForAgentsByModifiedOn() started " );
