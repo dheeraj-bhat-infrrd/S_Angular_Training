@@ -142,7 +142,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Resource
     @Qualifier ( "user")
     private UserDao usersDao;
-    
+
     @Autowired
     private GenericDao<User, Long> userDao;
 
@@ -1418,10 +1418,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.debug( "Found the setting. Converting into agent settings" );
             agentSettings = (AgentSettings) organizationUnitSettings;
             // handle the cases where record is present in the mongo but not in SQL
-            try{
-            	user = userDao.findById( User.class, agentSettings.getIden() );
-            }catch(HibernateException e){
-            	LOG.error( "No active agent found in SQL.", e );
+            try {
+                user = userDao.findById( User.class, agentSettings.getIden() );
+            } catch ( HibernateException e ) {
+                LOG.error( "No active agent found in SQL.", e );
                 throw new ProfileNotFoundException( "No active agent found in SQL." );
             }
             if ( user == null || ( user.getStatus() == CommonConstants.STATUS_INACTIVE && checkStatus ) ) {
@@ -1431,9 +1431,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             compositeUserObject = new UserCompositeEntity();
             compositeUserObject.setUser( user );
             compositeUserObject.setAgentSettings( agentSettings );
-        }else{
-        	LOG.warn("No profile found with profile name: "+agentProfileName);
-        	throw new ProfileNotFoundException("No profile found with profile name: "+agentProfileName);
+        } else {
+            LOG.warn( "No profile found with profile name: " + agentProfileName );
+            throw new ProfileNotFoundException( "No profile found with profile name: " + agentProfileName );
         }
         LOG.info( "Returning the user composite object." );
         return compositeUserObject;
@@ -2060,7 +2060,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method to delete post to a user's profile finished." );
     }
 
-    
+
     /*
      * Method to fetch social posts for a particular user.
      */
@@ -2105,11 +2105,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         //If agent, get social posts for only that agent.
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate );
+            posts = socialPostDao
+                .getSocialPosts( entityId, CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate );
             //If company, get social posts for that company, all the regions, branches and agents in that company.
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             //Get social posts for company
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.COMPANY_ID, startIndex, numOfRows, startDate, endDate );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.COMPANY_ID, startIndex, numOfRows, startDate,
+                endDate );
             Company company = organizationManagementService.getCompanyById( entityId );
             //Get social posts for all the regions in the company.
             for ( Region region : company.getRegions() ) {
@@ -2123,41 +2125,46 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
             //Get social posts for all the users in the company
             for ( User user : company.getUsers() ) {
-                posts
-                    .addAll( socialPostDao.getSocialPosts( user.getUserId(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
+                posts.addAll( socialPostDao.getSocialPosts( user.getUserId(), CommonConstants.AGENT_ID, startIndex, numOfRows,
+                    startDate, endDate ) );
             }
             //Get all social posts for region
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             Region region = userManagementService.getRegionById( entityId );
             //Get social posts for the region
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.REGION_ID, startIndex, numOfRows, startDate, endDate );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.REGION_ID, startIndex, numOfRows, startDate,
+                endDate );
             //Get social posts for all the branches in the region
             for ( Branch branch : region.getBranches() ) {
                 posts.addAll( socialPostDao.getSocialPosts( branch.getBranchId(), CommonConstants.BRANCH_ID, startIndex,
                     numOfRows, startDate, endDate ) );
             }
             //Get social posts for all the users in the region
-            
-            if (  getIndividualsByRegionId( entityId ) != null ) {
+
+            if ( getIndividualsByRegionId( entityId ) != null ) {
                 for ( AgentSettings user : getIndividualsByRegionId( entityId ) ) {
-                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex,
+                        numOfRows, startDate, endDate ) );
                 }
             }
             //Get all social posts for branch
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             //Get social posts for the branch
-            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.BRANCH_ID, startIndex, numOfRows, startDate, endDate );
+            posts = socialPostDao.getSocialPosts( entityId, CommonConstants.BRANCH_ID, startIndex, numOfRows, startDate,
+                endDate );
             //Get social posts for all the users in the branch
             if ( getIndividualsByBranchId( entityId ) != null ) {
                 for ( AgentSettings user : getIndividualsByBranchId( entityId ) ) {
-                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex, numOfRows, startDate, endDate ) );
+                    posts.addAll( socialPostDao.getSocialPosts( user.getIden(), CommonConstants.AGENT_ID, startIndex,
+                        numOfRows, startDate, endDate ) );
                 }
             }
         }
         LOG.info( "Method to fetch social posts , getCumulativeSocialPosts() finished." );
         return posts;
     }
-    
+
+
     /*
      * Method to fetch social posts for a particular user.
      */
@@ -2250,7 +2257,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public void setAgentProfileUrlForReview( List<SurveyDetails> reviews )
+    public void setAgentProfileUrlForReview( List<SurveyDetails> reviews ) throws InvalidInputException
     {
         String profileUrl;
         String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
@@ -2259,19 +2266,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( reviews != null && !reviews.isEmpty() ) {
             for ( SurveyDetails review : reviews ) {
 
+                //JIRA SS-1286
+                /*Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden( review.getAgentId(),
+                    CommonConstants.USER_ID_SOLR, true, 0, 1 );*/
                 // adding completeProfileUrl
-                try {
-                    Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden( review.getAgentId(),
-                        CommonConstants.USER_ID_SOLR, false, 0, 1 );
-                    if ( documents != null && !documents.isEmpty() ) {
-                        profileUrl = (String) documents.iterator().next().getProfileUrl();
-                        review.setCompleteProfileUrl( baseProfileUrl + profileUrl );
-                        review.setGoogleApi( googleApiKey );
-                        review.setFaceBookShareUrl( facebookShareUrl );
-                    }
-                } catch ( InvalidInputException | SolrException e ) {
-                    LOG.error( "Exception caught in setAgentProfileUrlForReview() for agent : " + review.getAgentName()
-                        + " Nested exception is ", e );
+                OrganizationUnitSettings unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                    review.getAgentId(), CommonConstants.AGENT_SETTINGS_COLLECTION );
+                if ( unitSetting != null ) {
+                    profileUrl = (String) unitSetting.getProfileUrl();
+                    review.setCompleteProfileUrl( baseProfileUrl + profileUrl );
+                    review.setGoogleApi( googleApiKey );
+                    review.setFaceBookShareUrl( facebookShareUrl );
+                } else {
+                    throw new InvalidInputException( "An agent with ID : " + review.getAgentId() + " does not exist" );
                 }
 
                 OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review

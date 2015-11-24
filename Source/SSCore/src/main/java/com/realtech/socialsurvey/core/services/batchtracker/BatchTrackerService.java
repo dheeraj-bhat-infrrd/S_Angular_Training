@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.batchtracker;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -23,5 +24,9 @@ public interface BatchTrackerService
 
 
     public List<Long> getUserIdListToBeUpdated( long modifiedOn );
+
+
+    void updateModifiedOnColumnByBatchTypeAndTime( String batchType, Timestamp time ) throws NoRecordsFetchedException,
+        InvalidInputException;
 
 }

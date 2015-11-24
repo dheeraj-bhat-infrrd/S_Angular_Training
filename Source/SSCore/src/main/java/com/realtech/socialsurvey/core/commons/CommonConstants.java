@@ -166,6 +166,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_COLUMN = "batchType";
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
+    public static final String BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD = "socialMonitorLastBuildTime";
 
     /**
      * Mongo entities and column name constants
