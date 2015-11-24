@@ -1,23 +1,21 @@
-package com.realtech.socialsurvey.core.services.batchTracker.impl;
+package com.realtech.socialsurvey.core.services.batchtracker.impl;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.BatchTracker;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.services.batchTracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
@@ -47,7 +45,8 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
     {
         LOG.debug( "method getLastRunTimeByBatchType() started for batch type : " + batchType );
 
-        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class, CommonConstants.BATCH_TYPE_COLUMN, batchType );
+        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
+            CommonConstants.BATCH_TYPE_COLUMN, batchType );
         if ( batchTrackerList == null || batchTrackerList.isEmpty() ) {
             throw new NoRecordsFetchedException( "Invalid batch type" );
         }
@@ -64,13 +63,14 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
     public void updateModifiedOnColumnByBatchType( String batchType ) throws NoRecordsFetchedException, InvalidInputException
     {
         LOG.debug( "method updateModifiedOnColumnByBatchType() started for batch type : " + batchType );
-        if(batchType !=null && ! batchType.isEmpty()){
-            throw new InvalidInputException("passed parameter batchtype is incorrect");
+        if ( batchType != null && !batchType.isEmpty() ) {
+            throw new InvalidInputException( "passed parameter batchtype is incorrect" );
         }
 
         List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
             CommonConstants.BATCH_TYPE_COLUMN, batchType );
-        if ( batchTrackerList == null || batchTrackerList.size() <= 0 || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
+        if ( batchTrackerList == null || batchTrackerList.size() <= 0
+            || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
             throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
         }
 
@@ -122,7 +122,9 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
         try {
             solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
         } catch ( SolrException e ) {
-            LOG.error( "Error while updating review count" );
+            LOG.error( "Error while updating review count", e );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Error while updating review count", e );
         }
         LOG.debug( "method updateReviewCountForAgentsInSolr() ended" );
     }
