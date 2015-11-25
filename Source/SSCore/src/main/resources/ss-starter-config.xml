@@ -134,6 +134,19 @@
 		<property name="durability" value="true" />
 	</bean>
 	
+	<!-- Setting isprofileimageset field in users job detail -->
+	<bean id="isprofileimgsetjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.UsersIsProfileImageSetUpdater" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="setIsProfileImageSetFieldForUsers" value-ref="setIsProfileImageSetFieldForUsers" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
 	<!-- Setting set companyId in mongo social posts job detail -->
 	<bean id="setcompanyidsinsocialpostsjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -296,6 +309,7 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="imageProcessor" value-ref="imageProcessor" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -348,6 +362,13 @@
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialpostsimportjobdetail" />
 		<property name="cronExpression" value="0 0/15 * * * ?" />
+	</bean>
+
+	<!-- setting cron for isprofileimgset batch -->
+	<bean id="isprofileimagesetcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="isprofileimgsetjobdetail" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
 	</bean>
 
 	<!-- setting cron for Set Company Ids In Social Posts -->
@@ -452,8 +473,9 @@
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
-				<!-- <ref bean="imageprocessingjobdetail" />  -->
+				<ref bean="imageprocessingjobdetail" /> 
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
+				<ref bean="isprofileimgsetjobdetail" />
 			</list>
 		</property>
 
@@ -475,8 +497,9 @@
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
-				<!-- <ref bean="imageprocessingcron" /> -->
+				<ref bean="imageprocessingcron" />
 				<!-- <ref bean="hierarchysettingscron" /> -->
+				<ref bean="isprofileimagesetcron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -511,7 +534,7 @@
 	<bean id="solrSearchService"
 		class="com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl" />
 	<bean id="batchTrackerService"
-		class="com.realtech.socialsurvey.core.services.batchTracker.impl.BatchTrackerServiceImpl" />
+		class="com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl" />
 		
 
 	<!-- Update subscription dependencies -->
@@ -526,6 +549,10 @@
 	<bean id="socialPostsDeltaImport"
 		class="com.realtech.socialsurvey.core.utils.solr.SocialPostsDeltaImport" />
 	
+	<!--  IsProfileImageSet for users dependencies -->
+	<bean id="setIsProfileImageSetFieldForUsers"
+		class="com.realtech.socialsurvey.core.utils.solr.SetIsProfileImageSetFieldForUsers" />
+		
 	<!-- setCompanyIdsInSocialPosts dependencies -->
 	<bean id="setCompanyIdInSocialPosts"
 		class="com.realtech.socialsurvey.core.utils.mongo.SetCompanyIdInSocialPosts" />

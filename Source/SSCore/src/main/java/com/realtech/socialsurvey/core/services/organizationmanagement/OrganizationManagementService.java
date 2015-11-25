@@ -1170,4 +1170,11 @@ public interface OrganizationManagementService
 
     List<User> getAllUsers();
 
+
+    Map<Long, String> getListOfUnprocessedImages( String collectionName, String imageType ) throws InvalidInputException;
+
+
+    void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+        boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
+
 }
