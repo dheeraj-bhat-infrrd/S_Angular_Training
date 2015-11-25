@@ -42,17 +42,17 @@ public interface DashboardService
 	 */
 	public long getCompleteSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException;
 	
-    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays );
+    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
 
 
-    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin );
+    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin ) throws InvalidInputException;
 
 
     public int getProfileCompletionPercentage( User user, String columnName, long columnValue,
-        OrganizationUnitSettings unitSettings );
+        OrganizationUnitSettings unitSettings ) throws InvalidInputException;
 
 
-    public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness );
+    public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness ) throws InvalidInputException;
 
 
     public Map<String, Map<Integer, Integer>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
@@ -60,20 +60,20 @@ public interface DashboardService
 
 
     public XSSFWorkbook downloadIncompleteSurveyData( List<SurveyPreInitiation> surveyDetails, String fileLocation )
-        throws IOException;
+        throws IOException, InvalidInputException;
 
 
-    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName );
+    public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName ) throws InvalidInputException;
 
 
     public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileName )
-        throws IOException;
+        throws IOException, InvalidInputException;
 
 
     public XSSFWorkbook downloadAgentRankingData( List<AgentRankingReport> agentDetails, String fileLocation )
-        throws IOException;
+        throws IOException, InvalidInputException;
 
 
-    public long getSocialPostsForPastNdaysWithHierarchy( String coumnName, long columnValue, int numberOfDays );
+    public long getSocialPostsForPastNdaysWithHierarchy( String coumnName, long columnValue, int numberOfDays ) throws InvalidInputException;
 }
 // JIRA SS-137 BY RM05:EOC
