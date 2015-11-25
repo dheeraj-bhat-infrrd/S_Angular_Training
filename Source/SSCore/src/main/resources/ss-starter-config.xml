@@ -511,7 +511,7 @@
 	<bean id="solrSearchService"
 		class="com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl" />
 	<bean id="batchTrackerService"
-		class="com.realtech.socialsurvey.core.services.batchTracker.impl.BatchTrackerServiceImpl" />
+		class="com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl" />
 		
 
 	<!-- Update subscription dependencies -->
