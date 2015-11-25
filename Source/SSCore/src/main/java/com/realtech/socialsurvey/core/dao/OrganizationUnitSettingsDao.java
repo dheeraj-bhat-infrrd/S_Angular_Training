@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -213,4 +214,8 @@ public interface OrganizationUnitSettingsDao
      * @throws InvalidInputException
      */
     public Map<Long, String> getCollectionListOfUnprocessedImages(String collectionName, String imageType) throws InvalidInputException;
+
+
+    void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+        boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
 }

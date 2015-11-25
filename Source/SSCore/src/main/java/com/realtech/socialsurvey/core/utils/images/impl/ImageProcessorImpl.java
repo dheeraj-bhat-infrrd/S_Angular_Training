@@ -72,6 +72,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 		processedFile = new File(CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + String.valueOf(System.currentTimeMillis()) + "-"
 				+ width + "-" + height + "." + imageExtension);
 		try {
+            LOG.debug( "File path of processed file : " + processedFile.getAbsolutePath() );
 			processedFile.createNewFile();
 			if (processedFile.exists()) {
 				ImageIO.write(scaledImage, imageExtension, processedFile);
@@ -119,7 +120,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 		}
 		else if (imageType.equals(CommonConstants.IMAGE_TYPE_LOGO)) {
 			LOG.debug("Uploading logo");
-			fileUploadService.uploadProfileImageFile(image, destFileName, true);
+			fileUploadService.uploadLogoImageFile(image, destFileName, true);
 			cloudFrontUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket + CommonConstants.FILE_SEPARATOR + destFileName;
 		}
 		LOG.debug("Returning image name: " + cloudFrontUrl);

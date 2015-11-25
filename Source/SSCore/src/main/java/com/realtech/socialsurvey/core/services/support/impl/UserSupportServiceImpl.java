@@ -44,11 +44,11 @@ public class UserSupportServiceImpl implements UserSupportService {
 	public void sendHelpMailToAdmin( String  senderEmail , String senderName , String mailSubject , String MailText , Map<String , String > attachmentsDetails) throws NonFatalException{
 		
 		LOG.info("Method sendHelpMailToAdmin started.");
-		if(senderEmail.isEmpty() || senderEmail == null){
+		if(senderEmail == null || senderEmail.isEmpty()){
 		    throw new InvalidInputException("Sender Email Address is not valid");
 		}
 		
-		if(senderName.isEmpty() || senderName == null){
+		if(senderName == null || senderName.isEmpty()){
             throw new InvalidInputException("Sender Name is not valid");
         }
 		
