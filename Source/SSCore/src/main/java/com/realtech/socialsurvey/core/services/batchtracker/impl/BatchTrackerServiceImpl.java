@@ -85,17 +85,23 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
 
     @Override
     @Transactional
-    public void updateModifiedOnColumnByBatchTypeAndTime( String batchType, Timestamp time ) throws NoRecordsFetchedException, InvalidInputException
+    public void updateModifiedOnColumnByBatchTypeAndTime( String batchType, Timestamp time ) throws NoRecordsFetchedException,
+        InvalidInputException
     {
         LOG.debug( "method updateModifiedOnColumnByBatchType() started for batch type : " + batchType );
 
-        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
-            CommonConstants.BATCH_TYPE_COLUMN, batchType );
-        if ( batchTrackerList.size() <= 0 || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
-            throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
+        if ( batchType == null || batchType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid batch type" );
         }
         if ( time == null ) {
             throw new InvalidInputException( "Invalid Timestamp object pased. Timestamp is null" );
+        }
+        List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
+            CommonConstants.BATCH_TYPE_COLUMN, batchType );
+
+        if ( batchTrackerList == null || batchTrackerList.size() <= 0
+            || batchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
+            throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
         }
         BatchTracker batchTracker = batchTrackerList.get( CommonConstants.INITIAL_INDEX );
         batchTracker.setLastRunTime( time );
