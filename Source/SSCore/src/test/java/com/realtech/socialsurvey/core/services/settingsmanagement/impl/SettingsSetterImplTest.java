@@ -3,14 +3,11 @@ package com.realtech.socialsurvey.core.services.settingsmanagement.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -109,7 +106,7 @@ public class SettingsSetterImplTest
     public void testcheckSettingsSetStatusWithInvalidSettingNumber() throws NonFatalException
     {
         assertFalse( "Setting status does not match expected",
-            settingsSetterImpl.checkSettingsSetStatus( Mockito.anyInt(), OrganizationUnit.AGENT ) );
+            settingsSetterImpl.checkSettingsSetStatus( 0, OrganizationUnit.AGENT ) );
     }
 
 
