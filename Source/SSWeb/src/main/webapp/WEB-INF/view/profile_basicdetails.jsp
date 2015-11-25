@@ -67,31 +67,10 @@
 	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
 </div>
 <script>
-	if (verticalsMasterList == undefined) {
-		callAjaxGETWithTextData("/fetchverticalsmaster.do", function(data) {
-			var parsedData = JSON.parse(data);
-			if (parsedData.errCode == undefined) {
-				verticalsMasterList = parsedData;
-				initializeVerticalAutcomplete();
-			}
-		}, true, {});
-	} else {
-		initializeVerticalAutcomplete();		
-	}
+	initializeVerticalsMasterForProfilePage();
 	
 	// Fetch and paint Reviews
 	$(window).scroll(function() {
-		var newIndex = startIndex + numOfRows;
-		var totalReviews = $("#prof-company-review-count")
-				.html();
-		if (totalReviews != undefined) {
-			totalReviews = totalReviews.substr(0, totalReviews
-					.indexOf(' '));
-			if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
-					&& newIndex <= totalReviews) {
-				fetchReviews(attrName, attrVal, minScore, newIndex, numOfRows);
-				startIndex = newIndex;
-			}
-		}
+		fetchReviewsEditProfileScroll();
 	});
 </script>

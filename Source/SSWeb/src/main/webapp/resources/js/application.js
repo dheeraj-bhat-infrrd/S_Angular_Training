@@ -7316,7 +7316,7 @@ function paintForProfile() {
 	// Common call for all cases
 	fetchAvgRating(attrName, attrVal);
 	fetchReviewCount(attrName, attrVal, minScore);
-	fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows);
+	fetchReviewsOnEditProfile(attrName, attrVal, false);
 }
 
 function focusOnElement() {
@@ -7431,28 +7431,88 @@ function paintProfImage(imgDivClass) {
 			});
 }
 
-function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
+var doStopReviewsPaginationEditProfile = false;
+var isReviewsRequestRunningEditProfile = false;
+
+function fetchReviewsEditProfileScroll() {
+
+	if (startIndex == 0) {
+		doStopReviewsPaginationEditProfile = false;
+	}
+
+	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
+			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
+		if($('div.dsh-review-cont.hide').length > 0){
+			displayReviewOnEditProfile();
+		} else{
+			fetchReviewsOnEditProfile(attrName, attrVal, false);
+		}
+	}
+}
+
+function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
+	
+	//Check if the request is running
+	if(isReviewsRequestRunningEditProfile) return;
+	
 	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
 			+ minScore + "&startIndex=" + startIndex + "&numOfRows="
 			+ numOfRows;
+	
+	isReviewsRequestRunningEditProfile = true;
 	callAjaxGET(url, function(data) {
-		$("#prof-review-item").append(data);
-		$(".review-ratings").each(function() {
-			changeRatingPattern($(this).attr("data-rating"), $(this), false, $(this).attr("data-source"));
-		});
+		
+		var tempDiv = $("<div>");
+		tempDiv.html(data);
+		
+		var countOfReviewsFetched = tempDiv.children('div.dsh-review-cont').length;
 
-		$('.icn-plus-open').click(function() {
-			$(this).hide();
-			$(this).parent().find('.ppl-share-social,.icn-remove').show();
-		});
-
-		$('.icn-remove').click(function() {
-			$(this).hide();
-			$(this).parent().find('.ppl-share-social').hide();
-			$(this).parent().find('.icn-plus-open').show();
-		});
+		if(countOfReviewsFetched < numOfRows) {
+			doStopReviewsPaginationEditProfile = true; //Stop pagination if reviews fetch are less than batch size
+		}
+		
+		//Check if list revcieved is empty 
+		if (countOfReviewsFetched <= 0) {
+			if (startIndex == 0) {
+				$("#prof-review-item").html("<span>No Reviews Found</span>");
+			}
+		} else {
+			// Populate the reviews
+			$("#prof-review-item").append(data);
+		}
+		
+		updateEventOnDashboardPageForReviews();
+		
+		//update start index 
+		startIndex = startIndex + numOfRows;
+		isReviewsRequestRunningEditProfile = false;
+		
+		if(!isNextBatch) {
+			displayReviewOnEditProfile();
+			return;
+		}
+		
+		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
+			fetchReviewsOnEditProfile(attrName, attrVal, true);
+		}
 	}, true);
 }
+
+//Display the review on edit profile
+function displayReviewOnEditProfile() {
+	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
+		if(index >= numOfRows) {
+			return;
+		}
+		$(this).removeClass("hide");
+	});
+	
+	//Get the next batch
+	if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
+		fetchReviewsOnEditProfile(attrName, attrVal, true);
+	}
+}
+
 
 // fetch review count
 function fetchReviewCount(attrName, attrVal, minScore) {
@@ -7563,12 +7623,22 @@ function showPosts(fromStart) {
 		proPostStartIndex = 0;
 		proPostCount++;
 	}
-	var success = false;
 	var payload = {
 		"batchSize" : proPostBatchSize,
 		"startIndex" : proPostStartIndex
 	};
-	$.ajax({
+	
+	callAjaxGetWithPayloadData("./postsforuser.do", function(data) {
+		if (data.errCode == undefined) {
+			if(data != "") {
+				var posts = JSON.parse(data);
+				paintPosts(posts);
+				proPostStartIndex += proPostBatchSize;	
+			}
+		}
+	}, payload, false);
+	
+	/*$.ajax({
 		url : "./postsforuser.do",
 		type : "GET",
 		cache : false,
@@ -7591,7 +7661,7 @@ function showPosts(fromStart) {
 				return;
 			}
 		}
-	});
+	});*/
 }
 
 function paintPosts(posts) {
@@ -9829,4 +9899,18 @@ function attachReInvitationClickEvent(){
 	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
 	    reinviteUser(firstName, lastName, emailId);
 });
+}
+
+function initializeVerticalsMasterForProfilePage() {
+	if (verticalsMasterList == undefined) {
+		callAjaxGETWithTextData("/fetchverticalsmaster.do", function(data) {
+			var parsedData = JSON.parse(data);
+			if (parsedData.errCode == undefined) {
+				verticalsMasterList = parsedData;
+				initializeVerticalAutcomplete();
+			}
+		}, true, {});
+	} else {
+		initializeVerticalAutcomplete();		
+	}
 }
