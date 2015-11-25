@@ -639,4 +639,20 @@ public class SolrSearchServiceImplTest
     {
         solrSearchServiceImpl.getUserIdsFromSolrDocumentList( null );
     }
+    
+    //Tests for updateIsProfileImageSetFieldForMultipleUsers
+    @Test ( expected = InvalidInputException.class)
+    public void updateIsProfileImageSetFieldForMultipleUsersTestIsProfileSetMapNull() throws InvalidInputException,
+        SolrException
+    {
+        solrSearchServiceImpl.updateIsProfileImageSetFieldForMultipleUsers( null );
+    }
+    
+
+    @Test ( expected = InvalidInputException.class)
+    public void updateIsProfileImageSetFieldForMultipleUsersTestIsProfileSetMapEmpty() throws InvalidInputException,
+        SolrException
+    {
+        solrSearchServiceImpl.updateIsProfileImageSetFieldForMultipleUsers( new HashMap<Long, Boolean>() );
+    }
 }
