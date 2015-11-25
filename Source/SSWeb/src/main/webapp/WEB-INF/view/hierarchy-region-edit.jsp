@@ -193,7 +193,7 @@
   		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
   			var uniqueSearchData = getUniqueCitySearchData(data);
   			initializeCityLookup(uniqueSearchData, "region-city-txt");
-  		}, true,'');
+  		}, true);
   	});
 
   	$('#region-city-txt').bind('focus', function(){ 

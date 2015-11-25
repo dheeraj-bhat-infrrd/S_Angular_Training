@@ -69,7 +69,7 @@ $(document).ready(function() {
 
 	function updatechangepassword(formid) {
 		var url = "./changepassword.do";
-		callAjaxFormSubmit(url, updatechangepasswordCallBack, formid,'');
+		callAjaxFormSubmit(url, updatechangepasswordCallBack, formid);
 	}
 	
 	function updatechangepasswordCallBack(response) {

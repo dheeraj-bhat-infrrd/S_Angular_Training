@@ -228,7 +228,7 @@ $(document).ready(function(){
   		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
   			var uniqueSearchData = getUniqueCitySearchData(data);
   			initializeCityLookup(uniqueSearchData, "office-city-txt");
-  		}, true,'');
+  		}, true);
   	});
 
   	$('#office-city-txt').bind('focus', function(){ 

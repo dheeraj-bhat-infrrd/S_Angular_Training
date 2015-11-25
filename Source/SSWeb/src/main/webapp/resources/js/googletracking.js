@@ -15,6 +15,6 @@ $(document).ready(function() {
 
 				ga('create', gaTrackingId, 'auto');
 				ga('send', 'pageview');
-		}, true,'');
+		}, true);
 	}
 });

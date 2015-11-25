@@ -51,7 +51,7 @@ function searchAndDisplayCompanies(key) {
 	var accountType = $('#com-type-filter').val();
 	callAjaxGET("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue+"&accountType="+accountType, function(data) {
 		$('#admin-com-list').html(data);
-	}, true,'');
+	}, true);
 }
 
 function searchAdminCompanies (element) {
@@ -75,7 +75,7 @@ function searchAdminCompanies (element) {
 			
 			//showSelectedCompanyHierarchy(value);
 		});
-	}, payload, true,'');
+	}, payload, true);
 }
 
 function showSelectedCompanyHierarchy(companyId) {
@@ -87,7 +87,7 @@ function showSelectedCompanyHierarchy(companyId) {
 	    });
 	    bindAdminBranchListClicks();
 	    bindUserEditClicks();
-	}, true,'');
+	}, true);
 }
 
 function bindAdminRegionListClicks() {
@@ -162,7 +162,7 @@ function fetchAdminHierarchyViewBranches(regionId, companyId) {
 	var url = "./fetchhierarchyviewbranchesforadmin.do?regionId="+regionId + "&companyId="+companyId;
 	callAjaxGET(url, function(data) {
 		paintAdminHierarchyViewBranches(data,regionId);
-	}, true,'');
+	}, true);
 }
 
 function paintAdminHierarchyViewBranches(data,regionId) {
@@ -177,7 +177,7 @@ function fetchAdminUsersForBranch(branchId,regionId, companyId) {
 	var url="./fetchbranchusersforadmin.do?branchId="+branchId+"&regionId="+regionId + "&companyId="+companyId;
 	callAjaxGET(url, function(data) {
 		paintAdminUsersFromBranch(data,branchId);
-	}, true,'');
+	}, true);
 }
 
 function paintAdminUsersFromBranch(data,branchId,regionId) {
@@ -221,7 +221,7 @@ $(document).on('click','#send-invite-form-submit',function(){
 	callAjaxGetWithPayloadData("/generateregistrationurl.do", function(data){
 		$('#overlay-toast').html(data);
 		showToast();
-	}, formData, true,'');
+	}, formData, true);
 });
 
 $(document).on('keyup','#send-invite-form',function(e){
@@ -296,7 +296,7 @@ function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 			$('#admin-abs-sur-list').append(data);
 		
 		startIndexCmp += batchSizeCmp;
-	}, payload, false,'');
+	}, payload, false);
 }
 
 $(document).on('scroll', '#dsh-inc-srvey', function() {
@@ -334,5 +334,5 @@ function unmarkReviewFromAbusive(surveyId){
 		
 		displayMessage(data);
 		showAbusiveReviews(0,10);
-	}, payload, true,'');
+	}, payload, true);
 }

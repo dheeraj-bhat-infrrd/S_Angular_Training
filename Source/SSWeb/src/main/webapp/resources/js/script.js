@@ -595,7 +595,7 @@ function upgradeToPaidPlan(){
 	 callAjaxGET(url, function(data){
      	$('#outer-payment').html(data);
     	$('#outer-payment').show();
-	 }, false,'');
+	 }, false);
 }
 
 function loadDisplayPicture(profileMasterId){
@@ -614,13 +614,13 @@ function loadDisplayPicture(profileMasterId){
 					$("#usr-initl").html("");
 				} else {
 					callAjaxGET('./initialofusername.do', displayPicCallback,
-							false,'');
+							false);
 				}
 			}
 			
 		}
 		return data.responseJSON;
-	}, false, payload,'');
+	}, false, payload);
 }
 function displayPicCallback(data){
 	$("#hdr-usr-img").css("background", "");
@@ -639,7 +639,7 @@ function sendVerificationMail(emailUrl){
 	var payload = {
 			"emailUrl" : emailUrl
 	};
-	callAjaxGetWithPayloadData("./sendverificationmail", verificationCallback, payload, true,'');
+	callAjaxGetWithPayloadData("./sendverificationmail", verificationCallback, payload, true);
 }
 
 function verificationCallback(){

@@ -48,12 +48,12 @@ function landingFlow() {
 		if ($(this).closest('.welcome-popup-wrapper').attr('data-page') == 'one') {
 			callAjaxGET("./showlinkedindatacompare.do", function(data) {
 				$('#welocome-step2').html(data);
-			}, false,'');
+			}, false);
 		}
 		
 		if ($(this).closest('.welcome-popup-wrapper').attr('data-page') == 'two') {
 			callAjaxGET("./finalizeprofileimage.do", function(data) {
-			}, false,'');
+			}, false);
 			
 			$('#wc-address-submit').trigger('click');
 		}

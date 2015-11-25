@@ -72,7 +72,7 @@
 		}
 		
 		$(document).on('click','.err-page-btn', function() {
-			callAjaxGET("/removeuseronerror.do", function(){}, false,'')
+			callAjaxGET("/removeuseronerror.do", function(){}, false)
 			window.open(getLocationOrigin(),'_self');
 		});
 	});
