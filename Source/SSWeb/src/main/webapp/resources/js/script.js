@@ -595,7 +595,7 @@ function upgradeToPaidPlan(){
 	 callAjaxGET(url, function(data){
      	$('#outer-payment').html(data);
     	$('#outer-payment').show();
-	 }, false);
+	 }, false,'');
 }
 
 function loadDisplayPicture(profileMasterId){
@@ -614,7 +614,7 @@ function loadDisplayPicture(profileMasterId){
 					$("#usr-initl").html("");
 				} else {
 					callAjaxGET('./initialofusername.do', displayPicCallback,
-							false);
+							false,'');
 				}
 			}
 			

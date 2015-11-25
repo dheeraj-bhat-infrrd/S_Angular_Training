@@ -404,7 +404,7 @@ $('#com-state').on('change',function(e){
 	callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
 		var uniqueSearchData = getUniqueCitySearchData(data);
 		initializeCityLookup(uniqueSearchData, "com-city");
-	}, true);
+	}, true,'');
 });
 
 $('#com-city').bind('focus', function(){ 

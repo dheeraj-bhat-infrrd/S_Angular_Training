@@ -19,7 +19,13 @@ function redirectToLoginPageOnSessionTimeOut(status) {
  * @param callBackFunction
  * @param isAsync
  */
-function callAjaxGET(url, callBackFunction, isAsync) {
+function callAjaxGET(url, callBackFunction, isAsync,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	
 	if (isAsync == "undefined") {
 		isAsync = true;
 	}
@@ -30,6 +36,14 @@ function callAjaxGET(url, callBackFunction, isAsync) {
 		async : isAsync,
 		cache : false,
 		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+			/*$(document).data('requestRunning', false);
+			*/
+			enable(disableEle);
+			
+			
+		},
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -551,10 +565,10 @@ function openForgotPasswordPage(){
 function openAuthPage(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
 }
-function openAuthPageZillow() {
+function openAuthPageZillow(disableEle) {
 	callAjaxGET("/socialauth.do?social=zillow", function(data) {
 		createZillowProfileUrlPopup( data);
-	}, true);
+	}, true,disableEle);
 }
 /*function updateProfileUrl(){
 window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
@@ -667,7 +681,7 @@ function showStateCityRow(parentId, elementId) {
 									+ stateList[i].statecode + '</option>');
 				}
 			}
-		}, true);
+		}, true,'');
 	} else {
 
 		if ($('#'+elementId).children('option').size() == 1) {
