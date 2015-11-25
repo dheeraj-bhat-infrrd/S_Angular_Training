@@ -74,7 +74,7 @@
 				verticalsMasterList = parsedData;
 				initializeVerticalAutcomplete();
 			}
-		}, true, {});
+		}, true, {},'');
 	} else {
 		initializeVerticalAutcomplete();		
 	}
