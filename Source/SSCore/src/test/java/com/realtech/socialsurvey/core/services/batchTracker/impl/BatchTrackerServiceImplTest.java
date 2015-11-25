@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.services.batchTracker.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -10,11 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.BatchTracker;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl;
+
 
 public class BatchTrackerServiceImplTest
 {
@@ -23,47 +27,114 @@ public class BatchTrackerServiceImplTest
 
     @Mock
     private GenericDao<BatchTracker, Long> batchTrackerDao;
-    
+
+
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
+    public static void setUpBeforeClass() throws Exception
+    {}
+
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
+    public static void tearDownAfterClass() throws Exception
+    {}
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
         MockitoAnnotations.initMocks( this );
     }
 
 
     @After
-    public void tearDown() throws Exception {}
+    public void tearDown() throws Exception
+    {}
 
-    
+
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testGetLastRunTimeByBatchTypeWhenEmptyListFound() throws NoRecordsFetchedException{
-        Mockito.when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString() , Mockito.anyObject() ) ).thenReturn( new ArrayList<BatchTracker>() );
+    public void testGetLastRunTimeByBatchTypeWhenEmptyListFound() throws NoRecordsFetchedException
+    {
+        Mockito
+            .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyObject() ) )
+            .thenReturn( new ArrayList<BatchTracker>() );
         batchTrackerServiceImpl.getLastRunTimeByBatchType( "" );
     }
-    
-    
+
+
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testGetLastRunTimeByBatchTypeWhenNoBatchTrackerFound() throws NoRecordsFetchedException{
-        Mockito.when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString() , Mockito.anyObject() ) ).thenReturn( null );
+    public void testGetLastRunTimeByBatchTypeWhenNoBatchTrackerFound() throws NoRecordsFetchedException
+    {
+        Mockito
+            .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyObject() ) )
+            .thenReturn( null );
         batchTrackerServiceImpl.getLastRunTimeByBatchType( "" );
     }
-    
+
+
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpdateModifiedOnColumnByBatchTypeWhenEmptyListFound() throws NoRecordsFetchedException, InvalidInputException{
-        Mockito.when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString() , Mockito.anyObject() ) ).thenReturn( new ArrayList<BatchTracker>() );
-        batchTrackerServiceImpl.updateModifiedOnColumnByBatchType( "" );
-    }
-    
-    @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpdateModifiedOnColumnByBatchTypeWhenNoBatchTrackerFound() throws NoRecordsFetchedException, InvalidInputException{
-        Mockito.when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString() , Mockito.anyObject() ) ).thenReturn( null );
+    public void testUpdateModifiedOnColumnByBatchTypeWhenEmptyListFound() throws NoRecordsFetchedException,
+        InvalidInputException
+    {
+        Mockito
+            .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyObject() ) )
+            .thenReturn( new ArrayList<BatchTracker>() );
         batchTrackerServiceImpl.updateModifiedOnColumnByBatchType( "" );
     }
 
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testUpdateModifiedOnColumnByBatchTypeWhenNoBatchTrackerFound() throws NoRecordsFetchedException,
+        InvalidInputException
+    {
+        Mockito
+            .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyObject() ) )
+            .thenReturn( null );
+        batchTrackerServiceImpl.updateModifiedOnColumnByBatchType( "" );
+    }
+
+
+    //Tests for updateModifiedOnColumnByBatchTypeAndTime
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void updateModifiedOnColumnByBatchTypeAndTimeTestBatchTrackListEmpty() throws NoRecordsFetchedException,
+        InvalidInputException
+    {
+        Mockito
+            .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyString() ) )
+            .thenReturn( new ArrayList<BatchTracker>() );
+        batchTrackerServiceImpl.updateModifiedOnColumnByBatchTypeAndTime( "test", new Timestamp( 0 ) );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void updateModifiedOnColumnByBatchTypeAndTimeTestBatchTrackListNull() throws NoRecordsFetchedException,
+        InvalidInputException
+    {
+        Mockito
+            .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyString() ) )
+            .thenReturn( null );
+        batchTrackerServiceImpl.updateModifiedOnColumnByBatchTypeAndTime( "test", new Timestamp( 0 ) );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void updateModifiedOnColumnByBatchTypeAndTimeTestBatchTypeNull() throws NoRecordsFetchedException,
+        InvalidInputException
+    {
+        batchTrackerServiceImpl.updateModifiedOnColumnByBatchTypeAndTime( null, null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void updateModifiedOnColumnByBatchTypeAndTimeTestBatchTypeEmpty() throws NoRecordsFetchedException,
+        InvalidInputException
+    {
+        batchTrackerServiceImpl.updateModifiedOnColumnByBatchTypeAndTime( "", null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void updateModifiedOnColumnByBatchTypeAndTimeTestTimeNull() throws NoRecordsFetchedException, InvalidInputException
+    {
+        batchTrackerServiceImpl.updateModifiedOnColumnByBatchTypeAndTime( "test", null );
+    }
 }

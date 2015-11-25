@@ -340,5 +340,12 @@ public interface SolrSearchService
 
 
     List<UserFromSearch> getUsersWithMetaDataFromSolrDocuments( SolrDocumentList documentList ) throws InvalidInputException;
+
+
+    void updateIsProfileImageSetFieldForMultipleUsers( Map<Long, Boolean> isProfileSetMap ) throws InvalidInputException,
+        SolrException;
+
+
+    SolrDocumentList getAllUsers( int startIndex, int batchSize ) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

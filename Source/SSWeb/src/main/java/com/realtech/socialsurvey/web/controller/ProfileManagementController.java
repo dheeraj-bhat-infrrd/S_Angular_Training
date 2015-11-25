@@ -1582,6 +1582,7 @@ public class ProfileManagementController
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                     companySettings, logoUrl );
                 companySettings.setLogo( logoUrl );
+                companySettings.setLogoThumbnail( logoUrl );
                 userSettings.setCompanySettings( companySettings );
 
 
@@ -1593,6 +1594,7 @@ public class ProfileManagementController
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
                     regionSettings, logoUrl );
                 regionSettings.setLogo( logoUrl );
+                regionSettings.setLogoThumbnail( logoUrl );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
 
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
@@ -1610,6 +1612,7 @@ public class ProfileManagementController
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                     branchSettings, logoUrl );
                 branchSettings.setLogo( logoUrl );
+                branchSettings.setLogoThumbnail( logoUrl );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
                 Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                 if ( branch != null ) {
@@ -1625,6 +1628,7 @@ public class ProfileManagementController
                 profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
                     agentSettings, logoUrl );
                 agentSettings.setLogo( logoUrl );
+                agentSettings.setLogoThumbnail( logoUrl );
                 userSettings.setAgentSettings( agentSettings );
 
             } else {
@@ -1633,6 +1637,7 @@ public class ProfileManagementController
             }
 
             profileSettings.setLogo( logoUrl );
+            profileSettings.setLogoThumbnail( logoUrl );
             sessionHelper.setLogoInSession( session, userSettings );
             LOG.info( "Logo uploaded successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL,
@@ -1735,6 +1740,7 @@ public class ProfileManagementController
                 profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                     companySettings, profileImageUrl );
                 companySettings.setProfileImageUrl( profileImageUrl );
+                companySettings.setProfileImageUrlThumbnail( profileImageUrl );
                 userSettings.setCompanySettings( companySettings );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -1744,6 +1750,7 @@ public class ProfileManagementController
                 profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
                     regionSettings, profileImageUrl );
                 regionSettings.setProfileImageUrl( profileImageUrl );
+                regionSettings.setProfileImageUrlThumbnail( profileImageUrl );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -1753,6 +1760,7 @@ public class ProfileManagementController
                 profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                     branchSettings, profileImageUrl );
                 branchSettings.setProfileImageUrl( profileImageUrl );
+                branchSettings.setProfileImageUrlThumbnail( profileImageUrl );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -1762,17 +1770,21 @@ public class ProfileManagementController
                 profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
                     agentSettings, profileImageUrl );
                 agentSettings.setProfileImageUrl( profileImageUrl );
+                agentSettings.setProfileImageUrlThumbnail( profileImageUrl );
                 userSettings.setAgentSettings( agentSettings );
 
                 // Modify Agent details in Solr
-                solrSearchService.editUserInSolr( agentSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR,
-                    profileImageUrl );
+                Map<String, Object> updateMap = new HashMap<String, Object>();
+                updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl );
+                updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                solrSearchService.editUserInSolrWithMultipleValues( agentSettings.getIden(), updateMap );
             } else {
                 throw new InvalidInputException( "Invalid input exception occurred while uploading profile image.",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
 
             profileSettings.setProfileImageUrl( profileImageUrl );
+            profileSettings.setProfileImageUrlThumbnail( profileImageUrl );
             sessionHelper.setProfileImageInSession( session, userSettings );
 
             LOG.info( "Profile Image uploaded successfully" );
