@@ -93,7 +93,7 @@ $(document).ready(function(){
   		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
   			var uniqueSearchData = getUniqueCitySearchData(data);
   			initializeCityLookup(uniqueSearchData, "prof-city");
-  		}, true,'');
+  		}, true);
   	});
 
   	$('#prof-city').bind('focus', function(){ 
@@ -122,7 +122,7 @@ $(document).ready(function(){
   										+ stateList[i].statecode + '</option>');
   					}
   				}
-  			}, true,'');
+  			}, true);
   		}else {
   			if ($('#prof-state').children('option').size() == 1) {
   				for (var i = 0; i < stateList.length; i++) {

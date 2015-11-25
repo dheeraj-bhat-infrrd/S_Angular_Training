@@ -164,20 +164,16 @@ function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData, disab
 }
 function disable(disableEle) {
 
-	if (disableEle) {
+	if (disableEle && disableEle.trim()!='') {
 		$(disableEle).data('requestRunning', true);
-		disableIcon=true;
-	} else {
-		return;
+		disableIcon = true;
 	}
 }
 
 function enable(disableEle) {
-	if (disableEle) {
+	if (disableEle && disableEle.trim()!='') {
 		$(disableEle).data("requestRunning", false);
-		disableIcon=false;
-	} else {
-		return;
+		disableIcon = false;
 	}
 }
 
@@ -683,7 +679,7 @@ function showStateCityRow(parentId, elementId) {
 									+ stateList[i].statecode + '</option>');
 				}
 			}
-		}, true,'');
+		}, true);
 	} else {
 
 		if ($('#'+elementId).children('option').size() == 1) {
