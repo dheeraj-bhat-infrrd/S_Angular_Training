@@ -475,7 +475,7 @@
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
 				<ref bean="imageprocessingjobdetail" /> 
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
-				<ref bean="isprofileimgsetjobdetail" />
+				<!-- <ref bean="isprofileimgsetjobdetail" /> -->
 			</list>
 		</property>
 
@@ -499,7 +499,7 @@
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
 				<ref bean="imageprocessingcron" />
 				<!-- <ref bean="hierarchysettingscron" /> -->
-				<ref bean="isprofileimagesetcron" />
+				<!-- <ref bean="isprofileimagesetcron" /> -->
 			</list>
 		</property>
 		<property name="quartzProperties">
