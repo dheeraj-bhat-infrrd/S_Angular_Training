@@ -567,13 +567,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             }
             Query query = new Query();
             query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( id ) );
-            query.fields().include( CommonConstants.PROFILE_IMAGE_URL_SOLR ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+            query.fields().include( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
             String queryStr = query.toString();
             LOG.debug( "Query : " + queryStr );
             HashMap<String, String> imageUrlMap = mongoTemplate.findOne( query, HashMap.class, collectionName );
             String profileImageUrl = null;
             if ( imageUrlMap != null && !( imageUrlMap.isEmpty() ) ) {
-                profileImageUrl = imageUrlMap.get( "profileImageUrl" );
+                profileImageUrl = imageUrlMap.get( "profileImageUrlThumbnail" );
             }
             if ( profileImageUrl == null || profileImageUrl.isEmpty() ) {
                 profileImageUrl = "";
@@ -597,7 +597,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     		throw new InvalidInputException("Invalid input getCollectionListOfUnprocessedImages");
     	}
     	Query query = new Query();
-    	if(imageType.equals(CommonConstants.IMAGE_TYPE_LOGO)){
+    	if(imageType.equals(CommonConstants.IMAGE_TYPE_PROFILE)){
     		query.addCriteria(Criteria.where(CommonConstants.PROFILE_IMAGE_URL_SOLR).exists(true)).addCriteria(Criteria.where(CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN).is(false));
     	}else if(imageType.equals(CommonConstants.IMAGE_TYPE_LOGO)){
     		query.addCriteria(Criteria.where(CommonConstants.LOGO_COLUMN).exists(true)).addCriteria(Criteria.where(CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN).is(false));
@@ -619,5 +619,47 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     		}
     	}
     	return images;
+    }
+    
+
+    @Override
+    public void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+        boolean flagValue, boolean isThumbnail ) throws InvalidInputException
+    {
+        LOG.info( "Updating thumbnail image details for collection : " + collectionName + " ID: " + iden + " imageType : "
+            + imageType + " with filename : " + fileName );
+        if ( iden <= 0l || fileName == null || fileName.isEmpty() || collectionName == null || collectionName.isEmpty()
+            || imageType == null || imageType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input provided to the method updateImage" );
+        }
+        Query query = new Query();
+        Update update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( iden ) );
+        //determine the key and flag to update
+        //If the image you're updating isn't a thumbnail, set the same value for the image column and it's thumbnail column
+        if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
+            if ( isThumbnail ) {
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
+            } else {
+                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
+            }
+            update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, flagValue );
+        } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
+            if ( isThumbnail ) {
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, fileName );
+            } else {
+                update.set( CommonConstants.LOGO_COLUMN, fileName );
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, fileName );
+            }
+            update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, flagValue );
+        } else {
+            throw new InvalidInputException( "Invalid image type" );
+        }
+        if ( !( isThumbnail ) ) {
+
+        }
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
+        LOG.info( "Updated thumbnail image details" );
     }
 }

@@ -2,8 +2,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<c:if test="${not empty profileSettings && not empty profileSettings.profileImageUrl}">
-	<c:set value="${profileSettings.profileImageUrl}" var="profileimage"></c:set>
+<c:if test="${not empty profileSettings && not empty profileSettings.profileImageUrlThumbnail}">
+	<c:set value="${profileSettings.profileImageUrlThumbnail}" var="profileimage"></c:set>
 </c:if>
 <c:choose>
 	<c:when test="${entityType == 'companyId'}">

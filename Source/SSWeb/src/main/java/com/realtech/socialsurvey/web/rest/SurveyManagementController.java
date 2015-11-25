@@ -553,8 +553,8 @@ public class SurveyManagementController
                 // fetching company logo
                 User user = userManagementService.getUserByUserId( agentId );
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-                if ( companySettings != null && companySettings.getLogo() != null ) {
-                    surveyAndStage.put( "companyLogo", companySettings.getLogo() );
+                if ( companySettings != null && companySettings.getLogoThumbnail() != null ) {
+                    surveyAndStage.put( "companyLogo", companySettings.getLogoThumbnail() );
                 }
             }
         } catch ( NonFatalException e ) {
