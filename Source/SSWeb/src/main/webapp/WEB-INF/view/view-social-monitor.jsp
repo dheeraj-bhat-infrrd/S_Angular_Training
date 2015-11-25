@@ -88,7 +88,7 @@
 			
 			var lastBuild = new Date(Number("${ lastBuild }"));
 			if(lastBuild != null){
-				lastBuild = convertUserDateToLocale(lastBuild);
+				//lastBuild = convertUserDateToLocale(lastBuild);
 				$("#last-build-date").html(lastBuild.toString(" ddd, MMMM d, yyyy hh:mm"));
 			} else {
 				$("#last-build-date").html("Last build date unavailable");
