@@ -147,8 +147,7 @@ function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData, disab
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
-			/*$(document).data('requestRunning', false);
-			*/
+			
 			enable(disableEle);
 			
 			
@@ -162,6 +161,12 @@ function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData, disab
 		}
 	});
 }
+
+/**
+ * function to disable elements
+
+ * @param disableEle element to be disabled while ajax call is made
+ */
 function disable(disableEle) {
 
 	if (disableEle && disableEle.trim()!='') {
@@ -170,6 +175,10 @@ function disable(disableEle) {
 	}
 }
 
+/**
+ * function to enable elements
+ * @param disableEle element to be enabled after ajax call is made
+ */
 function enable(disableEle) {
 	if (disableEle && disableEle.trim()!='') {
 		$(disableEle).data("requestRunning", false);
@@ -231,9 +240,7 @@ function redirectErrorpage(){
  * @param payload
  */
 function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync,disableEle){
-	/*if ( $(document).data('requestRunning') ) {
-        return;
-    }*/
+	
 	
 	if(disableIcon){
 		return;
