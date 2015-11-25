@@ -11,7 +11,7 @@ $(document).ready(function() {
 		//fetchGoogleMapApi();
 		callAjaxGET("/fetchgooglemapapikey.do", function(data) {
 			apikey = data;
-		}, true);
+		}, true,'');
 	}
 });
 

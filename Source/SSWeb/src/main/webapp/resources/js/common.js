@@ -19,7 +19,13 @@ function redirectToLoginPageOnSessionTimeOut(status) {
  * @param callBackFunction
  * @param isAsync
  */
-function callAjaxGET(url, callBackFunction, isAsync) {
+function callAjaxGET(url, callBackFunction, isAsync,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	
 	if (isAsync == "undefined") {
 		isAsync = true;
 	}
@@ -32,7 +38,14 @@ function callAjaxGET(url, callBackFunction, isAsync) {
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
-			},
+
+			/*$(document).data('requestRunning', false);
+			*/
+			enable(disableEle);
+			
+			
+		},
+
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -78,6 +91,7 @@ function callAjaxPOST(url, callBackFunction, isAsync) {
  * @param isAsync
  */
 function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
+	
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -111,7 +125,15 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
  * @param callBackFunction
  * @param isAsync
  */
-function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
+var disableIcon=false;
+function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData, disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	
+	
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -125,6 +147,11 @@ function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
+			/*$(document).data('requestRunning', false);
+			*/
+			enable(disableEle);
+			
+			
 		},
 		error : function(e) {
 			if(e.status == 504) {
@@ -135,7 +162,24 @@ function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
 		}
 	});
 }
+function disable(disableEle) {
 
+	if (disableEle) {
+		$(disableEle).data('requestRunning', true);
+		disableIcon=true;
+	} else {
+		return;
+	}
+}
+
+function enable(disableEle) {
+	if (disableEle) {
+		$(disableEle).data("requestRunning", false);
+		disableIcon=false;
+	} else {
+		return;
+	}
+}
 
 /**
  * Generic function to be used for making form submission with ajax post
@@ -144,7 +188,12 @@ function callAjaxGETWithTextData(url, callBackFunction, isAsync, formData) {
  * @param callBackFunction
  * @param formId
  */
-function callAjaxFormSubmit(url, callBackFunction, formId) {
+function callAjaxFormSubmit(url, callBackFunction, formId,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
 	var $form = $("#" + formId);
 	var payLoad = $form.serialize();
 	$.ajax({
@@ -155,6 +204,11 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 		type : "POST",
 		data : payLoad,
 		success : callBackFunction,
+		complete: function(){
+			enable(disableEle);
+			
+			
+		},
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -180,10 +234,24 @@ function redirectErrorpage(){
  * @param callBackFunction
  * @param payload
  */
-function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
+function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync,disableEle){
+	/*if ( $(document).data('requestRunning') ) {
+        return;
+    }*/
+	
+	if(disableIcon){
+		return;
+	}
+	
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
+	
 	$.ajax({
 		url : url,
 		headers: {          
@@ -195,6 +263,7 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
+			enable(disableEle);
 		},
 		error : function(e) {
 			if(e.status == 504) {
@@ -206,7 +275,13 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
 	});
 }
 
-function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
+function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disableEle){
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -222,6 +297,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
+			enable(disableEle);
 		},
 		error : function(e) {
 			if(e.status == 504) {
@@ -491,10 +567,10 @@ function openForgotPasswordPage(){
 function openAuthPage(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
 }
-function openAuthPageZillow() {
+function openAuthPageZillow(disableEle) {
 	callAjaxGET("/socialauth.do?social=zillow", function(data) {
 		createZillowProfileUrlPopup( data);
-	}, true);
+	}, true,disableEle);
 }
 /*function updateProfileUrl(){
 window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
@@ -607,7 +683,7 @@ function showStateCityRow(parentId, elementId) {
 									+ stateList[i].statecode + '</option>');
 				}
 			}
-		}, true);
+		}, true,'');
 	} else {
 
 		if ($('#'+elementId).children('option').size() == 1) {
