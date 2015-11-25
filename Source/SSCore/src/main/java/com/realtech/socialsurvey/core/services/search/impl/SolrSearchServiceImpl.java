@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -613,7 +614,12 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 CommonConstants.TITLE_SOLR, CommonConstants.ABOUT_ME_SOLR, CommonConstants.PROFILE_IMAGE_URL_SOLR,
                 CommonConstants.PROFILE_URL_SOLR, CommonConstants.REVIEW_COUNT_SOLR };
             solrQuery.setFields( fields );
-            solrQuery.setSort( CommonConstants.REVIEW_COUNT_SOLR, ORDER.desc );
+            List<SortClause> sortList = new ArrayList<SolrQuery.SortClause>();
+            sortList.add( new SortClause( CommonConstants.REVIEW_COUNT_SOLR, ORDER.desc ) );
+            sortList.add( new SortClause( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, ORDER.desc ) );
+            solrQuery.setSorts( sortList );
+            //solrQuery.setSort( CommonConstants.REVIEW_COUNT_SOLR, ORDER.desc );
+            //solrQuery.setSort( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, ORDER.desc );
             String query = "";
             if ( !patternFirst.equals( "" ) && !patternLast.equals( "" ) ) {
                 query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " AND "
@@ -2404,5 +2410,82 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 searchArrStr += id + " ";
         }
         return "(" + searchArrStr.trim() + ")";
+    }
+    
+
+    /**
+     * Method to get all users in solr
+     * 
+     * @param startIndex
+     * @param batchSize
+     * @return
+     * @throws SolrException
+     */
+    @Override
+    public SolrDocumentList getAllUsers( int startIndex, int batchSize ) throws SolrException
+    {
+        SolrDocumentList results;
+        QueryResponse response = null;
+        SolrServer solrServer = new HttpSolrServer( solrUserUrl );
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery( "*:*" );
+        if ( startIndex > -1 ) {
+            solrQuery.setStart( startIndex );
+        }
+        if ( batchSize > 0 ) {
+            solrQuery.setRows( batchSize );
+        }
+        LOG.info( "Running Solr query : " + solrQuery.getQuery() );
+        try {
+            response = solrServer.query( solrQuery );
+            results = response.getResults();
+        } catch ( SolrServerException e ) {
+            LOG.error( "SolrServerException while performing User search" );
+            throw new SolrException( "Exception while performing search for user. Reason : " + e.getMessage(), e );
+        }
+        LOG.info( "Method getAllUsers finished" );
+        return results;
+    }
+    
+    /**
+     * Method to set isProfileImageSet field for multiple users
+     * 
+     * @param isProfileSetMap
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    @Override
+    public void updateIsProfileImageSetFieldForMultipleUsers( Map<Long, Boolean> isProfileSetMap ) throws InvalidInputException,
+        SolrException
+    {
+        if ( isProfileSetMap == null || isProfileSetMap.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed isProfileSetMap map is null or empty" );
+        }
+
+        SolrServer solrServer = new HttpSolrServer( solrUserUrl );
+
+        List<SolrInputDocument> inputDocList = new ArrayList<SolrInputDocument>();
+        Map<String, Boolean> editKeyValues;
+        SolrInputDocument inputDoc;
+
+        for ( Entry<Long, Boolean> entry : isProfileSetMap.entrySet() ) {
+            editKeyValues = new HashMap<String, Boolean>();
+            editKeyValues.put( SOLR_EDIT_REPLACE, entry.getValue() );
+            // Adding fields to be updated
+            inputDoc = new SolrInputDocument();
+            inputDoc.setField( CommonConstants.USER_ID_SOLR, entry.getKey() );
+            inputDoc.setField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, editKeyValues );
+            inputDocList.add( inputDoc );
+        }
+
+        try {
+            if ( inputDocList.size() > 0 ) {
+                solrServer.add( inputDocList );
+                solrServer.commit();
+            }
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while updating user to solr. Reason : " + e.getMessage(), e );
+        }
     }
 }

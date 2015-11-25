@@ -681,8 +681,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Logo passed can not be null or empty" );
         }
         LOG.info( "Updating logo" );
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
-            logo, companySettings, collection );
+        /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
+            logo, companySettings, collection );*/
+        organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
+            CommonConstants.IMAGE_TYPE_LOGO, false, false );
+        /*organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
+            CommonConstants.IMAGE_TYPE_LOGO, false, false );*/
         LOG.info( "Logo updated successfully" );
     }
 
@@ -696,8 +700,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "image passed can not be null or empty" );
         }
         LOG.info( "Updating image" );
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image, companySettings, collection );
+        /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image, companySettings, collection );*/
+        /*organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
+            CommonConstants.IMAGE_TYPE_PROFILE, false, false );*/
+        organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
+            CommonConstants.IMAGE_TYPE_PROFILE, false, false );
         LOG.info( "Image updated successfully" );
     }
 
@@ -3267,16 +3275,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
         Map<SettingsForApplication, OrganizationUnit> map )
     {
+        //Set logoThumbnail along with logo
         for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
             if ( entry.getKey() == SettingsForApplication.LOGO ) {
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     userProfile.setLogo( companyUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( companyUnitSettings.getLogoThumbnail() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
                     userProfile.setLogo( regionUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( regionUnitSettings.getLogoThumbnail() );
                 } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
                     userProfile.setLogo( branchUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( branchUnitSettings.getLogoThumbnail() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     userProfile.setLogo( agentUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( agentUnitSettings.getLogoThumbnail() );
                 }
 
             } else if ( entry.getKey() == SettingsForApplication.LOCATION ) {

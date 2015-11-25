@@ -21,7 +21,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.annotation.Resource;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,6 +39,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -5263,6 +5266,60 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         LOG.info( "Method fetchProfileImageUrlsForEntityList() called" );
         return organizationUnitSettingsDao.fetchProfileImageUrlsForEntityList( entityType, entityList );
+    }
+    
+
+    /**
+     * Method to get list of unprocessed images
+     * 
+     * @param collectionName
+     * @param imageType
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public Map<Long, String> getListOfUnprocessedImages( String collectionName, String imageType ) throws InvalidInputException
+    {
+        LOG.info( "Method getCollectionListOfUnprocessedImages called" );
+        return organizationUnitSettingsDao.getCollectionListOfUnprocessedImages( collectionName, imageType );
+    }
+
+
+    /**
+     * Method to update image for organization unit setting
+     * 
+     * @param iden
+     * @param fileName
+     * @param collectionName
+     * @param imageType
+     * @param flagValue
+     * @param isThumbnail
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+        boolean flagValue, boolean isThumbnail ) throws InvalidInputException
+    {
+        LOG.info( "Method updateImageForOrganizationUnitSetting called" );
+        LOG.debug( "updating mongodb" );
+        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType,
+            flagValue, isThumbnail );
+        LOG.debug( "updated mongodb" );
+        if ( !( isThumbnail ) && imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
+            LOG.debug( "updating solr" );
+            Map<String, Object> updateMap = new HashMap<String, Object>();
+            updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
+            updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+            try {
+                solrSearchService.editUserInSolrWithMultipleValues( iden, updateMap );
+            } catch ( SolrException e ) {
+                LOG.error( "SolrException occured while updating user in solr. Reason : ", e );
+                throw new InvalidInputException( "SolrException occured while updating user in solr. Reason : ", e );
+            }
+        }
+        LOG.info( "Method updateImageForOrganizationUnitSetting finished" );
     }
 }
 // JIRA: SS-27: By RM05: EOC
