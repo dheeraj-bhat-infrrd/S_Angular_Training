@@ -440,7 +440,7 @@ function focusOnContact() {
 
 function fetchCompanyRegions() {
 	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/regions';
-	callAjaxGET(url, paintCompanyRegions, true);
+	callAjaxGET(url, paintCompanyRegions, true,'');
 }
 
 function paintCompanyRegions(data) {
@@ -466,7 +466,7 @@ function paintCompanyRegions(data) {
 function fetchBranchesForRegion(regionId) {
 	var url = getLocationOrigin() +'/rest/profile/region/'+regionId+'/branches';
 	$("#regionid-hidden").val(regionId);
-	callAjaxGET(url, paintBranchesForRegion, true);
+	callAjaxGET(url, paintBranchesForRegion, true,'');
 }
 
 function paintBranchesForRegion(data) {
@@ -520,7 +520,7 @@ function fetchIndividualsForBranch(branchId) {
 	var url = getLocationOrigin() + '/rest/profile/branch/' + branchId
 			+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#branchid-hidden").val(branchId);
-	callAjaxGET(url, paintIndividualForBranch, true);
+	callAjaxGET(url, paintIndividualForBranch, true,'');
 }
 
 function paintIndividualForBranch(data) {
@@ -621,7 +621,7 @@ function fetchIndividualsForRegion(regionId) {
 	var url = getLocationOrigin() + '/rest/profile/region/' + regionId
 	+ '/individuals?start=' + start + "&rows=" + rows;
 	$("#regionid-hidden").val(regionId);
-	callAjaxGET(url, paintIndividualsForRegion, true);
+	callAjaxGET(url, paintIndividualsForRegion, true,'');
 }
 
 function paintIndividualsForRegion(data) {
@@ -659,7 +659,7 @@ function paintIndividualsForRegion(data) {
 
 function fetchCompanyIndividuals() {
 	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/individuals';
-	callAjaxGET(url, paintCompanyIndividuals, true);
+	callAjaxGET(url, paintCompanyIndividuals, true,'');
 }
 
 function paintCompanyIndividuals(data) {
@@ -692,7 +692,7 @@ function paintCompanyIndividuals(data) {
 
 function fetchCompanyBranches() {
 	var url = getLocationOrigin() +'/rest/profile/'+companyProfileName+'/branches';
-	callAjaxGET(url, paintCompanyBranches, true);
+	callAjaxGET(url, paintCompanyBranches, true,'');
 }
 
 function paintCompanyBranches(data) {
@@ -941,7 +941,7 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
 		url += "individual/";
 	}
 	url += currentProfileIden + "/zillowreviews";
-	callAjaxGET(url, fetchZillowReviewsCallBack, true);
+	callAjaxGET(url, fetchZillowReviewsCallBack, true,'');
 }
 
 function fetchZillowReviewsCallBack(data) {
@@ -968,7 +968,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 	if (minScore != undefined) {
 		url = url + "&minScore=" + minScore;
 	}
-	callAjaxGET(url, fetchReviewsCallBack, true);
+	callAjaxGET(url, fetchReviewsCallBack, true,'');
 }
 
 function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
@@ -996,7 +996,7 @@ function fetchReviewsCountBasedOnProfileLevel(profileLevel, iden,
 	if(notRecommended != undefined && typeof(notRecommended) === "boolean") {
 		url += '&notRecommended=' + notRecommended;
 	}
-	callAjaxGET(url, callbackFunction, true);
+	callAjaxGET(url, callbackFunction, true,'');
 }
 
 function fetchReviewsCallBack(data) {
@@ -1282,7 +1282,7 @@ function paintPublicPosts() {
 		//Fetch the reviews for individual
 		url += currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
 	}
-	callAjaxGET(url, callBackPaintPublicPosts, true);
+	callAjaxGET(url, callBackPaintPublicPosts, true,'');
 }
 
 function callBackPaintPublicPosts(data) {

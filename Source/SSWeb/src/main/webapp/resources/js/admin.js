@@ -51,7 +51,7 @@ function searchAndDisplayCompanies(key) {
 	var accountType = $('#com-type-filter').val();
 	callAjaxGET("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue+"&accountType="+accountType, function(data) {
 		$('#admin-com-list').html(data);
-	}, true);
+	}, true,'');
 }
 
 function searchAdminCompanies (element) {
@@ -87,7 +87,7 @@ function showSelectedCompanyHierarchy(companyId) {
 	    });
 	    bindAdminBranchListClicks();
 	    bindUserEditClicks();
-	}, true);
+	}, true,'');
 }
 
 function bindAdminRegionListClicks() {
@@ -162,7 +162,7 @@ function fetchAdminHierarchyViewBranches(regionId, companyId) {
 	var url = "./fetchhierarchyviewbranchesforadmin.do?regionId="+regionId + "&companyId="+companyId;
 	callAjaxGET(url, function(data) {
 		paintAdminHierarchyViewBranches(data,regionId);
-	}, true);
+	}, true,'');
 }
 
 function paintAdminHierarchyViewBranches(data,regionId) {
@@ -177,7 +177,7 @@ function fetchAdminUsersForBranch(branchId,regionId, companyId) {
 	var url="./fetchbranchusersforadmin.do?branchId="+branchId+"&regionId="+regionId + "&companyId="+companyId;
 	callAjaxGET(url, function(data) {
 		paintAdminUsersFromBranch(data,branchId);
-	}, true);
+	}, true,'');
 }
 
 function paintAdminUsersFromBranch(data,branchId,regionId) {
