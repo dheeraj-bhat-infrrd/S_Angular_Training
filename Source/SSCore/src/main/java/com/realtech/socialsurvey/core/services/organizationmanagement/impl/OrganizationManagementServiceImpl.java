@@ -5307,11 +5307,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType,
             flagValue, isThumbnail );
         LOG.debug( "updated mongodb" );
-        if ( !( isThumbnail ) && imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
+        if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             LOG.debug( "updating solr" );
             Map<String, Object> updateMap = new HashMap<String, Object>();
-            updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
-            updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+            updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
+            if ( !( isThumbnail ) ) {
+                updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
+                updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+            }
             try {
                 solrSearchService.editUserInSolrWithMultipleValues( iden, updateMap );
             } catch ( SolrException e ) {
