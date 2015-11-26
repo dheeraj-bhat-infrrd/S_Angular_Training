@@ -22,10 +22,9 @@
 					<c:set value="${ nameArray[0] }" var="customerDisplayName"></c:set>
 				</c:otherwise>
 			</c:choose>
-			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
-				data-review="${feedback.review}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="${reviewitemclass}">
+				data-review="${feedback.review}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
 				
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
@@ -39,12 +38,12 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
-						<div class="ppl-head-2" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
+						<div class="ppl-head-2" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 							value="${feedback.modifiedOn}" />">
 						</div>
 					</div>
 					<div class="float-right ppl-header-right">
-						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-rating="${feedback.score}" data-source="${feedback.source }">
+						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
 						</div>
 						<c:if test="${feedback.source != 'Zillow'}">
 							<div class="report-resend-icn-container clearfix float-right">
@@ -76,24 +75,11 @@
                             data-cookiepolicy="single_host_origin"
                             data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${feedback.review}"
                             data-calltoactionlabel="USE"
-                            data-calltoactionurl="${feedback.completeProfileUrl}"
-                         >
+                            data-calltoactionurl="${feedback.completeProfileUrl}">
                            <span class="icon">&nbsp;</span>
                            <span class="label">share</span>
                        </button>
                         </span>
-						<!-- <c:if test="${not empty feedback.yelpProfileUrl}">
-							<span class="float-left ppl-share-icns icn-yelp" title="Yelp" data-link="${feedback.yelpProfileUrl}"></span>
-						</c:if>
-						<c:if test="${not empty feedback.zillowProfileUrl}">
-							<span class="float-left ppl-share-icns icn-zillow" title="Zillow" data-link="${feedback.zillowProfileUrl}"></span>
-						</c:if>
-						<c:if test="${not empty feedback.lendingTreeProfileUrl}">
-							<span class="float-left ppl-share-icns icn-lendingtree" title="LendingTree" data-link="${feedback.lendingTreeProfileUrl}"></span>
-						</c:if>
-						<c:if test="${not empty feedback.realtorProfileUrl}">
-							<span class="float-left ppl-share-icns icn-realtor" title="Realtor" data-link="${feedback.realtorProfileUrl}"></span>
-						</c:if> -->
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>
@@ -106,34 +92,3 @@
 </c:choose>
 <script type="text/javascript" src="//apis.google.com/js/client:plusone.js" async="async"></script>
 <script type="text/javascript" src="//apis.google.com/js/plusone.js" async="async"></script>
-<script>
-$(document).ready(function(){
-	$('.ppl-head-2').each(function(index, currentElement) {
-		var dateSplit = $(this).attr('data-modifiedon').split('-');
-		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
-		$(this).html(date.toDateString());
-	});
-	
-	$('.icn-yelp').each(function(index, currentElement) {
-		var url = $(this).parent().attr('href');
-		$(this).parent().attr('href', returnValidWebAddress(url));
-	});
-	$('.icn-zillow').each(function(index, currentElement) {
-		var url = $(this).parent().attr('href');
-		$(this).parent().attr('href', returnValidWebAddress(url));
-	});
-	$('.icn-lendingtree').each(function(index, currentElement) {
-		var url = $(this).parent().attr('href');
-		$(this).parent().attr('href', returnValidWebAddress(url));
-	});
-	
-	$('.ppl-share-icns').bind('click', function() {
-		var link = $(this).attr('data-link');
-		var title = $(this).attr('title');
-		if (link == undefined || link == "") {
-			return false;
-		}
-		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
-	});
-});
-</script>
