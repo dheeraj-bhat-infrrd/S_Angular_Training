@@ -1719,6 +1719,11 @@ button.paypal.is-active {
 	width: 32px;
 	margin-right: 10px;
 }
+.tweet-icn-sm {
+	height: 32px;
+	width: 32px;
+	margin-right: 10px;
+}
 
 .tweet-panel-left {
     padding-right: 15px;
@@ -4089,6 +4094,18 @@ img.prof-image {
 	padding-left: 5px;
 	outline: none;
 }
+.dash-sel-item-sm {
+	background-color: #fff;
+	height: 36px;
+	width: 40%;
+	margin-left: 20px;
+	border: 1px solid #dcdcdc;
+	border-radius: 3px;
+	padding-left: 5px;
+	outline: none;
+	min-width: 200px;
+}
+
 
 .stat-icn-lbl {
 	width: 200px;
@@ -4215,15 +4232,16 @@ img.prof-image {
 }
 
 .sm-btn-dl-sd-admin{
-	clear: both;
-	float: right;
+	
+	float: left;
 	margin-right: 10px;
 	color: #009FE0;
 	border-radius: 3px;
 	line-height: 32px;
 	border: 1px solid #009FE0;
 	height: 32px;
-	width: 360px;
+	width: 25%;
+	min-width: 215px;
 	max-width: 90%;
 	max-width: calc(100% - 20px);
 	text-align: center;
@@ -5434,7 +5452,13 @@ td.v-tbl-spacer {
     border-radius: 3px;
     padding: 0 5px;
 } 
-
+.v-um-hdr-search-sm {
+	position: relative;
+	width: 200px;
+	border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    padding: 0 5px;
+} 
 .v-um-inp {
 	width: 145px;
 	border: 0;
@@ -6425,6 +6449,7 @@ tr.u-tbl-header td {
 	padding-left: 10px;
 	clear: none;
 	float: left;
+	width:100%;
 }
 
 .cs-gq-lbl {
@@ -7806,7 +7831,7 @@ label.url-change-input-label {
 }
 
 .search-panel-item {
-	margin-left: 10px;
+	margin-left: 3%;
 }
 
 .search-panel {
