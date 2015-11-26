@@ -145,7 +145,7 @@
 								<a href="${completeProfileUrl}" target="_blank">${completeProfileUrl}</a>
 							</div>
 							<c:if test="${ profilemasterid != 1 }">
-								<div class="float-left edit-pos-icn" onclick="editProfileUrl();" title="Edit"></div>
+								<div class="float-left edit-pos-icn" onclick="editProfileUrl('.edit-pos-icn');" title="Edit"></div>
 							</c:if>
 						</c:if>
 						
@@ -164,7 +164,7 @@
 							<div id="icn-lin" class="float-left social-item-icon icn-lin" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage('linkedin');" title="LinkedIn"></div>
                             <div id="icn-gplus" class="float-left social-item-icon icn-gplus" data-source="google" data-link="${googleLink}" onclick="openAuthPage('google');" title="Google+"></div>
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-source="yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
-							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow();"></div>
+							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow('.icn-zillow');"></div>
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-source="lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
 							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-source="realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
@@ -198,7 +198,7 @@
 								<div class="left-auth-wrapper">
 									<div class="clearfix">
 										<div class="float-left left-panel-header"><spring:message code="label.positions.key" /></div>
-										<div class="float-right icn-share edit-pos-icn" onclick="editPositions();" title="Edit"></div>
+										<div class="float-right icn-share edit-pos-icn" onclick="editPositions('.edit-pos-icn');" title="Edit"></div>
 									</div>
 									<div id="positions-container" class="left-panel-content">
 										<c:choose>

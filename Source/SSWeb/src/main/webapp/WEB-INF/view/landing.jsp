@@ -40,7 +40,7 @@ function landingFlow() {
 		linkedInDataImport();
 	}
 	else if (cookieValue !="true" && showSendSurveyPopup == "true" && popupStatus == "Y") {
-		sendSurveyInvitation();
+		sendSurveyInvitation('');
 	}
 	
 	// Skip / Next buttons 
