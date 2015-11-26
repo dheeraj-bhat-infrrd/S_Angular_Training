@@ -449,7 +449,6 @@ $(document).ready(function() {
 	$('.va-dd-wrapper').perfectScrollbar('update');
 	
 	hideOverlay();
-	countPosts();
 	$(document).attr("title", "Profile Settings");
 	
 	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
@@ -464,6 +463,13 @@ $(document).ready(function() {
 		adjustImage();
 	});
 	
+	
+	//Initialize start index
+	proPostStartIndex = 0;
+	
+	//Fetch public posts
+	fetchPublicPostEditProfile();
+	
 	if ($('#aboutme-status').val() != 'new') {
 		$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
 	}
@@ -475,5 +481,7 @@ $(document).ready(function() {
 			$(this).addClass('icn-social-add');
 		}
 	});
+	
+	attachPostsScrollEvent();
 });
 </script>

@@ -7590,78 +7590,93 @@ function bindClickForIndividuals(elementClass) {
 	});
 }
 
-function countPosts() {
-	var success = false;
-	proPostStartIndex = 0;
-	$.ajax({
-		url : "./postscountforuser.do",
-		type : "GET",
-		cache : false,
-		dataType : "text",
-		async : false,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				proPostCount = parseInt(data.responseText);
-				showPosts();
-			}
-		},
-		error : function(e) {
-			if(e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
+//Bind scroll event for public posts on edit profile page
+function attachPostsScrollEvent() {
+	$('#prof-posts').off('scroll');
+	$('#prof-posts').on('scroll',function(){
+		var scrollContainer = this;
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
+					- scrollContainer.clientHeight) {
+				if (!doStopPostPaginationEditProfile || publicPostsBatch.length > 0) {
+					fetchPublicPostEditProfile(false);
+				}
+					
 		}
 	});
 }
 
-function showPosts(fromStart) {
-	if(fromStart){
-		proPostStartIndex = 0;
-		proPostCount++;
+var doStopPostPaginationEditProfile = false; 
+var isAjaxRequestRunningEditProfile = false;
+var publicPostsBatch = [];
+
+/**
+ * Method to fetch public posts on edit profile page
+ * @param isNextBatch
+ */
+function fetchPublicPostEditProfile(isNextBatch) {
+
+	
+	if(proPostStartIndex == 0) {
+		doStopPostPaginationEditProfile = false;
+		publicPostsBatch = [];
+		$('#prof-posts').html('');
 	}
+	
+	//Show from existing batch if the data is present
+	if (!isNextBatch && publicPostsBatch.length > 0) {
+		var posts = publicPostsBatch.slice(0, proPostBatchSize);
+		if (publicPostsBatch.length > proPostBatchSize) {
+			publicPostsBatch = publicPostsBatch.slice(proPostBatchSize);
+		} else {
+			publicPostsBatch = [];
+		}
+		
+		//paint the posts
+		paintPosts(posts);
+		
+		//Fetch the next batch
+		if(!doStopPostPaginationEditProfile && publicPostsBatch.length <= proPostBatchSize) {
+			fetchPublicPostEditProfile(true);
+		}
+		return;
+	} 
+	
+	if(isAjaxRequestRunningEditProfile) return; //Return if ajax request running to fetch the social posts
+	
 	var payload = {
 		"batchSize" : proPostBatchSize,
 		"startIndex" : proPostStartIndex
 	};
 	
+	isAjaxRequestRunningEditProfile = true;
 	callAjaxGetWithPayloadData("./postsforuser.do", function(data) {
+		isAjaxRequestRunningEditProfile = false;
 		if (data.errCode == undefined) {
 			if(data != "") {
-				var posts = JSON.parse(data);
-				paintPosts(posts);
+				
+				//update start index
 				proPostStartIndex += proPostBatchSize;	
+				
+				var posts = JSON.parse(data);
+				if(posts.length < proPostBatchSize) {
+					doStopPostPaginationEditProfile = true;
+				}
+				
+				//update the batch
+				publicPostsBatch = publicPostsBatch.concat(posts);
+				
+				if(isNextBatch) {
+					//Fetch the next batch
+					if(!doStopPostPaginationEditProfile && publicPostsBatch.length <= proPostBatchSize) {
+						fetchPublicPostEditProfile(true);
+					}
+				} else {
+					fetchPublicPostEditProfile(false);
+				}
+					
 			}
 		}
 	}, payload, false);
-	
-	/*$.ajax({
-		url : "./postsforuser.do",
-		type : "GET",
-		cache : false,
-		dataType : "JSON",
-		data : payload,
-		async : false,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				paintPosts(data.responseJSON);
-				proPostStartIndex += proPostBatchSize;
-			}
-		},
-		error : function(e) {
-			if(e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-		}
-	});*/
 }
 
 function paintPosts(posts) {
@@ -7709,12 +7724,9 @@ function paintPosts(posts) {
 		}
 		
 		divToPopulate += '</div>';
-		
-		
-		
 	});
 
-	if (proPostStartIndex == 0){
+	if ($('#prof-posts').children('.tweet-panel-item').length == 0){
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar({
 			suppressScrollX : true
@@ -7725,15 +7737,6 @@ function paintPosts(posts) {
 		$('#prof-posts').append(divToPopulate);
 		$('#prof-posts').perfectScrollbar('update');
 	}
-
-	$('#prof-posts').on('scroll',function(){
-		var scrollContainer = this;
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) {
-				if (proPostStartIndex < proPostCount)
-					showPosts();
-		}
-	});
 }
 
 function showDashboardButtons(columnName, columnValue){
@@ -9269,12 +9272,46 @@ function getImageandCaptionProfile(loop) {
 
 }
 
+
+var isSocialMonitorPostAjaxRequestRunning = false;
+var doStopSocialMonitorPostAjaxRequest = false;
+var socialMonitorPostBatch = [];
+
 function postsSearch(){
-	smScrollTop = 0;
+	proPostStartIndex = 0;
 	$('#prof-posts').html("");
+	socialMonitorPostBatch = [];
+	doStopSocialMonitorPostAjaxRequest = false;
+	fetchSearchedPostsSolr();
+}
+
+function fetchSearchedPostsSolr(isNextBatch) {
+	
 	var entityType = $("#select-hierarchy-level").val();
 	var entityId;
 	entityId = $("#selected-entity-id-hidden").val();
+	
+	
+	if(!isNextBatch && socialMonitorPostBatch.length > 0) {
+		var posts = socialMonitorPostBatch.slice(0, proPostBatchSize);
+		if (socialMonitorPostBatch.length > proPostBatchSize) {
+			socialMonitorPostBatch = socialMonitorPostBatch.slice(proPostBatchSize);
+		} else {
+			socialMonitorPostBatch = [];
+		}
+		
+		//paint the posts
+		paintPostsSolr(posts, entityType, entityId);
+		
+		//Fetch the next batch
+		if(!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
+			fetchSearchedPostsSolr(true);
+		}
+		return;
+	}
+	
+	if(isSocialMonitorPostAjaxRequestRunning) return;//Return if posts fetch is still working
+	
 	if(entityType == undefined || entityType == "companyId"){
 		entityType = "companyId";
 		entityId = companyIdForSocialMonitor;
@@ -9283,13 +9320,8 @@ function postsSearch(){
 		showToast();
 		return;
 	}
-	showSearchedPostsSolr(true, entityType, entityId, $("#post-search-query").val());
-}
-
-function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
-	if(fromstart){
-		proPostStartIndex = 0;
-	}
+	var searchQuery = $("#post-search-query").val();
+	
 	var payload = {
 			"entityType" : entityType,
 			"entityId" : entityId,
@@ -9297,20 +9329,60 @@ function showSearchedPostsSolr(fromstart, entityType, entityId, searchQuery) {
 			"startIndex" : proPostStartIndex,
 			"searchQuery" : searchQuery
 		};
+	
+	isSocialMonitorPostAjaxRequestRunning = true;
 	callAjaxGetWithPayloadData("./searchSocialPosts.do", function(response, e) {
+		isSocialMonitorPostAjaxRequestRunning = false;
 		var data = $.parseJSON(response);
-		if (fromstart) {
-			proPostStartIndex = 0;
-			proPostCount = data.count + 1;
+		var posts = data.socialMonitorPosts; 
+		var profilePics = data.profileImageUrlDataList;
+		
+		//Process images
+		for(var i=0; i< posts.length; i++) {
+			var post = posts[i];
+			var profileImg = "";
+			$.each(profilePics,  function(i, pic){
+				if(pic.profileImageUrl != ""){
+					//post by region
+					if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
+						profileImg = pic.profileImageUrl;
+						//post by branch
+					} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
+						profileImg = pic.profileImageUrl;
+						//post by agent
+					} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
+						profileImg = pic.profileImageUrl;
+						//post by company
+					} else if(post.companyId > 0 && post.regionId <=0 && post.branchId <= 0 && post.agentId <= 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
+						profileImg = pic.profileImageUrl;
+					}
+				}
+			});
+			post["profileImage"] = profileImg;
+		};
+		
+		if(posts.length < proPostBatchSize) {
+			doStopSocialMonitorPostAjaxRequest = true;
 		}
-		paintPostsSolr(data, entityType, entityId, searchQuery);
+		
 		proPostStartIndex += proPostBatchSize;
+		
+		//update the batch
+		socialMonitorPostBatch = socialMonitorPostBatch.concat(posts);
+		
+		if(isNextBatch) {
+			//Fetch the next batch
+			if(!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
+				fetchSearchedPostsSolr(true);
+			}
+		} else {
+			fetchSearchedPostsSolr(false);
+		}
+		
 	}, payload, true);
 }
 
-function paintPostsSolr(data, entityType, entityId, searchQuery) {
-	var posts = data.socialMonitorPosts;
-	var profilePics = data.profileImageUrlDataList;
+function paintPostsSolr(posts, entityType, entityId) {
 	var divToPopulate = "";
 	$.each(posts, function(i, post) {
 		var profImgClass = "sm-default-img";
@@ -9337,24 +9409,7 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 		if(typeof post.postUrl!=  "undefined" ){
 			 href= post.postUrl;
 		}
-		var profileImg = "";
-		$.each(profilePics,  function(i, pic){
-			if(pic.profileImageUrl != ""){
-				//post by region
-				if(post.regionId > 0 && pic.entityType == "regionId" && pic.entityId == post.regionId){
-					profileImg = pic.profileImageUrl;
-					//post by branch
-				} else if(post.branchId > 0 && pic.entityType == "branchId" && pic.entityId == post.branchId){
-					profileImg = pic.profileImageUrl;
-					//post by agent
-				} else if(post.agentId > 0 && pic.entityType == "userId" && pic.entityId == post.agentId){
-					profileImg = pic.profileImageUrl;
-					//post by company
-				} else if(post.companyId > 0 && post.regionId <=0 && post.branchId <= 0 && post.agentId <= 0 && pic.entityType == "companyId" && pic.entityId == post.companyId){
-					profileImg = pic.profileImageUrl;
-				}
-			}
-		});
+		var profileImg = post.profileImage;
 		if(profileImg != ""){
 			profImgClass = "sm-custom-img";
 			profImgStyle = 'style="background:url(' + profileImg + ') no-repeat center; background-size: 50px;"';
@@ -9392,7 +9447,7 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 		
 		
 	});
-	if (proPostStartIndex == 0){
+	if ($('#prof-posts').children('.tweet-panel-item').length == 0){
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar({
 			suppressScrollX : true
@@ -9403,29 +9458,6 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 		$('#prof-posts').append(divToPopulate);
 		$('#prof-posts').perfectScrollbar('update');
 	}
-
-	$('#prof-posts').on('scroll',function(){
-		var scrollContainer = this;
-		if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) && (smScrollTop < scrollContainer.scrollTop)) {
-				
-				if (proPostStartIndex < proPostCount){
-					var entityType = $("#select-hierarchy-level").val();
-					var entityId;
-					entityId = $("#selected-entity-id-hidden").val();
-					if(entityType == undefined || entityType == "companyId"){
-						entityType = "companyId";
-						entityId = companyIdForSocialMonitor;
-					} else if(entityId == undefined || entityId <= 0 ){
-						$('#overlay-toast').html("Please select a valid " + $("#select-hierarchy-level").find(':selected').data('entity'));
-						showToast();
-						return;
-					}
-					showSearchedPostsSolr(false, entityType, entityId, $("#post-search-query").val());
-					smScrollTop = scrollContainer.scrollTop;
-				}
-		}
-	});
 }
 
 function setColDetails(currentProfileName, currentProfileValue, parentCompanyId){
@@ -9472,7 +9504,8 @@ function removeUserPost(surveyMongoId) {
 		if (data.errCode == undefined) {
 			$('#overlay-toast').html(data.responseText);
 			showToast();
-			showPosts(true);
+			proPostStartIndex = 0;
+			fetchPublicPostEditProfile(false);
 		} else {
 			$('#overlay-toast').html(data.responseText);
 			showToast();
@@ -9497,7 +9530,8 @@ $(document).on('click', '#prof-post-btn', function() {
 
 	callAjaxPostWithPayloadData("./savestatus.do", function(data) {
 		if (data.errCode == undefined) {
-			showPosts(true);
+			proPostStartIndex = 0;
+			fetchPublicPostEditProfile(false);
 		}
 	}, payload, true);
 });
