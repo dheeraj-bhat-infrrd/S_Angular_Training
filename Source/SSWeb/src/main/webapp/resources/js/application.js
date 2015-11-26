@@ -791,9 +791,6 @@ function updateEventOnDashboardPageForReviews() {
 	});
 }
 
-$(document).on('scroll', '#dsh-inc-srvey', function() {
-});
-
 function showSurveyStatisticsGraphically(columnName, columnValue) {
 	var element = document.getElementById("dsh-grph-format");
 	var numberOfDays = element.options[element.selectedIndex].value;

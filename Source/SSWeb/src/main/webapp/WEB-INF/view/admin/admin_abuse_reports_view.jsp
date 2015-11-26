@@ -30,6 +30,9 @@
 <div id="temp-message" class="hide"></div>
 <script>
 $(document).ready(function() {
-	showAbusiveReviews(0,10);
+	abuseReportStartIndex = 0;
+	showAbusiveReviews(abuseReportStartIndex, abuseReportBatch);
+	
+	attachScrollEventOnAbuseReports();
 });
 </script>
