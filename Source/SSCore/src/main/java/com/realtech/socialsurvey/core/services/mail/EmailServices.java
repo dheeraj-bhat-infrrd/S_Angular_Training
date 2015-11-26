@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.mail;
 
 import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
