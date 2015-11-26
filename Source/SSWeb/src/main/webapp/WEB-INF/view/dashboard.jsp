@@ -220,7 +220,7 @@ $(document).ready(function() {
 	var cookieValue = $.cookie("doNotShowPopup");
 	
 	if (cookieValue != "true" && showSendSurveyPopupAdmin == "true" && popupStatus == "Y") {
-		sendSurveyInvitationAdmin(currentProfileName, currentProfileValue);
+		sendSurveyInvitationAdmin(currentProfileName, currentProfileValue,'');
 	}
 	
 	paintDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);

@@ -393,7 +393,7 @@
 		});
 		$('#save-participation-mail-content').click(function() {
 			$('#mailcategory').val('participationmail');
-			updateMailContent("mail-body-settings-form");
+			updateMailContent("mail-body-settings-form",'#save-participation-mail-content');
 			
 			try {
 				$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
@@ -414,7 +414,7 @@
 			$('#overlay-cancel').html("Cancel");
 			$('#overlay-header').html("Reset Mail Template");
 			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
-			$('#overlay-continue').attr("onclick", "revertMailContent('participationmail');");
+			$('#overlay-continue').attr("onclick", "revertMailContent('participationmail','#revert-participation-mail');");
 			
 		});
 		
@@ -434,7 +434,7 @@
 		});
 		$('#save-participation-reminder-mail-content').click(function() {
 			$('#mailcategory').val('participationremindermail');
-			updateMailContent("mail-body-settings-form");
+			updateMailContent("mail-body-settings-form",'#save-participation-reminder-mail-content');
 			
 			try { 
 				$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
@@ -455,7 +455,7 @@
 			$('#overlay-cancel').html("Cancel");
 			$('#overlay-header').html("Reset Mail Template");
 			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
-			$('#overlay-continue').attr("onclick", "revertMailContent('participationremindermail');");
+			$('#overlay-continue').attr("onclick", "revertMailContent('participationremindermail','#revert-participation-reminder-mail');");
 		});
 		
 		//for survey completion mail
@@ -474,7 +474,7 @@
 		});
 		$('#save-survey-completion-mail-content').click(function() {
 			$('#mailcategory').val('surveycompletionmail');
-			updateMailContent("mail-body-settings-form");
+			updateMailContent("mail-body-settings-form",'#save-survey-completion-mail-content');
 			
 			try {
 				$('#survey-completion-mailcontent').ckeditorGet().setReadOnly(true);
@@ -495,7 +495,7 @@
 			$('#overlay-cancel').html("Cancel");
 			$('#overlay-header').html("Reset Mail Template");
 			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
-			$('#overlay-continue').attr("onclick", "revertMailContent('surveycompletionmail');");
+			$('#overlay-continue').attr("onclick", "revertMailContent('surveycompletionmail','');");
 		});
 		
 		//for survey completion unpleasant mail
@@ -514,7 +514,7 @@
 		});
 		$('#save-survey-completion-unpleasant-mail-content').click(function() {
 			$('#mailcategory').val('surveycompletionunpleasantmail');
-			updateMailContent("mail-body-settings-form");
+			updateMailContent("mail-body-settings-form",'#save-survey-completion-unpleasant-mail-content');
 			
 			try {
 				$('#survey-completion-unpleasant-mailcontent').ckeditorGet().setReadOnly(true);
@@ -535,7 +535,7 @@
 			$('#overlay-cancel').html("Cancel");
 			$('#overlay-header').html("Reset Mail Template");
 			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
-			$('#overlay-continue').attr("onclick", "revertMailContent('surveycompletionunpleasantmail');");
+			$('#overlay-continue').attr("onclick", "revertMailContent('surveycompletionunpleasantmail','#revert-survey-completion-unpleasant-mail');");
 		});
 		
 		//social post reminder mail
@@ -554,7 +554,7 @@
 		});
 		$('#save-social-post-reminder-mail-content').click(function() {
 			$('#mailcategory').val('socialpostremindermail');
-			updateMailContent("mail-body-settings-form");
+			updateMailContent("mail-body-settings-form",'#save-social-post-reminder-mail-content');
 			
 			try { 
 				$('#social-post-reminder-mailcontent').ckeditorGet().setReadOnly(true);
@@ -575,7 +575,7 @@
 			$('#overlay-cancel').html("Cancel");
 			$('#overlay-header').html("Reset Mail Template");
 			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
-			$('#overlay-continue').attr("onclick", "revertMailContent('socialpostremindermail');");
+			$('#overlay-continue').attr("onclick", "revertMailContent('socialpostremindermail','#revert-social-post-reminder-mail');");
 		});
 		
 		//incomplete survey reminder mail
@@ -594,7 +594,7 @@
 		});
 		$('#save-incomplete-survey-reminder-mail-content').click(function() {
 			$('#mailcategory').val('restartsurveymail');
-			updateMailContent("mail-body-settings-form");
+			updateMailContent("mail-body-settings-form",'#save-incomplete-survey-reminder-mail-content');
 			
 			try { 
 				$('#incomplete-survey-reminder-mailcontent').ckeditorGet().setReadOnly(true);
@@ -615,7 +615,7 @@
 			$('#overlay-cancel').html("Cancel");
 			$('#overlay-header').html("Reset Mail Template");
 			$('#overlay-text').html("Are you sure you want to reset the mail template ?");
-			$('#overlay-continue').attr("onclick", "revertMailContent('restartsurveymail');");
+			$('#overlay-continue').attr("onclick", "revertMailContent('restartsurveymail','#revert-incomplete-survey-reminder-mail');");
 		});
 		
 		
