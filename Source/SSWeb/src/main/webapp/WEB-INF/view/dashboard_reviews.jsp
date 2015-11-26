@@ -22,10 +22,9 @@
 					<c:set value="${ nameArray[0] }" var="customerDisplayName"></c:set>
 				</c:otherwise>
 			</c:choose>
-			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
-				data-review="${feedback.review}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="${reviewitemclass} dsh-review-cont hide">
+				data-review="${feedback.review}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
 				
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">

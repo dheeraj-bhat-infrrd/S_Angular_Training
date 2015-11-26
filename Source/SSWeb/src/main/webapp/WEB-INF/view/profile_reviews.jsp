@@ -5,10 +5,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:if test="${not empty reviews}">
 	<c:forEach var="reviewItem" varStatus="loop" items="${reviews}">
-		<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
-		<c:if test="${loop.last}">
-			<c:set value="ppl-review-item-last" var="reviewitemclass"></c:set>
-		</c:if>
 		<c:set value = "#.#" var = "scoreformat"></c:set>
 		<c:set
 			value="${ reviewItem.customerFirstName } ${ reviewItem.customerLastName }"
@@ -27,7 +23,7 @@
 		<div data-firstname="${reviewItem.customerFirstName}"
 			data-lastname="${reviewItem.customerLastName}"
 			data-review="${reviewItem.review}" data-score="${reviewItem.score}"
-			data-agentname="${reviewItem.agentName}" class="${reviewitemclass} dsh-review-cont hide">
+			data-agentname="${reviewItem.agentName}" class="ppl-review-item dsh-review-cont hide">
 
 			<div class="ppl-header-wrapper clearfix">
 				<div class="float-left ppl-header-left">
