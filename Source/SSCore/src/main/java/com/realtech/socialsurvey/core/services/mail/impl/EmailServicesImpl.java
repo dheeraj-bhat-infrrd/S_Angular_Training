@@ -16,10 +16,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
+import com.realtech.socialsurvey.core.dao.ForwardMailDetailsDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
+import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -78,6 +80,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Autowired
     private UrlService urlService;
+
+    @Autowired
+    private ForwardMailDetailsDao forwardMailDetailsDao;
 
 
     /**
@@ -1658,6 +1663,72 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_SUBJECT, messageBodyReplacements, false, false );
         LOG.info( "Successfully sent survey completion mail" );
+    }
+
+
+    @Async
+    @Override
+    public void forwardCustomerReplyMail( String recipientMailId, String subject, String mailBody, String senderName,
+        String senderEmailAddress, String messageId ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Executing the sendSurveyReminderMail() method" );
+        boolean saveForwardMailDetails = true;
+
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null in forwardCustomerReplyMail method " );
+            throw new InvalidInputException( "Recipient email Id is empty or null in forwardCustomerReplyMail method " );
+        }
+        if ( subject == null || subject.isEmpty() ) {
+            LOG.error( "Subject is empty or null in forwardCustomerReplyMail method" );
+            throw new InvalidInputException( "Subject is empty or null in forwardCustomerReplyMail method" );
+        }
+        if ( mailBody == null || mailBody.isEmpty() ) {
+            LOG.error( "Mail Body is empty or null in forwardCustomerReplyMail method" );
+            throw new InvalidInputException( "Mail Body is empty or null in forwardCustomerReplyMail method" );
+        }
+        if ( senderName == null || senderName.isEmpty() ) {
+            LOG.error( "Sender Name is empty or null in forwardCustomerReplyMail method " );
+            throw new InvalidInputException( "Sender Name is empty or null in forwardCustomerReplyMail method " );
+        }
+        if ( senderEmailAddress == null || senderEmailAddress.isEmpty() ) {
+            LOG.error( "Sender email Id is empty or null in forwardCustomerReplyMail method " );
+            throw new InvalidInputException( "Sender email Id is empty or null in forwardCustomerReplyMail method " );
+        }
+
+        if ( messageId == null || messageId.isEmpty() ) {
+            LOG.error( "Message Id is empty or null in forwardCustomerReplyMail method " );
+            throw new InvalidInputException( "Message Id is empty or null in forwardCustomerReplyMail method " );
+        }
+
+        try {
+            // Find Forward mail details with messageId
+            if ( forwardMailDetailsDao.checkIfForwardMailDetailsExist( senderEmailAddress, recipientMailId, messageId ) ) {
+                LOG.info( "This mail has already been sent to the recipient" );
+                return;
+            }
+        } catch ( UnsupportedOperationException uoe ) {
+            LOG.warn( "Exception occurred while checking if Forward Mail Details already exists for message Id : " + messageId
+                + ".Reason :", uoe );
+            saveForwardMailDetails = false;
+        }
+
+        // Save Mail details to prevent further sending to same recipient
+        if ( saveForwardMailDetails ) {
+            ForwardMailDetails forwardMailDetail = new ForwardMailDetails();
+            forwardMailDetail.setSenderMailId( senderEmailAddress );
+            forwardMailDetail.setRecipientMailId( recipientMailId );
+            forwardMailDetail.setMessageId( messageId );
+
+            forwardMailDetailsDao.insertForwardMailDetails( forwardMailDetail );
+        }
+
+        LOG.info( "Forwarding customer reply mail from " + senderEmailAddress + "  to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setSenderName( senderName );
+        emailEntity.setSenderEmailId( senderEmailAddress );
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmail( emailEntity, subject, mailBody, true, false );
+        LOG.info( "Successfully forwarded customer reply mail from " + senderEmailAddress + " to : " + recipientMailId );
     }
 }
 // JIRA: SS-7: By RM02: EOC

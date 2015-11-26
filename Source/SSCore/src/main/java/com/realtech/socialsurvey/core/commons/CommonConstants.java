@@ -822,4 +822,15 @@ public interface CommonConstants
     //mark abusive by application constant
     public static final String REPORT_ABUSE_BY_APPLICSTION_NAME = "Application";
     public static final String REPORT_ABUSE_BY_APPLICSTION_EMAIL = "Reported By Application";
+
+    // sendgrid inbound mail status
+    public static final String SENDGRID_OK_STATUS = "OK";
+
+    // Forward Mail Details Mongo Column constants
+    public static final String SENDER_MAIL_ID_COLUMN = "senderMailId";
+    public static final String RECIPIENT_MAIL_ID_COLUMN = "recipientMailId";
+    public static final String MESSAGE_ID_COLUMN = "messageId";
+    public static final String MESSAGE_HASH_COLUMN = "messageHash";
+    public static final String FORWARD_MAIL_DETAILS_STATUS_COLUMN = "status";
+    public static final String FORWARD_MAIL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
 }
