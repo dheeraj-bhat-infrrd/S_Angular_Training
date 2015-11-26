@@ -9318,7 +9318,7 @@ function paintPostsSolr(data, entityType, entityId, searchQuery) {
 		divToPopulate += '<div class="sm-prof-name">' + profName + '</div>'
 				+ '<div class="sm-post-row float-left">'
 				+ hrefComplet
-				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
+				+ '<div class="tweet-icn-sm ' + iconClass + ' float-left"></div>'
 				+"</a>"
 				+ '<div class="tweet-txt float-left">'
 				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
