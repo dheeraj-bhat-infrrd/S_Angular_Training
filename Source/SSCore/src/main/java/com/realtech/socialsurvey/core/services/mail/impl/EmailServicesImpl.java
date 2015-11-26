@@ -1666,6 +1666,18 @@ public class EmailServicesImpl implements EmailServices
     }
 
 
+    /**
+     * Method to forward customer reply to recipient
+     *
+     * @param recipientMailId
+     * @param subject
+     * @param mailBody
+     * @param senderName
+     * @param senderEmailAddress
+     * @param messageId
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
     @Async
     @Override
     public void forwardCustomerReplyMail( String recipientMailId, String subject, String mailBody, String senderName,
