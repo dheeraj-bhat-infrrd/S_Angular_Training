@@ -126,7 +126,7 @@ public class MongoForwardMailDetailsDaoImpl implements ForwardMailDetailsDao
         if ( id == null || id.isEmpty() )
             throw new InvalidInputException( "Id passed cannot be null or empty" );
 
-        LOG.info( "Started method updateStatusOfForwarMailDetails() to update status of forward mail details with id : " + id );
+        LOG.info( "Started method updateStatusOfForwardMailDetails() to update status of forward mail details with id : " + id );
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( id ) );
 
@@ -135,7 +135,7 @@ public class MongoForwardMailDetailsDaoImpl implements ForwardMailDetailsDao
         update.set( CommonConstants.FORWARD_MAIL_DETAILS_MODIFIED_ON_COLUMN, new Date() );
 
         mongoTemplate.updateFirst( query, update, ForwardMailDetails.class, FORWARD_MAIL_DETAILS_COLLECTION );
-        LOG.info( "Ended method updateStatusOfForwarMailDetails() to update status of forward mail details with id : " + id );
+        LOG.info( "Ended method updateStatusOfForwardMailDetails() to update status of forward mail details with id : " + id );
 
 
     }
