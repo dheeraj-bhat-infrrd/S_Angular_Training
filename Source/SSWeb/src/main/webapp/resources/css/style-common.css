@@ -7833,3 +7833,6 @@ label.url-change-input-label {
 	background: url(../images/Load_SS_Thin_4.gif) no-repeat center;
 	clear: both;
 }
+.abuse-report-col {
+    word-break: break-word;
+}
