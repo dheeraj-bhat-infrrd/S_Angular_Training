@@ -317,7 +317,22 @@
    
     margin-left: 2%;
 }
+	.tweet-icn-sm {
+	height: 32px;
+	width: 32px;
+	margin-right:0px;
+}
+.sm-post-row {
+	padding-left: 0px;
 	
+}
+.sm-prof-name {
+	line-height: 30px;
+}
+.sm-custom-img{
+	width:40px;
+	height:40px;
+}
 }
 
 
@@ -327,6 +342,7 @@
 	.pro-wrapper{
 		display: block !important;
 	}
+	
 }
 
 
@@ -576,5 +592,9 @@
 	
 	font-size: 14px;
 	width: 250px;
+}
+.sm-post-row {
+	padding-left: 0px;
+	clear:both;
 }
 }
