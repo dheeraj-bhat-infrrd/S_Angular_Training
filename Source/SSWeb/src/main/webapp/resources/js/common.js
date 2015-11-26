@@ -960,3 +960,14 @@ function validateRegConfirmPassword(pwdId, confirmPwdId) {
 	}
 
 }
+
+//Show loader icon on pagination of infinite scroll
+function showLoaderOnPagination(element) {
+	element.find(".loader-icn-sm").remove();
+	element.append("<div class='loader-icn-sm'></div>");
+}
+
+//Hide loader icon on pagination of infinite scroll
+function hideLoaderOnPagination(element) {
+	element.find(".loader-icn-sm").remove();
+}

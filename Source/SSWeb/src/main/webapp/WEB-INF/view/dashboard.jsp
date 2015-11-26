@@ -190,22 +190,17 @@ $(document).ready(function() {
 
 	$(document).scroll(function() {
 		if(window.location.hash.substr(1) == "dashboard") {
-			if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
-				showReviews(colName, colValue);
-			}			
+			dashbaordReviewScroll();		
 		}
 	});
 	
 	var scrollContainer = document.getElementById('dsh-inc-srvey');
 	scrollContainer.onscroll = function() {
-		var totalIncReviews = parseInt($('#dsh-inc-srvey').attr("data-total"));
-		if(totalIncReviews != NaN && startIndexInc < totalIncReviews) {
-			if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
-				setTimeout(function() {
-					showIncompleteSurvey(colName, colValue);
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+			if(!doStopIncompleteSurveyPostAjaxRequest || $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
+					fetchIncompleteSurvey(false);
 					$('#dsh-inc-srvey').perfectScrollbar('update');
-				}, 100);
-			}			
+			}
 		}
 	};
 	

@@ -374,4 +374,8 @@ public interface EmailServices
      */
     public void sendInvalidEmailsNotificationMail( String firstName, String lastName, String recipientMailId,
         Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    void forwardCustomerReplyMail( String recipientMailId, String subject, String mailBody, String senderName,
+        String senderEmailAddress, String headers ) throws InvalidInputException, UndeliveredEmailException;
 }
