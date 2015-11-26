@@ -1,17 +1,12 @@
 package com.realtech.socialsurvey.core.utils;
 
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
