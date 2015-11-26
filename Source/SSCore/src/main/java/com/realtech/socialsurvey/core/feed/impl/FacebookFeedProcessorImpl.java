@@ -8,11 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -21,13 +24,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FacebookSocialPost;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -54,6 +62,16 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
     @Autowired
     private GenericDao<FeedStatus, Long> feedStatusDao;
+    
+    @Autowired
+    private GenericDao<Region, Long> regionDao;
+    
+    @Resource
+    @Qualifier ( "branch" )
+    private BranchDao branchDao;
+    
+    @Autowired
+    private GenericDao<User, Long> userDao;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -285,13 +303,34 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
                 case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
                     feed.setRegionId( profileId );
+                    Region region = regionDao.findById( Region.class, profileId );
+                    if ( region != null ) {
+                        Company company = region.getCompany();
+                        if ( company !=  null ) {
+                            feed.setCompanyId( company.getCompanyId() );
+                        }
+                    }
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
+                    Branch branch = branchDao.findById( Branch.class, profileId );
+                    if ( branch != null ) {
+                        Company company = branch.getCompany();
+                        if ( company != null ) {
+                            feed.setCompanyId( company.getCompanyId() );
+                        }
+                    }
                     feed.setBranchId( profileId );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
+                    User user = userDao.findById( User.class, profileId );
+                    if ( user != null ) {
+                        Company company = user.getCompany();
+                        if ( company != null ) {
+                            feed.setCompanyId( company.getCompanyId() );
+                        }
+                    }
                     feed.setAgentId( profileId );
                     break;
             }
