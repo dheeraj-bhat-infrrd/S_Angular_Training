@@ -561,11 +561,29 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 	}, payload, false);
 }
 
-function showIncompleteSurvey(columnName, columnValue) {
+
+var isIncompleteSurveyAjaxRequestRunning = false;
+var doStopIncompleteSurveyPostAjaxRequest = false;
+
+function fetchIncompleteSurvey(isNextBatch) {
+	
+	if(!isNextBatch && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
+		
+		//paint the posts
+		displayIncompleteSurveysOnDashboard();
+		
+		//Fetch the next batch
+		if(!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= proPostBatchSize) {
+			fetchIncompleteSurvey(true);
+		}
+		return;
+	}
+	
+	if(isIncompleteSurveyAjaxRequestRunning) return; //Return if request is running
 	
 	var payload = {
-		"columnName" : columnName,
-		"columnValue" : columnValue,
+		"columnName" : colName,
+		"columnValue" : colValue,
 		"startIndex" : startIndexInc,
 		"batchSize" : batchSizeInc
 	};
@@ -576,7 +594,19 @@ function showIncompleteSurvey(columnName, columnValue) {
 		return;
 	}
 	
+	isIncompleteSurveyAjaxRequestRunning = true;
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurvey.do", function(data) {
+		
+		isIncompleteSurveyAjaxRequestRunning = false;
+		startIndexInc += batchSizeInc;
+		
+		var tempDiv = $("<div>");
+		tempDiv.html(data);
+		
+		if(tempDiv.children('div.dsh-icn-sur-item').length < batchSizeInc) {
+			doStopIncompleteSurveyPostAjaxRequest = true;
+		}
+		
 		if (startIndexInc == 0) {
 			$('#dsh-inc-srvey').html(data);
 			$("#dsh-inc-dwnld").show();
@@ -584,17 +614,37 @@ function showIncompleteSurvey(columnName, columnValue) {
 		else {
 			$('#dsh-inc-srvey').append(data);
 		}
-		$('#dsh-inc-srvey').perfectScrollbar();
-		startIndexInc += batchSizeInc;
+		
+		$('.dsh-inc-sur-date[data-modified="false"]').each(function(index, currentElement) {
+			var dateStr = $(this).attr('data-value');
+			$(this).html(getDateStrToUTC(dateStr)).attr("data-modified","true");
+		});
+		
+		if(isNextBatch) {
+			//Fetch the next batch
+			if(!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= batchSizeInc) {
+				fetchIncompleteSurvey(true);
+			}
+		} else {
+			if($('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0)
+				fetchIncompleteSurvey(false);
+		}
 	}, payload, false);
 	
 }
 
+function displayIncompleteSurveysOnDashboard() {
+	$('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').each(function(index, currentElement) {
+		if(index >= batchSizeInc) {
+			return;
+		}
+		$(this).removeClass("hide");
+	});
+	$('#dsh-inc-srvey').perfectScrollbar();
+}
+
 $(document).on('click', '.dash-lp-rt-img', function() {
 	var surveyPreInitiationId = $(this).data("surveypreinitiationid");
-	/*var agentId = $(this).data("agentid");
-	var agentName = $(this).data("agentname");
-	var customerEmail = $(this).data("custemail");*/
 	var customerName = $(this).data("custname");
 	sendSurveyReminderMail(surveyPreInitiationId, customerName);
 });
@@ -7671,7 +7721,8 @@ function fetchPublicPostEditProfile(isNextBatch) {
 						fetchPublicPostEditProfile(true);
 					}
 				} else {
-					fetchPublicPostEditProfile(false);
+					if(posts && posts.length > 0)
+						fetchPublicPostEditProfile(false);
 				}
 					
 			}
@@ -7998,7 +8049,8 @@ function getIncompleteSurveyCount(colName, colValue){
 		$('#paginate-total-pages').html(numPages);
 		
 		//Show dashboard incomplete reviews
-		showIncompleteSurvey(colName, colValue);
+		doStopIncompleteSurveyPostAjaxRequest = false;
+		fetchIncompleteSurvey(false);
 		$('#dsh-inc-srvey').perfectScrollbar({
 			suppressScrollX : true
 		});
@@ -8183,7 +8235,8 @@ function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 			$('.sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
 			
 			//Update the incomplete survey on dashboard
-			showIncompleteSurvey(colName, colValue);
+			doStopIncompleteSurveyPostAjaxRequest = false;
+			fetchIncompleteSurvey(false);
 			$('#dsh-inc-srvey').perfectScrollbar('update');
 			
 			//update the page
@@ -9282,15 +9335,10 @@ function postsSearch(){
 	$('#prof-posts').html("");
 	socialMonitorPostBatch = [];
 	doStopSocialMonitorPostAjaxRequest = false;
-	fetchSearchedPostsSolr();
+	fetchSearchedPostsSolr(false);
 }
 
 function fetchSearchedPostsSolr(isNextBatch) {
-	
-	var entityType = $("#select-hierarchy-level").val();
-	var entityId;
-	entityId = $("#selected-entity-id-hidden").val();
-	
 	
 	if(!isNextBatch && socialMonitorPostBatch.length > 0) {
 		var posts = socialMonitorPostBatch.slice(0, proPostBatchSize);
@@ -9301,7 +9349,7 @@ function fetchSearchedPostsSolr(isNextBatch) {
 		}
 		
 		//paint the posts
-		paintPostsSolr(posts, entityType, entityId);
+		paintPostsSolr(posts);
 		
 		//Fetch the next batch
 		if(!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
@@ -9312,6 +9360,9 @@ function fetchSearchedPostsSolr(isNextBatch) {
 	
 	if(isSocialMonitorPostAjaxRequestRunning) return;//Return if posts fetch is still working
 	
+	var entityType = $("#select-hierarchy-level").val();
+	var entityId;
+	entityId = $("#selected-entity-id-hidden").val();
 	if(entityType == undefined || entityType == "companyId"){
 		entityType = "companyId";
 		entityId = companyIdForSocialMonitor;
@@ -9376,7 +9427,8 @@ function fetchSearchedPostsSolr(isNextBatch) {
 				fetchSearchedPostsSolr(true);
 			}
 		} else {
-			fetchSearchedPostsSolr(false);
+			if(posts && posts.length > 0)
+				fetchSearchedPostsSolr(false);
 		}
 		
 	}, payload, true);
@@ -9947,4 +9999,23 @@ function initializeVerticalsMasterForProfilePage() {
 	} else {
 		initializeVerticalAutcomplete();		
 	}
+}
+
+function attachEventsOnSocialMonitor() {
+	$("#select-hierarchy-level").off('change');
+	$("#select-hierarchy-level").on('change', function(){
+		autocompleteData = [];
+		getRelevantEntities();
+	});
+	$('#prof-posts').off('scroll');
+	$('#prof-posts').on('scroll',function(){
+		var scrollContainer = this;
+		if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
+					- scrollContainer.clientHeight)) {
+				
+				if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
+					fetchSearchedPostsSolr(false);
+				}
+		}
+	});
 }
