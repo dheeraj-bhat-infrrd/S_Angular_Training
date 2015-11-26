@@ -94,10 +94,7 @@
 				$("#last-build-date").html("Last build date unavailable");
 			}
 			
-		});
-		$("#select-hierarchy-level").on('change', function(){
-			autocompleteData = [];
-			getRelevantEntities();
+			attachEventsOnSocialMonitor();
 		});
 	</script>
 </body>
