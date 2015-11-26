@@ -807,6 +807,7 @@ function paintReviews(result){
 		$('#reviews-container').show();
 	}
 	
+	hideLoaderOnPagination($('#prof-review-item'));
 	if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
 		$("#prof-review-item").html(reviewsHtml);
 	}else {
@@ -928,6 +929,8 @@ $(document).scroll(function(){
 	}
 });
 
+var isReviewsLoaderRunning = false;
+
 /**
  * Function to fetch the reviews on scroll 
  * @param isNextBatch 
@@ -935,8 +938,8 @@ $(document).scroll(function(){
 function fetchReviewsScroll(isNextBatch) {
 	//if pagination is stopped or next batch is not empty
 	if (!stopFetchReviewPagination || reviewsNextBatch.length > 0) {
-		if (isFetchReviewAjaxRequestRunning)
-			return; // Return if ajax request is still running
+		if (isFetchReviewAjaxRequestRunning || isReviewsLoaderRunning)
+			return; // Return if ajax request is still running or data is being loaded
 		if(!isNextBatch && reviewsNextBatch != undefined && reviewsNextBatch.length > 0) {
 			var reviewsToShow = reviewsNextBatch.slice(0, numOfRows);
 			if(reviewsNextBatch.length > numOfRows) {
@@ -944,7 +947,13 @@ function fetchReviewsScroll(isNextBatch) {
 			} else {
 				reviewsNextBatch = [];
 			}
-			paintReviews(reviewsToShow);
+			showLoaderOnPagination($('#prof-review-item'));
+			isReviewsLoaderRunning = true;
+			setTimeout(function() {
+				isReviewsLoaderRunning = false;
+				paintReviews(reviewsToShow);
+			}, 500);
+			
 		} else {
 			if(stopFetchReviewPagination) return; //Return if pagination is stopped
 			startIndex = startIndex + numOfRows;
@@ -1023,6 +1032,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 						fetchReviewsScroll(true);
 					}
 				} else {
+					showLoaderOnPagination($('#prof-review-item'));
 					paintReviews(result);				
 				}
 			} else {
@@ -1310,12 +1320,19 @@ function downloadVCard(agentName){
 	window.open(url, "_blank");
 }
 
+var isLoaderRunningPublicPosts = false;
+
 $('#prof-posts').on('scroll',function(){
 	var scrollContainer = this;
 	if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-				- scrollContainer.clientHeight) {
+				- scrollContainer.clientHeight && !isLoaderRunningPublicPosts) {
 		if(publicPostsNextBatch.length > 0) {
-			paintPublicPosts(publicPostsNextBatch.slice(0, publicPostNumRows));
+			showLoaderOnPagination($('#prof-posts'));
+			isLoaderRunningPublicPosts = true;
+			setTimeout(function() {
+				isLoaderRunningPublicPosts = false;
+				paintPublicPosts(publicPostsNextBatch.slice(0, publicPostNumRows));
+			}, 500);
 			if(publicPostsNextBatch.length > publicPostNumRows) {
 				publicPostsNextBatch = publicPostsNextBatch.slice(publicPostNumRows);
 			} else {
@@ -1357,6 +1374,10 @@ function fetchPublicPosts(isNextBatch) {
 		url += currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
 	}
 	isPublicPostAjaxRequestRunning = true;
+	
+	if(!isNextBatch) {
+		showLoaderOnPagination($('#prof-posts'));
+	}
 	callAjaxGET(url, function(data) {
 		isPublicPostAjaxRequestRunning = false;
 		var posts = $.parseJSON(data);
@@ -1416,6 +1437,7 @@ function paintPublicPosts(posts) {
 		+ '</div>';
 	});
 	
+	hideLoaderOnPagination($('#prof-posts'));
 
 	if (publicPostStartIndex == 0) {
 		if (posts.length > 0) {

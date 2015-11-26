@@ -568,18 +568,21 @@ var doStopIncompleteSurveyPostAjaxRequest = false;
 function fetchIncompleteSurvey(isNextBatch) {
 	
 	if(!isNextBatch && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
+		showLoaderOnPagination($('#dsh-inc-srvey'));
 		
 		//paint the posts
-		displayIncompleteSurveysOnDashboard();
-		
-		//Fetch the next batch
-		if(!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= proPostBatchSize) {
-			fetchIncompleteSurvey(true);
-		}
+		setTimeout(function() {
+			displayIncompleteSurveysOnDashboard();
+		}, 500);
 		return;
 	}
 	
 	if(isIncompleteSurveyAjaxRequestRunning) return; //Return if request is running
+	
+	//Show loader icon if not next batch
+	if(!isNextBatch) {
+		showLoaderOnPagination($('#dsh-inc-srvey'));
+	}
 	
 	var payload = {
 		"columnName" : colName,
@@ -634,6 +637,7 @@ function fetchIncompleteSurvey(isNextBatch) {
 }
 
 function displayIncompleteSurveysOnDashboard() {
+	hideLoaderOnPagination($('#dsh-inc-srvey'));
 	$('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').each(function(index, currentElement) {
 		if(index >= batchSizeInc) {
 			return;
@@ -641,6 +645,11 @@ function displayIncompleteSurveysOnDashboard() {
 		$(this).removeClass("hide");
 	});
 	$('#dsh-inc-srvey').perfectScrollbar();
+	
+	//Fetch the next batch
+	if(!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= batchSizeInc) {
+		fetchIncompleteSurvey(true);
+	}
 }
 
 $(document).on('click', '.dash-lp-rt-img', function() {
@@ -685,22 +694,25 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 		}, payload, false);
 		
 		if (parseInt(totalReview) > 0) {
-			fetchReviewsOnDashboard(columnName, columnValue, false);
+			fetchReviewsOnDashboard(false);
 		}
 	}, payload, false);
 }
 
 var isDashboardReviewRequestRunning = false;
-function fetchReviewsOnDashboard(columnName, columnValue, isNextBatch) {
+function fetchReviewsOnDashboard(isNextBatch) {
 	if(isDashboardReviewRequestRunning) return; //Return if ajax request is still running
 	
 	var payload = {
-		"columnName" : columnName,
-		"columnValue" : columnValue,
+		"columnName" : colName,
+		"columnValue" : colValue,
 		"startIndex" : startIndexCmp,
 		"batchSize" : batchSizeCmp
 	};
 	isDashboardReviewRequestRunning = true;
+	if(!isNextBatch) {
+		showLoaderOnPagination($('#review-details'));
+	}
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
 		if (startIndexCmp == 0)
 			$('#review-details').html(data);
@@ -716,7 +728,7 @@ function fetchReviewsOnDashboard(columnName, columnValue, isNextBatch) {
 		}
 		isDashboardReviewRequestRunning = false;
 		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && startIndexCmp < totalReviews) {
-			fetchReviewsOnDashboard(colName, colValue, true);
+			fetchReviewsOnDashboard(true);
 		}
 	}, payload, false);
 }
@@ -724,24 +736,35 @@ function fetchReviewsOnDashboard(columnName, columnValue, isNextBatch) {
 function dashbaordReviewScroll() {
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
 		if($('div.dsh-review-cont.hide').length > 0){
-			displayReviewOnDashboard();
+			showLoaderOnPagination($('#review-details'));
+			setTimeout(displayReviewOnDashboard, 500);
 		} else{
-			fetchReviewsOnDashboard(colName, colValue, false);
+			fetchReviewsOnDashboard(false);
 		}
 	}	
 }
 
 function displayReviewOnDashboard() {
+	
+	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
+	
+	hideLoaderOnPagination($('#review-details'));
 	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
-		if(index >= batchSizeCmp) {
+		$(this).removeClass("hide");
+		if(index >= batchSizeCmp - 1) {
+			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
 			return;
 		}
-		$(this).removeClass("hide");
 	});
+	
+	//check for last element
+	if(startIndexCmp >= totalReviews && $('div.dsh-review-cont.hide').length <= 0) {
+		
+	}
 	
 	//Get the next batch
 	if($('div.dsh-review-cont.hide').length <= batchSizeCmp && startIndexCmp < totalReviews) {
-		fetchReviewsOnDashboard(colName, colValue, true);
+		fetchReviewsOnDashboard(true);
 	}
 }
 
@@ -7510,17 +7533,19 @@ function paintProfImage(imgDivClass) {
 
 var doStopReviewsPaginationEditProfile = false;
 var isReviewsRequestRunningEditProfile = false;
+var isReviewsLoadingEditProfile = false;
 
 function fetchReviewsEditProfileScroll() {
-
-	if (startIndex == 0) {
-		doStopReviewsPaginationEditProfile = false;
-	}
 
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
 			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
 		if($('div.dsh-review-cont.hide').length > 0){
-			displayReviewOnEditProfile();
+			showLoaderOnPagination($('#prof-review-item'));
+			isReviewsLoadingEditProfile = true;
+			setTimeout(function() {
+				isReviewsLoadingEditProfile = false;
+				displayReviewOnEditProfile();
+			}, 500);
 		} else{
 			fetchReviewsOnEditProfile(attrName, attrVal, false);
 		}
@@ -7532,11 +7557,19 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 	//Check if the request is running
 	if(isReviewsRequestRunningEditProfile) return;
 	
+	if (startIndex == 0) {
+		doStopReviewsPaginationEditProfile = false;
+		$('#prof-review-item').html('');
+	}
+	
 	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
 			+ minScore + "&startIndex=" + startIndex + "&numOfRows="
 			+ numOfRows;
 	
 	isReviewsRequestRunningEditProfile = true;
+	if(!isNextBatch) {
+		showLoaderOnPagination($('#prof-review-item'));
+	}
 	callAjaxGET(url, function(data) {
 		
 		var tempDiv = $("<div>");
@@ -7577,12 +7610,20 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 
 //Display the review on edit profile
 function displayReviewOnEditProfile() {
+	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
+	hideLoaderOnPagination($('#prof-review-item'));
 	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
-		if(index >= numOfRows) {
+		$(this).removeClass("hide");
+		if(index >= batchSizeCmp - 1) {
+			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
 			return;
 		}
-		$(this).removeClass("hide");
 	});
+	
+	//check for the last element and add last element class
+	if(doStopReviewsPaginationEditProfile && $('div.dsh-review-cont.hide').length <= 0) {
+		$('div.dsh-review-cont:last-of-type').addClass("ppl-review-item-last").removeClass("ppl-review-item");
+	}
 	
 	//Get the next batch
 	if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
@@ -7684,6 +7725,7 @@ function attachPostsScrollEvent() {
 
 var doStopPostPaginationEditProfile = false; 
 var isAjaxRequestRunningEditProfile = false;
+var isLoaderRunningEditProfile = false;
 var publicPostsBatch = [];
 
 /**
@@ -7708,15 +7750,27 @@ function fetchPublicPostEditProfile(isNextBatch) {
 			publicPostsBatch = [];
 		}
 		
-		//paint the posts
-		paintPosts(posts);
-		
-		//Fetch the next batch
-		if(!doStopPostPaginationEditProfile && publicPostsBatch.length <= proPostBatchSize) {
-			fetchPublicPostEditProfile(true);
+		if(isLoaderRunningEditProfile) {
+			return; //Return if loader is running
 		}
+		showLoaderOnPagination($('#prof-posts'));
+		isLoaderRunningEditProfile = true;
+		//paint the posts
+		setTimeout(function() {
+			paintPosts(posts);
+			isLoaderRunningEditProfile = false;
+			//Fetch the next batch
+			if(!doStopPostPaginationEditProfile && publicPostsBatch.length <= proPostBatchSize) {
+				fetchPublicPostEditProfile(true);
+			}
+		}, 500);
+		
 		return;
 	} 
+	
+	if (!isNextBatch) {
+		showLoaderOnPagination($('#prof-posts'));
+	}
 	
 	if(isAjaxRequestRunningEditProfile) return; //Return if ajax request running to fetch the social posts
 	
@@ -7803,6 +7857,9 @@ function paintPosts(posts) {
 		
 		divToPopulate += '</div>';
 	});
+	
+	//Hide the loader icon
+	hideLoaderOnPagination($('#prof-posts'));
 
 	if ($('#prof-posts').children('.tweet-panel-item').length == 0){
 		$('#prof-posts').html(divToPopulate);
@@ -8021,8 +8078,6 @@ function bindUserLoginEvent() {
 			"colValue" : $(this).attr('data-iden')
 		};
 		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
-			// window.location = window.location.origin + '/userlogin.do';
-			/*$('.user-login-icn').removeClass('disable-click');*/
 			window.location = getLocationOrigin() + '/userlogin.do';
 		}, true, payload,'.user-login-icn');
 	});
@@ -8076,6 +8131,7 @@ function getIncompleteSurveyCount(colName, colValue){
 		
 		//Show dashboard incomplete reviews
 		doStopIncompleteSurveyPostAjaxRequest = false;
+		$('#dsh-inc-srvey').html('');
 		fetchIncompleteSurvey(false);
 		$('#dsh-inc-srvey').perfectScrollbar({
 			suppressScrollX : true
@@ -9354,6 +9410,7 @@ function getImageandCaptionProfile(loop) {
 
 var isSocialMonitorPostAjaxRequestRunning = false;
 var doStopSocialMonitorPostAjaxRequest = false;
+var isSocialMonitorPostLoaderRunning = false;
 var socialMonitorPostBatch = [];
 
 function postsSearch(){
@@ -9375,13 +9432,22 @@ function fetchSearchedPostsSolr(isNextBatch) {
 		}
 		
 		//paint the posts
-		paintPostsSolr(posts);
+		showLoaderOnPagination($('#prof-posts'));
+		isSocialMonitorPostLoaderRunning = true;
+		setTimeout(function() {
+			isSocialMonitorPostLoaderRunning = false;
+			paintPostsSolr(posts);
+		}, 500);
 		
 		//Fetch the next batch
 		if(!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
 			fetchSearchedPostsSolr(true);
 		}
 		return;
+	}
+	
+	if(!isNextBatch) {
+		showLoaderOnPagination($('#prof-posts'));
 	}
 	
 	if(isSocialMonitorPostAjaxRequestRunning) return;//Return if posts fetch is still working
@@ -9525,6 +9591,9 @@ function paintPostsSolr(posts, entityType, entityId) {
 		
 		
 	});
+	
+	hideLoaderOnPagination($('#prof-posts'));
+	
 	if ($('#prof-posts').children('.tweet-panel-item').length == 0){
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar({
@@ -10037,7 +10106,7 @@ function attachEventsOnSocialMonitor() {
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
 		if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight)) {
+					- scrollContainer.clientHeight) && !isSocialMonitorPostLoaderRunning) {
 				
 				if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
 					fetchSearchedPostsSolr(false);
