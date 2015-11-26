@@ -99,6 +99,17 @@
 			autocompleteData = [];
 			getRelevantEntities();
 		});
+		$('#prof-posts').off('scroll');
+		$('#prof-posts').on('scroll',function(){
+			var scrollContainer = this;
+			if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
+						- scrollContainer.clientHeight)) {
+					
+					if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
+						fetchSearchedPostsSolr(false);
+					}
+			}
+		});
 	</script>
 </body>
 </html>
