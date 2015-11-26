@@ -16,15 +16,22 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
 @Repository
-public class MongoForwardDetailsDaoImpl implements ForwardMailDetailsDao
+public class MongoForwardMailDetailsDaoImpl implements ForwardMailDetailsDao
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MongoForwardDetailsDaoImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( MongoForwardMailDetailsDaoImpl.class );
     public static final String FORWARD_MAIL_DETAILS_COLLECTION = "FORWARD_MAIL_DETAILS";
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
 
+    /**
+     *  Method to insert ForwardMailDetails data into FORWARD_MAIL_DETAILS collection
+     *
+     * @param forwardMailDetails
+     * @return
+     * @throws InvalidInputException
+     */
     @Override
     public void insertForwardMailDetails( ForwardMailDetails forwardMailDetails ) throws InvalidInputException
     {
@@ -57,6 +64,15 @@ public class MongoForwardDetailsDaoImpl implements ForwardMailDetailsDao
     }
 
 
+    /**
+     *  Method to check if messageId already exists in FORWARD_MAIL_DETAILS collection
+     *
+     * @param senderMailId
+     * @param recipientMailId
+     * @param messageId
+     * @return
+     * @throws InvalidInputException
+     */
     @Override
     public boolean checkIfForwardMailDetailsExist( String senderMailId, String recipientMailId, String messageId )
         throws InvalidInputException
@@ -92,18 +108,25 @@ public class MongoForwardDetailsDaoImpl implements ForwardMailDetailsDao
         }
         LOG.info( "Found forward mail details with id : " + forwardMailDetail.get_id() );
         if ( forwardMailDetail.getStatus() != CommonConstants.STATUS_ACCESSED )
-            updateStatusOfForwarMailDetails( forwardMailDetail.get_id() );
+            updateStatusOfForwardMailDetails( forwardMailDetail.get_id() );
         LOG.info( "Ended Method checkIfForwardMailDetailsExist() to find forward mail details." );
         return true;
     }
 
 
-    private void updateStatusOfForwarMailDetails( String id ) throws InvalidInputException
+    /**
+     *  Method to update status of an id in FORWARD_MAIL_DETAILS collection
+     *
+     * @param id
+     * @return
+     * @throws InvalidInputException
+     */
+    private void updateStatusOfForwardMailDetails( String id ) throws InvalidInputException
     {
         if ( id == null || id.isEmpty() )
             throw new InvalidInputException( "Id passed cannot be null or empty" );
 
-        LOG.info( "Started method updateStatusOfForwarMailDetails() to update status of forward mail details with id : " + id );
+        LOG.info( "Started method updateStatusOfForwardMailDetails() to update status of forward mail details with id : " + id );
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( id ) );
 
@@ -112,7 +135,7 @@ public class MongoForwardDetailsDaoImpl implements ForwardMailDetailsDao
         update.set( CommonConstants.FORWARD_MAIL_DETAILS_MODIFIED_ON_COLUMN, new Date() );
 
         mongoTemplate.updateFirst( query, update, ForwardMailDetails.class, FORWARD_MAIL_DETAILS_COLLECTION );
-        LOG.info( "Ended method updateStatusOfForwarMailDetails() to update status of forward mail details with id : " + id );
+        LOG.info( "Ended method updateStatusOfForwardMailDetails() to update status of forward mail details with id : " + id );
 
 
     }
