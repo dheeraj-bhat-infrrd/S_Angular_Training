@@ -41,6 +41,19 @@ public class IncomingMailController
     private EmailServices emailServices;
 
 
+
+    /**
+     *  Method to handle forwarding of customer reply to corresponding recipient based on below strategy :
+     *
+     *  if mail replied to an agent mail, then mail will be forwarded to the agent
+     *  if mail replied to a default from address, then mail will be send to application admin mail id configured.
+     *
+     * @param request
+     * @return
+     * @throws NumberFormatException
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
     @RequestMapping ( value = "/inboundmail")
     @ResponseBody
     public String inboundMail( HttpServletRequest request ) throws NumberFormatException, InvalidInputException,
