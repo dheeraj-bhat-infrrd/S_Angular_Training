@@ -1,4 +1,10 @@
 // Contains js functions for realtech admin
+
+var abuseReportStartIndex = 0;
+var abuseReportBatch = 5;
+var doStopAbuseReportPagination = false;
+var isAbuseReportRequestRunning = false;
+
 $(document).on('click','#dsh-ind-report-dwn-btn',function(e){
 	var startDate = $('#indv-dsh-start-date').val();
 	var endDate = $("#indv-dsh-end-date").val();
@@ -285,23 +291,34 @@ function downloadCompanyReport() {
 }
 
 function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
+	if(startIndexCmp == 0) {
+		isAbuseReportRequestRunning = false;
+		doStopAbuseReportPagination = false;
+	}
+	showLoaderOnPagination($('#admin-abs-sur-list'));
 	var payload = {
 		"startIndex" : startIndexCmp,
 		"batchSize" : batchSizeCmp
 	};
+	isAbuseReportRequestRunning = true;
 	callAjaxGetWithPayloadData("./fetchsurveybyabuse.do", function(data) {
+		isAbuseReportRequestRunning = false;
+		var tempDiv = $("<div>");
+		tempDiv.html(data);
+		
+		if(tempDiv.children('.abuse-review-item').length < abuseReportBatch) {
+			doStopAbuseReportPagination = true;
+		}
+	
+		hideLoaderOnPagination($('#admin-abs-sur-list'));	
+		
 		if (startIndexCmp == 0)
 			$('#admin-abs-sur-list').html(data);
 		else
 			$('#admin-abs-sur-list').append(data);
 		
-		startIndexCmp += batchSizeCmp;
 	}, payload, false);
 }
-
-$(document).on('scroll', '#dsh-inc-srvey', function() {
-});
-
 
 $(document).on('click', '.unmark-abusive-icn', function() {
 	var surveyMongoId = $(this).parent().parent().attr('data-iden');
@@ -329,10 +346,21 @@ function unmarkReviewFromAbusive(surveyId){
 	//close the popup
 	overlayRevert();
 	showOverlay();
-	
+	abuseReportStartIndex = 0;
 	callAjaxGetWithPayloadData("./unmarkabusivereview.do", function(data) {
 		
 		displayMessage(data);
-		showAbusiveReviews(0,10);
+		showAbusiveReviews(abuseReportStartIndex, abuseReportBatch);
 	}, payload, true);
+}
+
+function attachScrollEventOnAbuseReports(){
+	$(window).scroll(function() {
+		if ((window.innerHeight + window.pageYOffset) >= ($('#admin-abs-sur-list').offset().top + $('#admin-abs-sur-list').height()) ){
+			if(!doStopAbuseReportPagination && !isAbuseReportRequestRunning) {
+				abuseReportStartIndex += abuseReportBatch;
+				showAbusiveReviews(abuseReportStartIndex, abuseReportBatch);				
+			}
+		}
+	});
 }

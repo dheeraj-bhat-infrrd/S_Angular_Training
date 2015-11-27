@@ -21,7 +21,7 @@
 		<jstl.version>1.2</jstl.version>
 		<servlet.version>2.5</servlet.version>
 
-		<dev.deployment.path>/Users/nishit/work/apps/jboss/jboss-eap-6.3/standalone/deployments</dev.deployment.path>
+		<dev.deployment.path>E:\SS\jboss-as-7.1.1.Final\standalone\deployments</dev.deployment.path>
 
 
 		<!-- Spring -->
