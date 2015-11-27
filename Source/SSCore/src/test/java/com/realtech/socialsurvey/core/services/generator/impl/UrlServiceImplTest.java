@@ -1,20 +1,37 @@
 package com.realtech.socialsurvey.core.services.generator.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.internal.util.reflection.Whitebox;
+import com.realtech.socialsurvey.core.dao.UrlDetailsDao;
+import com.realtech.socialsurvey.core.entities.UrlDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
 public class UrlServiceImplTest
 {
+	@Spy
+	@InjectMocks
     private UrlServiceImpl urlServiceImpl;
+	
+	@Mock
+	private UrlDetailsDao urlDetailsDao;
+	
+	@Mock
+	private EncryptionHelper encryptionHelper;
 
 
     @BeforeClass
@@ -27,7 +44,7 @@ public class UrlServiceImplTest
 
     @Before
     public void setUp() throws Exception {
-        urlServiceImpl = new UrlServiceImpl();
+        MockitoAnnotations.initMocks(this);
     }
 
 
@@ -59,11 +76,14 @@ public class UrlServiceImplTest
     }
     
     @Test
-    public void testGetUrlTypeManualRegistration() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-    	Method getUrlTypeMethod = UrlServiceImpl.class.getDeclaredMethod("getUrlType", String.class);
-    	getUrlTypeMethod.setAccessible(true);
-    	String actualUrl = (String)getUrlTypeMethod.invoke(urlServiceImpl, "url/invitetoregister.do");
-    	String expected = CommonConstants.MANUAL_REGISTRATION_URL_TYPE;
-    	Assert.assertEquals("Manual registration",expected, actualUrl);
+    public void testShortenUrl() throws InvalidInputException{
+    	Map<String, String> queryMap = new HashMap<String, String>();
+    	Mockito.when(urlDetailsDao.findUrlDetailsByUrl(Matchers.anyString())).thenReturn(null);
+    	Mockito.doReturn("abc").when(urlServiceImpl).getUrlType(Matchers.anyString());
+    	Mockito.doReturn(queryMap).when(urlServiceImpl).getQueryParamsFromUrl(Matchers.anyString());
+    	Mockito.when(urlDetailsDao.insertUrlDetails((UrlDetails)Matchers.anyObject())).thenReturn("pass");
+    	Mockito.when(encryptionHelper.encodeBase64(Matchers.anyString())).thenReturn("encryptedurl");
+    	Whitebox.setInternalState(urlServiceImpl, "applicationBaseUrl", "http://localhost:8080/");
+    	Assert.assertEquals("Shorten Url", urlServiceImpl.shortenUrl("test"), "http://localhost:8080/mail.do?q=encryptedurl");
     }
 }
