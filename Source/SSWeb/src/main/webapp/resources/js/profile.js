@@ -76,7 +76,7 @@ function validateContactUsForm() {
 	isContactUsFormValid = true;
 
 	var isFocussed = false;
-	if($(window).width() < 768){
+	if(getWindowWidth() < 768){
 		isSmallScreen = true;
 	}
 	
@@ -221,7 +221,7 @@ function showMessage(data){
 }
 
 function adjustImage(){
-    var windW = $(window).width();
+    var windW = getWindowWidth();
     if(windW < 768){
         var imgW = $('#prof-image').width();
         $('#prof-image').height(imgW * 0.7);
@@ -925,6 +925,13 @@ function confirmReportAbuse(payload) {
 
 $(document).scroll(function(){
 	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height()) ){
+		//check if small screen
+		if(getWindowWidth() < 768) {
+			//check if reviews are visible. If not, do not proceed
+			if(!$('#prof-review-item').is(':visible')) {
+				return false;
+			}
+		}
 		fetchReviewsScroll(false);
 	}
 });
@@ -1383,8 +1390,11 @@ function fetchPublicPosts(isNextBatch) {
 		var posts = $.parseJSON(data);
 		posts = $.parseJSON(posts.entity);
 		
-		if(publicPostStartIndex == 0 && posts.length <= 0) {
-			hideLoaderOnPagination($('#prof-posts'));
+		//check if reponse is correct or no reviews are fetched
+		if(posts.errorCode != undefined || (publicPostStartIndex == 0 && posts.length <= 0)) {
+			$('#recent-post-container').remove();
+			doStopPublicPostPagination = true;
+			return
 		}
 		
 		//Check if request is for next batch

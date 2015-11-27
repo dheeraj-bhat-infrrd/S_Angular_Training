@@ -639,7 +639,7 @@ function displayIncompleteSurveysOnDashboard() {
 	hideLoaderOnPagination($('#dsh-inc-srvey'));
 	$('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').each(function(index, currentElement) {
 		if(index >= batchSizeInc) {
-			return;
+			return false;
 		}
 		$(this).removeClass("hide");
 	});
@@ -752,13 +752,13 @@ function displayReviewOnDashboard() {
 		$(this).removeClass("hide");
 		if(index >= batchSizeCmp - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
-			return;
+			return false;
 		}
 	});
 	
 	//check for last element
 	if(startIndexCmp >= totalReviews && $('div.dsh-review-cont.hide').length <= 0) {
-		
+		$('.dsh-review-cont:last-of-type').addClass("ppl-review-item-last").removeClass("ppl-review-item");
 	}
 	
 	//Get the next batch
@@ -7612,7 +7612,7 @@ function displayReviewOnEditProfile() {
 		$(this).removeClass("hide");
 		if(index >= batchSizeCmp - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
-			return;
+			return false;
 		}
 	});
 	
@@ -8319,6 +8319,7 @@ function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 			$('.sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
 			
 			//Update the incomplete survey on dashboard
+			startIndexInc = 0;
 			doStopIncompleteSurveyPostAjaxRequest = false;
 			fetchIncompleteSurvey(false);
 			$('#dsh-inc-srvey').perfectScrollbar('update');
