@@ -7781,13 +7781,18 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		if (data.errCode == undefined) {
 			if(data != "") {
 				
-				//update start index
-				proPostStartIndex += proPostBatchSize;	
 				
 				var posts = JSON.parse(data);
+				if(posts.length <= 0 && proPostStartIndex == 0) {
+					doStopPostPaginationEditProfile = true;
+					hideLoaderOnPagination($('#prof-posts'));
+				}
 				if(posts.length < proPostBatchSize) {
 					doStopPostPaginationEditProfile = true;
 				}
+				
+				//update start index
+				proPostStartIndex += proPostBatchSize;	
 				
 				//update the batch
 				publicPostsBatch = publicPostsBatch.concat(posts);
