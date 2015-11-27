@@ -204,7 +204,7 @@ $(document).ready(function() {
     		}
     		return isRegistrationFormValid;
 		}
-		if (!validateLastName('reg-lname')) {
+		 if (!validateLastName('reg-lname')) {
 			isRegistrationFormValid = false;
 			if (!isFocussed) {
     			$('#reg-lname').focus();
@@ -214,7 +214,7 @@ $(document).ready(function() {
     			return isRegistrationFormValid;
     		}
     		return isRegistrationFormValid;
-		}
+		} 
 		if (!validateEmailId('reg-email')) {
 			isRegistrationFormValid = false;
 			if (!isFocussed) {

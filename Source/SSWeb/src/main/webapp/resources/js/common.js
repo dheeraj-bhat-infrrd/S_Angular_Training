@@ -902,7 +902,7 @@ function validateRegFirstName(elementId) {
 }
 
 // Function to validate the last name
-function validateRegLastName(elementId) {
+/*function validateRegLastName(elementId) {
 	if ($('#' + elementId).val() != "") {
 		if (lastNameRegEx.test($('#' + elementId).val()) == true) {
 			return true;
@@ -916,6 +916,19 @@ function validateRegLastName(elementId) {
 		showRegErr('Please enter a valid last name.');
 		return false;
 	}
+}*/
+
+function validateRegLastName(elementId) {
+
+		if ($('#' + elementId).val() == ""||lastNameRegEx.test($('#' + elementId).val()) == true) {
+			return true;
+		} else {
+			// $('#overlay-toast').html('Please enter a valid last name.');
+			// showToast();
+			showRegErr('Please enter a valid last name.');
+			return false;
+		}
+	
 }
 
 // function to validate a password in form
