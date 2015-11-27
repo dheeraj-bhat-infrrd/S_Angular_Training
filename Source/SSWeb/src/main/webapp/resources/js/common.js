@@ -971,3 +971,13 @@ function showLoaderOnPagination(element) {
 function hideLoaderOnPagination(element) {
 	element.find(".loader-icn-sm").remove();
 }
+
+function getWindowWidth() {
+	return window.innerWidth || document.documentElement.clientWidth
+			|| document.body.clientWidth;
+}
+
+function getWindowHeight() {
+	return window.innerHeight || document.documentElement.clientHeight
+			|| document.body.clientHeight;
+}
