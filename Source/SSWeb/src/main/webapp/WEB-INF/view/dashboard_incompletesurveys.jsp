@@ -4,10 +4,10 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <c:if test="${not empty incompleteSurveys}">
 	<c:forEach var="survey" items="${incompleteSurveys}"  varStatus="loop">
-		<div class="dash-lp-item clearfix"  data-iden="sur-pre-${survey.surveyPreIntitiationId }">
+		<div class="dash-lp-item clearfix dsh-icn-sur-item hide"  data-iden="sur-pre-${survey.surveyPreIntitiationId }">
 			<div class="float-left dash-lp-txt text-capitalize">
 				${survey.customerFirstName} ${survey.customerLastName}
-					<div class="font-11 opensanslight" data-value="<fmt:formatDate value="${survey.modifiedOn}" pattern="yyyy-MM-dd-H-mm-s-S"/>">
+					<div class="font-11 opensanslight dsh-inc-sur-date" data-modified="false" data-value="<fmt:formatDate value="${survey.modifiedOn}" pattern="yyyy-MM-dd-H-mm-s-S"/>">
 					</div>
 			</div>
 			<div
@@ -20,11 +20,3 @@
 		</div>
 	</c:forEach>
 </c:if>
-<script>
-$(document).ready(function(){
-	$('.opensanslight').each(function(index, currentElement) {
-		var dateStr = $(this).attr('data-value');
-		$(this).html(getDateStrToUTC(dateStr));
-	});
-});
-</script>

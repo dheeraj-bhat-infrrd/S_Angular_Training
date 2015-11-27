@@ -164,28 +164,15 @@ public class UrlGeneratorImpl implements URLGenerator {
 
 		for (int counter = 0; counter < keyValuePairs.length; counter += 1) {
 			String[] keyValuePair = keyValuePairs[counter].split("=");
-			boolean isKeyExists = isElementExists(keyValuePair, 0);
-			boolean isValueExists = isElementExists(keyValuePair, 1);
 			
-			if (isKeyExists && isValueExists) {
+			if(keyValuePair.length == 2){
 				params.put(keyValuePair[0], keyValuePair[1]);
 			}
-			else if (isKeyExists && !isValueExists) {
+			else if (keyValuePair.length == 1) {
 				params.put(keyValuePair[0], "");
 			}
 		}
 		return params;
-	}
-	
-	@SuppressWarnings("unused")
-	private static boolean isElementExists(String[] keyValuePair, int index) {
-		try {
-			String value = keyValuePair[index];
-			return true;
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			return false;
-		}
 	}
 	
 	/**
