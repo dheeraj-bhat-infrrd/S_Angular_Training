@@ -6533,17 +6533,16 @@ function callBackEditAddressDetails(data) {
 
 //Function to update events on edit profile page
 function updateEventsEditAddress() {
-	var countryCode = $('#prof-country-code').val();
-	if (countryCode == "US") {
-		showStateCityRow('prof-address-state-city-row', 'prof-state');
-	} else {
-		hideStateCityRow('prof-address-state-city-row', 'prof-state');
-	}
+    var countryCode = $('#prof-country-code').val();
+    if (countryCode == "US") {
+        showStateCityRow('prof-address-state-city-row', 'prof-state',
+            'prof-city');
+    } else {
+        hideStateCityRow('prof-address-state-city-row', 'prof-state');
+    }
 
-	attachAutocompleteCountry('prof-country', 'prof-country-code',
-			'prof-address-state-city-row', 'prof-state');
-	attachChangeEventStateDropDown("prof-state", "prof-city");
-	attachFocusEventCity("prof-state", "prof-city");
+    attachAutocompleteCountry('prof-country', 'prof-country-code',
+        'prof-state', 'prof-address-state-city-row', 'prof-city');
 }
 
 function callBackUpdateAddressDetails(data) {
@@ -6571,7 +6570,6 @@ function createEditAddressPopup(header, body) {
 	$('#overlay-text').html(body);
 	$('#overlay-continue').html("Ok");
 	$('#overlay-cancel').html("Cancel");
-
 	$('#overlay-main').show();
 }
 function overlayRevert() {
@@ -6586,7 +6584,6 @@ function overlayRevert() {
 
 	$('#overlay-continue').unbind('click');
 
-	//$('body').css('overflow', 'auto');
 	enableBodyScroll();
 	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 }
@@ -6595,8 +6592,6 @@ function overlayRevert() {
 function callBackShowBasicDetails(response) {
 	$('#prof-basic-container').html(response);
 	adjustImage();
-	//fetchAvgRating(attrName, attrVal);
-	//fetchReviewCount(attrName, attrVal, minScore);
 }
 
 $(document).on('blur', '#prof-basic-container input', function() {
@@ -6633,9 +6628,6 @@ $(document).on('blur', '#prof-basic-container input', function() {
 function callBackUpdateBasicDetails(data) {
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
-	//callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
-	//callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
-
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
@@ -7548,6 +7540,10 @@ var isReviewsLoadingEditProfile = false;
 
 function fetchReviewsEditProfileScroll() {
 
+	//check if the current page is edit profile
+	if(location.hash != "#showprofilepage")  {
+		return;
+	}
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
 			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
 		if($('div.dsh-review-cont.hide').length > 0){

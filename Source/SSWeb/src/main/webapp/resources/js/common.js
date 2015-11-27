@@ -658,40 +658,38 @@ function getUniqueCitySearchData(data) {
 	return uniqueSearchData;
 }
 
-function showStateCityRow(parentId, elementId) {
+function showStateCityRow(parentId, stateId, cityId) {
     $('#' + parentId).show();
-    var stateVal = $('#' + elementId).attr('data-value');
+    var stateVal = $('#' + stateId).attr('data-value');
     if (!stateList) {
         callAjaxGET("./getusstatelist.do", function(data) {
             stateList = JSON.parse(data);
-            for (var i = 0; i < stateList.length; i++) {
-                if (stateVal == stateList[i].statecode) {
-                    $('#' + elementId).append(
-                        '<option data-stateid=' + stateList[i].id + ' selected >' + stateList[i].statecode + '</option>');
-                } else {
-                    $('#' + elementId).append(
-                        '<option data-stateid=' + stateList[i].id + '>' + stateList[i].statecode + '</option>');
-                }
-            }
+            appendStateListToDropDown(stateId, stateList, cityId);
         }, true);
     } else {
 
-        if ($('#' + elementId).children('option').size() == 1) {
-            for (var i = 0; i < stateList.length; i++) {
-                if (stateVal == stateList[i].statecode) {
-                    $('#' + elementId).append(
-                        '<option data-stateid=' + stateList[i].id + ' selected >' + stateList[i].statecode + '</option>');
-                } else {
-                    $('#' + elementId).append(
-                        '<option data-stateid=' + stateList[i].id + '>' + stateList[i].statecode + '</option>');
-                }
-            }
+        if ($('#' + stateId).children('option').size() == 1) {
+        	appendStateListToDropDown(stateId, stateList, cityId);
         } else {
             if (stateVal != undefined && stateVal != "") {
-                $('#' + elementId).val(stateVal);
+                $('#' + stateId).val(stateVal);
             }
         }
     }
+}
+
+function appendStateListToDropDown(stateId, stateList, cityId) {
+	var stateVal = $('#' + stateId).attr('data-value');
+	for (var i = 0; i < stateList.length; i++) {
+        if (stateVal == stateList[i].statecode) {
+            $('#' + stateId).append(
+                '<option data-stateid=' + stateList[i].id + ' selected >' + stateList[i].statecode + '</option>');
+        } else {
+            $('#' + stateId).append(
+                '<option data-stateid=' + stateList[i].id + '>' + stateList[i].statecode + '</option>');
+        }
+    }
+	attachChangeEventStateDropDown(stateId, cityId);
 }
 
 function enableBodyScroll() {
@@ -967,14 +965,23 @@ function getWindowHeight() {
 }
 
 function attachChangeEventStateDropDown(stateId, cityId) {
-	$('#'+stateId).off('change');
-	$('#'+stateId).on('change',function(e){
-  		var stateId = $(this).find(":selected").attr('data-stateid');
-  		callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
-  			var uniqueSearchData = getUniqueCitySearchData(data);
-  			initializeCityLookup(uniqueSearchData, cityId);
-  		}, true);
-  	});
+    $('#' + stateId).off('change');
+    $('#' + stateId).on('change', function(e) {
+        var stateIdVal = $(this).find(":selected").attr('data-stateid');
+        updateCityAutcomplete(stateIdVal, cityId, stateId);
+    });
+    var stateIdVal = $('#' + stateId).find(":selected").attr('data-stateid');
+    if (stateIdVal != undefined && stateIdVal != '') {
+    	updateCityAutcomplete(stateIdVal, cityId, stateId);
+    }
+}
+
+function updateCityAutcomplete(stateIdVal, cityId, stateId) {
+	callAjaxGET("./getzipcodesbystateid.do?stateId=" + stateIdVal, function(data) {
+        var uniqueSearchData = getUniqueCitySearchData(data);
+        initializeCityLookup(uniqueSearchData, cityId);
+        attachFocusEventCity(stateId, cityId);
+    }, true);
 }
 
 function attachFocusEventCity(stateId, cityId) {
@@ -987,8 +994,28 @@ function attachFocusEventCity(stateId, cityId) {
   	});
 }
 
-function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId) {
+function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId, cityId) {
 	
+	//check for the existing value of country code and set defualt to us if not set
+	var countryCode = "US";
+
+	if ($('#' + countryCodeId).val() != undefined && $('#' + countryCodeId).val() != "") {
+	    countryCode = $('#' + countryCodeId).val();
+	}
+
+	if (countryCode == "US") {
+	    showStateCityRow(stateCityRowId, stateId, cityId);
+	    if ($('#' + countryId).val() == null || $('#' + countryId).val() == "") {
+	        $('#' + countryId).val("United States");
+	        $('#' + countryCodeId).val(countryCode);
+	    }
+	    selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+	    selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	} else {
+	    hideStateCityRow(stateCityRowId, stateId);
+	}
+	
+	//attach autocomplete event
 	$("#"+countryId).autocomplete({
 		minLength: 1,
 		source: countryData,
@@ -1008,7 +1035,7 @@ function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityR
 				}
 			}
 			if(ui.item.code == "US"){
-				showStateCityRow(stateCityRowId, stateId);
+				showStateCityRow(stateCityRowId, stateId, cityId);
 			}else{
 				hideStateCityRow(stateCityRowId, stateId);
 			}
