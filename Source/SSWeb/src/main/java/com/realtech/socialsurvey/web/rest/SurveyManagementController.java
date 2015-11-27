@@ -238,8 +238,8 @@ public class SurveyManagementController
                 }
             }
 
-            // Sending email to the customer telling about successful completion of survey.
             SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
+            // Sending email to the customer telling about successful completion of survey.
             try {
                 String customerName = emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                     survey.getCustomerLastName() );
@@ -588,14 +588,17 @@ public class SurveyManagementController
             String feedback = request.getParameter( "feedback" );
             String isAbusiveStr = request.getParameter( "isAbusive" );
             String serverBaseUrl = requestUtils.getRequestServerName( request );
+            String onlyPostToSocialSurveyStr = request.getParameter( "onlyPostToSocialSurvey" );
 
             long agentId = 0;
             double rating = 0;
             boolean isAbusive = false;
+            boolean onlyPostToSocialSurvey = false;
             try {
                 agentId = Long.parseLong( agentIdStr );
                 rating = Double.parseDouble( ratingStr );
                 isAbusive = Boolean.parseBoolean( isAbusiveStr );
+                onlyPostToSocialSurvey = Boolean.parseBoolean( onlyPostToSocialSurveyStr );
             } catch ( NumberFormatException | NullPointerException e ) {
                 LOG.error(
                     "Number format/Null Pointer exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ",
@@ -603,8 +606,8 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
-            if(socialManagementService.postToSocialMedia( agentName, agentProfileLink, custFirstName, custLastName, agentId,
-                rating, customerEmail, feedback, isAbusive, serverBaseUrl )){
+            if ( socialManagementService.postToSocialMedia( agentName, agentProfileLink, custFirstName, custLastName, agentId,
+                rating, customerEmail, feedback, isAbusive, serverBaseUrl, onlyPostToSocialSurvey ) ) {
                 return "Successfully posted to all the places in hierarchy";
             }
 
@@ -616,13 +619,13 @@ public class SurveyManagementController
         }
         LOG.info( "Method to post feedback of customer to various pages of social networking sites finished." );
         return "Error while posting on social media";
-        
+
     }
 
 
     //@ResponseBody
     @RequestMapping ( value = "/posttofacebook", method = RequestMethod.GET)
-    public String postToFacebook(  Model model , HttpServletRequest request )
+    public String postToFacebook( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to facebook started." );
         try {
@@ -786,7 +789,7 @@ public class SurveyManagementController
 
 
     @RequestMapping ( value = "/posttotwitter", method = RequestMethod.GET)
-    public String postToTwitter( Model model , HttpServletRequest request )
+    public String postToTwitter( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to twitter started." );
         try {
@@ -943,7 +946,7 @@ public class SurveyManagementController
 
 
     @RequestMapping ( value = "/posttolinkedin", method = RequestMethod.GET)
-    public String postToLinkedin( Model model , HttpServletRequest request )
+    public String postToLinkedin( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to linkedin started." );
         try {

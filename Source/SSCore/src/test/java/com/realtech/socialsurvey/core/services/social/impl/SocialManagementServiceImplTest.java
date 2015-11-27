@@ -9,7 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
 import twitter4j.TwitterException;
+
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -17,6 +19,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+
 import facebook4j.FacebookException;
 
 public class SocialManagementServiceImplTest
@@ -105,15 +108,4 @@ public class SocialManagementServiceImplTest
         socialManagementServiceImpl.checkOrAddZillowLastUpdated( new SocialMediaTokens() );
     }
 
-
-    @Test ( expected = NonFatalException.class)
-    public void testPostToSocialMediaWithIsAbusiveTrue() throws NonFatalException
-    {
-
-        Mockito.when( emailFormatHelper.getCustomerDisplayNameForEmail( Mockito.anyString(), Mockito.anyString() ) )
-            .thenReturn( "" );
-        socialManagementServiceImpl.postToSocialMedia( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_LONG, TestConstants.TEST_DOUBLE,
-            TestConstants.TEST_MAIL_ID_STRING, TestConstants.TEST_STRING, true, TestConstants.TEST_STRING );
-    }
 }

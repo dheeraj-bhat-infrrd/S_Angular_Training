@@ -5588,9 +5588,10 @@ function showMasterQuestionPage(){
 			}
 		}
 		
+		var onlyPostToSocialSurvey = true;
 		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			if(isAbusive == false){
-				postToSocialMedia(feedback , isAbusive);
+				onlyPostToSocialSurvey = false;
 			}
 			/*$('#social-post-lnk').show();
 			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
@@ -5623,6 +5624,8 @@ function showMasterQuestionPage(){
 			}
 		}
 		
+		//call method to post the review and update the review count
+		postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey);
 		
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val() , isAbusive);
 		$("div[data-ques-type]").hide();
@@ -5644,7 +5647,7 @@ function showMasterQuestionPage(){
 	return;
 }
 
-function postToSocialMedia(feedback , isAbusive){
+function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey){
 	var success = false;
 	var payload = {
 		"agentId" : agentId,
@@ -5655,7 +5658,8 @@ function postToSocialMedia(feedback , isAbusive){
 		"isAbusive" : isAbusive,
 		"customerEmail" : customerEmail,
 		"feedback" : feedback,
-		"agentProfileLink" : agentProfileLink
+		"agentProfileLink" : agentProfileLink,
+		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey
 	};
 	$.ajax({
 		//url : window.location.origin + surveyUrl + "posttosocialnetwork",
