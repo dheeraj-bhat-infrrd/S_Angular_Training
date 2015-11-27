@@ -2205,9 +2205,9 @@ function validateRegionForm() {
 	}
 	
 	if(!validateAddress1('region-address1-txt')){
-		isOfficeValid = false;
+		isRegionValid = false;
 		if(!isFocussed){
-			$('#office-address-txt').focus();
+			$('#region-address1-txt').focus();
 			isFocussed=true;
 		}
 		return isRegionValid;
