@@ -579,11 +579,6 @@ function fetchIncompleteSurvey(isNextBatch) {
 	
 	if(isIncompleteSurveyAjaxRequestRunning) return; //Return if request is running
 	
-	//Show loader icon if not next batch
-	if(!isNextBatch) {
-		showLoaderOnPagination($('#dsh-inc-srvey'));
-	}
-	
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue,
@@ -595,6 +590,11 @@ function fetchIncompleteSurvey(isNextBatch) {
 	if(totalIncReviews == 0) {
 		$("#incomplete-survey-header").html("No incomplete surveys found");
 		return;
+	}
+	
+	//Show loader icon if not next batch
+	if(!isNextBatch) {
+		showLoaderOnPagination($('#dsh-inc-srvey'));
 	}
 	
 	isIncompleteSurveyAjaxRequestRunning = true;
@@ -628,10 +628,9 @@ function fetchIncompleteSurvey(isNextBatch) {
 			if(!doStopIncompleteSurveyPostAjaxRequest && $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length <= batchSizeInc) {
 				fetchIncompleteSurvey(true);
 			}
-		} else {
-			if($('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0)
+		} else if($('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
 				fetchIncompleteSurvey(false);
-		}
+		} 
 	}, payload, false);
 	
 }
@@ -9477,6 +9476,16 @@ function fetchSearchedPostsSolr(isNextBatch) {
 		var posts = data.socialMonitorPosts; 
 		var profilePics = data.profileImageUrlDataList;
 		
+		//check if posts are empty
+		if(proPostStartIndex == 0 && posts.length <= 0) {
+			doStopSocialMonitorPostAjaxRequest = true;
+			hideLoaderOnPagination($('#prof-posts'));
+			return;
+		} else if(posts.length < proPostBatchSize) {
+			doStopSocialMonitorPostAjaxRequest = true;
+		}
+		proPostStartIndex += proPostBatchSize;
+		
 		//Process images
 		for(var i=0; i< posts.length; i++) {
 			var post = posts[i];
@@ -9501,12 +9510,6 @@ function fetchSearchedPostsSolr(isNextBatch) {
 			post["profileImage"] = profileImg;
 		};
 		
-		if(posts.length < proPostBatchSize) {
-			doStopSocialMonitorPostAjaxRequest = true;
-		}
-		
-		proPostStartIndex += proPostBatchSize;
-		
 		//update the batch
 		socialMonitorPostBatch = socialMonitorPostBatch.concat(posts);
 		
@@ -9515,8 +9518,7 @@ function fetchSearchedPostsSolr(isNextBatch) {
 			if(!doStopSocialMonitorPostAjaxRequest && socialMonitorPostBatch.length <= proPostBatchSize) {
 				fetchSearchedPostsSolr(true);
 			}
-		} else {
-			if(posts && posts.length > 0)
+		} else if(posts && posts.length > 0) {
 				fetchSearchedPostsSolr(false);
 		}
 		
