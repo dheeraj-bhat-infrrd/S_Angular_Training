@@ -6,7 +6,7 @@
 <c:if test="${not empty abusiveReviewReportList}">
 	<c:forEach items="${abusiveReviewReportList}" var="abusiveReviewReportItem">
 		<c:forEach items="${abusiveReviewReportItem.abuseReporterDetails.abuseReporters}" var="reporterDetailItem">
-			<div class="abuse-review-row row" data-iden="${abusiveReviewReportItem.survey._id}">
+			<div class="abuse-review-item abuse-review-row row" data-iden="${abusiveReviewReportItem.survey._id}">
 				<div class="abuse-report-col capitalize col-lg-3 col-md-3 col-sm-3 col-xs-3">
 					<c:if test="${not empty abusiveReviewReportItem.survey.agentName }">
 						${abusiveReviewReportItem.survey.agentName}
