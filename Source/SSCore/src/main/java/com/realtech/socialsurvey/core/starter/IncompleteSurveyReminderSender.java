@@ -218,10 +218,10 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
 
             OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
             if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                logoUrl = companySettings.getLogo();
+                logoUrl = companySettings.getLogoThumbnail();
             } else if ( organizationUnit == OrganizationUnit.REGION ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-                logoUrl = regionSettings.getLogo();
+                logoUrl = regionSettings.getLogoThumbnail();
             } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
                 OrganizationUnitSettings branchSettings = null;
                 try {
@@ -231,10 +231,10 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                     e.printStackTrace();
                 }
                 if ( branchSettings != null ) {
-                    logoUrl = branchSettings.getLogo();
+                    logoUrl = branchSettings.getLogoThumbnail();
                 }
             } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                logoUrl = agentSettings.getLogo();
+                logoUrl = agentSettings.getLogoThumbnail();
             }
 
             MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
@@ -368,10 +368,10 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
 
             OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
             if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                logoUrl = companySettings.getLogo();
+                logoUrl = companySettings.getLogoThumbnail();
             } else if ( organizationUnit == OrganizationUnit.REGION ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-                logoUrl = regionSettings.getLogo();
+                logoUrl = regionSettings.getLogoThumbnail();
             } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
                 OrganizationUnitSettings branchSettings = null;
                 try {
@@ -381,10 +381,10 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                     e.printStackTrace();
                 }
                 if ( branchSettings != null ) {
-                    logoUrl = branchSettings.getLogo();
+                    logoUrl = branchSettings.getLogoThumbnail();
                 }
             } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                logoUrl = agentSettings.getLogo();
+                logoUrl = agentSettings.getLogoThumbnail();
             }
 
             MailContent mailContent = companySettings.getMail_content().getTake_survey_mail();

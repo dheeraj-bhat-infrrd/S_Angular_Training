@@ -27,8 +27,10 @@ public class UserFromSearch {
 	private String profileUrl;
 	private String profileName;
 	private String profileImageUrl;
+	private String profileImageThumbnail;
 	private List<Long> agentIds;
 	private long reviewCount;
+	private boolean isProfileImageSet;
 
 	public List<Long> getRegions() {
 		return regions;
@@ -206,7 +208,39 @@ public class UserFromSearch {
 		this.reviewCount = reviewCount;
 	}
 
-	@Override
+	/**
+     * @return the profileImageThumbnail
+     */
+    public String getProfileImageThumbnail()
+    {
+        return profileImageThumbnail;
+    }
+
+    /**
+     * @param profileImageThumbnail the profileImageThumbnail to set
+     */
+    public void setProfileImageThumbnail( String profileImageThumbnail )
+    {
+        this.profileImageThumbnail = profileImageThumbnail;
+    }
+
+    /**
+     * @return the isProfileImageSet
+     */
+    public boolean isProfileImageSet()
+    {
+        return isProfileImageSet;
+    }
+
+    /**
+     * @param isProfileImageSet the isProfileImageSet to set
+     */
+    public void setProfileImageSet( boolean isProfileImageSet )
+    {
+        this.isProfileImageSet = isProfileImageSet;
+    }
+
+    @Override
 	public String toString() {
 		return "user id: " + userId + "\temailId: " + emailId + "\tdisplayName: " + displayName + "\tstatus: " + status + "\tisRegionAdmin: "
 				+ isRegionAdmin + "\tisBranchAdmin: " + isBranchAdmin + "\tisAgent: " + isAgent + "\tcanEdit: " + canEdit;

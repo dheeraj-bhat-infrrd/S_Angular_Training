@@ -829,7 +829,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             .addField( CommonConstants.IS_BRANCH_ADMIN_SOLR, ( user.isBranchAdmin() ? user.isBranchAdmin() : isBranchAdmin ) );
         document
             .addField( CommonConstants.IS_REGION_ADMIN_SOLR, ( user.isRegionAdmin() ? user.isRegionAdmin() : isRegionAdmin ) );
-
+        document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
         return document;
     }
 
@@ -1739,6 +1739,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 // update profileImageUrl
                 if ( agentSettings.getProfileImageUrl() != null ) {
                     document.addField( CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl() );
+                    document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                }
+                if ( agentSettings.getProfileImageUrlThumbnail() != null ) {
+                    document.addField( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN,
+                        agentSettings.getProfileImageUrlThumbnail() );
                 }
 
                 documents.add( document );
@@ -2225,7 +2230,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
             user.setRegions( (List<Long>) document.get( CommonConstants.REGIONS_SOLR ) );
             user.setBranches( (List<Long>) document.get( CommonConstants.BRANCHES_SOLR ) );
             user.setAgentIds( (List<Long>) document.get( "agentIds" ) );
-
+            user.setProfileImageSet( Boolean
+                .parseBoolean( document.get( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR ).toString() ) );
             matchedUsers.put( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ), user );
         }
 
@@ -2242,6 +2248,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             user.setTitle( setting.getContact_details().getTitle() );
             user.setAboutMe( setting.getContact_details().getAbout_me() );
             user.setProfileImageUrl( setting.getProfileImageUrl() );
+            user.setProfileImageThumbnail( setting.getProfileImageUrlThumbnail() );
             user.setProfileName( setting.getProfileName() );
             user.setProfileUrl( setting.getProfileUrl() );
             user.setReviewCount( setting.getReviewCount() );
