@@ -1619,12 +1619,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         query = new Query( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).in( surveyIds ) );
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.SURVEY_ID_COLUMN ) );
-        if ( start > -1 ) {
-            query.skip( start );
-        }
-        if ( rows > -1 ) {
-            query.limit( rows );
-        }
 
         List<AbuseReporterDetails> absReporterDetails = mongoTemplate.find( query, AbuseReporterDetails.class,
             ABS_REPORTER_DETAILS_COLLECTION );
