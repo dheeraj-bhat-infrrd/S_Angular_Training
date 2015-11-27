@@ -109,7 +109,7 @@ public interface UserManagementService
 
     // Method to check if new users can be added to the current compeny or limit for the same is
     // exhausted.
-    public boolean isUserAdditionAllowed( User user ) throws NoRecordsFetchedException;
+    public boolean isUserAdditionAllowed( User user ) throws NoRecordsFetchedException, InvalidInputException;
 
 
     /**

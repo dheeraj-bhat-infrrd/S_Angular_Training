@@ -497,6 +497,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method to deactivate user " + userIdToRemove + " called." );
         User userToBeDeactivated = userDao.findById( User.class, userIdToRemove );
+        if(userToBeDeactivated == null){
+            throw new InvalidInputException("No user found in databse for user id : " + userIdToRemove);
+        }
+        
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
         userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
@@ -621,10 +625,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public boolean isUserAdditionAllowed( User user ) throws NoRecordsFetchedException
+    public boolean isUserAdditionAllowed( User user ) throws NoRecordsFetchedException, InvalidInputException
     {
         LOG.info( "Method to check whether users can be added or not started." );
         boolean isUserAdditionAllowed = false;
+        
+        if(user == null){
+            throw new InvalidInputException("passed user parameter is null");
+        }
+        if(user.getCompany() == null){
+            throw new InvalidInputException("passed user parameter doesnt have the company");
+        }
 
         List<LicenseDetail> licenseDetails = licenseDetailsDao.findByColumn( LicenseDetail.class, CommonConstants.COMPANY,
             user.getCompany() );
