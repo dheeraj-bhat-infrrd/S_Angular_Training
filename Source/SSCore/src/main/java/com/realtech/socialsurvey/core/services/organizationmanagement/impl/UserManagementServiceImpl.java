@@ -806,7 +806,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             user.setDisplayName( agentSettings.getContact_details().getName() );
             user.setProfileName( agentSettings.getProfileName() );
             user.setProfileUrl( agentSettings.getProfileUrl() );
-            user.setProfileImageUrl( agentSettings.getProfileImageUrl() );
+            user.setProfileImageUrl( agentSettings.getProfileImageUrlThumbnail() );
             user.setEmailId( agentSettings.getContact_details().getMail_ids().getWork() );
             user.setTitle( agentSettings.getContact_details().getTitle() );
             user.setLocation( agentSettings.getContact_details().getLocation() );
@@ -2766,15 +2766,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-            logoUrl = companySettings.getLogo();
+            logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-            logoUrl = regionSettings.getLogo();
+            logoUrl = regionSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
             OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-            logoUrl = branchSettings.getLogo();
+            logoUrl = branchSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-            logoUrl = agentSettings.getLogo();
+            logoUrl = agentSettings.getLogoThumbnail();
         }
 
         return logoUrl;

@@ -143,7 +143,7 @@ public class SessionHelper {
 	private void setLogo(HttpSession session, UserSettings userSettings) {
 		LOG.debug("Setting logo name in the session");
 		// check if company has a logo
-		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogo() != null) {
+		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogoThumbnail() != null) {
 			LOG.debug("Settings logo image from company settings");
 			String logoUrl = userSettings.getCompanySettings().getLogoThumbnail();
 			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
@@ -157,9 +157,9 @@ public class SessionHelper {
 	private void setProfileImage(HttpSession session, UserSettings userSettings) {
 		LOG.debug("Setting profile image name in the session");
 		// check if company has a logo
-		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getProfileImageUrl() != null) {
+		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getProfileImageUrlThumbnail() != null) {
 			LOG.debug("Settings profile image from company settings");
-			String imageUrl = userSettings.getCompanySettings().getProfileImageUrl();
+			String imageUrl = userSettings.getCompanySettings().getProfileImageUrlThumbnail();
 			session.setAttribute(CommonConstants.IMAGE_DISPLAY_IN_SESSION, imageUrl);
 		}
 		else {

@@ -531,7 +531,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companySettings.setIden( company.getCompanyId() );
         if ( organizationalDetails.get( CommonConstants.LOGO_NAME ) != null ) {
             companySettings.setLogo( organizationalDetails.get( CommonConstants.LOGO_NAME ) );
-
+            companySettings.setLogoThumbnail( organizationalDetails.get( CommonConstants.LOGO_NAME ) );
+            companySettings.setLogoImageProcessed( false );
             try {
                 settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
                 settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
