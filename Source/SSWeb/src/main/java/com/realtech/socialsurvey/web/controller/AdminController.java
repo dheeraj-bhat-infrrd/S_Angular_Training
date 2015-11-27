@@ -651,7 +651,7 @@ public class AdminController
                     socialManagementService.postToSocialMedia( surveyDetails.getAgentName(), user.getProfileUrl(),
                         surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName(), surveyDetails.getAgentId(),
                         surveyDetails.getScore(), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), false,
-                        serverBaseUrl );
+                        serverBaseUrl , false );
                 }
             }
 
