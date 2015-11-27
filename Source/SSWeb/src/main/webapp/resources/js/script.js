@@ -284,17 +284,14 @@ function validateFirstName(elementId){
  * Function to validate the last name
  */
 function validateLastName(elementId){
-	if ($('#'+elementId).val() != "") {
-		if (lastNameRegEx.test($('#'+elementId).val()) == true) {
+	
+		if ($('#'+elementId).val() == ""||lastNameRegEx.test($('#'+elementId).val()) == true) {
 			return true;
 		} else {
 			showErrorMobileAndWeb('Please enter a valid last name');
 			return false;
 		}
-	} else {
-		showErrorMobileAndWeb('Please enter a valid last name');
-		return false;
-	}
+	
 }
 
 /**
