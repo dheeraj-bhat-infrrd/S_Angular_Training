@@ -38,7 +38,7 @@
 			<c:forEach var="individual" items="${individuals}">
 				<div class="bd-hr-item-l1 comp-individual" data-agentid="${individual.iden}">
 					<div class="bd-hr-item bd-lt-l3 clearfix">
-						<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image" data-imageurl="${individual.profileImageUrl}"></div>
+						<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image" data-imageurl="${individual.profileImageUrlThumbnail}"></div>
 						<div class="bd-hr-txt">${individual.contact_details.name}</div>
 					</div>
 				</div>
