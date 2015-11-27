@@ -196,7 +196,7 @@ $(document).ready(function() {
 	
 	var scrollContainer = document.getElementById('dsh-inc-srvey');
 	scrollContainer.onscroll = function() {
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) - scrollContainer.clientHeight)) {
 			if(!doStopIncompleteSurveyPostAjaxRequest || $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
 					fetchIncompleteSurvey(false);
 					$('#dsh-inc-srvey').perfectScrollbar('update');

@@ -733,7 +733,7 @@ function fetchReviewsOnDashboard(isNextBatch) {
 }
 
 function dashbaordReviewScroll() {
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() * 0.75) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#review-details'));
 			setTimeout(displayReviewOnDashboard, 500);
@@ -6527,7 +6527,6 @@ function callBackEditAddressDetails(data) {
 
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	disableBodyScroll();
-	//$('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
 }
 
@@ -7548,7 +7547,7 @@ var isReviewsLoadingEditProfile = false;
 
 function fetchReviewsEditProfileScroll() {
 
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75)
 			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#prof-review-item'));
@@ -7724,8 +7723,8 @@ function attachPostsScrollEvent() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) {
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
+				- scrollContainer.clientHeight)) {
 				if (!doStopPostPaginationEditProfile || publicPostsBatch.length > 0) {
 					fetchPublicPostEditProfile(false);
 				}
@@ -10126,8 +10125,8 @@ function attachEventsOnSocialMonitor() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) && !isSocialMonitorPostLoaderRunning) {
+		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
+				- scrollContainer.clientHeight)) && !isSocialMonitorPostLoaderRunning) {
 				
 				if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
 					fetchSearchedPostsSolr(false);
