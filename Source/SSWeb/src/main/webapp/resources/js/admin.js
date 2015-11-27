@@ -159,6 +159,7 @@ function bindAdminBranchListClicks(){
 	});
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
+		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
