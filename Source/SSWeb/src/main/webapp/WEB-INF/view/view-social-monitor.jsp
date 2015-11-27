@@ -20,17 +20,17 @@
 				<div class="float-left hm-header-row-left text-center">
 					<spring:message code="label.socialmonitor.key" />
 				</div>
-				<div class="float-right sm-header-row-left text-center">
+				<div class="float-right sm-header-row-left text-center" style="margin-right:5%">
 					<spring:message code="label.lastbuild.key" /> : <span id="last-build-date"></span>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="container v-sm-container">
-		<div class="v-um-header">
-			<div id="search-panel" class="float-left">
-				<div id="hierarchy-selection-panel" class="float-left clearfix">
- 					<select id="select-hierarchy-level" class="float-left dash-sel-item">
+		<div >
+			<div id="search-panel" class="float-left clearfix" style="width:100%">
+				<div id="hierarchy-selection-panel" class="float-left clearfix hierarchy-selection-panel v-um-header">
+ 					<select id="select-hierarchy-level" class="float-left dash-sel-item-sm">
 						<option value="companyId" data-entity="company"><spring:message code="label.company.key" /></option>
 						<c:if test='${ accounttype != "INDIVIDUAL" }'>
 							<option value="userId" data-entity="user"><spring:message code="label.user.key" /></option>
@@ -39,16 +39,16 @@
 						</c:if>
 					</select>
 				</div>
-				<div id="entity-selection-panel" class="float-left clearfix">
-					<input id="select-entity-id" class="float-left dash-sel-item v-ed-txt-dd" placeholder="<spring:message code="label.starttyping.key" />">
+				<div id="entity-selection-panel" class="float-left clearfix hierarchy-selection-panel v-um-header select-hierarchy-level">
+					<input id="select-entity-id" class="float-left dash-sel-item-sm v-ed-txt-dd" placeholder="<spring:message code="label.starttyping.key" />">
 					<input type="hidden" name="entity-id" id="selected-entity-id-hidden"/>
 				</div>
-				<div class="v-um-hdr-right v-um-hdr-search float-left clearfix search-panel-item">
+				<div class="v-um-hdr-right v-um-hdr-search-sm float-left clearfix search-panel-item v-um-header">
 					<input id="post-search-query" name="post-search-query" class="v-um-inp" placeholder="<spring:message code="label.searchpost.key" />">
 					<span id="sm-search-icn" class="um-search-icn" onclick="postsSearch();"></span>
 				</div>
-			</div>
-			<div class="sm-btn-dl-sd-admin clear-none resp-float">
+			
+			<div class="sm-btn-dl-sd-admin  search-panel-item v-um-header">
 				<div id="dsh-dwnld-report-btn" class="sm-down-rep-button float-left cursor-pointer">
 					<spring:message code="label.downloadsocialmonitordata.click" />
 				</div>
@@ -59,9 +59,10 @@
 				<span>-</span>
 				<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
 			</div>
+			</div>
 		</div>
 		<div class="v-sm-tbl-wrapper" id="social-post-list">
-			<div id="ppl-post-cont" class="rt-content-main bord-bot-dc clearfix">
+			<div id="ppl-post-cont" class="rt-content-main  clearfix">
 				<div class="float-left panel-tweet-wrapper">
 					<div id="prof-posts" class="tweet-panel tweet-panel-left sm-tweet-panel">
 						<!--  latest posts get populated here -->
@@ -94,10 +95,7 @@
 				$("#last-build-date").html("Last build date unavailable");
 			}
 			
-		});
-		$("#select-hierarchy-level").on('change', function(){
-			autocompleteData = [];
-			getRelevantEntities();
+			attachEventsOnSocialMonitor();
 		});
 	</script>
 </body>
