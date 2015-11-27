@@ -37,6 +37,11 @@ public class UserMongoTransformer
         } else {
             row.put( "isProfileImageSet", false );
         }
+        //profileImageUrlThumbnail
+        if ( row.get( "profileImageUrlThumbnail" ) != null ) {
+            String profileImageUrlThumbnail = (String) row.get( "profileImageUrlThumbnail" );
+            row.put( "profileImageUrlThumbnail", profileImageUrlThumbnail );
+        }
         //contact details
         BasicDBObject contactDetailsObject = (BasicDBObject) row.get( "contact_details" );
         System.out.println( "CONTACT DETAILS : " + contactDetailsObject );
