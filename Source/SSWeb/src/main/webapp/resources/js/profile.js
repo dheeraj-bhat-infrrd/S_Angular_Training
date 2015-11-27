@@ -924,7 +924,7 @@ function confirmReportAbuse(payload) {
 }
 
 $(document).scroll(function(){
-	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height()) ){
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75) ){
 		//check if small screen
 		if(getWindowWidth() < 768) {
 			//check if reviews are visible. If not, do not proceed
@@ -1331,8 +1331,8 @@ var isLoaderRunningPublicPosts = false;
 
 $('#prof-posts').on('scroll',function(){
 	var scrollContainer = this;
-	if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-				- scrollContainer.clientHeight && !isLoaderRunningPublicPosts) {
+	if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
+				- scrollContainer.clientHeight)) && !isLoaderRunningPublicPosts) {
 		if(publicPostsNextBatch.length > 0) {
 			showLoaderOnPagination($('#prof-posts'));
 			isLoaderRunningPublicPosts = true;
