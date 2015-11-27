@@ -6500,9 +6500,13 @@ function showEditAddressPopup() {
 }
 
 function callBackEditAddressDetails(data) {
+	
 	var header = "Edit Address Detail";
 	createEditAddressPopup(header, data);
 
+	//update events
+	updateEventsEditAddress();
+	
 	$('#overlay-continue').click(function() {
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
@@ -6514,13 +6518,6 @@ function callBackEditAddressDetails(data) {
 		}
 
 		delay(function() {
-			/*var payload = {
-				"profName" : profName,
-				"address1" : profAddress1,
-				"address2" : profAddress2,
-				"country" : country,
-				"zipCode" : zipCode
-			};*/
 			payload = $('#prof-edit-address-form').serialize();
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload,true);
 		}, 0);
@@ -6532,6 +6529,21 @@ function callBackEditAddressDetails(data) {
 	disableBodyScroll();
 	//$('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
+}
+
+//Function to update events on edit profile page
+function updateEventsEditAddress() {
+	var countryCode = $('#prof-country-code').val();
+	if (countryCode == "US") {
+		showStateCityRow('prof-address-state-city-row', 'prof-state');
+	} else {
+		hideStateCityRow('prof-address-state-city-row', 'prof-state');
+	}
+
+	attachAutocompleteCountry('prof-country', 'prof-country-code',
+			'prof-address-state-city-row', 'prof-state');
+	attachChangeEventStateDropDown("prof-state", "prof-city");
+	attachFocusEventCity("prof-state", "prof-city");
 }
 
 function callBackUpdateAddressDetails(data) {
@@ -6635,7 +6647,9 @@ function callBackShowProfileLogo(data) {
 	if (logoImageUrl == undefined || logoImageUrl == "none") {
 		return;
 	}
-	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
+	
+	//update logo if it is company admin or it does not have logo
+	if ($('#header-user-info').find('.user-info-logo').length <= 0 || colName == "companyId") {
 		var userInfoDivider = $('<div>').attr({
 			"class" : "float-left user-info-seperator"
 		});
@@ -6645,8 +6659,9 @@ function callBackShowProfileLogo(data) {
 			"background" : logoImageUrl + " no-repeat center",
 			"background-size" : "contain"
 		});
+		$('#header-user-info').find('.user-info-logo').remove();
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	}
+	} 
 	adjustImage();
 	hideOverlay();
 }
