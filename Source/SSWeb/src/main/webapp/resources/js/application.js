@@ -2748,6 +2748,7 @@ function bindBranchListClicks(){
 	});
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
+		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
@@ -3007,7 +3008,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 	var success = "Selected Office could be deleted";
 	var successMsg = $("#overlay-text").find('.success-message').text().trim();
 	if (success == successMsg) {
-		createPopupConfirm("Remove Branch");
+		createPopupConfirm("Remove Office");
 		
 		$('#overlay-continue').click(function(){
 			if ($('#overlay-continue').attr("disabled") != "disabled") {
@@ -3020,7 +3021,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 			}
 		});
 	} else {
-		createPopupInfo("Remove Branch");
+		createPopupInfo("Remove Office");
 		branchId = null;
 	}
 }

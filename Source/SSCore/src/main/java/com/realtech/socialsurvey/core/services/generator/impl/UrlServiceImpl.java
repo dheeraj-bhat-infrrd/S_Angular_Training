@@ -130,7 +130,7 @@ public class UrlServiceImpl implements UrlService
     }
 
 
-    private String getUrlType( String url )
+    String getUrlType( String url )
     {
         if ( url.contains( CommonConstants.MANUAL_REGISTRATION ) )
             return CommonConstants.MANUAL_REGISTRATION_URL_TYPE;
@@ -155,7 +155,7 @@ public class UrlServiceImpl implements UrlService
     }
 
 
-    private Map<String, String> getQueryParamsFromUrl( String url )
+    Map<String, String> getQueryParamsFromUrl( String url )
     {
         String urlParts[] = url.split( "\\?q=" );
         Map<String, String> queryParams = new HashMap<String, String>();
