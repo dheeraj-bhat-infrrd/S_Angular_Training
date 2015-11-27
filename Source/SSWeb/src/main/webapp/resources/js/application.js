@@ -7786,6 +7786,7 @@ function fetchPublicPostEditProfile(isNextBatch) {
 				if(posts.length <= 0 && proPostStartIndex == 0) {
 					doStopPostPaginationEditProfile = true;
 					hideLoaderOnPagination($('#prof-posts'));
+					return;
 				}
 				if(posts.length < proPostBatchSize) {
 					doStopPostPaginationEditProfile = true;
