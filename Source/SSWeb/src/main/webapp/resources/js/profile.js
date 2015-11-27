@@ -1383,6 +1383,10 @@ function fetchPublicPosts(isNextBatch) {
 		var posts = $.parseJSON(data);
 		posts = $.parseJSON(posts.entity);
 		
+		if(publicPostStartIndex == 0 && posts.length <= 0) {
+			hideLoaderOnPagination($('#prof-posts'));
+		}
+		
 		//Check if request is for next batch
 		if(isNextBatch) {
 			publicPostsNextBatch = publicPostsNextBatch.concat(posts);
