@@ -52,7 +52,7 @@
 		<div class="container reg_panel_container">
 			<div class="reg_header"><spring:message code="label.companysettings.header.key"/></div>
 			
-			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data">
+			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data"  >
 				<div class="reg_form_wrapper_2">
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl"><spring:message code="label.company.key"/></div>
@@ -224,6 +224,8 @@ $(document).ready(function() {
 	currentPhoneRegEx = phoneFormat; 
 	
 	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+	
+	$('#com-contactno').attr('autocomplete','false');
 	
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
 		var countryCode = $('#country-code').val();
