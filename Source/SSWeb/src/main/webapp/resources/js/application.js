@@ -639,7 +639,7 @@ function displayIncompleteSurveysOnDashboard() {
 	hideLoaderOnPagination($('#dsh-inc-srvey'));
 	$('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').each(function(index, currentElement) {
 		if(index >= batchSizeInc) {
-			return;
+			return false;
 		}
 		$(this).removeClass("hide");
 	});
@@ -752,13 +752,13 @@ function displayReviewOnDashboard() {
 		$(this).removeClass("hide");
 		if(index >= batchSizeCmp - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
-			return;
+			return false;
 		}
 	});
 	
 	//check for last element
 	if(startIndexCmp >= totalReviews && $('div.dsh-review-cont.hide').length <= 0) {
-		
+		$('.dsh-review-cont:last-of-type').addClass("ppl-review-item-last").removeClass("ppl-review-item");
 	}
 	
 	//Get the next batch
@@ -6501,9 +6501,13 @@ function showEditAddressPopup() {
 }
 
 function callBackEditAddressDetails(data) {
+	
 	var header = "Edit Address Detail";
 	createEditAddressPopup(header, data);
 
+	//update events
+	updateEventsEditAddress();
+	
 	$('#overlay-continue').click(function() {
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
@@ -6515,13 +6519,6 @@ function callBackEditAddressDetails(data) {
 		}
 
 		delay(function() {
-			/*var payload = {
-				"profName" : profName,
-				"address1" : profAddress1,
-				"address2" : profAddress2,
-				"country" : country,
-				"zipCode" : zipCode
-			};*/
 			payload = $('#prof-edit-address-form').serialize();
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload,true);
 		}, 0);
@@ -6533,6 +6530,21 @@ function callBackEditAddressDetails(data) {
 	disableBodyScroll();
 	//$('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
+}
+
+//Function to update events on edit profile page
+function updateEventsEditAddress() {
+	var countryCode = $('#prof-country-code').val();
+	if (countryCode == "US") {
+		showStateCityRow('prof-address-state-city-row', 'prof-state');
+	} else {
+		hideStateCityRow('prof-address-state-city-row', 'prof-state');
+	}
+
+	attachAutocompleteCountry('prof-country', 'prof-country-code',
+			'prof-address-state-city-row', 'prof-state');
+	attachChangeEventStateDropDown("prof-state", "prof-city");
+	attachFocusEventCity("prof-state", "prof-city");
 }
 
 function callBackUpdateAddressDetails(data) {
@@ -6636,7 +6648,9 @@ function callBackShowProfileLogo(data) {
 	if (logoImageUrl == undefined || logoImageUrl == "none") {
 		return;
 	}
-	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
+	
+	//update logo if it is company admin or it does not have logo
+	if ($('#header-user-info').find('.user-info-logo').length <= 0 || colName == "companyId") {
 		var userInfoDivider = $('<div>').attr({
 			"class" : "float-left user-info-seperator"
 		});
@@ -6646,8 +6660,9 @@ function callBackShowProfileLogo(data) {
 			"background" : logoImageUrl + " no-repeat center",
 			"background-size" : "contain"
 		});
+		$('#header-user-info').find('.user-info-logo').remove();
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	}
+	} 
 	adjustImage();
 	hideOverlay();
 }
@@ -7613,7 +7628,7 @@ function displayReviewOnEditProfile() {
 		$(this).removeClass("hide");
 		if(index >= batchSizeCmp - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
-			return;
+			return false;
 		}
 	});
 	
@@ -7782,13 +7797,19 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		if (data.errCode == undefined) {
 			if(data != "") {
 				
-				//update start index
-				proPostStartIndex += proPostBatchSize;	
 				
 				var posts = JSON.parse(data);
+				if(posts.length <= 0 && proPostStartIndex == 0) {
+					doStopPostPaginationEditProfile = true;
+					hideLoaderOnPagination($('#prof-posts'));
+					return;
+				}
 				if(posts.length < proPostBatchSize) {
 					doStopPostPaginationEditProfile = true;
 				}
+				
+				//update start index
+				proPostStartIndex += proPostBatchSize;	
 				
 				//update the batch
 				publicPostsBatch = publicPostsBatch.concat(posts);
@@ -8314,6 +8335,7 @@ function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 			$('.sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
 			
 			//Update the incomplete survey on dashboard
+			startIndexInc = 0;
 			doStopIncompleteSurveyPostAjaxRequest = false;
 			fetchIncompleteSurvey(false);
 			$('#dsh-inc-srvey').perfectScrollbar('update');
