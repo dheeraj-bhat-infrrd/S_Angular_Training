@@ -794,6 +794,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<ProListUser> getMultipleUsersByUserId( List<Long> userIds ) throws InvalidInputException
     {
+        if(userIds == null){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter user id list is null");
+        }
         LOG.info( "Method to find multiple users on the basis of list of user id started for user ids " + userIds );
         List<ProListUser> users = new ArrayList<ProListUser>();
         List<AgentSettings> agentSettingsList = new ArrayList<AgentSettings>();
