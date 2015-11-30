@@ -100,6 +100,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public User getUserWithLoginName(String userName) throws NoRecordsFetchedException {
 		LOG.info("Fetching user object with userId : " + userName);
 		User user = userDao.getActiveUser(userName);
+		if(user == null){
+		    throw new NoRecordsFetchedException("No user found with userName : " + userName);
+		}
 		userManagementService.setProfilesOfUser(user);
 		LOG.info("User found with the login name " + userName);
 		return user;

@@ -844,8 +844,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public List<Branch> getBranchesAssignedToUser( User user ) throws NoRecordsFetchedException
+    public List<Branch> getBranchesAssignedToUser( User user ) throws NoRecordsFetchedException, InvalidInputException
     {
+        if(user == null){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter user is null");
+        }
         LOG.info( "Method to find branches assigned to the user started for " + user.getFirstName() );
         List<Long> branchIds = userProfileDao.getBranchIdsForUser( user );
         if ( branchIds == null || branchIds.isEmpty() ) {
@@ -865,7 +868,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<User> getUsersForCompany( User user ) throws InvalidInputException, NoRecordsFetchedException
     {
-        if ( user == null ) {
+        if ( user == null || user.getCompany() == null ) {
             LOG.error( "User cannote be null." );
             throw new InvalidInputException( "Null value found  user found for userId specified in getUsersForCompany()" );
         }
