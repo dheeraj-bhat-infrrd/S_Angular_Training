@@ -245,15 +245,6 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
 	};
-	/* $("#com-country").keydown(function(e){
- 	   if( e.keyCode != $.ui.keyCode.TAB) return; 
- 	    
-   	   e.keyCode = $.ui.keyCode.DOWN;
-   	   $(this).trigger(e);
-
-   	   e.keyCode = $.ui.keyCode.ENTER;
-   	   $(this).trigger(e);
-   	}); */
 });
 
 // Profile image upload
