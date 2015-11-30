@@ -128,7 +128,7 @@ public class SettingsLockerImpl implements SettingsLocker {
 		return organizationUnit;
 	}
 
-	private long getModifiedSetSettingsValue(OrganizationUnit organizationUnit, long currentLockValue, SettingsForApplication settings,
+	long getModifiedSetSettingsValue(OrganizationUnit organizationUnit, long currentLockValue, SettingsForApplication settings,
 			boolean hasBeenLocked) throws InvalidSettingsStateException {
 		LOG.debug("Finding the modified settings lock value");
 		long valueToBeReturned = currentLockValue;
