@@ -7762,7 +7762,7 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		}
 		
 		if(isLoaderRunningEditProfile) {
-			return; //Return if loader is running
+			hideLoaderOnPagination($('#prof-posts'));
 		}
 		showLoaderOnPagination($('#prof-posts'));
 		isLoaderRunningEditProfile = true;
