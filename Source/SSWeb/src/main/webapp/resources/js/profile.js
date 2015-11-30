@@ -542,7 +542,7 @@ function paintIndividualForBranch(data) {
 					individualsHtml += '<div class="bd-hr-item-l3 comp-individual" data-agentid=' + individual.iden + '>';
 					individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
 					if (individual.profileImageUrl != undefined && individual.profileImageUrl.trim() != "") {
-						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrl+'"/></div>';
+						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrlThumbnail+'"/></div>';
 					} else {
 						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
@@ -641,7 +641,7 @@ function paintIndividualsForRegion(data) {
 						individualsHtml += '<div class="bd-hr-item-l2 comp-region-individual" data-agentid=' + individual.iden + '>';
 						individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
 						if (individual.profileImageUrl != undefined && individual.profileImageUrl.trim() != "") {
-							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrl+'"/></div>';
+							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrlThumbnail+'"/></div>';
 						} else {
 							individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 						}
@@ -679,7 +679,7 @@ function paintCompanyIndividuals(data) {
 					compIndividualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
 					
 					if (compIndividual.profileImageUrl != undefined && compIndividual.profileImageUrl.trim() != "") {
-						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+compIndividual.profileImageUrl+'"/></div>';
+						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+compIndividual.profileImageUrlThumbnail+'"/></div>';
 					} else {
 						compIndividualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
@@ -924,7 +924,7 @@ function confirmReportAbuse(payload) {
 }
 
 $(document).scroll(function(){
-	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height()) ){
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75) ){
 		//check if small screen
 		if(getWindowWidth() < 768) {
 			//check if reviews are visible. If not, do not proceed
@@ -1331,8 +1331,8 @@ var isLoaderRunningPublicPosts = false;
 
 $('#prof-posts').on('scroll',function(){
 	var scrollContainer = this;
-	if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-				- scrollContainer.clientHeight && !isLoaderRunningPublicPosts) {
+	if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
+				- scrollContainer.clientHeight)) && !isLoaderRunningPublicPosts) {
 		if(publicPostsNextBatch.length > 0) {
 			showLoaderOnPagination($('#prof-posts'));
 			isLoaderRunningPublicPosts = true;
