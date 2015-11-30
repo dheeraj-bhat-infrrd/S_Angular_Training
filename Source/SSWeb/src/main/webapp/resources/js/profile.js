@@ -1336,19 +1336,20 @@ $('#prof-posts').on('scroll',function(){
 		if(publicPostsNextBatch.length > 0) {
 			showLoaderOnPagination($('#prof-posts'));
 			isLoaderRunningPublicPosts = true;
+			var postsToShow = publicPostsNextBatch.slice(0, publicPostNumRows);
 			setTimeout(function() {
 				isLoaderRunningPublicPosts = false;
-				paintPublicPosts(publicPostsNextBatch.slice(0, publicPostNumRows));
+				paintPublicPosts(postsToShow);
 			}, 500);
 			if(publicPostsNextBatch.length > publicPostNumRows) {
 				publicPostsNextBatch = publicPostsNextBatch.slice(publicPostNumRows);
 			} else {
 				publicPostsNextBatch = [];
 			}
-			if(publicPostsNextBatch.length <= publicPostNumRows) {
+			if(publicPostsNextBatch.length <= publicPostNumRows && !doStopPublicPostPagination) {
 				fetchPublicPosts(true);
 			}
-		} else {
+		} else if(!doStopPublicPostPagination) {
 			fetchPublicPosts(false);
 		}
 	}
@@ -1406,6 +1407,7 @@ function fetchPublicPosts(isNextBatch) {
 		publicPostStartIndex += posts.length;
 		if (publicPostStartIndex < publicPostNumRows || posts.length < publicPostNumRows){
 			doStopPublicPostPagination = true;
+			return;
 		}
 		
 		if(publicPostsNextBatch.length <= publicPostNumRows) {
