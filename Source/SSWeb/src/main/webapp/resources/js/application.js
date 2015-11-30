@@ -2244,9 +2244,6 @@ function validateRegionForm() {
  */
 function resetInputFields(elementId) {
 	document.getElementById(elementId).reset();
-	$('#region-country').val(defaultCountry);
-	$('#region-country-code').val(defaultCountryCode);
-	//$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
 /**
@@ -2268,10 +2265,10 @@ function addRegion(formId,disableEle) {
 function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	//$('#region-state-city-row').hide();
+	showStateCityRow("region-state-city-row", "region-state-txt", "region-city-txt");
+	resetInputFields("edit-region-form");
 	$('#region-country').val(defaultCountry);
 	$('#region-country-code').val(defaultCountryCode);
-	resetInputFields("edit-region-form");
 	fetchCompleteHierarchy();
 }
 
@@ -2440,7 +2437,7 @@ function addOffice(formId,disableEle) {
 function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	//$('#office-state-city-row').hide();
+	showStateCityRow("office-state-city-row", "office-state-txt", "office-city-txt");
 	resetInputFields("edit-office-form");
 	$('#office-country').val(defaultCountry);
 	$('#office-country-code').val(defaultCountryCode);
@@ -6515,6 +6512,9 @@ function callBackEditAddressDetails(data) {
 		var country = $('#prof-country').val();
 		var zipCode = $('#prof-zipcode').val();
 		if (!profName || !profAddress1 || !country || !zipCode) {
+			//TODO:Add proper validations
+			$('#overlay-toast').html("Please enter valid address details");
+			showToast();
 			return;
 		}
 
