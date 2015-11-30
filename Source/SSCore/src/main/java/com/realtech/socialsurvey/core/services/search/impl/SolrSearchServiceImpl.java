@@ -2418,7 +2418,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
         return "(" + searchArrStr.trim() + ")";
     }
-    
+
 
     /**
      * Method to get all users in solr
@@ -2453,7 +2453,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method getAllUsers finished" );
         return results;
     }
-    
+
+
     /**
      * Method to set isProfileImageSet field for multiple users
      * 
@@ -2462,8 +2463,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
      * @throws SolrException
      */
     @Override
-    public void updateIsProfileImageSetFieldForMultipleUsers( Map<Long, Boolean> isProfileSetMap ) throws InvalidInputException,
-        SolrException
+    public void updateIsProfileImageSetFieldForMultipleUsers( Map<Long, Boolean> isProfileSetMap )
+        throws InvalidInputException, SolrException
     {
         if ( isProfileSetMap == null || isProfileSetMap.isEmpty() ) {
             throw new InvalidInputException( "Invalid parameter passed : passed isProfileSetMap map is null or empty" );
@@ -2494,5 +2495,34 @@ public class SolrSearchServiceImpl implements SolrSearchService
             LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
             throw new SolrException( "Exception while updating user to solr. Reason : " + e.getMessage(), e );
         }
+    }
+
+
+    /**
+     * Method to remove social post from solr
+     * 
+     * JIRA SS-1329
+     * 
+     * @param postMongoId
+     * @throws SolrException
+     * @throws InvalidInputException
+     */
+    @Override
+    public void removeSocialPostFromSolr( String postMongoId ) throws SolrException, InvalidInputException
+    {
+        LOG.info( "Method removeSocialPostFromSolr() to remove social post from solr started.", postMongoId );
+        if ( postMongoId == null || postMongoId.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input pareameter : passed postMongoId is not valid" );
+        }
+
+        try {
+            SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
+            solrServer.deleteById( postMongoId );
+            solrServer.commit();
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Exception while removing social post from solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while removing social post from solr. Reason : " + e.getMessage(), e );
+        }
+        LOG.info( "Method removeUserFromSolr() to remove social post {} from solr finished successfully.", postMongoId );
     }
 }
