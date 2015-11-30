@@ -2204,14 +2204,6 @@ function validateRegionForm() {
 		return isRegionValid;
 	}
 	
-	if(!validateAddress1('region-address1-txt')){
-		isRegionValid = false;
-		if(!isFocussed){
-			$('#region-address1-txt').focus();
-			isFocussed=true;
-		}
-		return isRegionValid;
-	}
 	
 	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
