@@ -267,7 +267,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws CreditCardException
 	 * @throws SubscriptionUnsuccessfulException
 	 */
-	private void addCustomerWithPayment(Company company, String nonce) throws InvalidInputException, PaymentException, CreditCardException,
+	void addCustomerWithPayment(Company company, String nonce) throws InvalidInputException, PaymentException, CreditCardException,
 			SubscriptionUnsuccessfulException {
 
 		if (company == null) {
