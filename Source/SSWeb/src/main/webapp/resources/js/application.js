@@ -639,7 +639,7 @@ function displayIncompleteSurveysOnDashboard() {
 	hideLoaderOnPagination($('#dsh-inc-srvey'));
 	$('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').each(function(index, currentElement) {
 		if(index >= batchSizeInc) {
-			return;
+			return false;
 		}
 		$(this).removeClass("hide");
 	});
@@ -733,7 +733,7 @@ function fetchReviewsOnDashboard(isNextBatch) {
 }
 
 function dashbaordReviewScroll() {
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() * 0.75) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#review-details'));
 			setTimeout(displayReviewOnDashboard, 500);
@@ -752,13 +752,13 @@ function displayReviewOnDashboard() {
 		$(this).removeClass("hide");
 		if(index >= batchSizeCmp - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
-			return;
+			return false;
 		}
 	});
 	
 	//check for last element
 	if(startIndexCmp >= totalReviews && $('div.dsh-review-cont.hide').length <= 0) {
-		
+		$('.dsh-review-cont:last-of-type').addClass("ppl-review-item-last").removeClass("ppl-review-item");
 	}
 	
 	//Get the next batch
@@ -2205,9 +2205,9 @@ function validateRegionForm() {
 	}
 	
 	if(!validateAddress1('region-address1-txt')){
-		isOfficeValid = false;
+		isRegionValid = false;
 		if(!isFocussed){
-			$('#office-address-txt').focus();
+			$('#region-address1-txt').focus();
 			isFocussed=true;
 		}
 		return isRegionValid;
@@ -2748,6 +2748,7 @@ function bindBranchListClicks(){
 	});
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
+		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
@@ -3007,7 +3008,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 	var success = "Selected Office could be deleted";
 	var successMsg = $("#overlay-text").find('.success-message').text().trim();
 	if (success == successMsg) {
-		createPopupConfirm("Remove Branch");
+		createPopupConfirm("Remove Office");
 		
 		$('#overlay-continue').click(function(){
 			if ($('#overlay-continue').attr("disabled") != "disabled") {
@@ -3020,7 +3021,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 			}
 		});
 	} else {
-		createPopupInfo("Remove Branch");
+		createPopupInfo("Remove Office");
 		branchId = null;
 	}
 }
@@ -6500,9 +6501,13 @@ function showEditAddressPopup() {
 }
 
 function callBackEditAddressDetails(data) {
+	
 	var header = "Edit Address Detail";
 	createEditAddressPopup(header, data);
 
+	//update events
+	updateEventsEditAddress();
+	
 	$('#overlay-continue').click(function() {
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
@@ -6514,13 +6519,6 @@ function callBackEditAddressDetails(data) {
 		}
 
 		delay(function() {
-			/*var payload = {
-				"profName" : profName,
-				"address1" : profAddress1,
-				"address2" : profAddress2,
-				"country" : country,
-				"zipCode" : zipCode
-			};*/
 			payload = $('#prof-edit-address-form').serialize();
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload,true);
 		}, 0);
@@ -6530,8 +6528,22 @@ function callBackEditAddressDetails(data) {
 
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	disableBodyScroll();
-	//$('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
+}
+
+//Function to update events on edit profile page
+function updateEventsEditAddress() {
+	var countryCode = $('#prof-country-code').val();
+	if (countryCode == "US") {
+		showStateCityRow('prof-address-state-city-row', 'prof-state');
+	} else {
+		hideStateCityRow('prof-address-state-city-row', 'prof-state');
+	}
+
+	attachAutocompleteCountry('prof-country', 'prof-country-code',
+			'prof-address-state-city-row', 'prof-state');
+	attachChangeEventStateDropDown("prof-state", "prof-city");
+	attachFocusEventCity("prof-state", "prof-city");
 }
 
 function callBackUpdateAddressDetails(data) {
@@ -6635,7 +6647,9 @@ function callBackShowProfileLogo(data) {
 	if (logoImageUrl == undefined || logoImageUrl == "none") {
 		return;
 	}
-	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
+	
+	//update logo if it is company admin or it does not have logo
+	if ($('#header-user-info').find('.user-info-logo').length <= 0 || colName == "companyId") {
 		var userInfoDivider = $('<div>').attr({
 			"class" : "float-left user-info-seperator"
 		});
@@ -6645,8 +6659,9 @@ function callBackShowProfileLogo(data) {
 			"background" : logoImageUrl + " no-repeat center",
 			"background-size" : "contain"
 		});
+		$('#header-user-info').find('.user-info-logo').remove();
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	}
+	} 
 	adjustImage();
 	hideOverlay();
 }
@@ -7533,7 +7548,7 @@ var isReviewsLoadingEditProfile = false;
 
 function fetchReviewsEditProfileScroll() {
 
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75)
 			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#prof-review-item'));
@@ -7612,7 +7627,7 @@ function displayReviewOnEditProfile() {
 		$(this).removeClass("hide");
 		if(index >= batchSizeCmp - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
-			return;
+			return false;
 		}
 	});
 	
@@ -7709,8 +7724,8 @@ function attachPostsScrollEvent() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) {
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
+				- scrollContainer.clientHeight)) {
 				if (!doStopPostPaginationEditProfile || publicPostsBatch.length > 0) {
 					fetchPublicPostEditProfile(false);
 				}
@@ -7781,13 +7796,19 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		if (data.errCode == undefined) {
 			if(data != "") {
 				
-				//update start index
-				proPostStartIndex += proPostBatchSize;	
 				
 				var posts = JSON.parse(data);
+				if(posts.length <= 0 && proPostStartIndex == 0) {
+					doStopPostPaginationEditProfile = true;
+					hideLoaderOnPagination($('#prof-posts'));
+					return;
+				}
 				if(posts.length < proPostBatchSize) {
 					doStopPostPaginationEditProfile = true;
 				}
+				
+				//update start index
+				proPostStartIndex += proPostBatchSize;	
 				
 				//update the batch
 				publicPostsBatch = publicPostsBatch.concat(posts);
@@ -8313,6 +8334,7 @@ function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 			$('.sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
 			
 			//Update the incomplete survey on dashboard
+			startIndexInc = 0;
 			doStopIncompleteSurveyPostAjaxRequest = false;
 			fetchIncompleteSurvey(false);
 			$('#dsh-inc-srvey').perfectScrollbar('update');
@@ -10104,8 +10126,8 @@ function attachEventsOnSocialMonitor() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) && !isSocialMonitorPostLoaderRunning) {
+		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
+				- scrollContainer.clientHeight)) && !isSocialMonitorPostLoaderRunning) {
 				
 				if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
 					fetchSearchedPostsSolr(false);

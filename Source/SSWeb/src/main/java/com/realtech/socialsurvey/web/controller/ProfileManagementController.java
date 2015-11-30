@@ -1776,6 +1776,7 @@ public class ProfileManagementController
                 // Modify Agent details in Solr
                 Map<String, Object> updateMap = new HashMap<String, Object>();
                 updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl );
+                updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, profileImageUrl );
                 updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
                 solrSearchService.editUserInSolrWithMultipleValues( agentSettings.getIden(), updateMap );
             } else {
