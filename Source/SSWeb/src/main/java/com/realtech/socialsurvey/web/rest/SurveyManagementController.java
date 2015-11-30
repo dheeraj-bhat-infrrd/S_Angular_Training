@@ -1102,8 +1102,8 @@ public class SurveyManagementController
         try {
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
             if ( agentSettings != null ) {
-                if ( agentSettings.getProfileImageUrl() != null && !agentSettings.getProfileImageUrl().isEmpty() ) {
-                    picLocation = agentSettings.getProfileImageUrl();
+                if ( agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
+                    picLocation = agentSettings.getProfileImageUrlThumbnail();
                 }
             }
         } catch ( InvalidInputException e ) {
