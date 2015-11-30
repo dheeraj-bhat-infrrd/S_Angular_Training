@@ -1392,7 +1392,7 @@ public class UserManagementController
         LOG.info( "Fetching profile image" );
         OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) request.getSession( false ).getAttribute(
             CommonConstants.USER_PROFILE_SETTINGS );
-        return profileSettings.getProfileImageUrl();
+        return profileSettings.getProfileImageUrlThumbnail();
     }
 
 

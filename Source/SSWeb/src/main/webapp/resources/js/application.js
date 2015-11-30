@@ -733,7 +733,7 @@ function fetchReviewsOnDashboard(isNextBatch) {
 }
 
 function dashbaordReviewScroll() {
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() * 0.75) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#review-details'));
 			setTimeout(displayReviewOnDashboard, 500);
@@ -2205,9 +2205,9 @@ function validateRegionForm() {
 	}
 	
 	if(!validateAddress1('region-address1-txt')){
-		isOfficeValid = false;
+		isRegionValid = false;
 		if(!isFocussed){
-			$('#office-address-txt').focus();
+			$('#region-address1-txt').focus();
 			isFocussed=true;
 		}
 		return isRegionValid;
@@ -2748,6 +2748,7 @@ function bindBranchListClicks(){
 	});
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
+		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
@@ -3007,7 +3008,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 	var success = "Selected Office could be deleted";
 	var successMsg = $("#overlay-text").find('.success-message').text().trim();
 	if (success == successMsg) {
-		createPopupConfirm("Remove Branch");
+		createPopupConfirm("Remove Office");
 		
 		$('#overlay-continue').click(function(){
 			if ($('#overlay-continue').attr("disabled") != "disabled") {
@@ -3020,7 +3021,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 			}
 		});
 	} else {
-		createPopupInfo("Remove Branch");
+		createPopupInfo("Remove Office");
 		branchId = null;
 	}
 }
@@ -6527,7 +6528,6 @@ function callBackEditAddressDetails(data) {
 
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	disableBodyScroll();
-	//$('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
 }
 
@@ -7544,7 +7544,7 @@ function fetchReviewsEditProfileScroll() {
 	if(location.hash != "#showprofilepage")  {
 		return;
 	}
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75)
 			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#prof-review-item'));
@@ -7720,8 +7720,8 @@ function attachPostsScrollEvent() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) {
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
+				- scrollContainer.clientHeight)) {
 				if (!doStopPostPaginationEditProfile || publicPostsBatch.length > 0) {
 					fetchPublicPostEditProfile(false);
 				}
@@ -7758,7 +7758,7 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		}
 		
 		if(isLoaderRunningEditProfile) {
-			return; //Return if loader is running
+			hideLoaderOnPagination($('#prof-posts'));
 		}
 		showLoaderOnPagination($('#prof-posts'));
 		isLoaderRunningEditProfile = true;
@@ -10122,8 +10122,8 @@ function attachEventsOnSocialMonitor() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) && !isSocialMonitorPostLoaderRunning) {
+		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
+				- scrollContainer.clientHeight)) && !isSocialMonitorPostLoaderRunning) {
 				
 				if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
 					fetchSearchedPostsSolr(false);
