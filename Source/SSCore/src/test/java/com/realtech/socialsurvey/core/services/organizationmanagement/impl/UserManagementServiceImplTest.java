@@ -58,7 +58,7 @@ public class UserManagementServiceImplTest
 
     @Mock
     private GenericDao<Company, Long> companyDao;
-    
+
     @Mock
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
@@ -395,86 +395,248 @@ public class UserManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testUnassignBranchAdminForNullAdmin() throws InvalidInputException, NoRecordsFetchedException
     {
-       userManagementServiceImpl.unassignBranchAdmin( null, 2l, 2l );
+        userManagementServiceImpl.unassignBranchAdmin( null, 2l, 2l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testUnassignBranchAdminForInvalidBranchId() throws InvalidInputException, NoRecordsFetchedException
     {
-       userManagementServiceImpl.unassignBranchAdmin( new User(), 0l, 2l );
+        userManagementServiceImpl.unassignBranchAdmin( new User(), 0l, 2l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testUnassignBranchAdminForInvalidUserId() throws InvalidInputException, NoRecordsFetchedException
     {
-       userManagementServiceImpl.unassignBranchAdmin( new User(), 1l, 0l );
+        userManagementServiceImpl.unassignBranchAdmin( new User(), 1l, 0l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testUnassignBranchAdminForNoUserFound() throws InvalidInputException, NoRecordsFetchedException
     {
-       Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-       userManagementServiceImpl.unassignBranchAdmin( new User(), 1l, 1l );
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.unassignBranchAdmin( new User(), 1l, 1l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testUnassignRegionAdminForNullAdmin() throws InvalidInputException, NoRecordsFetchedException
     {
-       userManagementServiceImpl.unassignRegionAdmin( null, 2l, 2l );
+        userManagementServiceImpl.unassignRegionAdmin( null, 2l, 2l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testUnassignRegionAdminForInvalidBranchId() throws InvalidInputException, NoRecordsFetchedException
     {
-       userManagementServiceImpl.unassignRegionAdmin( new User(), 0l, 2l );
+        userManagementServiceImpl.unassignRegionAdmin( new User(), 0l, 2l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testUnassignRegionAdminForInvalidUserId() throws InvalidInputException, NoRecordsFetchedException
     {
-       userManagementServiceImpl.unassignRegionAdmin( new User(), 1l, 0l );
+        userManagementServiceImpl.unassignRegionAdmin( new User(), 1l, 0l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testUnassignRegionAdminForNoUserFound() throws InvalidInputException, NoRecordsFetchedException
     {
-       Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-       userManagementServiceImpl.unassignRegionAdmin( new User(), 1l, 1l );
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.unassignRegionAdmin( new User(), 1l, 1l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testGetUserByUserIdForNoUserFound() throws InvalidInputException, NoRecordsFetchedException
     {
-       Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-       userManagementServiceImpl.getUserByUserId( 1l );
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.getUserByUserId( 1l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testGetUserByUserIdForNoUserSettingsFound() throws InvalidInputException, NoRecordsFetchedException
     {
-       Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
-       Mockito.when( organizationUnitSettingsDao.fetchAgentSettingsById( Mockito.anyLong() ) ).thenReturn( null );
-       userManagementServiceImpl.getUserByUserId( 1l );
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
+        Mockito.when( organizationUnitSettingsDao.fetchAgentSettingsById( Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.getUserByUserId( 1l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testGetUserObjByUserIdForNoUserFound() throws InvalidInputException, NoRecordsFetchedException
     {
-       Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-       userManagementServiceImpl.getUserObjByUserId( 0l );
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.getUserObjByUserId( 0l );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testGetUserByProfileIdForNoUserProfileFound() throws InvalidInputException, NoRecordsFetchedException
     {
-       Mockito.when( userProfileDao.findById( Mockito.eq( UserProfile.class ), Mockito.anyLong() ) ).thenReturn( null );
-       userManagementServiceImpl.getUserByProfileId( 0l );
+        Mockito.when( userProfileDao.findById( Mockito.eq( UserProfile.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.getUserByProfileId( 0l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetMultipleUsersByUserId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getMultipleUsersByUserId( null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchesAssignedToUserForNullUser() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getBranchesAssignedToUser( null );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testGetBranchesAssignedToUserForNoBranchFound() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( userProfileDao.getBranchIdsForUser( (User) Mockito.anyObject() ) ).thenReturn( null );
+        userManagementServiceImpl.getBranchesAssignedToUser( new User() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUsersForCompanyForNullUser() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getUsersForCompany( null );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testGetUsersForCompanyForNoUserFound() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( userProfileDao.getBranchIdsForUser( (User) Mockito.anyObject() ) ).thenReturn( null );
+        User user = new User();
+        user.setCompany( new Company() );
+        userManagementServiceImpl.getUsersForCompany( user );
+    }
+    
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignBranchAdminForNullAdmin() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.assignBranchAdmin( null, 2l, 2l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignBranchAdminForInvalidBranchId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.assignBranchAdmin( new User(), 0l, 2l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignBranchAdminForInvalidUserId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.assignBranchAdmin( new User(), 2l, 0l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignBranchAdminForNoUserFound() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.assignBranchAdmin( new User(), 2l, 2l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignUserToBranchForNullAdmin() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.assignUserToBranch( null, 1l, 1l );
     }
     
     
     @Test ( expected = InvalidInputException.class)
-    public void testGetMultipleUsersByUserId() throws InvalidInputException, NoRecordsFetchedException
+    public void testUnassignUserFromBranchNullAdmin() throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
-       userManagementServiceImpl.getMultipleUsersByUserId( null );
+        userManagementServiceImpl.unassignUserFromBranch( null, 1l, 1l );
     }
+     
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUnassignUserFromBranchForNoUserFound() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.assignUserToBranch( new User(), 1l, 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUnassignUserFromBranchForNoUserProfileFound() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
+        Mockito.when( userProfileDao.findByKeyValue(  Mockito.eq( UserProfile.class ), Mockito.anyMap() ) ).thenReturn( null );
+        userManagementServiceImpl.assignUserToBranch( new User(), 1l, 1l );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserForNullAdmin() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateUser( null, 1l, true );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserForNoUserFound() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null);
+        userManagementServiceImpl.updateUser( new User() , 1l, true );
+    }
+    
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserProfileForNullAdmin() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateUserProfile( null, 1l, 1 );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserProfileForNoUserProfileFound() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        Mockito.when( userProfileDao.findById( Mockito.eq( UserProfile.class ), Mockito.anyLong() ) ).thenReturn( null);
+        userManagementServiceImpl.updateUserProfile( new User() , 1l, 1 );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testremoveUserProfileForNoUserProfileFound() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        Mockito.when( userProfileDao.findById( Mockito.eq( UserProfile.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.removeUserProfile( 1l );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateUserInSolrForNullUser() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateUserInSolr( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserProfilesStatusForNullAdmin() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateUserProfilesStatus( null, 1l );
+    }
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserProfilesStatusForNoUserProfileFound() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        Mockito.when( userProfileDao.findById( Mockito.eq( UserProfile.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.updateUserProfilesStatus( new User(), 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdatePrimaryProfileOfUserForNullUser() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updatePrimaryProfileOfUser( null );
+    }
+    
 }
