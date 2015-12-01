@@ -6498,18 +6498,39 @@ function callBackEditAddressDetails(data) {
 	updateEventsEditAddress();
 	
 	$('#overlay-continue').click(function() {
+		var isFocussed = false;
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
+		
 		//var profAddress2 = $('#prof-address2').val();
 		var country = $('#prof-country').val();
 		var zipCode = $('#prof-zipcode').val();
-		if (!profName || !profAddress1 || !country || !zipCode) {
-			//TODO:Add proper validations
-			$('#overlay-toast').html("Please enter valid address details");
-			showToast();
+		if(!validateAddress1('prof-address1',true)){
+			
+			if(!isFocussed){
+				$('#prof-address1').focus();
+				isFocussed=true;
+			}
+			return; 
+		}
+		if(!validateCountryProfile(country)){
+			
+			if(!isFocussed){
+				$('#prof-country').focus();
+				isFocussed=true;
+			}
 			return;
 		}
-
+		if(!validateCountryZipcode('prof-zipcode',true)){
+			
+			if(!isFocussed){
+				$('#prof-zipcode').focus();
+				isFocussed=true;
+			}
+			return; 
+		}
+		
+		
 		delay(function() {
 			payload = $('#prof-edit-address-form').serialize();
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload,true);
