@@ -108,6 +108,7 @@
                 })
                 .on('change.mask', function(){
                     el.data('changed', true);
+                    el.trigger('keyup');
                 })
                 .on('blur.mask', function(){
                     if (oldValue !== el.val() && !el.data('changed')) {
