@@ -497,6 +497,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method to deactivate user " + userIdToRemove + " called." );
         User userToBeDeactivated = userDao.findById( User.class, userIdToRemove );
+        if(userToBeDeactivated == null){
+            throw new InvalidInputException("No user found in databse for user id : " + userIdToRemove);
+        }
+        
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
         userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
@@ -621,10 +625,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public boolean isUserAdditionAllowed( User user ) throws NoRecordsFetchedException
+    public boolean isUserAdditionAllowed( User user ) throws NoRecordsFetchedException, InvalidInputException
     {
         LOG.info( "Method to check whether users can be added or not started." );
         boolean isUserAdditionAllowed = false;
+        
+        if(user == null){
+            throw new InvalidInputException("passed user parameter is null");
+        }
+        if(user.getCompany() == null){
+            throw new InvalidInputException("passed user parameter doesnt have the company");
+        }
 
         List<LicenseDetail> licenseDetails = licenseDetailsDao.findByColumn( LicenseDetail.class, CommonConstants.COMPANY,
             user.getCompany() );
@@ -783,6 +794,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<ProListUser> getMultipleUsersByUserId( List<Long> userIds ) throws InvalidInputException
     {
+        if(userIds == null){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter user id list is null");
+        }
         LOG.info( "Method to find multiple users on the basis of list of user id started for user ids " + userIds );
         List<ProListUser> users = new ArrayList<ProListUser>();
         List<AgentSettings> agentSettingsList = new ArrayList<AgentSettings>();
@@ -830,8 +844,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public List<Branch> getBranchesAssignedToUser( User user ) throws NoRecordsFetchedException
+    public List<Branch> getBranchesAssignedToUser( User user ) throws NoRecordsFetchedException, InvalidInputException
     {
+        if(user == null){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter user is null");
+        }
         LOG.info( "Method to find branches assigned to the user started for " + user.getFirstName() );
         List<Long> branchIds = userProfileDao.getBranchIdsForUser( user );
         if ( branchIds == null || branchIds.isEmpty() ) {
@@ -851,7 +868,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<User> getUsersForCompany( User user ) throws InvalidInputException, NoRecordsFetchedException
     {
-        if ( user == null ) {
+        if ( user == null || user.getCompany() == null ) {
             LOG.error( "User cannote be null." );
             throw new InvalidInputException( "Null value found  user found for userId specified in getUsersForCompany()" );
         }
