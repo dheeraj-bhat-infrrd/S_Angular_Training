@@ -25,13 +25,11 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
@@ -1560,7 +1558,7 @@ public class HierarchyManagementController {
 		LOG.info("Method fetchHierarchyViewBranches called in controller");
 		String strRegionId = request.getParameter("regionId");
 		long regionId = 0l;
-		List<BranchFromSearch> branches = null;
+		List<Branch> branches = null;
 		int start = 0;
 		int rows = -1;
 		try {
@@ -1571,11 +1569,7 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Error while parsing regionId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			int branchCount = (int) solrSearchService.getBranchCountByRegion(regionId);
-			String branchesJson = solrSearchService.searchBranchesByRegion(regionId, start, branchCount);
-			LOG.debug("Fetched branch .branches json is :" + branchesJson);
-			Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
-			branches = new Gson().fromJson(branchesJson, searchedBranchesList);
+            branches = organizationManagementService.getBranchesByRegionId( regionId );
 
 			Set<Long> regionIds = new HashSet<Long>();
 			regionIds.add(regionId);
@@ -1710,8 +1704,8 @@ public class HierarchyManagementController {
 		
 		Set<Long> regionIds = null;
 		Set<Long> branchIds = null;
-		List<RegionFromSearch> regions = null;
-		List<BranchFromSearch> branches = null;
+		List<Region> regions = null;
+		List<Branch> branches = null;
 		List<UserFromSearch> users = null;
 		String jspToReturn = null;
 		int start = 0;
@@ -1728,16 +1722,14 @@ public class HierarchyManagementController {
 				throw new NonFatalException("SolrException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
+			long companyId = admin.getCompany().getCompanyId();
 			int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
 			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				LOG.debug("fetching regions under company from solr");
-				int regionCount = (int) solrSearchService.getRegionsCount("*", admin.getCompany(), null);
-				String regionsJson = solrSearchService.searchRegions("*", admin.getCompany(), null, start, regionCount);
-				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
-				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
+				regions = organizationManagementService.getRegionsForCompany( companyId );
 
 				LOG.debug("fetching branches under company from solr");
-				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(admin.getCompany(), start);
+				branches = organizationManagementService.getBranchesUnderCompany( companyId );
 
 				LOG.debug("fetching users under company from solr");
 				users = organizationManagementService.getUsersUnderCompanyFromSolr(admin.getCompany(), start);
@@ -1748,20 +1740,14 @@ public class HierarchyManagementController {
 			else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of regions for the region admin");
 				regionIds = organizationManagementService.getRegionIdsForUser(admin, highestRole);
-				String regionsJson = solrSearchService.searchRegions("*", admin.getCompany(), regionIds, start, regionIds.size());
-				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
-				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
+				regions = organizationManagementService.getRegionsForRegionIds( regionIds );
 
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of branches for the branch admin");
 				branchIds = organizationManagementService.getBranchIdsForUser(admin, highestRole);
-
-				String branchesJson = solrSearchService.searchBranches("*", admin.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, start,
-						branchIds.size());
-				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
-				branches = new Gson().fromJson(branchesJson, searchedBranchesList);
+				branches = organizationManagementService.getBranchesForBranchIds( branchIds );
 
 				jspToReturn = JspResolver.VIEW_HIERARCHY_BRANCH_LIST;
 			}

@@ -996,7 +996,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     /**
-     * Method to fetch all individuals directly linked to a company
+     * Method to fetch all individuals directly linked to a company based on company profile name
      */
     @Override
     @Transactional
