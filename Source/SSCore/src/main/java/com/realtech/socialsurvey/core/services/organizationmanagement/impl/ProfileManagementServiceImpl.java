@@ -2044,6 +2044,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         long companyId = socialPost.getCompanyId();
         long branchId = socialPost.getBranchId();
         socialPostDao.removePostFromUsersProfile( socialPost );
+        //JIRA SS-1329
+        try {
+            solrSearchService.removeSocialPostFromSolr( postMongoId );
+        } catch ( SolrException e ) {
+            throw new InvalidInputException( "Error removing social post from Solr. Reason : ", e );
+        }
         LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
         if ( companyId > 0 ) {
             surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, companyId );
