@@ -51,7 +51,7 @@ public class HierarchySettingsCorrector extends QuartzJobBean
                         // get region settings
                         OrganizationUnitSettings regionSetting = organizationManagementService.getRegionSettings( region
                             .getRegionId() );
-                        //  processRegion( regionSetting, region );
+                        processRegion( regionSetting, region );
                     }
 
                 } catch ( InvalidInputException e ) {
