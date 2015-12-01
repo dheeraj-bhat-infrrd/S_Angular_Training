@@ -1,8 +1,12 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.After;
@@ -17,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
@@ -24,14 +29,18 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -39,7 +48,6 @@ import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -73,6 +81,12 @@ public class ProfileManagementServiceImplTest
 
     @Mock
     private SocialPostDao socialPostDao;
+
+    @Mock
+    private GenericDao<Company, Long> companyDao;
+
+    @Mock
+    private BranchDao branchDao;
 
 
     @BeforeClass
@@ -1170,4 +1184,267 @@ public class ProfileManagementServiceImplTest
         profileManagementServiceImpl.getCumulativeSocialPosts( 0, null, 0, 0, null, null, null );
     }
 
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateLinkedInProfileDataWithNullLinkedInProfileData() throws InvalidInputException
+    {
+        profileManagementServiceImpl
+            .updateLinkedInProfileData( TestConstants.TEST_STRING, new OrganizationUnitSettings(), null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentExpertiseWithNullExpertise() throws InvalidInputException
+    {
+        profileManagementServiceImpl.updateAgentExpertise( new AgentSettings(), null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentExpertiseWithEmptyExpertise() throws InvalidInputException
+    {
+        profileManagementServiceImpl.updateAgentExpertise( new AgentSettings(), new ArrayList<String>() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentHobbiesWithNullHobbies() throws InvalidInputException
+    {
+        profileManagementServiceImpl.updateAgentHobbies( new AgentSettings(), null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentHobbiesWithEmptyHobbies() throws InvalidInputException
+    {
+        profileManagementServiceImpl.updateAgentHobbies( new AgentSettings(), new ArrayList<String>() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentCompanyPositionsWithNullCompanyPositions() throws InvalidInputException
+    {
+        profileManagementServiceImpl.updateAgentCompanyPositions( new AgentSettings(), null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentCompanyPositionsWithEmptyCompanyPositions() throws InvalidInputException
+    {
+        profileManagementServiceImpl.updateAgentCompanyPositions( new AgentSettings(), new ArrayList<CompanyPositions>() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSetAgentProfileUrlForReviewWhenUnitSettingIsNull() throws InvalidInputException
+    {
+        SurveyDetails surveyDetails = new SurveyDetails();
+        surveyDetails.setAgentId( 2 );
+        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( Mockito.anyLong(), Mockito.anyString() ) )
+            .thenReturn( null );
+        profileManagementServiceImpl.setAgentProfileUrlForReview( Arrays.asList( new SurveyDetails[] { surveyDetails } ) );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentReportWithNullColumnName() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getAgentReport( 0, null, new Date(), new Date(), new Object() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentReportWithEmptyColumnName() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getAgentReport( 0, TestConstants.TEST_EMPTY_STRING, new Date(), new Date(), new Object() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentReportWithInvalidIden() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getAgentReport( -1, TestConstants.TEST_STRING, new Date(), new Date(), new Object() );
+    }
+
+
+    @Test ( expected = ProfileNotFoundException.class)
+    public void testIndividualsBreadCrumbWhenUserProfileIsNull() throws InvalidInputException, NoRecordsFetchedException,
+        ProfileNotFoundException
+    {
+        User user = new User();
+        user.setUserProfiles( Arrays.asList( new UserProfile[] { new UserProfile() } ) );
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( user );
+        profileManagementServiceImpl.getIndividualsBreadCrumb( 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateCompanyNameWhenCompanyIsNull() throws InvalidInputException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
+        profileManagementServiceImpl.updateCompanyName( 1, 1, TestConstants.TEST_STRING );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionNameWhenRegionIsNull() throws InvalidInputException
+    {
+        Mockito.when( regionDao.findById( Mockito.eq( Region.class ), Mockito.anyLong() ) ).thenReturn( null );
+        profileManagementServiceImpl.updateRegionName( 1, 1, TestConstants.TEST_STRING );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateBranchNameWhenBranchIsNull() throws InvalidInputException
+    {
+        Mockito.when( branchDao.findById( Mockito.eq( Branch.class ), Mockito.anyLong() ) ).thenReturn( null );
+        profileManagementServiceImpl.updateBranchName( 1, 1, TestConstants.TEST_STRING );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateIndividualNameWhenUserIsNull() throws InvalidInputException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        profileManagementServiceImpl.updateIndividualName( 1, 1, TestConstants.TEST_STRING );
+
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateIndividualNameWhenNameArrayIsNull() throws InvalidInputException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
+        profileManagementServiceImpl.updateIndividualName( 1, 1, null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateCompanyEmailWhenCompanyIsNull() throws InvalidInputException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
+        profileManagementServiceImpl.updateCompanyEmail( 1, TestConstants.TEST_STRING );
+
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateIndividualEmailWhenUserIsNull() throws InvalidInputException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        profileManagementServiceImpl.updateIndividualEmail( 1, TestConstants.TEST_STRING );
+    }
+
+
+    @Test
+    public void testFindNamesfromProfileNameWithEmptyProfileName()
+    {
+        Map<String, String> nameSeggregationMap = profileManagementServiceImpl
+            .findNamesfromProfileName( TestConstants.TEST_EMPTY_STRING );
+        assertEquals( "First name does not match expected", TestConstants.TEST_EMPTY_STRING,
+            nameSeggregationMap.get( CommonConstants.PATTERN_FIRST ) );
+        assertEquals( "Last name does not match expected", TestConstants.TEST_EMPTY_STRING,
+            nameSeggregationMap.get( CommonConstants.PATTERN_LAST ) );
+    }
+
+
+    @Test
+    public void testFindNamesfromProfileNameWithNoSpaceNoHyphenInProfileName()
+    {
+        Map<String, String> nameSeggregationMap = profileManagementServiceImpl.findNamesfromProfileName( "SocialSurvey" );
+        assertEquals( "First name does not match expected", "SocialSurvey",
+            nameSeggregationMap.get( CommonConstants.PATTERN_FIRST ) );
+        assertEquals( "Last name does not match expected", TestConstants.TEST_EMPTY_STRING,
+            nameSeggregationMap.get( CommonConstants.PATTERN_LAST ) );
+    }
+
+
+    @Test
+    public void testFindNamesfromProfileNameWithSpaceInProfileName()
+    {
+        Map<String, String> nameSeggregationMap = profileManagementServiceImpl.findNamesfromProfileName( "Social Survey" );
+        assertEquals( "First name does not match expected", "Social Survey",
+            nameSeggregationMap.get( CommonConstants.PATTERN_FIRST ) );
+        assertEquals( "Last name does not match expected", TestConstants.TEST_EMPTY_STRING,
+            nameSeggregationMap.get( CommonConstants.PATTERN_LAST ) );
+    }
+
+
+    @Test
+    public void testFindNamesfromProfileNameWithHyphenInProfileName()
+    {
+        Map<String, String> nameSeggregationMap = profileManagementServiceImpl.findNamesfromProfileName( "Social-Survey" );
+        assertEquals( "First name does not match expected", "Social", nameSeggregationMap.get( CommonConstants.PATTERN_FIRST ) );
+        assertEquals( "Last name does not match expected", "Survey", nameSeggregationMap.get( CommonConstants.PATTERN_LAST ) );
+    }
+
+
+    @Test
+    public void testFindNamesfromProfileNameWithSpaceHyphenInProfileName()
+    {
+        Map<String, String> nameSeggregationMap = profileManagementServiceImpl.findNamesfromProfileName( "Social Survey-i" );
+        assertEquals( "First name does not match expected", "Social Survey",
+            nameSeggregationMap.get( CommonConstants.PATTERN_FIRST ) );
+        assertEquals( "Last name does not match expected", "i", nameSeggregationMap.get( CommonConstants.PATTERN_LAST ) );
+    }
+
+
+    @Test
+    public void testFindNamesfromProfileNameWithSpaceHyphenAndDigitAfterHyphenInProfileName()
+    {
+        Map<String, String> nameSeggregationMap = profileManagementServiceImpl.findNamesfromProfileName( "Social Survey-2" );
+        assertEquals( "First name does not match expected", "Social Survey-2",
+            nameSeggregationMap.get( CommonConstants.PATTERN_FIRST ) );
+        assertEquals( "Last name does not match expected", TestConstants.TEST_EMPTY_STRING,
+            nameSeggregationMap.get( CommonConstants.PATTERN_LAST ) );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testAggregateAgentDetailsWithNullProfileSettings() throws InvalidInputException, NoRecordsFetchedException
+    {
+        profileManagementServiceImpl.aggregateAgentDetails( new User(), null, new LockSettings() );
+    }
+
+
+    @Test
+    public void testAggregateAgentDetailsWithProfileSettingsAsAgentSettings() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        ProfilesMaster profilesMaster = new ProfilesMaster();
+        profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+        UserProfile userProfile = new UserProfile();
+        userProfile.setProfilesMaster( profilesMaster );
+        User user = new User();
+        user.setUserProfiles( Arrays.asList( new UserProfile[] {} ) );
+        OrganizationUnitSettings entitiySettings = new OrganizationUnitSettings();
+        entitiySettings.setContact_details( new ContactDetailsSettings() );
+
+        Mockito.when( organizationManagementService.getCompanySettings( (User) Mockito.any() ) ).thenReturn( entitiySettings );
+        OrganizationUnitSettings agentSettings = profileManagementServiceImpl.aggregateAgentDetails( user, new AgentSettings(),
+            new LockSettings() );
+        assertNotNull( "Unit Settings does not match expected", ( (AgentSettings) agentSettings ).getCompanyProfileData() );
+    }
+
+
+    @Test
+    public void testAggregateAgentDetailsWithProfileSettingsAsOrganizationUnitSettings() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        ProfilesMaster profilesMaster = new ProfilesMaster();
+        profilesMaster.setProfileId( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+        UserProfile userProfile = new UserProfile();
+        userProfile.setProfilesMaster( profilesMaster );
+        User user = new User();
+        user.setUserProfiles( Arrays.asList( new UserProfile[] {} ) );
+        OrganizationUnitSettings entitiySettings = new OrganizationUnitSettings();
+        entitiySettings.setContact_details( new ContactDetailsSettings() );
+
+        OrganizationUnitSettings profileSettings = new OrganizationUnitSettings();
+
+        Mockito.when( organizationManagementService.getCompanySettings( (User) Mockito.any() ) ).thenReturn( entitiySettings );
+        OrganizationUnitSettings unitSettings = profileManagementServiceImpl.aggregateAgentDetails( user, profileSettings,
+            new LockSettings() );
+        assertSame( "Unit Settings does not match expected", unitSettings, profileSettings );
+    }
 }
