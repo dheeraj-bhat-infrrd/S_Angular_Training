@@ -680,6 +680,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( logo == null || logo.isEmpty() ) {
             throw new InvalidInputException( "Logo passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
+        }
         LOG.info( "Updating logo" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             logo, companySettings, collection );*/
@@ -698,6 +704,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( image == null || image.isEmpty() ) {
             throw new InvalidInputException( "image passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
         }
         LOG.info( "Updating image" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -718,6 +730,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( vertical == null || vertical.isEmpty() ) {
             throw new InvalidInputException( "vertical passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
         }
         LOG.info( "Updating vertical" );
         if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
@@ -754,7 +772,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( associations == null ) {
             throw new InvalidInputException( "Association name passed can not be null" );
         }
-
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Adding associations" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, unitSettings,
@@ -771,7 +794,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( associations == null ) {
             throw new InvalidInputException( "Association name passed can not be null" );
         }
-
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
+        }
         LOG.info( "Adding associations" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION,
             associations, agentSettings );
@@ -788,6 +816,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( lockSettings == null ) {
             throw new InvalidInputException( "LockSettings passed can not be null" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Updating lock detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_LOCK_SETTINGS, lockSettings, unitSettings, collection );
@@ -803,6 +837,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( contactDetailsSettings == null ) {
             throw new InvalidInputException( "Contact details passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
         LOG.info( "Updating contact detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -821,6 +861,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( contactDetailsSettings == null ) {
             throw new InvalidInputException( "Contact details passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
         }
         LOG.info( "Updating contact detail information" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings(
@@ -841,6 +887,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( achievements == null ) {
             throw new InvalidInputException( "Achievements passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Adding achievements" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS, achievements, unitSettings, collection );
@@ -856,6 +908,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( achievements == null ) {
             throw new InvalidInputException( "Achievements passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
+        }
         LOG.info( "Adding achievements" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS,
             achievements, agentSettings );
@@ -870,7 +928,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException
     {
         if ( authorisedIn == null ) {
-            throw new InvalidInputException( "Contact details passed can not be null" );
+            throw new InvalidInputException( "Authorised In list passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
 
         Licenses licenses = unitSettings.getLicenses();
@@ -892,7 +956,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException
     {
         if ( authorisedIn == null ) {
-            throw new InvalidInputException( "Contact details passed can not be null" );
+            throw new InvalidInputException( "Authorised In list passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
         }
 
         Licenses licenses = agentSettings.getLicenses();
@@ -917,6 +987,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( mediaTokens == null ) {
             throw new InvalidInputException( "Media tokens passed was null" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Updating the social media tokens in profile." );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens, unitSettings, collection );
@@ -931,6 +1007,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( disclaimer == null || disclaimer.isEmpty() ) {
             throw new InvalidInputException( "disclaimer passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
         LOG.info( "Updating disclaimer" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
