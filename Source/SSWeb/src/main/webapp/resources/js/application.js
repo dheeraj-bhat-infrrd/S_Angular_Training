@@ -6659,8 +6659,12 @@ function callBackShowProfileLogo(data) {
 }
 
 $(document).on('change', '#prof-logo', function() {
-	showOverlay();
 
+	if(!logoValidate('#prof-logo')){
+		console.log("inside log");
+		return false;
+	}
+	showOverlay();
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
