@@ -2236,9 +2236,6 @@ function validateRegionForm() {
  */
 function resetInputFields(elementId) {
 	document.getElementById(elementId).reset();
-	$('#region-country').val(defaultCountry);
-	$('#region-country-code').val(defaultCountryCode);
-	//$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
 /**
@@ -2260,10 +2257,10 @@ function addRegion(formId,disableEle) {
 function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	//$('#region-state-city-row').hide();
+	showStateCityRow("region-state-city-row", "region-state-txt", "region-city-txt");
+	resetInputFields("edit-region-form");
 	$('#region-country').val(defaultCountry);
 	$('#region-country-code').val(defaultCountryCode);
-	resetInputFields("edit-region-form");
 	fetchCompleteHierarchy();
 }
 
@@ -2432,7 +2429,7 @@ function addOffice(formId,disableEle) {
 function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	//$('#office-state-city-row').hide();
+	showStateCityRow("office-state-city-row", "office-state-txt", "office-city-txt");
 	resetInputFields("edit-office-form");
 	$('#office-country').val(defaultCountry);
 	$('#office-country-code').val(defaultCountryCode);
@@ -6507,6 +6504,9 @@ function callBackEditAddressDetails(data) {
 		var country = $('#prof-country').val();
 		var zipCode = $('#prof-zipcode').val();
 		if (!profName || !profAddress1 || !country || !zipCode) {
+			//TODO:Add proper validations
+			$('#overlay-toast').html("Please enter valid address details");
+			showToast();
 			return;
 		}
 
@@ -6525,17 +6525,16 @@ function callBackEditAddressDetails(data) {
 
 //Function to update events on edit profile page
 function updateEventsEditAddress() {
-	var countryCode = $('#prof-country-code').val();
-	if (countryCode == "US") {
-		showStateCityRow('prof-address-state-city-row', 'prof-state');
-	} else {
-		hideStateCityRow('prof-address-state-city-row', 'prof-state');
-	}
+    var countryCode = $('#prof-country-code').val();
+    if (countryCode == "US") {
+        showStateCityRow('prof-address-state-city-row', 'prof-state',
+            'prof-city');
+    } else {
+        hideStateCityRow('prof-address-state-city-row', 'prof-state');
+    }
 
-	attachAutocompleteCountry('prof-country', 'prof-country-code',
-			'prof-address-state-city-row', 'prof-state');
-	attachChangeEventStateDropDown("prof-state", "prof-city");
-	attachFocusEventCity("prof-state", "prof-city");
+    attachAutocompleteCountry('prof-country', 'prof-country-code',
+        'prof-state', 'prof-address-state-city-row', 'prof-city');
 }
 
 function callBackUpdateAddressDetails(data) {
@@ -6563,7 +6562,6 @@ function createEditAddressPopup(header, body) {
 	$('#overlay-text').html(body);
 	$('#overlay-continue').html("Ok");
 	$('#overlay-cancel').html("Cancel");
-
 	$('#overlay-main').show();
 }
 function overlayRevert() {
@@ -6578,7 +6576,6 @@ function overlayRevert() {
 
 	$('#overlay-continue').unbind('click');
 
-	//$('body').css('overflow', 'auto');
 	enableBodyScroll();
 	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 }
@@ -6587,8 +6584,6 @@ function overlayRevert() {
 function callBackShowBasicDetails(response) {
 	$('#prof-basic-container').html(response);
 	adjustImage();
-	//fetchAvgRating(attrName, attrVal);
-	//fetchReviewCount(attrName, attrVal, minScore);
 }
 
 $(document).on('blur', '#prof-basic-container input', function() {
@@ -6625,9 +6620,6 @@ $(document).on('blur', '#prof-basic-container input', function() {
 function callBackUpdateBasicDetails(data) {
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
-	//callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
-	//callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
-
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
@@ -7544,6 +7536,10 @@ var isReviewsLoadingEditProfile = false;
 
 function fetchReviewsEditProfileScroll() {
 
+	//check if the current page is edit profile
+	if(location.hash != "#showprofilepage")  {
+		return;
+	}
 	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75)
 			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
 		if($('div.dsh-review-cont.hide').length > 0){
