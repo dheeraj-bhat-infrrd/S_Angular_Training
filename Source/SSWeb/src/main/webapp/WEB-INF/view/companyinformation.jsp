@@ -225,7 +225,6 @@ $(document).ready(function() {
 	
 	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 	
-	 $('#com-contactno').attr('autocomplete','false'); 
 	
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
 		var countryCode = $('#country-code').val();
