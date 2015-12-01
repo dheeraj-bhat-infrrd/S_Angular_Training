@@ -52,7 +52,7 @@
 		<div class="container reg_panel_container">
 			<div class="reg_header"><spring:message code="label.companysettings.header.key"/></div>
 			
-			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data"  >
+			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data" autocomplete="off" >
 				<div class="reg_form_wrapper_2">
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl"><spring:message code="label.company.key"/></div>
@@ -225,7 +225,7 @@ $(document).ready(function() {
 	
 	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 	
-	$('#com-contactno').attr('autocomplete','false');
+	 $('#com-contactno').attr('autocomplete','false'); 
 	
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
 		var countryCode = $('#country-code').val();
@@ -239,7 +239,14 @@ $(document).ready(function() {
 	}
 	
 	$('#company-info-submit').click(function() {
-		submitCompanyInfoForm();
+		if(logo){
+			submitCompanyInfoForm();
+		}
+		else{
+			$('#overlay-toast').html('Logo is uploading please wait');
+			showToast();
+		}
+		
 	});
 	
 	$('#icn-file').click(function(){
@@ -331,7 +338,12 @@ $('input').keypress(function(e){
 });
 
 // Logo upload
+var logo=true;
 $("#com-logo").on("change", function() {
+	logo =false;
+	if(!logoValidate("#com-logo")){
+		return false;
+	}
 	var formData = new FormData();
 	formData.append("logo", $('#com-logo').prop("files")[0]);
 	formData.append("logo_name", $('#com-logo').prop("files")[0].name);
@@ -339,6 +351,7 @@ $("#com-logo").on("change", function() {
 });
 
 function uploadImageSuccessCallback(response) {
+	logo=true;
 	var success = "Logo has been uploaded successfully";
 	if (success != response.trim()) {
 		$('#com-logo').val('');
