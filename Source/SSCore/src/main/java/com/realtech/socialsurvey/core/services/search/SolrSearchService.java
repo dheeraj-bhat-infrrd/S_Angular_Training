@@ -347,5 +347,8 @@ public interface SolrSearchService
 
 
     SolrDocumentList getAllUsers( int startIndex, int batchSize ) throws SolrException;
+
+
+    void removeSocialPostFromSolr( String postMongoId ) throws SolrException, InvalidInputException;
 }
 // JIRA:SS-62 BY RM 02 EOC
