@@ -42,6 +42,14 @@ public class ImageProcessorImpl implements ImageProcessor {
 	@Override
 	public String processImage(String imageFileName, String imageType)
 			throws ImageProcessingException, InvalidInputException {
+        if ( imageFileName == null || imageFileName.isEmpty() ) {
+            LOG.error( "Image File Name is empty" );
+            throw new InvalidInputException( "Image File Name is empty" );
+        }
+        if ( imageType == null || imageType.isEmpty() ) {
+            LOG.error( "Image Type is empty" );
+            throw new InvalidInputException( "Image Type is empty" );
+        }
 		LOG.info("Processing images for " + imageFileName);
 		// get the image
 		BufferedImage sourceImage = getImageFromCloud(imageFileName);

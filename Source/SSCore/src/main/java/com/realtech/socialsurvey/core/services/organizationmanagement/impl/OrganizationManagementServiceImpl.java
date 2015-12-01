@@ -1116,7 +1116,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         SurveySettings surveySettings ) throws InvalidInputException
     {
         if ( unitSettings == null ) {
-            throw new InvalidInputException( "Company settings cannot be null." );
+            throw new InvalidInputException( "Unit settings cannot be null." );
         }
 
         LOG.info( "Updating unitSettings: " + unitSettings + " with surveySettings: " + surveySettings );
