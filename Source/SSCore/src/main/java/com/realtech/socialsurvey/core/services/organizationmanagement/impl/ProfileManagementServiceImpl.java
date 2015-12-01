@@ -2722,7 +2722,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Region region = regionDao.findById( Region.class, regionId );
         if ( region == null ) {
-            throw new InvalidInputException( "No region present for the specified companyId" );
+            throw new InvalidInputException( "No region present for the specified regionId" );
         }
         region.setRegion( regionName );
         region.setModifiedBy( String.valueOf( userId ) );
@@ -2741,7 +2741,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Branch branch = branchDao.findById( Branch.class, branchId );
         if ( branch == null ) {
-            throw new InvalidInputException( "No branch present for the specified companyId" );
+            throw new InvalidInputException( "No branch present for the specified branchId" );
         }
         branch.setBranch( branchName );
         branch.setModifiedBy( String.valueOf( userId ) );
@@ -2760,7 +2760,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         User user = userDao.findById( User.class, individualId );
         if ( user == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No user present for the specified individualId" );
         }
         String nameArray[] = null;
         if ( individualName != null && !individualName.equalsIgnoreCase( "" ) ) {
@@ -2798,7 +2798,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Company company = companyDao.findById( Company.class, companyId );
         if ( company == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No company present for the specified companyId" );
         }
 
         User companyAdmin = null;
@@ -2847,7 +2847,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         User user = userDao.findById( User.class, userId );
         if ( user == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No user present for the specified userId" );
         }
         user.setEmailId( emailId );
         user.setModifiedBy( String.valueOf( userId ) );
