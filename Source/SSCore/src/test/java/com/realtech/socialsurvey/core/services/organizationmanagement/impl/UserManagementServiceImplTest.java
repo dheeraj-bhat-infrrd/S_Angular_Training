@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
@@ -639,4 +640,78 @@ public class UserManagementServiceImplTest
         userManagementServiceImpl.updatePrimaryProfileOfUser( null );
     }
     
+    @Test ( expected = InvalidInputException.class)
+    public void testSendRegistrationCompletionLinkForNullEmailId() throws InvalidInputException, NoRecordsFetchedException, SolrException, UndeliveredEmailException
+    {
+        userManagementServiceImpl.sendRegistrationCompletionLink( null, "test", "test", 2l, "test", "test", false );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendRegistrationCompletionLinkForInvalidEmailId() throws InvalidInputException, NoRecordsFetchedException, SolrException, UndeliveredEmailException
+    {
+        userManagementServiceImpl.sendRegistrationCompletionLink( "", "test", "test", 2l, "test", "test", false );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendRegistrationCompletionLinkForNullProfileName() throws InvalidInputException, NoRecordsFetchedException, SolrException, UndeliveredEmailException
+    {
+        userManagementServiceImpl.sendRegistrationCompletionLink( "test", "test", "test", 2l, null , "test", false );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendRegistrationCompletionLinkForInvalidProfileName() throws InvalidInputException, NoRecordsFetchedException, SolrException, UndeliveredEmailException
+    {
+        userManagementServiceImpl.sendRegistrationCompletionLink( null, "test", "test", 2l, "", "test", false );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAllUserProfilesForUserForNullUser() throws InvalidInputException
+    {
+        userManagementServiceImpl.getAllUserProfilesForUser( null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendVerificationLinkForNullUser() throws InvalidInputException, UndeliveredEmailException
+    {
+        userManagementServiceImpl.sendVerificationLink( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendVerificationLinkForGenerateUrlError() throws InvalidInputException, UndeliveredEmailException
+    {
+        Mockito.when( urlGenerator.generateUrl( Mockito.anyMap() , Mockito.anyString() ) ).thenThrow( new InvalidInputException() );
+        userManagementServiceImpl.sendVerificationLink( new User() );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUserExistsForNullUserName() throws InvalidInputException, UndeliveredEmailException
+    {
+        userManagementServiceImpl.userExists( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUserExistsForEmptyUserName() throws InvalidInputException, UndeliveredEmailException
+    {
+        userManagementServiceImpl.userExists( "" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetCanonicalUserSettingsForNullUser() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getCanonicalUserSettings( null, AccountType.COMPANY );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetCanonicalUserSettingsForNullAccountType() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getCanonicalUserSettings( new User() , null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUserSettingsForInvalidAgentId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getUserSettings(  0l );
+    }
 }
