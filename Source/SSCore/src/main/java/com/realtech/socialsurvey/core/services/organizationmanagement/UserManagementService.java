@@ -236,7 +236,7 @@ public interface UserManagementService
     public List<UserProfile> getAllUserProfilesForUser( User user ) throws InvalidInputException;
 
 
-    public boolean userExists( String userName );
+    public boolean userExists( String userName ) throws InvalidInputException;
 
 
     // JIRA SS-42 by RM-06:EOC
