@@ -19,16 +19,22 @@
 		<c:set value="4" var="sessionprofilemasterid"></c:set>
 	</c:when>
 </c:choose>
+
 <c:if test="${not empty branches}">
 	<c:forEach var="branch" items="${branches}">
-		<tr id="tr-branch-row-${branch.branchId}" data-regionid="${branch.regionId}" data-branchid="${branch.branchId}" clicked="false"
-			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-r${branch.regionId}-b${branch.branchId}">
+		<c:choose>
+			<c:when test="${not empty regionId}">
+				<c:set var="regionIdVal" value="${regionId }"></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="regionIdVal" value="${branch.region.regionId }"></c:set>
+			</c:otherwise>
+		</c:choose>
+		<tr id="tr-branch-row-${branch.branchId}" data-regionid="${regionIdVal}" data-branchid="${branch.branchId}" clicked="false"
+			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-r${regionIdVal}-b${branch.branchId}">
 		    <td class="v-tbl-line"><div class="v-line-brnch"></div></td>
-		    <td class="v-tbl-name">${branch.branchName}</td>
-		    <td class="v-tbl-add">
-		    	<c:if test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;
-		    	<c:if test="${not empty branch.address2}">${branch.address2}</c:if>
-		    </td>
+		    <td class="v-tbl-name">${branch.branch}</td>
+		    <td class="v-tbl-add"></td>
 		    <td class="v-tbl-role"></td>
 		    <td class="v-tbl-btns">
 		        <div class="clearfix v-tbl-icn-wraper">
