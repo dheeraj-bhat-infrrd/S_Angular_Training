@@ -475,8 +475,7 @@
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<ref bean="setcompanyidsinsocialpostsjobdetail" />
 				<ref bean="imageprocessingjobdetail" /> 
-				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
-				<!-- <ref bean="isprofileimgsetjobdetail" /> -->
+				<ref bean="hierarchysettingsjobdetail" />
 			</list>
 		</property>
 
@@ -499,8 +498,7 @@
 				<ref bean="solrreviewcounterupdatercron" />
 				<ref bean="setcompanyidsinsocialpostscron" />
 				<ref bean="imageprocessingcron" />
-				<!-- <ref bean="hierarchysettingscron" /> -->
-				<!-- <ref bean="isprofileimagesetcron" /> -->
+				<ref bean="hierarchysettingscron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
