@@ -489,6 +489,6 @@ public class TopicConsumer implements Runnable {
 
 		LOG.debug("Sending account completion admin mail");
 		emailServices.sendSurveyCompletionMailToAdminsAndAgent(recipientName,
-				recipient, surveyDetail, customerName, customerRating);
+				recipient, surveyDetail, customerName, customerRating , null);
 	}
 }
