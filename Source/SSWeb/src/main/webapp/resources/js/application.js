@@ -4656,6 +4656,14 @@ function authenticate(socialNetwork) {
 	};
 }
 
+function authenticateZillow() {
+	openAuthPageZillow();
+	
+	/*payload = {
+		'socialNetwork' : socialNetwork
+	};*/
+}
+
 // update yelp profile url
 function showYelpInput() {
 	$('#yelp-profile-url-display').addClass('hide');
@@ -8578,6 +8586,23 @@ function createZillowProfileUrlPopup(body){
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
+/*function saveZillowEmailAddress1(){
+	console.info("before zillosaveinfo is called");
+	callAjaxGET("/zillowSaveInfo.do", function(data) {
+		createZillowProfileUrlPopupPath( data);
+	}, true);
+}
+*/
+function createZillowProfileUrlPopupPath(body){
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("ok");
+	$('#overlay-continue').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		saveZillowEmailAddress();
+		overlayRevert();
+	});
+}
 
 
 /*function updateProfileUrl(){
@@ -10147,4 +10172,31 @@ function attachEventsOnSocialMonitor() {
 				}
 		}
 	});
+}
+
+//Zillow connect functions
+function saveZillowEmailAddress() {
+	if(!validateZillowForm()){
+		return false;
+	}
+	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
+		if(data && data == "success") {
+			$('#overlay-toast').text("Zillow update successful");
+			showToast();
+		} else {
+			$('#overlay-toast').text("Some problem occurred while saving zillow");
+			showToast();
+		}
+	}, "zillowForm");
+}
+
+function validateZillowForm() {
+	var zillowProfileName = $('input[name="zillowProfileName"]').val();
+	if (zillowProfileName == undefined || zillowProfileName == "") {
+		$('#overlay-toast').text("Please enter a valid profile name");
+		showToast();
+		return false;
+	} else {
+		return true;
+	}
 }
