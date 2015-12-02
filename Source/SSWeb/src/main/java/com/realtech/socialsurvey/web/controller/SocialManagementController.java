@@ -1810,6 +1810,7 @@ public class SocialManagementController
 
     @SuppressWarnings ( "unchecked")
     @RequestMapping ( value = "/zillowSaveInfo")
+    @ResponseBody
     public String saveZillowDetails( Model model, HttpServletRequest request )
     {
         LOG.info( "Method saveZillowDetails() called from SocialManagementController" );
@@ -2092,10 +2093,10 @@ public class SocialManagementController
 
 
             } catch ( Exception e ) {
-                session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
+                /*session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );*/
                 LOG.error( "Exception while setting zillow profile link. Reason : " + e.getMessage(), e );
-                return JspResolver.SOCIAL_AUTH_MESSAGE;
+                return CommonConstants.ERROR;
             }
 
             //Add action to social connection history
@@ -2120,7 +2121,7 @@ public class SocialManagementController
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
             session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         }
-        return JspResolver.SOCIAL_AUTH_MESSAGE;
+        return CommonConstants.SUCCESS_ATTRIBUTE;
     }
 
 
