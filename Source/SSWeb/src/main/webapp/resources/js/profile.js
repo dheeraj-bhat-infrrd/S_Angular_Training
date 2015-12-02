@@ -614,7 +614,6 @@ function bindClickToFetchIndividualProfile(bindingClass) {
 	$("."+bindingClass).click(function(e){
 		e.stopPropagation();
 		var agentProfileName = $(this).data("profilename");
-		//var url = window.location.origin +"/pages/"+agentProfileName;
 		var url = getLocationOrigin() +"/pages/"+agentProfileName;
 		window.open(url, "_blank");				
 	});
@@ -734,9 +733,6 @@ function paintReviews(result){
 	var reviewsHtml = "";
 	$.each(result, function(i, reviewItem) {
 		var scoreFixVal = 1;
-		/*if (reviewItem.score % 1 == 0) {
-			scoreFixVal = 0;
-		}*/
 		var date = Date.parse(reviewItem.modifiedOn);
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
@@ -811,15 +807,19 @@ function paintReviews(result){
 	
 	hideLoaderOnPagination($('#prof-review-item'));
 	if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
-		$("#prof-review-item").html(reviewsHtml);
-	}else {
-		$("#prof-review-item").append(reviewsHtml);
+		$("#prof-review-item").html('');
 	}
+	
+	$("#prof-review-item").append(reviewsHtml);
 	
 	$("#prof-reviews-header").parent().show();
 	$(".review-ratings").each(function() {
 		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
 	});
+	
+	setTimeout(function() {
+		$(window).trigger('scroll');
+	}, 100);
 }
 
 $(document).on('click','.review-more-button',function(){
@@ -906,8 +906,8 @@ function confirmReportAbuse(payload) {
 	}, payload, true);
 }
 
-//Check for reviews scroll every 30ms
-var reviewsScrollInterval = setInterval(function(){ 
+//window scroll event to listen for reviews scroll
+$(window).scroll(function() {
 	//check if small screen
 	if(getWindowWidth() < 768) {
 		//check if reviews are visible. If not, do not proceed
@@ -919,7 +919,7 @@ var reviewsScrollInterval = setInterval(function(){
 		if(!isLoaderRunningReviews)
 			fetchReviewsScroll(false);
 	}
-}, 100);
+});
 
 /**
  * Function to fetch the reviews on scroll 
@@ -940,11 +940,15 @@ function fetchReviewsScroll(isNextBatch) {
 			setTimeout(function() {
 				paintReviews(reviewsToShow);
 				isLoaderRunningReviews = false;
-			}, 500);
-			
+			}, 500);	
 		} else {
 			if (isFetchReviewAjaxRequestRunning){
-				return; // Return if ajax request is still running or data is being loaded	
+				if(!isNextBatch) {
+					setTimeout(function() {
+						fetchReviewsScroll(true); //keep checking until the reviews arrives
+					}, 200);
+				}
+				return; // Return if ajax request is still running and not next batch of reviews
 			}
 			if(stopFetchReviewPagination) return; //Return if pagination is stopped
 			startIndex = startIndex + numOfRows;
@@ -1309,62 +1313,75 @@ function downloadVCard(agentName){
 }
 
 //Watch the scroll position of social posts
-var socialPostsInterval = setInterval(function() {
-	var scrollContainer = document.getElementById('prof-posts');
-	if(scrollContainer && $(scrollContainer).is(':visible')) {
-		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
-				- scrollContainer.clientHeight)) && !isLoaderRunningPublicPosts) {
-		if(publicPostsNextBatch.length > 0) {
-			showLoaderOnPagination($('#prof-posts'));
-			isLoaderRunningPublicPosts = true;
-			var postsToShow = publicPostsNextBatch.slice(0, publicPostNumRows);
-			setTimeout(function() {
-				isLoaderRunningPublicPosts = false;
-				paintPublicPosts(postsToShow);
-			}, 500);
-			if(publicPostsNextBatch.length > publicPostNumRows) {
-				publicPostsNextBatch = publicPostsNextBatch.slice(publicPostNumRows);
-			} else {
-				publicPostsNextBatch = [];
+$('#prof-posts').scroll(function() {
+    var scrollContainer = this;
+    if (scrollContainer && $(scrollContainer).is(':visible')) {
+        if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) - scrollContainer.clientHeight)) &&
+            !isLoaderRunningPublicPosts) {
+        	if (publicPostsNextBatch.length > 0 || !doStopPublicPostPagination) {
+        		fetchPublicPostsScroll();        		
+        	}
+        }
+    }
+});
+
+function fetchPublicPostsScroll() {
+ 	var isNextBatch = false;
+	if (!isNextBatch && publicPostsNextBatch.length > 0) {
+	    var postsToShow = publicPostsNextBatch.slice(0, publicPostNumRows);
+	    if (publicPostsNextBatch.length > publicPostNumRows) {
+	        publicPostsNextBatch = publicPostsNextBatch.slice(publicPostNumRows);
+	    } else {
+	        publicPostsNextBatch = [];
+	    }
+	    
+	    isLoaderRunningPublicPosts = true;
+	    showLoaderOnPagination($('#prof-posts'));
+	    setTimeout(function() {
+	        isLoaderRunningPublicPosts = false;
+	        paintPublicPosts(postsToShow);
+	    }, 500);
+	} else {
+		if (isPublicPostAjaxRequestRunning){
+			if(!isNextBatch) {
+				setTimeout(function() {
+					fetchPublicPostsScroll(); //keep checking until the posts arrives	
+				}, 200);
 			}
-			if(publicPostsNextBatch.length <= publicPostNumRows && !doStopPublicPostPagination) {
-				fetchPublicPosts(true);
-			}
-		} else if(!doStopPublicPostPagination) {
-			fetchPublicPosts(false);
-		} else {
-			clearInterval(socialPostsInterval);
+			return; // Return if ajax request is still running
 		}
-	}	
+		if(doStopPublicPostPagination) return; //If pagination has stopped return the request
+		
+		if (publicPostsNextBatch.length <= publicPostNumRows) {
+	        fetchPublicPosts(true);
+	    }
 	}
-}, 100);
+}
 
 //Function to paint posts
 function fetchPublicPosts(isNextBatch) {
-	
-	if(isPublicPostAjaxRequestRunning) return; // Return if request is running
-	
-	if(doStopPublicPostPagination) return; //If pagination has stopped return the request
 	
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	
 	var url = getLocationOrigin() + "/rest/profile/";
 	if(profileLevel == 'COMPANY'){
 		//Fectch the reviews for company
-		url += "company/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+		url += "company/";
 	}
 	else if(profileLevel == 'REGION'){
 		//Fetch the reviews for region
-		url += "region/"+companyProfileName+"/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+		url += "region/"+companyProfileName+"/";
 	}
 	else if(profileLevel == 'BRANCH') {
 		//Fetch the reviews for branch
-		url += "branch/"+companyProfileName+"/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+		url += "branch/"+companyProfileName+"/";
 	}
 	else if(profileLevel == 'INDIVIDUAL'){
 		//Fetch the reviews for individual
-		url += currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
 	}
+	
+	url += currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	
 	isPublicPostAjaxRequestRunning = true;
 	
 	if(!isNextBatch) {
@@ -1438,19 +1455,29 @@ function paintPublicPosts(posts) {
 	});
 	
 	hideLoaderOnPagination($('#prof-posts'));
-
 	if (publicPostStartIndex == 0) {
 		if (posts.length > 0) {
 			$('#recent-post-container').show();
 		} else {
 			$('#recent-post-container').remove();
 		}
-		$('#prof-posts').html(divToPopulate);
-		$('#prof-posts').perfectScrollbar();
+		$('#prof-posts').html('');
+	}
+	
+	$('#prof-posts').append(divToPopulate);
+	
+	if (publicPostStartIndex == 0) {
+		$('#prof-posts').perfectScrollbar({
+			suppressScrollX : true
+		});
 	} else {
-		$('#prof-posts').append(divToPopulate);
 		$('#prof-posts').perfectScrollbar('update');
 	}
+	
+	//trigger the scroll to update posts
+	setTimeout(function() {
+		$('#prof-posts').trigger('scroll');
+	}, 100);
 }
 
 $('body').on('click',".branch-link",function(e) {
