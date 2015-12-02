@@ -3689,7 +3689,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
                 entityType = CommonConstants.AGENT_ID_COLUMN;
             }
-            surveyHandler.deleteExcessZillowSurveysByEntity( entityType, profile.getIden() );
+//            No need to delete zillow reviews as per JIRA SS-1276
+//            surveyHandler.deleteExcessZillowSurveysByEntity( entityType, profile.getIden() );
         } else {
             LOG.info( "Zillow is not added for the profile" );
             throw new InvalidInputException( "Zillow is not added for the profile" );
@@ -3772,6 +3773,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 } else {
                                     surveyDetailsDao.updateZillowCallCount();
                                 }
+
                                 if ( responseMap != null ) {
                                     resultMap = (HashMap<String, Object>) responseMap.get( "results" );
                                     if ( resultMap != null ) {
@@ -3779,44 +3781,45 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                         if ( proReviews != null ) {
                                             reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
                                             if ( reviews != null ) {
-                                                for ( HashMap<String, Object> review : reviews ) {
-                                                    String sourceId = (String) review.get( "reviewURL" );
-                                                    SurveyDetails surveyDetails = surveyHandler
-                                                        .getSurveyDetailsBySourceIdAndMongoCollection( sourceId,
-                                                            profile.getIden(), collectionName );
-                                                    if ( surveyDetails == null ) {
-                                                        surveyDetails = new SurveyDetails();
-                                                        if ( collectionName
-                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-                                                            surveyDetails.setCompanyId( profile.getIden() );
-                                                        } else if ( collectionName
-                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-                                                            surveyDetails.setRegionId( profile.getIden() );
-                                                        } else if ( collectionName
-                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-                                                            surveyDetails.setBranchId( profile.getIden() );
-                                                        } else if ( collectionName
-                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                                                            surveyDetails.setAgentId( profile.getIden() );
-                                                        }
-                                                        String createdDate = (String) review.get( "reviewDate" );
-                                                        surveyDetails.setCompleteProfileUrl( (String) review
-                                                            .get( "reviewerLink" ) );
-                                                        surveyDetails.setCustomerFirstName( (String) review.get( "reviewer" ) );
-                                                        surveyDetails.setReview( (String) review.get( "description" ) );
-                                                        surveyDetails.setEditable( false );
-                                                        surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
-                                                        surveyDetails
-                                                            .setScore( Double.valueOf( (String) review.get( "rating" ) ) );
-                                                        surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
-                                                        surveyDetails.setSourceId( sourceId );
-                                                        surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
-                                                        surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
-                                                        surveyDetails.setAgreedToShare( "true" );
-                                                        surveyDetails.setAbusive( false );
-                                                        surveyHandler.insertSurveyDetails( surveyDetails );
-                                                    }
-                                                }
+//                                                No need to insert zillow reviews as per JIRA SS-1276
+//                                                for ( HashMap<String, Object> review : reviews ) {
+//                                                    String sourceId = (String) review.get( "reviewURL" );
+//                                                    SurveyDetails surveyDetails = surveyHandler
+//                                                        .getSurveyDetailsBySourceIdAndMongoCollection( sourceId,
+//                                                            profile.getIden(), collectionName );
+//                                                    if ( surveyDetails == null ) {
+//                                                        surveyDetails = new SurveyDetails();
+//                                                        if ( collectionName
+//                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+//                                                            surveyDetails.setCompanyId( profile.getIden() );
+//                                                        } else if ( collectionName
+//                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+//                                                            surveyDetails.setRegionId( profile.getIden() );
+//                                                        } else if ( collectionName
+//                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+//                                                            surveyDetails.setBranchId( profile.getIden() );
+//                                                        } else if ( collectionName
+//                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+//                                                            surveyDetails.setAgentId( profile.getIden() );
+//                                                        }
+//                                                        String createdDate = (String) review.get( "reviewDate" );
+//                                                        surveyDetails.setCompleteProfileUrl( (String) review
+//                                                            .get( "reviewerLink" ) );
+//                                                        surveyDetails.setCustomerFirstName( (String) review.get( "reviewer" ) );
+//                                                        surveyDetails.setReview( (String) review.get( "description" ) );
+//                                                        surveyDetails.setEditable( false );
+//                                                        surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
+//                                                        surveyDetails
+//                                                            .setScore( Double.valueOf( (String) review.get( "rating" ) ) );
+//                                                        surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
+//                                                        surveyDetails.setSourceId( sourceId );
+//                                                        surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
+//                                                        surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
+//                                                        surveyDetails.setAgreedToShare( "true" );
+//                                                        surveyDetails.setAbusive( false );
+//                                                        surveyHandler.insertSurveyDetails( surveyDetails );
+//                                                    }
+//                                                }
                                             }
                                         }
 
