@@ -1367,7 +1367,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         String profileName, String loginName, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method to send profile completion link to the user started." );
-
+        if(emailId == null || emailId.isEmpty()){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter emailId is null or empty");
+        }
+        if(profileName == null || profileName.isEmpty()){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter profileName is null or empty");
+        }
+        if(companyId <= 0l){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter company id ininvald");
+        }
         Map<String, String> urlParams = new HashMap<String, String>();
         urlParams.put( CommonConstants.EMAIL_ID, emailId );
         urlParams.put( CommonConstants.FIRST_NAME, firstName );
@@ -1395,27 +1403,30 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void setProfilesOfUser( User user )
     {
         LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started." );
-        List<UserProfile> userProfiles = user.getUserProfiles();
-        for ( UserProfile userProfile : userProfiles ) {
-            if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                switch ( userProfile.getProfilesMaster().getProfileId() ) {
-                    case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-                        user.setCompanyAdmin( true );
-                        continue;
-                    case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-                        user.setRegionAdmin( true );
-                        continue;
-                    case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-                        user.setBranchAdmin( true );
-                        continue;
-                    case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-                        user.setAgent( true );
-                        continue;
-                    default:
-                        LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName() );
+        if(user != null){
+            List<UserProfile> userProfiles = user.getUserProfiles();
+            for ( UserProfile userProfile : userProfiles ) {
+                if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    switch ( userProfile.getProfilesMaster().getProfileId() ) {
+                        case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+                            user.setCompanyAdmin( true );
+                            continue;
+                        case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                            user.setRegionAdmin( true );
+                            continue;
+                        case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                            user.setBranchAdmin( true );
+                            continue;
+                        case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                            user.setAgent( true );
+                            continue;
+                        default:
+                            LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName() );
+                    }
                 }
             }
         }
+        
         LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user finished." );
     }
 
@@ -1453,6 +1464,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void sendVerificationLink( User user ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "Method sendVerificationLink of Registration service called" );
+        if(user == null){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter user is null " );
+        }
         String verificationUrl = null;
 
         try {
@@ -1501,6 +1515,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         LOG.debug( "Method inviteUser called with url : " + url + " emailId : " + emailId + " firstname : " + firstName
             + " lastName : " + lastName );
+        
+        if(emailId == null || emailId.isEmpty()){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter email id is null or empty");
+        }
 
         String queryParam = extractUrlQueryParam( url );
         if ( !isReinvitation ) {
@@ -1683,12 +1701,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * 
      * @param userName
      * @return
+     * @throws InvalidInputException 
      */
     @Transactional
     @Override
-    public boolean userExists( String userName )
+    public boolean userExists( String userName ) throws InvalidInputException
     {
         LOG.debug( "Method to check if user exists called for username : " + userName );
+        if(userName == null || userName.isEmpty()){
+            throw new InvalidInputException("Invalid parameter passed : passed parameter user name is null or empty");
+        }
         boolean isUserPresent = false;
         try {
             userDao.getActiveUser( userName );
