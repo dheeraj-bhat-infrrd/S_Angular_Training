@@ -1046,3 +1046,35 @@ function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityR
 		return $("<li>").append(item.label).appendTo(ul);
 	};
 }
+
+//function to check the type of file on logo upload
+var logoFileExtensions = [".jpg", ".jpeg", ".png"]; 
+function logoValidate(logo) {
+	if ($(logo).attr("type")=="file"){
+    	 var sFileName = $(logo).val();
+         if (sFileName.length > 0) {
+            var blnValid = false;
+            for (var j = 0; j < logoFileExtensions.length; j++) {
+                var sCurExtension = logoFileExtensions[j];
+                if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                    blnValid = true;
+                    break;
+                }
+            }
+             
+            if (!blnValid) {
+            	var msg="Please upload files of type jpeg, png or jpg";
+            	showErrorMobileAndWeb(msg);
+                $(logo).val="";
+                
+                return false;
+            }
+        }
+    }
+	
+    return true;
+    
+}
+
+
+
