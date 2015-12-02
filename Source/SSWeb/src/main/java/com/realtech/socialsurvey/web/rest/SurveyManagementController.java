@@ -276,7 +276,7 @@ public class SurveyManagementController
                 String surveyScore = String.valueOf( survey.getScore() );
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
-                        customerName, surveyScore );
+                        customerName, surveyScore , logoUrl );
                 }
 
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
