@@ -3834,35 +3834,6 @@ function deleteUser(userId) {
 		$('#user-row-' + userId).next('.u-tbl-row').remove();
 		$('#user-row-' + userId).remove();
 	}, payload,true);
-
-	/*$.ajax({
-		url : "./removeexistinguser.do",
-		type : "POST",
-		dataType : "html",
-		data : payload,
-		success : function(data) {
-			var map =  $.parseJSON(data);
-			if (map.status == "success") {
-				showInfo(map.message);
-			} else {
-				showError(map.message);
-			}
-			
-			// hide the row of the user deleted
-			$('#user-row-' + userId).next('.v-tbl-row').remove();
-			$('#user-row-' + userId).next('.u-tbl-row').remove();
-			$('#user-row-' + userId).remove();
-		},
-		complete : function() {
-			hideOverlay();
-		},
-		error : function(e) {
-			if(e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-		}
-	});*/
 }
 
 
@@ -5381,7 +5352,6 @@ function storeCustomerAnswer(customerResponse) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "data/storeAnswer",
 		url : getLocationOrigin() + surveyUrl + "data/storeAnswer",
 		type : "GET",
 		cache : false,
@@ -5425,7 +5395,6 @@ function updateCustomerResponse(feedback, agreedToShare , isAbusive) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "data/storeFeedback",
 		url : getLocationOrigin() + surveyUrl + "data/storeFeedback",
 		type : "GET",
 		cache : false,
@@ -5656,7 +5625,6 @@ function postToSocialMedia(feedback , isAbusive){
 		"agentProfileLink" : agentProfileLink
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "posttosocialnetwork",
 		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
 		type : "GET",
 		cache : false,
@@ -5689,7 +5657,6 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 		"socialSite" : socialSite
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "updatesharedon",
 		url : getLocationOrigin() + surveyUrl + "updatesharedon",
 		type : "GET",
 		cache : false,
@@ -10108,10 +10075,6 @@ function validateprofileUrlEditForm() {
 			else{
 				$('#overlay-toast').text("Url updated successfully");
 				showToast();
-				/* window.opener.$("#prof-header-url").html(data);
-				setTimeout(function(){
-				    window.close();
-				},3000); */
 				hideActiveUserLogoutOverlay();
 				console.log(data);
 				$("#prof-header-url").html(data);
