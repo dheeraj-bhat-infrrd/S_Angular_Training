@@ -8,9 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -1176,5 +1174,18 @@ public interface OrganizationManagementService
 
     void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
+
+
+    public List<Region> getRegionsForCompany( long companyId ) throws InvalidInputException, ProfileNotFoundException;
+
+
+    public List<Branch> getBranchesUnderCompany( long companyId ) throws InvalidInputException, NoRecordsFetchedException,
+        ProfileNotFoundException;
+
+
+    public List<Region> getRegionsForRegionIds( Set<Long> regionIds ) throws InvalidInputException;
+
+
+    public List<Branch> getBranchesForBranchIds( Set<Long> branchIds ) throws InvalidInputException;
 
 }

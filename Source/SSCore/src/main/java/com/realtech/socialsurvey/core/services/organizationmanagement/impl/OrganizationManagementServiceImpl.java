@@ -1949,7 +1949,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     /**
-     * Method to fetch all regions of a company
+     * Method to fetch all regions of a company based on company profile name
      * 
      * @param companyProfileName
      * @return
@@ -1966,26 +1966,45 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( companySettings != null ) {
             long companyId = companySettings.getIden();
             LOG.debug( "Fetching regions for company : " + companyId );
-
-            /**
-             * Adding columns to be fetched in the list
-             */
-            List<String> columnNames = new ArrayList<String>();
-            columnNames.add( CommonConstants.REGION_NAME_COLUMN );
-            columnNames.add( CommonConstants.REGION_ID_COLUMN );
-            columnNames.add( CommonConstants.PROFILE_NAME_COLUMN );
-
-            /**
-             * Building criteria
-             */
-            Map<String, Object> queries = new HashMap<String, Object>();
-            queries.put( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) );
-            queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-            queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
-            regions = regionDao.findProjectionsByKeyValue( Region.class, columnNames, queries );
+            regions = getRegionsForCompany( companyId );
         } else {
             LOG.warn( "No company settings found for profileName : " + companyProfileName );
         }
+        return regions;
+    }
+
+    /**
+     * Method to fetch all regions of a company based on company id
+     *
+     * @param companyProfileName
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<Region> getRegionsForCompany( long companyId ) throws InvalidInputException, ProfileNotFoundException
+    {
+        if( companyId < 0l)
+            throw new InvalidInputException("Invalid company id passed as argument ");
+        LOG.info( "Method getRegionsForCompany called for companyId:" + companyId );
+        List<Region> regions = null;
+        /**
+         * Adding columns to be fetched in the list
+         */
+        List<String> columnNames = new ArrayList<String>();
+        columnNames.add( CommonConstants.REGION_NAME_COLUMN );
+        columnNames.add( CommonConstants.REGION_ID_COLUMN );
+        columnNames.add( CommonConstants.PROFILE_NAME_COLUMN );
+
+        /**
+         * Building criteria
+         */
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
+        regions = regionDao.findProjectionsByKeyValue( Region.class, columnNames, queries );
+
         return regions;
     }
 
@@ -2021,7 +2040,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     /**
-     * Method to fetch all the branches that are directly linked to a company
+     * Method to fetch all the branches that are directly linked to a company based on companyProfileName
      * 
      * @throws NoRecordsFetchedException
      */
@@ -2035,6 +2054,32 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "companyProfileName is null or empty in getBranchesUnderCompany" );
         }
         List<Branch> branches = null;
+        OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
+        if ( companySettings != null ) {
+            branches = getBranchesUnderCompany( companySettings.getIden() );
+        } else {
+            LOG.warn( "No company settings found for profileName : " + companyProfileName );
+        }
+        LOG.info( "Method getBranchesUnderCompany executed sucessfully" );
+
+        return branches;
+    }
+
+
+    /**
+     * Method to fetch all the branches that are directly linked to a company based on company Id
+     *
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    @Transactional
+    public List<Branch> getBranchesUnderCompany( long companyId ) throws InvalidInputException,
+        NoRecordsFetchedException, ProfileNotFoundException
+    {
+        if ( companyId < 0l )
+            throw new InvalidInputException( "Invalid company id passed as argument " );
+
+        List<Branch> branches = null;
         List<String> columnNames = new ArrayList<String>();
         columnNames.add( CommonConstants.BRANCH_ID_COLUMN );
         columnNames.add( CommonConstants.BRANCH_NAME_COLUMN );
@@ -2042,16 +2087,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         Map<String, Object> queries = new HashMap<String, Object>();
 
-        OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
-        if ( companySettings != null ) {
-            Company company = companyDao.findById( Company.class, companySettings.getIden() );
-            queries.put( CommonConstants.COMPANY_COLUMN, company );
-            queries.put( CommonConstants.REGION_COLUMN, getDefaultRegionForCompany( company ) );
-            queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-            queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
+        Company company = companyDao.findById( Company.class, companyId );
+        queries.put( CommonConstants.COMPANY_COLUMN, company );
+        queries.put( CommonConstants.REGION_COLUMN, getDefaultRegionForCompany( company ) );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
 
-            branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
-        }
+        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
         LOG.info( "Method getBranchesUnderCompany executed sucessfully" );
 
         return branches;
@@ -5324,6 +5366,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         LOG.info( "Method updateImageForOrganizationUnitSetting finished" );
+    }
+
+
+    @Override
+    @Transactional
+    public List<Region> getRegionsForRegionIds( Set<Long> regionIds ) throws InvalidInputException
+    {
+        if ( regionIds == null || regionIds.isEmpty() ) {
+            LOG.error( "Region ids passed cannot be null or empty" );
+            throw new InvalidInputException( "Region ids passed cannot be null or empty" );
+        }
+        LOG.info( "Method getRegionsForRegionIds called to get Region for regionIds : " + regionIds );
+        List<Region> regions = regionDao.getRegionForRegionIds( regionIds );
+        LOG.info( "Method getRegionsForRegionIds called to get Region for regionIds : " + regionIds );
+        return regions;
+    }
+
+
+    @Override
+    @Transactional
+    public List<Branch> getBranchesForBranchIds( Set<Long> branchIds ) throws InvalidInputException
+    {
+        if ( branchIds == null || branchIds.isEmpty() ) {
+            LOG.error( "Branch ids passed cannot be null or empty" );
+            throw new InvalidInputException( "Branch ids passed cannot be null or empty" );
+        }
+        LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
+        List<Branch> branches = branchDao.getBranchForBranchIds( branchIds );
+        LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
+        return branches;
     }
 }
 // JIRA: SS-27: By RM05: EOC

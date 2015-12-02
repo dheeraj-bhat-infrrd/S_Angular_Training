@@ -1039,6 +1039,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( regionProfileName == null || regionProfileName.isEmpty() ) {
             throw new ProfileNotFoundException( "regionProfileName is null or empty in getRegionByProfileName" );
         }
+
+        companySettings = getCompanyProfileByProfileName( companyProfileName );
+        if ( companySettings == null ) {
+            LOG.error( "Unable to fetch company settings, invalid input provided by the user" );
+            throw new ProfileNotFoundException( "Unable to get company settings " );
+        }
         /**
          * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
          * unique, whereas profileName is unique only within a company
