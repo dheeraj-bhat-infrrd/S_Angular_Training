@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import java.util.ArrayList;
@@ -1419,9 +1420,9 @@ public class ProfileManagementServiceImplTest
         user.setUserProfiles( Arrays.asList( new UserProfile[] {} ) );
         OrganizationUnitSettings entitiySettings = new OrganizationUnitSettings();
         entitiySettings.setContact_details( new ContactDetailsSettings() );
-
+        OrganizationUnitSettings profileSettings  = new AgentSettings();
         Mockito.when( organizationManagementService.getCompanySettings( (User) Mockito.any() ) ).thenReturn( entitiySettings );
-        OrganizationUnitSettings agentSettings = profileManagementServiceImpl.aggregateAgentDetails( user, new AgentSettings(),
+        OrganizationUnitSettings agentSettings = profileManagementServiceImpl.aggregateAgentDetails( user, profileSettings,
             new LockSettings() );
         assertNotNull( "Unit Settings does not match expected", ( (AgentSettings) agentSettings ).getCompanyProfileData() );
     }
@@ -1445,6 +1446,6 @@ public class ProfileManagementServiceImplTest
         Mockito.when( organizationManagementService.getCompanySettings( (User) Mockito.any() ) ).thenReturn( entitiySettings );
         OrganizationUnitSettings unitSettings = profileManagementServiceImpl.aggregateAgentDetails( user, profileSettings,
             new LockSettings() );
-        assertSame( "Unit Settings does not match expected", unitSettings, profileSettings );
+        assertSame( "Unit Settings does not match expected", profileSettings, unitSettings);
     }
 }
