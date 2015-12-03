@@ -866,7 +866,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 	}
 
-	private long getRegionIdFromSourceId(List<RegionUploadVO> uploadedRegions, String regionSourceId) throws BranchAdditionException {
+	long getRegionIdFromSourceId(List<RegionUploadVO> uploadedRegions, String regionSourceId) throws BranchAdditionException {
 		LOG.debug("Getting region id from source id");
 		long regionId = 0;
 		for (RegionUploadVO uploadedRegion : uploadedRegions) {
@@ -881,7 +881,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		return regionId;
 	}
 
-	private long getBranchIdFromSourceId(List<BranchUploadVO> uploadedBranches, String regionBranchId) throws UserAdditionException {
+	long getBranchIdFromSourceId(List<BranchUploadVO> uploadedBranches, String regionBranchId) throws UserAdditionException {
 		LOG.debug("Getting branch id from source id");
 		long branchId = 0;
 		for (BranchUploadVO uploadedBranch : uploadedBranches) {
@@ -1029,7 +1029,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 	}
 
-	private boolean checkIfEmailIdExists(String emailId, Company company) {
+	boolean checkIfEmailIdExists(String emailId, Company company) {
 		boolean status = false;
 		try {
 			userDao.getActiveUser(emailId);
@@ -1041,7 +1041,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		return status;
 	}
 
-	private Company getCompany(User user) throws InvalidInputException {
+	Company getCompany(User user) throws InvalidInputException {
 		Company company = user.getCompany();
 		if (company == null) {
 			LOG.error("Company property not found in admin user object!");
@@ -1051,7 +1051,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		return company;
 	}
 
-	private LicenseDetail getLicenseDetail(Company company) throws InvalidInputException {
+	LicenseDetail getLicenseDetail(Company company) throws InvalidInputException {
 		LicenseDetail companyLicenseDetail = null;
 		if (company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty()) {
 			companyLicenseDetail = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
@@ -1064,7 +1064,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private User addUser(UserUploadVO user, User adminUser) throws InvalidInputException, NoRecordsFetchedException, SolrException,
+	User addUser(UserUploadVO user, User adminUser) throws InvalidInputException, NoRecordsFetchedException, SolrException,
 			UserAssignmentException, UserAdditionException {
 		User uploadedUser = null;
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -1141,7 +1141,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	}
 
-	private User assignUser(UserUploadVO user, User adminUser) throws UserAdditionException, InvalidInputException, SolrException,
+	User assignUser(UserUploadVO user, User adminUser) throws UserAdditionException, InvalidInputException, SolrException,
 			NoRecordsFetchedException, UserAssignmentException {
 
 		LOG.info("User already exists so assigning user to approprite place");
