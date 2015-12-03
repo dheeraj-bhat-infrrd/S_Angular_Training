@@ -101,7 +101,7 @@ namespace EncompassSocialSurvey
                         forLoanVM_Borrower.CompanyId = runningCompanyId;
                         forLoanVM_Borrower.AgentId = (loanOfficer != null) ? loanOfficer.ID : "";
                         forLoanVM_Borrower.AgentName = (loanOfficer != null) ? loanOfficer.FullName : "";
-                        forLoanVM_Borrower.AgentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
+                        
 
                         forLoanVM_Borrower.CustomerFirstName = fieldValues[2];
                         forLoanVM_Borrower.CustomerLastName = fieldValues[3];
@@ -113,10 +113,12 @@ namespace EncompassSocialSurvey
                         {
 
                             forLoanVM_Borrower.CustomerEmailId = emailId;
+                            forLoanVM_Borrower.AgentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
                         }
                         else
                         {
                             forLoanVM_Borrower.CustomerEmailId = replaceEmailAddress(emailId, emailDomain, emailPrefix);
+                            forLoanVM_Borrower.AgentEmailId = replaceEmailAddress((loanOfficer != null) ? loanOfficer.Email : "", emailDomain, emailPrefix);
                         }
 
                         forLoanVM_Borrower.ReminderCounts = EncompassSocialSurverConstant.REMINDER_COUNT;
