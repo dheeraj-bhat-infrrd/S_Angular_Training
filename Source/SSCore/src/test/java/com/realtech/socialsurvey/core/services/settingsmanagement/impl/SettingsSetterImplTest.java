@@ -3,11 +3,17 @@ package com.realtech.socialsurvey.core.services.settingsmanagement.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -21,6 +27,8 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 
 public class SettingsSetterImplTest
 {
+    @Spy
+    @InjectMocks
     private SettingsSetterImpl settingsSetterImpl;
 
 
@@ -37,6 +45,7 @@ public class SettingsSetterImplTest
     @Before
     public void setUp() throws Exception
     {
+        MockitoAnnotations.initMocks( this );
         settingsSetterImpl = new SettingsSetterImpl();
     }
 
@@ -455,5 +464,27 @@ public class SettingsSetterImplTest
     public void getLowestSetterLevelTestSetByCompanyNRegionNBranch() throws InvalidSettingsStateException
     {
         assertEquals( "OrganizationUnit is not null", OrganizationUnit.BRANCH, settingsSetterImpl.getLowestSetterLevel( 7 ) );
+    }
+
+
+    @Test
+    public void testGetModifiedSetSettingsValueAlreadyLockedNotSet() throws InvalidSettingsStateException
+    {
+        SettingsSetterImpl spy = Mockito.spy( settingsSetterImpl );
+        Mockito.doReturn( false ).when( spy )
+            .isSettingsValueSet( (OrganizationUnit) Mockito.any(), Mockito.anyLong(), (SettingsForApplication) Mockito.any() );
+        assertEquals( "", 0l,
+            settingsSetterImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, false ) );
+    }
+
+
+    @Test
+    public void testGetModifiedSetSettingsValueAlreadyLockedSettingSet() throws InvalidSettingsStateException
+    {
+        SettingsSetterImpl spy = Mockito.spy( settingsSetterImpl );
+        Mockito.doReturn( false ).when( spy )
+        .isSettingsValueSet( (OrganizationUnit) Mockito.any(), Mockito.anyLong(), (SettingsForApplication) Mockito.any() );
+        assertEquals( "", 1l,
+            settingsSetterImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, true ) );
     }
 }

@@ -61,7 +61,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 		return branch;
 	}
 
-	private long getModifiedSetSettingsValue(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings,
+	long getModifiedSetSettingsValue(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings,
 			boolean hasBeenSet) {
 		LOG.debug("Finding the modified set settings value");
 		long valueToBeReturned = currentSetValue;

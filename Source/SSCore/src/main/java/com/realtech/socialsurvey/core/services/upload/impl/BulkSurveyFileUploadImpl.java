@@ -202,7 +202,7 @@ public class BulkSurveyFileUploadImpl implements BulkSurveyFileUpload {
 		return surveyUploadList;
 	}
 
-	private boolean checkUploadObject(SurveyUploadVO surveyUpload) {
+	boolean checkUploadObject(SurveyUploadVO surveyUpload) {
 		if (surveyUpload.getAgentEmailId() == null || surveyUpload.getAgentEmailId().isEmpty()) {
 			LOG.warn("Agent email is not present");
 			return false;
@@ -224,7 +224,7 @@ public class BulkSurveyFileUploadImpl implements BulkSurveyFileUpload {
 		return true;
 	}
 
-	private void initiateSurvey(List<SurveyUploadVO> surveyUploadList, long companyId) throws ProfileNotFoundException {
+	void initiateSurvey(List<SurveyUploadVO> surveyUploadList, long companyId) throws ProfileNotFoundException {
 		LOG.debug("Sending survey reminders");
 		for (SurveyUploadVO surveyUpload : surveyUploadList) {
 			LOG.debug("Sending survey request to " + surveyUpload.getCustomerFirstName() + " at " + surveyUpload.getCustomerEmailId());
