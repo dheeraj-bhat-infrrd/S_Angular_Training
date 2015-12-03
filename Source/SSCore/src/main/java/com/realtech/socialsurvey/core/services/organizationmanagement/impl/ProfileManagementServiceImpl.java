@@ -2505,7 +2505,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 Branch branch = branchDao.findById( Branch.class, userProfile.getBranchId() );
                 updateCrumbListWithBranchName( breadCrumbList, branch );
 
-                Region region = regionDao.findById( Region.class, userProfile.getRegionId() );
+                //JIRA SS-1337
+                if ( branch == null ) {
+                    throw new InvalidInputException( "No branch with ID : " + userProfile.getBranchId() + " was found" );
+                } else if ( branch.getRegion() == null ) {
+                    throw new InvalidInputException( "No region associated to branch with ID : " + userProfile.getBranchId()
+                        + " was found" );
+                }
+                Region region = branch.getRegion();
+                //Region region = regionDao.findById( Region.class, userProfile.getRegionId() );
                 updateCrumbListWithRegionName( breadCrumbList, region );
 
                 updateCrumbListWithCompanyName( breadCrumbList, company );
