@@ -732,10 +732,14 @@ function fetchReviewsOnDashboard(isNextBatch) {
 	}, payload, false);
 }
 
+var isDashboardReviewScrollRunning = false;
+
 function dashbaordReviewScroll() {
-	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() * 0.75) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() - 200) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+		if(isDashboardReviewScrollRunning) return; //return if the scroll is running
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#review-details'));
+			isDashboardReviewScrollRunning = true;
 			setTimeout(displayReviewOnDashboard, 500);
 		} else{
 			fetchReviewsOnDashboard(false);
@@ -745,6 +749,7 @@ function dashbaordReviewScroll() {
 
 function displayReviewOnDashboard() {
 	
+	isDashboardReviewScrollRunning = false;
 	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
 	
 	hideLoaderOnPagination($('#review-details'));
@@ -7536,15 +7541,13 @@ function fetchReviewsEditProfileScroll() {
 	if(location.hash != "#showprofilepage")  {
 		return;
 	}
-	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() * 0.75)
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() - 200)
 			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
+		if(isReviewsLoadingEditProfile) return; //return if the scroll is running
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#prof-review-item'));
 			isReviewsLoadingEditProfile = true;
-			setTimeout(function() {
-				isReviewsLoadingEditProfile = false;
-				displayReviewOnEditProfile();
-			}, 500);
+			setTimeout(displayReviewOnEditProfile, 500);
 		} else{
 			fetchReviewsOnEditProfile(attrName, attrVal, false);
 		}
@@ -7553,14 +7556,13 @@ function fetchReviewsEditProfileScroll() {
 
 function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 	
-	//Check if the request is running
-	if(isReviewsRequestRunningEditProfile) return;
-	
 	if (startIndex == 0) {
 		doStopReviewsPaginationEditProfile = false;
+		isReviewsRequestRunningEditProfile = false;
 		$('#prof-review-item').html('');
 	}
 	
+	if(isReviewsRequestRunningEditProfile) return; //Return if ajax request is still running
 	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
 			+ minScore + "&startIndex=" + startIndex + "&numOfRows="
 			+ numOfRows;
@@ -7570,17 +7572,11 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		showLoaderOnPagination($('#prof-review-item'));
 	}
 	callAjaxGET(url, function(data) {
-		
-		var tempDiv = $("<div>");
-		tempDiv.html(data);
-		
-		var countOfReviewsFetched = tempDiv.children('div.dsh-review-cont').length;
-
-		if(countOfReviewsFetched < numOfRows) {
-			doStopReviewsPaginationEditProfile = true; //Stop pagination if reviews fetch are less than batch size
-		}
-		
 		//Check if list revcieved is empty 
+		var tempDiv = $("<div>").html(data);
+		
+		var countOfReviewsFetched = tempDiv.children('.dsh-review-cont').length;
+		
 		if (countOfReviewsFetched <= 0) {
 			if (startIndex == 0) {
 				$("#prof-review-item").html("<span>No Reviews Found</span>");
@@ -7590,17 +7586,18 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 			$("#prof-review-item").append(data);
 		}
 		
-		updateEventOnDashboardPageForReviews();
+		if(countOfReviewsFetched < numOfRows) {
+			doStopReviewsPaginationEditProfile = true;
+		}
 		
-		//update start index 
+		//Update events
+		updateEventOnDashboardPageForReviews();
 		startIndex = startIndex + numOfRows;
-		isReviewsRequestRunningEditProfile = false;
 		
 		if(!isNextBatch) {
 			displayReviewOnEditProfile();
-			return;
 		}
-		
+		isReviewsRequestRunningEditProfile = false;
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
 		}
@@ -7609,22 +7606,18 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 
 //Display the review on edit profile
 function displayReviewOnEditProfile() {
+	isReviewsLoadingEditProfile = false;
 	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
 	hideLoaderOnPagination($('#prof-review-item'));
+	var total = $('div.dsh-review-cont.hide').length;
 	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
 		$(this).removeClass("hide");
-		if(index >= batchSizeCmp - 1) {
+		if(index >= numOfRows - 1 || index >= total - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
 			return false;
 		}
 	});
 	
-	//check for the last element and add last element class
-	if(doStopReviewsPaginationEditProfile && $('div.dsh-review-cont.hide').length <= 0) {
-		$('div.dsh-review-cont:last-of-type').addClass("ppl-review-item-last").removeClass("ppl-review-item");
-	}
-	
-	//Get the next batch
 	if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 		fetchReviewsOnEditProfile(attrName, attrVal, true);
 	}
@@ -7712,8 +7705,8 @@ function attachPostsScrollEvent() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
-				- scrollContainer.clientHeight)) {
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
+				- (scrollContainer.clientHeight / 0.75))) {
 				if (!doStopPostPaginationEditProfile || publicPostsBatch.length > 0) {
 					fetchPublicPostEditProfile(false);
 				}
@@ -10127,8 +10120,8 @@ function attachEventsOnSocialMonitor() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) 
-				- scrollContainer.clientHeight)) && !isSocialMonitorPostLoaderRunning) {
+		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
+				- (scrollContainer.clientHeight / 0.75))) && !isSocialMonitorPostLoaderRunning) {
 				
 				if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
 					fetchSearchedPostsSolr(false);
