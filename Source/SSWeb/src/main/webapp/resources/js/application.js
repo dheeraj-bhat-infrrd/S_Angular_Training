@@ -3834,35 +3834,6 @@ function deleteUser(userId) {
 		$('#user-row-' + userId).next('.u-tbl-row').remove();
 		$('#user-row-' + userId).remove();
 	}, payload,true);
-
-	/*$.ajax({
-		url : "./removeexistinguser.do",
-		type : "POST",
-		dataType : "html",
-		data : payload,
-		success : function(data) {
-			var map =  $.parseJSON(data);
-			if (map.status == "success") {
-				showInfo(map.message);
-			} else {
-				showError(map.message);
-			}
-			
-			// hide the row of the user deleted
-			$('#user-row-' + userId).next('.v-tbl-row').remove();
-			$('#user-row-' + userId).next('.u-tbl-row').remove();
-			$('#user-row-' + userId).remove();
-		},
-		complete : function() {
-			hideOverlay();
-		},
-		error : function(e) {
-			if(e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-		}
-	});*/
 }
 
 
@@ -4656,6 +4627,14 @@ function authenticate(socialNetwork) {
 	};
 }
 
+function authenticateZillow() {
+	openAuthPageZillow();
+	
+	/*payload = {
+		'socialNetwork' : socialNetwork
+	};*/
+}
+
 // update yelp profile url
 function showYelpInput() {
 	$('#yelp-profile-url-display').addClass('hide');
@@ -5373,7 +5352,6 @@ function storeCustomerAnswer(customerResponse) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "data/storeAnswer",
 		url : getLocationOrigin() + surveyUrl + "data/storeAnswer",
 		type : "GET",
 		cache : false,
@@ -5417,7 +5395,6 @@ function updateCustomerResponse(feedback, agreedToShare , isAbusive) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "data/storeFeedback",
 		url : getLocationOrigin() + surveyUrl + "data/storeFeedback",
 		type : "GET",
 		cache : false,
@@ -5648,7 +5625,6 @@ function postToSocialMedia(feedback , isAbusive){
 		"agentProfileLink" : agentProfileLink
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "posttosocialnetwork",
 		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
 		type : "GET",
 		cache : false,
@@ -5681,7 +5657,6 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 		"socialSite" : socialSite
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "updatesharedon",
 		url : getLocationOrigin() + surveyUrl + "updatesharedon",
 		type : "GET",
 		cache : false,
@@ -6498,18 +6473,39 @@ function callBackEditAddressDetails(data) {
 	updateEventsEditAddress();
 	
 	$('#overlay-continue').click(function() {
+		var isFocussed = false;
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
+		
 		//var profAddress2 = $('#prof-address2').val();
 		var country = $('#prof-country').val();
 		var zipCode = $('#prof-zipcode').val();
-		if (!profName || !profAddress1 || !country || !zipCode) {
-			//TODO:Add proper validations
-			$('#overlay-toast').html("Please enter valid address details");
-			showToast();
+		if(!validateAddress1('prof-address1',true)){
+			
+			if(!isFocussed){
+				$('#prof-address1').focus();
+				isFocussed=true;
+			}
+			return; 
+		}
+		if(!validateCountryProfile(country)){
+			
+			if(!isFocussed){
+				$('#prof-country').focus();
+				isFocussed=true;
+			}
 			return;
 		}
-
+		if(!validateCountryZipcode('prof-zipcode',true)){
+			
+			if(!isFocussed){
+				$('#prof-zipcode').focus();
+				isFocussed=true;
+			}
+			return; 
+		}
+		
+		
 		delay(function() {
 			payload = $('#prof-edit-address-form').serialize();
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload,true);
@@ -6651,8 +6647,12 @@ function callBackShowProfileLogo(data) {
 }
 
 $(document).on('change', '#prof-logo', function() {
-	showOverlay();
 
+	if(!logoValidate('#prof-logo')){
+		console.log("inside log");
+		return false;
+	}
+	showOverlay();
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
@@ -8553,6 +8553,23 @@ function createZillowProfileUrlPopup(body){
 	$('#overlay-main').show();
 	disableBodyScroll();
 }
+/*function saveZillowEmailAddress1(){
+	console.info("before zillosaveinfo is called");
+	callAjaxGET("/zillowSaveInfo.do", function(data) {
+		createZillowProfileUrlPopupPath( data);
+	}, true);
+}
+*/
+function createZillowProfileUrlPopupPath(body){
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("ok");
+	$('#overlay-continue').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		saveZillowEmailAddress();
+		overlayRevert();
+	});
+}
 
 
 /*function updateProfileUrl(){
@@ -10058,10 +10075,6 @@ function validateprofileUrlEditForm() {
 			else{
 				$('#overlay-toast').text("Url updated successfully");
 				showToast();
-				/* window.opener.$("#prof-header-url").html(data);
-				setTimeout(function(){
-				    window.close();
-				},3000); */
 				hideActiveUserLogoutOverlay();
 				console.log(data);
 				$("#prof-header-url").html(data);
@@ -10122,4 +10135,31 @@ function attachEventsOnSocialMonitor() {
 				}
 		}
 	});
+}
+
+//Zillow connect functions
+function saveZillowEmailAddress() {
+	if(!validateZillowForm()){
+		return false;
+	}
+	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
+		if(data && data == "success") {
+			$('#overlay-toast').text("Zillow update successful");
+			showToast();
+		} else {
+			$('#overlay-toast').text("Some problem occurred while saving zillow");
+			showToast();
+		}
+	}, "zillowForm");
+}
+
+function validateZillowForm() {
+	var zillowProfileName = $('input[name="zillowProfileName"]').val();
+	if (zillowProfileName == undefined || zillowProfileName == "") {
+		$('#overlay-toast').text("Please enter a valid profile name");
+		showToast();
+		return false;
+	} else {
+		return true;
+	}
 }

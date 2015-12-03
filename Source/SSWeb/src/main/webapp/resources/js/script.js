@@ -439,8 +439,29 @@ function validateAddress1(elementId ,isOnlyShowToast){
 	}
 }
 
+
 function validateAddress2(elementId) {
 	return true;
+}
+
+function validateCountryProfile() {
+	var country = $.trim($('#prof-country').val());
+	if (country == "") {
+		var msg='Please enter country name';
+		$('#overlay-toast').html(msg);
+		showToast();
+		return false;
+	} else {
+		var countryCode = $.trim($('#prof-country').val());
+		if (countryCode == "") {
+			var msg='Please enter valid country name';
+			$('#overlay-toast').html(msg);
+			showToast();
+			return false;
+		} else {
+			return true;
+		}
+	}
 }
 
 //Function to validate Branch name
@@ -701,32 +722,34 @@ function validateTextArea(elementId) {
 }
 
 function validateCountryZipcode(elementId, isOnlyShowToast) {
-	if(selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/'){
+	selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+	selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	if (selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/') {
 		selectedCountryRegEx = ".*";
 		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
 	}
-	
+
 	var zipcode = $('#' + elementId).val();
 	if (zipcode != "") {
 		if (selectedCountryRegEx.test(zipcode) == true) {
 			return true;
 		} else {
 			var msg = 'Please enter a valid zipcode';
-			if(isOnlyShowToast){
+			if (isOnlyShowToast) {
 				$('#overlay-toast').html(msg);
-				showToast();			
+				showToast();
 			} else {
-				showErrorMobileAndWeb(msg);			
+				showErrorMobileAndWeb(msg);
 			}
 			return false;
 		}
 	} else {
-		var msg = 'Please enter a valid zipcode';
-		if(isOnlyShowToast){
+		var msg = 'Please enter the zipcode';
+		if (isOnlyShowToast) {
 			$('#overlay-toast').html(msg);
-			showToast();			
+			showToast();
 		} else {
-			showErrorMobileAndWeb(msg);			
+			showErrorMobileAndWeb(msg);
 		}
 		return false;
 	}
