@@ -262,7 +262,7 @@ function paintProfilePage(result) {
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		
 		// paint public  posts
-		fetchPublicPosts();
+		fetchPublicPosts(false);
 		
 		var breadCrumUrl = '/rest/breadcrumb/';
 		
@@ -1319,14 +1319,13 @@ $('#prof-posts').scroll(function() {
         if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) - (scrollContainer.clientHeight / 0.75))) &&
             !isLoaderRunningPublicPosts) {
         	if (publicPostsNextBatch.length > 0 || !doStopPublicPostPagination) {
-        		fetchPublicPostsScroll();        		
+        		fetchPublicPostsScroll(false);        		
         	}
         }
     }
 });
 
-function fetchPublicPostsScroll() {
- 	var isNextBatch = false;
+function fetchPublicPostsScroll(isNextBatch) {
 	if (!isNextBatch && publicPostsNextBatch.length > 0) {
 	    var postsToShow = publicPostsNextBatch.slice(0, publicPostNumRows);
 	    if (publicPostsNextBatch.length > publicPostNumRows) {
@@ -1340,12 +1339,15 @@ function fetchPublicPostsScroll() {
 	    setTimeout(function() {
 	        isLoaderRunningPublicPosts = false;
 	        paintPublicPosts(postsToShow);
+	        if(publicPostsNextBatch.length <= publicPostNumRows) {
+	    		fetchPublicPosts(true);
+	    	}
 	    }, 500);
 	} else {
 		if (isPublicPostAjaxRequestRunning){
 			if(!isNextBatch) {
 				setTimeout(function() {
-					fetchPublicPostsScroll(); //keep checking until the posts arrives	
+					fetchPublicPostsScroll(false); //keep checking until the posts arrives	
 				}, 200);
 			}
 			return; // Return if ajax request is still running
@@ -1389,6 +1391,7 @@ function fetchPublicPosts(isNextBatch) {
 	}
 	callAjaxGET(url, function(data) {
 		isPublicPostAjaxRequestRunning = false;
+		
 		var posts = $.parseJSON(data);
 		posts = $.parseJSON(posts.entity);
 		
@@ -1399,21 +1402,24 @@ function fetchPublicPosts(isNextBatch) {
 			return
 		}
 		
+		
+		
 		//Check if request is for next batch
-		if(isNextBatch) {
-			publicPostsNextBatch = publicPostsNextBatch.concat(posts);
-		} else {
+		if(!isNextBatch) {
 			paintPublicPosts(posts);
+		} else {
+			publicPostsNextBatch = publicPostsNextBatch.concat(posts);
 		}
+		
 		publicPostStartIndex += posts.length;
 		if (publicPostStartIndex < publicPostNumRows || posts.length < publicPostNumRows){
 			doStopPublicPostPagination = true;
 			return;
 		}
 		
-		if(publicPostsNextBatch.length <= publicPostNumRows) {
-			fetchPublicPosts(true);
-		}
+		if (publicPostsNextBatch.length <= publicPostNumRows) {
+	        fetchPublicPosts(true);
+	    }
 	}, true);
 }
 
@@ -1478,6 +1484,7 @@ function paintPublicPosts(posts) {
 	setTimeout(function() {
 		$('#prof-posts').trigger('scroll');
 	}, 100);
+	
 }
 
 $('body').on('click',".branch-link",function(e) {
