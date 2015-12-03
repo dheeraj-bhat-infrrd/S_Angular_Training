@@ -6525,6 +6525,8 @@ function updateEventsEditAddress() {
     if (countryCode == "US") {
         showStateCityRow('prof-address-state-city-row', 'prof-state',
             'prof-city');
+        selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+    	selectedCountryRegEx = new RegExp(selectedCountryRegEx);
     } else {
         hideStateCityRow('prof-address-state-city-row', 'prof-state');
     }

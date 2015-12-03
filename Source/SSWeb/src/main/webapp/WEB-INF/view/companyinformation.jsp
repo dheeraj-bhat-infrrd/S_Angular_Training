@@ -49,7 +49,7 @@
 	</div>
 	
 	<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
-		<div class="container reg_panel_container">
+		<div class="container reg_panel_container" id="company-info-load">
 			<div class="reg_header"><spring:message code="label.companysettings.header.key"/></div>
 			
 			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data" autocomplete="off" >
@@ -238,14 +238,19 @@ $(document).ready(function() {
 	}
 	
 	$('#company-info-submit').click(function() {
-		if(logo){
+		
+		if(logo && logoSuccess && !isFormSubmitted ){
 			submitCompanyInfoForm();
 		}
-		else{
-			$('#overlay-toast').html('Logo is uploading please wait');
+		
+		if(!logoSuccess){
+			$('#overlay-toast').html('uploading logo please wait');
 			showToast();
 		}
-		
+		if(!logo){
+			$('#overlay-toast').html('Please upload files of type jpeg, png or jpg');
+			showToast();
+		}
 	});
 	
 	$('#icn-file').click(function(){
@@ -321,10 +326,12 @@ $('#com-city').bind('focus', function(){
 		$(this).autocomplete("search");		
 	}
 });
-
+ var isFormSubmitted=false;
 function submitCompanyInfoForm() {
 	if (validateCompanyInformationForm('company-info-div')) {
+		isFormSubmitted=true;
 		$('#company-info-form').submit();
+		
 	}
 }
 
@@ -338,19 +345,27 @@ $('input').keypress(function(e){
 
 // Logo upload
 var logo=true;
+var logoSuccess=true;
 $("#com-logo").on("change", function() {
-	logo =false;
+	logo=true;
 	if(!logoValidate("#com-logo")){
+		logo =false;
 		return false;
 	}
+	logoSuccess=false;
 	var formData = new FormData();
 	formData.append("logo", $('#com-logo').prop("files")[0]);
 	formData.append("logo_name", $('#com-logo').prop("files")[0].name);
-	callAjaxPOSTWithTextData("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
+	
+	
+	callAjaxPOSTWithTextDataLogo("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
+	
+
+	
 });
 
 function uploadImageSuccessCallback(response) {
-	logo=true;
+	logoSuccess=true;
 	var success = "Logo has been uploaded successfully";
 	if (success != response.trim()) {
 		$('#com-logo').val('');
@@ -376,6 +391,9 @@ function validateCountry() {
 		}
 	}
 }
+ 
+
+
 
 function validateCompanyInformationForm(elementId) {
 	isCompanyInfoPageValid = true;
