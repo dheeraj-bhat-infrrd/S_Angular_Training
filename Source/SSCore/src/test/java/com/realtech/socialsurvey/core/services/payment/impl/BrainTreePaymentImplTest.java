@@ -1,6 +1,12 @@
 package com.realtech.socialsurvey.core.services.payment.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -9,11 +15,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
@@ -34,7 +44,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public class BrainTreePaymentImplTest
 {
-
+    @Spy
     @InjectMocks
     private BrainTreePaymentImpl brainTreePaymentImpl;
 
@@ -474,5 +484,230 @@ public class BrainTreePaymentImplTest
         SubscriptionUnsuccessfulException
     {
         brainTreePaymentImpl.addCustomerWithPayment( null, "" );
+    }
+
+
+    //Tests for containsCustomer
+    @Test ( expected = InvalidInputException.class)
+    public void containsCustomerTestIdNull() throws InvalidInputException, PaymentException
+    {
+        brainTreePaymentImpl.containsCustomer( null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void containsCustomerTestIdEmpty() throws InvalidInputException, PaymentException
+    {
+        brainTreePaymentImpl.containsCustomer( "" );
+    }
+
+
+    //Tests for subscribeCustomer
+    @Test ( expected = InvalidInputException.class)
+    public void subscribeCustomerTestCustomerIdNull() throws InvalidInputException, PaymentException,
+        SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException
+    {
+        brainTreePaymentImpl.subscribeCustomer( null, "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void subscribeCustomerTestCustomerIdEmpty() throws InvalidInputException, PaymentException,
+        SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException
+    {
+        brainTreePaymentImpl.subscribeCustomer( "", "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void subscribeCustomerTestPlanIdNull() throws InvalidInputException, PaymentException,
+        SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException
+    {
+        brainTreePaymentImpl.subscribeCustomer( "test", null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void subscribeCustomerTestPlanIdEmpty() throws InvalidInputException, PaymentException,
+        SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException
+    {
+        brainTreePaymentImpl.subscribeCustomer( "test", "" );
+    }
+
+
+    //Tests for upgradeSubscription
+    @Test ( expected = InvalidInputException.class)
+    public void upgradeSubscriptionTestSubIdNull() throws PaymentException, InvalidInputException,
+        SubscriptionUpgradeUnsuccessfulException, NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.upgradeSubscription( null, 10, "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void upgradeSubscriptionTestSubIdEmpty() throws PaymentException, InvalidInputException,
+        SubscriptionUpgradeUnsuccessfulException, NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.upgradeSubscription( "", 10, "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void upgradeSubscriptionTestAmountInvalid() throws PaymentException, InvalidInputException,
+        SubscriptionUpgradeUnsuccessfulException, NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.upgradeSubscription( "test", -1, "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void upgradeSubscriptionTestPlanIdNull() throws PaymentException, InvalidInputException,
+        SubscriptionUpgradeUnsuccessfulException, NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.upgradeSubscription( "test", 10, null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void upgradeSubscriptionTestPlanIdEmpty() throws PaymentException, InvalidInputException,
+        SubscriptionUpgradeUnsuccessfulException, NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.upgradeSubscription( "test", 10, "" );
+    }
+
+
+    //Tests for updateLicenseDetailsTableOnPlanUpgrade
+    @Test ( expected = InvalidInputException.class)
+    public void updateLicenseDetailsTableOnPlanUpgradeTestLicenseDetailNull() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.updateLicenseDetailsTableOnPlanUpgrade( new User(), null, new Company(), new AccountsMaster(),
+            "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void updateLicenseDetailsTableOnPlanUpgradeTestCompanyNull() throws InvalidInputException, NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.updateLicenseDetailsTableOnPlanUpgrade( new User(), new LicenseDetail(), null,
+            new AccountsMaster(), "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void updateLicenseDetailsTableOnPlanUpgradeTestAccountMasterNull() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.updateLicenseDetailsTableOnPlanUpgrade( new User(), new LicenseDetail(), new Company(), null,
+            "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void updateLicenseDetailsTableOnPlanUpgradeTestSubscripionIdNull() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LicenseDetail license = new LicenseDetail();
+        AccountsMaster master = new AccountsMaster();
+        master.setAccountsMasterId( CommonConstants.ACCOUNTS_MASTER_FREE );
+        license.setAccountsMaster( master );
+        brainTreePaymentImpl.updateLicenseDetailsTableOnPlanUpgrade( new User(), license, new Company(), new AccountsMaster(),
+            null );
+    }
+
+
+    //Tests for checkIfItIsAFreeAccount
+    @Test ( expected = InvalidInputException.class)
+    public void checkIfItIsAFreeAccountTestUserNull() throws InvalidInputException, NoRecordsFetchedException
+    {
+        brainTreePaymentImpl.checkIfItIsAFreeAccount( null );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void checkIfItIsAFreeAccountTestLicenseDetailNull() throws InvalidInputException, NoRecordsFetchedException
+    {
+        User user = new User();
+        user.setCompany( new Company() );
+        brainTreePaymentImpl.checkIfItIsAFreeAccount( user );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void checkIfItIsAFreeAccountTestLicenseDetailEmpty() throws InvalidInputException, NoRecordsFetchedException
+    {
+        User user = new User();
+        Company company = new Company();
+        company.setLicenseDetails( new ArrayList<LicenseDetail>() );
+        user.setCompany( company );
+        brainTreePaymentImpl.checkIfItIsAFreeAccount( user );
+    }
+
+
+    @Test
+    public void checkIfItIsAFreeAccountTestReturnTrue() throws InvalidInputException, NoRecordsFetchedException
+    {
+        User user = new User();
+        Company company = new Company();
+        LicenseDetail license = new LicenseDetail();
+        AccountsMaster master = new AccountsMaster();
+        master.setAccountsMasterId( CommonConstants.ACCOUNTS_MASTER_FREE );
+        license.setAccountsMaster( master );
+        List<LicenseDetail> details = new ArrayList<LicenseDetail>();
+        details.add( license );
+        company.setLicenseDetails( details );
+        user.setCompany( company );
+        assertTrue( "", brainTreePaymentImpl.checkIfItIsAFreeAccount( user ) );
+    }
+
+
+    @Test
+    public void checkIfItIsAFreeAccountTestReturnFalse() throws InvalidInputException, NoRecordsFetchedException
+    {
+        User user = new User();
+        Company company = new Company();
+        LicenseDetail license = new LicenseDetail();
+        AccountsMaster master = new AccountsMaster();
+        master.setAccountsMasterId( CommonConstants.ACCOUNTS_MASTER_ENTERPRISE );
+        license.setAccountsMaster( master );
+        List<LicenseDetail> details = new ArrayList<LicenseDetail>();
+        details.add( license );
+        company.setLicenseDetails( details );
+        user.setCompany( company );
+        assertFalse( "", brainTreePaymentImpl.checkIfItIsAFreeAccount( user ) );
+    }
+
+
+    //Tests for calculateAmount
+    @Test ( expected = InvalidInputException.class)
+    public void calculateAmountTestCompanyNull() throws InvalidInputException
+    {
+        brainTreePaymentImpl.calculateAmount( null, new AccountsMaster() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void calculateAmountTestAccountsMasterNull() throws InvalidInputException
+    {
+        brainTreePaymentImpl.calculateAmount( new Company(), null );
+    }
+
+
+    @Test
+    public void calculateAmountTestValidInput() throws InvalidInputException
+    {
+        AccountsMaster accountsMaster = new AccountsMaster();
+        accountsMaster.setAmount( 1000 );
+        Mockito.doReturn( 1.0 ).when( brainTreePaymentImpl )
+            .calculateAmount( (Company) Mockito.any(), (AccountsMaster) Mockito.any() );
+        assertEquals( "", 1, brainTreePaymentImpl.calculateAmount( new Company(), accountsMaster ), 0 );
+    }
+
+
+    //Tests for getSubscriptionPriceFromBraintree
+    @Test ( expected = InvalidInputException.class)
+    public void getSubscriptionPriceFromBraintreeTestCompanyNull() throws InvalidInputException
+    {
+        brainTreePaymentImpl.getSubscriptionPriceFromBraintree( null );
     }
 }
