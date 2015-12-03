@@ -1364,7 +1364,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.setQuery( entityType + ":" + entityId + " AND " + CommonConstants.POST_TEXT_SOLR + ":" + "*"
-                + searchQuery + "*" );
+                + searchQuery + "*" + " AND " + CommonConstants.POST_TEXT_SOLR + ":[\"\" TO *]" );
             solrQuery.setStart( startIndex );
             solrQuery.setRows( noOfRows );
             solrQuery.addSort( CommonConstants.TIME_IN_MILLIS_SOLR, ORDER.desc );
