@@ -267,7 +267,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws CreditCardException
 	 * @throws SubscriptionUnsuccessfulException
 	 */
-	private void addCustomerWithPayment(Company company, String nonce) throws InvalidInputException, PaymentException, CreditCardException,
+	void addCustomerWithPayment(Company company, String nonce) throws InvalidInputException, PaymentException, CreditCardException,
 			SubscriptionUnsuccessfulException {
 
 		if (company == null) {
@@ -343,7 +343,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws InvalidInputException
 	 * @throws PaymentException
 	 */
-	private Customer containsCustomer(String customerId) throws InvalidInputException, PaymentException {
+	Customer containsCustomer(String customerId) throws InvalidInputException, PaymentException {
 
 		Customer customer = null;
 
@@ -393,7 +393,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws CreditCardException
 	 * @throws NonFatalException
 	 */
-	private String subscribeCustomer(String customerId, String planId) throws InvalidInputException, PaymentException,
+	String subscribeCustomer(String customerId, String planId) throws InvalidInputException, PaymentException,
 			SubscriptionUnsuccessfulException, NoRecordsFetchedException, CreditCardException {
 
 		String subscriptionId = null;
@@ -991,7 +991,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws SubscriptionUpgradeUnsuccessfulException
 	 * @throws NoRecordsFetchedException
 	 */
-	private void upgradeSubscription(String subscriptionId, float amount, String braintreePlanId) throws PaymentException, InvalidInputException,
+	void upgradeSubscription(String subscriptionId, float amount, String braintreePlanId) throws PaymentException, InvalidInputException,
 			SubscriptionUpgradeUnsuccessfulException, NoRecordsFetchedException {
 
 		if (subscriptionId == null || subscriptionId.isEmpty()) {
@@ -1058,7 +1058,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	private String getBraintreePlanId(int accountsMasterId) throws InvalidInputException {
+	String getBraintreePlanId(int accountsMasterId) throws InvalidInputException {
 		if (accountsMasterId < CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL && accountsMasterId > CommonConstants.ACCOUNTS_MASTER_FREE) {
 			LOG.error("getBraintreePlanId : accountsMAsterId parameter is invalid!");
 			throw new InvalidInputException("getBraintreePlanId : accountsMAsterId parameter is invalid!");
@@ -1083,7 +1083,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	private void updateLicenseDetailsTableOnPlanUpgrade(User user, LicenseDetail licenseDetail, Company company, AccountsMaster newAccountsMaster,
+	void updateLicenseDetailsTableOnPlanUpgrade(User user, LicenseDetail licenseDetail, Company company, AccountsMaster newAccountsMaster,
 			String subscriptionId) throws InvalidInputException, NoRecordsFetchedException {
 
 		if (licenseDetail == null) {
@@ -1127,7 +1127,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	private boolean checkIfItIsAFreeAccount(User user) throws InvalidInputException, NoRecordsFetchedException {
+	boolean checkIfItIsAFreeAccount(User user) throws InvalidInputException, NoRecordsFetchedException {
 		if (user == null) {
 			LOG.error("checkIfItIsAFreeAccount : user parameter null!");
 			throw new InvalidInputException("checkIfItIsAFreeAccount : user parameter null!");
@@ -1766,7 +1766,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	}
 
 	@Transactional
-	private double calculateAmount(Company company, AccountsMaster accountsMaster) throws InvalidInputException {
+	double calculateAmount(Company company, AccountsMaster accountsMaster) throws InvalidInputException {
 		if (company == null) {
 			LOG.error("Company is null in calculateAmount");
 			throw new InvalidInputException("Company is null in calculateAmount");
@@ -1795,7 +1795,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	}
 
 	@Transactional
-	private double getSubscriptionPriceFromBraintree(Company company) throws InvalidInputException {
+	double getSubscriptionPriceFromBraintree(Company company) throws InvalidInputException {
 		if (company == null) {
 			LOG.error("Company is null in getSubscriptionPriceFromBraintree.");
 			throw new InvalidInputException("Company is null in getSubscriptionPriceFromBraintree.");

@@ -356,7 +356,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
     }
 
 
-    private String createGooglePlusFeedURL( String accessToken )
+    String createGooglePlusFeedURL( String accessToken )
     {
         // Add parameters which are required in response fetch results.
         StringBuffer url = new StringBuffer( "https://www.googleapis.com/plus/v1/people/me/activities/public?access_token="
@@ -372,7 +372,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
     }
 
 
-    private Timestamp convertStringToDate( String dateStr ) throws NonFatalException
+    Timestamp convertStringToDate( String dateStr ) throws NonFatalException
     {
         Date date = null;
         SimpleDateFormat format = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );

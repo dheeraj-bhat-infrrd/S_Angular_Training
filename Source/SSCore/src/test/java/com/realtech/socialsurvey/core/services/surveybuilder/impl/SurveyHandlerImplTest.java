@@ -24,10 +24,13 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -375,5 +378,103 @@ public class SurveyHandlerImplTest
     public void canPostOnSocialMediaTestCanPost()
     {
         surveyHandlerImpl.canPostOnSocialMedia( new OrganizationUnitSettings(), 5.0 );
+    }
+
+
+    //Tests for validateUnitsettingsForDotloop
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationNull()
+    {
+        assertEquals( "", 1, surveyHandlerImpl.validateUnitsettingsForDotloop( null, null ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdNotSame()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 2 );
+        assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdSameInvalidCollectionName()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 1 );
+        surveyPreInitiation.setCollectionName( "test" );
+        assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdSameRegionSettingsCollectionNoUserProfile()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 1 );
+        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdSameRegionSettingsCollectionValidUserProfile()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 1 );
+        List<UserProfile> profiles = new ArrayList<UserProfile>();
+        profiles.add( new UserProfile() );
+        user.setUserProfiles( profiles );
+        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdSameBranchSettingsCollectionValidUserProfile()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 1 );
+        List<UserProfile> profiles = new ArrayList<UserProfile>();
+        profiles.add( new UserProfile() );
+        user.setUserProfiles( profiles );
+        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        assertEquals( "", 1, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    //Tests for checkIfRecordHasExpired
+    @Test
+    public void checkIfRecordHasExpiredTestHasExpired()
+    {
+        assertTrue( surveyHandlerImpl.checkIfRecordHasExpired( 0, 0, 0 ) );
+    }
+
+
+    @Test
+    public void checkIfRecordHasExpiredTestHasNotExpired()
+    {
+        assertFalse( surveyHandlerImpl.checkIfRecordHasExpired( 0, 0, 1 ) );
     }
 }
