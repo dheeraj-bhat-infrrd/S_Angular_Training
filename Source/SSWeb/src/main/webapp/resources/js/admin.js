@@ -1,7 +1,7 @@
 // Contains js functions for realtech admin
 
 var abuseReportStartIndex = 0;
-var abuseReportBatch = 5;
+var abuseReportBatch = 10;
 var doStopAbuseReportPagination = false;
 var isAbuseReportRequestRunning = false;
 
