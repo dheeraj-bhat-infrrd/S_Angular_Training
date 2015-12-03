@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 
 import org.junit.After;
@@ -12,11 +15,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.SurveyUploadVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 
 public class BulkSurveyFileUploadImplTest
@@ -26,6 +32,9 @@ public class BulkSurveyFileUploadImplTest
 
     @Mock
     private GenericDao<FileUpload, Long> fileUploadDao;
+
+    @Mock
+    private UserManagementService userManagementService;
 
 
     @BeforeClass
@@ -41,7 +50,6 @@ public class BulkSurveyFileUploadImplTest
     @Before
     public void setUp() throws Exception
     {
-        //bulkSurveyFileUploadImpl = new BulkSurveyFileUploadImpl();
         MockitoAnnotations.initMocks( this );
     }
 
@@ -110,5 +118,88 @@ public class BulkSurveyFileUploadImplTest
     public void updateFileUploadRecordTestFileuploadNull() throws InvalidInputException
     {
         bulkSurveyFileUploadImpl.updateFileUploadRecord( null );
+    }
+
+
+    //Tests for checkUploadObject
+    @Test
+    public void checkUploadObjectTestAgentMailIdNull()
+    {
+        SurveyUploadVO surveyUpload = new SurveyUploadVO();
+        surveyUpload.setAgentEmailId( null );
+        assertFalse( bulkSurveyFileUploadImpl.checkUploadObject( surveyUpload ) );
+    }
+
+
+    @Test
+    public void checkUploadObjectTestAgentMailIdEmpty()
+    {
+        SurveyUploadVO surveyUpload = new SurveyUploadVO();
+        surveyUpload.setAgentEmailId( "" );
+        assertFalse( bulkSurveyFileUploadImpl.checkUploadObject( surveyUpload ) );
+    }
+
+
+    @Test
+    public void checkUploadObjectTestCustomerFirstNameNull()
+    {
+        SurveyUploadVO surveyUpload = new SurveyUploadVO();
+        surveyUpload.setAgentEmailId( TestConstants.TEST_MAIL_ID_STRING );
+        surveyUpload.setCustomerFirstName( null );
+        assertFalse( bulkSurveyFileUploadImpl.checkUploadObject( surveyUpload ) );
+    }
+
+
+    @Test
+    public void checkUploadObjectTestCustomerFirstNameEmpty()
+    {
+        SurveyUploadVO surveyUpload = new SurveyUploadVO();
+        surveyUpload.setAgentEmailId( TestConstants.TEST_MAIL_ID_STRING );
+        surveyUpload.setCustomerFirstName( "" );
+        assertFalse( bulkSurveyFileUploadImpl.checkUploadObject( surveyUpload ) );
+    }
+
+
+    @Test
+    public void checkUploadObjectTestCustomerMailIdNull()
+    {
+        SurveyUploadVO surveyUpload = new SurveyUploadVO();
+        surveyUpload.setAgentEmailId( TestConstants.TEST_MAIL_ID_STRING );
+        surveyUpload.setCustomerFirstName( "test" );
+        surveyUpload.setCustomerEmailId( null );
+        assertFalse( bulkSurveyFileUploadImpl.checkUploadObject( surveyUpload ) );
+    }
+
+
+    @Test
+    public void checkUploadObjectTestCustomerMailIdEmpty()
+    {
+        SurveyUploadVO surveyUpload = new SurveyUploadVO();
+        surveyUpload.setAgentEmailId( TestConstants.TEST_MAIL_ID_STRING );
+        surveyUpload.setCustomerFirstName( "test" );
+        surveyUpload.setCustomerEmailId( "" );
+        assertFalse( bulkSurveyFileUploadImpl.checkUploadObject( surveyUpload ) );
+    }
+
+
+    @Test
+    public void checkUploadObjectTestCustomerMailIdSameAsAgentMailId()
+    {
+        SurveyUploadVO surveyUpload = new SurveyUploadVO();
+        surveyUpload.setAgentEmailId( TestConstants.TEST_MAIL_ID_STRING );
+        surveyUpload.setCustomerFirstName( "test" );
+        surveyUpload.setCustomerEmailId( TestConstants.TEST_MAIL_ID_STRING );
+        assertFalse( bulkSurveyFileUploadImpl.checkUploadObject( surveyUpload ) );
+    }
+
+
+    @Test
+    public void checkUploadObjectTestUploadObjectValid()
+    {
+        SurveyUploadVO surveyUpload = new SurveyUploadVO();
+        surveyUpload.setAgentEmailId( TestConstants.TEST_MAIL_ID_STRING );
+        surveyUpload.setCustomerFirstName( "test" );
+        surveyUpload.setCustomerEmailId( "test1@raremile.com" );
+        assertTrue( bulkSurveyFileUploadImpl.checkUploadObject( surveyUpload ) );
     }
 }
