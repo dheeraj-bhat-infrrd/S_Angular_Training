@@ -92,6 +92,7 @@
     <Compile Include="DAL\TestDBConnection.cs" />
     <Compile Include="EncompassGlobal.cs" />
     <Compile Include="EncompassSocialSurverConstant.cs" />
+    <Compile Include="EncompassSocialSurveyConfiguration.cs" />
     <Compile Include="EncryptionHelper.cs" />
     <Compile Include="Entity\Company.cs" />
     <Compile Include="Entity\CompanyCredentials.cs" />
