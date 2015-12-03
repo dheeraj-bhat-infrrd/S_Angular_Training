@@ -1340,7 +1340,7 @@ function fetchPublicPostsScroll(isNextBatch) {
 	        isLoaderRunningPublicPosts = false;
 	        paintPublicPosts(postsToShow);
 	        if(publicPostsNextBatch.length <= publicPostNumRows) {
-	    		fetchPublicPosts(true);
+	        	fetchPublicPostsScroll(true);
 	    	}
 	    }, 500);
 	} else {
@@ -1401,8 +1401,6 @@ function fetchPublicPosts(isNextBatch) {
 			doStopPublicPostPagination = true;
 			return
 		}
-		
-		
 		
 		//Check if request is for next batch
 		if(!isNextBatch) {
