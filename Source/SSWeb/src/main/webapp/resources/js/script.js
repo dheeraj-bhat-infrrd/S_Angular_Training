@@ -721,9 +721,10 @@ function validateTextArea(elementId) {
 	}
 }
 
+
+
 function validateCountryZipcode(elementId, isOnlyShowToast) {
-	selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
-	selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	
 	if (selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/') {
 		selectedCountryRegEx = ".*";
 		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
