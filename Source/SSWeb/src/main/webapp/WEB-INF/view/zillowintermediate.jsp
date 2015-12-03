@@ -3,9 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-
-
-
 <c:if test="${not empty accountSettings}">
 	<c:set var = "profile" value = "${ accountSettings }"></c:set>
 </c:if>
@@ -24,7 +21,7 @@
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
 						<div>
-							<form id="zillowForm" action="/zillowSaveInfo.do" method="post">
+							<form id="zillowForm">
 	 							<div class="zillow-input-container clearfix popupUrl">
 									<label class="zillow-input-label"><spring:message code="label.zillowconnect.key"/></label>
 									<div class="zillow-input-cont">
@@ -33,7 +30,6 @@
 										<span>/</span>
 									</div>
 								</div>
-								<%-- <div class="zillow-sub-btn" onclick="saveZillowEmailAddress()"><spring:message code="label.submit.key"/></div> --%>
 							</form>
 							<div class="zillow-example-cont popupUrl">
 								<div class="zillow-exm-url">
@@ -55,93 +51,3 @@
 		</div>
 	</div>
 </div>
-
-<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
-<script>
-$(document).ready(function() {
-	
-});
-
-
-function saveZillowEmailAddress() {
-	if(!validateZillowForm()){
-		return false;
-	}
-	
-	$('#zillowForm').submit();
-	
-	/* var payload = $('#zillowForm').serialize();
-	$.ajax({
-		url : './zillowSaveInfo.do',
-		type : "POST",
-		data : payload,
-		async : false,
-		complete : function(data) {
-			setTimeout(function() {
-				window.close();
-			}, 3000);
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			redirectErrorpage();
-		}
-	}); */
-}
-
-function validateZillowForm() {
-	/* var zillowEmailAddress = $('input[name="zillowEmailAddress"]').val();
-	if(zillowEmailAddress != undefined && zillowEmailAddress != "" && emailRegex.test(zillowEmailAddress)) {
-		return true;
-	} */
-	var zillowProfileName = $('input[name="zillowProfileName"]').val();
-	if(zillowProfileName == undefined ||  zillowProfileName == "") {
-		$('#overlay-toast').text("Please enter a valid profile name");
-		showToast();
-		return false;
-	}else {
-		return true;
-	}
-}
-
-$(window).on('unload',
-		function() {
-			var parentWindow = null;
-			if (window.opener != null && !window.opener.closed) {
-				parentWindow = window.opener;
-			}
-			var payload = {
-				'socialNetwork' : "zillow"
-			};
-			fetchSocialProfileUrl(payload, function(data) {
-				parentWindow.showLinkedInProfileUrl(data);
-				parentWindow.showProfileLink("zillow", data);
-				parentWindow.showProfileLinkInEditProfilePage("zillow",
-						data.responseText);
-			});
-		});
-
-function fetchSocialProfileUrl(payload, callBackFunction) {
-	$.ajax({
-		url : './profileUrl.do',
-		type : "GET",
-		cache : false,
-		data : payload,
-		async : false,
-		complete : callBackFunction,
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			redirectErrorpage();
-		}
-	});
-}
-</script>
-
-
