@@ -1316,7 +1316,7 @@ function downloadVCard(agentName){
 $('#prof-posts').scroll(function() {
     var scrollContainer = this;
     if (scrollContainer && $(scrollContainer).is(':visible')) {
-        if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) - scrollContainer.clientHeight)) &&
+        if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) - (scrollContainer.clientHeight / 0.75))) &&
             !isLoaderRunningPublicPosts) {
         	if (publicPostsNextBatch.length > 0 || !doStopPublicPostPagination) {
         		fetchPublicPostsScroll();        		
