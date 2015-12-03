@@ -1,8 +1,13 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -325,5 +330,32 @@ public class DashboardServiceImplTest
     public void testDownloadAgentRankingDataForNullSocialPosts() throws InvalidInputException, IOException
     {
         dashboardServiceImpl.downloadAgentRankingData( null, "test" );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Test
+    public void testAggregateAllSurveysSentForIncompleteSurveysNull()
+    {
+        @SuppressWarnings ( "rawtypes") Map completeSurveys = new HashMap<Integer, Integer>();
+        completeSurveys.put( 1, 1 );
+        assertEquals( completeSurveys, dashboardServiceImpl.aggregateAllSurveysSent( null, completeSurveys ) );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Test
+    public void testAggregateAllSurveysSentForCompleteSurveysNull()
+    {
+        @SuppressWarnings ( "rawtypes") Map incompleteSurveys = new HashMap<Integer, Integer>();
+        incompleteSurveys.put( 1, 1 );
+        assertEquals( incompleteSurveys, dashboardServiceImpl.aggregateAllSurveysSent( incompleteSurveys, null ) );
+    }
+
+
+    @Test
+    public void testAggregateAllSurveysSentForCompleteAndIncompleteSurveysNull()
+    {
+        assertNull( dashboardServiceImpl.aggregateAllSurveysSent( null, null ) );
     }
 }

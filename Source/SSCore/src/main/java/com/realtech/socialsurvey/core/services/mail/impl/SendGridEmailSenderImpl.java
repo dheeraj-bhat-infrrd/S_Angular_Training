@@ -170,7 +170,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     }
 
 
-    private void saveEmail( EmailEntity emailEntity, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException
+    void saveEmail( EmailEntity emailEntity, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "Sending mail: " + emailEntity.toString() );
         if ( emailEntity.getRecipients() == null || emailEntity.getRecipients().isEmpty() ) {
