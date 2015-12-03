@@ -1392,7 +1392,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    private int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
+    int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
     {
         LOG.info( "Inside method validateUnitSettingsForDotloop " );
         int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
@@ -1601,7 +1601,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    private Boolean checkIfRecordHasExpired( long surveyClosedDate, long systemTime, int expirationDays )
+    Boolean checkIfRecordHasExpired( long surveyClosedDate, long systemTime, int expirationDays )
     {
         long totalDaysInMillseconds = systemTime - surveyClosedDate;
         int totalDays = (int) ( totalDaysInMillseconds / ( 1000 * 60 * 60 * 24 ) );
