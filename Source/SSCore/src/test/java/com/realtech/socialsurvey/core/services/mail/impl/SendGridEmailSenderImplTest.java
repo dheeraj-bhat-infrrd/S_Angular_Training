@@ -27,11 +27,13 @@ public class SendGridEmailSenderImplTest
 
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
+    public static void setUpBeforeClass() throws Exception
+    {}
 
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
+    public static void tearDownAfterClass() throws Exception
+    {}
 
 
     @Before
@@ -45,7 +47,8 @@ public class SendGridEmailSenderImplTest
 
 
     @After
-    public void tearDown() throws Exception {}
+    public void tearDown() throws Exception
+    {}
 
 
     @Test ( expected = InvalidInputException.class)
@@ -167,5 +170,69 @@ public class SendGridEmailSenderImplTest
     {
         Whitebox.setInternalState( sendGridEmailSenderImpl, "sendMail", "Y" );
         sendGridEmailSenderImpl.sendEmail( emailEntity, TestConstants.TEST_STRING, null, true, true );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSaveEmailRecipientsNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        sendGridEmailSenderImpl.saveEmail( new EmailEntity(), false );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSaveEmailRecipientsEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        EmailEntity email = new EmailEntity();
+        email.setRecipients( new ArrayList<String>() );
+        sendGridEmailSenderImpl.saveEmail( email, false );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSaveEmailBodyNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        EmailEntity email = new EmailEntity();
+        List<String> list = new ArrayList<String>();
+        list.add( "test" );
+        email.setRecipients( list );
+        sendGridEmailSenderImpl.saveEmail( email, false );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSaveEmailBodyEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        EmailEntity email = new EmailEntity();
+        List<String> list = new ArrayList<String>();
+        list.add( "test" );
+        email.setRecipients( list );
+        email.setBody( "" );
+        sendGridEmailSenderImpl.saveEmail( email, false );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSaveEmailSubjectNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        EmailEntity email = new EmailEntity();
+        List<String> list = new ArrayList<String>();
+        list.add( "test" );
+        email.setRecipients( list );
+        email.setBody( "test" );
+        sendGridEmailSenderImpl.saveEmail( email, false );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSaveEmailSubjectEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        EmailEntity email = new EmailEntity();
+        List<String> list = new ArrayList<String>();
+        list.add( "test" );
+        email.setRecipients( list );
+        email.setBody( "test" );
+        email.setSubject( "" );
+        sendGridEmailSenderImpl.saveEmail( email, false );
     }
 }

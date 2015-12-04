@@ -1,13 +1,20 @@
 package com.realtech.socialsurvey.core.services.settingsmanagement.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -18,19 +25,24 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 
+
 public class SettingsLockerImplTest
 {
+    @Spy
     @InjectMocks
     private SettingsLockerImpl settingsLockerImpl;
 
     SettingsForApplication settings;
 
+
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
+    public static void setUpBeforeClass() throws Exception
+    {}
 
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
+    public static void tearDownAfterClass() throws Exception
+    {}
 
 
     @Before
@@ -42,7 +54,8 @@ public class SettingsLockerImplTest
 
 
     @After
-    public void tearDown() throws Exception {}
+    public void tearDown() throws Exception
+    {}
 
 
     @Test ( expected = InvalidInputException.class)
@@ -250,5 +263,29 @@ public class SettingsLockerImplTest
     {
         assertEquals( "Organization Unit does not match expected", OrganizationUnit.BRANCH,
             settingsLockerImpl.getHighestLockerLevel( CommonConstants.SET_BY_BRANCH ) );
+    }
+
+
+    @Test ( expected = InvalidSettingsStateException.class)
+    public void testGetModifiedSetSettingsValueAlreadyLockedNotLocked() throws InvalidSettingsStateException
+    {
+        Mockito
+            .doReturn( false )
+            .when( settingsLockerImpl )
+            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), Matchers.anyLong(),
+                (SettingsForApplication) Mockito.any() );
+        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, false );
+    }
+
+
+    @Test ( expected = RuntimeException.class)
+    public void testGetModifiedSetSettingsValueAlreadyLockedSettingLocked() throws InvalidSettingsStateException
+    {
+        Mockito
+            .doReturn( true )
+            .when( settingsLockerImpl )
+            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), Matchers.anyLong(),
+                (SettingsForApplication) Mockito.any() );
+        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, true );
     }
 }
