@@ -2284,8 +2284,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 /*Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden( review.getAgentId(),
                     CommonConstants.USER_ID_SOLR, true, 0, 1 );*/
                 // adding completeProfileUrl
-                OrganizationUnitSettings unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-                    review.getAgentId(), CommonConstants.AGENT_SETTINGS_COLLECTION );
+                OrganizationUnitSettings unitSetting = null;
+                if ( review.getSource().equals( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
+                    if ( review.getCompanyId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getCompanyId(),
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    } else if ( review.getRegionId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getRegionId(),
+                            CommonConstants.REGION_SETTINGS_COLLECTION );
+                    } else if ( review.getBranchId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getBranchId(),
+                            CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                    } else if ( review.getAgentId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
+                            CommonConstants.AGENT_SETTINGS_COLLECTION );
+                    } else {
+                        throw new InvalidInputException( "The zillow review with ID : " + review.get_id()
+                            + "does not have any hierarchy ID set" );
+                    }
+                } else {
+                    unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
+                        CommonConstants.AGENT_SETTINGS_COLLECTION );
+                }
                 if ( unitSetting != null ) {
                     profileUrl = (String) unitSetting.getProfileUrl();
                     review.setCompleteProfileUrl( baseProfileUrl + profileUrl );
@@ -2295,10 +2315,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     throw new InvalidInputException( "An agent with ID : " + review.getAgentId() + " does not exist" );
                 }
 
-                OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review
-                    .getAgentId() );
-                if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null ) {
-                    SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
+                /*OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review
+                    .getAgentId() );*/
+                if ( unitSetting != null && unitSetting.getSocialMediaTokens() != null ) {
+                    SocialMediaTokens mediaTokens = unitSetting.getSocialMediaTokens();
 
                     // adding yelpUrl
                     if ( mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null ) {
