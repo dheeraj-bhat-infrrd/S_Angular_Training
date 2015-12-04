@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import java.util.ArrayList;
@@ -16,9 +15,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -58,7 +59,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public class ProfileManagementServiceImplTest
 {
-
+    @Spy
     @InjectMocks
     private ProfileManagementServiceImpl profileManagementServiceImpl;
 
@@ -1420,7 +1421,7 @@ public class ProfileManagementServiceImplTest
         user.setUserProfiles( Arrays.asList( new UserProfile[] {} ) );
         OrganizationUnitSettings entitiySettings = new OrganizationUnitSettings();
         entitiySettings.setContact_details( new ContactDetailsSettings() );
-        OrganizationUnitSettings profileSettings  = new AgentSettings();
+        OrganizationUnitSettings profileSettings = new AgentSettings();
         Mockito.when( organizationManagementService.getCompanySettings( (User) Mockito.any() ) ).thenReturn( entitiySettings );
         OrganizationUnitSettings agentSettings = profileManagementServiceImpl.aggregateAgentDetails( user, profileSettings,
             new LockSettings() );
@@ -1446,6 +1447,65 @@ public class ProfileManagementServiceImplTest
         Mockito.when( organizationManagementService.getCompanySettings( (User) Mockito.any() ) ).thenReturn( entitiySettings );
         OrganizationUnitSettings unitSettings = profileManagementServiceImpl.aggregateAgentDetails( user, profileSettings,
             new LockSettings() );
-        assertSame( "Unit Settings does not match expected", profileSettings, unitSettings);
+        assertSame( "Unit Settings does not match expected", profileSettings, unitSettings );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetHierarchyDetailsByEntityWithEntityTypeRegionIdAndWhenCompanyIsNull() throws InvalidInputException,
+        ProfileNotFoundException
+    {
+        Mockito.when( organizationManagementService.getPrimaryCompanyByRegion( Mockito.anyLong() ) ).thenReturn( null );
+        profileManagementServiceImpl.getHierarchyDetailsByEntity( CommonConstants.REGION_ID, TestConstants.TEST_INT );
+
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetHierarchyDetailsByEntityWithEntityTypeBranchIdAndWhenRegionIsNull() throws InvalidInputException,
+        ProfileNotFoundException
+    {
+        Mockito.when( organizationManagementService.getPrimaryRegionByBranch( Mockito.anyLong() ) ).thenReturn( null );
+        profileManagementServiceImpl.getHierarchyDetailsByEntity( CommonConstants.BRANCH_ID, TestConstants.TEST_INT );
+
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetHierarchyDetailsByEntityWithEntityTypeBranchIdAndWhenRegionHasCompanyAsNull()
+        throws InvalidInputException, ProfileNotFoundException
+    {
+        Mockito.when( organizationManagementService.getPrimaryRegionByBranch( Mockito.anyLong() ) ).thenReturn( new Region() );
+        profileManagementServiceImpl.getHierarchyDetailsByEntity( CommonConstants.BRANCH_ID, TestConstants.TEST_INT );
+
+    }
+
+
+    @Test ( expected = ProfileNotFoundException.class)
+    public void testGetRegionSettingsByProfileNameWithNullRegionProfileName() throws ProfileNotFoundException,
+        InvalidInputException
+    {
+        profileManagementServiceImpl.getRegionSettingsByProfileName( TestConstants.TEST_STRING, null );
+    }
+
+
+    @Test ( expected = ProfileNotFoundException.class)
+    public void testGetBranchSettingsByProfileNameWhenCompanySettingsIsNull() throws ProfileNotFoundException,
+        InvalidInputException
+    {
+        Mockito.doReturn( null ).when( profileManagementServiceImpl ).getCompanyProfileByProfileName( Matchers.anyString() );
+        profileManagementServiceImpl.getBranchSettingsByProfileName( TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+    }
+
+
+    @Test ( expected = ProfileNotFoundException.class)
+    public void testGetBranchSettingsByProfileNameWhenBranchSettingsIsNull() throws ProfileNotFoundException,
+        InvalidInputException
+    {
+        Mockito.doReturn( new OrganizationUnitSettings() ).when( profileManagementServiceImpl )
+            .getCompanyProfileByProfileName( Matchers.anyString() );
+        Mockito.when( utils.generateBranchProfileUrl( Mockito.anyString(), Mockito.anyString() ) ).thenReturn( null );
+        profileManagementServiceImpl.getBranchSettingsByProfileName( TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+    }
+    /**getPrimaryHierarchyByEntity test cases on the settingslogic*/
 }
