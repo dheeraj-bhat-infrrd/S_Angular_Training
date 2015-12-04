@@ -5,18 +5,20 @@ package com.realtech.socialsurvey.core.utils;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import com.braintreegateway.org.apache.commons.codec.binary.Base64;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl;
 
 /**
  * This class houses all the encryption utilities required for the project.
@@ -138,7 +140,7 @@ public class EncryptionHelper {
 	 * @return encrypted text Byte Array
 	 * @throws InvalidInputException
 	 */
-	private byte[] encryptAES256Bytes(byte[] plainText, SecretKeySpec key) throws InvalidInputException {
+	byte[] encryptAES256Bytes(byte[] plainText, SecretKeySpec key) throws InvalidInputException {
 
 		if (plainText == null) {
 			LOG.error("Null parameter passed as first argument to encryptAES256Bytes of EncryptionHelper!");
@@ -189,7 +191,7 @@ public class EncryptionHelper {
 	 * @return plain text Byte Array
 	 * @throws InvalidInputException
 	 */
-	private byte[] decryptAES256Bytes(byte[] encryptedText, SecretKeySpec key) throws InvalidInputException {
+	byte[] decryptAES256Bytes(byte[] encryptedText, SecretKeySpec key) throws InvalidInputException {
 
 		if (encryptedText == null) {
 			LOG.error("Null parameter passed as first argument to decryptAES256Bytes of EncryptionHelper!");
