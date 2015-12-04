@@ -2568,6 +2568,10 @@ public class SocialManagementController
                 Collection<SocialMonitorPost> socialMonitorPosts = new ArrayList<SocialMonitorPost>();
                 List<ProfileImageUrlData> profileImageUrlList = new ArrayList<ProfileImageUrlData>();
                 for ( SocialPost item : postlist ) {
+                    if ( item.getPostText() == null || item.getPostText().isEmpty() ) {
+                        LOG.debug( "Empty post found! Skipping" );
+                        continue;
+                    }
                     SocialMonitorPost socialMonitorPost = new SocialMonitorPost();
 
                     socialMonitorPost.set_id( item.get_id() );

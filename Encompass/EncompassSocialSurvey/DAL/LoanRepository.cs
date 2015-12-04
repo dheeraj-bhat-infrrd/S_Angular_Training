@@ -223,9 +223,9 @@ namespace EncompassSocialSurvey.DAL
             finally
             {
 
-                if (mySqlDbConnnection.State == System.Data.ConnectionState.Open)
+                if (null != mySqlDbConnnection && mySqlDbConnnection.State == System.Data.ConnectionState.Open)
                 {
-                    Logger.Debug("Closin database connection ");
+                    Logger.Debug("Closing database connection ");
                     mySqlDbConnnection.Close();
                     mySqlDbConnnection.Dispose();
                 }
