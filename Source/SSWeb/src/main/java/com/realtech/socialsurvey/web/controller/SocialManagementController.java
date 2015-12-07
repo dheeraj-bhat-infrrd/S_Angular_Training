@@ -2476,7 +2476,7 @@ public class SocialManagementController
         }
         //JIRA SS-1287
         try {
-            Long lastBuild = batchTrackerService.getLastRunTimeByBatchType( CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD );
+            Long lastBuild = batchTrackerService.getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD );
             model.addAttribute( "lastBuild", lastBuild );
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "NoRecordsFetchedException while getting last build time. Reason  : ", e );

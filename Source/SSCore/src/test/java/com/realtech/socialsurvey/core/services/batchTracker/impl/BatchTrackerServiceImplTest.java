@@ -57,7 +57,7 @@ public class BatchTrackerServiceImplTest
         Mockito
             .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyObject() ) )
             .thenReturn( new ArrayList<BatchTracker>() );
-        batchTrackerServiceImpl.getLastRunTimeByBatchType( "" );
+        batchTrackerServiceImpl.getLastRunEndTimeByBatchType( "" );
     }
 
 
@@ -67,7 +67,7 @@ public class BatchTrackerServiceImplTest
         Mockito
             .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyObject() ) )
             .thenReturn( null );
-        batchTrackerServiceImpl.getLastRunTimeByBatchType( "" );
+        batchTrackerServiceImpl.getLastRunEndTimeByBatchType( "" );
     }
 
 
@@ -78,7 +78,7 @@ public class BatchTrackerServiceImplTest
         Mockito
             .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyObject() ) )
             .thenReturn( new ArrayList<BatchTracker>() );
-        batchTrackerServiceImpl.updateModifiedOnColumnByBatchType( "" );
+        batchTrackerServiceImpl.updateLastRunEndTimeByBatchType( "" );
     }
 
 
@@ -89,7 +89,7 @@ public class BatchTrackerServiceImplTest
         Mockito
             .when( batchTrackerDao.findByColumn( Mockito.eq( BatchTracker.class ), Mockito.anyString(), Mockito.anyObject() ) )
             .thenReturn( null );
-        batchTrackerServiceImpl.updateModifiedOnColumnByBatchType( "" );
+        batchTrackerServiceImpl.updateLastRunEndTimeByBatchType( "" );
     }
 
 
