@@ -53,6 +53,7 @@
 	</div>
 </div>
 
+
  <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script> 
@@ -90,7 +91,7 @@
 		window.close();
 	}, 3000);
 });
- 
+
 $(window).on('unload', function(){
 
 	var parentWindow = null;
