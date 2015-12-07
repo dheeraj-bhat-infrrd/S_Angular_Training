@@ -522,12 +522,12 @@ function updateDashboardProfileEvents() {
     
     //update dashboard button events 
     $('#pro-cmplt-stars').on('click', '#dsh-btn1', function() {
-		if (columnName == 'agentId') {
+		if (colName == 'agentId') {
 			sendSurveyInvitation('#dsh-btn1');
 		} else if (accountType == "INDIVIDUAL") {
 			sendSurveyInvitation('#dsh-btn1');
 		} else {
-			sendSurveyInvitationAdmin(columnName, columnValue,'#dsh-btn1');
+			sendSurveyInvitationAdmin(colName, colValue,'#dsh-btn1');
 		}
 	});
 	$('#pro-cmplt-stars').on('click', '#dsh-btn2', function(){
@@ -755,25 +755,21 @@ function fetchReviewsOnDashboard(isNextBatch) {
 	if(!isNextBatch) {
 		showLoaderOnPagination($('#review-details'));
 	}
+	
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
 		var tempDiv = $('<div>').html(data);
 		var reviewsCount = tempDiv.children('div.dsh-review-cont').length;
 		
 		//check if no reviews found
-		var payloadData = {
-				"columnName" : colName,
-				"columnValue" : colValue
-			};
 		if(startIndexCmp == 0) {
-			callAjaxGetWithPayloadData("./fetchName.do", function(name) {
-				if (reviewsCount == 0) {
-					$("#review-desc").html("No reviews found for " + name);
-					$("#review-details").html('');
-					return;
-				} else {
-					$("#review-desc").html("What people say about " + name);
-				}
-			}, payloadData, true);
+			var name = $('#review-desc').attr('data-profile-name');
+			if (reviewsCount == 0) {
+				$("#review-desc").html("No reviews found for " + name);
+				$("#review-details").html('');
+				return;
+			} else {
+				$("#review-desc").html("What people say about " + name);
+			}
 		}
 		
 		if(reviewsCount < batchSizeCmp) {

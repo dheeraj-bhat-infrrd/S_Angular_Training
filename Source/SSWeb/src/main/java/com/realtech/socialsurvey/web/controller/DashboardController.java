@@ -159,27 +159,33 @@ public class DashboardController
             }
         }
 
+        String profileName = "";
         if ( !modelSet ) {
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = user.getCompany().getCompany();
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = solrSearchService.searchRegionById( entityId );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = solrSearchService.searchBranchNameById( entityId );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
                 model.addAttribute( "columnValue", entityId );
+                profileName = user.getFirstName() + " " + user.getLastName();
             }
         }
-
+        
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "emailId", user.getEmailId() );
+        model.addAttribute( "profileName", profileName );
 
         return JspResolver.DASHBOARD;
     }
