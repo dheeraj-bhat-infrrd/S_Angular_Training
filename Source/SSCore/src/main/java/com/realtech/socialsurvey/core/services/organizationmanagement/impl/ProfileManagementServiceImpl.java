@@ -3697,8 +3697,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
                 entityType = CommonConstants.AGENT_ID_COLUMN;
             }
-//            No need to delete zillow reviews as per JIRA SS-1276
-//            surveyHandler.deleteExcessZillowSurveysByEntity( entityType, profile.getIden() );
+            // Commented as Zillow surveys are not stored in database, SS-1276
+            // surveyHandler.deleteExcessZillowSurveysByEntity( entityType, profile.getIden() );
         } else {
             LOG.info( "Zillow is not added for the profile" );
             throw new InvalidInputException( "Zillow is not added for the profile" );
@@ -3789,7 +3789,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                         if ( proReviews != null ) {
                                             reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
                                             if ( reviews != null ) {
-//                                                No need to insert zillow reviews as per JIRA SS-1276
+//                                                Commented as Zillow surveys are not stored in database, SS-1276
 //                                                for ( HashMap<String, Object> review : reviews ) {
 //                                                    String sourceId = (String) review.get( "reviewURL" );
 //                                                    SurveyDetails surveyDetails = surveyHandler

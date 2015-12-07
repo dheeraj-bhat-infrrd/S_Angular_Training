@@ -1708,7 +1708,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( entityId <= 0 ) {
             throw new InvalidInputException( "Entity ID is invalid" );
         }
-        surveyDetailsDao.removeZillowSurveysByEntity( entityType, entityId );
+        // Commented as Zillow surveys are not stored in database, SS-1276
+        // surveyDetailsDao.removeZillowSurveysByEntity( entityType, entityId );
         LOG.info( "Method deleteZillowSurveysByEntity() finished" );
     }
 
@@ -1724,7 +1725,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( entityId <= 0 ) {
             throw new InvalidInputException( "Entity ID is invalid" );
         }
-        surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
+        // Commented as Zillow surveys are not stored in database, SS-1276
+        // surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
         LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
     }
 

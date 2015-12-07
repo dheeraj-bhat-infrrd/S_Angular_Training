@@ -973,7 +973,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	}
     	Query query = new Query();
     	query.addCriteria(Criteria.where(organizationUnitColumn).is(organizationUnitColumnValue));
-    	query.addCriteria(Criteria.where(CommonConstants.SURVEY_SOURCE_COLUMN).ne(CommonConstants.SURVEY_SOURCE_ZILLOW));
+        // Commented as Zillow surveys are not stored in database, SS-1276
+        // query.addCriteria(Criteria.where(CommonConstants.SURVEY_SOURCE_COLUMN).ne(CommonConstants.SURVEY_SOURCE_ZILLOW));
     	query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
     	if(filterAbusive){
     		query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(false));
@@ -1012,8 +1013,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	}
     	// match survey stage
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.STAGE_COLUMN,CommonConstants.SURVEY_STAGE_COMPLETE)));
+        // Commented as Zillow surveys are not stored in database, SS-1276
     	// match non zillow survey
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
+        // pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
     	// match non abusive survey
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.IS_ABUSIVE_COLUMN,false)));
     	// match start date
@@ -1079,8 +1081,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     		// adding organization unit
     		pipeline.add(new BasicDBObject("$match", new BasicDBObject(organizationUnitColumn, organizationUnitColumnValue)));
     	}
+        // Commented as Zillow surveys are not stored in database, SS-1276
     	// match non zillow survey
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
+        // pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
     	// match start date
     	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.CREATED_ON,new BasicDBObject("$gte", new Date(startDate.getTime())))));
     	// match end date
@@ -1379,8 +1382,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+            	    // Commented as Zillow surveys are not stored in database, SS-1276
+            	    // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
             		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
             		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
             		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), 
@@ -1389,23 +1393,26 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         } else if ( startDate != null && endDate == null )
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
             		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            	    // Commented as Zillow surveys are not stored in database, SS-1276
+            	    // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
             		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
             		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
             		Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
             		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         else if ( startDate == null && endDate != null )
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
+            		// Commented as Zillow surveys are not stored in database, SS-1276
+            		// Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
             		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
             		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
             		Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), 
             		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                    Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                    // Commented as Zillow surveys are not stored in database, SS-1276
+                    // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
             		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
             		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
             		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
@@ -1445,7 +1452,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( startDate != null && endDate != null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
             		Aggregation.match( Criteria.where(columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		// Commented as Zillow surveys are not stored in database, SS-1276
+            	    // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
             		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
             		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
             		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
@@ -1454,7 +1462,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         } else if ( startDate != null && endDate == null )
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
             		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		// Commented as Zillow surveys are not stored in database, SS-1276
+            		// Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
             		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
             		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
             		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
@@ -1462,7 +1471,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         else if ( startDate == null && endDate != null )
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
             		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+            		// Commented as Zillow surveys are not stored in database, SS-1276
+            		// Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
             		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
             		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
             		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), 
@@ -1470,7 +1480,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
             		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+//            		Commented as Zillow surveys are not stored in database, SS-1276
+//            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
             		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
             		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
             		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
@@ -1560,7 +1571,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
             CommonConstants.SURVEY_SOURCE_ZILLOW ) );
         query.addCriteria( Criteria.where( entityType ).is( entityId ) );
-        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+        // Commented as Zillow surveys are not stored in database, SS-1276
+        // mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method removeZillowSurveysByEntity() finished" );
     }
 
@@ -1569,18 +1581,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public void removeExcessZillowSurveysByEntity( String entityType, long entityId )
     {
         LOG.info( "Method removeExcessZillowSurveysByEntity() started" );
-        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
-            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
-        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
-        query.with( new Sort( Sort.Direction.ASC, "createdOn" ) );
-        List<DBObject> surveys = mongoTemplate.find( query, DBObject.class, SURVEY_DETAILS_COLLECTION );
-        int count = surveys.size();
-        if ( count > 10 ) {
-            int noOfSurveysToRemove = count - 10;
-            for ( int i = 0; i < noOfSurveysToRemove; i++ ) {
-                mongoTemplate.remove( surveys.get( i ), SURVEY_DETAILS_COLLECTION );
-            }
-        }
+        // Commented as Zillow surveys are not stored in database, SS-1276
+        //        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
+        //            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+        //        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+        //        query.with( new Sort( Sort.Direction.ASC, "createdOn" ) );
+        //        List<DBObject> surveys = mongoTemplate.find( query, DBObject.class, SURVEY_DETAILS_COLLECTION );
+        //        int count = surveys.size();
+        //        if ( count > 10 ) {
+        //            int noOfSurveysToRemove = count - 10;
+        //            for ( int i = 0; i < noOfSurveysToRemove; i++ ) {
+        //                mongoTemplate.remove( surveys.get( i ), SURVEY_DETAILS_COLLECTION );
+        //            }
+        //        }
         LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
     }
 

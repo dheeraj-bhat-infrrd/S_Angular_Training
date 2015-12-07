@@ -1863,7 +1863,7 @@ public class SocialManagementController
                     model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                     return JspResolver.SOCIAL_AUTH_MESSAGE;
                 }
-//                No need to insert zillow reviews as per JIRA SS-1276
+//                Commented as Zillow surveys are not stored in database, SS-1276
 //                LOG.debug("Deleting old zillow feed for company ID : " + entityId);
 //                surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
                 
@@ -1938,7 +1938,7 @@ public class SocialManagementController
 							if (proReviews != null) {
 								reviews = (List<HashMap<String, Object>>) proReviews.get("review");
 								if (reviews != null) {
-//				                    No need to insert zillow reviews as per JIRA SS-1276
+//				                    Commented as Zillow surveys are not stored in database, SS-1276
 //									for (HashMap<String, Object> review : reviews) {
 //										String sourceId = (String) review.get("reviewURL");
 //										SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(
@@ -2292,8 +2292,9 @@ public class SocialManagementController
             
             //Remove zillow reviews on disconnect.
             if(socialMedia.equals(CommonConstants.ZILLOW_SOCIAL_SITE)){
-            	LOG.debug("Deleting zillow feed for agent ID : " + entityId);
-                surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // LOG.debug("Deleting zillow feed for agent ID : " + entityId);
+                // surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
             }
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in disconnectSocialNetwork() while disconnecting with the social Media." );
