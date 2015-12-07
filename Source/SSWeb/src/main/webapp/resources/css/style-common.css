@@ -4055,7 +4055,7 @@ img.prof-image {
 .dash-top-info {
 	border-bottom: 1px solid #dcdcdc;
 	overflow: hidden;
-	height: 425px;
+	min-height: 330px;
 }
 
 .stats-left {
