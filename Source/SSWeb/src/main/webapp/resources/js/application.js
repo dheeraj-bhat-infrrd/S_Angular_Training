@@ -7529,7 +7529,7 @@ function paintProfImage(imgDivClass) {
 	$("." + imgDivClass).each(
 			function() {
 				var imageUrl = $(this).attr('data-imageurl');
-				if (imageUrl != "" && imageUrl != undefined) {
+				if (imageUrl != "" && imageUrl != undefined && imageUrl != " ") {
 					$(this).css("background",
 							"url(" + imageUrl + ") no-repeat center");
 					$(this).css("background-size", "100%");
