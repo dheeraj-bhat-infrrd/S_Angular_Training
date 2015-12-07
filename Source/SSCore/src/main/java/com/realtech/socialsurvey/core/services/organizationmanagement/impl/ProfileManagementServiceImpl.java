@@ -2525,7 +2525,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 Branch branch = branchDao.findById( Branch.class, userProfile.getBranchId() );
                 updateCrumbListWithBranchName( breadCrumbList, branch );
 
-                Region region = regionDao.findById( Region.class, userProfile.getRegionId() );
+                //JIRA SS-1337
+                if ( branch == null ) {
+                    throw new InvalidInputException( "No branch with ID : " + userProfile.getBranchId() + " was found" );
+                } else if ( branch.getRegion() == null ) {
+                    throw new InvalidInputException( "No region associated to branch with ID : " + userProfile.getBranchId()
+                        + " was found" );
+                }
+                Region region = branch.getRegion();
+                //Region region = regionDao.findById( Region.class, userProfile.getRegionId() );
                 updateCrumbListWithRegionName( breadCrumbList, region );
 
                 updateCrumbListWithCompanyName( breadCrumbList, company );
@@ -3490,7 +3498,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                /*if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     socialMediaTokens.setFacebookToken( companyUnitSettings.getSocialMediaTokens().getFacebookToken() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
                     socialMediaTokens.setFacebookToken( regionUnitSettings.getSocialMediaTokens().getFacebookToken() );
@@ -3498,11 +3506,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setFacebookToken( branchUnitSettings.getSocialMediaTokens().getFacebookToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setFacebookToken( agentUnitSettings.getSocialMediaTokens().getFacebookToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.GOOGLE_PLUS ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3513,11 +3521,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setGoogleToken( branchUnitSettings.getSocialMediaTokens().getGoogleToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setGoogleToken( agentUnitSettings.getSocialMediaTokens().getGoogleToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.TWITTER ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3528,11 +3536,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setTwitterToken( branchUnitSettings.getSocialMediaTokens().getTwitterToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setTwitterToken( agentUnitSettings.getSocialMediaTokens().getTwitterToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.LINKED_IN ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3543,11 +3551,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setLinkedInToken( branchUnitSettings.getSocialMediaTokens().getLinkedInToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setLinkedInToken( agentUnitSettings.getSocialMediaTokens().getLinkedInToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.LENDING_TREE ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3558,11 +3566,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setLendingTreeToken( branchUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setLendingTreeToken( agentUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.YELP ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3573,11 +3581,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setYelpToken( branchUnitSettings.getSocialMediaTokens().getYelpToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setYelpToken( agentUnitSettings.getSocialMediaTokens().getYelpToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.REALTOR ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3588,11 +3596,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setRealtorToken( branchUnitSettings.getSocialMediaTokens().getRealtorToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setRealtorToken( agentUnitSettings.getSocialMediaTokens().getRealtorToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.ZILLOW ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3603,7 +3611,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setZillowToken( branchUnitSettings.getSocialMediaTokens().getZillowToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setZillowToken( agentUnitSettings.getSocialMediaTokens().getZillowToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             }
         }
