@@ -62,18 +62,15 @@ public class SocialPostsDeltaImport
             lastBuildTime = new Date( 0l );
             nextLastBuildTime = new Timestamp( System.currentTimeMillis() );
         } else {
-            try {
-                //Long lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
-                //JIRA SS-1287
-                //Get last build time from batch tracker table
-                Long lastBuild = batchTrackerService
-                    .getLastRunTimeByBatchType( CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD );
-                lastBuildTime = new Date( lastBuild );
-                nextLastBuildTime = new Timestamp( System.currentTimeMillis() );
-            } catch ( NoRecordsFetchedException e ) {
-                LOG.error( "Unable to fetch lastBuildTime from Batch Tracker table. Reason : ", e );
-                errorOccured = true;
-            }
+
+            //Long lastBuild = solrSearchService.getLastBuildTimeForSocialPosts().getTime();
+            //JIRA SS-1287
+            //Get last build time from batch tracker table
+            Long lastBuild = batchTrackerService
+                .getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD );
+            lastBuildTime = new Date( lastBuild );
+            nextLastBuildTime = new Timestamp( System.currentTimeMillis() );
+
         }
         do {
             try {
@@ -105,8 +102,8 @@ public class SocialPostsDeltaImport
         //Update last build time in batch tracker table
         if ( !( errorOccured ) ) {
             try {
-                batchTrackerService.updateModifiedOnColumnByBatchTypeAndTime(
-                    CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD, nextLastBuildTime );
+                batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD );
+             
             } catch ( NoRecordsFetchedException e ) {
                 LOG.error( "Unable to update last build time in batch tracker. Reason : ", e );
             } catch ( InvalidInputException e ) {
