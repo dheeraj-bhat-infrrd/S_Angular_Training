@@ -278,7 +278,7 @@ public class SettingsLockerImplTest
     }
 
 
-    @Test ( expected = RuntimeException.class)
+    @Test ( expected = InvalidSettingsStateException.class)
     public void testGetModifiedSetSettingsValueAlreadyLockedSettingLocked() throws InvalidSettingsStateException
     {
         Mockito
