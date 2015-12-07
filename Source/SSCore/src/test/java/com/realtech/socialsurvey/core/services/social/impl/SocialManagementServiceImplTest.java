@@ -108,4 +108,15 @@ public class SocialManagementServiceImplTest
         socialManagementServiceImpl.checkOrAddZillowLastUpdated( new SocialMediaTokens() );
     }
 
+    @Test ( expected = NonFatalException.class)
+        public void testPostToSocialMediaWithIsAbusiveTrue() throws NonFatalException
+        {
+    
+            Mockito.when( emailFormatHelper.getCustomerDisplayNameForEmail( Mockito.anyString(), Mockito.anyString() ) )
+                .thenReturn( "" );
+           socialManagementServiceImpl.postToSocialMedia( TestConstants.TEST_STRING, null ,
+               TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_LONG, TestConstants.TEST_DOUBLE,
+                TestConstants.TEST_MAIL_ID_STRING, TestConstants.TEST_STRING, true, TestConstants.TEST_STRING , true );
+        }
+     
 }

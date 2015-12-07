@@ -633,6 +633,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         LOG.info( "Method to post feedback of customer to various pages of social networking sites started." );
         boolean successfullyPosted = true;
+        
+        if(agentProfileLink == null || agentProfileLink.isEmpty()){
+            throw new InvalidInputException("Invalid parameter passed : passed input parameter agentProfileLink is null or empty");
+        }
+        
         try {
             String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
 
@@ -694,7 +699,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             //Social Survey
             if ( !agentSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
                 agentSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
-            
+
             if ( !companySocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
                 companySocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
 
@@ -713,7 +718,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 branchMediaPostDetails.setSharedOn( branchSocialList );
             }
 
-            //if onlyPostToSocialSurvey is false than only post on the social medial otherwise just add social survey channel in social media post list
+            //if onlyPostToSocialSurvey is false than only post on the social media otherwise just add social survey channel in social media post list
             if ( !isAbusive && !onlyPostToSocialSurvey ) {
                 // Facebook
                 String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
@@ -940,6 +945,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( companySocialList );
             surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
             surveyHandler.updateSurveyDetails( surveyDetails );
+
 
         } catch ( NonFatalException e ) {
             LOG.error(
