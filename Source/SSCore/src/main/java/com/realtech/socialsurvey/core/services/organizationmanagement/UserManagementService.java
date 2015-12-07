@@ -130,7 +130,7 @@ public interface UserManagementService
 
 
     // Method to get list of the branches assigned to the given user.
-    public List<Branch> getBranchesAssignedToUser( User user ) throws NoRecordsFetchedException;
+    public List<Branch> getBranchesAssignedToUser( User user ) throws NoRecordsFetchedException, InvalidInputException;
 
 
     // Method to return list of users belonging to the same company as that of user passed.
@@ -236,7 +236,7 @@ public interface UserManagementService
     public List<UserProfile> getAllUserProfilesForUser( User user ) throws InvalidInputException;
 
 
-    public boolean userExists( String userName );
+    public boolean userExists( String userName ) throws InvalidInputException;
 
 
     // JIRA SS-42 by RM-06:EOC

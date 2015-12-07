@@ -276,7 +276,7 @@ public class SurveyManagementController
                 String surveyScore = String.valueOf( survey.getScore() );
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
-                        customerName, surveyScore );
+                        customerName, surveyScore , logoUrl );
                 }
 
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
@@ -1105,8 +1105,8 @@ public class SurveyManagementController
         try {
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
             if ( agentSettings != null ) {
-                if ( agentSettings.getProfileImageUrl() != null && !agentSettings.getProfileImageUrl().isEmpty() ) {
-                    picLocation = agentSettings.getProfileImageUrl();
+                if ( agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
+                    picLocation = agentSettings.getProfileImageUrlThumbnail();
                 }
             }
         } catch ( InvalidInputException e ) {

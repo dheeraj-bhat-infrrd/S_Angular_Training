@@ -8,12 +8,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.dao.ForwardMailDetailsDao;
@@ -775,7 +777,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyCompletionMailToAdminsAndAgent( String recipientName, String recipientMailId, String surveyDetail,
-        String customerName, String rating ) throws InvalidInputException, UndeliveredEmailException
+        String customerName, String rating , String logoUrl ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -797,7 +799,13 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, recipientMailId, surveyDetail ) );
+        
+        if ( logoUrl == null || logoUrl.isEmpty() ){
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, recipientMailId, surveyDetail ) );
+        }else{
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, recipientMailId, surveyDetail ) );
+        }
+        
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements, false, false );
@@ -922,6 +930,10 @@ public class EmailServicesImpl implements EmailServices
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT;
+        
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName( subjectFileName );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( agentName) );
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -939,7 +951,7 @@ public class EmailServicesImpl implements EmailServices
 
 
         LOG.debug( "Calling email sender to send mail" );
-        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false, false );
         LOG.info( "Successfully sent survey invitation mail" );
     }
 

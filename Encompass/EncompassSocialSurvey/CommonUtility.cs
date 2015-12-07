@@ -3,6 +3,10 @@ using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+/* Network */
+using System.Net;
+using System.Net.Mail;
+using SendGrid;
 
 namespace EncompassSocialSurvey
 {
@@ -13,7 +17,21 @@ namespace EncompassSocialSurvey
             Logger.Info("Entering the method CommonUtility.ConvertStringToDateTime()");
             try
             {
-                DateTime dt = DateTime.ParseExact(inputDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                // "11/30/2015 01:54 PM"
+                string dateWithTimeFormat = "MM/dd/yyyy hh:mm tt";
+
+                string dateFormat = "MM/dd/yyyy";
+
+                DateTime dt;
+
+                try
+                {
+                    dt = DateTime.ParseExact(inputDate, dateWithTimeFormat, CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                    dt = DateTime.ParseExact(inputDate, dateFormat, CultureInfo.InvariantCulture);
+                }
 
                 Logger.Info("Exiting the method CommonUtility.ConvertStringToDateTime()");
                 return dt;
@@ -86,6 +104,35 @@ namespace EncompassSocialSurvey
             byte[] encryptedBytes = Convert.FromBase64CharArray(CipherText.ToCharArray(), 0, CipherText.Length);
             byte[] decryptedData = decrypto.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
             return ASCIIEncoding.UTF8.GetString(decryptedData);
-        }       
+        }
+
+        public static void SendMailToAdmin(string subject , string body)
+        {
+            try
+            {
+                Logger.Debug("Sending mail to admin ");
+                Logger.Debug("Mail Subject is : " + subject);
+                Logger.Debug("Mail body is : " + body);
+
+                var credentials = new NetworkCredential(EncompassSocialSurveyConfiguration.SendgridUsername, EncompassSocialSurveyConfiguration.SendgridPassword);
+
+                SendGridMessage myMessage = new SendGridMessage();
+                myMessage.AddTo(EncompassSocialSurveyConfiguration.AdminEmailAddress);
+                myMessage.From = new MailAddress(EncompassSocialSurveyConfiguration.SendgridFromAddress, EncompassSocialSurveyConfiguration.SendgridName);
+                myMessage.Subject = subject;
+                myMessage.Text = body;
+
+                var transportWeb = new Web(credentials);
+                transportWeb.DeliverAsync(myMessage);
+
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: CommonUtility.sendMailToAdmin(): ", ex);
+            }
+
+        }
+
     }
 }

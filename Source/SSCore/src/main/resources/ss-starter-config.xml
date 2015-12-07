@@ -451,7 +451,7 @@
 	<bean id="imageprocessingcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="imageprocessingjobdetail" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 0 8 * * ?" />
 	</bean>
 
 	<!-- Scheduler factory -->
@@ -475,8 +475,7 @@
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<ref bean="setcompanyidsinsocialpostsjobdetail" />
 				<ref bean="imageprocessingjobdetail" /> 
-				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
-				<!-- <ref bean="isprofileimgsetjobdetail" /> -->
+				<ref bean="hierarchysettingsjobdetail" />
 			</list>
 		</property>
 
@@ -499,8 +498,7 @@
 				<ref bean="solrreviewcounterupdatercron" />
 				<ref bean="setcompanyidsinsocialpostscron" />
 				<ref bean="imageprocessingcron" />
-				<!-- <ref bean="hierarchysettingscron" /> -->
-				<!-- <ref bean="isprofileimagesetcron" /> -->
+				<ref bean="hierarchysettingscron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

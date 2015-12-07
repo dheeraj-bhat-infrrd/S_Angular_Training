@@ -695,15 +695,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-            logoUrl = companySettings.getLogo();
+            logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-            logoUrl = regionSettings.getLogo();
+            logoUrl = regionSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
             OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-            logoUrl = branchSettings.getLogo();
+            logoUrl = branchSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-            logoUrl = agentSettings.getLogo();
+            logoUrl = agentSettings.getLogoThumbnail();
         }
         sendInvitationMailByAgent( user, custFirstName, custLastName, custEmail, link, logoUrl );
         // else
@@ -765,10 +765,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-            logoUrl = companySettings.getLogo();
+            logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-            logoUrl = regionSettings.getLogo();
+            logoUrl = regionSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
             OrganizationUnitSettings branchSettings = null;
             try {
@@ -778,10 +778,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 e.printStackTrace();
             }
             if ( branchSettings != null ) {
-                logoUrl = branchSettings.getLogo();
+                logoUrl = branchSettings.getLogoThumbnail();
             }
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-            logoUrl = agentSettings.getLogo();
+            logoUrl = agentSettings.getLogoThumbnail();
         }
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
@@ -881,10 +881,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-            logoUrl = companySettings.getLogo();
+            logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-            logoUrl = regionSettings.getLogo();
+            logoUrl = regionSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
             OrganizationUnitSettings branchSettings = null;
             try {
@@ -894,10 +894,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 e.printStackTrace();
             }
             if ( branchSettings != null ) {
-                logoUrl = branchSettings.getLogo();
+                logoUrl = branchSettings.getLogoThumbnail();
             }
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-            logoUrl = agentSettings.getLogo();
+            logoUrl = agentSettings.getLogoThumbnail();
         }
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
@@ -997,10 +997,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-            logoUrl = companySettings.getLogo();
+            logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-            logoUrl = regionSettings.getLogo();
+            logoUrl = regionSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
             OrganizationUnitSettings branchSettings = null;
             try {
@@ -1010,10 +1010,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 e.printStackTrace();
             }
             if ( branchSettings != null ) {
-                logoUrl = branchSettings.getLogo();
+                logoUrl = branchSettings.getLogoThumbnail();
             }
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-            logoUrl = agentSettings.getLogo();
+            logoUrl = agentSettings.getLogoThumbnail();
         }
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
@@ -1121,10 +1121,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-            logoUrl = companySettings.getLogo();
+            logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-            logoUrl = regionSettings.getLogo();
+            logoUrl = regionSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
             OrganizationUnitSettings branchSettings = null;
             try {
@@ -1134,10 +1134,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 e.printStackTrace();
             }
             if ( branchSettings != null ) {
-                logoUrl = branchSettings.getLogo();
+                logoUrl = branchSettings.getLogoThumbnail();
             }
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-            logoUrl = agentSettings.getLogo();
+            logoUrl = agentSettings.getLogoThumbnail();
         }
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
@@ -1392,7 +1392,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    private int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
+    int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
     {
         LOG.info( "Inside method validateUnitSettingsForDotloop " );
         int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
@@ -1601,7 +1601,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    private Boolean checkIfRecordHasExpired( long surveyClosedDate, long systemTime, int expirationDays )
+    Boolean checkIfRecordHasExpired( long surveyClosedDate, long systemTime, int expirationDays )
     {
         long totalDaysInMillseconds = systemTime - surveyClosedDate;
         int totalDays = (int) ( totalDaysInMillseconds / ( 1000 * 60 * 60 * 24 ) );

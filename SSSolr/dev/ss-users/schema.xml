@@ -46,6 +46,7 @@
     <field name="profileUrl" type="text" indexed="true" stored="true" />
     <field name="profileName" type="text" indexed="true" stored="true" />
     <field name="profileImageUrl" type="text" indexed="true" stored="true" />
+    <field name="profileImageUrlThumbnail" type="text" indexed="true" stored="true" />
     <field name="emailId" type="textEmailId" indexed="true" stored="true" />
     <field name="status" type="integer" indexed="true" stored="true" />
     <field name="isOwner" type="integer" indexed="true" stored="true" />

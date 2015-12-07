@@ -251,6 +251,8 @@ public class ProfileManagementController
             OrganizationUnitSettings companyProfile = null;
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
+                //set setting detail by company Setting
+                setSettingSetByEntityInModel( model, companyProfile );
                 String json = new Gson().toJson( companyProfile );
                 model.addAttribute( "profileJson", json );
                 double averageRating = profileManagementService.getAverageRatings( companyId,
@@ -277,6 +279,8 @@ public class ProfileManagementController
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
+                //set setting detail by region Setting
+                setSettingSetByEntityInModel( model, regionProfile );
 
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
@@ -334,6 +338,9 @@ public class ProfileManagementController
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
+
+                //set setting detail by branch Setting
+                setSettingSetByEntityInModel( model, branchProfile );
 
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID_COLUMN,
@@ -394,6 +401,9 @@ public class ProfileManagementController
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
                 individualProfile = userManagementService.getAgentSettingsForUserProfiles( agentId );
+
+                //set setting detail by agent Setting
+                setSettingSetByEntityInModel( model, individualProfile );
 
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
@@ -465,6 +475,53 @@ public class ProfileManagementController
 
         LOG.info( "Method showProfileEditPage() finished from ProfileManagementService" );
         return JspResolver.PROFILE_EDIT;
+    }
+
+
+    /**
+     * 
+     * @param model
+     * @param entitySetting
+     * @throws InvalidInputException 
+     */
+    private void setSettingSetByEntityInModel( Model model, OrganizationUnitSettings entitySetting )
+        throws InvalidInputException
+    {
+        LOG.debug( "method setSettingSetByEntityInModel() started " );
+        boolean isLogoSetByEntity;
+        boolean isContactNoSetByEntity;
+        boolean isWebAddressSetByEntity;
+
+        if ( entitySetting == null ) {
+            throw new InvalidInputException( "Passed entity setting is null" );
+        }
+
+        if ( entitySetting.getLogo() == null || entitySetting.getLogo().isEmpty() ) {
+            isLogoSetByEntity = false;
+        } else {
+            isLogoSetByEntity = true;
+        }
+
+        if ( entitySetting.getContact_details() != null && entitySetting.getContact_details().getWeb_addresses() != null
+            && entitySetting.getContact_details().getWeb_addresses().getWork() != null
+            && !entitySetting.getContact_details().getWeb_addresses().getWork().isEmpty() ) {
+            isWebAddressSetByEntity = true;
+        } else {
+            isWebAddressSetByEntity = false;
+        }
+
+        if ( entitySetting.getContact_details() != null && entitySetting.getContact_details().getContact_numbers() != null
+            && entitySetting.getContact_details().getContact_numbers().getWork() != null
+            && !entitySetting.getContact_details().getContact_numbers().getWork().isEmpty() ) {
+            isContactNoSetByEntity = true;
+        } else {
+            isContactNoSetByEntity = false;
+        }
+        model.addAttribute( "isLogoSetByEntity", isLogoSetByEntity );
+        model.addAttribute( "isWebAddressSetByEntity", isWebAddressSetByEntity );
+        model.addAttribute( "isContactNoSetByEntity", isContactNoSetByEntity );
+
+        LOG.debug( "method setSettingSetByEntityInModel() ended " );
     }
 
 
@@ -1776,6 +1833,7 @@ public class ProfileManagementController
                 // Modify Agent details in Solr
                 Map<String, Object> updateMap = new HashMap<String, Object>();
                 updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl );
+                updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, profileImageUrl );
                 updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
                 solrSearchService.editUserInSolrWithMultipleValues( agentSettings.getIden(), updateMap );
             } else {

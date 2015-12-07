@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+ <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -18,7 +18,7 @@
 </head>
 <body>
 <div id="overlay-toast" class="overlay-toast"></div>
-<div class="overlay-loader hide"></div>
+<div class="overlay-loader hide"></div> 
 <div class="login-main-wrapper padding-001 login-wrapper-min-height">
 	<div class="container login-container">
 		<div class="row login-row">
@@ -53,12 +53,13 @@
 	</div>
 </div>
 
-<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
+
+ <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/script.js"></script> 
 <script>
-$(document).ready(function() {
-	// Onload before auth Url
+ $(document).ready(function() {
+	
 	var waitMessage = "${message}";
 	if (parseInt(waitMessage) == 1) {
 		var authUrl = "${authUrl}";
@@ -131,7 +132,7 @@ $(window).on('unload', function(){
 		}
 	}
 });
-
+ 
 function fetchSocialProfileUrl(payload, callBackFunction){
 	$.ajax({
 		url : './profileUrl.do',
@@ -151,5 +152,3 @@ function fetchSocialProfileUrl(payload, callBackFunction){
 }
 </script>
 
-</body>
-</html>

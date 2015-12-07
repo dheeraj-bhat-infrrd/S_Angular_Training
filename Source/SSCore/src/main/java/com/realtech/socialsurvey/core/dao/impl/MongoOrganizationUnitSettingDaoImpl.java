@@ -191,7 +191,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 		LOG.info("Preparing the list of logo names");
 		for (OrganizationUnitSettings settings : settingsList) {
-			String logoName = settings.getLogo();
+			String logoName = settings.getLogoThumbnail();
 			if (logoName != null && !logoName.isEmpty()) {
 				logoList.add(logoName);
 			}
