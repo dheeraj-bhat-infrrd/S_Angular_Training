@@ -10,6 +10,7 @@ import twitter4j.auth.RequestToken;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -112,7 +113,8 @@ public interface SocialManagementService
 
 
     public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl ) throws NonFatalException;
+        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl,
+        boolean onlyPostToSocialSurvey ) throws NonFatalException;
 
 }
 // JIRA SS-34 BY RM02 BOC
