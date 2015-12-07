@@ -5560,9 +5560,10 @@ function showMasterQuestionPage(){
 			}
 		}
 		
+		var onlyPostToSocialSurvey = true;
 		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
 			if(isAbusive == false){
-				postToSocialMedia(feedback , isAbusive);
+				onlyPostToSocialSurvey = false;
 			}
 			/*$('#social-post-lnk').show();
 			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
@@ -5595,6 +5596,8 @@ function showMasterQuestionPage(){
 			}
 		}
 		
+		//call method to post the review and update the review count
+		postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey);
 		
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val() , isAbusive);
 		$("div[data-ques-type]").hide();
@@ -5616,7 +5619,7 @@ function showMasterQuestionPage(){
 	return;
 }
 
-function postToSocialMedia(feedback , isAbusive){
+function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey){
 	var success = false;
 	var payload = {
 		"agentId" : agentId,
@@ -5627,7 +5630,8 @@ function postToSocialMedia(feedback , isAbusive){
 		"isAbusive" : isAbusive,
 		"customerEmail" : customerEmail,
 		"feedback" : feedback,
-		"agentProfileLink" : agentProfileLink
+		"agentProfileLink" : agentProfileLink,
+		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey
 	};
 	$.ajax({
 		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
@@ -6530,6 +6534,8 @@ function updateEventsEditAddress() {
     if (countryCode == "US") {
         showStateCityRow('prof-address-state-city-row', 'prof-state',
             'prof-city');
+        selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+    	selectedCountryRegEx = new RegExp(selectedCountryRegEx);
     } else {
         hideStateCityRow('prof-address-state-city-row', 'prof-state');
     }
@@ -10137,6 +10143,7 @@ function saveZillowEmailAddress() {
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
 		if(data && data == "success") {
+			loadSocialMediaUrlInSettingsPage();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {

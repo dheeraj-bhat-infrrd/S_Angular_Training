@@ -109,7 +109,7 @@ public class POSIntegrationImpl implements POSIntegration {
 		
 	}
 	
-	private long getAgentId(String emailId){
+	long getAgentId(String emailId){
 		LOG.debug("checking if "+emailId+" is present in our repository.");
 		// TODO: remove
 		if(emailId.equals("nishit+none@raremile.com"))

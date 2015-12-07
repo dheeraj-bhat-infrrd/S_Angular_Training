@@ -119,7 +119,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 		return entries;
 	}
 
-	private String generateLocation(String profileUrl) {
+	String generateLocation(String profileUrl) {
 		// check the collection name and generate location accordingly
 		LOG.trace("Generating location url for " + profileUrl + " for collection " + collectionName);
 		if (collectionName.equals(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
@@ -135,7 +135,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 		}
 	}
 
-	private List<SiteMapEntry> prepareSMEObjects(List<ProfileUrlEntity> profileUrls) {
+	List<SiteMapEntry> prepareSMEObjects(List<ProfileUrlEntity> profileUrls) {
 		LOG.info("Preparing SME objects");
 		List<SiteMapEntry> entries = new ArrayList<SiteMapEntry>();
 		SiteMapEntry entry = null;
