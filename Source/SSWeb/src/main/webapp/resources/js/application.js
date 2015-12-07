@@ -639,7 +639,7 @@ function displayIncompleteSurveysOnDashboard() {
 	hideLoaderOnPagination($('#dsh-inc-srvey'));
 	$('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').each(function(index, currentElement) {
 		if(index >= batchSizeInc) {
-			return;
+			return false;
 		}
 		$(this).removeClass("hide");
 	});
@@ -732,10 +732,14 @@ function fetchReviewsOnDashboard(isNextBatch) {
 	}, payload, false);
 }
 
+var isDashboardReviewScrollRunning = false;
+
 function dashbaordReviewScroll() {
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() - 200) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+		if(isDashboardReviewScrollRunning) return; //return if the scroll is running
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#review-details'));
+			isDashboardReviewScrollRunning = true;
 			setTimeout(displayReviewOnDashboard, 500);
 		} else{
 			fetchReviewsOnDashboard(false);
@@ -745,6 +749,7 @@ function dashbaordReviewScroll() {
 
 function displayReviewOnDashboard() {
 	
+	isDashboardReviewScrollRunning = false;
 	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
 	
 	hideLoaderOnPagination($('#review-details'));
@@ -752,13 +757,13 @@ function displayReviewOnDashboard() {
 		$(this).removeClass("hide");
 		if(index >= batchSizeCmp - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
-			return;
+			return false;
 		}
 	});
 	
 	//check for last element
 	if(startIndexCmp >= totalReviews && $('div.dsh-review-cont.hide').length <= 0) {
-		
+		$('.dsh-review-cont:last-of-type').addClass("ppl-review-item-last").removeClass("ppl-review-item");
 	}
 	
 	//Get the next batch
@@ -2204,14 +2209,6 @@ function validateRegionForm() {
 		return isRegionValid;
 	}
 	
-	if(!validateAddress1('region-address1-txt')){
-		isOfficeValid = false;
-		if(!isFocussed){
-			$('#office-address-txt').focus();
-			isFocussed=true;
-		}
-		return isRegionValid;
-	}
 	
 	var userSelectionType = $('#user-selection-info').attr('data-user-selection-type');
 	if(userSelectionType =="single"){
@@ -2244,9 +2241,6 @@ function validateRegionForm() {
  */
 function resetInputFields(elementId) {
 	document.getElementById(elementId).reset();
-	$('#region-country').val(defaultCountry);
-	$('#region-country-code').val(defaultCountryCode);
-	//$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
 /**
@@ -2268,10 +2262,10 @@ function addRegion(formId,disableEle) {
 function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	//$('#region-state-city-row').hide();
+	showStateCityRow("region-state-city-row", "region-state-txt", "region-city-txt");
+	resetInputFields("edit-region-form");
 	$('#region-country').val(defaultCountry);
 	$('#region-country-code').val(defaultCountryCode);
-	resetInputFields("edit-region-form");
 	fetchCompleteHierarchy();
 }
 
@@ -2440,7 +2434,7 @@ function addOffice(formId,disableEle) {
 function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	//$('#office-state-city-row').hide();
+	showStateCityRow("office-state-city-row", "office-state-txt", "office-city-txt");
 	resetInputFields("edit-office-form");
 	$('#office-country').val(defaultCountry);
 	$('#office-country-code').val(defaultCountryCode);
@@ -2748,6 +2742,7 @@ function bindBranchListClicks(){
 	});
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
+		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
@@ -3007,7 +3002,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 	var success = "Selected Office could be deleted";
 	var successMsg = $("#overlay-text").find('.success-message').text().trim();
 	if (success == successMsg) {
-		createPopupConfirm("Remove Branch");
+		createPopupConfirm("Remove Office");
 		
 		$('#overlay-continue').click(function(){
 			if ($('#overlay-continue').attr("disabled") != "disabled") {
@@ -3020,7 +3015,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 			}
 		});
 	} else {
-		createPopupInfo("Remove Branch");
+		createPopupInfo("Remove Office");
 		branchId = null;
 	}
 }
@@ -3844,35 +3839,6 @@ function deleteUser(userId) {
 		$('#user-row-' + userId).next('.u-tbl-row').remove();
 		$('#user-row-' + userId).remove();
 	}, payload,true);
-
-	/*$.ajax({
-		url : "./removeexistinguser.do",
-		type : "POST",
-		dataType : "html",
-		data : payload,
-		success : function(data) {
-			var map =  $.parseJSON(data);
-			if (map.status == "success") {
-				showInfo(map.message);
-			} else {
-				showError(map.message);
-			}
-			
-			// hide the row of the user deleted
-			$('#user-row-' + userId).next('.v-tbl-row').remove();
-			$('#user-row-' + userId).next('.u-tbl-row').remove();
-			$('#user-row-' + userId).remove();
-		},
-		complete : function() {
-			hideOverlay();
-		},
-		error : function(e) {
-			if(e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-		}
-	});*/
 }
 
 
@@ -4666,6 +4632,14 @@ function authenticate(socialNetwork) {
 	};
 }
 
+function authenticateZillow() {
+	openAuthPageZillow();
+	
+	/*payload = {
+		'socialNetwork' : socialNetwork
+	};*/
+}
+
 // update yelp profile url
 function showYelpInput() {
 	$('#yelp-profile-url-display').addClass('hide');
@@ -5383,7 +5357,6 @@ function storeCustomerAnswer(customerResponse) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "data/storeAnswer",
 		url : getLocationOrigin() + surveyUrl + "data/storeAnswer",
 		type : "GET",
 		cache : false,
@@ -5427,7 +5400,6 @@ function updateCustomerResponse(feedback, agreedToShare , isAbusive) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "data/storeFeedback",
 		url : getLocationOrigin() + surveyUrl + "data/storeFeedback",
 		type : "GET",
 		cache : false,
@@ -5662,7 +5634,6 @@ function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey){
 		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "posttosocialnetwork",
 		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
 		type : "GET",
 		cache : false,
@@ -5695,7 +5666,6 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 		"socialSite" : socialSite
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "updatesharedon",
 		url : getLocationOrigin() + surveyUrl + "updatesharedon",
 		type : "GET",
 		cache : false,
@@ -6504,27 +6474,48 @@ function showEditAddressPopup() {
 }
 
 function callBackEditAddressDetails(data) {
+	
 	var header = "Edit Address Detail";
 	createEditAddressPopup(header, data);
 
+	//update events
+	updateEventsEditAddress();
+	
 	$('#overlay-continue').click(function() {
+		var isFocussed = false;
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
+		
 		//var profAddress2 = $('#prof-address2').val();
 		var country = $('#prof-country').val();
 		var zipCode = $('#prof-zipcode').val();
-		if (!profName || !profAddress1 || !country || !zipCode) {
+		if(!validateAddress1('prof-address1',true)){
+			
+			if(!isFocussed){
+				$('#prof-address1').focus();
+				isFocussed=true;
+			}
+			return; 
+		}
+		if(!validateCountryProfile(country)){
+			
+			if(!isFocussed){
+				$('#prof-country').focus();
+				isFocussed=true;
+			}
 			return;
 		}
-
+		if(!validateCountryZipcode('prof-zipcode',true)){
+			
+			if(!isFocussed){
+				$('#prof-zipcode').focus();
+				isFocussed=true;
+			}
+			return; 
+		}
+		
+		
 		delay(function() {
-			/*var payload = {
-				"profName" : profName,
-				"address1" : profAddress1,
-				"address2" : profAddress2,
-				"country" : country,
-				"zipCode" : zipCode
-			};*/
 			payload = $('#prof-edit-address-form').serialize();
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload,true);
 		}, 0);
@@ -6534,8 +6525,23 @@ function callBackEditAddressDetails(data) {
 
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	disableBodyScroll();
-	//$('body').css('overflow', 'hidden');
 	$('body').scrollTop('0');
+}
+
+//Function to update events on edit profile page
+function updateEventsEditAddress() {
+    var countryCode = $('#prof-country-code').val();
+    if (countryCode == "US") {
+        showStateCityRow('prof-address-state-city-row', 'prof-state',
+            'prof-city');
+        selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+    	selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+    } else {
+        hideStateCityRow('prof-address-state-city-row', 'prof-state');
+    }
+
+    attachAutocompleteCountry('prof-country', 'prof-country-code',
+        'prof-state', 'prof-address-state-city-row', 'prof-city');
 }
 
 function callBackUpdateAddressDetails(data) {
@@ -6563,7 +6569,6 @@ function createEditAddressPopup(header, body) {
 	$('#overlay-text').html(body);
 	$('#overlay-continue').html("Ok");
 	$('#overlay-cancel').html("Cancel");
-
 	$('#overlay-main').show();
 }
 function overlayRevert() {
@@ -6578,7 +6583,6 @@ function overlayRevert() {
 
 	$('#overlay-continue').unbind('click');
 
-	//$('body').css('overflow', 'auto');
 	enableBodyScroll();
 	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 }
@@ -6587,8 +6591,6 @@ function overlayRevert() {
 function callBackShowBasicDetails(response) {
 	$('#prof-basic-container').html(response);
 	adjustImage();
-	//fetchAvgRating(attrName, attrVal);
-	//fetchReviewCount(attrName, attrVal, minScore);
 }
 
 $(document).on('blur', '#prof-basic-container input', function() {
@@ -6625,9 +6627,6 @@ $(document).on('blur', '#prof-basic-container input', function() {
 function callBackUpdateBasicDetails(data) {
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
-	//callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
-	//callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
-
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
@@ -6639,7 +6638,9 @@ function callBackShowProfileLogo(data) {
 	if (logoImageUrl == undefined || logoImageUrl == "none") {
 		return;
 	}
-	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
+	
+	//update logo if it is company admin or it does not have logo
+	if ($('#header-user-info').find('.user-info-logo').length <= 0 || colName == "companyId") {
 		var userInfoDivider = $('<div>').attr({
 			"class" : "float-left user-info-seperator"
 		});
@@ -6649,15 +6650,20 @@ function callBackShowProfileLogo(data) {
 			"background" : logoImageUrl + " no-repeat center",
 			"background-size" : "contain"
 		});
+		$('#header-user-info').find('.user-info-logo').remove();
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	}
+	} 
 	adjustImage();
 	hideOverlay();
 }
 
 $(document).on('change', '#prof-logo', function() {
-	showOverlay();
 
+	if(!logoValidate('#prof-logo')){
+		console.log("inside log");
+		return false;
+	}
+	showOverlay();
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
@@ -7537,15 +7543,17 @@ var isReviewsLoadingEditProfile = false;
 
 function fetchReviewsEditProfileScroll() {
 
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
+	//check if the current page is edit profile
+	if(location.hash != "#showprofilepage")  {
+		return;
+	}
+	if ((window.innerHeight + window.pageYOffset) >= ($('#prof-review-item').offset().top + $('#prof-review-item').height() - 200)
 			&& ( !doStopReviewsPaginationEditProfile || $('div.dsh-review-cont.hide').length > 0 ) ) {
+		if(isReviewsLoadingEditProfile) return; //return if the scroll is running
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#prof-review-item'));
 			isReviewsLoadingEditProfile = true;
-			setTimeout(function() {
-				isReviewsLoadingEditProfile = false;
-				displayReviewOnEditProfile();
-			}, 500);
+			setTimeout(displayReviewOnEditProfile, 500);
 		} else{
 			fetchReviewsOnEditProfile(attrName, attrVal, false);
 		}
@@ -7554,14 +7562,13 @@ function fetchReviewsEditProfileScroll() {
 
 function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 	
-	//Check if the request is running
-	if(isReviewsRequestRunningEditProfile) return;
-	
 	if (startIndex == 0) {
 		doStopReviewsPaginationEditProfile = false;
+		isReviewsRequestRunningEditProfile = false;
 		$('#prof-review-item').html('');
 	}
 	
+	if(isReviewsRequestRunningEditProfile) return; //Return if ajax request is still running
 	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
 			+ minScore + "&startIndex=" + startIndex + "&numOfRows="
 			+ numOfRows;
@@ -7571,17 +7578,11 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		showLoaderOnPagination($('#prof-review-item'));
 	}
 	callAjaxGET(url, function(data) {
-		
-		var tempDiv = $("<div>");
-		tempDiv.html(data);
-		
-		var countOfReviewsFetched = tempDiv.children('div.dsh-review-cont').length;
-
-		if(countOfReviewsFetched < numOfRows) {
-			doStopReviewsPaginationEditProfile = true; //Stop pagination if reviews fetch are less than batch size
-		}
-		
 		//Check if list revcieved is empty 
+		var tempDiv = $("<div>").html(data);
+		
+		var countOfReviewsFetched = tempDiv.children('.dsh-review-cont').length;
+		
 		if (countOfReviewsFetched <= 0) {
 			if (startIndex == 0) {
 				$("#prof-review-item").html("<span>No Reviews Found</span>");
@@ -7591,17 +7592,18 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 			$("#prof-review-item").append(data);
 		}
 		
-		updateEventOnDashboardPageForReviews();
+		if(countOfReviewsFetched < numOfRows) {
+			doStopReviewsPaginationEditProfile = true;
+		}
 		
-		//update start index 
+		//Update events
+		updateEventOnDashboardPageForReviews();
 		startIndex = startIndex + numOfRows;
-		isReviewsRequestRunningEditProfile = false;
 		
 		if(!isNextBatch) {
 			displayReviewOnEditProfile();
-			return;
 		}
-		
+		isReviewsRequestRunningEditProfile = false;
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
 		}
@@ -7610,22 +7612,18 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 
 //Display the review on edit profile
 function displayReviewOnEditProfile() {
+	isReviewsLoadingEditProfile = false;
 	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
 	hideLoaderOnPagination($('#prof-review-item'));
+	var total = $('div.dsh-review-cont.hide').length;
 	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
 		$(this).removeClass("hide");
-		if(index >= batchSizeCmp - 1) {
+		if(index >= numOfRows - 1 || index >= total - 1) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
-			return;
+			return false;
 		}
 	});
 	
-	//check for the last element and add last element class
-	if(doStopReviewsPaginationEditProfile && $('div.dsh-review-cont.hide').length <= 0) {
-		$('div.dsh-review-cont:last-of-type').addClass("ppl-review-item-last").removeClass("ppl-review-item");
-	}
-	
-	//Get the next batch
 	if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 		fetchReviewsOnEditProfile(attrName, attrVal, true);
 	}
@@ -7713,8 +7711,8 @@ function attachPostsScrollEvent() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) {
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
+				- (scrollContainer.clientHeight / 0.75))) {
 				if (!doStopPostPaginationEditProfile || publicPostsBatch.length > 0) {
 					fetchPublicPostEditProfile(false);
 				}
@@ -7751,7 +7749,7 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		}
 		
 		if(isLoaderRunningEditProfile) {
-			return; //Return if loader is running
+			hideLoaderOnPagination($('#prof-posts'));
 		}
 		showLoaderOnPagination($('#prof-posts'));
 		isLoaderRunningEditProfile = true;
@@ -7785,13 +7783,19 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		if (data.errCode == undefined) {
 			if(data != "") {
 				
-				//update start index
-				proPostStartIndex += proPostBatchSize;	
 				
 				var posts = JSON.parse(data);
+				if(posts.length <= 0 && proPostStartIndex == 0) {
+					doStopPostPaginationEditProfile = true;
+					hideLoaderOnPagination($('#prof-posts'));
+					return;
+				}
 				if(posts.length < proPostBatchSize) {
 					doStopPostPaginationEditProfile = true;
 				}
+				
+				//update start index
+				proPostStartIndex += proPostBatchSize;	
 				
 				//update the batch
 				publicPostsBatch = publicPostsBatch.concat(posts);
@@ -8317,6 +8321,7 @@ function resendMultipleIncompleteSurveyRequests(incompleteSurveyIds) {
 			$('.sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
 			
 			//Update the incomplete survey on dashboard
+			startIndexInc = 0;
 			doStopIncompleteSurveyPostAjaxRequest = false;
 			fetchIncompleteSurvey(false);
 			$('#dsh-inc-srvey').perfectScrollbar('update');
@@ -8546,6 +8551,23 @@ function createZillowProfileUrlPopup(body){
 	
 	$('#overlay-main').show();
 	disableBodyScroll();
+}
+/*function saveZillowEmailAddress1(){
+	console.info("before zillosaveinfo is called");
+	callAjaxGET("/zillowSaveInfo.do", function(data) {
+		createZillowProfileUrlPopupPath( data);
+	}, true);
+}
+*/
+function createZillowProfileUrlPopupPath(body){
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("ok");
+	$('#overlay-continue').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		saveZillowEmailAddress();
+		overlayRevert();
+	});
 }
 
 
@@ -10052,10 +10074,6 @@ function validateprofileUrlEditForm() {
 			else{
 				$('#overlay-toast').text("Url updated successfully");
 				showToast();
-				/* window.opener.$("#prof-header-url").html(data);
-				setTimeout(function(){
-				    window.close();
-				},3000); */
 				hideActiveUserLogoutOverlay();
 				console.log(data);
 				$("#prof-header-url").html(data);
@@ -10108,12 +10126,40 @@ function attachEventsOnSocialMonitor() {
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
-		if ((scrollContainer.scrollTop === scrollContainer.scrollHeight
-					- scrollContainer.clientHeight) && !isSocialMonitorPostLoaderRunning) {
+		if ((scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
+				- (scrollContainer.clientHeight / 0.75))) && !isSocialMonitorPostLoaderRunning) {
 				
 				if (!doStopSocialMonitorPostAjaxRequest || socialMonitorPostBatch.length > 0){
 					fetchSearchedPostsSolr(false);
 				}
 		}
 	});
+}
+
+//Zillow connect functions
+function saveZillowEmailAddress() {
+	if(!validateZillowForm()){
+		return false;
+	}
+	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
+		if(data && data == "success") {
+			loadSocialMediaUrlInSettingsPage();
+			$('#overlay-toast').text("Zillow update successful");
+			showToast();
+		} else {
+			$('#overlay-toast').text("Some problem occurred while saving zillow");
+			showToast();
+		}
+	}, "zillowForm");
+}
+
+function validateZillowForm() {
+	var zillowProfileName = $('input[name="zillowProfileName"]').val();
+	if (zillowProfileName == undefined || zillowProfileName == "") {
+		$('#overlay-toast').text("Please enter a valid profile name");
+		showToast();
+		return false;
+	} else {
+		return true;
+	}
 }

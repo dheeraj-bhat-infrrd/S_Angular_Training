@@ -118,6 +118,46 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
 	});
 }
 
+function callAjaxPOSTWithTextDataLogo(url, callBackFunction, isAsync, formData) {
+
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+				url : url,
+				type : "POST",
+				dataType : "text",
+				timeout : 30000,
+				contentType : false,
+				processData : false,
+				cache : false,
+				data : formData,
+				async : isAsync,
+				success : callBackFunction,
+				complete : function() {
+					hideOverlay();
+				},
+				error : function(x, t, m) {
+					if (t === "timeout") {
+						logoSuccess=true;
+						showErrorMobileAndWeb(' please try uploading the logo again');
+						$('#overlay-toast').text("Please try uploading the logo again");
+						showToast();
+						
+					} else {
+						redirectErrorpage();
+					}
+				}
+
+			/*
+			 * function(e) { if(e.status == 504) {
+			 * redirectToLoginPageOnSessionTimeOut(e.status); return; }
+			 * redirectErrorpage(); }
+			 */
+			});
+}
+
+
 /**
  * Generic function to be used for making ajax get calls with datatype text and formdata
  * 
@@ -575,16 +615,6 @@ function openAuthPageZillow(disableEle) {
 		createZillowProfileUrlPopup( data);
 	}, true,disableEle);
 }
-/*function updateProfileUrl(){
-window.open("./editprofileurl.do","_blank", "width=800,height=600,scrollbars=yes");
-}*/
-/*function updateProfileUrl() {
-	callAjaxGET("/editprofileurl.do", function(data) {
-		createEditProfileUrlPopup2( data);
-	}, true);
-	
-}
- */
 
 function openAuthPageRegistration(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
@@ -668,46 +698,38 @@ function getUniqueCitySearchData(data) {
 	return uniqueSearchData;
 }
 
-function showStateCityRow(parentId, elementId) {
-	$('#'+parentId).show();
-	var stateVal = $('#'+elementId).attr('data-value');
-	if (!stateList) {
-		callAjaxGET("./getusstatelist.do", function(data) {
-			stateList = JSON.parse(data);
-			for (var i = 0; i < stateList.length; i++) {
-				if (stateVal == stateList[i].statecode) {
-					$('#'+elementId).append(
-							'<option data-stateid=' + stateList[i].id
-									+ ' selected >' + stateList[i].statecode
-									+ '</option>');
-				} else {
-					$('#'+elementId).append(
-							'<option data-stateid=' + stateList[i].id + '>'
-									+ stateList[i].statecode + '</option>');
-				}
-			}
-		}, true);
-	} else {
+function showStateCityRow(parentId, stateId, cityId) {
+    $('#' + parentId).show();
+    var stateVal = $('#' + stateId).attr('data-value');
+    if (!stateList) {
+        callAjaxGET("./getusstatelist.do", function(data) {
+            stateList = JSON.parse(data);
+            appendStateListToDropDown(stateId, stateList, cityId);
+        }, true);
+    } else {
 
-		if ($('#'+elementId).children('option').size() == 1) {
-			for (var i = 0; i < stateList.length; i++) {
-				if (stateVal == stateList[i].statecode) {
-					$('#'+elementId).append(
-							'<option data-stateid=' + stateList[i].id
-									+ ' selected >' + stateList[i].statecode
-									+ '</option>');
-				} else {
-					$('#'+elementId).append(
-							'<option data-stateid=' + stateList[i].id + '>'
-									+ stateList[i].statecode + '</option>');
-				}
-			}
-		} else {
-			if (stateVal != undefined && stateVal != "") {
-				$('#'+elementId).val(stateVal);
-			}
-		}
-	}
+        if ($('#' + stateId).children('option').size() == 1) {
+        	appendStateListToDropDown(stateId, stateList, cityId);
+        } else {
+            if (stateVal != undefined && stateVal != "") {
+                $('#' + stateId).val(stateVal);
+            }
+        }
+    }
+}
+
+function appendStateListToDropDown(stateId, stateList, cityId) {
+	var stateVal = $('#' + stateId).attr('data-value');
+	for (var i = 0; i < stateList.length; i++) {
+        if (stateVal == stateList[i].statecode) {
+            $('#' + stateId).append(
+                '<option data-stateid=' + stateList[i].id + ' selected >' + stateList[i].statecode + '</option>');
+        } else {
+            $('#' + stateId).append(
+                '<option data-stateid=' + stateList[i].id + '>' + stateList[i].statecode + '</option>');
+        }
+    }
+	attachChangeEventStateDropDown(stateId, cityId);
 }
 
 function enableBodyScroll() {
@@ -903,8 +925,8 @@ function validateRegFirstName(elementId) {
 
 // Function to validate the last name
 function validateRegLastName(elementId) {
-	if ($('#' + elementId).val() != "") {
-		if (lastNameRegEx.test($('#' + elementId).val()) == true) {
+
+		if ($('#' + elementId).val() == ""||lastNameRegEx.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
 			// $('#overlay-toast').html('Please enter a valid last name.');
@@ -912,10 +934,7 @@ function validateRegLastName(elementId) {
 			showRegErr('Please enter a valid last name.');
 			return false;
 		}
-	} else {
-		showRegErr('Please enter a valid last name.');
-		return false;
-	}
+	
 }
 
 // function to validate a password in form
@@ -971,3 +990,131 @@ function showLoaderOnPagination(element) {
 function hideLoaderOnPagination(element) {
 	element.find(".loader-icn-sm").remove();
 }
+
+function getWindowWidth() {
+	return window.innerWidth || document.documentElement.clientWidth
+			|| document.body.clientWidth;
+}
+
+function getWindowHeight() {
+	return window.innerHeight || document.documentElement.clientHeight
+			|| document.body.clientHeight;
+}
+
+function attachChangeEventStateDropDown(stateId, cityId) {
+    $('#' + stateId).off('change');
+    $('#' + stateId).on('change', function(e) {
+        var stateIdVal = $(this).find(":selected").attr('data-stateid');
+        updateCityAutcomplete(stateIdVal, cityId, stateId);
+    });
+    var stateIdVal = $('#' + stateId).find(":selected").attr('data-stateid');
+    if (stateIdVal != undefined && stateIdVal != '') {
+    	updateCityAutcomplete(stateIdVal, cityId, stateId);
+    }
+}
+
+function updateCityAutcomplete(stateIdVal, cityId, stateId) {
+	callAjaxGET("./getzipcodesbystateid.do?stateId=" + stateIdVal, function(data) {
+        var uniqueSearchData = getUniqueCitySearchData(data);
+        initializeCityLookup(uniqueSearchData, cityId);
+        attachFocusEventCity(stateId, cityId);
+    }, true);
+}
+
+function attachFocusEventCity(stateId, cityId) {
+	$('#'+cityId).unbind('focus');
+  	$('#'+cityId).bind('focus', function(){ 
+  		if($('#'+stateId).val() &&  $('#'+stateId).val() != ""){
+  			$(this).trigger('keydown');
+  			$(this).autocomplete("search");		
+  		}
+  	});
+}
+
+function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId, cityId) {
+	
+	//check for the existing value of country code and set defualt to us if not set
+	var countryCode = "US";
+
+	if ($('#' + countryCodeId).val() != undefined && $('#' + countryCodeId).val() != "") {
+	    countryCode = $('#' + countryCodeId).val();
+	}
+
+	if (countryCode == "US") {
+	    showStateCityRow(stateCityRowId, stateId, cityId);
+	    if ($('#' + countryId).val() == null || $('#' + countryId).val() == "") {
+	        $('#' + countryId).val("United States");
+	        $('#' + countryCodeId).val(countryCode);
+	    }
+	    selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+	    selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	} else {
+	    hideStateCityRow(stateCityRowId, stateId);
+	}
+	
+	//attach autocomplete event
+	$("#"+countryId).autocomplete({
+		minLength: 1,
+		source: countryData,
+		delay : 0,
+		autoFocus : true,
+		open : function(event, ui) {
+			$( "#"+countryCodeId ).val("");
+		},
+		select: function(event, ui) {
+			$("#"+countryId).val(ui.item.label);
+			$("#"+countryCodeId).val(ui.item.code);
+			for (var i = 0; i < postCodeRegex.length; i++) {
+				if (postCodeRegex[i].code == ui.item.code) {
+					selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+					selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+					break;
+				}
+			}
+			if(ui.item.code == "US"){
+				showStateCityRow(stateCityRowId, stateId, cityId);
+			}else{
+				hideStateCityRow(stateCityRowId, stateId);
+			}
+			return false;
+		},
+		close: function(event, ui) {},
+		create: function(event, ui) {
+	        $('.ui-helper-hidden-accessible').remove();
+		}
+	}).autocomplete("instance")._renderItem = function(ul, item) {
+		return $("<li>").append(item.label).appendTo(ul);
+	};
+}
+
+//function to check the type of file on logo upload
+var logoFileExtensions = [".jpg", ".jpeg", ".png"]; 
+function logoValidate(logo) {
+	if ($(logo).attr("type")=="file"){
+    	 var sFileName = $(logo).val();
+         if (sFileName.length > 0) {
+            var blnValid = false;
+            for (var j = 0; j < logoFileExtensions.length; j++) {
+                var sCurExtension = logoFileExtensions[j];
+                if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                    blnValid = true;
+                    break;
+                }
+            }
+             
+            if (!blnValid) {
+            	var msg="Please upload files of type jpeg, png or jpg";
+            	showErrorMobileAndWeb(msg);
+                $(logo).val="";
+                
+                return false;
+            }
+        }
+    }
+	
+    return true;
+    
+}
+
+
+

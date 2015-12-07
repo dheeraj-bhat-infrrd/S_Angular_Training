@@ -49,10 +49,10 @@
 	</div>
 	
 	<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
-		<div class="container reg_panel_container">
+		<div class="container reg_panel_container" id="company-info-load">
 			<div class="reg_header"><spring:message code="label.companysettings.header.key"/></div>
 			
-			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data">
+			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data" autocomplete="off" >
 				<div class="reg_form_wrapper_2">
 					<div class="reg_form_row clearfix">
 						<div class="float-left rfr_lbl"><spring:message code="label.company.key"/></div>
@@ -225,6 +225,7 @@ $(document).ready(function() {
 	
 	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 	
+	
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
 		var countryCode = $('#country-code').val();
 		for (var i = 0; i < postCodeRegex.length; i++) {
@@ -237,7 +238,19 @@ $(document).ready(function() {
 	}
 	
 	$('#company-info-submit').click(function() {
-		submitCompanyInfoForm();
+		
+		if(logo && logoSuccess && !isFormSubmitted ){
+			submitCompanyInfoForm();
+		}
+		
+		if(!logoSuccess){
+			$('#overlay-toast').html('uploading logo please wait');
+			showToast();
+		}
+		if(!logo){
+			$('#overlay-toast').html('Please upload files of type jpeg, png or jpg');
+			showToast();
+		}
 	});
 	
 	$('#icn-file').click(function(){
@@ -313,10 +326,12 @@ $('#com-city').bind('focus', function(){
 		$(this).autocomplete("search");		
 	}
 });
-
+ var isFormSubmitted=false;
 function submitCompanyInfoForm() {
 	if (validateCompanyInformationForm('company-info-div')) {
+		isFormSubmitted=true;
 		$('#company-info-form').submit();
+		
 	}
 }
 
@@ -329,14 +344,28 @@ $('input').keypress(function(e){
 });
 
 // Logo upload
+var logo=true;
+var logoSuccess=true;
 $("#com-logo").on("change", function() {
+	logo=true;
+	if(!logoValidate("#com-logo")){
+		logo =false;
+		return false;
+	}
+	logoSuccess=false;
 	var formData = new FormData();
 	formData.append("logo", $('#com-logo').prop("files")[0]);
 	formData.append("logo_name", $('#com-logo').prop("files")[0].name);
-	callAjaxPOSTWithTextData("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
+	
+	
+	callAjaxPOSTWithTextDataLogo("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
+	
+
+	
 });
 
 function uploadImageSuccessCallback(response) {
+	logoSuccess=true;
 	var success = "Logo has been uploaded successfully";
 	if (success != response.trim()) {
 		$('#com-logo').val('');
@@ -362,6 +391,9 @@ function validateCountry() {
 		}
 	}
 }
+ 
+
+
 
 function validateCompanyInformationForm(elementId) {
 	isCompanyInfoPageValid = true;

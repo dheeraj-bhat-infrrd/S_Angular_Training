@@ -1,69 +1,117 @@
 package com.realtech.socialsurvey.core.services.generator.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import static org.junit.Assert.assertEquals;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.internal.util.reflection.Whitebox;
+
+import com.realtech.socialsurvey.core.dao.UrlDetailsDao;
+import com.realtech.socialsurvey.core.entities.UrlDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
 public class UrlServiceImplTest
 {
+    @Spy
+    @InjectMocks
     private UrlServiceImpl urlServiceImpl;
+
+    @Mock
+    private UrlDetailsDao urlDetailsDao;
+
+    @Mock
+    private EncryptionHelper encryptionHelper;
+
+    @Mock
+    private URLGenerator urlGenerator;
 
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
+    public static void setUpBeforeClass() throws Exception
+    {}
 
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
+    public static void tearDownAfterClass() throws Exception
+    {}
 
 
     @Before
-    public void setUp() throws Exception {
-        urlServiceImpl = new UrlServiceImpl();
+    public void setUp() throws Exception
+    {
+        MockitoAnnotations.initMocks( this );
     }
 
 
     @After
-    public void tearDown() throws Exception {}
+    public void tearDown() throws Exception
+    {}
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testShortenUrlWithNullURLString() throws InvalidInputException {
+    public void testShortenUrlWithNullURLString() throws InvalidInputException
+    {
         urlServiceImpl.shortenUrl( null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testShortenUrlWithEmptyURLString() throws InvalidInputException {
+    public void testShortenUrlWithEmptyURLString() throws InvalidInputException
+    {
         urlServiceImpl.shortenUrl( "" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testRetrieveCompleteUrlForIDWithNullURLString() throws InvalidInputException {
+    public void testRetrieveCompleteUrlForIDWithNullURLString() throws InvalidInputException
+    {
         urlServiceImpl.retrieveCompleteUrlForID( null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testRetrieveCompleteUrlForIDWithEmptyURLString() throws InvalidInputException {
+    public void testRetrieveCompleteUrlForIDWithEmptyURLString() throws InvalidInputException
+    {
         urlServiceImpl.retrieveCompleteUrlForID( "" );
     }
-    
+
+
     @Test
-    public void testGetUrlTypeManualRegistration() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-    	Method getUrlTypeMethod = UrlServiceImpl.class.getDeclaredMethod("getUrlType", String.class);
-    	getUrlTypeMethod.setAccessible(true);
-    	String actualUrl = (String)getUrlTypeMethod.invoke(urlServiceImpl, "url/invitetoregister.do");
-    	String expected = CommonConstants.MANUAL_REGISTRATION_URL_TYPE;
-    	Assert.assertEquals("Manual registration",expected, actualUrl);
+    public void testShortenUrl() throws InvalidInputException
+    {
+        Map<String, String> queryMap = new HashMap<String, String>();
+        Mockito.when( urlDetailsDao.findUrlDetailsByUrl( Matchers.anyString() ) ).thenReturn( null );
+        Mockito.doReturn( "abc" ).when( urlServiceImpl ).getUrlType( Matchers.anyString() );
+        Mockito.doReturn( queryMap ).when( urlServiceImpl ).getQueryParamsFromUrl( Matchers.anyString() );
+        Mockito.when( urlDetailsDao.insertUrlDetails( (UrlDetails) Matchers.anyObject() ) ).thenReturn( "pass" );
+        Mockito.when( encryptionHelper.encodeBase64( Matchers.anyString() ) ).thenReturn( "encryptedurl" );
+        Whitebox.setInternalState( urlServiceImpl, "applicationBaseUrl", "http://localhost:8080/" );
+        Assert
+            .assertEquals( "Shorten Url", urlServiceImpl.shortenUrl( "test" ), "http://localhost:8080/mail.do?q=encryptedurl" );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Test
+    public void getQueryParamsFromUrlTestInvalidInput() throws InvalidInputException
+    {
+        Mockito.when( urlGenerator.decryptParameters( Mockito.anyString() ) ).thenThrow( InvalidInputException.class );
+        assertEquals("Not null", null, urlServiceImpl.getQueryParamsFromUrl( "test\\?q=test" ) );
     }
 }

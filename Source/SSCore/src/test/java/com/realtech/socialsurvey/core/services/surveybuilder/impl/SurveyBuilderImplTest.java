@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyAnswerOptions;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
@@ -318,5 +319,27 @@ public class SurveyBuilderImplTest
     public void checkIfSurveyIsDefaultAndCloneTestUserNull() throws InvalidInputException, NoRecordsFetchedException
     {
         surveyBuilderImpl.checkIfSurveyIsDefaultAndClone( null );
+    }
+
+
+    //Tests for mapSurveyToCompany
+    @Test ( expected = InvalidInputException.class)
+    public void mapSurveyToCompanyTestSurveyNull() throws InvalidInputException
+    {
+        surveyBuilderImpl.mapSurveyToCompany( new User(), null, new Company() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void mapSurveyToCompanyTestCompanyNull() throws InvalidInputException
+    {
+        surveyBuilderImpl.mapSurveyToCompany( new User(), new Survey(), null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void mapSurveyToCompanyTestUserNull() throws InvalidInputException
+    {
+        surveyBuilderImpl.mapSurveyToCompany( null, new Survey(), new Company() );
     }
 }

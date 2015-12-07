@@ -829,7 +829,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             .addField( CommonConstants.IS_BRANCH_ADMIN_SOLR, ( user.isBranchAdmin() ? user.isBranchAdmin() : isBranchAdmin ) );
         document
             .addField( CommonConstants.IS_REGION_ADMIN_SOLR, ( user.isRegionAdmin() ? user.isRegionAdmin() : isRegionAdmin ) );
-
+        document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
         return document;
     }
 
@@ -1364,7 +1364,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.setQuery( entityType + ":" + entityId + " AND " + CommonConstants.POST_TEXT_SOLR + ":" + "*"
-                + searchQuery + "*" );
+                + searchQuery + "*" + " AND " + CommonConstants.POST_TEXT_SOLR + ":[\"\" TO *]" );
             solrQuery.setStart( startIndex );
             solrQuery.setRows( noOfRows );
             solrQuery.addSort( CommonConstants.TIME_IN_MILLIS_SOLR, ORDER.desc );
@@ -1739,6 +1739,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 // update profileImageUrl
                 if ( agentSettings.getProfileImageUrl() != null ) {
                     document.addField( CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl() );
+                    document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                }
+                if ( agentSettings.getProfileImageUrlThumbnail() != null ) {
+                    document.addField( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN,
+                        agentSettings.getProfileImageUrlThumbnail() );
                 }
 
                 documents.add( document );
@@ -2225,7 +2230,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
             user.setRegions( (List<Long>) document.get( CommonConstants.REGIONS_SOLR ) );
             user.setBranches( (List<Long>) document.get( CommonConstants.BRANCHES_SOLR ) );
             user.setAgentIds( (List<Long>) document.get( "agentIds" ) );
-
+            user.setProfileImageSet( Boolean
+                .parseBoolean( document.get( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR ).toString() ) );
             matchedUsers.put( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ), user );
         }
 
@@ -2242,6 +2248,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             user.setTitle( setting.getContact_details().getTitle() );
             user.setAboutMe( setting.getContact_details().getAbout_me() );
             user.setProfileImageUrl( setting.getProfileImageUrl() );
+            user.setProfileImageThumbnail( setting.getProfileImageUrlThumbnail() );
             user.setProfileName( setting.getProfileName() );
             user.setProfileUrl( setting.getProfileUrl() );
             user.setReviewCount( setting.getReviewCount() );
@@ -2411,7 +2418,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
         return "(" + searchArrStr.trim() + ")";
     }
-    
+
 
     /**
      * Method to get all users in solr
@@ -2446,7 +2453,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method getAllUsers finished" );
         return results;
     }
-    
+
+
     /**
      * Method to set isProfileImageSet field for multiple users
      * 
@@ -2455,8 +2463,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
      * @throws SolrException
      */
     @Override
-    public void updateIsProfileImageSetFieldForMultipleUsers( Map<Long, Boolean> isProfileSetMap ) throws InvalidInputException,
-        SolrException
+    public void updateIsProfileImageSetFieldForMultipleUsers( Map<Long, Boolean> isProfileSetMap )
+        throws InvalidInputException, SolrException
     {
         if ( isProfileSetMap == null || isProfileSetMap.isEmpty() ) {
             throw new InvalidInputException( "Invalid parameter passed : passed isProfileSetMap map is null or empty" );
@@ -2487,5 +2495,34 @@ public class SolrSearchServiceImpl implements SolrSearchService
             LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
             throw new SolrException( "Exception while updating user to solr. Reason : " + e.getMessage(), e );
         }
+    }
+
+
+    /**
+     * Method to remove social post from solr
+     * 
+     * JIRA SS-1329
+     * 
+     * @param postMongoId
+     * @throws SolrException
+     * @throws InvalidInputException
+     */
+    @Override
+    public void removeSocialPostFromSolr( String postMongoId ) throws SolrException, InvalidInputException
+    {
+        LOG.info( "Method removeSocialPostFromSolr() to remove social post from solr started.", postMongoId );
+        if ( postMongoId == null || postMongoId.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input pareameter : passed postMongoId is not valid" );
+        }
+
+        try {
+            SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
+            solrServer.deleteById( postMongoId );
+            solrServer.commit();
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Exception while removing social post from solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while removing social post from solr. Reason : " + e.getMessage(), e );
+        }
+        LOG.info( "Method removeUserFromSolr() to remove social post {} from solr finished successfully.", postMongoId );
     }
 }

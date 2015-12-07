@@ -1,7 +1,7 @@
 // Contains js functions for realtech admin
 
 var abuseReportStartIndex = 0;
-var abuseReportBatch = 5;
+var abuseReportBatch = 10;
 var doStopAbuseReportPagination = false;
 var isAbuseReportRequestRunning = false;
 
@@ -159,6 +159,7 @@ function bindAdminBranchListClicks(){
 	});
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
+		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});

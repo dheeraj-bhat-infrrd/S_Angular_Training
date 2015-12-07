@@ -1061,7 +1061,7 @@ public class DashboardController
 
                 OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
                 if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                    logoUrl = companySettings.getLogo();
+                    logoUrl = companySettings.getLogoThumbnail();
                 } else if ( organizationUnit == OrganizationUnit.REGION ) {
                     OrganizationUnitSettings regionSettings = null;
                     try {
@@ -1070,7 +1070,7 @@ public class DashboardController
                         e.printStackTrace();
                     }
                     if ( regionSettings != null )
-                        logoUrl = regionSettings.getLogo();
+                        logoUrl = regionSettings.getLogoThumbnail();
                 } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
                     OrganizationUnitSettings branchSettings = null;
                     try {
@@ -1079,10 +1079,10 @@ public class DashboardController
                         e.printStackTrace();
                     }
                     if ( branchSettings != null ) {
-                        logoUrl = branchSettings.getLogo();
+                        logoUrl = branchSettings.getLogoThumbnail();
                     }
                 } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                    logoUrl = agentSettings.getLogo();
+                    logoUrl = agentSettings.getLogoThumbnail();
                 }
 
                 emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
@@ -1199,7 +1199,7 @@ public class DashboardController
 
                     OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
                     if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                        logoUrl = companySettings.getLogo();
+                        logoUrl = companySettings.getLogoThumbnail();
                     } else if ( organizationUnit == OrganizationUnit.REGION ) {
                         OrganizationUnitSettings regionSettings = null;
                         try {
@@ -1208,7 +1208,7 @@ public class DashboardController
                             e.printStackTrace();
                         }
                         if ( regionSettings != null )
-                            logoUrl = regionSettings.getLogo();
+                            logoUrl = regionSettings.getLogoThumbnail();
                     } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
                         OrganizationUnitSettings branchSettings = null;
                         try {
@@ -1217,10 +1217,10 @@ public class DashboardController
                             e.printStackTrace();
                         }
                         if ( branchSettings != null ) {
-                            logoUrl = branchSettings.getLogo();
+                            logoUrl = branchSettings.getLogoThumbnail();
                         }
                     } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                        logoUrl = agentSettings.getLogo();
+                        logoUrl = agentSettings.getLogoThumbnail();
                     }
 
                     emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,

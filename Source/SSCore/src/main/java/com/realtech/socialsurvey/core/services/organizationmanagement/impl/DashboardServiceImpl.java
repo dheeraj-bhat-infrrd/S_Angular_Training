@@ -385,7 +385,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
 
 
-    private Map<Integer, Integer> aggregateAllSurveysSent(Map<Integer, Integer> incompleteSurveys, Map<Integer, Integer> completedSurveys){
+    Map<Integer, Integer> aggregateAllSurveysSent(Map<Integer, Integer> incompleteSurveys, Map<Integer, Integer> completedSurveys){
     	LOG.debug("Aggregating all surveys");
     	if((incompleteSurveys == null || incompleteSurveys.size() == 0) && (completedSurveys != null && completedSurveys.size() > 0)){
     		return completedSurveys;
@@ -441,12 +441,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             surveyDetailsToPopulate.add( survey.getCreatedOn() );
             surveyDetailsToPopulate.add( survey.getModifiedOn() );
 
-            try {
+            /*try {
                 surveyDetailsToPopulate.add( surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
                     survey.getCustomerFirstName(), survey.getCustomerLastName() ) );
             } catch ( InvalidInputException e ) {
                 LOG.error( "Invalid input exception caught in downloadIncompleteSurveyData(). Nested exception is ", e );
-            }
+            }*/
             data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
             surveyDetailsToPopulate = new ArrayList<>();
         }
@@ -456,7 +456,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         surveyDetailsToPopulate.add( "Email Id" );
         surveyDetailsToPopulate.add( "Started On" );
         surveyDetailsToPopulate.add( "Last Updated On" );
-        surveyDetailsToPopulate.add( "Link To Survey" );
+        //surveyDetailsToPopulate.add( "Link To Survey" );
 
         data.put( "1", surveyDetailsToPopulate );
 

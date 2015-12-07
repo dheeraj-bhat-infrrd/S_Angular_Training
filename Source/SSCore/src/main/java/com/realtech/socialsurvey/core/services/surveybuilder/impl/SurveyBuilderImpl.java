@@ -172,7 +172,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	/**
 	 * Creates a new entry for new survey company mapping into database.
 	 */
-	private void mapSurveyToCompany(User user, Survey survey, Company company) throws InvalidInputException {
+	void mapSurveyToCompany(User user, Survey survey, Company company) throws InvalidInputException {
 		if (survey == null) {
 			LOG.error("Invalid argument. Null value is passed for survey.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
