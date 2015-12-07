@@ -357,7 +357,8 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	accountType = typeoOfAccount;
 	startIndexCmp = 0;
 	batchSizeCmp = 5;
-	totalReviews = 0;
+	doStopPaginationDashboard = false;
+	isDashboardReviewRequestRunning = false;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
 	batchSizeInc = 6;
@@ -375,6 +376,10 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	});
 	lastColNameForCount = newProfileName;
 	lastColValueForCount = newProfileValue;
+	
+	colName = newProfileName;
+	colValue = newProfileValue;
+	
 	if (newProfileName == "companyId") {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
 	} else if (newProfileName == "regionId") {
@@ -384,12 +389,13 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	} else if (newProfileName == "agentId") {
 		showAgentFlow(newProfileName, newProfileValue);
 	}
-	colName = newProfileName;
-	colValue = newProfileValue;
 	
-	showDisplayPic();
+	// initializing datepickers
+	bindDatePickerforSurveyDownload();
+	bindDatePickerforIndividualSurveyDownload();
+	
 	getIncompleteSurveyCount(colName, colValue);
-	getReviewsCountAndShowReviews(colName, colValue);
+	fetchReviewsOnDashboard(false);
 }
 
 function showCompanyAdminFlow(newProfileName, newProfileValue) {
@@ -458,8 +464,84 @@ function showProfileDetails(columnName, columnValue, numberOfDays) {
 	};
 	callAjaxGetWithPayloadData("./profiledetails.do", function(data) {
 		$('#dash-profile-detail-circles').html(data);
-	}, payload, false);
+		showDashboardButtons(columnName, columnValue);
+		showDisplayPic();
+		updateDashboardProfileEvents();
+	}, payload, true);
 }
+
+function updateDashboardProfileEvents() {
+    // Social Posts
+    $('#dg-img-3').find('svg').remove();
+    var socialPosts = $('#socl-post').text();
+    var circle1 = new ProgressBar.Circle('#dg-img-3', {
+        color: '#7AB400',
+        fill: "rgba(249,249,251, 1)",
+        duration: 1500,
+        strokeWidth: 4,
+        easing: 'easeInOut'
+    });
+    if ((parseFloat(socialPosts) / maxSocialPosts) > 1) circle1.animate(1);
+    else circle1.animate(parseFloat(socialPosts) / maxSocialPosts);
+    // Survey Count
+    $('#dg-img-2').find('svg').remove();
+    var surveyCount = $("#srv-snt-cnt").text();
+    var circle2 = new ProgressBar.Circle('#dg-img-2', {
+        color: '#E97F30',
+        fill: "rgba(249,249,251, 1)",
+        duration: 1500,
+        strokeWidth: 4,
+        easing: 'easeInOut'
+    });
+    if ((parseInt(surveyCount) / maxSurveySent) > 1) circle2.animate(1);
+    else circle2.animate(parseInt(surveyCount) / maxSurveySent);
+    // Social Score
+    $('#dg-img-1').find('svg').remove();
+    var socialScore = $("#srv-scr").text();
+    var circle3 = new ProgressBar.Circle('#dg-img-1', {
+        color: '#5CC7EF',
+        fill: "rgba(249,249,251, 1)",
+        duration: 1500,
+        strokeWidth: 4,
+        easing: 'easeInOut'
+    });
+    if ((parseFloat(socialScore) / 5) > 1) circle3.animate(1);
+    else circle3.animate(parseFloat(socialScore) / 5);
+    // Profile completion
+    $('#dg-img-4').find('svg').remove();
+    var circle4 = new ProgressBar.Circle('#dg-img-4', {
+        color: '#7AB400',
+        fill: "rgba(249,249,251, 1)",
+        duration: 1500,
+        strokeWidth: 4,
+        easing: 'easeInOut'
+    });
+    var profileCompleted = parseInt($('#pro-cmplt-stars').attr("data-profilecompleteness"));
+    if ((profileCompleted / 100) > 1) circle4.animate(1);
+    else circle4.animate(profileCompleted / 100);
+    
+    //update dashboard button events 
+    $('#pro-cmplt-stars').on('click', '#dsh-btn1', function() {
+		if (columnName == 'agentId') {
+			sendSurveyInvitation('#dsh-btn1');
+		} else if (accountType == "INDIVIDUAL") {
+			sendSurveyInvitation('#dsh-btn1');
+		} else {
+			sendSurveyInvitationAdmin(columnName, columnValue,'#dsh-btn1');
+		}
+	});
+	$('#pro-cmplt-stars').on('click', '#dsh-btn2', function(){
+		var buttonId = 'dsh-btn2';
+		var task = $('#dsh-btn2').data('social');
+		dashboardButtonAction(buttonId, task, colName, colValue);
+	});
+	$('#pro-cmplt-stars').on('click', '#dsh-btn3', function(){
+		var buttonId = 'dsh-btn3';
+		var task = $('#dsh-btn3').data('social');
+		dashboardButtonAction(buttonId, task, colName, colValue);
+	});
+}
+
 
 function bindSelectButtons() {
 	$("#selection-list").unbind('change');
@@ -558,7 +640,7 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 	};
 	callAjaxGetWithPayloadData("./surveycount.do", function(data) {
 		$('#dash-survey-status').html(data);
-	}, payload, false);
+	}, payload, true);
 }
 
 
@@ -631,7 +713,7 @@ function fetchIncompleteSurvey(isNextBatch) {
 		} else if($('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
 				fetchIncompleteSurvey(false);
 		} 
-	}, payload, false);
+	}, payload, true);
 	
 }
 
@@ -658,47 +740,24 @@ $(document).on('click', '.dash-lp-rt-img', function() {
 });
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
-	var payload = {
-		"columnName" : columnName,
-		"columnValue" : columnValue
-	};
 	callAjaxGetWithPayloadData("./fetchdashboardreviewCount.do", function(totalReview) {
 		totalReviews = parseInt(totalReview);
 		callAjaxGetWithPayloadData("./fetchName.do", function(name) {
-			if (totalReview == 0) {
-				$("#review-desc").html("No reviews found for " + name);
-				$("#dsh-admin-cmp-dwnld").hide();
-				$("#dsh-cmp-dwnld").hide();
-				$("#review-details").html('');
-				return;
-			} else {
-				$("#review-desc").html("What people say about " + name);
-				if (colName != "agentId"){
-					$("#dsh-cmp-dwnld").hide();
-					$("#dsh-admin-cmp-dwnld").show();
-				}
-				else if (accountType == "INDIVIDUAL") {
-					$("#dsh-cmp-dwnld").hide();
-					$("#dsh-admin-cmp-dwnld").show();
-				}
-				else { 
-					$("#dsh-admin-cmp-dwnld").hide();
-					$("#dsh-cmp-dwnld").show();
-				}
-				
-				// initializing datepickers
-				bindDatePickerforSurveyDownload();
-				bindDatePickerforIndividualSurveyDownload();
-			}
-		}, payload, false);
+			alert(name);
+		}, {
+			"columnName" : colName,
+			"columnValue" : colValue
+		}, true);
 		
 		if (parseInt(totalReview) > 0) {
 			fetchReviewsOnDashboard(false);
 		}
-	}, payload, false);
+	}, payload, true);
 }
 
 var isDashboardReviewRequestRunning = false;
+var doStopPaginationDashboard = false;
+
 function fetchReviewsOnDashboard(isNextBatch) {
 	if(isDashboardReviewRequestRunning) return; //Return if ajax request is still running
 	
@@ -713,6 +772,30 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		showLoaderOnPagination($('#review-details'));
 	}
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
+		var tempDiv = $('<div>').html(data);
+		var reviewsCount = tempDiv.children('div.dsh-review-cont').length;
+		
+		//check if no reviews found
+		var payloadData = {
+				"columnName" : colName,
+				"columnValue" : colValue
+			};
+		if(startIndexCmp == 0) {
+			callAjaxGetWithPayloadData("./fetchName.do", function(name) {
+				if (reviewsCount == 0) {
+					$("#review-desc").html("No reviews found for " + name);
+					$("#review-details").html('');
+					return;
+				} else {
+					$("#review-desc").html("What people say about " + name);
+				}
+			}, payloadData, true);
+		}
+		
+		if(reviewsCount < batchSizeCmp) {
+			doStopPaginationDashboard = true;
+		}
+		
 		if (startIndexCmp == 0)
 			$('#review-details').html(data);
 		else
@@ -726,16 +809,16 @@ function fetchReviewsOnDashboard(isNextBatch) {
 			displayReviewOnDashboard();
 		}
 		isDashboardReviewRequestRunning = false;
-		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && startIndexCmp < totalReviews) {
+		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 			fetchReviewsOnDashboard(true);
 		}
-	}, payload, false);
+	}, payload, true);
 }
 
 var isDashboardReviewScrollRunning = false;
 
 function dashbaordReviewScroll() {
-	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() - 200) && (startIndexCmp < totalReviews || $('div.dsh-review-cont.hide').length > 0)) {
+	if ((window.innerHeight + window.pageYOffset) >= ($('#review-details').offset().top + $('#review-details').height() - 200) && (!doStopPaginationDashboard || $('div.dsh-review-cont.hide').length > 0)) {
 		if(isDashboardReviewScrollRunning) return; //return if the scroll is running
 		if($('div.dsh-review-cont.hide').length > 0){
 			showLoaderOnPagination($('#review-details'));
@@ -753,21 +836,17 @@ function displayReviewOnDashboard() {
 	$('.dsh-review-cont').removeClass("ppl-review-item-last").addClass("ppl-review-item");
 	
 	hideLoaderOnPagination($('#review-details'));
+	var nextBatchReviews = $('div.dsh-review-cont.hide').length;
 	$('div.dsh-review-cont.hide').each(function(index, currentElement) {
 		$(this).removeClass("hide");
-		if(index >= batchSizeCmp - 1) {
+		if(index >= batchSizeCmp - 1 || index >= nextBatchReviews - 1 ) {
 			$(this).addClass("ppl-review-item-last").removeClass("ppl-review-item");
 			return false;
 		}
 	});
 	
-	//check for last element
-	if(startIndexCmp >= totalReviews && $('div.dsh-review-cont.hide').length <= 0) {
-		$('.dsh-review-cont:last-of-type').addClass("ppl-review-item-last").removeClass("ppl-review-item");
-	}
-	
 	//Get the next batch
-	if($('div.dsh-review-cont.hide').length <= batchSizeCmp && startIndexCmp < totalReviews) {
+	if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 		fetchReviewsOnDashboard(true);
 	}
 }
@@ -802,7 +881,6 @@ function showSurveyStatisticsGraphically(columnName, columnValue) {
 }
 
 function showSurveyGraph(columnName, columnValue, numberOfDays) {
-	var success = false;
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
@@ -815,14 +893,8 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				graphData = data.responseJSON;
-				paintSurveyGraph();
-			}
+			graphData = data;
+			paintSurveyGraph();
 		},
 		error : function(e) {
 			if(e.status == 504) {
@@ -1061,7 +1133,7 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			}
 			$('.dsh-res-display').hide();
 		});
-	}, payload, false);
+	}, payload, true);
 }
 
 function sendSurveyReminderMail(surveyPreInitiationId, customerName,disableEle) {
@@ -5001,8 +5073,6 @@ function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 	if (iden == undefined) {
 		return;
 	}
-	//var url = window.location.origin + "/rest/profile/individuals/" + iden
-	//		+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
 	var url = getLocationOrigin() + "/rest/profile/individuals/" + iden
 	+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
 	callAjaxGET(url, fetchUsersByProfileLevelCallback, false);
@@ -7808,7 +7878,7 @@ function fetchPublicPostEditProfile(isNextBatch) {
 					
 			}
 		}
-	}, payload, false);
+	}, payload, true);
 }
 
 function paintPosts(posts) {
@@ -7876,16 +7946,14 @@ function paintPosts(posts) {
 
 function showDashboardButtons(columnName, columnValue){
 	var payload={
-			"columnName" : columnName,
-			"columnValue" : columnValue
+		"columnName" : columnName,
+		"columnValue" : columnValue
 	};
 	callAjaxGetWithPayloadData('./dashboardbuttonsorder.do', paintDashboardButtons, payload, true);
 }
 
 function paintDashboardButtons(data){
 	data = $.parseJSON(data);
-	var columnName = data.columnName;
-	var columnValue = data.columnValue;
 	var stages = data.stages;
 	var max = 2;
 	if (stages != undefined && stages.length != 0) {
@@ -7927,25 +7995,6 @@ function paintDashboardButtons(data){
 			}
 		}
 	}
-	$('#dsh-btn1').click(function() {
-		if (columnName == 'agentId') {
-			sendSurveyInvitation('#dsh-btn1');
-		} else if (accountType == "INDIVIDUAL") {
-			sendSurveyInvitation('#dsh-btn1');
-		} else {
-			sendSurveyInvitationAdmin(columnName, columnValue,'#dsh-btn1');
-		}
-	});
-	$('#dsh-btn2').click(function(){
-		var buttonId = 'dsh-btn2';
-		var task = $('#dsh-btn2').data('social');
-		dashboardButtonAction(buttonId, task, columnName, columnValue);
-	});
-	$('#dsh-btn3').click(function(){
-		var buttonId = 'dsh-btn3';
-		var task = $('#dsh-btn3').data('social');
-		dashboardButtonAction(buttonId, task, columnName, columnValue);
-	});
 }
 
 function dashboardButtonAction(buttonId, task, columnName, columnValue){
@@ -8238,7 +8287,7 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex){
 		} else {
 			$('#sur-next').removeClass('paginate-button');
 		}
-	}, payload, false);
+	}, payload, true);
 }
 
 function hideIncompleteSurveyListPopup() {
@@ -8895,7 +8944,7 @@ function showSurveysUnderResolution(startIndexCmp, batchSizeCmp){
 				$('#sur-under-res-list').append(data);
 			
 			startIndexCmp += batchSizeCmp;
-		}, payload, false);
+		}, payload, true);
 }
 
 // Send Survey Agent
