@@ -569,9 +569,9 @@ public class DashboardController
 
             long id = 0;
             if ( columnName.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                return new Gson().toJson( user.getCompany().getCompany() );
+                return user.getCompany().getCompany();
             } else if ( columnName.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-                return new Gson().toJson( user.getFirstName() + " " + user.getLastName() );
+                return user.getFirstName() + " " + user.getLastName();
             } else {
                 String columnValue = request.getParameter( "columnValue" );
                 if ( columnValue != null && !columnValue.isEmpty() ) {

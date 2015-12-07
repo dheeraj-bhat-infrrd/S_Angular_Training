@@ -739,22 +739,6 @@ $(document).on('click', '.dash-lp-rt-img', function() {
 	sendSurveyReminderMail(surveyPreInitiationId, customerName,'.dash-lp-rt-img');
 });
 
-function getReviewsCountAndShowReviews(columnName, columnValue) {
-	callAjaxGetWithPayloadData("./fetchdashboardreviewCount.do", function(totalReview) {
-		totalReviews = parseInt(totalReview);
-		callAjaxGetWithPayloadData("./fetchName.do", function(name) {
-			alert(name);
-		}, {
-			"columnName" : colName,
-			"columnValue" : colValue
-		}, true);
-		
-		if (parseInt(totalReview) > 0) {
-			fetchReviewsOnDashboard(false);
-		}
-	}, payload, true);
-}
-
 var isDashboardReviewRequestRunning = false;
 var doStopPaginationDashboard = false;
 
