@@ -412,8 +412,8 @@
 						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit" placeholder="<spring:message code="label.sspost.key"/>"></textarea>
 						<div id="prof-post-btn" class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
 					</div>
-					<div class="float-left panel-tweet-wrapper">
-						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
+					<div id="last-post" class="float-left panel-tweet-wrapper">
+						<div  class="main-con-header"><spring:message code="label.latestposts.key"/></div>
 						<div id="prof-posts" class="tweet-panel tweet-panel-left">
 							<!--  latest posts get populated here --> 
 						</div>
