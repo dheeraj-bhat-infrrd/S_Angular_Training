@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import retrofit.client.Response;
@@ -3873,6 +3874,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
+        double zillowReviewScoreTotal = -1;
         if ( profile != null && profile.getSocialMediaTokens() != null ) {
             LOG.debug( "Starting to fetch the feed." );
 
@@ -3974,6 +3976,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                                         surveyDetails.setAgreedToShare( "true" );
                                                         surveyDetails.setAbusive( false );
 
+                                                        if(zillowReviewScoreTotal == -1 )
+                                                            zillowReviewScoreTotal = surveyDetails.getScore();
+                                                        else
+                                                            zillowReviewScoreTotal += surveyDetails.getScore();
                                                         surveyDetailsList.add( surveyDetails );
                                                     }
                                                 }
@@ -3986,11 +3992,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                     }
                 }
-            }
         } else {
             LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
         }
 
+        if ( surveyDetailsList.size() > 0 && zillowReviewScoreTotal > -1 ) {
+            updateReviewCountAndAverage( collectionName, profile.getIden(), zillowReviewScoreTotal, zillowReviewScoreTotal
+                / surveyDetailsList.size() );
+        }
         // return the fetched zillow review
         return surveyDetailsList;
     }
@@ -4217,5 +4226,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.error( "Exception occurred while fetching zillow count for a profile and id. Reason : ", e );
         }
         return zillowReviewCount;
+    }
+
+    @Async
+    @Override
+    public void updateReviewCountAndAverage( String collectionName, long iden, double zillowReview, double zillowAverage )
+    {
+        LOG.info( "Updating the zillow review score and average in collection : " + collectionName );
+        organizationUnitSettingsDao.updateZillowReviewScoreAndAverage( collectionName, iden, zillowReview, zillowAverage );
+        LOG.info( "Updated the zillow review score and average in collection : " + collectionName );
     }
 }
