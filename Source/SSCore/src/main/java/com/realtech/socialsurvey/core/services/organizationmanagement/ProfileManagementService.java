@@ -616,4 +616,7 @@ public interface ProfileManagementService
     public List<SurveyDetails> fetchZillowData( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
 
 
+    public void updateReviewCountAndAverage( String collectionName, long iden, double zillowReview, double zillowAverage );
+
+
 }

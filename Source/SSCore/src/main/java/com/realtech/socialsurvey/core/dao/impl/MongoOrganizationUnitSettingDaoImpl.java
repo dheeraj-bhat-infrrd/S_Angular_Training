@@ -662,4 +662,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.info( "Updated thumbnail image details" );
     }
+
+
+    @Override
+    public void updateZillowReviewScoreAndAverage( String collectionName, long iden, double zillowReview, double zillowAverage )
+    {
+        // TODO Auto-generated method stub
+
+    }
 }
