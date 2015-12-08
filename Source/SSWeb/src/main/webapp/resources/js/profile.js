@@ -1042,25 +1042,17 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
 	}
 	url += currentProfileIden + "/zillowreviews";
 	callAjaxGET(url, function(data) {
-		if (data != undefined && data != "") {
-		    var responseJson = $.parseJSON(data);
-		    if (responseJson != undefined) {
-		        var result = $.parseJSON(responseJson.entity);
-		        stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
-		        if (result != undefined && result.length > 0) {
-		        	var reviewCount = parseInt($("#prof-company-review-count").text().split(" ")[0]);
-		        	if($("#prof-company-review-count").attr("data-org-review-count") != undefined)
-		        		reviewCount = parseInt($("#prof-company-review-count").attr("data-org-review-count"));
-		        	else
-		        		$("#prof-company-review-count").attr("data-org-review-count", reviewCount);
-		        	reviewCount = result.length + reviewCount;
-		        	reviewCount = "<span itemprop=\"reviewCount\">" + reviewCount + "</span>" + ' Review(s)';
-		    		$("#prof-company-review-count").html(reviewCount);
-		            reviewsNextBatch = reviewsNextBatch.concat(result);
-		            fetchReviewsScroll(false);
-		        }
-		    }
-		}
+	    if (data != undefined && data != "") {
+	        var responseJson = $.parseJSON(data);
+	        if (responseJson != undefined) {
+	            var result = $.parseJSON(responseJson.entity);
+	            stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
+	            if (result != undefined && result.length > 0) {
+	                reviewsNextBatch = reviewsNextBatch.concat(result);
+	                fetchReviewsScroll(false);
+	            }
+	        }
+	    }
 	}, true);
 }
 
