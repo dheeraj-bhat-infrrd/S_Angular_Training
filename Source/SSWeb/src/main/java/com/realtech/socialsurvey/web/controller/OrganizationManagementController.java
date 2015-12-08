@@ -301,10 +301,12 @@ public class OrganizationManagementController
             // JIRA SS-536: Added for manual registration via invitation
             if ( strIsDirectRegistration.equalsIgnoreCase( "false" ) ) {
                 companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE );
-                redirectAttributes.addFlashAttribute( "skippayment", "true" );
+                /*redirectAttributes.addFlashAttribute( "skippayment", "true" );*/
+                session.setAttribute("skippayment", "true");
             } else {
                 companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO );
-                redirectAttributes.addFlashAttribute( "skippayment", "false" );
+                /*redirectAttributes.addFlashAttribute( "skippayment", "false" );*/
+                session.setAttribute("skippayment", "false");
             }
 
             LOG.debug( "Calling services to add company details" );

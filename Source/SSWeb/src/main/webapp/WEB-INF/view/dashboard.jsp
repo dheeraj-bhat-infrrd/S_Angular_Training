@@ -166,7 +166,7 @@
 					<div class="people-say-wrapper rt-content-main rt-content-main-adj">
 						<div class="main-con-header clearfix pad-bot-10-resp">
 							<div id="review-desc" class="float-left dash-ppl-say-lbl">
-								<spring:message code="label.peoplesayabout.key" />${profileName}
+								<spring:message code="label.peoplesayabout.key" />
 							</div>
 						</div>
 						<div id="review-details" class="ppl-review-item-wrapper">
