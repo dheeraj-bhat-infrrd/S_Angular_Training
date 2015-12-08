@@ -2478,7 +2478,7 @@ public class SocialManagementController
         try {
             Long lastBuild = batchTrackerService.getLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD );
             model.addAttribute( "lastBuild", lastBuild );
-        } catch ( NoRecordsFetchedException e ) {
+        } catch ( NoRecordsFetchedException | InvalidInputException e ) {
             LOG.error( "NoRecordsFetchedException while getting last build time. Reason  : ", e );
         }
         

@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
@@ -46,7 +45,7 @@ public class SolrReviewCountUpdater extends QuartzJobBean
 
             //getting last run end time of batch and update last start time
             long lastRunEndTime = batchTrackerService
-                .getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER );
+                .getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER  , CommonConstants.BATCH_NAME_REVIEW_COUNT_UPDATER );
             //get user id list for them review count will be updated
             List<Long> userIdList = batchTrackerService.getUserIdListToBeUpdated( lastRunEndTime );
             //getting no of reviews for the agents 
@@ -57,9 +56,8 @@ public class SolrReviewCountUpdater extends QuartzJobBean
                 LOG.error( "Error while parsing the data fetched from mongo for survey count", e );
                 throw e;
             }
-            User user = new User();
-            long userProfileId = user.getUserProfiles().get( 0 ).getUserProfileId();
-            solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
+            if ( agentsReviewCount != null && !agentsReviewCount.isEmpty() )
+                solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
 
 
             //updating last run time for batch in database
@@ -71,11 +69,12 @@ public class SolrReviewCountUpdater extends QuartzJobBean
                 batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER,
                     e.getMessage() );
                 //send report bug mail to admin
-                batchTrackerService.sendMailToAdminREgardingBatchError( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER, System.currentTimeMillis(), e );
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_REVIEW_COUNT_UPDATER,
+                    System.currentTimeMillis(), e );
             } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
-                LOG.error( "Error while updating error message in batch tracker "  );
+                LOG.error( "Error while updating error message in batch tracker " );
             } catch ( UndeliveredEmailException e1 ) {
-                LOG.error( "Error while sending report excption mail to admin "  );
+                LOG.error( "Error while sending report excption mail to admin " );
             }
         }
 
