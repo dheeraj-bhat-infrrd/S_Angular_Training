@@ -121,8 +121,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }else if(columnName.equals("branchId")){
         	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
         }
-    	long incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds);
-    	LOG.debug("Completed survey: "+completedSurveyCount);
+    	//long incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds);
+        //JIRA SS-1350 begin
+        long incompleteSurveyCount = 0;
+        if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
+            incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount( companyId, agentId,
+                CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds );
+        }
+        //JIRA SS-1350 end
+        LOG.debug("Completed survey: "+completedSurveyCount);
     	LOG.debug("Incomplete survey: "+incompleteSurveyCount);
     	return completedSurveyCount+incompleteSurveyCount;
     }
