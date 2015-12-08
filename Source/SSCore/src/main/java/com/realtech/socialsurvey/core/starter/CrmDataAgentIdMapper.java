@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,9 +20,13 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -40,6 +45,7 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
     private String adminEmailId;
     private String adminName;
     private String fileDirectoryLocation;
+    private BatchTrackerService batchTrackerService;
 
 
     @Override
@@ -47,12 +53,35 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
     {
 
         LOG.info( "Executing CrmDataAgentIdMapper" );
-        // initialize the dependencies
-        initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-        Map<String, Object> corruptRecords = surveyHandler.mapAgentsInSurveyPreInitiation();
-        sendCorruptDataFromCrmNotificationMail( corruptRecords );
+        try {
+            // initialize the dependencies
+            initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
 
-        LOG.info( "Completed CrmDataAgentIdMapper" );
+            // update last start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER, CommonConstants.BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER );
+
+            Map<String, Object> corruptRecords = surveyHandler.mapAgentsInSurveyPreInitiation();
+            sendCorruptDataFromCrmNotificationMail( corruptRecords );
+
+          //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER );
+            LOG.info( "Completed CrmDataAgentIdMapper" );
+        } catch ( Exception e ) {
+            LOG.error( "Error in CrmDataAgentIdMapper", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in CrmDataAgentIdMapper " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
 
     }
 
@@ -222,5 +251,6 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
         adminEmailId = (String) jobMap.get( "adminEmailId" );
         adminName = (String) jobMap.get( "adminName" );
         fileDirectoryLocation = (String) jobMap.get( "fileDirectoryLocation" );
+        batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
     }
 }
