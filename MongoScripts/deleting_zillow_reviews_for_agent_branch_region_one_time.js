@@ -4,7 +4,7 @@ db.getCollection("SURVEY_DETAILS").find({}).snapshot().forEach(
                 // in the collection
 		if(e.source != null && e.source == "Zillow"){
                         // remove the reviews with source as Zillow
-                        db.SURVEY_DETAILS.remove( { _id : e._id });
+                        db.getCollection("SURVEY_DETAILS").remove( { _id : e._id });
       		}
          }
 );

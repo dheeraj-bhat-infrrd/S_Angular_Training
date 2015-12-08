@@ -19,6 +19,7 @@ var reviewsNextBatch = []; //Reviews batch to store the next reviews
 var publicPostsNextBatch = []; //Posts batch to store the next posts
 var isLoaderRunningPublicPosts = false; //Keeps track of loader running in social posts
 var isLoaderRunningReviews = false; //Keeps track of loader running in reviews
+var doFetchZillowReviews = true;
 
 $(document).ajaxStop(function() {
 	adjustImage();
@@ -250,8 +251,9 @@ function fetchCompanyProfile() {
 		minScore = result.survey_settings.show_survey_above_score;
 	}
 	fetchReviewsCountBasedOnProfileLevel('COMPANY',result.iden,paintHiddenReviewsCount,0,minScore, true);
-	fetchReviewsBasedOnProfileLevel('COMPANY', result.iden,startIndex,numOfRows,minScore , true);	
-	fetchZillowReviewsBasedOnProfile('COMPANY',result.iden);
+	fetchReviewsBasedOnProfileLevel('COMPANY', result.iden,startIndex,numOfRows,minScore , true);
+	// Commented as zillow reviews are to be fetched after the last batch of social survey reviews fetched, SS-1277
+	// fetchZillowReviewsBasedOnProfile('COMPANY',result.iden);
 }
 
 function paintProfilePage(result) {
@@ -270,8 +272,8 @@ function paintProfilePage(result) {
 			breadCrumUrl += 'individual/' + profileJson.iden;
 		} else if (profileLevel == 'BRANCH') {
 			breadCrumUrl += '/branch/' + profileJson.iden;
-		} else if (profileLevel == 'REGION') {
 			breadCrumUrl += '/region/' + profileJson.iden;
+		} else if (profileLevel == 'REGION') {
 		}
 		
 		if(profileLevel != 'COMPANY'){
@@ -960,6 +962,12 @@ function fetchReviewsScroll(isNextBatch) {
 				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 						startIndex, numOfRows, minScore, true, isNextBatch);
 		}
+	} else {
+		// fetch zillow reviews
+		var profileLevel = $("#profile-fetch-info").attr("profile-level");
+		if(doFetchZillowReviews && profileJson.socialMediaTokens.zillowToken != undefined)
+			fetchZillowReviewsBasedOnProfile(profileLevel,currentProfileIden);
+		doFetchZillowReviews = false;
 	}
 }
 
@@ -1033,8 +1041,26 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
 		url += "individual/";
 	}
 	url += currentProfileIden + "/zillowreviews";
-	callAjaxGET(url, function() {
-		
+	callAjaxGET(url, function(data) {
+		if (data != undefined && data != "") {
+		    var responseJson = $.parseJSON(data);
+		    if (responseJson != undefined) {
+		        var result = $.parseJSON(responseJson.entity);
+		        stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
+		        if (result != undefined && result.length > 0) {
+		        	var reviewCount = parseInt($("#prof-company-review-count").text().split(" ")[0]);
+		        	if($("#prof-company-review-count").attr("data-org-review-count") != undefined)
+		        		reviewCount = parseInt($("#prof-company-review-count").attr("data-org-review-count"));
+		        	else
+		        		$("#prof-company-review-count").attr("data-org-review-count", reviewCount);
+		        	reviewCount = result.length + reviewCount;
+		        	reviewCount = "<span itemprop=\"reviewCount\">" + reviewCount + "</span>" + ' Review(s)';
+		    		$("#prof-company-review-count").html(reviewCount);
+		            reviewsNextBatch = reviewsNextBatch.concat(result);
+		            fetchReviewsScroll(false);
+		        }
+		    }
+		}
 	}, true);
 }
 
@@ -1093,6 +1119,7 @@ function paintHiddenReviewsCount(data) {
 				$(window).scrollTop($('#reviews-container').offset().top);
 				showAllReviews = true;
 				var profileLevel = $("#profile-fetch-info").attr("profile-level");
+				doFetchZillowReviews = true;
 				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true);
 			});
 		}
@@ -1108,6 +1135,7 @@ $(document).on('click', '#sort-by-feature',function(e){
 	showAllReviews = false;
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	reviewsSortBy = 'feature';
+	doFetchZillowReviews = true;
 	fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore , true);
 });
 
@@ -1120,6 +1148,7 @@ $(document).on('click', '#sort-by-date',function(e){
 	showAllReviews = true;
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	reviewsSortBy = 'date';
+	doFetchZillowReviews = true;
 	fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true);
 });
 
@@ -1135,7 +1164,8 @@ function fetchRegionProfile() {
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('REGION', result.iden,startIndex,numOfRows,minScore , true);
 	fetchReviewsCountBasedOnProfileLevel('REGION',result.iden, paintHiddenReviewsCount, 0, minScore, true);
-	fetchZillowReviewsBasedOnProfile('REGION',result.iden);
+	// Commented as zillow reviews are to be fetched after the last batch of social survey reviews fetched, SS-1277
+	// fetchZillowReviewsBasedOnProfile('REGION',result.iden);
 }
 
 function fetchBranchProfile() {
@@ -1149,7 +1179,8 @@ function fetchBranchProfile() {
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('BRANCH', result.iden, startIndex, numOfRows, minScore);
 	fetchReviewsCountBasedOnProfileLevel('BRANCH',result.iden, paintHiddenReviewsCount, 0, minScore, true);
-	fetchZillowReviewsBasedOnProfile('BRANCH',result.iden);
+	// Commented as zillow reviews are to be fetched after the last batch of social survey reviews fetched, SS-1277
+	// fetchZillowReviewsBasedOnProfile('BRANCH',result.iden);
 }
 
 function paintIndividualDetails(result) {
@@ -1286,7 +1317,8 @@ function fetchAgentProfile(){
 	startIndex = 0;
 	fetchReviewsBasedOnProfileLevel('INDIVIDUAL', result.iden, startIndex, numOfRows, minScore , true);
 	fetchReviewsCountBasedOnProfileLevel('INDIVIDUAL',result.iden, paintHiddenReviewsCount, 0, minScore, true);
-	fetchZillowReviewsBasedOnProfile('INDIVIDUAL',result.iden);
+	// Commented as zillow reviews are to be fetched after the last batch of social survey reviews fetched, SS-1277
+	// fetchZillowReviewsBasedOnProfile('INDIVIDUAL',result.iden);
 }
 
 function findProList(iden,searchcritrianame){

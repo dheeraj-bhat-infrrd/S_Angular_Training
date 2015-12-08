@@ -613,4 +613,7 @@ public interface ProfileManagementService
         String profileLevel, Date startDate, Date endDate ) throws InvalidInputException, NoRecordsFetchedException;
 
 
+    public List<SurveyDetails> fetchZillowData( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
+
+
 }
