@@ -2,12 +2,15 @@ package com.realtech.socialsurvey.core.starter;
 
 import java.util.List;
 import java.util.Set;
+
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -15,6 +18,8 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 
 
@@ -28,35 +33,58 @@ public class HierarchySettingsCorrector extends QuartzJobBean
 
     private OrganizationManagementService organizationManagementService;
 
+    private BatchTrackerService batchTrackerService;
+
 
     @Override
     protected void executeInternal( JobExecutionContext jobExecutionContext ) throws JobExecutionException
     {
-        initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-        // get a list of all the companies and find all the values set
-        Set<Company> companyList = organizationManagementService.getAllCompanies();
-        LOG.debug( "Got " + companyList.size() + " companies" );
-        for ( Company company : companyList ) {
-            OrganizationUnitSettings companySetting = null;
-            try {
-                companySetting = organizationManagementService.getCompanySettings( company.getCompanyId() );
-            } catch ( InvalidInputException e1 ) {
-                LOG.error( "Exception caught ", e1 );
-            }
-            if ( companySetting != null ) {
-                processCompany( companySetting );
+        try {
+            initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
+            // update last start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR, CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR );
+            // get a list of all the companies and find all the values set
+            Set<Company> companyList = organizationManagementService.getAllCompanies();
+            LOG.debug( "Got " + companyList.size() + " companies" );
+            for ( Company company : companyList ) {
+                OrganizationUnitSettings companySetting = null;
                 try {
-                    List<Region> regions = company.getRegions();
-                    for ( Region region : regions ) {
-                        // get region settings
-                        OrganizationUnitSettings regionSetting = organizationManagementService.getRegionSettings( region
-                            .getRegionId() );
-                        processRegion( regionSetting, region );
-                    }
-
-                } catch ( InvalidInputException e ) {
-                    LOG.error( "Could not get regions for company profile " + companySetting.getProfileName(), e );
+                    companySetting = organizationManagementService.getCompanySettings( company.getCompanyId() );
+                } catch ( InvalidInputException e1 ) {
+                    LOG.error( "Exception caught ", e1 );
                 }
+                if ( companySetting != null ) {
+                    processCompany( companySetting );
+                    try {
+                        List<Region> regions = company.getRegions();
+                        for ( Region region : regions ) {
+                            // get region settings
+                            OrganizationUnitSettings regionSetting = organizationManagementService.getRegionSettings( region
+                                .getRegionId() );
+                            processRegion( regionSetting, region );
+                        }
+
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "Could not get regions for company profile " + companySetting.getProfileName(), e );
+                    }
+                }
+            }
+          //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR );
+        } catch ( Exception e ) {
+            LOG.error( "Error in HierarchySettingsCorrector", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in HierarchySettingsCorrector " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
             }
         }
     }
@@ -394,5 +422,6 @@ public class HierarchySettingsCorrector extends QuartzJobBean
     private void initializeDependencies( JobDataMap jobMap )
     {
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
+        batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
     }
 }
