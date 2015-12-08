@@ -2284,8 +2284,30 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 /*Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden( review.getAgentId(),
                     CommonConstants.USER_ID_SOLR, true, 0, 1 );*/
                 // adding completeProfileUrl
-                OrganizationUnitSettings unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-                    review.getAgentId(), CommonConstants.AGENT_SETTINGS_COLLECTION );
+                OrganizationUnitSettings unitSetting = null;
+                if ( review.getSource() != null && !review.getSource().isEmpty() ) {
+                    if ( review.getSource().equals( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
+                        if ( review.getCompanyId() > 0 ) {
+                            unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getCompanyId(),
+                                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                        } else if ( review.getRegionId() > 0 ) {
+                            unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getRegionId(),
+                                CommonConstants.REGION_SETTINGS_COLLECTION );
+                        } else if ( review.getBranchId() > 0 ) {
+                            unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getBranchId(),
+                                CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                        } else if ( review.getAgentId() > 0 ) {
+                            unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
+                                CommonConstants.AGENT_SETTINGS_COLLECTION );
+                        } else {
+                            throw new InvalidInputException( "The zillow review with ID : " + review.get_id()
+                                + "does not have any hierarchy ID set" );
+                        }
+                    }
+                } else {
+                    unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
+                        CommonConstants.AGENT_SETTINGS_COLLECTION );
+                }
                 if ( unitSetting != null ) {
                     profileUrl = (String) unitSetting.getProfileUrl();
                     review.setCompleteProfileUrl( baseProfileUrl + profileUrl );
@@ -2295,10 +2317,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     throw new InvalidInputException( "An agent with ID : " + review.getAgentId() + " does not exist" );
                 }
 
-                OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review
-                    .getAgentId() );
-                if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null ) {
-                    SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
+                /*OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review
+                    .getAgentId() );*/
+                if ( unitSetting != null && unitSetting.getSocialMediaTokens() != null ) {
+                    SocialMediaTokens mediaTokens = unitSetting.getSocialMediaTokens();
 
                     // adding yelpUrl
                     if ( mediaTokens.getYelpToken() != null && mediaTokens.getYelpToken().getYelpPageLink() != null ) {
@@ -2505,7 +2527,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 Branch branch = branchDao.findById( Branch.class, userProfile.getBranchId() );
                 updateCrumbListWithBranchName( breadCrumbList, branch );
 
-                Region region = regionDao.findById( Region.class, userProfile.getRegionId() );
+                //JIRA SS-1337
+                if ( branch == null ) {
+                    throw new InvalidInputException( "No branch with ID : " + userProfile.getBranchId() + " was found" );
+                } else if ( branch.getRegion() == null ) {
+                    throw new InvalidInputException( "No region associated to branch with ID : " + userProfile.getBranchId()
+                        + " was found" );
+                }
+                Region region = branch.getRegion();
+                //Region region = regionDao.findById( Region.class, userProfile.getRegionId() );
                 updateCrumbListWithRegionName( breadCrumbList, region );
 
                 updateCrumbListWithCompanyName( breadCrumbList, company );
@@ -3470,7 +3500,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                /*if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     socialMediaTokens.setFacebookToken( companyUnitSettings.getSocialMediaTokens().getFacebookToken() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
                     socialMediaTokens.setFacebookToken( regionUnitSettings.getSocialMediaTokens().getFacebookToken() );
@@ -3478,11 +3508,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setFacebookToken( branchUnitSettings.getSocialMediaTokens().getFacebookToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setFacebookToken( agentUnitSettings.getSocialMediaTokens().getFacebookToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.GOOGLE_PLUS ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3493,11 +3523,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setGoogleToken( branchUnitSettings.getSocialMediaTokens().getGoogleToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setGoogleToken( agentUnitSettings.getSocialMediaTokens().getGoogleToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.TWITTER ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3508,11 +3538,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setTwitterToken( branchUnitSettings.getSocialMediaTokens().getTwitterToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setTwitterToken( agentUnitSettings.getSocialMediaTokens().getTwitterToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.LINKED_IN ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3523,11 +3553,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setLinkedInToken( branchUnitSettings.getSocialMediaTokens().getLinkedInToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setLinkedInToken( agentUnitSettings.getSocialMediaTokens().getLinkedInToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.LENDING_TREE ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3538,11 +3568,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setLendingTreeToken( branchUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setLendingTreeToken( agentUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.YELP ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3553,11 +3583,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setYelpToken( branchUnitSettings.getSocialMediaTokens().getYelpToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setYelpToken( agentUnitSettings.getSocialMediaTokens().getYelpToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.REALTOR ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3568,11 +3598,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setRealtorToken( branchUnitSettings.getSocialMediaTokens().getRealtorToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setRealtorToken( agentUnitSettings.getSocialMediaTokens().getRealtorToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.ZILLOW ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                if ( socialMediaTokens == null ) {
+                /*if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
                 if ( entry.getValue() == OrganizationUnit.COMPANY ) {
@@ -3583,7 +3613,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     socialMediaTokens.setZillowToken( branchUnitSettings.getSocialMediaTokens().getZillowToken() );
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     socialMediaTokens.setZillowToken( agentUnitSettings.getSocialMediaTokens().getZillowToken() );
-                }
+                }*/
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             }
         }

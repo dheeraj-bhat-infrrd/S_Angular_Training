@@ -385,7 +385,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
 
 
-    private Map<Integer, Integer> aggregateAllSurveysSent(Map<Integer, Integer> incompleteSurveys, Map<Integer, Integer> completedSurveys){
+    Map<Integer, Integer> aggregateAllSurveysSent(Map<Integer, Integer> incompleteSurveys, Map<Integer, Integer> completedSurveys){
     	LOG.debug("Aggregating all surveys");
     	if((incompleteSurveys == null || incompleteSurveys.size() == 0) && (completedSurveys != null && completedSurveys.size() > 0)){
     		return completedSurveys;
