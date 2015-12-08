@@ -22,6 +22,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -47,6 +48,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
     private SocialManagementService socialManagementService;
 
+    private BatchTrackerService batchTrackerService;
+
     public static final Logger LOG = LoggerFactory.getLogger( IncompleteSocialPostReminderSender.class );
 
     private static List<String> socialSites = new ArrayList<>();
@@ -55,88 +58,115 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
     @Override
     protected void executeInternal( JobExecutionContext jobExecutionContext )
     {
-        LOG.info( "Executing IncompleteSocialPostReminderSender" );
-        initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-        populateSocialSites();
-        // IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
-        StringBuilder links = new StringBuilder();
-        Set<String> socialPosts;
-        AgentSettings agentSettings = null;
-        User user = null;
-        for ( Company company : organizationManagementService.getAllCompanies() ) {
-            List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys( company
-                .getCompanyId() );
-            for ( SurveyDetails survey : incompleteSocialPostCustomers ) {
-                // To fetch settings of Agent and admins in the hierarchy
-                Set<String> socialSitesWithSettings = new HashSet<>();
-                try {
-                    socialSitesWithSettings = getSocialSitesWithSettingsConfigured( survey.getAgentId() );
-                } catch ( InvalidInputException e ) {
-                    LOG.error( "InvalidInputException caught in executeInternal() for SocialpostReminderMail" );
-                    continue;
-                }
+        try {
+            LOG.info( "Executing IncompleteSocialPostReminderSender" );
+            initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
+            
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER,
+                CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
 
-                if ( survey.getSocialMediaPostDetails() != null
-                    && survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
-                    && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null ) {
-                    socialPosts = new HashSet<String>( survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
-                        .getSharedOn() );
-                } else {
-                    socialPosts = new HashSet<>();
-                }
-
-                links = new StringBuilder();
-                for ( String site : getRemainingSites( socialPosts, socialSitesWithSettings ) ) {
+            populateSocialSites();
+            // IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
+            StringBuilder links = new StringBuilder();
+            Set<String> socialPosts;
+            AgentSettings agentSettings = null;
+            User user = null;
+            for ( Company company : organizationManagementService.getAllCompanies() ) {
+                List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys( company
+                    .getCompanyId() );
+                for ( SurveyDetails survey : incompleteSocialPostCustomers ) {
+                    // To fetch settings of Agent and admins in the hierarchy
+                    Set<String> socialSitesWithSettings = new HashSet<>();
                     try {
-                        links.append( "<br/>For " ).append( site ).append( " : " )
-                            .append( "<a href=" + generateQueryParams( survey, site ) + ">Click here</a>" );
-                        agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
-                        user = userManagementService.getUserByUserId( survey.getAgentId() );
-
+                        socialSitesWithSettings = getSocialSitesWithSettingsConfigured( survey.getAgentId() );
                     } catch ( InvalidInputException e ) {
-                        LOG.error( "InvalidInputException occured while generating URL for " + site + ". Nested exception is ",
-                            e );
+                        LOG.error( "InvalidInputException caught in executeInternal() for SocialpostReminderMail" );
                         continue;
                     }
-                }
-                // Send email to complete social post for survey to each customer.
-                if ( !links.toString().isEmpty() ) {
-                    try {
-                        String title = "";
-                        String phoneNo = "";
-                        String companyName = "";
-                        if ( agentSettings != null && agentSettings.getContact_details() != null ) {
-                            if ( agentSettings.getContact_details().getTitle() != null ) {
-                                title = agentSettings.getContact_details().getTitle();
-                            }
-                            if ( agentSettings.getContact_details().getContact_numbers() != null
-                                && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
-                                phoneNo = agentSettings.getContact_details().getContact_numbers().getWork();
-                            }
-                            if ( company.getCompany() != null ) {
-                                companyName = company.getCompany();
-                            }
-                        }
 
-                        String logoUrl = null;
+                    if ( survey.getSocialMediaPostDetails() != null
+                        && survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
+                        && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null ) {
+                        socialPosts = new HashSet<String>( survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                            .getSharedOn() );
+                    } else {
+                        socialPosts = new HashSet<>();
+                    }
+
+                    links = new StringBuilder();
+                    for ( String site : getRemainingSites( socialPosts, socialSitesWithSettings ) ) {
                         try {
-                            logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser( survey.getAgentId() );
-                        } catch ( NoRecordsFetchedException e ) {
-                            LOG.error( "Error while fatching logo for user with id : " + survey.getAgentId(), e );
-                        } catch ( ProfileNotFoundException e ) {
-                            LOG.error( "Error while fatching logo for user with id : " + survey.getAgentId(), e );
-                        }
+                            links.append( "<br/>For " ).append( site ).append( " : " )
+                                .append( "<a href=" + generateQueryParams( survey, site ) + ">Click here</a>" );
+                            agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
+                            user = userManagementService.getUserByUserId( survey.getAgentId() );
 
-                        surveyHandler.sendSocialPostReminderMail( survey.getCustomerEmail(), survey.getCustomerFirstName(),
-                            survey.getCustomerLastName(), user, links.toString() );
-                        surveyHandler.updateReminderCountForSocialPosts( survey.getAgentId(), survey.getCustomerEmail() );
-                    } catch ( InvalidInputException | UndeliveredEmailException | ProfileNotFoundException e ) {
-                        LOG.error(
-                            "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
-                                + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
-                        continue;
+                        } catch ( InvalidInputException e ) {
+                            LOG.error( "InvalidInputException occured while generating URL for " + site
+                                + ". Nested exception is ", e );
+                            continue;
+                        }
+                    }
+                    // Send email to complete social post for survey to each customer.
+                    if ( !links.toString().isEmpty() ) {
+                        try {
+                            String title = "";
+                            String phoneNo = "";
+                            String companyName = "";
+                            if ( agentSettings != null && agentSettings.getContact_details() != null ) {
+                                if ( agentSettings.getContact_details().getTitle() != null ) {
+                                    title = agentSettings.getContact_details().getTitle();
+                                }
+                                if ( agentSettings.getContact_details().getContact_numbers() != null
+                                    && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+                                    phoneNo = agentSettings.getContact_details().getContact_numbers().getWork();
+                                }
+                                if ( company.getCompany() != null ) {
+                                    companyName = company.getCompany();
+                                }
+                            }
+
+                            String logoUrl = null;
+                            try {
+                                logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser( survey
+                                    .getAgentId() );
+                            } catch ( NoRecordsFetchedException e ) {
+                                LOG.error( "Error while fatching logo for user with id : " + survey.getAgentId(), e );
+                            } catch ( ProfileNotFoundException e ) {
+                                LOG.error( "Error while fatching logo for user with id : " + survey.getAgentId(), e );
+                            }
+
+                            surveyHandler.sendSocialPostReminderMail( survey.getCustomerEmail(), survey.getCustomerFirstName(),
+                                survey.getCustomerLastName(), user, links.toString() );
+                            surveyHandler.updateReminderCountForSocialPosts( survey.getAgentId(), survey.getCustomerEmail() );
+                        } catch ( InvalidInputException | UndeliveredEmailException | ProfileNotFoundException e ) {
+                            LOG.error(
+                                "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
+                                    + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
+                            continue;
+                        }
                     }
                 }
+            }
+
+            //Update last build time in batch tracker table
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
+
+        } catch ( Exception e ) {
+            LOG.error( "Error in IncompleteSocialPostReminderSender", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER, e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in IncompleteSocialPostReminderSender " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
             }
         }
     }
@@ -150,6 +180,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         userManagementService = (UserManagementService) jobMap.get( "userManagementService" );
         socialManagementService = (SocialManagementService) jobMap.get( "socialManagementService" );
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
+        batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
 
     }
 
