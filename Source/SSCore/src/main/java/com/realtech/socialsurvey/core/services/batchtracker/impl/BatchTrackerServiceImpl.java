@@ -55,7 +55,7 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
      */
     @Override
     @Transactional
-    public long getLastRunEndTimeAndUpdateLastStartTimeByBatchType( String batchType )
+    public long getLastRunEndTimeAndUpdateLastStartTimeByBatchType( String batchType  , String batchName)
     {
         LOG.debug( "method getLastRunEndTimeAndUpdateLastStartTimeByBatchType() started for batch type : " + batchType );
         List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
@@ -69,6 +69,7 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
             //create new batch tracker for the record
             batchTracker = new BatchTracker();
             batchTracker.setBatchType( batchType );
+            batchTracker.setBatchName( batchName );
             batchTracker.setLastEndTime( new Timestamp( CommonConstants.EPOCH_TIME_IN_MILLIS ) );
             batchTracker.setCreatedOn( new Timestamp( currentTime ) );
             lastEndTime = CommonConstants.EPOCH_TIME_IN_MILLIS;
@@ -91,9 +92,12 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
 
     @Override
     @Transactional
-    public long getLastRunEndTimeByBatchType( String batchType ) throws NoRecordsFetchedException
+    public long getLastRunEndTimeByBatchType( String batchType ) throws NoRecordsFetchedException, InvalidInputException
     {
         LOG.debug( "method getLastRunEndTimeByBatchType() started for batch type : " + batchType );
+        if ( batchType == null || batchType.isEmpty() ) {
+            throw new InvalidInputException( "passed parameter batchtype is incorrect" );
+        }
         List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
             CommonConstants.BATCH_TYPE_COLUMN, batchType );
 
@@ -164,17 +168,22 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
 
     @Override
     @Transactional
-    public void sendMailToAdminREgardingBatchError( String  batchName, long lastRunTime ,Exception e )
+    public void sendMailToAdminRegardingBatchError( String  batchName, long lastRunTime ,Exception exception )
         throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "method sendMailToAdminREgardingBatchError started() for batch :  " + batchName );
-        String lastRunTimeStr = new Timestamp( lastRunTime ).toString();
-        String stackTrace = ExceptionUtils.getStackTrace( e ).replaceAll( "\n", "<br>" );
-        String errMsg = e.getMessage();
-        if(errMsg == null || errMsg.isEmpty()){
-            errMsg = e.getLocalizedMessage();
+        if(exception == null){
+            throw new InvalidInputException("Passed parameter exception is null");
         }
-        emailServices.sendReportBugMailToAdminForExceptionInBatch( applicationAdminName, batchName, lastRunTimeStr, e.getMessage(),
+        String lastRunTimeStr = new Timestamp( lastRunTime ).toString();
+        String stackTrace = ExceptionUtils.getStackTrace( exception );
+        if(stackTrace != null)
+            stackTrace.replaceAll( "\n", "<br>" );
+        String errMsg = exception.getMessage();
+        if(errMsg == null || errMsg.isEmpty()){
+            errMsg = "No error Message Found";
+        }
+        emailServices.sendReportBugMailToAdminForExceptionInBatch( applicationAdminName, batchName, lastRunTimeStr, errMsg,
             stackTrace, applicationAdminEmail );
         LOG.debug( "method sendMailToAdminREgardingBatchError ended()" );
     }

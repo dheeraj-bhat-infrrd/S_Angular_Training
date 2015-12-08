@@ -11,7 +11,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 public interface BatchTrackerService
 {
-    public long getLastRunEndTimeAndUpdateLastStartTimeByBatchType( String batchType );
+    public long getLastRunEndTimeAndUpdateLastStartTimeByBatchType( String batchType , String batchName );
 
 
     public Map<Long, Integer> getReviewCountForAgents( List<Long> agentIdList ) throws ParseException;
@@ -27,10 +27,10 @@ public interface BatchTrackerService
         InvalidInputException;
 
 
-    public void sendMailToAdminREgardingBatchError( String  batchName, long lastRunTime ,  Exception e ) throws InvalidInputException, UndeliveredEmailException;
+    public void sendMailToAdminRegardingBatchError( String  batchName, long lastRunTime ,  Exception e ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public long getLastRunEndTimeByBatchType( String batchType ) throws NoRecordsFetchedException;
+    public long getLastRunEndTimeByBatchType( String batchType ) throws NoRecordsFetchedException, InvalidInputException;
 
 
 }
