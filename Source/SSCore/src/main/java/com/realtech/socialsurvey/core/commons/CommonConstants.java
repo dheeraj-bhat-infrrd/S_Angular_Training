@@ -164,10 +164,49 @@ public interface CommonConstants
     public static final String VERTICAL_NAME = "verticalName";
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
     public static final String BATCH_TYPE_COLUMN = "batchType";
-    public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
+    
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
-    public static final String BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD = "socialMonitorLastBuildTime";
 
+    //batch type constant for batch tracker
+    public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
+    public static final String BATCH_TYPE_SOCIAL_MONITOR_LAST_BUILD = "socialMonitorLastBuildTime";
+    public static final String BATCH_TYPE_APPLICATION_SITE_MAP_GENERATOR = "ApplicationSiteMapGenerator";
+    public static final String BATCH_TYPE_EMAIL_READER = "EmailProcessor";
+    public static final String BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER = "IncompleteSocialPostReminderSender";
+    public static final String BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER = "IncompleteSurveyReminderSender";
+    public static final String BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER = "updateSubscriptionPriceStarter";
+    public static final String BATCH_TYPE_SOCIAL_FEED_INGESTER = "socialfeedingester";
+    public static final String BATCH_TYPE_ACCOUNT_DEACTIVATOR = "AccountDeactivator";
+    public static final String BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER = "DeactivatedAccountPurger";
+    public static final String BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER = "CrmDataAgentIdMapper";
+    public static final String BATCH_TYPE_IMAGE_LOADER = "imageLoader";
+    public static final String BATCH_TYPE_DOT_LOOP_REVIEW_PROCESSOR = "dotloopReviewProcessor";
+    public static final String BATCH_TYPE_CSV_BULK_SURVEY_PROCESSOR = "CSVBulkSurveyProcessor";
+    public static final String BATCH_TYPE_CSV_HIERARCHY_UPLOAD_PROCESSOR = "CSVHierarchyUploadProcessor";
+    public static final String BATCH_TYPE_SET_COMPANY_ID_IN_SOCIAL_POSTS = "SetCompanyIdInSocialPosts";
+    public static final String BATCH_TYPE_IMAGE_PROCESSING_STARTER = "ImageProcessingStarter";
+    public static final String BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR = "HierarchySettingsCorrector";
+    
+    //batch name constant for batch tracker
+    public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
+    public static final String BATCH_NAME_SOCIAL_MONITOR_LAST_BUILD = "Social Post Import In Solr";
+    public static final String BATCH_NAME_APPLICATION_SITE_MAP_GENERATOR = "Site Map Generator Batch";
+    public static final String BATCH_NAME_EMAIL_READER = "Email Reader And Processor";
+    public static final String BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER = "incomplete Social Post Reminder Sender";
+    public static final String BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER = "Incomplete Survey Reminder Sender";
+    public static final String BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER = "Update Subscription Price For Accounts";
+    public static final String BATCH_NAME_SOCIAL_FEED_INGESTER = "Social Feed Ingester";
+    public static final String BATCH_NAME_ACCOUNT_DEACTIVATOR = "Account Deactivator For Disabled Account Batch";
+    public static final String BATCH_NAME_DEACTIVATED_ACCOUNT_PURGER = "Purge Deactivated Company";
+    public static final String BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER = "Map CRM records with Agent";
+    public static final String BATCH_NAME_IMAGE_LOADER = "Image Loader Batch To Update uploaded Images";
+    public static final String BATCH_NAME_DOT_LOOP_REVIEW_PROCESSOR = "Dot Loop Review Processor";
+    public static final String BATCH_NAME_CSV_BULK_SURVEY_PROCESSOR = "CSV Bulk Survey Processor";
+    public static final String BATCH_NAME_CSV_HIERARCHY_UPLOAD_PROCESSOR = "CSV Hierarchy Upload Processor";
+    public static final String BATCH_NAME_SET_COMPANY_ID_IN_SOCIAL_POSTS = "Set Company Id In Social Posts Stored In Database";
+    public static final String BATCH_NAME_IMAGE_PROCESSING_STARTER = "Image Processing Starter";
+    public static final String BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR = "Hierarchy Settings Corrector For Old Records";
+    
     /**
      * Mongo entities and column name constants
      */
