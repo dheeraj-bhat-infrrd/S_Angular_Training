@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BreadCrumb;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
@@ -1727,7 +1728,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
             notRecommended );
-
+        // get zillow review count based on profile level
+        long zillowReviewCount = getZillowReviewCountBasedOnProfileLevelAndId(profileLevel, iden);
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;
     }
@@ -3940,11 +3942,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                             if ( reviews != null ) {
                                                 for ( HashMap<String, Object> review : reviews ) {
                                                     String sourceId = (String) review.get( "reviewURL" );
-                                                    SurveyDetails surveyDetails = surveyHandler
-                                                        .getSurveyDetailsBySourceIdAndMongoCollection( sourceId,
-                                                            profile.getIden(), collectionName );
-                                                    if ( surveyDetails == null ) {
-                                                        surveyDetails = new SurveyDetails();
+                                                    SurveyDetails surveyDetails = new SurveyDetails();
                                                         if ( collectionName
                                                             .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                                                             surveyDetails.setCompanyId( profile.getIden() );
@@ -4174,6 +4172,48 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.info( "Zillow is not added for the profile" );
             throw new InvalidInputException( "Zillow is not added for the profile" );
         }
+    }
 
+
+    private long getZillowReviewCountBasedOnProfileLevelAndId( String profileLevel, long iden )
+    {
+        long zillowReviewCount = 0;
+        try {
+            String idenColumnName = null;
+            if ( profileLevel == null || profileLevel.isEmpty() ) {
+                throw new InvalidInputException( "profile level is null or empty while getting iden column name" );
+            }
+            LOG.debug( "Getting zillow review count for profile level :" + profileLevel + " and id : " + iden );
+            switch ( profileLevel ) {
+                case CommonConstants.PROFILE_LEVEL_COMPANY:
+                    OrganizationUnitSettings companyProfile = organizationManagementService.getCompanySettings( iden );
+                    if ( companyProfile != null )
+                        zillowReviewCount = companyProfile.getZillowReviewCount();
+                    break;
+                case CommonConstants.PROFILE_LEVEL_REGION:
+                    OrganizationUnitSettings regionProfile = organizationManagementService.getRegionSettings( iden );
+                    if ( regionProfile != null )
+                        zillowReviewCount = regionProfile.getZillowReviewCount();
+                    break;
+                case CommonConstants.PROFILE_LEVEL_BRANCH:
+                    BranchSettings branchProfile = organizationManagementService.getBranchSettings( iden );
+                    if ( branchProfile != null )
+                        zillowReviewCount = branchProfile.getOrganizationUnitSettings().getZillowReviewCount();
+                    break;
+                case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
+                    AgentSettings agentProfile = organizationManagementService.getAgentSettings( iden );
+                    if ( agentProfile != null )
+                        zillowReviewCount = agentProfile.getZillowReviewCount();
+                    break;
+                case CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN:
+                    break;
+                default:
+                    throw new InvalidInputException( "Invalid profile level while getting iden column name" );
+            }
+            LOG.debug( "Returning column name:" + idenColumnName + " for profile level:" + profileLevel );
+        } catch ( Exception e ) {
+            LOG.error( "Exception occurred while fetching zillow count for a profile and id. Reason : ", e );
+        }
+        return zillowReviewCount;
     }
 }
