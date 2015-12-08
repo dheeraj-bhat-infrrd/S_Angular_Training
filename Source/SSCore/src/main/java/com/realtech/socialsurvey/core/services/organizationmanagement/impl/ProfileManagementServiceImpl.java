@@ -4024,7 +4024,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateEmailIdInSolr( String emailId, long iden ) throws NonFatalException
+    void updateEmailIdInSolr( String emailId, long iden ) throws NonFatalException
     {
         LOG.info( "Updating verified email id info into solr for user id : " + iden );
         Map<String, Object> editKeys = new HashMap<String, Object>();
