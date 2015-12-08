@@ -1523,7 +1523,9 @@ public class SurveyManagementController
             throw e;
         }
 
-        /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService.getUserByUserId(agentId));*/
+        //Used to set survey texts (which can be changed by the company admin)
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( userManagementService
+            .getUserByUserId( agentId ) );
         OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( agentId );
         if ( unitSettings.getSurvey_settings() == null ) {
             SurveySettings surveySettings = new SurveySettings();
@@ -1540,35 +1542,77 @@ public class SurveyManagementController
                     unitSettings.getSurvey_settings() );
             }
         }
-        SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-        surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
-        surveyAndStage.put( "neutralText", defaultSurveySettings.getNeutralText() );
-        surveyAndStage.put( "sadText", defaultSurveySettings.getSadText() );
-        surveyAndStage.put( "happyTextComplete", defaultSurveySettings.getHappyTextComplete() );
-        surveyAndStage.put( "neutralTextComplete", defaultSurveySettings.getNeutralTextComplete() );
-        surveyAndStage.put( "sadTextComplete", defaultSurveySettings.getSadTextComplete() );
+
+        //Flags to check if any particular text is not set in the companySettings
+        boolean isHappyTextSet = false, 
+            isNeutralTextSet = false, 
+            isSadTextSet = false,
+            isHappyTextCompleteSet = false, 
+            isNeutralTextCompleteSet = false, 
+            isSadTextCompleteSet = false;
 
         if ( unitSettings != null ) {
             SurveySettings surveySettings = unitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
-                if ( surveySettings.getHappyText() != null && !( surveySettings.getHappyText().isEmpty() ) )
-                    surveyAndStage.put( "happyText", surveySettings.getHappyText() );
-                if ( surveySettings.getNeutralText() != null && !( surveySettings.getNeutralText().isEmpty() ) )
-                    surveyAndStage.put( "neutralText", surveySettings.getNeutralText() );
-                if ( surveySettings.getSadText() != null && !surveySettings.getSadText().isEmpty() )
-                    surveyAndStage.put( "sadText", surveySettings.getSadText() );
-                if ( surveySettings.getHappyTextComplete() != null && !surveySettings.getHappyTextComplete().isEmpty() )
-                    surveyAndStage.put( "happyTextComplete", surveySettings.getHappyTextComplete() );
-                if ( surveySettings.getNeutralTextComplete() != null && !surveySettings.getNeutralTextComplete().isEmpty() )
-                    surveyAndStage.put( "neutralTextComplete", surveySettings.getNeutralTextComplete() );
-                if ( surveySettings.getSadTextComplete() != null && !surveySettings.getSadTextComplete().isEmpty() )
-                    surveyAndStage.put( "sadTextComplete", surveySettings.getSadTextComplete() );
-
+                //AutopostScore and autopostEnabled values, we get from the agent
                 surveyAndStage.put( "autopostScore", surveySettings.getShow_survey_above_score() );
                 surveyAndStage.put( "autopostEnabled", surveySettings.isAutoPostEnabled() );
             }
         }
-
+        if ( companySettings != null ) {
+            SurveySettings surveySettings = companySettings.getSurvey_settings();
+            if ( surveySettings != null ) {
+                if ( surveySettings.getHappyText() != null && !( surveySettings.getHappyText().isEmpty() ) ) {
+                    surveyAndStage.put( "happyText", surveySettings.getHappyText() );
+                    isHappyTextSet = true;
+                }
+                if ( surveySettings.getNeutralText() != null && !( surveySettings.getNeutralText().isEmpty() ) ) {
+                    surveyAndStage.put( "neutralText", surveySettings.getNeutralText() );
+                    isNeutralTextSet = true;
+                }
+                if ( surveySettings.getSadText() != null && !surveySettings.getSadText().isEmpty() ) {
+                    surveyAndStage.put( "sadText", surveySettings.getSadText() );
+                    isSadTextSet = true;
+                }
+                if ( surveySettings.getHappyTextComplete() != null && !surveySettings.getHappyTextComplete().isEmpty() ) {
+                    surveyAndStage.put( "happyTextComplete", surveySettings.getHappyTextComplete() );
+                    isHappyTextCompleteSet = true;
+                }
+                if ( surveySettings.getNeutralTextComplete() != null && !surveySettings.getNeutralTextComplete().isEmpty() ) {
+                    surveyAndStage.put( "neutralTextComplete", surveySettings.getNeutralTextComplete() );
+                    isNeutralTextCompleteSet = true;
+                }
+                if ( surveySettings.getSadTextComplete() != null && !surveySettings.getSadTextComplete().isEmpty() ) {
+                    surveyAndStage.put( "sadTextComplete", surveySettings.getSadTextComplete() );
+                    isSadTextCompleteSet = true;
+                }
+            }
+        }
+        
+        //If any of the texts are not set by the company, store default values for them.
+        if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet 
+            && isSadTextCompleteSet ) ) {
+            SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+            if ( !isHappyTextSet ) {
+                surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
+            }
+            if ( !isNeutralTextSet ) {
+                surveyAndStage.put( "neutralText", defaultSurveySettings.getNeutralText() );
+            }
+            if ( !isSadTextSet ) {
+                surveyAndStage.put( "sadText", defaultSurveySettings.getSadText() );
+            }
+            if ( !isHappyTextCompleteSet ) {
+                surveyAndStage.put( "happyTextComplete", defaultSurveySettings.getHappyTextComplete() );
+            }
+            if ( isNeutralTextCompleteSet ) {
+                surveyAndStage.put( "neutralTextComplete", defaultSurveySettings.getNeutralTextComplete() );
+            }
+            if ( isSadTextCompleteSet ) {
+                surveyAndStage.put( "sadTextComplete", defaultSurveySettings.getSadTextComplete() );
+            }
+        }
+        
         AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
 
         // Fetching Yelp Url
