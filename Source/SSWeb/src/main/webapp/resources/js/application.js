@@ -7787,10 +7787,12 @@ function fetchPublicPostEditProfile(isNextBatch) {
 		doStopPostPaginationEditProfile = false;
 		publicPostsBatch = [];
 		$('#prof-posts').html('');
+		$('#last-post').attr('hidden','true');
 	}
 	
 	//Show from existing batch if the data is present
 	if (!isNextBatch && publicPostsBatch.length > 0) {
+		$('#last-post').removeAttr('hidden');
 		var posts = publicPostsBatch.slice(0, proPostBatchSize);
 		if (publicPostsBatch.length > proPostBatchSize) {
 			publicPostsBatch = publicPostsBatch.slice(proPostBatchSize);
