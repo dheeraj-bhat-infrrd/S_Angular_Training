@@ -220,5 +220,5 @@ public interface OrganizationUnitSettingsDao
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
 
 
-    public void updateZillowReviewScoreAndAverage( String collectionName, long iden, double zillowReview, double zillowAverage );
+    public void updateZillowReviewScoreAndAverage( String collectionName, long iden, double zillowReviewCount, double zillowReviewAverage ) throws InvalidInputException;
 }

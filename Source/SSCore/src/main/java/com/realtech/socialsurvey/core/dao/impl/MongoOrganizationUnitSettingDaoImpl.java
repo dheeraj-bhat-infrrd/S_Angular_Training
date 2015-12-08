@@ -665,9 +665,23 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 
     @Override
-    public void updateZillowReviewScoreAndAverage( String collectionName, long iden, double zillowReview, double zillowAverage )
+    public void updateZillowReviewScoreAndAverage( String collectionName, long iden, double zillowReviewCount, double zillowReviewAverage ) throws InvalidInputException
     {
-        // TODO Auto-generated method stub
-
+        if ( collectionName == null || collectionName.isEmpty() ) {
+            LOG.error( "Collection name passed cannot be null or empty" );
+            throw new InvalidInputException( "Collection name passed cannot be null or empty" );
+        }
+        if ( iden <= 0l ) {
+            LOG.error( "Invalid iden passed as argument" );
+            throw new InvalidInputException( "Invalid iden passed as argument" );
+        }
+        LOG.info( "Method called updateZillowReviewScoreAndAverage() for updating zillow count and average in collection : " +  collectionName);
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( iden ) );
+        Update update = new Update();
+        update.set( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN, zillowReviewCount );
+        update.set( CommonConstants.ZILLOW_REVIEW_AVERAGE_COLUMN, zillowReviewAverage );
+        mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
+        LOG.info( "Method call ended updateZillowReviewScoreAndAverage() for updating zillow count and average in collection : " +  collectionName);
     }
 }

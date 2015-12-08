@@ -1785,12 +1785,7 @@ public class ProfileController
                 if ( companyProfile.getSocialMediaTokens() != null
                     && companyProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for company id: " + iden );
-                    // profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
-                    // Fetch zillow reviews from zillow
                     List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
-                    // calculate average 
-                    // save the count and average in company settings
-                    // display data
                     LOG.info( "Done fetching zillow reviews for company id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();
@@ -1806,9 +1801,10 @@ public class ProfileController
                 if ( regionProfile.getSocialMediaTokens() != null
                     && regionProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for region id: " + iden );
-                    profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for region id: " + iden );
-                    response = Response.ok().build();
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch unit settings for region: " + iden, e );
@@ -1821,9 +1817,10 @@ public class ProfileController
                 if ( branchProfile.getSocialMediaTokens() != null
                     && branchProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for branch id: " + iden );
-                    profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for branch id: " + iden );
-                    response = Response.ok().build();
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch unit settings for branch: " + iden, e );
@@ -1839,9 +1836,10 @@ public class ProfileController
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for agent id: " + iden );
-                    profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( individualProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for agent id: " + iden );
-                    response = Response.ok().build();
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch unit settings for agent: " + iden, e );
