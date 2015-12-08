@@ -165,8 +165,7 @@
 				<div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
 					<div class="people-say-wrapper rt-content-main rt-content-main-adj">
 						<div class="main-con-header clearfix pad-bot-10-resp">
-							<div id="review-desc" class="float-left dash-ppl-say-lbl">
-								<spring:message code="label.peoplesayabout.key" />${profileName}
+							<div id="review-desc" class="float-left dash-ppl-say-lbl" data-profile-name="${profileName}">
 							</div>
 						</div>
 						<div id="review-details" class="ppl-review-item-wrapper">

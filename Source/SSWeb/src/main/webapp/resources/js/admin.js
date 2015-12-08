@@ -318,7 +318,7 @@ function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 		else
 			$('#admin-abs-sur-list').append(data);
 		
-	}, payload, false);
+	}, payload, true);
 }
 
 $(document).on('click', '.unmark-abusive-icn', function() {
