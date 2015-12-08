@@ -403,7 +403,7 @@ public interface ProfileManagementService
         String recipientName ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException;
+    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException, NonFatalException;
 
 
     /**
@@ -513,7 +513,7 @@ public interface ProfileManagementService
     public void updateIndividualName( long userId, long individualId, String individualName ) throws InvalidInputException;
 
 
-    public void updateCompanyEmail( long companyId, String emailId ) throws InvalidInputException;
+    public void updateCompanyEmail( long companyId, String emailId ) throws InvalidInputException, NonFatalException;
 
 
     public void updateIndividualEmail( long userId, String emailId ) throws InvalidInputException;

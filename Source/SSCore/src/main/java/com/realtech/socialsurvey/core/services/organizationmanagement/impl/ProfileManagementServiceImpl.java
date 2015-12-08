@@ -1784,7 +1784,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException
+    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException, NonFatalException
     {
         Map<String, String> urlParams = urlGenerator.decryptParameters( urlParamsStr );
         if ( urlParams == null || urlParams.isEmpty() ) {
@@ -1823,6 +1823,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 userManagementService.updateUser( user, iden, true );
 
                 updateIndividualEmail( iden, emailVerified );
+
+                // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
+                // BEGIN
+                updateEmailIdInSolr( emailVerified, iden );
+                // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
+                // END
             }
         } else if ( emailType.equals( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
             String emailVerified = mailIds.getPersonalEmailToVerify();
@@ -2737,7 +2743,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public void updateCompanyEmail( long companyId, String emailId ) throws InvalidInputException
+    public void updateCompanyEmail( long companyId, String emailId ) throws NonFatalException
     {
         LOG.info( "Method updateCompanyEmail of profileManagementService called for companyId : " + companyId );
 
@@ -2776,6 +2782,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             company.setModifiedBy( String.valueOf( companyAdmin.getUserId() ) );
             company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             companyDao.update( company );
+
+            // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
+            // BEGIN
+            updateEmailIdInSolr( emailId, companyAdmin.getUserId() );
+            // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
+            // END
 
             LOG.info( "Successfully completed method to update company email" );
         } else {
@@ -4009,5 +4021,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } else {
             return false;
         }
+    }
+
+
+    private void updateEmailIdInSolr( String emailId, long iden ) throws NonFatalException
+    {
+        LOG.info( "Updating verified email id info into solr for user id : " + iden );
+        Map<String, Object> editKeys = new HashMap<String, Object>();
+        editKeys.put( CommonConstants.USER_LOGIN_NAME_SOLR, emailId );
+        editKeys.put( CommonConstants.USER_EMAIL_ID_SOLR, emailId );
+        try {
+            solrSearchService.editUserInSolrWithMultipleValues( iden, editKeys );
+        } catch ( SolrException se ) {
+            throw new NonFatalException( se.getMessage() );
+        }
+        LOG.info( "Updated verified email id info into solr for user id : " + iden );
     }
 }
