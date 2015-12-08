@@ -1729,8 +1729,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
             notRecommended );
-        // get zillow review count based on profile level
-        long zillowReviewCount = getZillowReviewCountBasedOnProfileLevelAndId(profileLevel, iden);
+        if ( !notRecommended ) {
+            // get zillow review count based on profile level
+            long zillowReviewCount = getZillowReviewCountBasedOnProfileLevelAndId( profileLevel, iden );
+            reviewsCount += zillowReviewCount;
+        }
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;
     }
@@ -3870,8 +3873,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @SuppressWarnings ( "unchecked")
-    private List<SurveyDetails> fetchZillowFeeds( OrganizationUnitSettings profile, String collectionName )
+    List<SurveyDetails> fetchZillowFeeds( OrganizationUnitSettings profile, String collectionName ) throws InvalidInputException
     {
+        if ( profile == null )
+            throw new InvalidInputException( "Profile setting passed cannot be null" );
+        if ( collectionName == null || collectionName.isEmpty() ) {
+            throw new InvalidInputException( "Profile setting passed cannot be null" );
+        }
         LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
         double zillowReviewScoreTotal = -1;
@@ -3947,41 +3955,38 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                                 for ( HashMap<String, Object> review : reviews ) {
                                                     String sourceId = (String) review.get( "reviewURL" );
                                                     SurveyDetails surveyDetails = new SurveyDetails();
-                                                        if ( collectionName
-                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-                                                            surveyDetails.setCompanyId( profile.getIden() );
-                                                        } else if ( collectionName
-                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-                                                            surveyDetails.setRegionId( profile.getIden() );
-                                                        } else if ( collectionName
-                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-                                                            surveyDetails.setBranchId( profile.getIden() );
-                                                        } else if ( collectionName
-                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                                                            surveyDetails.setAgentId( profile.getIden() );
-                                                        }
-                                                        String createdDate = (String) review.get( "reviewDate" );
-                                                        surveyDetails.setCompleteProfileUrl( (String) review
-                                                            .get( "reviewerLink" ) );
-                                                        surveyDetails.setCustomerFirstName( (String) review.get( "reviewer" ) );
-                                                        surveyDetails.setReview( (String) review.get( "description" ) );
-                                                        surveyDetails.setEditable( false );
-                                                        surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
-                                                        surveyDetails
-                                                            .setScore( Double.valueOf( (String) review.get( "rating" ) ) );
-                                                        surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
-                                                        surveyDetails.setSourceId( sourceId );
-                                                        surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
-                                                        surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
-                                                        surveyDetails.setAgreedToShare( "true" );
-                                                        surveyDetails.setAbusive( false );
-
-                                                        if(zillowReviewScoreTotal == -1 )
-                                                            zillowReviewScoreTotal = surveyDetails.getScore();
-                                                        else
-                                                            zillowReviewScoreTotal += surveyDetails.getScore();
-                                                        surveyDetailsList.add( surveyDetails );
+                                                    if ( collectionName
+                                                        .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                                                        surveyDetails.setCompanyId( profile.getIden() );
+                                                    } else if ( collectionName
+                                                        .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                                                        surveyDetails.setRegionId( profile.getIden() );
+                                                    } else if ( collectionName
+                                                        .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                                                        surveyDetails.setBranchId( profile.getIden() );
+                                                    } else if ( collectionName
+                                                        .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                                                        surveyDetails.setAgentId( profile.getIden() );
                                                     }
+                                                    String createdDate = (String) review.get( "reviewDate" );
+                                                    surveyDetails.setCompleteProfileUrl( (String) review.get( "reviewerLink" ) );
+                                                    surveyDetails.setCustomerFirstName( (String) review.get( "reviewer" ) );
+                                                    surveyDetails.setReview( (String) review.get( "description" ) );
+                                                    surveyDetails.setEditable( false );
+                                                    surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
+                                                    surveyDetails.setScore( Double.valueOf( (String) review.get( "rating" ) ) );
+                                                    surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
+                                                    surveyDetails.setSourceId( sourceId );
+                                                    surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
+                                                    surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
+                                                    surveyDetails.setAgreedToShare( "true" );
+                                                    surveyDetails.setAbusive( false );
+
+                                                    if ( zillowReviewScoreTotal == -1 )
+                                                        zillowReviewScoreTotal = surveyDetails.getScore();
+                                                    else
+                                                        zillowReviewScoreTotal += surveyDetails.getScore();
+                                                    surveyDetailsList.add( surveyDetails );
                                                 }
                                             }
                                         }
@@ -3992,15 +3997,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                     }
                 }
+            }
         } else {
             LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
         }
 
         if ( surveyDetailsList.size() > 0 && zillowReviewScoreTotal > -1 ) {
-            updateReviewCountAndAverage( collectionName, profile.getIden(), zillowReviewScoreTotal, zillowReviewScoreTotal
-                / surveyDetailsList.size() );
+            updateReviewCountAndAverage( collectionName, profile.getIden(), surveyDetailsList.size(),
+                ( zillowReviewScoreTotal / surveyDetailsList.size() ) );
         }
-        // return the fetched zillow review
+        // return the fetched zillow reviews
         return surveyDetailsList;
     }
 
@@ -4186,7 +4192,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private long getZillowReviewCountBasedOnProfileLevelAndId( String profileLevel, long iden )
+    long getZillowReviewCountBasedOnProfileLevelAndId( String profileLevel, long iden )
     {
         long zillowReviewCount = 0;
         try {
@@ -4228,12 +4234,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         return zillowReviewCount;
     }
 
-    @Async
+
+//    @Async
     @Override
-    public void updateReviewCountAndAverage( String collectionName, long iden, double zillowReview, double zillowAverage )
+//    @Transactional
+    public void updateReviewCountAndAverage( String collectionName, long iden, double zillowReviewCount, double zillowAverage )
     {
-        LOG.info( "Updating the zillow review score and average in collection : " + collectionName );
-        organizationUnitSettingsDao.updateZillowReviewScoreAndAverage( collectionName, iden, zillowReview, zillowAverage );
-        LOG.info( "Updated the zillow review score and average in collection : " + collectionName );
+        if ( collectionName == null || collectionName.isEmpty() ) {
+            LOG.error( "Collection name passed cannot be null or empty" );
+        }
+        if ( iden <= 0l ) {
+            LOG.error( "Invalid iden passed as argument" );
+        }
+        LOG.info( "Updating the zillow review count and average in collection : " + collectionName );
+        try {
+            organizationUnitSettingsDao.updateZillowReviewScoreAndAverage( collectionName, iden, zillowReviewCount,
+                zillowAverage );
+        } catch ( InvalidInputException e ) {
+            LOG.error("Exception occurred while updating zillow review count and average. Reason : " + e);
+        }
+        LOG.info( "Updated the zillow review count and average in collection : " + collectionName );
     }
 }
