@@ -18,8 +18,8 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-<c:if test="${not empty profileSettings && not empty profileSettings.logoThumbnail}">
-	<c:set value="${profileSettings.logoThumbnail}" var="profilelogo"></c:set>
+<c:if test="${not empty profileSettings && not empty profileSettings.logo}">
+	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
 

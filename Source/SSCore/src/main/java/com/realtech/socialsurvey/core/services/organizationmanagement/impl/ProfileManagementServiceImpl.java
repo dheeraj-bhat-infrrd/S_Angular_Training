@@ -608,7 +608,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LockSettings parentLock = parentProfile.getLockSettings();
         if ( parentLock != null ) {
             // Logo
-            if ( parentProfile.getLogoThumbnail() != null ) {
+            //JIRA SS-1363 begin
+            /*if ( parentProfile.getLogoThumbnail() != null ) {
                 if ( parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() ) {
                     userProfile.setLogo( parentProfile.getLogoThumbnail() );
                     userLock.setLogoLocked( true );
@@ -618,7 +619,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         userProfile.setLogo( parentProfile.getLogoThumbnail() );
                     }
                 }
+            }*/
+            if ( parentProfile.getLogo() != null ) {
+                if ( parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() ) {
+                    userProfile.setLogo( parentProfile.getLogo() );
+                    userLock.setLogoLocked( true );
+                }
+                if ( !parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() ) {
+                    if ( userProfile.getLogo() == null || userProfile.getLogo().equals( "" ) ) {
+                        userProfile.setLogo( parentProfile.getLogo() );
+                    }
+                }
             }
+            //JIRA SS-1363 end
 
             // Basic Contact details
             if ( parentProfile.getContact_details() != null ) {
@@ -2925,9 +2938,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         if ( !parentLockSettings.getIsLogoLocked() && ( logoUrl == null || logoUrl.isEmpty() ) ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-            if ( companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty() ) {
+            //JIRA SS-1363 begin
+            /*if ( companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty() ) {
                 logoUrl = companySettings.getLogoThumbnail();
+            }*/
+            if ( companySettings.getLogo() != null && !companySettings.getLogo().isEmpty() ) {
+                logoUrl = companySettings.getLogo();
             }
+            //JIRA SS-1363 end
         }
 
         // add the company profile data into agent settings
@@ -3325,7 +3343,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         //Set logoThumbnail along with logo
         for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
             if ( entry.getKey() == SettingsForApplication.LOGO ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                //JIRA SS-1363 begin
+                /*if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     userProfile.setLogo( companyUnitSettings.getLogoThumbnail() );
                     userProfile.setLogoThumbnail( companyUnitSettings.getLogoThumbnail() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
@@ -3337,7 +3356,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     userProfile.setLogo( agentUnitSettings.getLogoThumbnail() );
                     userProfile.setLogoThumbnail( agentUnitSettings.getLogoThumbnail() );
+                }*/
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    userProfile.setLogo( companyUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( companyUnitSettings.getLogoThumbnail() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    userProfile.setLogo( regionUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( regionUnitSettings.getLogoThumbnail() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    userProfile.setLogo( branchUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( branchUnitSettings.getLogoThumbnail() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    userProfile.setLogo( agentUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( agentUnitSettings.getLogoThumbnail() );
                 }
+                //JIRA SS-1363 end
 
             } else if ( entry.getKey() == SettingsForApplication.LOCATION ) {
                 ContactDetailsSettings contactDetails = userProfile.getContact_details();
