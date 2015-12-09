@@ -21,7 +21,6 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
 
     @Async
     @Override
-    //    @Transactional
     public void updateZillowReviewCountAndAverage( String collectionName, long iden, double zillowReviewCount,
         double zillowAverage )
     {
