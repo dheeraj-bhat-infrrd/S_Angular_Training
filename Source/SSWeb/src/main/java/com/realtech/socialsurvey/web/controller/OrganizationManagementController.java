@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
@@ -27,7 +30,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
@@ -67,6 +69,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -497,7 +500,14 @@ public class OrganizationManagementController
             if ( settingsSetter.isSettingsValueSet( OrganizationUnit.COMPANY,
                 Long.parseLong( user.getCompany().getSettingsSetStatus() ), SettingsForApplication.LOGO ) ) {
                 LOG.debug( "Unlocking the logo" );
-                settingsLocker.lockSettingsValueForCompany( user.getCompany(), SettingsForApplication.LOGO, false );
+                try {
+                    if ( settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
+                        Long.parseLong( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.LOGO ) ) {
+                        settingsLocker.lockSettingsValueForCompany( user.getCompany(), SettingsForApplication.LOGO, false );
+                    }
+                } catch ( InvalidSettingsStateException e ) {
+                    LOG.error( "InvalidSettingsStateException occured. Reason :", e );
+                }
                 // update company
                 userManagementService.updateCompany( user.getCompany() );
             }
