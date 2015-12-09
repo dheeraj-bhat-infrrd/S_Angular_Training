@@ -553,9 +553,14 @@ public class SurveyManagementController
                 // fetching company logo
                 User user = userManagementService.getUserByUserId( agentId );
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-                if ( companySettings != null && companySettings.getLogoThumbnail() != null ) {
+                //JIRA SS-1363 begin
+                /*if ( companySettings != null && companySettings.getLogoThumbnail() != null ) {
                     surveyAndStage.put( "companyLogo", companySettings.getLogoThumbnail() );
+                }*/
+                if ( companySettings != null && companySettings.getLogo() != null ) {
+                    surveyAndStage.put( "companyLogo", companySettings.getLogo() );
                 }
+                //JIRA SS-1363 end
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in triggerSurveyWithUrl()." );
