@@ -59,5 +59,14 @@ namespace EncompassSocialSurvey
         }
 
 
+        public static int DefaultDaysIntervalToFetch
+        {
+            get
+            {
+                return Int32.Parse(System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.DEFAULT_DAYS_INTERVAL]);
+            }
+        }
+
+
     }
 }
