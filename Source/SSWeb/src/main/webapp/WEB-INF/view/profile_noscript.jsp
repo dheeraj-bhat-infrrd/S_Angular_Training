@@ -222,8 +222,8 @@
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
             	<c:choose>
-            		<c:when test="${not empty profile.logoThumbnail }">
-            			<div class="prof-user-logo" id="prof-company-logo" style="background: url(${profile.logoThumbnail}) no-repeat center; background-size: 100% auto;"></div>
+            		<c:when test="${not empty profile.logo }">
+            			<div class="prof-user-logo" id="prof-company-logo" style="background: url(${profile.logo}) no-repeat center; background-size: 100% auto;"></div>
             		</c:when>
             		<c:otherwise>
             			<div class="prof-user-logo" id="prof-company-logo"></div>
