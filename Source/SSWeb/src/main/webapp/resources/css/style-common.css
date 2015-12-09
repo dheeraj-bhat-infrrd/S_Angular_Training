@@ -512,6 +512,47 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	background-color: rgba(255, 255, 255, 0.7);
 }
 
+.overlay-dash-loader {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 999999999;
+	background: url(../images/dashloader.gif) no-repeat center;
+	background-size: 50px 50px;
+	background-color: rgba(255, 255, 255, 0.7);
+}
+#top-dash{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 999999999;
+	background: url(../images/dashloader.gif) no-repeat center;
+	background-size: 50px 50px;
+	background-color: rgba(255, 255, 255, 0.7);
+}
+#mid-dash{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 999999999;
+	background: url(../images/dashloader.gif) no-repeat center;
+	background-size: 50px 50px;
+	background-color: rgba(255, 255, 255, 0.7);
+	min-height:180px;
+}
+#low-dash{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 999999999;
+	background: url(../images/dashloader.gif) no-repeat center;
+	background-size: 50px 50px;
+	background-color: rgba(255, 255, 255, 0.7);
+}
+.pos-relative{
+	position:relative;
+}
+
 .overlay-payment {
 	position: fixed;
 	top: 0;

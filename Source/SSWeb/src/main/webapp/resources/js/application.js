@@ -462,6 +462,7 @@ function showProfileDetails(columnName, columnValue, numberOfDays) {
 		"columnValue" : columnValue,
 		"numberOfDays" : numberOfDays
 	};
+	showDashOverlay('#top-dash');
 	callAjaxGetWithPayloadData("./profiledetails.do", function(data) {
 		$('#dash-profile-detail-circles').html(data);
 		showDashboardButtons(columnName, columnValue);
@@ -638,6 +639,7 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 		"columnValue" : columnValue,
 		"numberOfDays" : numberOfDays
 	};
+	showDashOverlay('#mid-dash');
 	callAjaxGetWithPayloadData("./surveycount.do", function(data) {
 		$('#dash-survey-status').html(data);
 	}, payload, true);
@@ -857,6 +859,7 @@ function updateEventOnDashboardPageForReviews() {
 function showSurveyStatisticsGraphically(columnName, columnValue) {
 	var element = document.getElementById("dsh-grph-format");
 	var numberOfDays = element.options[element.selectedIndex].value;
+	showDashOverlay('#low-dash');
 	showSurveyGraph(columnName, columnValue, numberOfDays);
 }
 
@@ -875,6 +878,7 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		success : function(data) {
 			graphData = data;
 			paintSurveyGraph();
+			hideDashOverlay('#low-dash');
 		},
 		error : function(e) {
 			if(e.status == 504) {
