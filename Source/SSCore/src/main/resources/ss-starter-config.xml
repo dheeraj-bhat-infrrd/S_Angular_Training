@@ -29,6 +29,7 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="solrSearchService" value-ref="solrSearchService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -46,6 +47,7 @@
 				<entry key="branchSiteMapGenerator" value-ref="sitemapgenerator" />
 				<entry key="agentSiteMapGenerator" value-ref="sitemapgenerator" />
 				<entry key="uploadService" value-ref="uploadService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 				<entry key="envPrefix" value="${AMAZON_ENV_PREFIX}" />
 				<entry key="companySiteMapPath" value="${COMPANY_SITEMAP_PATH}" />
 				<entry key="regionSiteMapPath" value="${REGION_SITEMAP_PATH}" />
@@ -70,6 +72,7 @@
 				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="socialManagementService" value-ref="socialManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -90,6 +93,7 @@
 				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
 				<entry key="applicationBaseUrl" value="${APPLICATION_BASE_URL}" />
 				<entry key="applicationLogoUrl" value="${APPLICATION_LOGO_URL}" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -103,6 +107,7 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="reviseSubscription" value-ref="reviseSubscription" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -185,6 +190,7 @@
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 				<entry key="solrSearchService" value-ref="solrSearchService" />
 				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -201,6 +207,7 @@
 				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="solrSearchService" value-ref="solrSearchService" />
 				<entry key="accountPermDeleteSpan" value="${ACCOUNT_PERM_DELETE_SPAN}" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -220,6 +227,7 @@
 				<entry key="adminEmailId" value="${APPLICATION_ADMIN_EMAIL}" />
 				<entry key="adminName" value="${APPLICATION_ADMIN_NAME}" />
 				<entry key="fileDirectoryLocation" value="${FILE_DIRECTORY_LOCATION}" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -235,6 +243,7 @@
 				<entry key="fileUploadService" value-ref="fileUploadService" />
 				<entry key="profileManagementService" value-ref="profileManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 				<entry key="amazonImageBucket" value="${AMAZON_IMAGE_BUCKET}" />
 				<entry key="cdnUrl" value="${CDN_PATH}" />
 			</map>
@@ -275,6 +284,7 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -297,6 +307,7 @@
 				<entry key="maskEmail" value="${MASK_EMAIL_ADDRESS}" />
 				<entry key="applicationAdminEmail" value="${APPLICATION_ADMIN_EMAIL}" />
 				<entry key="applicationAdminName" value="${APPLICATION_ADMIN_NAME}" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -310,6 +321,7 @@
 			<map>
 				<entry key="imageProcessor" value-ref="imageProcessor" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />

@@ -2285,7 +2285,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     CommonConstants.USER_ID_SOLR, true, 0, 1 );*/
                 // adding completeProfileUrl
                 OrganizationUnitSettings unitSetting = null;
-                if ( review.getSource().equals( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
+                if ( review.getSource() != null && !review.getSource().isEmpty()
+                    && review.getSource().equals( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
                     if ( review.getCompanyId() > 0 ) {
                         unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getCompanyId(),
                             CommonConstants.COMPANY_SETTINGS_COLLECTION );

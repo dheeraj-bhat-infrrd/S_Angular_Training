@@ -21,11 +21,14 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.EmailDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.EmailObject;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -62,53 +65,77 @@ public class EmailProcessor implements Runnable
     @Autowired
     private EmailSender emailSender;
 
+    @Autowired
+    private BatchTrackerService batchTrackerService;
+
 
     @Override
     public void run()
     {
-        Map<EmailEntity, String> errorEmails = new HashMap<EmailEntity, String>();
-        while ( true ) {
-            List<EmailObject> emailObjectList = emailDao.findAllEmailsToBeSent();
-            if ( emailObjectList.isEmpty() ) {
-                try {
-                    Thread.sleep( 60000 );
-                } catch ( InterruptedException ie ) {
-                    LOG.error( "Exception Caught " + ie.getMessage() );
-                }
-
-            }
-            for ( EmailObject emailObject : emailObjectList ) {
-                EmailEntity emailEntity = null;
-                try {
-                    emailEntity = (EmailEntity) utils.deserializeObject( emailObject.getEmailBinaryObject() );
-                    if ( !emailSender.sendEmailByEmailEntity( emailEntity ) ) {
-                        LOG.warn( " Email Sending Failed, Trying again " );
-                        errorEmails.put( emailEntity, "unable to send email" );
-                    } else {
-                        LOG.debug( "Email Sent Successfully " );
-                        LOG.debug( "Removing The Email From Database" + emailObject.getId() );
-                        emailDao.deleteEmail( emailObject );
+        try {
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_EMAIL_READER , CommonConstants.BATCH_NAME_EMAIL_READER );
+            Map<EmailEntity, String> errorEmails = new HashMap<EmailEntity, String>();
+            while ( true ) {
+                List<EmailObject> emailObjectList = emailDao.findAllEmailsToBeSent();
+                if ( emailObjectList.isEmpty() ) {
+                    try {
+                        Thread.sleep( 60000 );
+                    } catch ( InterruptedException ie ) {
+                        LOG.error( "Exception Caught " + ie.getMessage() );
                     }
-                } catch ( Exception e ) {
-                    LOG.error( "Exception caught " + e.getMessage() );
-                    errorEmails.put( emailEntity, e.getMessage() );
+
+                }
+                for ( EmailObject emailObject : emailObjectList ) {
+                    EmailEntity emailEntity = null;
+                    try {
+                        emailEntity = (EmailEntity) utils.deserializeObject( emailObject.getEmailBinaryObject() );
+                        if ( !emailSender.sendEmailByEmailEntity( emailEntity ) ) {
+                            LOG.warn( " Email Sending Failed, Trying again " );
+                            errorEmails.put( emailEntity, "unable to send email" );
+                        } else {
+                            LOG.debug( "Email Sent Successfully " );
+                            LOG.debug( "Removing The Email From Database" + emailObject.getId() );
+                            emailDao.deleteEmail( emailObject );
+                        }
+                    } catch ( Exception e ) {
+                        LOG.error( "Exception caught " + e.getMessage() );
+                        errorEmails.put( emailEntity, e.getMessage() );
+                    }
+
+                }
+                try {
+                    if ( errorEmails.size() > 10 ) {
+                        LOG.debug( "Send 10 invalid records at a time " );
+                        sendInvalidEmails( errorEmails );
+                        LOG.debug( "Clearing old exception emails " );
+                        errorEmails.clear();
+                    }
+                } catch ( Exception ex ) {
+                    LOG.error( "Exception while sending invalid mails to admin", ex );
+                    throw ex;
                 }
 
-            }
-            try{
-	            if ( errorEmails.size() > 10 ) {
-	                LOG.debug( "Send 10 invalid records at a time " );
-	                sendInvalidEmails( errorEmails );
-	                LOG.debug( "Clearing old exception emails " );
-	                errorEmails.clear();
-	            }
-            }catch(Exception ex){
-            	LOG.error("Exception while sending invalid mails to admin", ex);
+              //Update last run end time in batch tracker table
+                batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_EMAIL_READER );
             }
 
+        } catch ( Exception e ) {
+            LOG.error( "Error in EmailProcessor", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_EMAIL_READER,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_EMAIL_READER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in EmailProcessor " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
         }
-
-
     }
 
 
