@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -594,7 +595,8 @@ public interface ProfileManagementService
      * @param collection
      * @throws InvalidInputException
      */
-    void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
+//  Commented as Zillow surveys are not stored in database, SS-1276
+//  void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
 
 
     Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,

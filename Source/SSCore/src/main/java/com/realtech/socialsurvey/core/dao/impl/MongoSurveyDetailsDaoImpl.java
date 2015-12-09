@@ -533,7 +533,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         long reviewsCount = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Count of aggregated results :" + reviewsCount );
         double rating = 0;
-        if ( result != null && ( reviewsCount > 0 || includeZillow ) ) {
+        if ( result != null && reviewsCount > 0 ) {
             List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get( "result" );
             if ( includeZillow ) {
                 long zillowReviewCount = getZillowReviewCountBasedOnColumnNameAndId( columnName, columnValue );
@@ -546,6 +546,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     rating = totalRating / reviewsCount;
             } else
                 rating = (double) basicDBObject.get( 0 ).get( "total_score" ) / reviewsCount;
+        } else if ( includeZillow ) {
+            long zillowReviewCount = getZillowReviewCountBasedOnColumnNameAndId( columnName, columnValue );
+            double zillowRating = getZillowReviewAverageBasedOnColumnNameAndId( columnName, columnValue ) * zillowReviewCount;
+            if ( zillowReviewCount > 0 )
+                rating = zillowRating / zillowReviewCount;
         }
         LOG.info( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished." );
         return rating;
@@ -1585,38 +1590,38 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
-    @Override
-    public void removeZillowSurveysByEntity( String entityType, long entityId )
-    {
-        LOG.info( "Method removeZillowSurveysByEntity() started" );
-        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
-            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
-        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
-        // Commented as Zillow surveys are not stored in database, SS-1276
-        // mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
-        LOG.info( "Method removeZillowSurveysByEntity() finished" );
-    }
+    // Commented as Zillow surveys are not stored in database, SS-1276
+    //    @Override
+    //    public void removeZillowSurveysByEntity( String entityType, long entityId )
+    //    {
+    //        LOG.info( "Method removeZillowSurveysByEntity() started" );
+    //        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
+    //            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+    //        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+    //        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+    //        LOG.info( "Method removeZillowSurveysByEntity() finished" );
+    //    }
 
-
-    @Override
-    public void removeExcessZillowSurveysByEntity( String entityType, long entityId )
-    {
-        LOG.info( "Method removeExcessZillowSurveysByEntity() started" );
-        // Commented as Zillow surveys are not stored in database, SS-1276
-        //        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
-        //            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
-        //        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
-        //        query.with( new Sort( Sort.Direction.ASC, "createdOn" ) );
-        //        List<DBObject> surveys = mongoTemplate.find( query, DBObject.class, SURVEY_DETAILS_COLLECTION );
-        //        int count = surveys.size();
-        //        if ( count > 10 ) {
-        //            int noOfSurveysToRemove = count - 10;
-        //            for ( int i = 0; i < noOfSurveysToRemove; i++ ) {
-        //                mongoTemplate.remove( surveys.get( i ), SURVEY_DETAILS_COLLECTION );
-        //            }
-        //        }
-        LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
-    }
+    //    Commented as Zillow surveys are not stored in database, SS-1276
+    //    @Override
+    //    public void removeExcessZillowSurveysByEntity( String entityType, long entityId )
+    //    {
+    //        LOG.info( "Method removeExcessZillowSurveysByEntity() started" );
+    //        
+    //                Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
+    //                    CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+    //                query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+    //                query.with( new Sort( Sort.Direction.ASC, "createdOn" ) );
+    //                List<DBObject> surveys = mongoTemplate.find( query, DBObject.class, SURVEY_DETAILS_COLLECTION );
+    //                int count = surveys.size();
+    //                if ( count > 10 ) {
+    //                    int noOfSurveysToRemove = count - 10;
+    //                    for ( int i = 0; i < noOfSurveysToRemove; i++ ) {
+    //                        mongoTemplate.remove( surveys.get( i ), SURVEY_DETAILS_COLLECTION );
+    //                    }
+    //                }
+    //        LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
+    //    }
 
 
     @Override
@@ -1980,6 +1985,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             if ( columnName == null || columnName.isEmpty() ) {
                 throw new InvalidInputException(
                     "column name is null or empty while getting organization unit settings based on column name and id" );
+            }
+            if ( iden<=0l ) {
+                throw new InvalidInputException(
+                    "Invalid id passed while getting organization unit settings based on column name and id" );
             }
             LOG.debug( "Getting organization unit settings based on column name :" + columnName + " and id : " + iden );
             switch ( columnName ) {

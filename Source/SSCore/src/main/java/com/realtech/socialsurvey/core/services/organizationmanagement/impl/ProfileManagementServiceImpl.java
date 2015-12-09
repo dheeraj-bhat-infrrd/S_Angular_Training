@@ -3713,37 +3713,36 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     /**
      * Code to fetch zillow reviews on profile page load
      */
-
-    @Override
-    public void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException
-    {
-        if ( profile == null || collection == null || collection.isEmpty() ) {
-            LOG.info( "Invalid parameters passed to updateZillowFeed for fetching zillow feed" );
-            throw new InvalidInputException( "Invalid parameters passed to updateZillowFeed for fetching zillow feed" );
-        }
-        LOG.info( "Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection );
-        if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null ) {
-            // fetching zillow feed
-            LOG.debug( "Fetching zillow feed for " + profile.getId() + " from " + collection );
-            fetchFeedFromZillow( profile, collection );
-            String entityType = "";
-            if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-                entityType = CommonConstants.COMPANY_ID_COLUMN;
-            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-                entityType = CommonConstants.REGION_ID_COLUMN;
-            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-                entityType = CommonConstants.BRANCH_ID_COLUMN;
-            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                entityType = CommonConstants.AGENT_ID_COLUMN;
-            }
-            // Commented as Zillow surveys are not stored in database, SS-1276
-            // surveyHandler.deleteExcessZillowSurveysByEntity( entityType, profile.getIden() );
-        } else {
-            LOG.info( "Zillow is not added for the profile" );
-            throw new InvalidInputException( "Zillow is not added for the profile" );
-        }
-        LOG.info( "Method to update zillow feed finished." );
-    }
+//    Commented as Zillow surveys are not stored in database, SS-1276
+//    @Override
+//    public void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException
+//    {
+//        if ( profile == null || collection == null || collection.isEmpty() ) {
+//            LOG.info( "Invalid parameters passed to updateZillowFeed for fetching zillow feed" );
+//            throw new InvalidInputException( "Invalid parameters passed to updateZillowFeed for fetching zillow feed" );
+//        }
+//        LOG.info( "Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection );
+//        if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null ) {
+//            // fetching zillow feed
+//            LOG.debug( "Fetching zillow feed for " + profile.getId() + " from " + collection );
+//            fetchFeedFromZillow( profile, collection );
+//            String entityType = "";
+//            if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+//                entityType = CommonConstants.COMPANY_ID_COLUMN;
+//            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+//                entityType = CommonConstants.REGION_ID_COLUMN;
+//            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+//                entityType = CommonConstants.BRANCH_ID_COLUMN;
+//            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+//                entityType = CommonConstants.AGENT_ID_COLUMN;
+//            }
+//            surveyHandler.deleteExcessZillowSurveysByEntity( entityType, profile.getIden() );
+//        } else {
+//            LOG.info( "Zillow is not added for the profile" );
+//            throw new InvalidInputException( "Zillow is not added for the profile" );
+//        }
+//        LOG.info( "Method to update zillow feed finished." );
+//    }
 
 
     private Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
@@ -3753,82 +3752,81 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         return map;
     }
 
-
-    @SuppressWarnings ( "unchecked")
-    private void fetchFeedFromZillow( OrganizationUnitSettings profile, String collectionName )
-    {
-        LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
-
-        if ( profile != null && profile.getSocialMediaTokens() != null ) {
-            LOG.debug( "Starting to fetch the feed." );
-
-            SocialMediaTokens token = profile.getSocialMediaTokens();
-            if ( token != null ) {
-                if ( token.getZillowToken() != null ) {
-                    ZillowIntegrationApi zillowIntegrationApi = zillowIntegrationApiBuilder.getZellowIntegrationApi();
-                    String responseString = null;
-                    ZillowToken zillowToken = token.getZillowToken();
-                    String zillowScreenName = zillowToken.getZillowScreenName();
-                    if ( zillowScreenName == null || zillowScreenName.isEmpty() ) {
-                        LOG.debug( "Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing" );
-                        // TODO: Convert to proper format from the old url format
-                    } else {
-                        Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
-                            zillowScreenName );
-                        if ( response != null ) {
-                            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-                        }
-                        if ( responseString != null ) {
-                            Map<String, Object> map = null;
-                            try {
-                                map = convertJsonStringToMap( responseString );
-                            } catch ( JsonParseException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
-                            } catch ( JsonMappingException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
-                            } catch ( IOException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
-                            }
-
-                            if ( map != null ) {
-                                Map<String, Object> responseMap = new HashMap<String, Object>();
-                                Map<String, Object> resultMap = new HashMap<String, Object>();
-                                Map<String, Object> proReviews = new HashMap<String, Object>();
-                                Map<String, Object> messageMap = new HashMap<String, Object>();
-                                List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-                                responseMap = (HashMap<String, Object>) map.get( "response" );
-                                messageMap = (HashMap<String, Object>) map.get( "message" );
-                                String code = (String) messageMap.get( "code" );
-                                if ( !code.equalsIgnoreCase( "0" ) ) {
-                                    String errorMessage = (String) messageMap.get( "text" );
-                                    if ( errorMessage.contains( "You exceeded the maximum API requests per day." ) ) {
-                                        int count = socialManagementService.fetchZillowCallCount();
-                                        if ( count != 0 ) {
-                                            LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
-                                            try {
-                                                emailServices.sendZillowCallExceededMailToAdmin( count );
-                                                surveyDetailsDao.resetZillowCallCount();
-                                            } catch ( InvalidInputException e ) {
-                                                LOG.error(
-                                                    "Sending the mail to the admin failed due to invalid input. Reason : ", e );
-                                            } catch ( UndeliveredEmailException e ) {
-                                                LOG.error( "The email failed to get delivered. Reason : ", e );
-                                            }
-                                        }
-                                    }
-                                    LOG.error( "Error code : " + code + " Error description : " + errorMessage );
-                                } else {
-                                    surveyDetailsDao.updateZillowCallCount();
-                                }
-
-                                if ( responseMap != null ) {
-                                    resultMap = (HashMap<String, Object>) responseMap.get( "results" );
-                                    if ( resultMap != null ) {
-                                        proReviews = (HashMap<String, Object>) resultMap.get( "proReviews" );
-                                        if ( proReviews != null ) {
-                                            reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
-                                            if ( reviews != null ) {
-//                                                Commented as Zillow surveys are not stored in database, SS-1276
+//  Commented as Zillow surveys are not stored in database, SS-1276
+//    @SuppressWarnings ( "unchecked")
+//    private void fetchFeedFromZillow( OrganizationUnitSettings profile, String collectionName )
+//    {
+//        LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
+//
+//        if ( profile != null && profile.getSocialMediaTokens() != null ) {
+//            LOG.debug( "Starting to fetch the feed." );
+//
+//            SocialMediaTokens token = profile.getSocialMediaTokens();
+//            if ( token != null ) {
+//                if ( token.getZillowToken() != null ) {
+//                    ZillowIntegrationApi zillowIntegrationApi = zillowIntegrationApiBuilder.getZellowIntegrationApi();
+//                    String responseString = null;
+//                    ZillowToken zillowToken = token.getZillowToken();
+//                    String zillowScreenName = zillowToken.getZillowScreenName();
+//                    if ( zillowScreenName == null || zillowScreenName.isEmpty() ) {
+//                        LOG.debug( "Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing" );
+//                        // TODO: Convert to proper format from the old url format
+//                    } else {
+//                        Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
+//                            zillowScreenName );
+//                        if ( response != null ) {
+//                            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+//                        }
+//                        if ( responseString != null ) {
+//                            Map<String, Object> map = null;
+//                            try {
+//                                map = convertJsonStringToMap( responseString );
+//                            } catch ( JsonParseException e ) {
+//                                LOG.error( "Exception caught " + e.getMessage() );
+//                            } catch ( JsonMappingException e ) {
+//                                LOG.error( "Exception caught " + e.getMessage() );
+//                            } catch ( IOException e ) {
+//                                LOG.error( "Exception caught " + e.getMessage() );
+//                            }
+//
+//                            if ( map != null ) {
+//                                Map<String, Object> responseMap = new HashMap<String, Object>();
+//                                Map<String, Object> resultMap = new HashMap<String, Object>();
+//                                Map<String, Object> proReviews = new HashMap<String, Object>();
+//                                Map<String, Object> messageMap = new HashMap<String, Object>();
+//                                List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
+//                                responseMap = (HashMap<String, Object>) map.get( "response" );
+//                                messageMap = (HashMap<String, Object>) map.get( "message" );
+//                                String code = (String) messageMap.get( "code" );
+//                                if ( !code.equalsIgnoreCase( "0" ) ) {
+//                                    String errorMessage = (String) messageMap.get( "text" );
+//                                    if ( errorMessage.contains( "You exceeded the maximum API requests per day." ) ) {
+//                                        int count = socialManagementService.fetchZillowCallCount();
+//                                        if ( count != 0 ) {
+//                                            LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
+//                                            try {
+//                                                emailServices.sendZillowCallExceededMailToAdmin( count );
+//                                                surveyDetailsDao.resetZillowCallCount();
+//                                            } catch ( InvalidInputException e ) {
+//                                                LOG.error(
+//                                                    "Sending the mail to the admin failed due to invalid input. Reason : ", e );
+//                                            } catch ( UndeliveredEmailException e ) {
+//                                                LOG.error( "The email failed to get delivered. Reason : ", e );
+//                                            }
+//                                        }
+//                                    }
+//                                    LOG.error( "Error code : " + code + " Error description : " + errorMessage );
+//                                } else {
+//                                    surveyDetailsDao.updateZillowCallCount();
+//                                }
+//
+//                                if ( responseMap != null ) {
+//                                    resultMap = (HashMap<String, Object>) responseMap.get( "results" );
+//                                    if ( resultMap != null ) {
+//                                        proReviews = (HashMap<String, Object>) resultMap.get( "proReviews" );
+//                                        if ( proReviews != null ) {
+//                                            reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
+//                                            if ( reviews != null ) {
 //                                                for ( HashMap<String, Object> review : reviews ) {
 //                                                    String sourceId = (String) review.get( "reviewURL" );
 //                                                    SurveyDetails surveyDetails = surveyHandler
@@ -3867,20 +3865,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 //                                                        surveyHandler.insertSurveyDetails( surveyDetails );
 //                                                    }
 //                                                }
-                                            }
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
-        }
-    }
+//                                            }
+//                                        }
+//
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } else {
+//            LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
+//        }
+//    }
 
 
     @SuppressWarnings ( "unchecked")

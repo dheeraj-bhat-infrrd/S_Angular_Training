@@ -874,7 +874,7 @@ public interface CommonConstants
     public static final String FORWARD_MAIL_DETAILS_STATUS_COLUMN = "status";
     public static final String FORWARD_MAIL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
 
-    // Forward Mail Details Mongo Column constants
+    // Zillow Organization Unit Settings Mongo Column constants
     public static final String ZILLOW_REVIEW_COUNT_COLUMN = "zillowReviewCount";
     public static final String ZILLOW_REVIEW_AVERAGE_COLUMN = "zillowReviewAverage";
 }
