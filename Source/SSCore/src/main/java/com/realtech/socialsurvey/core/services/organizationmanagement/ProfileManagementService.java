@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -616,7 +615,11 @@ public interface ProfileManagementService
     public List<SurveyDetails> fetchZillowData( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
 
 
-    public void updateReviewCountAndAverage( String collectionName, long iden, double zillowReviewCount, double zillowAverage );
+    public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow ) throws InvalidInputException;
+
+
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
+        boolean notRecommended, boolean includeZillow ) throws InvalidInputException;
 
 
 }

@@ -1801,7 +1801,7 @@ public class ProfileController
                 if ( regionProfile.getSocialMediaTokens() != null
                     && regionProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for region id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for region id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();
@@ -1817,7 +1817,7 @@ public class ProfileController
                 if ( branchProfile.getSocialMediaTokens() != null
                     && branchProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for branch id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for branch id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();
@@ -1836,7 +1836,7 @@ public class ProfileController
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for agent id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( individualProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for agent id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();

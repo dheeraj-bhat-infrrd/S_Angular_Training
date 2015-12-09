@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import retrofit.client.Response;
@@ -51,7 +50,6 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BreadCrumb;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
@@ -103,6 +101,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
@@ -206,6 +205,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private EmailFormatHelper emailFormatHelper;
+
+    @Autowired
+    private ZillowUpdateService zillowUpdateService;
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
     String paramOrderTakeSurvey;
@@ -1515,7 +1517,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             + maxScore );
         long reviewsCount = 0;
         reviewsCount = surveyDetailsDao.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore,
-            fetchAbusive, notRecommended );
+            fetchAbusive, notRecommended, false );
         LOG.info( "Method getReviewsCountForCompany executed successfully" );
         return reviewsCount;
     }
@@ -1662,13 +1664,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public double getAverageRatings( long iden, String profileLevel, boolean aggregateAbusive ) throws InvalidInputException
     {
+        return getAverageRatings( iden, profileLevel, aggregateAbusive, false );
+    }
+
+
+    @Override
+    public double getAverageRatings( long iden, String profileLevel, boolean aggregateAbusive, boolean includeZillow ) throws InvalidInputException
+    {
         LOG.info( "Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel );
         if ( iden <= 0l ) {
             throw new InvalidInputException( "iden is invalid for getting average rating os a company" );
         }
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        double averageRating = surveyDetailsDao.getRatingForPastNdays( idenColumnName, iden, -1, aggregateAbusive, false );
-
+        double averageRating = surveyDetailsDao
+            .getRatingForPastNdays( idenColumnName, iden, -1, aggregateAbusive, false, includeZillow );
         LOG.info( "Method getAverageRatings executed successfully.Returning: " + averageRating );
         return averageRating;
     }
@@ -1720,6 +1729,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
         boolean notRecommended ) throws InvalidInputException
     {
+        return getReviewsCount( iden, minScore, maxScore, profileLevel, fetchAbusive, notRecommended, false );
+    }
+
+
+    @Override
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
+        boolean notRecommended, boolean includeZillow ) throws InvalidInputException
+    {
         LOG.info( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
             + " profilelevel:" + profileLevel );
         if ( iden <= 0l ) {
@@ -1728,12 +1745,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         long reviewsCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
-            notRecommended );
-        if ( !notRecommended ) {
-            // get zillow review count based on profile level
-            long zillowReviewCount = getZillowReviewCountBasedOnProfileLevelAndId( profileLevel, iden );
-            reviewsCount += zillowReviewCount;
-        }
+            notRecommended, includeZillow );
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
         return reviewsCount;
     }
@@ -4002,7 +4014,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         if ( surveyDetailsList.size() > 0 && zillowReviewScoreTotal > -1 ) {
-            updateReviewCountAndAverage( collectionName, profile.getIden(), surveyDetailsList.size(),
+            zillowUpdateService.updateZillowReviewCountAndAverage( collectionName, profile.getIden(), surveyDetailsList.size(),
                 ( zillowReviewScoreTotal / surveyDetailsList.size() ) );
         }
         // return the fetched zillow reviews
@@ -4188,70 +4200,5 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.info( "Zillow is not added for the profile" );
             throw new InvalidInputException( "Zillow is not added for the profile" );
         }
-    }
-
-
-    long getZillowReviewCountBasedOnProfileLevelAndId( String profileLevel, long iden )
-    {
-        long zillowReviewCount = 0;
-        try {
-            String idenColumnName = null;
-            if ( profileLevel == null || profileLevel.isEmpty() ) {
-                throw new InvalidInputException( "profile level is null or empty while getting iden column name" );
-            }
-            LOG.debug( "Getting zillow review count for profile level :" + profileLevel + " and id : " + iden );
-            switch ( profileLevel ) {
-                case CommonConstants.PROFILE_LEVEL_COMPANY:
-                    OrganizationUnitSettings companyProfile = organizationManagementService.getCompanySettings( iden );
-                    if ( companyProfile != null )
-                        zillowReviewCount = companyProfile.getZillowReviewCount();
-                    break;
-                case CommonConstants.PROFILE_LEVEL_REGION:
-                    OrganizationUnitSettings regionProfile = organizationManagementService.getRegionSettings( iden );
-                    if ( regionProfile != null )
-                        zillowReviewCount = regionProfile.getZillowReviewCount();
-                    break;
-                case CommonConstants.PROFILE_LEVEL_BRANCH:
-                    BranchSettings branchProfile = organizationManagementService.getBranchSettings( iden );
-                    if ( branchProfile != null )
-                        zillowReviewCount = branchProfile.getOrganizationUnitSettings().getZillowReviewCount();
-                    break;
-                case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
-                    AgentSettings agentProfile = organizationManagementService.getAgentSettings( iden );
-                    if ( agentProfile != null )
-                        zillowReviewCount = agentProfile.getZillowReviewCount();
-                    break;
-                case CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN:
-                    break;
-                default:
-                    throw new InvalidInputException( "Invalid profile level while getting iden column name" );
-            }
-            LOG.debug( "Returning column name:" + idenColumnName + " for profile level:" + profileLevel );
-        } catch ( Exception e ) {
-            LOG.error( "Exception occurred while fetching zillow count for a profile and id. Reason : ", e );
-        }
-        return zillowReviewCount;
-    }
-
-
-//    @Async
-    @Override
-//    @Transactional
-    public void updateReviewCountAndAverage( String collectionName, long iden, double zillowReviewCount, double zillowAverage )
-    {
-        if ( collectionName == null || collectionName.isEmpty() ) {
-            LOG.error( "Collection name passed cannot be null or empty" );
-        }
-        if ( iden <= 0l ) {
-            LOG.error( "Invalid iden passed as argument" );
-        }
-        LOG.info( "Updating the zillow review count and average in collection : " + collectionName );
-        try {
-            organizationUnitSettingsDao.updateZillowReviewScoreAndAverage( collectionName, iden, zillowReviewCount,
-                zillowAverage );
-        } catch ( InvalidInputException e ) {
-            LOG.error("Exception occurred while updating zillow review count and average. Reason : " + e);
-        }
-        LOG.info( "Updated the zillow review count and average in collection : " + collectionName );
     }
 }

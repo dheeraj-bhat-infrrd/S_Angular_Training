@@ -58,7 +58,7 @@ public interface SurveyDetailsDao
 
 
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin );
+        boolean realtechAdmin, boolean includeZillow );
 
 
     public long getIncompleteSurveyCount( String columnName, long columnValue, int noOfDays );
@@ -75,7 +75,7 @@ public interface SurveyDetailsDao
 
 
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
-        boolean fetchAbusive, boolean notRecommended );
+        boolean fetchAbusive, boolean notRecommended, boolean includeZillow );
 
 
     public List<SurveyDetails> getIncompleteSurvey( String columnName, long columNValue, int start, int rows,
