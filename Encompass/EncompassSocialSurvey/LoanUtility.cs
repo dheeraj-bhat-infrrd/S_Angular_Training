@@ -17,7 +17,7 @@ namespace EncompassSocialSurvey
 {
     public class LoanUtility
     {
-        private static int DAYS_INTERVAL = 30; // should not get loans older than DAYS_INTERVAL from NOW
+        private static int DAYS_INTERVAL = EncompassSocialSurveyConfiguration.DefaultDaysIntervalToFetch; // should not get loans older than DAYS_INTERVAL from NOW
         private static DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurverConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
         // Populates the loan list with the contents of a folder
 

@@ -209,6 +209,7 @@ public final class DisplayMessageConstants
     public static final String LICENSES_UPDATE_SUCCESSFUL = "LICENSES_UPDATE_SUCCESSFUL";
     public static final String CONTACT_US_MESSAGE_SENT = "CONTACT_US_MESSAGE_SENT";
     public static final String DISCLAIMER_UPDATE_SUCCESSFUL = "DISCLAIMER_UPDATE_SUCCESSFUL";
+    public static final String EMAIL_ID_UPDATE_UNSUCCESSFUL = "EMAIL_ID_UPDATE_UNSUCCESSFUL";
 
     //Realtech admin module
     public static final String COMPANY_NOT_REGISTERD = "COMPANY_NOT_REGISTERD";
