@@ -162,6 +162,13 @@ function showOverlay(){
 function hideOverlay(){
     $('.overlay-loader').hide();
 }
+function showDashOverlay(dashid){
+    $(dashid).show();
+}
+
+function hideDashOverlay(dashid){
+    $(dashid).hide();
+}
 
 //show Toast
 function showToast(){
