@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.rest;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -81,6 +82,7 @@ public class WidgetControllerTest
         this.mockMvc.perform( get( "/widget/{profileType}/{iden}", "company", 1l ) ).andExpect( status().isOk() )
             .andExpect( model().attribute( "profileLevel", "COMPANY" ) )
             .andExpect( model().attribute( "averageRating", 5.0 ) ).andExpect( model().attribute( "reviewsCount", 1l ) )
-            .andExpect( model().attribute( "profileLink", "testpages/companytest" ) );
+            .andExpect( model().attribute( "profileLink", "testpages/companytest" ) )
+            .andExpect(forwardedUrl("widget/widget"));
     }
 }
