@@ -92,7 +92,7 @@ var sadText;
 var happyTextComplete;
 var neutralTexCompletet;
 var sadTextComplete;
-var rating;
+var rating = -1; // default value to be used to post on social survey in case of "ok" or "unpleasant" mood
 var firstName;
 var lastName;
 var surveyUrl = "/rest/survey/";
