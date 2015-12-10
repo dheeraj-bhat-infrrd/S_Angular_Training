@@ -80,19 +80,9 @@
 </div>
 <script>
 	$(document).ready(function() {
-		hideOverlay();
 		$(document).attr("title", "Apps");
 
-		$('.va-dd-wrapper').perfectScrollbar({
-			suppressScrollX : true
-		});
-		$('.va-dd-wrapper').perfectScrollbar('update');
-		
-		if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
-			$('#da-dd-wrapper').remove();
-		} else {
-			$('#da-dd-wrapper').show();
-		}
+		updateViewAsScroll();
 
 		//Remove the dropdown icon if only one option for app available
 		if($('#crm-settings-dropdown-cont').children('.crm-settings-dropdown-item').length <= 1) {

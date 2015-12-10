@@ -188,12 +188,6 @@
 </div>
 <script>
 $(document).ready(function() {
-	$('.va-dd-wrapper').perfectScrollbar({
-		suppressScrollX : true
-	});
-	$('.va-dd-wrapper').perfectScrollbar('update');
-	
-	hideOverlay();
 	$(document).attr("title", "Dashboard");
 
 	$(document).scroll(function() {
@@ -212,11 +206,7 @@ $(document).ready(function() {
 		}
 	};
 	
-	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
-		$('#da-dd-wrapper').remove();
-	} else {
-		$('#da-dd-wrapper').show();
-	}
+	updateViewAsScroll();
 	
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');

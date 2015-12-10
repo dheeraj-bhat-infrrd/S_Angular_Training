@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE">
+<!DOCTYPE>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -18,6 +18,9 @@
 </head>
 
 <body>
+<div id="toast-container" class="toast-container">
+   <span id="overlay-toast" class="overlay-toast"></span>
+</div>
 <div class="hdr-wrapper">
 	<div class="container hdr-container clearfix">
 		<div class="float-left hdr-logo"></div>
@@ -30,7 +33,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left text-center"><spring:message code="label.resetpassword.key" /></div>
+			<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.resetpassword.key" /></div>
 		</div>
 	</div>
 </div>
@@ -76,7 +79,6 @@
 			<input type="hidden" value="${param.q}" name="q">
 			<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
 		</form>
-		
 	</div>
 </div>
 
@@ -84,89 +86,9 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script>
-var isResetFormValid;
 $(document).ready(function(){
-	isResetFormValid = false;
-	
-	if ($('#message').val() != "") {
-		if ($('#message').attr('data-status') == 'SUCCESS_MESSAGE') {
-			showInfo($('#message').val());
-		} else {
-			showError($('#message').val());
-		}
-	}
-	
-	function submitResetPasswordForm() {
-		if(validateResetPasswordForm('reset-pwd-form')){
-			$('#reset-pwd-form').submit();
-		}
-	}
-	
-	$('#reset-pwd-submit').click(function(e){
-		submitResetPasswordForm();
-	});
-	
-	$('input').keypress(function(e){
-		// detect enter
-		if (e.which==13){
-			e.preventDefault();
-			submitResetPasswordForm();
-		}
-	});
-	
-	$('#login-user-id').blur(function() {
-		validateEmailId(this.id);
-	});
-	
-	$('#login-pwd').blur(function() {
-		validatePassword(this.id);
-	});
-	
-	$('#login-cnf-pwd').blur(function() {
-		validateConfirmPassword('login-pwd', this.id);
-	});
-	
-	function validateResetPasswordForm(id) {
-		var isFocussed = false;
-		isResetFormValid = true;
-		var isSmallScreen = false;
-		if($(window).width()<768){
-			isSmallScreen = true;
-		}
-		if(!validateEmailId('login-user-id')){
-			isResetFormValid = false;
-			if(!isFocussed){
-				$('#login-user-id').focus();
-				isFocussed=true;
-			}
-			if(isSmallScreen){
-				return isResetFormValid;
-			}
-		}
-		if(!validatePassword('login-pwd')){
-			isResetFormValid = false;
-			if(!isFocussed){
-				$('#login-pwd').focus();
-				isFocussed=true;
-			}
-			if(isSmallScreen){
-				return isResetFormValid;
-			}
-		}
-		if(!validateConfirmPassword('login-pwd', 'login-cnf-pwd')){
-			isResetFormValid = false;
-			if(!isFocussed){
-				$('#login-cnf-pwd').focus();
-				isFocussed=true;
-			}
-			if(isSmallScreen){
-				return isResetFormValid;
-			}
-		}
-		return isResetFormValid;
-	}
+	initializeResetPasswordPage();
 });
 </script>
-
 </body>
 </html>
