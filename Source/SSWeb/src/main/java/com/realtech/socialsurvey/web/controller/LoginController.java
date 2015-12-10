@@ -176,21 +176,25 @@ public class LoginController {
 			if (request.getParameter("bm") != null && request.getParameter("bm").equals("I")) {
 				isDirectRegistration = "false";
 			}
+			HttpSession session = request.getSession(true);
+			user = sessionHelper.getCurrentUser();
 			// code to hide the overlay during registration
 			if (isDirectRegistration != null) {
 				if (isDirectRegistration.equals("false")) {
 					model.addAttribute("skippayment", "true");
+					session.setAttribute("skippayment", "true");
 				}
 				else if (isDirectRegistration.equals("true")) {
 					model.addAttribute("skippayment", "false");
+					session.setAttribute("skippayment", "false");
 				}
 			}
 			else {
 				model.addAttribute("skippayment", "false");
+				session.setAttribute("skippayment", "false");
 			}
 
-			HttpSession session = request.getSession(true);
-			user = sessionHelper.getCurrentUser();
+			
 			
 
 			// Check if super admin is logged in

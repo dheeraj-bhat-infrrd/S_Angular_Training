@@ -134,12 +134,12 @@ public class ProfileViewController
 
             Long companyId = companyProfile.getIden();
             double averageRating = profileManagementService.getAverageRatings( companyId,
-                CommonConstants.PROFILE_LEVEL_COMPANY, false );
+                CommonConstants.PROFILE_LEVEL_COMPANY, false, true );
             model.addAttribute( "averageRating", averageRating );
 
             // should show all review count
             long reviewsCount = profileManagementService.getReviewsCount( companyId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
+                -1, CommonConstants.PROFILE_LEVEL_COMPANY, false, false, true );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -258,11 +258,11 @@ public class ProfileViewController
 
             Long regionId = regionProfile.getIden();
             double averageRating = profileManagementService.getAverageRatings( regionId, CommonConstants.PROFILE_LEVEL_REGION,
-                false );
+                false, true );
             model.addAttribute( "averageRating", averageRating );
 
             long reviewsCount = profileManagementService.getReviewsCount( regionId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_REGION, false, false );
+                -1, CommonConstants.PROFILE_LEVEL_REGION, false, false, true );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -381,11 +381,11 @@ public class ProfileViewController
 
             Long branchId = branchProfile.getIden();
             double averageRating = profileManagementService.getAverageRatings( branchId, CommonConstants.PROFILE_LEVEL_BRANCH,
-                false );
+                false, true );
             model.addAttribute( "averageRating", averageRating );
 
             long reviewsCount = profileManagementService.getReviewsCount( branchId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
+                -1, CommonConstants.PROFILE_LEVEL_BRANCH, false, false, true );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -562,11 +562,11 @@ public class ProfileViewController
 
                 long agentId = user.getUserId();
                 double averageRating = profileManagementService.getAverageRatings( agentId,
-                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, true );
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( agentId, -1,
-                    -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
+                    -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, true );
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 if ( isBotRequest ) {
