@@ -5396,15 +5396,15 @@ tr.v-tbl-row-sel[clicked="false"]{
 }
 
 td.v-tbl-role {
-	width: 20%;
+	width: 15%;
 }
 
 td.v-tbl-btns {
-	width: 15.5%;
+	width: 23%;
 }
 
 td.v-tbl-spacer {
-	width: 2.5%;
+	width: 0%;
 }
 .v-tbl-top-spacer{
 	width:16.66%;
@@ -5598,6 +5598,7 @@ tr.u-tbl-header td {
 }
 .v-icn-femail {
 	background: url(../images/fast_mail.png) no-repeat 85% center;
+	cursor: pointer;
 }
 
 .v-icn-onl-off {
