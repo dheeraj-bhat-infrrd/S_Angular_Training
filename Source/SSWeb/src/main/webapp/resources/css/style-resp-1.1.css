@@ -6,13 +6,11 @@
     .header-logo-wrapper{
         height: 50px;
         float: none;
-        /* background: url(../images/ss-logo.png) no-repeat center; */
         background-size: 90px;
         width: 125px;
     }
     .header-row{
         margin: 0 -10px;
-        /* background-color: rgba(0, 159, 224, 0.8); */
     }
     .header-login-wrapper{
         float: none;
@@ -20,14 +18,7 @@
         overflow: auto;
         height: auto;
         margin: 10px 0;
-        /* background: #fff; */
     }
-    .h-email-wrapper, .h-pwd-wrapper, .h-login-btn-wrapper{
-        /* float: none; */
-        /* width: 100%; */
-        /* margin: 0; */
-    }
-    
     .h-email-wrapper {
 		width: 49%;
 		margin: 0;
@@ -54,24 +45,16 @@
         line-height: 30px;
         margin-bottom: 0;
         padding: 0 10px;
-        /* display: none; */  
     }
     .h-inp{
         width: 100%;
-        /* border-radius: 0; */
-        /* border-bottom: 1px solid #dcdcdc; */
         height: 44px;
         padding-left: 10px;
     }
     .h-btn-login{
-        /* margin: 0; */
         width: 100%;
-        /* background: #7fba00; */
-        /* color: #fff; */
-        /* text-align: center; */
         line-height: 44px;
         height: 44px;
-        /* border-radius: 0; */
         font-size: 13px;
     }
     .hero-txt-wrapper{
@@ -95,7 +78,6 @@
         width: 100%;
         padding: 0 10px;
         height: auto;
-        /* background: #fff; */
         color: #3e3e3e;
     }
     .reg-txt-top1 {
@@ -108,30 +90,21 @@
 	}
 	.reg-inp{
         width: 49%;
-        /* border-radius: 0; */
         margin: 0;
         border-bottom: 1px solid #dcdcdc;
         padding-left: 10px;
         height: 44px;
-    }
-    .reg-item{
-        /* margin-bottom: 0; */
-        /* overflow: auto; */
     }
     reg-item-bord-top{
         border-top: 1px solid #dcdcdc;
     }
     .reg-captcha-wrapper{
         width: 100%;
-        /* border-radius: 0; */
     }
     .reg-captcha-btns{
         width: 100%;
         background-color: #fff;
         border-bottom: 1px solid #dcdcdc;
-    }
-    .reg-cap-txt{
-       /* max-width: 175px; */
     }
     .reg-btn{
         display: block;
@@ -257,9 +230,6 @@
         float: right;
         width: 100%;
         padding-left: 10px;
-    }
-    .index-body{
-        /* background: #fff; */
     }
     .registration-form-cls{
         margin-bottom: 0;
@@ -581,20 +551,29 @@
 		padding: 0px 8px;
 		font-size: 12px;
 	}
-	.urlPopupButton{
-	width: 335px;
-	margin-left: 0px;
-}
-.profile-url-sub-btn{
-	width:120px
+	.urlPopupButton {
+		width: 335px;
+		margin-left: 0px;
 	}
-	.popupUrl{
-	
-	font-size: 14px;
-	width: 250px;
-}
-.sm-post-row {
-	padding-left: 0px;
-	clear:both;
-}
+	.profile-url-sub-btn {
+		width: 120px
+	}
+	.popupUrl {
+		font-size: 14px;
+		width: 250px;
+	}
+	.sm-post-row {
+		padding-left: 0px;
+		clear: both;
+	}
+	.wc-hdr-txt {
+		font-size: 14px;
+	}
+	.wc-popup-body-hdr {
+		padding-left: 10px;
+		font-size: 13px;
+	}
+	.wc-step2-body-row-hdr {
+	    font-size: 14px;
+	}
 }

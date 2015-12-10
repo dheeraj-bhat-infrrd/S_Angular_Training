@@ -298,48 +298,51 @@ public class SurveyHandlerImplTest
     }
 
 
-    //Tests for deleteZillowSurveysByEntity
-    @Test ( expected = InvalidInputException.class)
-    public void deleteZillowSurveysByEntityTestEntityTypeNull() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteZillowSurveysByEntity( null, 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void deleteZillowSurveysByEntityTestEntityTypeEmpty() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteZillowSurveysByEntity( "", 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void deleteZillowSurveysByEntityTestInvalidId() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteZillowSurveysByEntity( CommonConstants.COMPANY_ID_COLUMN, -1 );
-    }
-
-
-    //Tests for deleteExcessZillowSurveysByEntity
-    @Test ( expected = InvalidInputException.class)
-    public void deleteExcessZillowSurveysByEntityTestEntityTypeNull() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( null, 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void deleteExcessZillowSurveysByEntityTestEntityTypeEmpty() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( "", 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void deleteExcessZillowSurveysByEntityTestInvalidId() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( CommonConstants.COMPANY_ID_COLUMN, -1 );
-    }
+    /**
+     * Commented as Zillow surveys are not stored in database, SS-1276
+     * */
+//      Tests for deleteZillowSurveysByEntity
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteZillowSurveysByEntityTestEntityTypeNull() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteZillowSurveysByEntity( null, 1 );
+//    }
+//
+//
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteZillowSurveysByEntityTestEntityTypeEmpty() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteZillowSurveysByEntity( "", 1 );
+//    }
+//
+//
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteZillowSurveysByEntityTestInvalidId() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteZillowSurveysByEntity( CommonConstants.COMPANY_ID_COLUMN, -1 );
+//    }
+//
+//
+//    Tests for deleteExcessZillowSurveysByEntity
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteExcessZillowSurveysByEntityTestEntityTypeNull() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( null, 1 );
+//    }
+//
+//
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteExcessZillowSurveysByEntityTestEntityTypeEmpty() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( "", 1 );
+//    }
+//
+//
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteExcessZillowSurveysByEntityTestInvalidId() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( CommonConstants.COMPANY_ID_COLUMN, -1 );
+//    }
 
 
     //Tests for updateModifiedOnColumnForAgentHierachy

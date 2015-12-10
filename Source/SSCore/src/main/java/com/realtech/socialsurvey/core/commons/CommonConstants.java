@@ -877,4 +877,8 @@ public interface CommonConstants
     //Social Media Connections History constants
     public static final String SOCIAL_MEDIA_DISCONNECTED = "disconnected";
     public static final String SOCIAL_MEDIA_CONNECTED = "connected";
+
+    // Zillow Organization Unit Settings Mongo Column constants
+    public static final String ZILLOW_REVIEW_COUNT_COLUMN = "zillowReviewCount";
+    public static final String ZILLOW_REVIEW_AVERAGE_COLUMN = "zillowReviewAverage";
 }
