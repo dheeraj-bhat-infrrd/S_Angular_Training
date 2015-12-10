@@ -203,22 +203,12 @@
 
 <script>
 $(document).ready(function() {
-	hideOverlay();
 	$(document).attr("title", "Edit Settings");
 	
 	//social media urls
 	loadSocialMediaUrlInSettingsPage();
+	updateViewAsScroll();
 	
-	$('.va-dd-wrapper').perfectScrollbar({
-		suppressScrollX : true
-	});
-	$('.va-dd-wrapper').perfectScrollbar('update');
-	
-	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
-		$('#da-dd-wrapper').remove();
-	} else {
-		$('#da-dd-wrapper').show();
-	}
 	if("${autoPostEnabled}" == "false"){
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
