@@ -59,6 +59,13 @@ public class WidgetControllerTest
     }
 
 
+    @Test ( expected = NestedServletException.class)
+    public void testFetchWidgetForInvalidIden() throws Exception
+    {
+        this.mockMvc.perform( get( "/widget/{profileType}/{iden}", "company", 0l ) ).andExpect( status().is( 404 ) );
+    }
+
+
     @Test
     public void testFetchWidgetForValidProfileType() throws Exception
     {
@@ -80,9 +87,9 @@ public class WidgetControllerTest
                 (Date) Mockito.anyObject(), Mockito.anyString() ) ).thenReturn( new ArrayList<SurveyDetails>() );
         Whitebox.setInternalState( controller, "applicationBaseUrl", "test" );
         this.mockMvc.perform( get( "/widget/{profileType}/{iden}", "company", 1l ) ).andExpect( status().isOk() )
-            .andExpect( model().attribute( "profileLevel", "COMPANY" ) )
-            .andExpect( model().attribute( "averageRating", 5.0 ) ).andExpect( model().attribute( "reviewsCount", 1l ) )
+            .andExpect( model().attribute( "profileLevel", "COMPANY" ) ).andExpect( model().attribute( "averageRating", 5.0 ) )
+            .andExpect( model().attribute( "reviewsCount", 1l ) )
             .andExpect( model().attribute( "profileLink", "testpages/companytest" ) )
-            .andExpect(forwardedUrl("widget/widget"));
+            .andExpect( forwardedUrl( "widget/widget" ) );
     }
 }
