@@ -35,7 +35,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="hm-header-row-left text-center lgn-adj padding-10"><spring:message code="label.signuptostartsurvey.key"/></div>
+			<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.signuptostartsurvey.key"/></div>
 		</div>
 	</div>
 </div>
