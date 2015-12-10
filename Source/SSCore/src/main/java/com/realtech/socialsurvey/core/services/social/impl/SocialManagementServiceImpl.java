@@ -64,6 +64,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -114,6 +115,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private ZillowUpdateService zillowUpdateService;
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -572,6 +576,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             }
             profileManagementService.updateProfileStages( profileStageList, unitSettings, collectionName );
         }
+        if ( socialMedia.equalsIgnoreCase( CommonConstants.ZILLOW_SOCIAL_SITE ) )
+            zillowUpdateService.updateZillowReviewCountAndAverage( collectionName, organizationUnitSettings.getIden(), 0, 0 );
 
         LOG.debug( "Method disconnectSocialNetwork() finished" );
 

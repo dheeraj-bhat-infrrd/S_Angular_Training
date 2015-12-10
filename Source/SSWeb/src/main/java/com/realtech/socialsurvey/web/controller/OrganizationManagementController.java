@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;

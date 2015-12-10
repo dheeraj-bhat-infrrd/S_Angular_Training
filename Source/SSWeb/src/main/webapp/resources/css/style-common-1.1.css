@@ -105,10 +105,6 @@ a, a:hover, a:visited{
     background-color: rgba(0, 159, 224, 0.8);
 }
 
-.h-email-txt {
-    
-}
-
 .h-email-lbl {
     text-transform: uppercase;
 }
@@ -199,7 +195,6 @@ a, a:hover, a:visited{
     position: relative;
     width: 535px;
     height: 180px;
-/*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
     margin-right: 5px;
     padding: 15px;
@@ -378,7 +373,6 @@ a, a:hover, a:visited{
     position: relative;
     width: 600px;
     height: 70px;
-	/* background-color: rgba(0, 159, 224, 0.8); */
     color: #fff;
     padding: 15px;
 }
@@ -600,7 +594,6 @@ input#find-pro-submit{
 }
 
 .ctnt-list-item-txt-wrap{
-	/* height: 72px; */
 	overflow: hidden;
     margin-right: 25px;
 }
@@ -649,17 +642,13 @@ input#find-pro-submit{
     background-color: rgba(0, 159, 224, 0.8);
     top: 0;
     left: 0;
-    /* z-index: 9; */
 }
 
 .ctnt-wrapper {
     margin-bottom: 50px;
-    /* margin-top: -15px; */
 }
 
 .ads-container {
-	/* background: url('../images/temp_ad.png') no-repeat top center; */
-	/* height: 1000px; */
 	background-size: contain;
 	margin-top: 15px;
 	padding: 0;
@@ -667,28 +656,6 @@ input#find-pro-submit{
 
 .fp-txt-1 {
     position: relative;
-    /* z-index: 99999; */
-}
-
-.m-inp-img-uname {
-    background: url(../images/userName.png) no-repeat center;
-}
-
-.m-inp-img-pwd {
-    background: url(../images/password.png) no-repeat;
-    background-position: 10px center;
-}
-
-.m-inp-img-fname {
-    background: url(../images/first-name.png) no-repeat center;
-}
-
-.m-inp-img-lname {
-    background: url(../images/first-name.png) no-repeat center;
-}
-
-.m-inp-img-email {
-    background: url(../images/email.png) no-repeat center;
 }
 
 .h-inp-wrapper {
@@ -706,7 +673,6 @@ input#find-pro-submit{
 }
 
 .m-inp-img-adj {
-    /* top: 44px; */
     left: 48%;
 }
 
@@ -736,10 +702,6 @@ input#find-pro-submit{
     left: 0;
     width: 100%;
     height: 65px;
-/*
-    background-color: #E57C66;
-    color: #fff;
-*/
     background-color: rgba(255, 255, 255, 0.95);
     color: #E55757;
     text-align: center;
@@ -758,10 +720,6 @@ input#find-pro-submit{
     margin-left: 10px;
     color: rgba(255, 255, 255, 0.95);;
     cursor: pointer;
-}
-
-.row.row-dash-top-adj {
-/*    margin-bottom: -80px;*/
 }
 
 .disclaimer {
@@ -1456,19 +1414,14 @@ span.footer-ul a:hover {
 
 
 /*changes for help page*/
-.help
-{
-	width:800px;
+.help {
+	width: 800px;
 	margin: 0 auto;
-	max-width:100%;
-	
+	max-width: 100%;
 }
 
-/* anchor tag for home page
-.anchor-home
-{
+/*anchor tag for home page*/
+.anchor-home {
 	font-size: 20px;
 	color: #2a6496;
 }
-
-

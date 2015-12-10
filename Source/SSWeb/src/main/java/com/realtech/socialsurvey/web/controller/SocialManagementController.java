@@ -1745,9 +1745,9 @@ public class SocialManagementController
                     model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                     return JspResolver.SOCIAL_AUTH_MESSAGE;
                 }
-                
-                LOG.debug("Deleting old zillow feed for company ID : " + entityId);
-                surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
+//                Commented as Zillow surveys are not stored in database, SS-1276
+//                LOG.debug("Deleting old zillow feed for company ID : " + entityId);
+//                surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
                 
                 switch ( entityType ) {
                 case CommonConstants.AGENT_ID_COLUMN:
@@ -1808,6 +1808,7 @@ public class SocialManagementController
                     } else {
                     	socialManagementService.updateZillowCallCount();
                     }
+
                     if ( responseMap != null ) {
                         resultMap = (HashMap<String, Object>) responseMap.get( "results" );
                         if ( resultMap != null ) {
@@ -1819,44 +1820,45 @@ public class SocialManagementController
 							if (proReviews != null) {
 								reviews = (List<HashMap<String, Object>>) proReviews.get("review");
 								if (reviews != null) {
-									for (HashMap<String, Object> review : reviews) {
-										String sourceId = (String) review.get("reviewURL");
-										SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(
-												sourceId, entityId, collectionName);
-										if (surveyDetails == null) {
-											surveyDetails = new SurveyDetails();
-											if (collectionName
-													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
-												surveyDetails.setCompanyId(entityId);
-											}
-											else if (collectionName
-													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
-												surveyDetails.setRegionId(entityId);
-											}
-											else if (collectionName
-													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
-												surveyDetails.setBranchId(entityId);
-											}
-											else if (collectionName
-													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
-												surveyDetails.setAgentId(entityId);
-											}
-											String createdDate = (String) review.get("reviewDate");
-											surveyDetails.setCompleteProfileUrl((String) review.get("reviewerLink"));
-											surveyDetails.setCustomerFirstName((String) review.get("reviewer"));
-											surveyDetails.setReview((String) review.get("description"));
-											surveyDetails.setEditable(false);
-											surveyDetails.setStage(CommonConstants.SURVEY_STAGE_COMPLETE);
-											surveyDetails.setScore(Double.valueOf((String) review.get("rating")));
-											surveyDetails.setSource(CommonConstants.SURVEY_SOURCE_ZILLOW);
-											surveyDetails.setSourceId(sourceId);
-											surveyDetails.setModifiedOn(profileManagementService.convertStringToDate(createdDate));
-											surveyDetails.setCreatedOn(profileManagementService.convertStringToDate(createdDate));
-											surveyDetails.setAgreedToShare("true");
-											surveyDetails.setAbusive(false);
-											surveyHandler.insertSurveyDetails(surveyDetails);
-										}
-									}
+//				                    Commented as Zillow surveys are not stored in database, SS-1276
+//									for (HashMap<String, Object> review : reviews) {
+//										String sourceId = (String) review.get("reviewURL");
+//										SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(
+//												sourceId, entityId, collectionName);
+//										if (surveyDetails == null) {
+//											surveyDetails = new SurveyDetails();
+//											if (collectionName
+//													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
+//												surveyDetails.setCompanyId(entityId);
+//											}
+//											else if (collectionName
+//													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
+//												surveyDetails.setRegionId(entityId);
+//											}
+//											else if (collectionName
+//													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
+//												surveyDetails.setBranchId(entityId);
+//											}
+//											else if (collectionName
+//													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+//												surveyDetails.setAgentId(entityId);
+//											}
+//											String createdDate = (String) review.get("reviewDate");
+//											surveyDetails.setCompleteProfileUrl((String) review.get("reviewerLink"));
+//											surveyDetails.setCustomerFirstName((String) review.get("reviewer"));
+//											surveyDetails.setReview((String) review.get("description"));
+//											surveyDetails.setEditable(false);
+//											surveyDetails.setStage(CommonConstants.SURVEY_STAGE_COMPLETE);
+//											surveyDetails.setScore(Double.valueOf((String) review.get("rating")));
+//											surveyDetails.setSource(CommonConstants.SURVEY_SOURCE_ZILLOW);
+//											surveyDetails.setSourceId(sourceId);
+//											surveyDetails.setModifiedOn(profileManagementService.convertStringToDate(createdDate));
+//											surveyDetails.setCreatedOn(profileManagementService.convertStringToDate(createdDate));
+//											surveyDetails.setAgreedToShare("true");
+//											surveyDetails.setAbusive(false);
+//											surveyHandler.insertSurveyDetails(surveyDetails);
+//										}
+//									}
 								}
 							}
                         }
@@ -2144,8 +2146,9 @@ public class SocialManagementController
             
             //Remove zillow reviews on disconnect.
             if(socialMedia.equals(CommonConstants.ZILLOW_SOCIAL_SITE)){
-            	LOG.debug("Deleting zillow feed for agent ID : " + entityId);
-                surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // LOG.debug("Deleting zillow feed for agent ID : " + entityId);
+                // surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
             }
             
             //Add action to social connection history
