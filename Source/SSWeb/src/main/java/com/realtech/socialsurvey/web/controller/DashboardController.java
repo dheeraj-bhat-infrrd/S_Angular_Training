@@ -267,7 +267,7 @@ public class DashboardController
             }
 
 	        // calculating details for circles
-	        int numberOfDays = 30;
+	        int numberOfDays = -1;
 	        try {
 	            if ( request.getParameter( "numberOfDays" ) != null ) {
 	                numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
