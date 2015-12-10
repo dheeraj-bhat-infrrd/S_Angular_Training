@@ -31,13 +31,15 @@
 	<div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
-			data-column-value="${columnValue}" class="dash-top-info dash-prof-wrapper">
-			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
+			data-column-value="${columnValue}" class="dash-top-info dash-prof-wrapper pos-relative dash-size" >
+			<div id="top-dash" class="hide" ></div>
+			<div id="dash-profile-detail-circles" class="row row-dash-top-adj" >
 				<!-- Populated by dashboard_profiledetail.jsp -->
 			</div>
 		</div>
 
-		<div class="dash-stats-wrapper bord-bot-dc clearfix">
+		<div class="dash-stats-wrapper bord-bot-dc clearfix"  >
+		
 			<div class="float-left stats-left clearfix">
 				<div class="dash-sub-head"><spring:message code="label.surveystatus.key" /></div>
 				<div id="region-div" class="clearfix dash-sel-wrapper">
@@ -62,11 +64,16 @@
 					</select>
 				</div>
 			</div>
+			<div class="pos-relative">
+			 <div id="mid-dash" class="hide" > </div>
 			<div id="dash-survey-status" >
-				<!-- Populated by dashboard_surveystatus.jsp -->
+			
+				Populated by dashboard_surveystatus.jsp
 			</div>
+			</div> 
 		</div>
 
+		
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="float-left stats-left clearfix">
 				<div class="dash-sub-head"><spring:message code="label.utilization.key" /></div>
@@ -94,9 +101,11 @@
 						<option value="yearly"><spring:message code="label.format.three.key" /></option> --%>
 					</select>
 				</div>
+				
 			</div>
 			
-			<div class="float-left stats-right stats-right-adj">
+			<div class="float-left stats-right stats-right-adj pos-relative" >
+			<div id="low-dash" class="hide"></div>
 				<div class="util-graph-wrapper">
 					<div id="util-gph-item" class="util-gph-item"></div>
 					<div class="util-gph-legend clearfix">

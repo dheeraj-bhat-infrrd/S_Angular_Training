@@ -403,7 +403,7 @@ public interface ProfileManagementService
         String recipientName ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException;
+    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException, NonFatalException;
 
 
     /**
@@ -513,7 +513,7 @@ public interface ProfileManagementService
     public void updateIndividualName( long userId, long individualId, String individualName ) throws InvalidInputException;
 
 
-    public void updateCompanyEmail( long companyId, String emailId ) throws InvalidInputException;
+    public void updateCompanyEmail( long companyId, String emailId ) throws InvalidInputException, NonFatalException;
 
 
     public void updateIndividualEmail( long userId, String emailId ) throws InvalidInputException;
@@ -595,7 +595,8 @@ public interface ProfileManagementService
      * @param collection
      * @throws InvalidInputException
      */
-    void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
+//  Commented as Zillow surveys are not stored in database, SS-1276
+//  void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
 
 
     Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,
@@ -611,6 +612,16 @@ public interface ProfileManagementService
 
     List<SocialPost> getCumulativeSocialPosts( long entityId, String entityType, int startIndex, int numOfRows,
         String profileLevel, Date startDate, Date endDate ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public List<SurveyDetails> fetchZillowData( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
+
+
+    public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow ) throws InvalidInputException;
+
+
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
+        boolean notRecommended, boolean includeZillow ) throws InvalidInputException;
 
 
 }

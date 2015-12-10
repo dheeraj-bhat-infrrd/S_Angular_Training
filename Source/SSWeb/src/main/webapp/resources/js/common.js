@@ -249,7 +249,7 @@ function callAjaxFormSubmit(url, callBackFunction, formId,disableEle) {
 		type : "POST",
 		data : payLoad,
 		success : callBackFunction,
-		complete: function(){
+		complete: function(data){
 			enable(disableEle);
 			
 			
@@ -340,6 +340,8 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
+			hideDashOverlay('#mid-dash');
+			hideDashOverlay('#top-dash');
 			enable(disableEle);
 		},
 		error : function(e) {

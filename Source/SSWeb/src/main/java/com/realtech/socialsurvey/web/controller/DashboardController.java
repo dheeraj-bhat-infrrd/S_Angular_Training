@@ -1066,7 +1066,8 @@ public class DashboardController
                 }
 
                 OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                //JIRA SS-1363 begin
+                /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                     logoUrl = companySettings.getLogoThumbnail();
                 } else if ( organizationUnit == OrganizationUnit.REGION ) {
                     OrganizationUnitSettings regionSettings = null;
@@ -1089,7 +1090,32 @@ public class DashboardController
                     }
                 } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                     logoUrl = agentSettings.getLogoThumbnail();
+                }*/
+                if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                    logoUrl = companySettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                    OrganizationUnitSettings regionSettings = null;
+                    try {
+                        regionSettings = organizationManagementService.getRegionSettings( regionId );
+                    } catch ( InvalidInputException e ) {
+                        e.printStackTrace();
+                    }
+                    if ( regionSettings != null )
+                        logoUrl = regionSettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                    OrganizationUnitSettings branchSettings = null;
+                    try {
+                        branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                    } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                        e.printStackTrace();
+                    }
+                    if ( branchSettings != null ) {
+                        logoUrl = branchSettings.getLogo();
+                    }
+                } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                    logoUrl = agentSettings.getLogo();
                 }
+                //JIRA SS-1363 end
 
                 emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
                     agentTitle, companyName, survey, surveyLink, logoUrl );
@@ -1204,7 +1230,8 @@ public class DashboardController
                     }
 
                     OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                    //JIRA SS-1363 begin
+                    /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                         logoUrl = companySettings.getLogoThumbnail();
                     } else if ( organizationUnit == OrganizationUnit.REGION ) {
                         OrganizationUnitSettings regionSettings = null;
@@ -1227,7 +1254,32 @@ public class DashboardController
                         }
                     } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                         logoUrl = agentSettings.getLogoThumbnail();
+                    }*/
+                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                        logoUrl = companySettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                        OrganizationUnitSettings regionSettings = null;
+                        try {
+                            regionSettings = organizationManagementService.getRegionSettings( regionId );
+                        } catch ( InvalidInputException e ) {
+                            e.printStackTrace();
+                        }
+                        if ( regionSettings != null )
+                            logoUrl = regionSettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                        OrganizationUnitSettings branchSettings = null;
+                        try {
+                            branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                            e.printStackTrace();
+                        }
+                        if ( branchSettings != null ) {
+                            logoUrl = branchSettings.getLogo();
+                        }
+                    } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                        logoUrl = agentSettings.getLogo();
                     }
+                    //JIRA SS-1363 end
 
                     emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
                         agentTitle, companyName, survey, surveyLink, logoUrl );
