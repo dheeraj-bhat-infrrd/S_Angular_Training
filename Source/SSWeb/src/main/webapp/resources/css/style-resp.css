@@ -192,6 +192,9 @@
         line-height: 48px;
         border-bottom: 1px solid #dcdcdc;
     }
+    .hm-header-row-left.lgn-adj {
+    	line-height: 48px !important; 
+    }
     .hm-header-row-left-sur {
 		display: table-cell;
 		vertical-align: middle;
@@ -1171,10 +1174,9 @@
     .v-um-hdr-left, .v-um-hdr-right{
         font-size: 14px;
     }
-    .v-tbl-edit,.v-tbl-rem {
-		width: 10%;
+    .v-tbl-edit, .v-tbl-rem, .v-icn-wid {
+		width: 6.666666%;
 		min-width: 30px;
-		display: inline-block;
 	}
 	.v-tbl-uname{
     	width: 30%;
@@ -1406,11 +1408,14 @@
     	width: 18%;
     }
     td.v-tbl-spacer{
-    	width: 2%;
+    	width: 0;
     }
     .v-tbl-icn,.v-tbl-icn-disabled{
     	max-width: 28px;
     	float: right;
+    }
+    .u-tbl-row.user-row .v-tbl-icn , .u-tbl-row.user-row .v-tbl-icn-disabled{
+    	float: none;
     }
     .dash-lp-txt{
     	line-height: normal;
@@ -1426,6 +1431,7 @@
 		padding-left: 5px;
 		width: 25%;
 		font-size: 12px;
+		overflow: hidden;
 	}
 	.hr-txt2 {
 		width: 75%;
@@ -1480,14 +1486,16 @@
   		padding: 0 30px;
 	}
 	.wc-width {
-	width:100%;
-}
+		width:100%;
+	}
 	.wc-popup-body-cont{
 		padding: 10px 0;
 	}
-	
-	.wc-dash-btn{
-	margin-left:130px;
+	.wc-dash-btn {
+		margin-left: auto;
+		margin-right: auto;
+		width: 170px;
+		float: none;
 	}
 	.wc-form-txt {
 		width: 100%;
@@ -1504,9 +1512,6 @@
 	}
 	.wc-social-icn-row{
 		padding-left: 10%;
-	}
-	.edit-prof-pic-name-wrapper{
-	   /*  border-bottom: 1px solid #dcdcdc; */
 	}
 	.file-pick-logo-adj{
 		right: 0;
@@ -1577,9 +1582,6 @@
 	.st-subject-cont {
 		display: table;
 	}
-	.v-tbl-wid {
-		padding-right: 20px;
-	}
 	.bd-ans-smiley {
 		background: url(../csssprites/smileys.png) no-repeat -56px -150px;
 	}
@@ -1603,6 +1605,12 @@
 	.dsh-date-picker{
 	width:25%;
 	padding:0px;
+	}
+	.dash-size{
+	min-height:498px;
+	}
+	#top-dash{
+	min-height:498px;
 	}
 }
 
@@ -1940,6 +1948,12 @@
 	.dsh-date-picker{
 	width:25%;
 	}
+	.dash-size{
+	min-height:340px;
+	}
+	#top-dash{
+	min-height:340px;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -2097,6 +2111,13 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
+	.dash-size{
+	min-height:480px;
+	}
+	#top-dash{
+	min-height:480px;
+	}
+	
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
@@ -2110,6 +2131,12 @@
     .srv-tbl-txt{
         width: 884px !important;
     }
+    .dash-size{
+	min-height:480px;
+	}
+	#top-dash{
+	min-height:480px;
+	}
     
 }
 

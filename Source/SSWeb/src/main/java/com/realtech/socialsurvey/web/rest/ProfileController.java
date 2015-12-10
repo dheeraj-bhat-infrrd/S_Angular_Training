@@ -1785,8 +1785,10 @@ public class ProfileController
                 if ( companyProfile.getSocialMediaTokens() != null
                     && companyProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for company id: " + iden );
-                    profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for company id: " + iden );
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch unit settings for company: " + iden, e );
@@ -1799,8 +1801,10 @@ public class ProfileController
                 if ( regionProfile.getSocialMediaTokens() != null
                     && regionProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for region id: " + iden );
-                    profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for region id: " + iden );
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch unit settings for region: " + iden, e );
@@ -1813,8 +1817,10 @@ public class ProfileController
                 if ( branchProfile.getSocialMediaTokens() != null
                     && branchProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for branch id: " + iden );
-                    profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for branch id: " + iden );
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch unit settings for branch: " + iden, e );
@@ -1830,8 +1836,10 @@ public class ProfileController
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for agent id: " + iden );
-                    profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for agent id: " + iden );
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch unit settings for agent: " + iden, e );
@@ -1842,7 +1850,6 @@ public class ProfileController
             }
         }
         LOG.info( "Fetched zillow reviews for profile type: " + profileType + " and id: " + iden );
-        response = Response.ok().build();
         return response;
     }
 

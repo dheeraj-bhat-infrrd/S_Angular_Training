@@ -162,6 +162,13 @@ function showOverlay(){
 function hideOverlay(){
     $('.overlay-loader').hide();
 }
+function showDashOverlay(dashid){
+    $(dashid).show();
+}
+
+function hideDashOverlay(dashid){
+    $(dashid).hide();
+}
 
 //show Toast
 function showToast(){
@@ -249,18 +256,29 @@ $('.login-wrapper-txt').focus(function(){
 
 
 //Function to validate email id in a form
-function validateEmailId(elementId){
+function validateEmailId(elementId, isOnlyToast){
 	var emailId = $('#'+elementId).val();
+	var message = 'Please enter a valid Email Address';
 	if (emailId != "") {
 		emailId = emailId.trim();
 		if (emailRegex.test(emailId) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter a valid Email Address');
+			if(isOnlyToast) {
+				$('#overlay-toast').text(message);
+				showToast();
+			} else {
+				showError(message);
+			}
 			return false;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter a valid Email Address');
+		if(isOnlyToast) {
+			$('#overlay-toast').text(message);
+			showToast();
+		} else {
+			showError(message);
+		}
 		return false;
 	}
 }
@@ -595,18 +613,6 @@ $('body').click(function(){
     }
 });
 
-$(window).resize(function(){
-   if($(window).width() > 767){
-       $('#header-slider-wrapper').removeClass('rt-panel-slide');
-       enableBodyScroll();
-   }
-});
-
-function closeMoblieScreenMenu() {
-	$('#header-slider-wrapper').removeClass('rt-panel-slide');
-	enableBodyScroll();
-}
-
 function upgradeToPaidPlan(){
 	 var url = "./upgradetopaidplanpage.do";
 	    
@@ -781,7 +787,7 @@ function validateSignUpForm(){
 		$('sign-lname').focus();
 		return false;
 	}
-	if(!validateEmailId('sign-email')) {
+	if(!validateEmailId('sign-email', true)) {
 		$('sign-email').focus();
 		return false;
 	}
@@ -838,4 +844,183 @@ function validateComplaintRegistraionForm(){
 		/* Form validated. */
 		return true;
 	}
+}
+
+
+//Functions for login page
+function loginUserLoginPage() {
+	if(validateFormLoginPage('login-form')){
+		$('#frm-login').submit();
+		showOverlay();
+	}
+}
+
+function validateFormLoginPage(id) {
+	if (!validateUserNameLoginPage('login-user-id')) {
+		$('#login-user-id').focus();
+		return false;
+	}
+	if (!validatePasswordLoginPage('login-pwd')) {
+		$('#login-pwd').focus();
+		return false;
+	}
+	return true;
+}
+
+function validateUserNameLoginPage(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (emailRegex.test($('#' + elementId).val()) == true) {
+			return true;
+		} else {
+			showError('Please enter a valid user name.');
+			return false;
+		}
+	} else {
+		showError('Please enter user name.');
+		return false;
+	}
+}
+
+function validatePasswordLoginPage(elementId) {
+	if ($('#' + elementId).val() != "") {
+		return true;
+	} else {
+		showError('Please enter password.');
+		return false;
+	}
+}
+
+function initializeLoginPage() {
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
+			showError($('#message').val());
+		} else {
+			showInfo($('#message').val());
+		}
+	}
+
+	$('#login-submit').click(function(e){
+		loginUserLoginPage();
+	});
+   
+	$('input').keypress(function(e){
+		// detect enter
+		if (e.which==13){
+			e.preventDefault();
+			loginUserLoginPage();
+		}
+	});
+}
+
+//Functions for forgot password page
+function validateForgotPasswordForm(id) {
+	var isFocussed = false;
+	var isSmallScreen = false;
+	isForgotPasswordFormValid = true;
+	if ($(window).width() < 768) {
+		isSmallScreen = true;
+	}
+	if (!validateEmailId('login-user-id')) {
+		isForgotPasswordFormValid = false;
+		if (!isFocussed) {
+			$('#login-user-id').focus();
+			isFocussed = true;
+		}
+		if (isSmallScreen) {
+			return isForgotPasswordFormValid;
+		}
+	}
+	return isForgotPasswordFormValid;
+}
+
+function submitForgotPasswordForm() {
+	if (validateForgotPasswordForm('forgot-pwd-form')) {
+		$('#forgot-pwd-form').submit();
+	}
+}
+
+function initializeForgotPasswordPage() {
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'SUCCESS_MESSAGE') {
+			showInfo($('#message').val());
+		} else {
+			showError($('#message').val());
+		}
+	}
+	
+	$('input').keypress(function(e) {
+		e.stopPropagation();
+		// detect enter
+		if (e.which == 13) {
+			e.preventDefault();
+			submitForgotPasswordForm();
+		}
+	});
+
+	$('#forgot-pwd-submit').click(function(e) {
+		submitForgotPasswordForm();
+	});
+
+	$('#login-user-id').blur(function() {
+		if (validateEmailId(this.id)) {
+			hideError();
+		}
+	});
+}
+
+//Functions for reset password page
+function submitResetPasswordForm() {
+	if(validateResetPasswordForm('reset-pwd-form')){
+		$('#reset-pwd-form').submit();
+	}
+}
+
+function validateResetPasswordForm(id) {
+	if(!validateEmailId('login-user-id')){
+			$('#login-user-id').focus();
+			return false;
+	}
+	if(!validatePassword('login-pwd')){
+			$('#login-pwd').focus();
+			return false;
+	}
+	if(!validateConfirmPassword('login-pwd', 'login-cnf-pwd')){
+			$('#login-cnf-pwd').focus();
+			return false;
+	}
+	return true;
+}
+
+function initializeResetPasswordPage() {
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'SUCCESS_MESSAGE') {
+			showInfo($('#message').val());
+		} else {
+			showError($('#message').val());
+		}
+	}
+	
+	$('#reset-pwd-submit').click(function(e){
+		submitResetPasswordForm();
+	});
+	
+	$('input').keypress(function(e){
+		// detect enter
+		if (e.which==13){
+			e.preventDefault();
+			submitResetPasswordForm();
+		}
+	});
+	
+	$('#login-user-id').blur(function() {
+		validateEmailId(this.id);
+	});
+	
+	$('#login-pwd').blur(function() {
+		validatePassword(this.id);
+	});
+	
+	$('#login-cnf-pwd').blur(function() {
+		validateConfirmPassword('login-pwd', this.id);
+	});
 }

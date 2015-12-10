@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE">
+<!DOCTYPE>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -17,6 +17,9 @@
 </head>
 
 <body>
+	<div id="toast-container" class="toast-container">
+	   <span id="overlay-toast" class="overlay-toast"></span>
+    </div>
 	<div class="hdr-wrapper">
 		<div class="container hdr-container clearfix">
 			<div class="float-left hdr-logo"></div>
@@ -29,7 +32,7 @@
 	<div class="hm-header-main-wrapper">
 		<div class="container">
 			<div class="hm-header-row hm-header-row-main clearfix">
-				<div class="hm-header-row-left text-center lgn-adj padding-10"><spring:message code="label.title.forgotpassword.key" /></div>
+				<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.title.forgotpassword.key" /></div>
 			</div>
 		</div>
 	</div>
@@ -65,64 +68,9 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script>
-var isForgotPasswordFormValid;
 $(document).ready(function() {
-	isForgotPasswordFormValid = false;
-
-	if ($('#message').val() != "") {
-		if ($('#message').attr('data-status') == 'SUCCESS_MESSAGE') {
-			showInfo($('#message').val());
-		} else {
-			showError($('#message').val());
-		}
-	}
-
-	function submitForgotPasswordForm() {
-		if (validateForgotPasswordForm('forgot-pwd-form')) {
-			$('#forgot-pwd-form').submit();
-		}
-	}
-
-	$('input').keypress(function(e) {
-		e.stopPropagation();
-		// detect enter
-		if (e.which == 13) {
-			e.preventDefault();
-			submitForgotPasswordForm();
-		}
-	});
-
-	$('#forgot-pwd-submit').click(function(e) {
-		submitForgotPasswordForm();
-	});
-
-	$('#login-user-id').blur(function() {
-		if (validateEmailId(this.id)) {
-			hideError();
-		}
-	});
-
-	function validateForgotPasswordForm(id) {
-		var isFocussed = false;
-		var isSmallScreen = false;
-		isForgotPasswordFormValid = true;
-		if ($(window).width() < 768) {
-			isSmallScreen = true;
-		}
-		if (!validateEmailId('login-user-id')) {
-			isForgotPasswordFormValid = false;
-			if (!isFocussed) {
-				$('#login-user-id').focus();
-				isFocussed = true;
-			}
-			if (isSmallScreen) {
-				return isForgotPasswordFormValid;
-			}
-		}
-		return isForgotPasswordFormValid;
-	}
+	initializeForgotPasswordPage();
 });
 </script>
-
 </body>
 </html>

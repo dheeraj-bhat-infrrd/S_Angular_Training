@@ -193,11 +193,11 @@ public interface SurveyHandler
         SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
         ProfileNotFoundException;
 
+//    Commented as Zillow surveys are not stored in database, SS-1276
+//    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
-    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
-
-
-    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
+//    Commented as Zillow surveys are not stored in database, SS-1276
+//    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows );
