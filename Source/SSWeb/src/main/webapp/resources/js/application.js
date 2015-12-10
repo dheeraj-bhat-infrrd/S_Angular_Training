@@ -5172,9 +5172,10 @@ function loadAgentPic(agentId){
 				success = true;
 		},
 		complete : function(data) {
+			
 			if (success) {
 				imageUrl = data.responseText;
-				if(imageUrl!='' && imageUrl!=null) {
+				if(imageUrl.trim()!='' && imageUrl!=null) {
 					$("#agnt-img").html("<img class='hr-ind-img' src='"+imageUrl+"'/>");
 				}
 			}
