@@ -29,6 +29,8 @@ namespace EncompassSocialSurvey
 
         public const string ADMIN_EMAIL_ADDRESS = "application_admin_email";
 
+        public const string DEFAULT_DAYS_INTERVAL = "default_days_interval";
+
         private static StringList fieldIds = null;
         
         // MM/dd/yyyy

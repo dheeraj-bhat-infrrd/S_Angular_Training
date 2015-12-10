@@ -243,7 +243,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
 
             OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            //JIRA SS-1363 begin
+            /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                 logoUrl = companySettings.getLogoThumbnail();
             } else if ( organizationUnit == OrganizationUnit.REGION ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
@@ -261,7 +262,27 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                 }
             } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                 logoUrl = agentSettings.getLogoThumbnail();
+            }*/
+            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                logoUrl = companySettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+                logoUrl = regionSettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                OrganizationUnitSettings branchSettings = null;
+                try {
+                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                } catch ( NoRecordsFetchedException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if ( branchSettings != null ) {
+                    logoUrl = branchSettings.getLogo();
+                }
+            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                logoUrl = agentSettings.getLogo();
             }
+            //JIRA SS-1363 end
 
             MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
 
@@ -393,7 +414,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             && companySettings.getMail_content().getTake_survey_mail() != null ) {
 
             OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            //JIRA SS-1363 begin
+            /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                 logoUrl = companySettings.getLogoThumbnail();
             } else if ( organizationUnit == OrganizationUnit.REGION ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
@@ -411,7 +433,27 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                 }
             } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                 logoUrl = agentSettings.getLogoThumbnail();
+            }*/
+            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                logoUrl = companySettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+                logoUrl = regionSettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                OrganizationUnitSettings branchSettings = null;
+                try {
+                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                } catch ( NoRecordsFetchedException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if ( branchSettings != null ) {
+                    logoUrl = branchSettings.getLogo();
+                }
+            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                logoUrl = agentSettings.getLogo();
             }
+            //JIRA SS-1363 end
 
             MailContent mailContent = companySettings.getMail_content().getTake_survey_mail();
 
