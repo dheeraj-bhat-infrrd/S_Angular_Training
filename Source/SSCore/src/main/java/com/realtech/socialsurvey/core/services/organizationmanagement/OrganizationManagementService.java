@@ -1188,4 +1188,14 @@ public interface OrganizationManagementService
 
     public List<Branch> getBranchesForBranchIds( Set<Long> branchIds ) throws InvalidInputException;
 
+
+    /**
+     * Method to set profileurl of user to <firstname>-<lastname>-<userID> on delete
+     * JIRA SS-1365
+     *
+     * @param userId
+     * @throws InvalidInputException
+     */
+    void updateProfileUrlForDeletedUser( long userId ) throws InvalidInputException;
+
 }

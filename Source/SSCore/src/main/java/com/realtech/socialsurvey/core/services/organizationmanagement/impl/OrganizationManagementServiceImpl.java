@@ -5397,5 +5397,62 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
         return branches;
     }
+    
+
+    /**
+     * Method to set profileurl of user to <firstname>-<lastname>-<userID> on delete
+     * JIRA SS-1365
+     * @param userId
+     * @throws InvalidInputException 
+     */
+    @Override
+    @Transactional
+    public void updateProfileUrlForDeletedUser( long userId ) throws InvalidInputException
+    {
+        LOG.info( "Updating profile url for deleted user with user ID : " + userId );
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "Invalid userId passed. UserId : " + userId );
+        }
+        AgentSettings deletedAgent = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+        if ( deletedAgent == null ) {
+            throw new InvalidInputException( "No agent setting with the userID : " + userId + " found." );
+        }
+
+        //Get the user's contact details
+        ContactDetailsSettings contactDetails = deletedAgent.getContact_details();
+        if ( contactDetails == null ) {
+            throw new InvalidInputException( "Invalid profile name found for userID : " + userId );
+        }
+
+        //Get user's first name
+        String firstName = contactDetails.getFirstName();
+        if ( firstName == null || firstName.isEmpty() ) {
+            throw new InvalidInputException( "First name is empty for userID : " + userId );
+        }
+        LOG.debug( "First name : " + firstName );
+        String newProfileUrl = "/" + firstName;
+
+        //Get user's last name
+        String lastName = contactDetails.getLastName();
+        if ( lastName != null && !lastName.isEmpty() ) {
+            LOG.debug( "Last name : " + lastName );
+            newProfileUrl += "-" + lastName;
+        }
+
+        newProfileUrl += "-" + userId;
+        LOG.debug( "New profile url : " + newProfileUrl );
+
+        //Get existing profileUrl
+        String existingProfileUrl = deletedAgent.getProfileUrl();
+        if ( newProfileUrl.equals( existingProfileUrl ) ) {
+            LOG.debug( "There is no need to update profile url." );
+
+        } else {
+            //Update profileUrl in Mongo
+            organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
+                newProfileUrl, deletedAgent );
+        }
+        LOG.info( "Finished updating profile url for deleted user with user ID : " + userId );
+    }
 }
 // JIRA: SS-27: By RM05: EOC

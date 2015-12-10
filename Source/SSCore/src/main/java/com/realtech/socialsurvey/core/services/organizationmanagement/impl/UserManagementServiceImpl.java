@@ -519,7 +519,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         // Marks all the user profiles for given user as inactive.
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
-
+        
+        //TODO : update profile url in mongo if needed
+        
+        //TODO : Disconnect social connections(ensure that social connections history is updated)
+        
+        
         LOG.info( "Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished." );
     }
 
