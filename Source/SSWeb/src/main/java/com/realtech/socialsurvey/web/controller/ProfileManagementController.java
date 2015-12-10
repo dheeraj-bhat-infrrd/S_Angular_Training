@@ -2860,11 +2860,6 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-        long branchId = 0;
-        long regionId = 0;
-        long companyId = 0;
-        long agentId = 0;
-
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -2885,17 +2880,6 @@ public class ProfileManagementController
             } catch ( IOException ioException ) {
                 throw new InvalidInputException( "Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
                     ioException );
-            }
-
-            try {
-                Map<String, Long> hierarchyDetails = profileManagementService
-                    .getHierarchyDetailsByEntity( entityType, entityId );
-                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
-            } catch ( ProfileNotFoundException e ) {
-                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2995,19 +2979,8 @@ public class ProfileManagementController
             profileSettings.setSocialMediaTokens( socialMediaTokens );
 
             //Add action to social connection history
-            String action = "connected";
-            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
-            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getYelpToken() != null )
-                && ( socialMediaTokens.getYelpToken().getYelpPageLink() != null )
-                && !( socialMediaTokens.getYelpToken().getYelpPageLink().isEmpty() ) )
-                socialUpdateAction.setLink( socialMediaTokens.getYelpToken().getYelpPageLink() );
-            socialUpdateAction.setAction( action );
-            socialUpdateAction.setAgentId( agentId );
-            socialUpdateAction.setBranchId( branchId );
-            socialUpdateAction.setRegionId( regionId );
-            socialUpdateAction.setCompanyId( companyId );
-            socialUpdateAction.setSocialMediaSource( CommonConstants.YELP_SOCIAL_SITE );
-            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+            socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
+                CommonConstants.YELP_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
 
             LOG.info( "YelpLinked in link updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
@@ -3313,10 +3286,6 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-        long branchId = 0;
-        long regionId = 0;
-        long companyId = 0;
-        long agentId = 0;
 
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
@@ -3326,17 +3295,6 @@ public class ProfileManagementController
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
-            }
-
-            try {
-                Map<String, Long> hierarchyDetails = profileManagementService
-                    .getHierarchyDetailsByEntity( entityType, entityId );
-                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
-            } catch ( ProfileNotFoundException e ) {
-                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
 
             String realtorLink = request.getParameter( "realtorLink" );
@@ -3418,21 +3376,9 @@ public class ProfileManagementController
             profileSettings.setSocialMediaTokens( socialMediaTokens );
 
             //Add action to social connection history
-            String action = "connected";
-            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
-            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getRealtorToken() != null )
-                && ( socialMediaTokens.getRealtorToken().getRealtorProfileLink() != null )
-                && !( socialMediaTokens.getRealtorToken().getRealtorProfileLink().isEmpty() ) )
-                socialUpdateAction.setLink( socialMediaTokens.getRealtorToken().getRealtorProfileLink() );
-            socialUpdateAction.setAction( action );
-            socialUpdateAction.setAgentId( agentId );
-            socialUpdateAction.setBranchId( branchId );
-            socialUpdateAction.setRegionId( regionId );
-            socialUpdateAction.setCompanyId( companyId );
-            socialUpdateAction.setSocialMediaSource( CommonConstants.REALTOR_SOCIAL_SITE );
-
-            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
-
+            socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
+                CommonConstants.REALTOR_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+            
             LOG.info( "realtor updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REALTOR_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3474,10 +3420,6 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-        long branchId = 0;
-        long regionId = 0;
-        long companyId = 0;
-        long agentId = 0;
 
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
@@ -3487,17 +3429,6 @@ public class ProfileManagementController
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
-            }
-
-            try {
-                Map<String, Long> hierarchyDetails = profileManagementService
-                    .getHierarchyDetailsByEntity( entityType, entityId );
-                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
-            } catch ( ProfileNotFoundException e ) {
-                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
 
             String lendingTreeLink = request.getParameter( "lendingTreeLink" );
@@ -3578,23 +3509,11 @@ public class ProfileManagementController
             }
 
             profileSettings.setSocialMediaTokens( socialMediaTokens );
-
-            //Add action to social connection history
-            String action = "connected";
-            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
-            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getLendingTreeToken() != null )
-                && ( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null )
-                && !( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink().isEmpty() ) )
-                socialUpdateAction.setLink( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
-            socialUpdateAction.setAction( action );
-            socialUpdateAction.setAgentId( agentId );
-            socialUpdateAction.setBranchId( branchId );
-            socialUpdateAction.setRegionId( regionId );
-            socialUpdateAction.setCompanyId( companyId );
-            socialUpdateAction.setSocialMediaSource( CommonConstants.LENDINGTREE_SOCIAL_SITE );
-
-            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
-
+            
+            //Update social connection history
+            socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
+                CommonConstants.LENDINGTREE_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+            
             LOG.info( "lendingTree updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
