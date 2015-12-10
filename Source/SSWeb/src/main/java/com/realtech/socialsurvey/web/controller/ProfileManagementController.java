@@ -4734,6 +4734,10 @@ public class ProfileManagementController
             LOG.error( "InvalidInputException while verifying email. Reason : " + e.getMessage(), e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_VERIFICATION_URL,
                 DisplayMessageType.ERROR_MESSAGE ) );
+        } catch ( NonFatalException nfe ) {
+            LOG.error( "NonFatalException while updating verified email. Reason : " + nfe.getMessage(), nfe );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.EMAIL_ID_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Method to verify email finished" );
         return JspResolver.LOGIN;

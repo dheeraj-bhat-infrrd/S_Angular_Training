@@ -31,7 +31,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="hm-header-row-left text-center lgn-adj padding-10"><spring:message code="label.logintodosurvey.key"/></div>
+			<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.logintodosurvey.key"/></div>
 		</div>
 	</div>
 </div>
@@ -81,69 +81,8 @@
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script>
 $(document).ready(function(){
-
-	if ($('#message').val() != "") {
-		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
-			showError($('#message').val());
-		} else {
-			showInfo($('#message').val());
-		}
-	}
-
-	$('#login-submit').click(function(e){
-		loginUser();
-	});
-   
-	$('input').keypress(function(e){
-		// detect enter
-		if (e.which==13){
-			e.preventDefault();
-			loginUser();
-		}
-	});
-	
-	function loginUser() {
-		if(validateLoginForm('login-form')){
-			$('#frm-login').submit();
-			showOverlay();
-		}
-	}
-	
-	function validateLoginForm(id) {
-		if (!validateUserId('login-user-id')) {
-			$('#login-user-id').focus();
-			return false;
-		}
-		if (!validateLoginPassword('login-pwd')) {
-			$('#login-pwd').focus();
-			return false;
-		}
-		return true;
-	}
-
-	function validateUserId(elementId) {
-		if ($('#' + elementId).val() != "") {
-			if (emailRegex.test($('#' + elementId).val()) == true) {
-				return true;
-			} else {
-				showError('Please enter a valid user name.');
-				return false;
-			}
-		} else {
-			showError('Please enter user name.');
-			return false;
-		}
-	}
-
-	function validateLoginPassword(elementId) {
-		if ($('#' + elementId).val() != "") {
-			return true;
-		} else {
-			showError('Please enter password.');
-			return false;
-		}
-	}
-	});
+	initializeLoginPage();
+});
 </script>
 
 </body>

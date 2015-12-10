@@ -46,6 +46,8 @@ public class OrganizationUnitSettings {
 	private String logoThumbnail;
 	private boolean isProfileImageProcessed;
 	private boolean isLogoImageProcessed;
+	private long zillowReviewCount;
+	private long zillowReviewAverage;
 
 	public String getId() {
 		return id;
@@ -319,7 +321,27 @@ public class OrganizationUnitSettings {
 		this.isLogoImageProcessed = isLogoImageProcessed;
 	}
 
-	@Override
+	public long getZillowReviewCount()
+    {
+        return zillowReviewCount;
+    }
+
+    public void setZillowReviewCount( long zillowReviewCount )
+    {
+        this.zillowReviewCount = zillowReviewCount;
+    }
+
+    public long getZillowReviewAverage()
+    {
+        return zillowReviewAverage;
+    }
+
+    public void setZillowReviewAverage( long zillowReviewAverage )
+    {
+        this.zillowReviewAverage = zillowReviewAverage;
+    }
+
+    @Override
 	public String toString() {
 		return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion + ", profileName="
 				+ profileName + ", profileUrl=" + profileUrl + ", profileImageUrl=" + profileImageUrl + ", logo=" + logo + ", isLocationEnabled="
