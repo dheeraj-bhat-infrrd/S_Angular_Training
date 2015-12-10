@@ -1798,37 +1798,37 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         sendSurveyInvitationMail( recipientFirstname, recipientLastname, recipientEmailId, null, agent, true, source );
     }
 
+//    Commented as Zillow surveys are not stored in database, SS-1276
+//    @Override
+//    @Transactional
+//    public void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
+//    {
+//        LOG.info( "Method deleteZillowSurveysByEntity() started" );
+//        if ( entityType == null || entityType.isEmpty() ) {
+//            throw new InvalidInputException( "Entity Type is invalid" );
+//        }
+//        if ( entityId <= 0 ) {
+//            throw new InvalidInputException( "Entity ID is invalid" );
+//        }
+//        surveyDetailsDao.removeZillowSurveysByEntity( entityType, entityId );
+//        LOG.info( "Method deleteZillowSurveysByEntity() finished" );
+//    }
 
-    @Override
-    @Transactional
-    public void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
-    {
-        LOG.info( "Method deleteZillowSurveysByEntity() started" );
-        if ( entityType == null || entityType.isEmpty() ) {
-            throw new InvalidInputException( "Entity Type is invalid" );
-        }
-        if ( entityId <= 0 ) {
-            throw new InvalidInputException( "Entity ID is invalid" );
-        }
-        surveyDetailsDao.removeZillowSurveysByEntity( entityType, entityId );
-        LOG.info( "Method deleteZillowSurveysByEntity() finished" );
-    }
-
-
-    @Override
-    @Transactional
-    public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
-    {
-        LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
-        if ( entityType == null || entityType.isEmpty() ) {
-            throw new InvalidInputException( "Entity Type is invalid" );
-        }
-        if ( entityId <= 0 ) {
-            throw new InvalidInputException( "Entity ID is invalid" );
-        }
-        surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
-        LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
-    }
+//  Commented as Zillow surveys are not stored in database, SS-1276
+//    @Override
+//    @Transactional
+//    public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
+//    {
+//        LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
+//        if ( entityType == null || entityType.isEmpty() ) {
+//            throw new InvalidInputException( "Entity Type is invalid" );
+//        }
+//        if ( entityId <= 0 ) {
+//            throw new InvalidInputException( "Entity ID is invalid" );
+//        }
+//        surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
+//        LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
+//    }
 
 
     @Override
