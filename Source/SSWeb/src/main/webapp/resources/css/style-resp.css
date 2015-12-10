@@ -1604,6 +1604,12 @@
 	width:25%;
 	padding:0px;
 	}
+	.dash-size{
+	min-height:498px;
+	}
+	#top-dash{
+	min-height:498px;
+	}
 }
 
 
@@ -1940,6 +1946,12 @@
 	.dsh-date-picker{
 	width:25%;
 	}
+	.dash-size{
+	min-height:340px;
+	}
+	#top-dash{
+	min-height:340px;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -2097,6 +2109,13 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
+	.dash-size{
+	min-height:480px;
+	}
+	#top-dash{
+	min-height:480px;
+	}
+	
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
@@ -2110,6 +2129,12 @@
     .srv-tbl-txt{
         width: 884px !important;
     }
+    .dash-size{
+	min-height:480px;
+	}
+	#top-dash{
+	min-height:480px;
+	}
     
 }
 
