@@ -511,6 +511,7 @@
     .lp-con-row{
         border-bottom: 1px solid #dcdcdc;
         line-height: 55px;
+        padding-left: 0;
     }
     .lp-con-row:last-child{
         border-bottom: 0;
