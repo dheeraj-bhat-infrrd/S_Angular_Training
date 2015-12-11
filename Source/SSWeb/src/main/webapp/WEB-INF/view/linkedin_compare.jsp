@@ -176,7 +176,7 @@ $(document).ready(function() {
 	}
 	
 	if(countryCode == "US"){
-		showStateCityRow("state-city-row", "com-state");
+		showStateCityRow("state-city-row", "com-state", "com-city");
 		if( $('input[name="country"]').val() == null || $('input[name="country"]').val() == "" ){
 			$('input[name="country"]').val("United States");
 			$('#country-code').val(countryCode);
@@ -230,7 +230,7 @@ $(document).ready(function() {
 				}
 			}
 			if(ui.item.code=="US"){
-				showStateCityRow("state-city-row", "com-state");
+				showStateCityRow("state-city-row", "com-state", "com-city");
 			}else{
 				hideStateCityRow("state-city-row", "com-state");
 			}
@@ -401,7 +401,7 @@ $('#com-state').on('change',function(e){
 $('#com-city').bind('focus', function(){ 
 	if($('#com-state').val() &&  $('#com-state').val() != ""){
 		$(this).trigger('keydown');
-		$(this).autocomplete("search");		
+		//$(this).autocomplete("search");		
 	}
 });
 </script>

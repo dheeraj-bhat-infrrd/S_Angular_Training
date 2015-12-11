@@ -7486,6 +7486,9 @@ function paintForProfile() {
 		attrVal = agentId;
 	}
 	startIndex = 0;
+	doStopReviewsPaginationEditProfile = false;
+	isReviewsRequestRunningEditProfile = false;
+	$('#prof-review-item').html('');
 	// Common call for all cases
 	fetchAvgRating(attrName, attrVal);
 	fetchReviewCount(attrName, attrVal, minScore);
@@ -7628,12 +7631,6 @@ function fetchReviewsEditProfileScroll() {
 }
 
 function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
-	
-	if (startIndex == 0) {
-		doStopReviewsPaginationEditProfile = false;
-		isReviewsRequestRunningEditProfile = false;
-		$('#prof-review-item').html('');
-	}
 	
 	if(isReviewsRequestRunningEditProfile) return; //Return if ajax request is still running
 	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
@@ -9194,6 +9191,7 @@ function linkedInDataImport() {
 	disableBodyScroll();
 	callAjaxGET("./linkedindataimport.do", function(data) {
 		$('#overlay-linkedin-import').html(data);
+		disableBodyScroll();
 		if ($("#welocome-step1").length) {
 			$('#overlay-linkedin-import').removeClass("hide");
 			$('#overlay-linkedin-import').show();

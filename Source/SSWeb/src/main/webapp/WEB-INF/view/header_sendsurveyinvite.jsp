@@ -66,7 +66,7 @@
 </div>
 <script>
 	$(document).ready(function(){
-		
+		disableBodyScroll();
 		var cookieValue= $.cookie("doNotShowPopup");
 		if(cookieValue == "true"){
 			$('#wc-dashboard-popup').prop("checked",true);
@@ -83,14 +83,7 @@
 			else{
 				$.cookie("doNotShowPopup", "false");
 			}
-			
-			/* if (!$(this).is(":checked")) {
-				$.cookie("doNotShowPopup", "false");
-			}
-		     */
 		});
-		
-		
 		$('#wc-review-table').perfectScrollbar();
 		$('#wc-review-table').perfectScrollbar('update');
 	});
