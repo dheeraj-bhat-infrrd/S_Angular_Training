@@ -36,6 +36,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
@@ -50,6 +51,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -60,6 +62,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -156,6 +159,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Value ( "${CUSTOM_SOCIALNETWORK_POST_COMPANY_ID}")
     private String customisedSocialNetworkCompanyId;
 
+    @Autowired
+    private SocialPostDao socialPostDao;
 
     /**
      * Returns the Twitter request token for a particular URL
@@ -984,5 +989,112 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( InvalidInputException iie ) {
             LOG.error( "error while sending report bug mail to admin ", iie );
         }
+    }
+    
+
+    /**
+     * Method to add entry to social connections history
+     * 
+     * @param entityType
+     * @param entityId
+     * @param mediaTokens
+     * @param socialMedia
+     * @param action
+     * @throws InvalidInputException
+     * @throws ProfileNotFoundException
+     */
+    @Override
+    public void updateSocialConnectionsHistory( String entityType, long entityId, SocialMediaTokens mediaTokens,
+        String socialMedia, String action ) throws InvalidInputException, ProfileNotFoundException
+    {
+        //Check if any of the parameters are null or empty
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entity type. EntityType : " + entityType );
+        }
+        
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "Invalid entity ID. Entity ID : " + entityId );
+        }
+        
+        if ( mediaTokens == null ) {
+            throw new InvalidInputException( "MediaTokens is null" );
+        }
+        
+        if ( action == null || action.isEmpty() ) {
+            throw new InvalidInputException( "action is invalid. Action : " + action );
+        }
+
+        if ( socialMedia == null || socialMedia.isEmpty() ) {
+            throw new InvalidInputException( "social media invalid. Social Media : " + socialMedia );
+        }
+        SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+
+        //Check for the correct media token and set the appropriate link
+        switch ( socialMedia ) {
+            case CommonConstants.FACEBOOK_SOCIAL_SITE:
+                if ( ( mediaTokens.getFacebookToken() != null )
+                    && ( mediaTokens.getFacebookToken().getFacebookPageLink() != null )
+                    && !( mediaTokens.getFacebookToken().getFacebookPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getFacebookToken().getFacebookPageLink() );
+                break;
+
+            case CommonConstants.TWITTER_SOCIAL_SITE:
+                if ( ( mediaTokens.getTwitterToken() != null ) && ( mediaTokens.getTwitterToken().getTwitterPageLink() != null )
+                    && !( mediaTokens.getTwitterToken().getTwitterPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getTwitterToken().getTwitterPageLink() );
+                break;
+
+            case CommonConstants.GOOGLE_SOCIAL_SITE:
+                if ( ( mediaTokens.getGoogleToken() != null ) && ( mediaTokens.getGoogleToken().getProfileLink() != null )
+                    && !( mediaTokens.getGoogleToken().getProfileLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getGoogleToken().getProfileLink() );
+                break;
+
+            case CommonConstants.LINKEDIN_SOCIAL_SITE:
+                if ( ( mediaTokens.getLinkedInToken() != null )
+                    && ( mediaTokens.getLinkedInToken().getLinkedInPageLink() != null )
+                    && !( mediaTokens.getLinkedInToken().getLinkedInPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
+                break;
+
+            case CommonConstants.ZILLOW_SOCIAL_SITE:
+                if ( ( mediaTokens.getZillowToken() != null ) && ( mediaTokens.getZillowToken().getZillowProfileLink() != null )
+                    && !( mediaTokens.getZillowToken().getZillowProfileLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getZillowToken().getZillowProfileLink() );
+                break;
+
+            case CommonConstants.YELP_SOCIAL_SITE:
+                if ( ( mediaTokens.getYelpToken() != null ) && ( mediaTokens.getYelpToken().getYelpPageLink() != null )
+                    && !( mediaTokens.getYelpToken().getYelpPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getYelpToken().getYelpPageLink() );
+                break;
+
+            case CommonConstants.REALTOR_SOCIAL_SITE:
+                if ( ( mediaTokens.getRealtorToken() != null )
+                    && ( mediaTokens.getRealtorToken().getRealtorProfileLink() != null )
+                    && !( mediaTokens.getRealtorToken().getRealtorProfileLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getRealtorToken().getRealtorProfileLink() );
+                break;
+
+            case CommonConstants.LENDINGTREE_SOCIAL_SITE:
+                if ( ( mediaTokens.getLendingTreeToken() != null )
+                    && ( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null )
+                    && !( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
+                break;
+
+            default:
+                throw new InvalidInputException( "Invalid social media token entered" );
+        }
+        Map<String, Long> hierarchyList = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+
+        socialUpdateAction.setAction( action );
+        socialUpdateAction.setAgentId( hierarchyList.get( CommonConstants.AGENT_ID ) );
+        socialUpdateAction.setBranchId( hierarchyList.get( CommonConstants.BRANCH_ID ) );
+        socialUpdateAction.setRegionId( hierarchyList.get( CommonConstants.REGION_ID ) );
+        socialUpdateAction.setCompanyId( hierarchyList.get( CommonConstants.COMPANY_ID ) );
+        socialUpdateAction.setSocialMediaSource( socialMedia );
+
+        socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
     }
 }
