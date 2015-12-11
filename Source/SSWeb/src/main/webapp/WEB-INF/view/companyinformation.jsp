@@ -198,7 +198,7 @@ $(document).ready(function() {
 		countryCode = $('#country-code').val();
 	}
 	if(countryCode == "US"){
-		showStateCityRow("state-city-row", "com-state");
+		showStateCityRow("state-city-row", "com-state", "com-city");
 		if( $('input[name="country"]').val() == null || $('input[name="country"]').val() == "" ){
 			$('input[name="country"]').val("United States");
 			$('#country-code').val(countryCode);
@@ -238,7 +238,6 @@ $(document).ready(function() {
 	}
 	
 	$('#company-info-submit').click(function() {
-		
 		if(logo && logoSuccess && !isFormSubmitted ){
 			submitCompanyInfoForm();
 		}
@@ -282,7 +281,7 @@ $(document).ready(function() {
 				}
 			}
 			if(ui.item.code=="US"){
-				showStateCityRow("state-city-row", "com-state");
+				showStateCityRow("state-city-row", "com-state", "com-city");
 			}else{
 				hideStateCityRow("state-city-row", "com-state");
 			}
@@ -301,15 +300,6 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
-  	/* $("#com-country").keydown(function(e){
-  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
-  	    
-   	   e.keyCode = $.ui.keyCode.DOWN;
-   	   $(this).trigger(e);
-
-   	   e.keyCode = $.ui.keyCode.ENTER;
-   	   $(this).trigger(e);
-   	}); */
 });
 
 $('#com-state').on('change',function(e){
@@ -323,7 +313,7 @@ $('#com-state').on('change',function(e){
 $('#com-city').bind('focus', function(){ 
 	if($('#com-state').val() &&  $('#com-state').val() != ""){
 		$(this).trigger('keydown');
-		$(this).autocomplete("search");		
+		//$(this).autocomplete("search");		
 	}
 });
  var isFormSubmitted=false;
@@ -356,12 +346,7 @@ $("#com-logo").on("change", function() {
 	var formData = new FormData();
 	formData.append("logo", $('#com-logo').prop("files")[0]);
 	formData.append("logo_name", $('#com-logo').prop("files")[0].name);
-	
-	
 	callAjaxPOSTWithTextDataLogo("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
-	
-
-	
 });
 
 function uploadImageSuccessCallback(response) {
@@ -391,67 +376,33 @@ function validateCountry() {
 		}
 	}
 }
- 
-
-
 
 function validateCompanyInformationForm(elementId) {
-	isCompanyInfoPageValid = true;
-	var isFocussed = false;
-	//var isSmallScreen = false;
-	if($(window).width()<768){
-		isSmallScreen = true;
-	}
-	
 	if(!validateCompany('com-company')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-company').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
+		$('#com-company').focus();
+		return false;
 	}
 	if(!validateAddress1('com-address1')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-address1').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
+		$('#com-address1').focus();
+		return false;
 	}
 	if(!validateAddress2('com-address2')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-address2').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
+		$('#com-address2').focus();
+		return false;
 	}
 	if(!validateCountry('com-country')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-country').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
+		$('#com-country').focus();
+		return false;
 	}
 	if(!validateCountryZipcode('com-zipcode')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-zipcode').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
+		$('#com-zipcode').focus();
+		return false;
 	}
 	if(!validatePhoneNumber('com-contactno')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-contactno').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
+		$('#com-contactno').focus();
+		return false;
 	}
-	return isCompanyInfoPageValid;
+	return true;
 }
 </script>
 
