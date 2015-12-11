@@ -60,6 +60,7 @@
 </div>
 <script>
 $(document).ready(function(){
+	disableBodyScroll();
 	var cookieValue= $.cookie("doNotShowPopup");
 	if(cookieValue=="true"){
 		$('#wc-dashboard-popup').prop("checked",true);

@@ -467,14 +467,6 @@
         padding-bottom: 0px;
         border-bottom: 1px solid #dcdcdc;
     }
-/*
-    .prof-name-container{
-        height: 154px;
-    }
-    .prof-name-container{
-        height: 148px;
-    }
-*/
     .prof-name{
         font-size: 16px;
     }
@@ -519,13 +511,15 @@
     .lp-con-row{
         border-bottom: 1px solid #dcdcdc;
         line-height: 55px;
+        padding-left: 0;
     }
     .lp-con-row:last-child{
         border-bottom: 0;
     }
     .lp-con-icn{
-        height: 55px;
-        width: 40px;
+        height: 26px;
+        width: 26px;
+        margin: 15px 7px;
     }
     .mobile-tabs{
         display: block !important;
@@ -1612,12 +1606,19 @@
 	#top-dash{
 	min-height:498px;
 	}
+	.prof-details-header .social-item-icon {
+		width: 30px;
+		margin: 4px 2px;
+	}
+	.prof-details-header .icn-social-add {
+		width: 32px;
+	}
 }
 
 
 /* ============== ONLY TABLETS ==============*/
 @media (min-width: 768px) and (max-width: 991px) {
-	.container{
+	.container {
     	width: 100% !important;
     }
     .payment-option-tab{
