@@ -31,9 +31,8 @@
 	<div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
-			data-column-value="${columnValue}" class="dash-top-info dash-prof-wrapper pos-relative" >
-			<div id="top-dash" class="hide"></div>
-			<!-- <div class="overlay-dash-loader hide"></div> -->
+			data-column-value="${columnValue}" class="dash-top-info dash-prof-wrapper pos-relative dash-size" >
+			<div id="top-dash" class="hide" ></div>
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj" >
 				<!-- Populated by dashboard_profiledetail.jsp -->
 			</div>
@@ -189,12 +188,6 @@
 </div>
 <script>
 $(document).ready(function() {
-	$('.va-dd-wrapper').perfectScrollbar({
-		suppressScrollX : true
-	});
-	$('.va-dd-wrapper').perfectScrollbar('update');
-	
-	hideOverlay();
 	$(document).attr("title", "Dashboard");
 
 	$(document).scroll(function() {
@@ -213,11 +206,7 @@ $(document).ready(function() {
 		}
 	};
 	
-	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
-		$('#da-dd-wrapper').remove();
-	} else {
-		$('#da-dd-wrapper').show();
-	}
+	updateViewAsScroll();
 	
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');

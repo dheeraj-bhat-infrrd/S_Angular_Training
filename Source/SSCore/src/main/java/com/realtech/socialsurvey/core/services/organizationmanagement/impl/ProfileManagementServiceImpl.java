@@ -612,7 +612,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LockSettings parentLock = parentProfile.getLockSettings();
         if ( parentLock != null ) {
             // Logo
-            if ( parentProfile.getLogoThumbnail() != null ) {
+            //JIRA SS-1363 begin
+            /*if ( parentProfile.getLogoThumbnail() != null ) {
                 if ( parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() ) {
                     userProfile.setLogo( parentProfile.getLogoThumbnail() );
                     userLock.setLogoLocked( true );
@@ -622,7 +623,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         userProfile.setLogo( parentProfile.getLogoThumbnail() );
                     }
                 }
+            }*/
+            if ( parentProfile.getLogo() != null ) {
+                if ( parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() ) {
+                    userProfile.setLogo( parentProfile.getLogo() );
+                    userLock.setLogoLocked( true );
+                }
+                if ( !parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() ) {
+                    if ( userProfile.getLogo() == null || userProfile.getLogo().equals( "" ) ) {
+                        userProfile.setLogo( parentProfile.getLogo() );
+                    }
+                }
             }
+            //JIRA SS-1363 end
 
             // Basic Contact details
             if ( parentProfile.getContact_details() != null ) {
@@ -1802,7 +1815,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException
+    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException, NonFatalException
     {
         Map<String, String> urlParams = urlGenerator.decryptParameters( urlParamsStr );
         if ( urlParams == null || urlParams.isEmpty() ) {
@@ -1841,6 +1854,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 userManagementService.updateUser( user, iden, true );
 
                 updateIndividualEmail( iden, emailVerified );
+
+                // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
+                // BEGIN
+                updateEmailIdInSolr( emailVerified, iden );
+                // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
+                // END
             }
         } else if ( emailType.equals( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
             String emailVerified = mailIds.getPersonalEmailToVerify();
@@ -2763,7 +2782,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     @Transactional
-    public void updateCompanyEmail( long companyId, String emailId ) throws InvalidInputException
+    public void updateCompanyEmail( long companyId, String emailId ) throws NonFatalException
     {
         LOG.info( "Method updateCompanyEmail of profileManagementService called for companyId : " + companyId );
 
@@ -2802,6 +2821,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             company.setModifiedBy( String.valueOf( companyAdmin.getUserId() ) );
             company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             companyDao.update( company );
+
+            // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
+            // BEGIN
+            updateEmailIdInSolr( emailId, companyAdmin.getUserId() );
+            // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
+            // END
 
             LOG.info( "Successfully completed method to update company email" );
         } else {
@@ -2939,9 +2964,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         if ( !parentLockSettings.getIsLogoLocked() && ( logoUrl == null || logoUrl.isEmpty() ) ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-            if ( companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty() ) {
+            //JIRA SS-1363 begin
+            /*if ( companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty() ) {
                 logoUrl = companySettings.getLogoThumbnail();
+            }*/
+            if ( companySettings.getLogo() != null && !companySettings.getLogo().isEmpty() ) {
+                logoUrl = companySettings.getLogo();
             }
+            //JIRA SS-1363 end
         }
 
         // add the company profile data into agent settings
@@ -3339,7 +3369,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         //Set logoThumbnail along with logo
         for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
             if ( entry.getKey() == SettingsForApplication.LOGO ) {
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                //JIRA SS-1363 begin
+                /*if ( entry.getValue() == OrganizationUnit.COMPANY ) {
                     userProfile.setLogo( companyUnitSettings.getLogoThumbnail() );
                     userProfile.setLogoThumbnail( companyUnitSettings.getLogoThumbnail() );
                 } else if ( entry.getValue() == OrganizationUnit.REGION ) {
@@ -3351,7 +3382,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
                     userProfile.setLogo( agentUnitSettings.getLogoThumbnail() );
                     userProfile.setLogoThumbnail( agentUnitSettings.getLogoThumbnail() );
+                }*/
+                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                    userProfile.setLogo( companyUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( companyUnitSettings.getLogoThumbnail() );
+                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                    userProfile.setLogo( regionUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( regionUnitSettings.getLogoThumbnail() );
+                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                    userProfile.setLogo( branchUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( branchUnitSettings.getLogoThumbnail() );
+                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                    userProfile.setLogo( agentUnitSettings.getLogo() );
+                    userProfile.setLogoThumbnail( agentUnitSettings.getLogoThumbnail() );
                 }
+                //JIRA SS-1363 end
 
             } else if ( entry.getKey() == SettingsForApplication.LOCATION ) {
                 ContactDetailsSettings contactDetails = userProfile.getContact_details();
@@ -4178,6 +4223,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
+    void updateEmailIdInSolr( String emailId, long iden ) throws NonFatalException
+    {
+        LOG.info( "Updating verified email id info into solr for user id : " + iden );
+        Map<String, Object> editKeys = new HashMap<String, Object>();
+        editKeys.put( CommonConstants.USER_LOGIN_NAME_SOLR, emailId );
+        editKeys.put( CommonConstants.USER_EMAIL_ID_SOLR, emailId );
+        try {
+            solrSearchService.editUserInSolrWithMultipleValues( iden, editKeys );
+        } catch ( SolrException se ) {
+            throw new NonFatalException( se.getMessage() );
+        }
+        LOG.info( "Updated verified email id info into solr for user id : " + iden );
+    }
+    
     @Override
     public List<SurveyDetails> fetchZillowData( OrganizationUnitSettings profile, String collection )
         throws InvalidInputException

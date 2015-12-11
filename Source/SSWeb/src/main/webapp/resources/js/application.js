@@ -141,6 +141,18 @@ function showMainContentCallBack(data) {
 	hideOverlay();
 }
 
+$(window).resize(function(){
+	if ($(window).width() > 767) {
+		if ($('#header-slider-wrapper').hasClass('rt-panel-slide')) {
+			closeMoblieScreenMenu();
+		}
+	}
+});
+
+function closeMoblieScreenMenu() {
+	$('#header-slider-wrapper').removeClass('rt-panel-slide');
+	enableBodyScroll();
+}
 
 //Function to logout
 function userLogout() {
@@ -5172,9 +5184,10 @@ function loadAgentPic(agentId){
 				success = true;
 		},
 		complete : function(data) {
+			
 			if (success) {
 				imageUrl = data.responseText;
-				if(imageUrl!='' && imageUrl!=null) {
+				if(imageUrl.trim()!='' && imageUrl!=null) {
 					$("#agnt-img").html("<img class='hr-ind-img' src='"+imageUrl+"'/>");
 				}
 			}
@@ -10196,5 +10209,18 @@ function validateZillowForm() {
 		return false;
 	} else {
 		return true;
+	}
+}
+
+//Fucntion to update view as scroll in dashboard
+function updateViewAsScroll() {
+	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
+		$('#da-dd-wrapper').remove();
+	} else {
+		$('#da-dd-wrapper').show();
+		$('.va-dd-wrapper').perfectScrollbar({
+			suppressScrollX : true
+		});
+		$('.va-dd-wrapper').perfectScrollbar('update');
 	}
 }
