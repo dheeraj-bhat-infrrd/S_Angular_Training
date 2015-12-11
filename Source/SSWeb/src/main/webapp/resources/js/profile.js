@@ -966,7 +966,7 @@ function fetchReviewsScroll(isNextBatch) {
 		// fetch zillow reviews
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		if(doFetchZillowReviews && profileJson.socialMediaTokens.zillowToken != undefined)
-			fetchZillowReviewsBasedOnProfile(profileLevel,currentProfileIden);
+			fetchZillowReviewsBasedOnProfile(profileLevel,currentProfileIden, isNextBatch);
 		doFetchZillowReviews = false;
 	}
 }
@@ -1016,7 +1016,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 						fetchReviewsScroll(true);
 					}
 				} else {
-					fetchReviewsScroll(false);		
+				    fetchReviewsScroll(false);
 				}
 			} else {
 				if ($("#profile-fetch-info").attr("fetch-all-reviews") == "false"
@@ -1029,7 +1029,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 	
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch){
 	if (currentProfileIden == undefined || currentProfileIden == "") {
 		return;
 	}
@@ -1053,6 +1053,8 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
 	            if (result != undefined && result.length > 0) {
 	                reviewsNextBatch = reviewsNextBatch.concat(result);
 	            }
+	            if (!isNextBatch)
+	                fetchReviewsScroll(false);
 	        }
 	    }
 	}, true);
@@ -1626,6 +1628,7 @@ function twitterFn(loop) {
         }
     }
 }
+
 
 (function() {
 	var po = document.createElement('script');
