@@ -317,14 +317,14 @@ function validateLastName(elementId){
  * @param elementId
  * @returns {Boolean}
  */
-function validatePassword(elementId) {
+function validatePassword(elementId) { 
 	var password = $('#'+elementId).val();
 	if(password.trim() == "") {
-		showErrorMobileAndWeb("Please enter password");
+		showError("Please enter password");
 		return false;
 	}
 	else if (password.length < minPwdLength) {
-		showErrorMobileAndWeb('Password must be at least 6 characters');
+		showError('Password must be at least 6 characters');
 		return false;
 	}
 	return true;
@@ -338,13 +338,13 @@ function validatePassword(elementId) {
 function validateConfirmPassword(pwdId, confirmPwdId){
 	if ($('#'+confirmPwdId).val() != "") {
 		if ($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
-			showErrorMobileAndWeb('Passwords do not match');
+			showError('Passwords do not match');
 			return false;
 		} else {
 			return true;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter confirm password');
+		showError('Please enter confirm password');
 		return false;
 	}
 }
