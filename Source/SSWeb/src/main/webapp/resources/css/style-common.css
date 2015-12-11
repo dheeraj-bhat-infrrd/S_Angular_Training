@@ -4994,6 +4994,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+	background: #fff;
 }
 
 .bd-hr-form-item {
