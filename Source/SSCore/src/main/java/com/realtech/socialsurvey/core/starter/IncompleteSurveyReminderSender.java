@@ -61,25 +61,25 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         // initialize the dependencies
         initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
 
-        try{
-        //update last run start time
-        batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
-            CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
-            CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER );
+        try {
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
+                CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER );
 
-        for ( Company company : organizationManagementService.getAllCompanies() ) {
-            Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
-            int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
-            int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
-            LOG.debug( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
-            SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
-            Date epochReminderDate = null;
-            List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail( company );
-            LOG.debug( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
-                + " surveys sent for company id " + company.getCompanyId() );
-            for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
-                LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
-                if ( survey.getReminderCounts() <= reminderCount ) {
+            for ( Company company : organizationManagementService.getAllCompanies() ) {
+                Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
+                int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
+                int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
+                LOG.debug( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
+                Date epochReminderDate = null;
+                List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail( company );
+                LOG.debug( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
+                    + " surveys sent for company id " + company.getCompanyId() );
+                for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
+                    LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
+
                     LOG.debug( "Survey pre initiation id: " + survey.getSurveyPreIntitiationId() + " within reminder counts" );
                     boolean reminder = false;
                     try {
@@ -108,15 +108,22 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                              * sendMailToAgent( survey ); }
                              */
                             if ( reminder ) {
-                                sendSurveyReminderEmail( emailServices, organizationManagementService, userManagementService,
-                                    survey, company.getCompanyId() );
+                                if ( survey.getReminderCounts() < reminderCount ) {
+                                    sendSurveyReminderEmail( emailServices, organizationManagementService,
+                                        userManagementService, survey, company.getCompanyId() );
+                                    surveyHandler.markSurveyAsSent( survey );
+                                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
+                                } else {
+                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
+                                        + " has exceeded the reminder count " );
+                                }
                             } else {
                                 sendSurveyInitiationEmail( emailServices, organizationManagementService, userManagementService,
                                     survey, company.getCompanyId() );
+                                surveyHandler.markSurveyAsSent( survey );
+                                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                             }
 
-                            surveyHandler.markSurveyAsSent( survey );
-                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                         } catch ( InvalidInputException e ) {
                             LOG.error(
                                 "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
@@ -125,15 +132,13 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                             LOG.error( "Error while sending incomplete survey mail ", e );
                         }
                     }
-                } else {
-                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId() + " has exceeded the reminder count " );
+
                 }
             }
-        }
-        LOG.info( "Completed IncompleteSurveyReminderSender" );
-        //Update last build time in batch tracker table
-        batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER);
-        }catch(Exception e){
+            LOG.info( "Completed IncompleteSurveyReminderSender" );
+            //Update last build time in batch tracker table
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER );
+        } catch ( Exception e ) {
             LOG.error( "Error in IncompleteSurveyReminderSender", e );
             try {
                 //update batch tracker with error message
