@@ -9191,6 +9191,7 @@ function linkedInDataImport() {
 	disableBodyScroll();
 	callAjaxGET("./linkedindataimport.do", function(data) {
 		$('#overlay-linkedin-import').html(data);
+		disableBodyScroll();
 		if ($("#welocome-step1").length) {
 			$('#overlay-linkedin-import').removeClass("hide");
 			$('#overlay-linkedin-import').show();
