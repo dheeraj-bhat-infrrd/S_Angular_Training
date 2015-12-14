@@ -942,7 +942,9 @@ function fetchReviewsScroll(isNextBatch) {
 	} else {
 		// fetch zillow reviews
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
-		if(doFetchZillowReviews && profileJson.socialMediaTokens.zillowToken != undefined)
+		//Zillow fix : Added check to see if social media tokens exist
+		if (doFetchZillowReviews && profileJson.socialMediaTokens != undefined
+				&& profileJson.socialMediaTokens.zillowToken != undefined)
 			fetchZillowReviewsBasedOnProfile(profileLevel,currentProfileIden, isNextBatch);
 		doFetchZillowReviews = false;
 	}
@@ -983,7 +985,8 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 			var result = $.parseJSON(responseJson.entity);
 			if(result == undefined || result.length < numRows) {
 				stopFetchReviewPagination = true; //Stop pagination if reviews fetch are less than the batch size
-				if(profileJson.socialMediaTokens.zillowToken != undefined)
+				//Zillow fix : Added check to see if social media tokens exist
+				if(profileJson.socialMediaTokens != undefined && profileJson.socialMediaTokens.zillowToken != undefined)
 					fetchReviewsScroll(isNextBatch);
 			}
 			if (result != undefined && result.length > 0) {
