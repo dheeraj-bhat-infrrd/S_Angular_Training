@@ -199,7 +199,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
         }
         
-        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false );
+        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false, 0, 0 );
     }
 
 
