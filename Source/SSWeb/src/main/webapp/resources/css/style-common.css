@@ -239,7 +239,8 @@ a,a:hover,a:visited {
 }
 
 .icn-fname {
-	background: url('../images/first-name.png') no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -34px 0px;
+	background-size: auto 26px;
 }
 
 .mob-icn-fname {
@@ -253,7 +254,8 @@ a,a:hover,a:visited {
 }
 
 .icn-lname {
-	background: url('../images/first-name.png') no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -34px 0px;
+	background-size: auto 26px;
 }
 
 .mob-icn-lname {
@@ -270,50 +272,44 @@ a,a:hover,a:visited {
 	background-position: -50px center;
 }
 
-.mob-icn-branch-name {
-	background: url('../images/branch-name.png') no-repeat;
-	background-position: -50px center;
-}
-
 .icn-country {
-	background: url('../images/country.png') no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -333px 0px;
+	background-size: auto 26px;
 }
 
 .icn-logo {
-	background: url('../images/logo_placeholder.png') no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -221px 0px;
+	background-size: auto 26px;
 }
 
 .icn-address1 {
-	background: url(../images/address-1.png) no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -279px 0px;
+	background-size: auto 26px;
 }
 
 .icn-address2 {
-	background: url(../images/address-2.png) no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -279px 0px;
+	background-size: auto 26px;
 }
 
 .icn-state {
-	background: url('../images/state.png') no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -197px 0px;
+	background-size: auto 26px;
 }
 
 .icn-city {
-	background: url('../images/city.png') no-repeat center;
-}
-
-.icn-address-mobile {
-	background: url(../images/address-1.png) no-repeat center;
-	background-position: -50px center;
-}
-
-.icn-user-id {
-	background: url('../images/User.png') no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -363px 0px;
+	background-size: auto 26px;
 }
 
 .icn-password {
-	background: url('../images/password.png') no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -99px 0px;
+	background-size: auto 26px;
 }
 
 .icn-confirm-password {
-	background: url('../images/conf_pwd.png') no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat 0px 0px;
+	background-size: auto 26px;
 }
 
 .margin-bottom-15 {
@@ -330,19 +326,13 @@ a,a:hover,a:visited {
 }
 
 .icn-company {
-	background: url('../images/company.png') no-repeat center;
-}
-
-.icn-address {
-	background: url(../images/address-1.png) no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -252px 0px;
+	background-size: auto 26px;
 }
 
 .icn-zip {
-	background: url(../images/zip.png) no-repeat center;
-}
-
-.icn-contact {
-	background: url(../images/ph.png) no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -167px 0px;
+	background-size: auto 26px;
 }
 
 .pos-relative {
@@ -512,20 +502,12 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	background-color: rgba(255, 255, 255, 0.7);
 }
 
-.overlay-dash-loader {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	z-index: 999999999;
-	background: url(../images/dashloader.gif) no-repeat center;
-	background-size: 50px 50px;
-	background-color: rgba(255, 255, 255, 0.7);
-}
+
 #top-dash{
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	z-index: 999999999;
+	z-index: 9999999;
 	background: url(../images/dashloader.gif) no-repeat center;
 	background-size: 50px 50px;
 	background-color: rgba(255, 255, 255, 0.7);
@@ -534,7 +516,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	z-index: 999999999;
+	z-index: 9999999;
 	background: url(../images/dashloader.gif) no-repeat center;
 	background-size: 50px 50px;
 	background-color: rgba(255, 255, 255, 0.7);
@@ -544,7 +526,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	z-index: 999999999;
+	z-index: 9999999;
 	background: url(../images/dashloader.gif) no-repeat center;
 	background-size: 50px 50px;
 	background-color: rgba(255, 255, 255, 0.7);
@@ -731,13 +713,15 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	font-size: 16px;
 	line-height: 45px;
 	font-family: OpenSansBold;
-	/*    font-weight: bold !important;*/
+}
+
+.hm-header-row-left.lgn-adj {
+	line-height: 55px;
 }
 
 .sm-header-row-left {
 	font-size: 13px;
 	line-height: 45px;
-	/*    font-weight: bold !important;*/
 }
 
 .padding-10 {
@@ -1822,7 +1806,8 @@ button.paypal.is-active {
 }
 
 .icn-mail {
-	background: url(../images/mail.png) no-repeat center;
+	background: url('../csssprites/form_icons.png') no-repeat -65px 0px;
+	background-size: auto 26px;
 }
 
 .icn-web {
@@ -1830,8 +1815,7 @@ button.paypal.is-active {
 }
 
 .icn-mbl {
-	background: url(../images/mbl.png) no-repeat center;
-}
+background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      background-size: auto 26px;}
 
 .icn-phone {
 	background: url(../images/tele.png) no-repeat center;
@@ -3244,6 +3228,9 @@ button.paypal.is-active {
 
 .body-no-scroll {
 	overflow: hidden;
+	position: fixed;
+	width: 100%;
+	height: 100%;
 }
 
 .sb-quests-error {
@@ -4578,8 +4565,9 @@ select.rfr_txt_fld,select.rfr_input_fld{
 .rfr_icn {
 	display: none;
 	position: absolute;
-	height: 60px;
-	width: 60px;
+	height: 26px;
+	width: 26px;
+	margin: 17px;
 }
 
 .reg_btn {
@@ -4998,6 +4986,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+	background: #fff;
 }
 
 .bd-hr-form-item {
@@ -5199,13 +5188,12 @@ select.rfr_txt_fld,select.rfr_input_fld{
 }
 
 .v-tbl-icn {
-	cursor: pointer;
 	height: 39px;
 	width: 16.66%;
 }
 
 .v-tbl-icn-disabled {
-	cursor: auto;
+	cursor: auto !important;
 	opacity: 0.3;
 	height: 39px;
 	width: 16.66%;
@@ -5316,9 +5304,10 @@ tr.v-tbl-row {
 	border-bottom: 1px solid #dcdcdc;
 	height: 100%;
 	position: absolute;
-	top: 0;
+	top: -1px;
 	width: 100%;
 	border-top: 1px solid #dcdcdc;
+	box-sizing: content-box;
 }
 
 .v-line-brnch {
@@ -5326,10 +5315,11 @@ tr.v-tbl-row {
 	border-bottom: 1px solid #dcdcdc;
 	height: 100%;
 	position: absolute;
-	top: 0;
+	top: -1px;
 	width: 100%;
 	left: 25%;
-	/* border-top: 1px solid #dcdcdc; */
+	border-top: 1px solid #dcdcdc;
+	box-sizing: content-box;
 }
 
 .v-line-comp-brnch {
@@ -5363,16 +5353,17 @@ td.td-region-edit,td.td-branch-edit,td.td-user-edit {
 	border-bottom: 1px solid #dcdcdc;
 	height: 100%;
 	position: absolute;
-	top: 0;
+	top: -1px;
 	width: 100%;
 	left: 50%;
 	border-top: 1px solid #dcdcdc;
+	box-sizing: content-box;
 }
 
 .v-tbl-line {
-	border-bottom: 0px !important;
+	border-bottom: 1px solid transparent !important;
 	position: relative;
-	border-top: 0px !important;
+	border-top: 1px solid transparent !important;
 }
 
 td.v-tbl-line {
@@ -5401,15 +5392,15 @@ tr.v-tbl-row-sel[clicked="false"]{
 }
 
 td.v-tbl-role {
-	width: 20%;
+	width: 15%;
 }
 
 td.v-tbl-btns {
-	width: 15.5%;
+	width: 23%;
 }
 
 td.v-tbl-spacer {
-	width: 2.5%;
+	width: 0%;
 }
 .v-tbl-top-spacer{
 	width:16.66%;
@@ -5599,9 +5590,11 @@ tr.u-tbl-header td {
 
 .v-icn-fmail {
 	background: url(../images/fast_mail.png) no-repeat 85% center;
+	cursor: pointer;
 }
 .v-icn-femail {
 	background: url(../images/fast_mail.png) no-repeat 85% center;
+	cursor: pointer;
 }
 
 .v-icn-onl-off {
@@ -5625,8 +5618,8 @@ tr.u-tbl-header td {
 }
 
 .v-icn-rem-user {
-	
 	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
 }
 
 .v-icn-rem-userprofile {
@@ -5635,11 +5628,12 @@ tr.u-tbl-header td {
 
 .v-icn-edit-user {
 	background: url('../images/edit-1.png') no-repeat center;
-	 
+	cursor: pointer;
 }
 
 .v-icn-wid {
 	background: url(../images/generate_widget.png) no-repeat center;
+	cursor: pointer;
 }
 
 .v-um-tbl-wrapper {
@@ -7392,6 +7386,7 @@ div.v-tbl-spacer {
 .v-icn-login {
 	background: url(../images/login.png) no-repeat center;
 	background-size : auto 18px;
+	cursor: pointer;
 }
 
 .hdr-prof-sel {

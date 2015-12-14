@@ -443,19 +443,8 @@
 <script>
 $(document).ready(function() {
 	
-	$('.va-dd-wrapper').perfectScrollbar({
-		suppressScrollX : true
-	});
-	$('.va-dd-wrapper').perfectScrollbar('update');
-	
-	hideOverlay();
 	$(document).attr("title", "Profile Settings");
-	
-	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
-		$('#da-dd-wrapper').remove();
-	} else {
-		$('#da-dd-wrapper').show();
-	}
+	updateViewAsScroll();
 	
 	adjustImage();
 	$(window).resize(adjustImage);

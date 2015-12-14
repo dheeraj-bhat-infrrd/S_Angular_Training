@@ -873,6 +873,10 @@ public interface CommonConstants
     public static final String MESSAGE_HASH_COLUMN = "messageHash";
     public static final String FORWARD_MAIL_DETAILS_STATUS_COLUMN = "status";
     public static final String FORWARD_MAIL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
+    
+    //Social Media Connections History constants
+    public static final String SOCIAL_MEDIA_DISCONNECTED = "disconnected";
+    public static final String SOCIAL_MEDIA_CONNECTED = "connected";
 
     // Zillow Organization Unit Settings Mongo Column constants
     public static final String ZILLOW_REVIEW_COUNT_COLUMN = "zillowReviewCount";
