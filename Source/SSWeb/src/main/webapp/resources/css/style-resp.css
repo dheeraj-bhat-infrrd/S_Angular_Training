@@ -491,6 +491,7 @@
     }
     .overlay-payment{
         padding-bottom: 300px;
+        overflow: auto;
     }
     .btn-payment{
         width: 100%;

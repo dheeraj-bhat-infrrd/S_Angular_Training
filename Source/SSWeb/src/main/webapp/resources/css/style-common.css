@@ -3210,8 +3210,8 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
 }
 
 .ov-payment-container {
-	height: 100%;
-	overflow: auto;
+	/* height: 100%;
+	overflow: auto; */
 }
 
 .ov-payment-shadow {
@@ -7896,4 +7896,26 @@ label.url-change-input-label {
 }
 .abuse-report-col {
     word-break: break-word;
+}
+
+/*Payment page styles*/
+.update-card-details-txt {
+	display: block;
+	width: 100% !important;
+	min-width: 100px !important;
+	margin-bottom: 10px;
+	height: 40px;
+	padding: 0 10px;
+}
+
+.card-det-adj {
+	margin-bottom: 30px;
+}
+
+.card-err-txt {
+	line-height: 24px;
+	padding-left: 10px;
+	font-size: 12px;
+	color: #DE3838;
+	margin-bottom: 10px;
 }
