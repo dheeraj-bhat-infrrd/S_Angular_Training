@@ -10222,3 +10222,98 @@ function updateViewAsScroll() {
 		$('.va-dd-wrapper').perfectScrollbar('update');
 	}
 }
+
+//Sign up path functions
+
+//Address infromataion validation
+function validateIndividaulAddressForm() {
+
+	if (!validateAddress1('com-address1', true)) {
+		$('#com-address1').focus();
+		return false;
+	}
+	if (!validateAddress2('com-address2')) {
+		$('#com-address2').focus();
+		return false;
+	}
+	if (!validateCountry('com-country')) {
+		$('#com-country').focus();
+		return false;
+	}
+	if (!validateCountryZipcode('com-zipcode', true)) {
+		$('#com-zipcode').focus();
+		return false;
+	}
+	if (!validatePhoneNumber('com-contactno', true)) {
+		$('#com-contactno').focus();
+		return false;
+	}
+	return true;
+}
+
+
+//Summary form validation
+function validateSummaryForm() {
+	if (!validateInputField('wc-industry')) {
+		$('#overlay-toast').html('Please enter industry');
+		showToast();
+		$('#wc-industry').focus();
+		return false;
+	}
+	if (!validateInputField('wc-location')) {
+		$('#overlay-toast').html('Please enter location');
+		showToast();
+		$('#wc-location').focus();
+		return false;
+	}
+	if (!validateTextArea('wc-summary')) {
+		$('#overlay-toast').html('Please add or edit summary');
+		showToast();
+		$('#wc-summary').focus();
+		return false;
+	}
+	return true;
+}
+
+function bindIndividualSignupPathEvents() {
+
+	// Profile image upload
+	$('#prof-image-upload-btn').on('click', function() {
+		$('#prof-image').trigger('click');
+	});
+
+	$('#wc-address-submit').on('click', function() {
+		if (validateIndividaulAddressForm()) {
+			var payload = {
+				"address1" : $('#com-address1').val(),
+				"address2" : $('#com-address2').val(),
+				"country" : $('#com-country').val(),
+				"countrycode" : $('#country-code').val(),
+				"zipcode" : $('#com-zipcode').val(),
+				"contactno" : $('#com-contactno').val(),
+				"state" : $('select[name="state"]').val(),
+				"city" : $('input[name="city"]').val()
+			};
+			callAjaxPostWithPayloadData("./editcompanyinformation.do", function(data) {
+				$('#message-header').html(data);
+				$('#overlay-toast').html($('#display-msg-div').text().trim());
+				showToast();
+			}, payload, false);
+		}
+	});
+
+	$('#wc-summary-submit').on('click', function() {
+		if (validateSummaryForm()) {
+			var payload = {
+				"industry" : $('#wc-industry').val(),
+				"location" : $('#wc-location').val(),
+				"aboutme" : $('#wc-summary').val()
+			};
+			callAjaxPostWithPayloadData("./updatesummarydata.do", function(data) {
+				$('#message-header').html(data);
+				$('#overlay-toast').html($('#display-msg-div').text().trim());
+				showToast();
+			}, payload, false);
+		}
+	});
+}

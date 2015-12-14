@@ -317,14 +317,14 @@ function validateLastName(elementId){
  * @param elementId
  * @returns {Boolean}
  */
-function validatePassword(elementId) {
+function validatePassword(elementId) { 
 	var password = $('#'+elementId).val();
 	if(password.trim() == "") {
-		showErrorMobileAndWeb("Please enter password");
+		showError("Please enter password");
 		return false;
 	}
 	else if (password.length < minPwdLength) {
-		showErrorMobileAndWeb('Password must be at least 6 characters');
+		showError('Password must be at least 6 characters');
 		return false;
 	}
 	return true;
@@ -338,13 +338,13 @@ function validatePassword(elementId) {
 function validateConfirmPassword(pwdId, confirmPwdId){
 	if ($('#'+confirmPwdId).val() != "") {
 		if ($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
-			showErrorMobileAndWeb('Passwords do not match');
+			showError('Passwords do not match');
 			return false;
 		} else {
 			return true;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter confirm password');
+		showError('Please enter confirm password');
 		return false;
 	}
 }
@@ -1023,4 +1023,48 @@ function initializeResetPasswordPage() {
 	$('#login-cnf-pwd').blur(function() {
 		validateConfirmPassword('login-pwd', this.id);
 	});
+}
+
+
+//Function to validate country
+function validateCountry(elementId) {
+	var country = $.trim($('#'+elementId).val());
+	if (country == "") {
+		return false;
+	} else {
+		var countryCode = $.trim($('#country-code').val());
+		if (countryCode == "") {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
+function validateCompanyInformationForm() {
+	if(!validateCompany('com-company')){
+		$('#com-company').focus();
+		return false;
+	}
+	if(!validateAddress1('com-address1')){
+		$('#com-address1').focus();
+		return false;
+	}
+	if(!validateAddress2('com-address2')){
+		$('#com-address2').focus();
+		return false;
+	}
+	if(!validateCountry('com-country')){
+		$('#com-country').focus();
+		return false;
+	}
+	if(!validateCountryZipcode('com-zipcode')){
+		$('#com-zipcode').focus();
+		return false;
+	}
+	if(!validatePhoneNumber('com-contactno')){
+		$('#com-contactno').focus();
+		return false;
+	}
+	return true;
 }

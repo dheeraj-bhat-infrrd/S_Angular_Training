@@ -43,7 +43,7 @@
 	<div class="hm-header-main-wrapper">
 		<div class="container">
 			<div class="hm-header-row hm-header-row-main clearfix">
-				<div class="hm-header-row-left text-center padding-10"><spring:message code="label.signupstartjourney.key" /></div>
+				<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.signupstartjourney.key" /></div>
 			</div>
 		</div>
 	</div>
@@ -359,50 +359,6 @@ function uploadImageSuccessCallback(response) {
 	} else {
 		showInfo(response);
 	}
-}
-
-function validateCountry() {
-	var country = $.trim($('#com-country').val());
-	if (country == "") {
-		showError('Please enter country name');
-		return false;
-	} else {
-		var countryCode = $.trim($('#country-code').val());
-		if (countryCode == "") {
-			showError('Please enter valid country name');
-			return false;
-		} else {
-			return true;
-		}
-	}
-}
-
-function validateCompanyInformationForm(elementId) {
-	if(!validateCompany('com-company')){
-		$('#com-company').focus();
-		return false;
-	}
-	if(!validateAddress1('com-address1')){
-		$('#com-address1').focus();
-		return false;
-	}
-	if(!validateAddress2('com-address2')){
-		$('#com-address2').focus();
-		return false;
-	}
-	if(!validateCountry('com-country')){
-		$('#com-country').focus();
-		return false;
-	}
-	if(!validateCountryZipcode('com-zipcode')){
-		$('#com-zipcode').focus();
-		return false;
-	}
-	if(!validatePhoneNumber('com-contactno')){
-		$('#com-contactno').focus();
-		return false;
-	}
-	return true;
 }
 </script>
 
