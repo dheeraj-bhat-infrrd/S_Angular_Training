@@ -2,14 +2,6 @@
 <jsp:include page="admin_header.jsp" />
 <div id="main-content"></div>
 <jsp:include page="admin_scripts.jsp"/>
-<script>
-	$(document).ready(function() {
-		$('.header-links-item').on('click',function(){
-			 window.location.href = $(this).find('a').attr('href');
-		});
-		//loadDisplayPicture();
-	});
-</script>
 <script src="${initParam.resourcesPath}/resources/js/activesession.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){

@@ -61,24 +61,22 @@
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./admindashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
+				<div class="header-links-item" onclick="javascript:showMainContent('./admindashboard.do')">
+					<spring:message code="label.header.dashboard.key" />
 				</div>
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./adminhierarchy.do')"><spring:message code="label.header.hierachy.key" /></a>
+				<div class="header-links-item" onclick="javascript:showMainContent('./adminhierarchy.do')">
+					<spring:message code="label.header.hierachy.key" />
 				</div>
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showsendinvition.do')"><spring:message code="label.sendinvite.header.key" /></a>
+				<div class="header-links-item" onclick="javascript:showMainContent('./showsendinvition.do')">
+					<spring:message code="label.sendinvite.header.key" />
 				</div>
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showabusereports.do')"><spring:message code="label.abusereports.header.key" /></a>
+				<div class="header-links-item" onclick="javascript:showMainContent('./showabusereports.do')">
+					<spring:message code="label.abusereports.header.key" />
 				</div>
-				<div class="header-links-item" >
-					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
+				<div class="header-links-item" onclick="javascript:showMainContent('./showchangepasswordpage.do')">
+					<spring:message code="label.changepassword.key"/>
 				</div>
-				<div class="header-links-item" >
-					<a href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
-				</div>
+				<a href="j_spring_security_logout"><span class="header-links-item"><spring:message code="label.logout.key" /></span></a>
 			</div>
 		</div>
 	</div>
