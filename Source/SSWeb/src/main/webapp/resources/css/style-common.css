@@ -5002,6 +5002,7 @@ width: 50%;
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+
 } */
 .bd-frm-rt-txt {
 	width: 80%;
@@ -5011,6 +5012,8 @@ width: 50%;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
 	min-width: 180px;
+	background: #fff;
+
 }
 
 .bd-hr-form-item {

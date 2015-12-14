@@ -164,6 +164,7 @@ var selectedCountryRegEx = "";
 var phoneFormat = '(ddd) ddd-dddd';
 var profilemasterid = "${profilemasterid}";
 $(document).ready(function() {
+	bindIndividualSignupPathEvents();
 	var countryCode = $('#country-code').val();
 	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
 		for (var i = 0; i < postCodeRegex.length; i++) {
@@ -247,149 +248,6 @@ $(document).ready(function() {
 	};
 });
 
-// Profile image upload
-$(document).on('click', '#prof-image-upload-btn', function() {
-	$('#prof-image').trigger('click');
-});
-
-
-// Company information
-function validateCompanyInformationForm(elementId) {
-	var isCompanyInfoPageValid = true;
-	var isFocussed = false;
-
-	if (!validateAddress1('com-address1', true)) {
-		isCompanyInfoPageValid = false;
-		if (!isFocussed) {
-			$('#com-address1').focus();
-			isFocussed = true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if (!validateAddress2('com-address2')) {
-		isCompanyInfoPageValid = false;
-		if (!isFocussed) {
-			$('#com-address2').focus();
-			isFocussed = true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if (!validateCountry('com-country')) {
-		isCompanyInfoPageValid = false;
-		if (!isFocussed) {
-			$('#com-country').focus();
-			isFocussed = true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if (!validateCountryZipcode('com-zipcode', true)) {
-		isCompanyInfoPageValid = false;
-		if (!isFocussed) {
-			$('#com-zipcode').focus();
-			isFocussed = true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if (!validatePhoneNumber('com-contactno', true)) {
-		isCompanyInfoPageValid = false;
-		if (!isFocussed) {
-			$('#com-contactno').focus();
-			isFocussed = true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	return isCompanyInfoPageValid;
-}
-
-function validateCountry() {
-	var country = $.trim($('#com-country').val());
-	if (country == "") {
-		return false;
-	} else {
-		var countryCode = $.trim($('#country-code').val());
-		if (countryCode == "") {
-			return false;
-		} else {
-			return true;
-		}
-	}
-}
-
-$(document).on('click', '#wc-address-submit', function() {
-	if (validateCompanyInformationForm()) {
-		var payload = {
-			"address1" : $('#com-address1').val(),
-			"address2" : $('#com-address2').val(),
-			"country" : $('#com-country').val(),
-			"countrycode" : $('#country-code').val(),
-			"zipcode" : $('#com-zipcode').val(),
-			"contactno" : $('#com-contactno').val(),
-			"state" : $('select[name="state"]').val(),
-			"city" : $('input[name="city"]').val()
-		};
-		callAjaxPostWithPayloadData("./editcompanyinformation.do", function(data) {
-			$('#message-header').html(data);
-			$('#overlay-toast').html($('#display-msg-div').text().trim());
-			showToast();
-		}, payload, false);
-	}
-});
-
-// Summary
-function validateSummaryForm() {
-	var isFocussed = false;
-	var isFormValid = true;
-
-	if (!validateInputField('wc-industry')) {
-		$('#overlay-toast').html('Please enter industry');
-		showToast();
-
-		isFormValid = false;
-		if (!isFocussed) {
-			$('#wc-industry').focus();
-			isFocussed = true;
-		}
-		return isFormValid;
-	}
-	if (!validateInputField('wc-location')) {
-		$('#overlay-toast').html('Please enter location');
-		showToast();
-
-		isFormValid = false;
-		if (!isFocussed) {
-			$('#wc-location').focus();
-			isFocussed = true;
-		}
-		return isFormValid;
-	}
-	if (!validateTextArea('wc-summary')) {
-		$('#overlay-toast').html('Please add or edit summary');
-		showToast();
-
-		isFormValid = false;
-		if (!isFocussed) {
-			$('#wc-summary').focus();
-			isFocussed = true;
-		}
-		return isFormValid;
-	}
-	return isFormValid;
-}
-
-$(document).on('click', '#wc-summary-submit', function() {
-	if (validateSummaryForm()) {
-		var payload = {
-			"industry" : $('#wc-industry').val(),
-			"location" : $('#wc-location').val(),
-			"aboutme" : $('#wc-summary').val()
-		};
-		callAjaxPostWithPayloadData("./updatesummarydata.do", function(data) {
-			$('#message-header').html(data);
-			$('#overlay-toast').html($('#display-msg-div').text().trim());
-			showToast();
-		}, payload, false);
-	}
-});
 $('#com-state').on('change',function(e){
 	var stateId = $(this).find(":selected").attr('data-stateid');
 	callAjaxGET("./getzipcodesbystateid.do?stateId="+stateId, function(data){
@@ -403,5 +261,4 @@ $('#com-city').bind('focus', function(){
 		$(this).trigger('keydown');
 		//$(this).autocomplete("search");		
 	}
-});
-</script>
+});</script>

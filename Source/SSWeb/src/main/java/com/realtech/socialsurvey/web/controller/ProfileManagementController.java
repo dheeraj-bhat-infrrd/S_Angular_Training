@@ -5092,7 +5092,11 @@ public class ProfileManagementController
                     userSettings.setAgentSettings( agentSettings );
                     profileSettings.setProfileName( profileName );
                     profileSettings.setProfileUrl( profileUrl );
-                    userManagementService.updateProfileUrlInAgentSettings( profileName, profileUrl, agentSettings );
+                    try {
+                        userManagementService.updateProfileUrlInAgentSettings( profileName, profileUrl, agentSettings );
+                    } catch ( InvalidInputException e1 ) {
+                        LOG.error( "Error occured. Reason : " + e );
+                    }
                     profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );
                 }
                 break;
@@ -5161,7 +5165,11 @@ public class ProfileManagementController
                     companySettings.setProfileName( profileName );
                     companySettings.setProfileUrl( profileUrl );
                     userSettings.setCompanySettings( companySettings );
-                    userManagementService.updateProfileUrlInCompanySettings( profileName, profileUrl, companySettings );
+                    try{
+                        userManagementService.updateProfileUrlInCompanySettings( profileName, profileUrl, companySettings );
+                    } catch ( InvalidInputException e1 ) {
+                        LOG.error( "Error occured. Reason : " + e );
+                    }
                     profileSettings.setProfileName( profileName );
                     profileSettings.setProfileUrl( profileUrl );
                     profileSettings.setCompleteProfileUrl( profileBaseUrl + profileUrl );

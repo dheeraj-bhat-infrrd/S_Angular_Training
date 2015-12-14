@@ -96,7 +96,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
         }
     	
-    	Timestamp endDate = new Timestamp(System.currentTimeMillis());
     	Calendar startTime =  Calendar.getInstance();
     	startTime.add(Calendar.DATE, -1*numberOfDays);
         // strip the time component of start time
@@ -104,7 +103,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         startTime.set(Calendar.MINUTE, 0);
         startTime.set(Calendar.SECOND, 0);
         startTime.set(Calendar.MILLISECOND, 0);
-        Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
+        
+        Timestamp startDate = null;
+        Timestamp endDate = null;
+        if(numberOfDays >= 0){
+            startDate = new Timestamp(startTime.getTimeInMillis());
+            endDate = new Timestamp(System.currentTimeMillis());
+        }
+        
     	long completedSurveyCount = getCompletedSurveyCount(columnName, columnValue, startDate, endDate, true);
     	// TODO: remove hard coding
         long companyId = -1;
@@ -145,7 +151,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
         }
         
-    	Timestamp endDate = new Timestamp(System.currentTimeMillis());
+    	
     	Calendar startTime =  Calendar.getInstance();
     	startTime.add(Calendar.DATE, -1*numberOfDays);
         // strip the time component of start time
@@ -153,7 +159,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         startTime.set(Calendar.MINUTE, 0);
         startTime.set(Calendar.SECOND, 0);
         startTime.set(Calendar.MILLISECOND, 0);
-        Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
+        
+        Timestamp startDate = null;
+        Timestamp endDate = null;
+        if(numberOfDays >= 0){
+            startDate = new Timestamp(startTime.getTimeInMillis());
+            endDate = new Timestamp(System.currentTimeMillis());
+        }
     	return getCompletedSurveyCount(columnName, columnValue, startDate, endDate, true);
     }
     
