@@ -418,16 +418,16 @@ public interface UserManagementService
         ProfileNotFoundException;
 
 
-    void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings );
+    void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings ) throws InvalidInputException;
 
 
-    void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings );
+    void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings ) throws InvalidInputException;
 
 
-    void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings );
+    void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings ) throws InvalidInputException;
 
 
-    void updateProfileUrlInCompanySettings( String profileName, String profileUrl, OrganizationUnitSettings companySettings );
+    void updateProfileUrlInCompanySettings( String profileName, String profileUrl, OrganizationUnitSettings companySettings ) throws InvalidInputException;
 
 
     public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId ) throws InvalidInputException,
