@@ -1465,6 +1465,7 @@
 	.bd-frm-left {
 	  line-height: 30px;
 	  margin-left: 5px;
+	  margin-right: 5px;
 	}
 	.welcome-popup-wrapper{
 		width: 100%;

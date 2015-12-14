@@ -576,4 +576,11 @@
 	.wc-step2-body-row-hdr {
 	    font-size: 14px;
 	}
+	.bd-cust-rad-item-adj{
+	margin-left: 0px; 
+	float: none;
+	}
+	.manage-team-radio{
+	width:50%;
+}
 }
