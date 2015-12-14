@@ -53,74 +53,51 @@ function submitFindProForm() {
 
 // Contact us form validation functions
 function validateMessage(elementId) {
+	var message = 'Please enter your message!';
 	if ($('#'+elementId).val() != "") {
 		return true;
 	} else {
-		showErrorMobileAndWeb('Please enter your message!');
+		$('#overlay-toast').text(message);
+		showToast();
 		return false;
 	}
 }
 
 function validateName(elementId){
+	var message = 'Please enter your valid name!';
 	if ($('#'+elementId).val() != "") {
 		if (nameRegex.test($('#'+elementId).val()) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter your valid name!');
+			$('#overlay-toast').text(message);
+			showToast();
 			return false;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter your valid name!');
+		$('#overlay-toast').text(message);
+		showToast();
 		return false;
 	}
 }
 
 function validateContactUsForm() {
-	isContactUsFormValid = true;
-
-	var isFocussed = false;
-	if(getWindowWidth() < 768){
-		isSmallScreen = true;
-	}
 	
 	// Validate form input elements
 	if (!validateName('lp-input-name')) {
-		isContactUsFormValid = false;
-		if (!isFocussed) {
-			$('#lp-input-name').focus();
-			isFocussed=true;
-		}
-		return isContactUsFormValid;
+		$('#lp-input-name').focus();
+		return false;
 	}
 	
-	if (!validateEmailId('lp-input-email')) {
-		isContactUsFormValid = false;
-		if (!isFocussed) {
-			$('#lp-input-email').focus();
-			isFocussed=true;
-		}
-		return isContactUsFormValid;
+	if (!validateEmailId('lp-input-email', true)) {
+		$('#lp-input-email').focus();
+		return false;
 	}
 	
 	if (!validateMessage('lp-input-message')) {
-		isContactUsFormValid = false;
-		if (!isFocussed) {
-			$('#lp-input-message').focus();
-			isFocussed=true;
-		}
-		return isContactUsFormValid;
+		$('#lp-input-message').focus();
+		return false;
 	}
-	
-	if (!validateMessage('captcha-text')) {
-		isContactUsFormValid = false;
-		if (!isFocussed) {
-			$('#captcha-text').focus();
-			isFocussed=true;
-		}
-		return isContactUsFormValid;
-	}
-	
-	return isContactUsFormValid;
+	return false;
 } 
 
 $(document).on('click touchstart', '.icn-person', function() {
@@ -546,7 +523,7 @@ function paintIndividualForBranch(data) {
 					individualsHtml += '<div class="bd-hr-item-l3 comp-individual" data-agentid=' + individual.iden + '>';
 					individualsHtml += '	<div class="bd-hr-item bd-lt-l3 clearfix">';
 					if (individual.profileImageUrl != undefined && individual.profileImageUrl.trim() != "") {
-						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrlThumbnail+'"/></div>';
+						individualsHtml += '	<div class="float-left bd-hr-img  comp-individual-prof-image"><img class="hr-ind-img" src="'+individual.profileImageUrlThumbnail+'"/></div>';
 					} else {
 						individualsHtml += '	<div class="float-left bd-hr-img pers-default-img comp-individual-prof-image"></div>';
 					}
@@ -966,7 +943,7 @@ function fetchReviewsScroll(isNextBatch) {
 		// fetch zillow reviews
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		if(doFetchZillowReviews && profileJson.socialMediaTokens.zillowToken != undefined)
-			fetchZillowReviewsBasedOnProfile(profileLevel,currentProfileIden);
+			fetchZillowReviewsBasedOnProfile(profileLevel,currentProfileIden, isNextBatch);
 		doFetchZillowReviews = false;
 	}
 }
@@ -1016,7 +993,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 						fetchReviewsScroll(true);
 					}
 				} else {
-					fetchReviewsScroll(false);		
+				    fetchReviewsScroll(false);
 				}
 			} else {
 				if ($("#profile-fetch-info").attr("fetch-all-reviews") == "false"
@@ -1029,7 +1006,7 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 	
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch){
 	if (currentProfileIden == undefined || currentProfileIden == "") {
 		return;
 	}
@@ -1053,6 +1030,8 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden){
 	            if (result != undefined && result.length > 0) {
 	                reviewsNextBatch = reviewsNextBatch.concat(result);
 	            }
+	            if (!isNextBatch)
+	                fetchReviewsScroll(false);
 	        }
 	    }
 	}, true);
@@ -1626,6 +1605,7 @@ function twitterFn(loop) {
         }
     }
 }
+
 
 (function() {
 	var po = document.createElement('script');

@@ -13,14 +13,17 @@ import org.mockito.MockitoAnnotations;
 import twitter4j.TwitterException;
 
 import com.realtech.socialsurvey.TestConstants;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 import facebook4j.FacebookException;
+
 
 public class SocialManagementServiceImplTest
 {
@@ -33,11 +36,13 @@ public class SocialManagementServiceImplTest
 
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
+    public static void setUpBeforeClass() throws Exception
+    {}
 
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
+    public static void tearDownAfterClass() throws Exception
+    {}
 
 
     @Before
@@ -48,7 +53,8 @@ public class SocialManagementServiceImplTest
 
 
     @After
-    public void tearDown() throws Exception {}
+    public void tearDown() throws Exception
+    {}
 
 
     @Test ( expected = InvalidInputException.class)
@@ -108,15 +114,87 @@ public class SocialManagementServiceImplTest
         socialManagementServiceImpl.checkOrAddZillowLastUpdated( new SocialMediaTokens() );
     }
 
+
     @Test ( expected = NonFatalException.class)
-        public void testPostToSocialMediaWithIsAbusiveTrue() throws NonFatalException
-        {
-    
-            Mockito.when( emailFormatHelper.getCustomerDisplayNameForEmail( Mockito.anyString(), Mockito.anyString() ) )
-                .thenReturn( "" );
-           socialManagementServiceImpl.postToSocialMedia( TestConstants.TEST_STRING, null ,
-               TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_LONG, TestConstants.TEST_DOUBLE,
-                TestConstants.TEST_MAIL_ID_STRING, TestConstants.TEST_STRING, true, TestConstants.TEST_STRING , true );
-        }
-     
+    public void testPostToSocialMediaWithIsAbusiveTrue() throws NonFatalException
+    {
+
+        Mockito.when( emailFormatHelper.getCustomerDisplayNameForEmail( Mockito.anyString(), Mockito.anyString() ) )
+            .thenReturn( "" );
+        socialManagementServiceImpl.postToSocialMedia( TestConstants.TEST_STRING, null, TestConstants.TEST_STRING,
+            TestConstants.TEST_STRING, TestConstants.TEST_LONG, TestConstants.TEST_DOUBLE, TestConstants.TEST_MAIL_ID_STRING,
+            TestConstants.TEST_STRING, true, TestConstants.TEST_STRING, true );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistoryEntityTypeNull() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( null, 1l, new SocialMediaTokens(),
+            CommonConstants.FACEBOOK_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistoryEntityTypeEmpty() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( "", 1l, new SocialMediaTokens(),
+            CommonConstants.FACEBOOK_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistoryEntityIDInvalid() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( CommonConstants.COMPANY_ID, 0l, new SocialMediaTokens(),
+            CommonConstants.FACEBOOK_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistoryMediaTokensNull() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( CommonConstants.COMPANY_ID, 1l, null,
+            CommonConstants.FACEBOOK_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistoryActionNull() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( CommonConstants.COMPANY_ID, 1l, new SocialMediaTokens(),
+            CommonConstants.FACEBOOK_SOCIAL_SITE, null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistoryActionEmpty() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( CommonConstants.COMPANY_ID, 1l, new SocialMediaTokens(),
+            CommonConstants.FACEBOOK_SOCIAL_SITE, "" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistorySocialMediaNull() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( CommonConstants.COMPANY_ID, 1l, new SocialMediaTokens(),
+            null, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistorySocialMediaEmpty() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( CommonConstants.COMPANY_ID, 1l, new SocialMediaTokens(),
+            "", CommonConstants.SOCIAL_MEDIA_CONNECTED );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSocialConnectionsHistorySocialMediaInvalid() throws InvalidInputException, ProfileNotFoundException
+    {
+        socialManagementServiceImpl.updateSocialConnectionsHistory( CommonConstants.COMPANY_ID, 1l, new SocialMediaTokens(),
+            "test", CommonConstants.SOCIAL_MEDIA_CONNECTED );
+    }
 }
