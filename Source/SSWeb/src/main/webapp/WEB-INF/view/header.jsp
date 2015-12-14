@@ -111,70 +111,45 @@
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
-				<div class="header-links-item">
-					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
-				</div>
+				<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></div>
 				<c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></div>
 				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showbuildsurveypage.do');"><spring:message code="label.header.buildsurvey.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editsettings.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showcompanysettings.do');"><spring:message code="label.editsettings.key" /></div>
 				</c:if>
 				<c:if test="${highestrole == 1}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showcomplaintressettings.do')"><spring:message code="label.complaintregsettings.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showcomplaintressettings.do')"><spring:message code="label.complaintregsettings.key" /></div>
 				</c:if>
 				<!-- show apps for company admin other then free account -->
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showemailsettings.do')"><spring:message code="label.emailsettings.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showemailsettings.do')"><spring:message code="label.emailsettings.key" /></div>
 				</c:if>
 				<!-- show apps for company admin other then individual/free account -->
 				<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
 				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId < 4 }">	
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></div>
 				</c:if>
 				<c:if test="${ highestrole == 1 }">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></div>
 				</c:if>
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></a>
-				</div>
-				<div class="header-links-item" >
-					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
-				</div>
-				<div class="header-links-item" >
-					<a href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
-				</div>
+				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
+				<div class="header-links-item" onclick="showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></div>
+				<div class="header-links-item" onclick="showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></div>
+				<a href="j_spring_security_logout"><span class="header-links-item" ><spring:message code="label.logout.key" />
+					</span>
+				</a>
 			</div>
 		</div>
 	</div>
