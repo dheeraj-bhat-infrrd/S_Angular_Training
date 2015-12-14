@@ -1039,7 +1039,6 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	        var responseJson = $.parseJSON(data);
 	        if (responseJson != undefined) {
 	            var result = $.parseJSON(responseJson.entity);
-	            console.log("REsult parse" + JSON.stringify(result));
 	            zillowCallBreak = result.zillowCallBreak;
 	            if (!zillowCallBreak) {
 	                stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
