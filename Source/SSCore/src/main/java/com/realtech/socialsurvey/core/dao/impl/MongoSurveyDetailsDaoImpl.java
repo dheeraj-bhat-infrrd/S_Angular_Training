@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -633,14 +634,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
-        
+
         Date endDate = null;
         Date startDate = null;
-        if(numberOfDays >= 0){
+        if ( numberOfDays >= 0 ) {
             endDate = Calendar.getInstance().getTime();
             startDate = getNdaysBackDate( numberOfDays );
         }
-        
+
         Query query = new Query();
         if ( columnName == null ) {
         } else {
@@ -678,14 +679,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
             }
 
-            if(startDate != null && endDate == null){
+            if ( startDate != null && endDate == null ) {
                 query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
-            }else if(startDate == null && endDate != null){
+            } else if ( startDate == null && endDate != null ) {
                 query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
-            }else if(startDate != null && endDate != null){
+            } else if ( startDate != null && endDate != null ) {
                 query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
             }
-            
+
 
             List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
@@ -1515,6 +1516,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
 
+        //create rating format to format survey score
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
+
         if ( result != null ) {
             @SuppressWarnings ( "unchecked") List<BasicDBObject> averageSCore = (List<BasicDBObject>) result.getRawResults()
                 .get( "result" );
@@ -1528,8 +1534,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 }
 
                 double score = Double.parseDouble( o.get( "score" ).toString() );
-                score = new BigDecimal( score ).setScale( CommonConstants.DECIMALS_TO_ROUND_OFF, RoundingMode.HALF_UP )
-                    .doubleValue();
+                try {
+                    score = Double.parseDouble( ratingFormat.format( score ) );
+                } catch ( NumberFormatException e ) {
+                    LOG.error( "Error while parsing survey score " );
+                }
                 agentRankingReport.setAverageScore( score );
 
                 agentReportData.put( agentId, agentRankingReport );
