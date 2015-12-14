@@ -15,4 +15,7 @@ public interface RegionDao extends GenericDao<Region, Long> {
 
 
     public List<Region> getRegionForRegionIds( Set<Long> regionIds ) throws InvalidInputException;
+
+
+    List<Long> getRegionIdsForCompanyId( long companyId ) throws InvalidInputException;
 }
