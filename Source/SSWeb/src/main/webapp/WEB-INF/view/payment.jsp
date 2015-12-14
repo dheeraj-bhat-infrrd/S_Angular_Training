@@ -14,43 +14,9 @@
 	<div class="ov-payment-container">
 		<div class="clearfix ov-payment-shadow margin-top-25 margin-bottom-25 padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto">
     		<div>
-    			
-    		<style>
-    			.update-card-details-txt{
-    				display: block;
-					width: 100% !important;
-					min-width: 100px !important;
-					margin-bottom: 10px;
-					height: 40px;
-					padding: 0 10px;
-    			}
-    			.card-det-adj{
-    				margin-bottom: 30px;
-    			}
-    			.card-err-txt{
-    				line-height: 24px;
-					padding-left: 10px;
-					font-size: 12px;
-					color: #DE3838;
-					margin-bottom: 10px;
-    			}
-    		</style>
 </c:when>
 <c:when test="${ paidUpgrade == 1 }"></c:when>
 <c:otherwise>
-	<%-- <!DOCTYPE">
-	<html>
-	<head>
-	    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	    <meta name="viewport" content="width=device-width, initial-scale=1">
-	    <title><spring:message code="label.makepayment.title.key" /></title>
-	    <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
-	    <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
-	    <script src="${initParam.resourcesPath}/resources/js/jquery.mask.js"></script>
-	    <script type="text/javascript" src="${initParam.resourcesPath}/resources/js/common.js"></script>
-	</head>
-	    
-	<body> --%>
 </c:otherwise>
 </c:choose>
     <div class="payment-details-wrapper">
@@ -246,8 +212,6 @@
    <c:when test="${ paymentChange == 1 }"></c:when>
    <c:when test="${ paidUpgrade == 1 }"></c:when>
    <c:otherwise>
-	    <%-- <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
-	    <script src="${initParam.resourcesPath}/resources/js/script.js"></script> --%>
    </c:otherwise>
    </c:choose>
 
