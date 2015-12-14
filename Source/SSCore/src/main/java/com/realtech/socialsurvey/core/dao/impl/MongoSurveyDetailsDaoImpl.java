@@ -633,8 +633,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
-        Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( numberOfDays );
+        
+        Date endDate = null;
+        Date startDate = null;
+        if(numberOfDays >= 0){
+            endDate = Calendar.getInstance().getTime();
+            startDate = getNdaysBackDate( numberOfDays );
+        }
+        
         Query query = new Query();
         if ( columnName == null ) {
         } else {
@@ -672,7 +678,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
             }
 
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+            if(startDate != null && endDate == null){
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+            }else if(startDate == null && endDate != null){
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+            }else if(startDate != null && endDate != null){
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+            }
+            
 
             List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
