@@ -1988,6 +1988,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "assignUserToCompany : admin parameter is null" );
             throw new InvalidInputException( "assignUserToCompany : admin parameter is null" );
         }
+        if ( userId <= 0l ) {
+            LOG.error( "assignUserToCompany : userId parameter is null" );
+            throw new InvalidInputException( "assignUserToCompany : userId parameter is null" );
+        }
         LOG.info( "Method to assign user to a branch called for user : " + admin.getUserId() );
         User user = getUserByUserId( userId );
 
@@ -2099,6 +2103,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "assignUserToRegion : admin parameter is null" );
             throw new InvalidInputException( "assignUserToRegion : admin parameter is null" );
         }
+        
+        if ( userId <= 0l ) {
+            LOG.error( "assignUserToRegion : userId parameter is null" );
+            throw new InvalidInputException( "assignUserToRegion : userId parameter is null" );
+        }
+        if ( regionId <= 0l ) {
+            LOG.error( "assignUserToRegion : regionId parameter is null" );
+            throw new InvalidInputException( "assignUserToRegion : regionId parameter is null" );
+        }
         LOG.info( "Method to assign user to a branch called for user : " + admin.getUserId() );
         User user = getUserByUserId( userId );
 
@@ -2163,6 +2176,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void insertAgentSettings( User user ) throws InvalidInputException
     {
+        if(user ==null){
+            throw new InvalidInputException("passed parameter user is null");
+        }
         LOG.info( "Inserting agent settings. User id: " + user.getUserId() );
         AgentSettings agentSettings = new AgentSettings();
         agentSettings.setIden( user.getUserId() );
@@ -2233,6 +2249,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "emailId is null or empty while generating agent profile name" );
         }
+        if ( userId <= 0l  ) {
+            throw new InvalidInputException( "Wrong parameter passed : passed userId is invalid" );
+        }
         String profileName = null;
         String input = null;
         if ( name != null && !name.isEmpty() ) {
@@ -2266,11 +2285,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param profileName
      * @param profileUrl
      * @param agentSettings
+     * @throws InvalidInputException 
      */
     @Override
-    public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings )
+    public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        if(agentSettings == null){
+            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        }
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
             profileName, agentSettings );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
@@ -2287,10 +2310,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param branchSettings
      */
     @Override
-    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings )
+    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in BRANCH SETTINGS started" );
-
+        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        if(branchSettings == null){
+            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, branchSettings,
             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
@@ -2311,10 +2337,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param regionSettings
      */
     @Override
-    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings )
+    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in REGION SETTINGS started" );
-
+        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        if(regionSettings == null){
+            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, regionSettings,
             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
@@ -2336,10 +2365,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Override
     public void updateProfileUrlInCompanySettings( String profileName, String profileUrl,
-        OrganizationUnitSettings companySettings )
+        OrganizationUnitSettings companySettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in COMPANY SETTINGS started" );
-
+        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        if(companySettings == null){
+            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, companySettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );

@@ -3210,8 +3210,8 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
 }
 
 .ov-payment-container {
-	height: 100%;
-	overflow: auto;
+	/* height: 100%;
+	overflow: auto; */
 }
 
 .ov-payment-shadow {
@@ -4922,7 +4922,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 }
 
 .bd-hr-tabs-header-item {
-	width: 25%;
+	width: 30%;
 }
 
 .bd-hdr-active {
@@ -4969,7 +4969,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	margin: 30px auto;
 }
 
-.bd-frm-left {
+/* .bd-frm-left { 
 	line-height: 40px;
 	margin-right: 20px;
 	width: 200px;
@@ -4977,16 +4977,43 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	text-align: right;
 	font-family: opensanslight;
 	font-weight: bold !important;
+} */
+
+.bd-frm-left { 
+	line-height: 40px;
+	margin-right: 20px;
+	width: 25%;
+	min-width: 96px;
+	min-height: 10px;
+	text-align: right;
+	font-family: opensanslight;
+	font-weight: bold !important;
 }
 
-.bd-frm-rt-txt {
+.bd-frm-right{
+width: 50%;
+    min-width: 150px;
+}
+
+/* .bd-frm-rt-txt {
 	width: 275px;
 	padding: 0 10px;
 	height: 40px;
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+
+} */
+.bd-frm-rt-txt {
+	width: 80%;
+	padding: 0 10px;
+	height: 40px;
+	border-radius: 4px;
+	box-shadow: none;
+	border: 1px solid #dcdcdc;
+	min-width: 180px;
 	background: #fff;
+
 }
 
 .bd-hr-form-item {
@@ -4997,12 +5024,20 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	position: relative;
 }
 
-.bd-frm-rt-dd-list {
+/* .bd-frm-rt-dd-list {
 	position: absolute;
 	top: 39px;
 	border: 1px solid #dcdcdc;
 	width: 275px;
 	z-index: 999;
+} */
+.bd-frm-rt-dd-list {
+	position: absolute;
+	top: 39px;
+	border: 1px solid #dcdcdc;
+	width: 80%;
+	z-index: 999;
+	min-width:180px;
 }
 
 .bd-frm-rt-dd-item {
@@ -7897,3 +7932,29 @@ label.url-change-input-label {
 .abuse-report-col {
     word-break: break-word;
 }
+.manage-team-radio{
+	width:70%;
+}
+
+/*Payment page styles*/
+.update-card-details-txt {
+	display: block;
+	width: 100% !important;
+	min-width: 100px !important;
+	margin-bottom: 10px;
+	height: 40px;
+	padding: 0 10px;
+}
+
+.card-det-adj {
+	margin-bottom: 30px;
+}
+
+.card-err-txt {
+	line-height: 24px;
+	padding-left: 10px;
+	font-size: 12px;
+	color: #DE3838;
+	margin-bottom: 10px;
+}
+
