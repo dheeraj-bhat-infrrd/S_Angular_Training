@@ -3,9 +3,14 @@ package com.realtech.socialsurvey.web.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
@@ -1771,6 +1776,9 @@ public class ProfileController
     }
 
 
+    /**
+     * Method to fetch zillow reviews for a  profile type
+     * */
     @ResponseBody
     @RequestMapping ( value = "/{profileType}/{iden}/zillowreviews")
     public Response getZillowReviews( @PathVariable String profileType, @PathVariable long iden )
@@ -1785,14 +1793,17 @@ public class ProfileController
                 if ( companyProfile.getSocialMediaTokens() != null
                     && companyProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for company id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( companyProfile,
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for company id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "Could not fetch unit settings for company: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for company: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for company: " + iden, e );
+            } catch ( UnavailableException e ) {
+                LOG.error( "Could not fetch zillow reviews for company: " + iden, e );
+                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
             try {
@@ -1801,14 +1812,17 @@ public class ProfileController
                 if ( regionProfile.getSocialMediaTokens() != null
                     && regionProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for region id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile,
+                        CommonConstants.REGION_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for region id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "Could not fetch unit settings for region: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for region: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for region: " + iden, e );
+            } catch ( UnavailableException e ) {
+                LOG.error( "Could not fetch zillow reviews for region: " + iden, e );
+                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
             try {
@@ -1817,17 +1831,19 @@ public class ProfileController
                 if ( branchProfile.getSocialMediaTokens() != null
                     && branchProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for branch id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile,
+                        CommonConstants.BRANCH_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for branch id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "Could not fetch unit settings for branch: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for branch: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
             } catch ( NoRecordsFetchedException e ) {
-                LOG.error( "Could not fetch unit settings for branch: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for branch: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
+            } catch ( UnavailableException e ) {
+                LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
+                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_INDIVIDUAL ) ) {
             try {
@@ -1836,17 +1852,19 @@ public class ProfileController
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for agent id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( individualProfile,
+                        CommonConstants.AGENT_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for agent id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "Could not fetch unit settings for agent: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for agent: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for agent: " + iden, e );
             } catch ( NoRecordsFetchedException e ) {
-                LOG.error( "Could not fetch unit settings for agent: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for agent: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for agent: " + iden, e );
+            } catch ( UnavailableException e ) {
+                LOG.error( "Could not fetch zillow reviews for agent: " + iden, e );
+                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         }
         LOG.info( "Fetched zillow reviews for profile type: " + profileType + " and id: " + iden );
@@ -1944,5 +1962,38 @@ public class ProfileController
         }
         LOG.debug( "Resolved http status to " + httpStatus.getStatusCode() );
         return httpStatus;
+    }
+
+
+    /**
+     * Method to fetch all ids under a profile level connected to zillow
+     * */
+    @ResponseBody
+    @RequestMapping ( value = "/{profileType}/{iden}/fetchhierarchyconnectedtozillow")
+    public Response getIdsOfHeirarchyConnectedWithZillow( @PathVariable String profileType, @PathVariable long iden )
+    {/**
+         * Method to fetch all ids under a profile level connected to zillow
+         * */
+        Response response = null;
+        LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " connected with zillow" );
+        Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
+        if ( profileType.equals( PROFILE_TYPE_COMPANY ) ) {
+            // get all region and branches, individuals under a region connected to zillow
+            hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
+        } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
+            // get all branches, individuals under a region connected to zillow
+            hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet<Long>( Arrays
+                .asList( new Long[] { iden } ) ) );
+        } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
+            // get all individuals under branch connected with zillow
+            hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
+        }
+        if ( !hierarchyIdsMap.isEmpty() ) {
+            String json = new Gson().toJson( hierarchyIdsMap );
+            response = Response.ok( json ).build();
+        }
+        LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " connected with zillow" );
+        return response;
+
     }
 }
