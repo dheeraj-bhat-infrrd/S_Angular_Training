@@ -195,7 +195,6 @@
 		</div>
 	</div>
  
-<script src='//www.google.com/recaptcha/api.js'></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
 	if (!window.jQuery) { document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>'); }
@@ -203,6 +202,7 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
 <script>
 $(document).ready(function(){
 	var captchaText=true;
