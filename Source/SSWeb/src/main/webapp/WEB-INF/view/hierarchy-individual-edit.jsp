@@ -65,7 +65,7 @@
 	</div>
 	<div class="bd-hr-form-item clearfix">
 	    <div class="float-left bd-frm-left"></div>
-	    <div class="float-left bd-frm-right" id="manage-team-radio">
+	    <div class="float-left bd-frm-right manage-team-radio">
 	        <div class="bd-frm-rad-wrapper clearfix">
 				<input type="hidden" class="hide" name="userSelectionType">
 	            <div class="float-left bd-cust-rad-item clearfix">
