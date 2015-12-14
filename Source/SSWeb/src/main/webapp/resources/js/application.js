@@ -1316,10 +1316,7 @@ $(document).on('click touchstart', '.bd-srv-tbl-row', function() {
             $(this).find('.srv-tbl-move-up').hide();
             $(this).find('.srv-tbl-move-dn').hide();
 		}
-	} else {
-		// $(this).find('.srv-tbl-rem').hide();
-		// $(this).find('.srv-tbl-edit').hide();
-	}
+	} 
 });
 
 $(document).on('mouseover', '.bd-srv-tbl-row', function() {
