@@ -881,4 +881,16 @@ public interface CommonConstants
     // Zillow Organization Unit Settings Mongo Column constants
     public static final String ZILLOW_REVIEW_COUNT_COLUMN = "zillowReviewCount";
     public static final String ZILLOW_REVIEW_AVERAGE_COLUMN = "zillowReviewAverage";
+
+    // Zillow total score constant
+    public static final String ZILLOW_TOTAL_SCORE = "zillowTotalScore";
+
+    // Profile url constants
+    public static final String PROFILE_TYPE_COMPANY = "company";
+    public static final String PROFILE_TYPE_REGION = "region";
+    public static final String PROFILE_TYPE_BRANCH = "branch";
+    public static final String PROFILE_TYPE_INDIVIDUAL = "individual";
+
+    // Zillow fetch failure response
+    public static final String ZILLOW_FETCH_FAIL_RESPONSE = "{\"zillowCallBreak\":true}";
 }

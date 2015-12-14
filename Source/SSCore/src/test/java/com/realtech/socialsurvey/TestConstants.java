@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey;
 
+import org.junit.Ignore;
+
+@Ignore
 public class TestConstants
 {
     public static final String TEST_STRING = "test";
