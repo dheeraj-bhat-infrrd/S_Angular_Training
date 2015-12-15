@@ -5400,59 +5400,93 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
 
     /**
-     * Method to set profileurl of user to <firstname>-<lastname>-<userID> on delete
+     * Method to change profileurl of entity on delete
      * JIRA SS-1365
-     * @param userId
-     * @throws InvalidInputException 
+     * 
+     * @param entityType
+     * @param entityId
+     * @throws InvalidInputException
      */
     @Override
     @Transactional
-    public void updateProfileUrlForDeletedUser( long userId ) throws InvalidInputException
+    public void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException
     {
-        LOG.info( "Updating profile url for deleted user with user ID : " + userId );
-        if ( userId <= 0l ) {
-            throw new InvalidInputException( "Invalid userId passed. UserId : " + userId );
+        LOG.info( "Updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
+        
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entityType : " + entityType );
         }
-        AgentSettings deletedAgent = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
-        if ( deletedAgent == null ) {
-            throw new InvalidInputException( "No agent setting with the userID : " + userId + " found." );
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "Invalid Id passed for entityType : " + entityType + ". Id : " + entityId );
+        }
+        String collectionName = null;
+        OrganizationUnitSettings unitSettings = null;
+        switch ( entityType ) {
+            case CommonConstants.AGENT_ID_COLUMN:
+                unitSettings = userManagementService.getUserSettings( entityId );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                break;
+                
+            case CommonConstants.BRANCH_ID_COLUMN:
+                try {
+                    unitSettings = getBranchSettingsDefault( entityId );
+                } catch ( NoRecordsFetchedException e ) {
+                    throw new InvalidInputException( "No branch setting exists for ID : " + entityId );
+                }
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                break;
+                
+            case CommonConstants.REGION_ID_COLUMN:
+                unitSettings = getRegionSettings( entityId );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                break;
+
+            default:
+                throw new InvalidInputException( "Invalid entity type : " + entityType );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "No unit setting with the entity type : " + entityType + " ID : " + entityId + " found." );
         }
 
-        //Get the user's contact details
-        ContactDetailsSettings contactDetails = deletedAgent.getContact_details();
+        //Get the contact details
+        ContactDetailsSettings contactDetails = unitSettings.getContact_details();
         if ( contactDetails == null ) {
-            throw new InvalidInputException( "Invalid profile name found for userID : " + userId );
+            throw new InvalidInputException( "Invalid profile name found for userID : " + entityId );
         }
 
-        //Get user's first name
-        String firstName = contactDetails.getFirstName();
-        if ( firstName == null || firstName.isEmpty() ) {
-            throw new InvalidInputException( "First name is empty for userID : " + userId );
+        //Get name
+        if ( contactDetails.getName() == null || contactDetails.getName().isEmpty() ) {
+            throw new InvalidInputException( "Name cannot be empty. (entityType : " + entityType + " ID : " + entityId );
         }
-        LOG.debug( "First name : " + firstName );
-        String newProfileUrl = "/" + firstName;
-
-        //Get user's last name
-        String lastName = contactDetails.getLastName();
-        if ( lastName != null && !lastName.isEmpty() ) {
-            LOG.debug( "Last name : " + lastName );
-            newProfileUrl += "-" + lastName;
-        }
-
-        newProfileUrl += "-" + userId;
-        LOG.debug( "New profile url : " + newProfileUrl );
+        String name = contactDetails.getName();
+        //Convert to lower case
+        name = name.toLowerCase();
+        //Replace space with -
+        name = name.replace( ' ', '-' );
+        
+        //Set profile name
+        String newProfileName = name + "-" + entityId;
+        
 
         //Get existing profileUrl
-        String existingProfileUrl = deletedAgent.getProfileUrl();
+        String existingProfileUrl = unitSettings.getProfileUrl();
+        if ( existingProfileUrl == null || existingProfileUrl.isEmpty() ) {
+            throw new InvalidInputException( "Existing profile url cannot be empty" );
+        }
+        String subUrl = existingProfileUrl.substring( 0, existingProfileUrl.lastIndexOf( '/' ) );
+        String newProfileUrl = subUrl + "/" + newProfileName;
         if ( newProfileUrl.equals( existingProfileUrl ) ) {
             LOG.debug( "There is no need to update profile url." );
 
         } else {
             //Update profileUrl in Mongo
-            organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
-                newProfileUrl, deletedAgent );
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, newProfileUrl, unitSettings, collectionName );
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, newProfileName, unitSettings, collectionName );
+            
         }
-        LOG.info( "Finished updating profile url for deleted user with user ID : " + userId );
+        LOG.info( "Finished updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
     }
 }
 // JIRA: SS-27: By RM05: EOC
