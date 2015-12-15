@@ -1812,7 +1812,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         long zillowReviewCount = 0;
         long zillowReviewTotalScore = 0;
         if ( includeZillow ) {
-            Map<String, Long> zillowReviewInfo = getZillowTotalScoreAndReviewCountForProfileLevel( idenColumnName, iden );
+            Map<String, Long> zillowReviewInfo = getZillowTotalScoreAndReviewCountForColumnName( idenColumnName, iden );
             if ( zillowReviewInfo != null && !zillowReviewInfo.isEmpty()
                 && zillowReviewInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ) > 0
                 && zillowReviewInfo.get( CommonConstants.ZILLOW_TOTAL_SCORE ) > 0 ) {
@@ -1890,7 +1890,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         long zillowReviewCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         if ( includeZillow ) {
-            Map<String, Long> zillowReviewInfo = getZillowTotalScoreAndReviewCountForProfileLevel( idenColumnName, iden );
+            Map<String, Long> zillowReviewInfo = getZillowTotalScoreAndReviewCountForColumnName( idenColumnName, iden );
             if ( zillowReviewInfo != null && !zillowReviewInfo.isEmpty()
                 && zillowReviewInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ) > 0 )
                 zillowReviewCount = zillowReviewInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
@@ -3928,7 +3928,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 //    }
 
 
-    private Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
+    Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
         IOException
     {
         Map<String, Object> map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
@@ -4070,7 +4070,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( profile == null )
             throw new InvalidInputException( "Profile setting passed cannot be null" );
         if ( collectionName == null || collectionName.isEmpty() ) {
-            throw new InvalidInputException( "Profile setting passed cannot be null" );
+            throw new InvalidInputException( "Collection name passed cannot be null or empty" );
         }
         LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
@@ -4358,7 +4358,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
+    boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
         long currentLockValue )
     {
         LOG.debug( "Inside method getLogoLockedByCompany " );
@@ -4372,6 +4372,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     void updateEmailIdInSolr( String emailId, long iden ) throws NonFatalException
     {
+        if ( iden <= 0 ) {
+            LOG.error( "Invalid iden passed in updateEmailIdInSolr");
+            throw new InvalidInputException( "Invalid iden passed in updateEmailIdInSolr" );
+        }
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id passed cannot be null or empty in updateEmailIdInSolr" );
+        }
         LOG.info( "Updating verified email id info into solr for user id : " + iden );
         Map<String, Object> editKeys = new HashMap<String, Object>();
         editKeys.put( CommonConstants.USER_LOGIN_NAME_SOLR, emailId );
@@ -4417,65 +4424,65 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     /**
      * Method to get ids under a unit based on profile level
-     * @param profileLevel
+     * @param columnName
      * @param iden
      * @return
      * @throws InvalidInputException
      * @throws ProfileNotFoundException
      */
-    Map<String, Set<Long>> getIdsUnderAProfileLevel( String profileLevel, long iden ) throws InvalidInputException,
+    Map<String, Set<Long>> getIdsForColumnName( String columnName, long iden ) throws InvalidInputException,
         ProfileNotFoundException
     {
-        if ( profileLevel == null || profileLevel.isEmpty() ) {
-            LOG.error( "profile level is null or empty while getting ids under a profile and id" );
+        if ( columnName == null || columnName.isEmpty() ) {
+            LOG.error( "column name is null or empty in getIdsForColumnName" );
             return null;
         }
         if ( iden <= 0l ) {
-            LOG.error( "Invalid id passed while getting ids under a profile and id" );
+            LOG.error( "Invalid id passed in getIdsForColumnName" );
             return null;
         }
-        LOG.debug( "Getting ids under a profile level:" + profileLevel );
+        LOG.debug( "Getting ids belonging to column name:" + columnName );
         Map<String, Set<Long>> hierarchyIdsMap = new HashMap<String, Set<Long>>();
-        switch ( profileLevel ) {
+        switch ( columnName ) {
             case CommonConstants.COMPANY_ID_COLUMN:
                 hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
                 break;
             case CommonConstants.REGION_ID_COLUMN:
-                hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet( Arrays
+                hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet<Long>( Arrays
                     .asList( new Long[] { iden } ) ) );
                 break;
             case CommonConstants.BRANCH_ID_COLUMN:
                 hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
                 break;
             default:
-                LOG.error( "Invalid profile level while getting ids under a profile level and id" );
+                LOG.error( "Invalid profile level in getIdsForColumnName" );
         }
-        LOG.debug( "Returning ids:" + hierarchyIdsMap + " for profile level:" + profileLevel );
+        LOG.debug( "Returning ids:" + hierarchyIdsMap + " for column name:" + columnName );
         return hierarchyIdsMap;
     }
 
 
     /**
      * Method to get ids under a unit based on profile level
-     * @param profileLevel
+     * @param columnName
      * @param iden
      */
-    Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden )
+    Map<String, Long> getZillowTotalScoreAndReviewCountForColumnName( String columnName, long iden )
     {
-        if ( profileLevel == null || profileLevel.isEmpty() ) {
-            LOG.error( "profile level is null or empty while getting total review count and score for a profile level and id" );
+        if ( columnName == null || columnName.isEmpty() ) {
+            LOG.error( "column name is null or empty while getting total review count and score for a column name and id" );
             return null;
         }
         if ( iden <= 0l ) {
-            LOG.error( "Invalid id passed while getting total review count and score for a profile level and id" );
+            LOG.error( "Invalid id passed while getting total review count and score for a column name and id" );
             return null;
         }
         Map<String, Long> totalAverageAndCountMap = new HashMap<String, Long>();
         long reviewCount = 0;
         long totalScore = 0;
         try {
-            Map<String, Set<Long>> hierarchyIdsMap = getIdsUnderAProfileLevel( profileLevel, iden );
-            switch ( profileLevel ) {
+            Map<String, Set<Long>> hierarchyIdsMap = getIdsForColumnName( columnName, iden );
+            switch ( columnName ) {
                 case CommonConstants.COMPANY_ID_COLUMN:
                     OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
                         iden, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -4611,14 +4618,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     }
                     break;
                 default:
-                    LOG.error( "Invalid profile level while getting ids under a profile level" );
+                    LOG.error( "Invalid column name while getting total review count and score for a column name and id " );
             }
         } catch ( ProfileNotFoundException pne ) {
-            LOG.error( "ProfileNotFoundException occurred while getting total review count and score to be fetched for profile level : "
-                + profileLevel + ",Reason : " + pne );
+            LOG.error( "ProfileNotFoundException occurred while getting total review count and score to be fetched for column name : "
+                + columnName + ",Reason : " + pne );
         } catch ( InvalidInputException iie ) {
-            LOG.error( "InvalidInputException occurred while getting total review count and score to be fetched for profile level : "
-                + profileLevel + ",Reason : " + iie );
+            LOG.error( "InvalidInputException occurred while getting total review count and score to be fetched for column name : "
+                + columnName + ",Reason : " + iie );
         }
 
         totalAverageAndCountMap.put( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN, reviewCount );
