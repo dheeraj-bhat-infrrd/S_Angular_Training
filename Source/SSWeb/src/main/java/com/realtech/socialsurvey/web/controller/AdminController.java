@@ -643,15 +643,15 @@ public class AdminController
             }
 
             surveyHandler.updateSurveyAsUnAbusive( surveyId );
-
-            if ( surveyDetails.isAbuseRepByUser() ) {
+            //post on social media if review is reported abusive by application
+            if ( ! surveyDetails.isAbuseRepByUser() ) {
                 if ( surveyDetails.getAgreedToShare().equalsIgnoreCase( CommonConstants.AGREE_SHARE_COLUMN_TRUE ) ) {
                     LOG.debug( "Survey is reported bu user so auto posting on social media" );
                     String serverBaseUrl = requestUtils.getRequestServerName( request );
                     socialManagementService.postToSocialMedia( surveyDetails.getAgentName(), user.getProfileUrl(),
                         surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName(), surveyDetails.getAgentId(),
                         surveyDetails.getScore(), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), false,
-                        serverBaseUrl );
+                        serverBaseUrl , false );
                 }
             }
 

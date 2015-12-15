@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -49,6 +50,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
     private EmailFormatHelper emailFormatHelper;
     private String applicationBaseUrl;
     private String applicationLogoUrl;
+    private BatchTrackerService batchTrackerService;
 
 
     @Override
@@ -59,19 +61,25 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         // initialize the dependencies
         initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
 
-        for ( Company company : organizationManagementService.getAllCompanies() ) {
-            Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
-            int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
-            int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
-            LOG.debug( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
-            SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
-            Date epochReminderDate = null;
-            List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail( company );
-            LOG.debug( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
-                + " surveys sent for company id " + company.getCompanyId() );
-            for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
-                LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
-                if ( survey.getReminderCounts() <= reminderCount ) {
+        try {
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
+                CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER );
+
+            for ( Company company : organizationManagementService.getAllCompanies() ) {
+                Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
+                int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
+                int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
+                LOG.debug( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
+                Date epochReminderDate = null;
+                List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler.getIncompleteSurveyCustomersEmail( company );
+                LOG.debug( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
+                    + " surveys sent for company id " + company.getCompanyId() );
+                for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
+                    LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
+
                     LOG.debug( "Survey pre initiation id: " + survey.getSurveyPreIntitiationId() + " within reminder counts" );
                     boolean reminder = false;
                     try {
@@ -100,15 +108,22 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                              * sendMailToAgent( survey ); }
                              */
                             if ( reminder ) {
-                                sendSurveyReminderEmail( emailServices, organizationManagementService, userManagementService,
-                                    survey, company.getCompanyId() );
+                                if ( survey.getReminderCounts() < reminderCount ) {
+                                    sendSurveyReminderEmail( emailServices, organizationManagementService,
+                                        userManagementService, survey, company.getCompanyId() );
+                                    surveyHandler.markSurveyAsSent( survey );
+                                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
+                                } else {
+                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
+                                        + " has exceeded the reminder count " );
+                                }
                             } else {
                                 sendSurveyInitiationEmail( emailServices, organizationManagementService, userManagementService,
                                     survey, company.getCompanyId() );
+                                surveyHandler.markSurveyAsSent( survey );
+                                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                             }
 
-                            surveyHandler.markSurveyAsSent( survey );
-                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                         } catch ( InvalidInputException e ) {
                             LOG.error(
                                 "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
@@ -117,12 +132,27 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                             LOG.error( "Error while sending incomplete survey mail ", e );
                         }
                     }
-                } else {
-                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId() + " has exceeded the reminder count " );
+
                 }
             }
+            LOG.info( "Completed IncompleteSurveyReminderSender" );
+            //Update last build time in batch tracker table
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER );
+        } catch ( Exception e ) {
+            LOG.error( "Error in IncompleteSurveyReminderSender", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER, e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError(
+                    CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER, System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in IncompleteSurveyReminderSender " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
         }
-        LOG.info( "Completed IncompleteSurveyReminderSender" );
     }
 
 
@@ -146,6 +176,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         emailFormatHelper = (EmailFormatHelper) jobMap.get( "emailFormatHelper" );
         applicationBaseUrl = (String) jobMap.get( "applicationBaseUrl" );
         applicationLogoUrl = (String) jobMap.get( "applicationLogoUrl" );
+        batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
     }
 
 
@@ -217,7 +248,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
 
             OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            //JIRA SS-1363 begin
+            /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                 logoUrl = companySettings.getLogoThumbnail();
             } else if ( organizationUnit == OrganizationUnit.REGION ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
@@ -235,7 +267,27 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                 }
             } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                 logoUrl = agentSettings.getLogoThumbnail();
+            }*/
+            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                logoUrl = companySettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+                logoUrl = regionSettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                OrganizationUnitSettings branchSettings = null;
+                try {
+                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                } catch ( NoRecordsFetchedException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if ( branchSettings != null ) {
+                    logoUrl = branchSettings.getLogo();
+                }
+            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                logoUrl = agentSettings.getLogo();
             }
+            //JIRA SS-1363 end
 
             MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
 
@@ -367,7 +419,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             && companySettings.getMail_content().getTake_survey_mail() != null ) {
 
             OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            //JIRA SS-1363 begin
+            /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                 logoUrl = companySettings.getLogoThumbnail();
             } else if ( organizationUnit == OrganizationUnit.REGION ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
@@ -385,7 +438,27 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                 }
             } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                 logoUrl = agentSettings.getLogoThumbnail();
+            }*/
+            if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                logoUrl = companySettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+                logoUrl = regionSettings.getLogo();
+            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                OrganizationUnitSettings branchSettings = null;
+                try {
+                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                } catch ( NoRecordsFetchedException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if ( branchSettings != null ) {
+                    logoUrl = branchSettings.getLogo();
+                }
+            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                logoUrl = agentSettings.getLogo();
             }
+            //JIRA SS-1363 end
 
             MailContent mailContent = companySettings.getMail_content().getTake_survey_mail();
 
@@ -435,7 +508,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                         survey.getCustomerLastName() ),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyLink,
-                    user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress, user.getUserId() );
+                    user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress,
+                    user.getUserId() );
 
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "

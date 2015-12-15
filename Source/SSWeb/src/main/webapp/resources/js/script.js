@@ -162,6 +162,13 @@ function showOverlay(){
 function hideOverlay(){
     $('.overlay-loader').hide();
 }
+function showDashOverlay(dashid){
+    $(dashid).show();
+}
+
+function hideDashOverlay(dashid){
+    $(dashid).hide();
+}
 
 //show Toast
 function showToast(){
@@ -249,18 +256,29 @@ $('.login-wrapper-txt').focus(function(){
 
 
 //Function to validate email id in a form
-function validateEmailId(elementId){
+function validateEmailId(elementId, isOnlyToast){
 	var emailId = $('#'+elementId).val();
+	var message = 'Please enter a valid Email Address';
 	if (emailId != "") {
 		emailId = emailId.trim();
 		if (emailRegex.test(emailId) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter a valid Email Address');
+			if(isOnlyToast) {
+				$('#overlay-toast').text(message);
+				showToast();
+			} else {
+				showError(message);
+			}
 			return false;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter a valid Email Address');
+		if(isOnlyToast) {
+			$('#overlay-toast').text(message);
+			showToast();
+		} else {
+			showError(message);
+		}
 		return false;
 	}
 }
@@ -299,14 +317,14 @@ function validateLastName(elementId){
  * @param elementId
  * @returns {Boolean}
  */
-function validatePassword(elementId) {
+function validatePassword(elementId) { 
 	var password = $('#'+elementId).val();
 	if(password.trim() == "") {
-		showErrorMobileAndWeb("Please enter password");
+		showError("Please enter password");
 		return false;
 	}
 	else if (password.length < minPwdLength) {
-		showErrorMobileAndWeb('Password must be at least 6 characters');
+		showError('Password must be at least 6 characters');
 		return false;
 	}
 	return true;
@@ -320,13 +338,13 @@ function validatePassword(elementId) {
 function validateConfirmPassword(pwdId, confirmPwdId){
 	if ($('#'+confirmPwdId).val() != "") {
 		if ($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
-			showErrorMobileAndWeb('Passwords do not match');
+			showError('Passwords do not match');
 			return false;
 		} else {
 			return true;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter confirm password');
+		showError('Please enter confirm password');
 		return false;
 	}
 }
@@ -595,18 +613,6 @@ $('body').click(function(){
     }
 });
 
-$(window).resize(function(){
-   if($(window).width() > 767){
-       $('#header-slider-wrapper').removeClass('rt-panel-slide');
-       enableBodyScroll();
-   }
-});
-
-function closeMoblieScreenMenu() {
-	$('#header-slider-wrapper').removeClass('rt-panel-slide');
-	enableBodyScroll();
-}
-
 function upgradeToPaidPlan(){
 	 var url = "./upgradetopaidplanpage.do";
 	    
@@ -721,9 +727,10 @@ function validateTextArea(elementId) {
 	}
 }
 
+
+
 function validateCountryZipcode(elementId, isOnlyShowToast) {
-	selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
-	selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	
 	if (selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/') {
 		selectedCountryRegEx = ".*";
 		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
@@ -780,7 +787,7 @@ function validateSignUpForm(){
 		$('sign-lname').focus();
 		return false;
 	}
-	if(!validateEmailId('sign-email')) {
+	if(!validateEmailId('sign-email', true)) {
 		$('sign-email').focus();
 		return false;
 	}
@@ -837,4 +844,318 @@ function validateComplaintRegistraionForm(){
 		/* Form validated. */
 		return true;
 	}
+}
+
+
+//Functions for login page
+function loginUserLoginPage() {
+	if(validateFormLoginPage('login-form')){
+		$('#frm-login').submit();
+		showOverlay();
+	}
+}
+
+function validateFormLoginPage(id) {
+	if (!validateUserNameLoginPage('login-user-id')) {
+		$('#login-user-id').focus();
+		return false;
+	}
+	if (!validatePasswordLoginPage('login-pwd')) {
+		$('#login-pwd').focus();
+		return false;
+	}
+	return true;
+}
+
+function validateUserNameLoginPage(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (emailRegex.test($('#' + elementId).val()) == true) {
+			return true;
+		} else {
+			showError('Please enter a valid user name.');
+			return false;
+		}
+	} else {
+		showError('Please enter user name.');
+		return false;
+	}
+}
+
+function validatePasswordLoginPage(elementId) {
+	if ($('#' + elementId).val() != "") {
+		return true;
+	} else {
+		showError('Please enter password.');
+		return false;
+	}
+}
+
+function initializeLoginPage() {
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
+			showError($('#message').val());
+		} else {
+			showInfo($('#message').val());
+		}
+	}
+
+	$('#login-submit').click(function(e){
+		loginUserLoginPage();
+	});
+   
+	$('input').keypress(function(e){
+		// detect enter
+		if (e.which==13){
+			e.preventDefault();
+			loginUserLoginPage();
+		}
+	});
+}
+
+//Functions for forgot password page
+function validateForgotPasswordForm(id) {
+	var isFocussed = false;
+	var isSmallScreen = false;
+	isForgotPasswordFormValid = true;
+	if ($(window).width() < 768) {
+		isSmallScreen = true;
+	}
+	if (!validateEmailId('login-user-id')) {
+		isForgotPasswordFormValid = false;
+		if (!isFocussed) {
+			$('#login-user-id').focus();
+			isFocussed = true;
+		}
+		if (isSmallScreen) {
+			return isForgotPasswordFormValid;
+		}
+	}
+	return isForgotPasswordFormValid;
+}
+
+function submitForgotPasswordForm() {
+	if (validateForgotPasswordForm('forgot-pwd-form')) {
+		$('#forgot-pwd-form').submit();
+	}
+}
+
+function initializeForgotPasswordPage() {
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'SUCCESS_MESSAGE') {
+			showInfo($('#message').val());
+		} else {
+			showError($('#message').val());
+		}
+	}
+	
+	$('input').keypress(function(e) {
+		e.stopPropagation();
+		// detect enter
+		if (e.which == 13) {
+			e.preventDefault();
+			submitForgotPasswordForm();
+		}
+	});
+
+	$('#forgot-pwd-submit').click(function(e) {
+		submitForgotPasswordForm();
+	});
+
+	$('#login-user-id').blur(function() {
+		if (validateEmailId(this.id)) {
+			hideError();
+		}
+	});
+}
+
+//Functions for reset password page
+function submitResetPasswordForm() {
+	if(validateResetPasswordForm('reset-pwd-form')){
+		$('#reset-pwd-form').submit();
+	}
+}
+
+function validateResetPasswordForm(id) {
+	if(!validateEmailId('login-user-id')){
+			$('#login-user-id').focus();
+			return false;
+	}
+	if(!validatePassword('login-pwd')){
+			$('#login-pwd').focus();
+			return false;
+	}
+	if(!validateConfirmPassword('login-pwd', 'login-cnf-pwd')){
+			$('#login-cnf-pwd').focus();
+			return false;
+	}
+	return true;
+}
+
+function initializeResetPasswordPage() {
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'SUCCESS_MESSAGE') {
+			showInfo($('#message').val());
+		} else {
+			showError($('#message').val());
+		}
+	}
+	
+	$('#reset-pwd-submit').click(function(e){
+		submitResetPasswordForm();
+	});
+	
+	$('input').keypress(function(e){
+		// detect enter
+		if (e.which==13){
+			e.preventDefault();
+			submitResetPasswordForm();
+		}
+	});
+	
+	$('#login-user-id').blur(function() {
+		validateEmailId(this.id);
+	});
+	
+	$('#login-pwd').blur(function() {
+		validatePassword(this.id);
+	});
+	
+	$('#login-cnf-pwd').blur(function() {
+		validateConfirmPassword('login-pwd', this.id);
+	});
+}
+
+
+//Function to validate country
+function validateCountry(elementId) {
+	var country = $.trim($('#'+elementId).val());
+	if (country == "") {
+		return false;
+	} else {
+		var countryCode = $.trim($('#country-code').val());
+		if (countryCode == "") {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
+function validateCompanyInformationForm() {
+	if(!validateCompany('com-company')){
+		$('#com-company').focus();
+		return false;
+	}
+	if(!validateAddress1('com-address1')){
+		$('#com-address1').focus();
+		return false;
+	}
+	if(!validateAddress2('com-address2')){
+		$('#com-address2').focus();
+		return false;
+	}
+	if(!validateCountry('com-country')){
+		$('#com-country').focus();
+		return false;
+	}
+	if(!validateCountryZipcode('com-zipcode')){
+		$('#com-zipcode').focus();
+		return false;
+	}
+	if(!validatePhoneNumber('com-contactno')){
+		$('#com-contactno').focus();
+		return false;
+	}
+	return true;
+}
+
+//Functions for home page
+function resizeHomePageFunc(){
+	var winW = window.innerWidth;
+	if (winW < 768) {
+		var offset = winW - 114 - 50;
+		$('.reg-cap-txt').css('width',offset+'px');
+		if ($('#pro-wrapper-top').html() == "") {
+			$('#pro-wrapper-top').html($('#pro-wrapper').html());
+			$('#pro-wrapper').html('');
+		}
+	} else {
+		if ($('#pro-wrapper').html() == "") {
+			$('#pro-wrapper').html($('#pro-wrapper-top').html());
+			$('#pro-wrapper-top').html('');
+		}
+	}
+}
+
+function loginUserHomePage() {
+	if (validateLoginForm('login-form')) {
+		$('#login-form').submit();
+		showOverlay();
+	}
+}
+
+function submitRegistrationFormHomePage() {
+	if (validatePreRegistrationForm('reg-form')) {
+		$('#registration-form').submit();
+		showOverlay();
+	}
+}
+
+function submitFindProFormHomePage() {
+	$('#find-pro-form').submit();
+	showOverlay();
+}
+
+//Initialize home page
+function initializeHomePage() {
+	resizeHomePageFunc();
+	$(window).resize(resizeHomePageFunc);
+	
+	// Functions to trigger form validation of various input elements
+	if ($('#message').val() != "") {
+		showRegErr($('#message').val());
+	}
+	
+	// Login form
+	$('#login-form').on('keyup', 'input', function(e) {
+		if (e.which == 13) {
+			$('#login-submit').trigger('click');
+		}
+	});
+
+	$('#login-form').on('click', '#login-submit', function() {
+		loginUserHomePage();
+	});
+
+	$('#registration-form').on('click', '#reg-submit', function(e) {
+		e.preventDefault();
+		submitRegistrationFormHomePage();
+	});
+
+	$('#registration-form').on('keyup', 'input', function(e) {
+		// detect enter
+		if (e.which == 13) {
+			$('#reg-submit').trigger('click');
+		}
+	});
+
+	$('#reg-err-pu-close').click(function() {
+		hideRegErr();
+	});
+
+	// Find a pro
+	$('#find-pro-form').on('click', '#find-pro-submit', function(e) {
+		e.preventDefault();
+		submitFindProFormHomePage();
+	});
+
+	$('#find-pro-form').on('keyup', 'input', function(e) {
+		if (e.which == 13) {
+			$('#find-pro-submit').trigger('click');
+		}
+	});
+
+	$('#header-search-icn').click(function(e) {
+		$('#pro-wrapper-top').slideToggle(200);
+	});
 }

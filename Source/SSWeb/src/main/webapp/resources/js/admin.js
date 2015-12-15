@@ -1,7 +1,7 @@
 // Contains js functions for realtech admin
 
 var abuseReportStartIndex = 0;
-var abuseReportBatch = 5;
+var abuseReportBatch = 10;
 var doStopAbuseReportPagination = false;
 var isAbuseReportRequestRunning = false;
 
@@ -318,7 +318,7 @@ function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 		else
 			$('#admin-abs-sur-list').append(data);
 		
-	}, payload, false);
+	}, payload, true);
 }
 
 $(document).on('click', '.unmark-abusive-icn', function() {

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,9 +17,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -112,7 +116,7 @@ public class DashboardController
 
     @Autowired
     private EmailFormatHelper emailFormatHelper;
-    
+
     @Autowired
     BatchTrackerService batchTrackerService;
 
@@ -131,6 +135,7 @@ public class DashboardController
     private final String EXCEL_FORMAT = "application/vnd.ms-excel";
     private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private final String EXCEL_FILE_EXTENSION = ".xlsx";
+
 
     /*
      * Method to initiate dashboard
@@ -159,27 +164,33 @@ public class DashboardController
             }
         }
 
+        String profileName = "";
         if ( !modelSet ) {
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = user.getCompany().getCompany();
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = solrSearchService.searchRegionById( entityId );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = solrSearchService.searchBranchNameById( entityId );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
                 model.addAttribute( "columnValue", entityId );
+                profileName = user.getFirstName() + " " + user.getLastName();
             }
         }
 
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "emailId", user.getEmailId() );
+        model.addAttribute( "profileName", profileName );
 
         return JspResolver.DASHBOARD;
     }
@@ -260,59 +271,66 @@ public class DashboardController
                 realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
             }
 
-	        // calculating details for circles
-	        int numberOfDays = 30;
-	        try {
-	            if ( request.getParameter( "numberOfDays" ) != null ) {
-	                numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
-	            }
-	        } catch ( NumberFormatException e ) {
-	            LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
-	            throw e;
-	        }
-	
-	        if ( realtechAdmin ){
-	            columnName = null;
-	        }
-	        LOG.debug("Getting the survey score.");
-	        double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
-	            realtechAdmin ) * 1000.0 ) / 1000.0;
-	        LOG.debug("Getting the sent surveys count.");
-	        int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
-	        LOG.debug("Getting the social posts count with hierarchy.");
-	        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
-	            numberOfDays );
-	        int profileCompleteness = 0;
-	        if ( !realtechAdmin ){
-	        	LOG.debug("Getting profile completeness.");
-	            profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
-	        }
-	        model.addAttribute( "socialScore", surveyScore );
-	        if ( sentSurveyCount > 999 ){
-	        	int quotient = sentSurveyCount / 1000;
-	            model.addAttribute( "surveyCount", quotient+"K+" );
-	        }
-	        else{
-	            model.addAttribute( "surveyCount", sentSurveyCount );
-	        }
-	        if ( socialPostsCount > 999 ){
-	        	int quotient = socialPostsCount / 1000;
-	            model.addAttribute( "socialPosts", quotient+"K+" );
-	        }
-	        else{
-	            model.addAttribute( "socialPosts", socialPostsCount );
-	        }
-	
-	        model.addAttribute( "profileCompleteness", profileCompleteness );
-	        LOG.debug("Getting the badges.");
-	        model.addAttribute( "badges",
-	            dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
-	
-	        model.addAttribute( "columnName", columnName );
-	        model.addAttribute( "columnValue", columnValue );
-	
-	        LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
-	        return JspResolver.DASHBOARD_PROFILEDETAIL;
+            // calculating details for circles
+            int numberOfDays = -1;
+            try {
+                if ( request.getParameter( "numberOfDays" ) != null && !request.getParameter( "numberOfDays" ).isEmpty() ) {
+                    numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
+                }
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
+                throw e;
+            }
+
+            if ( realtechAdmin ) {
+                columnName = null;
+            }
+            LOG.debug( "Getting the survey score." );
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            ratingFormat.setMinimumFractionDigits( 1 );
+            ratingFormat.setMaximumFractionDigits( 1 );
+            double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
+            try {
+                //get formatted survey score using rating format
+                surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
+            }
+            LOG.debug( "Getting the sent surveys count." );
+            int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
+            LOG.debug( "Getting the social posts count with hierarchy." );
+            int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
+                numberOfDays );
+            int profileCompleteness = 0;
+            if ( !realtechAdmin ) {
+                LOG.debug( "Getting profile completeness." );
+                profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue,
+                    unitSettings );
+            }
+            model.addAttribute( "socialScore", surveyScore );
+            if ( sentSurveyCount > 999 ) {
+                int quotient = sentSurveyCount / 1000;
+                model.addAttribute( "surveyCount", quotient + "K+" );
+            } else {
+                model.addAttribute( "surveyCount", sentSurveyCount );
+            }
+            if ( socialPostsCount > 999 ) {
+                int quotient = socialPostsCount / 1000;
+                model.addAttribute( "socialPosts", quotient + "K+" );
+            } else {
+                model.addAttribute( "socialPosts", socialPostsCount );
+            }
+
+            model.addAttribute( "profileCompleteness", profileCompleteness );
+            LOG.debug( "Getting the badges." );
+            model.addAttribute( "badges",
+                dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
+
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
+
+            LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
+            return JspResolver.DASHBOARD_PROFILEDETAIL;
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
@@ -360,14 +378,16 @@ public class DashboardController
             throw e;
         }
 
-        try{
-	        model.addAttribute( "allSurveySent", dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays ) );
-	        model.addAttribute( "completedSurvey", dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
-	        model.addAttribute( "clickedSurvey",
-	            dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-	        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
-        }catch(InvalidInputException e){
-        	LOG.error("Error: "+e.getMessage(), e);
+        try {
+            model.addAttribute( "allSurveySent", dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "completedSurvey",
+                dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "clickedSurvey",
+                dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "socialPosts",
+                dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Error: " + e.getMessage(), e );
         }
 
         LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() finished" );
@@ -476,7 +496,8 @@ public class DashboardController
             }
 
             try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false, null, null, "date" );
+                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
+                    null, null, "date" );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
@@ -569,9 +590,9 @@ public class DashboardController
 
             long id = 0;
             if ( columnName.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                return new Gson().toJson( user.getCompany().getCompany() );
+                return user.getCompany().getCompany();
             } else if ( columnName.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-                return new Gson().toJson( user.getFirstName() + " " + user.getLastName() );
+                return user.getFirstName() + " " + user.getLastName();
             } else {
                 String columnValue = request.getParameter( "columnValue" );
                 if ( columnValue != null && !columnValue.isEmpty() ) {
@@ -996,9 +1017,9 @@ public class DashboardController
             String custFirstName = survey.getCustomerFirstName();
             String custLastName = survey.getCustomerLastName();
             if ( survey != null ) {
-//                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-//                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
-                  surveyLink =  surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
+                //                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+                //                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+                surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
             }
 
             try {
@@ -1060,7 +1081,8 @@ public class DashboardController
                 }
 
                 OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                //JIRA SS-1363 begin
+                /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                     logoUrl = companySettings.getLogoThumbnail();
                 } else if ( organizationUnit == OrganizationUnit.REGION ) {
                     OrganizationUnitSettings regionSettings = null;
@@ -1083,7 +1105,32 @@ public class DashboardController
                     }
                 } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                     logoUrl = agentSettings.getLogoThumbnail();
+                }*/
+                if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                    logoUrl = companySettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                    OrganizationUnitSettings regionSettings = null;
+                    try {
+                        regionSettings = organizationManagementService.getRegionSettings( regionId );
+                    } catch ( InvalidInputException e ) {
+                        e.printStackTrace();
+                    }
+                    if ( regionSettings != null )
+                        logoUrl = regionSettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                    OrganizationUnitSettings branchSettings = null;
+                    try {
+                        branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                    } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                        e.printStackTrace();
+                    }
+                    if ( branchSettings != null ) {
+                        logoUrl = branchSettings.getLogo();
+                    }
+                } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                    logoUrl = agentSettings.getLogo();
                 }
+                //JIRA SS-1363 end
 
                 emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
                     agentTitle, companyName, survey, surveyLink, logoUrl );
@@ -1138,8 +1185,8 @@ public class DashboardController
 
                     String surveyLink = "";
                     if ( survey != null ) {
-//                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-//                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+                        //                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+                        //                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
                         surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
                     }
 
@@ -1191,14 +1238,14 @@ public class DashboardController
 
                     OrganizationUnitSettings companySettings = null;
                     try {
-                        companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                            .getCompanyId() );
+                        companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
                     } catch ( InvalidInputException e ) {
                         LOG.error( "InvalidInputException occured while trying to fetch company settings." );
                     }
 
                     OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                    //JIRA SS-1363 begin
+                    /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                         logoUrl = companySettings.getLogoThumbnail();
                     } else if ( organizationUnit == OrganizationUnit.REGION ) {
                         OrganizationUnitSettings regionSettings = null;
@@ -1221,7 +1268,32 @@ public class DashboardController
                         }
                     } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                         logoUrl = agentSettings.getLogoThumbnail();
+                    }*/
+                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                        logoUrl = companySettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                        OrganizationUnitSettings regionSettings = null;
+                        try {
+                            regionSettings = organizationManagementService.getRegionSettings( regionId );
+                        } catch ( InvalidInputException e ) {
+                            e.printStackTrace();
+                        }
+                        if ( regionSettings != null )
+                            logoUrl = regionSettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                        OrganizationUnitSettings branchSettings = null;
+                        try {
+                            branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                            e.printStackTrace();
+                        }
+                        if ( branchSettings != null ) {
+                            logoUrl = branchSettings.getLogo();
+                        }
+                    } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                        logoUrl = agentSettings.getLogo();
                     }
+                    //JIRA SS-1363 end
 
                     emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
                         agentTitle, companyName, survey, surveyLink, logoUrl );
@@ -1572,7 +1644,7 @@ public class DashboardController
         LOG.info( "Method getSocialMonitorFile() finished." );
     }
 
-  
+
     /*
      * Method to download file containing incomplete surveys
      */
