@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -46,6 +49,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssign
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -72,6 +76,8 @@ public class HierarchyManagementController {
 	private SessionHelper sessionHelper;
 	@Autowired
 	private UserManagementService userManagementService;
+	@Autowired
+	private SocialManagementService socialManagementService;
 
 	/**
 	 * Method to call services for showing up the build hierarchy page
@@ -271,6 +277,11 @@ public class HierarchyManagementController {
 
 				removeRegionFromSession(regionId, session);
 				LOG.debug("Successfully executed service to deactivate region");
+                
+                //update profile name and url
+                organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.REGION_ID_COLUMN, regionId );
+                //remove social media connections
+                socialManagementService.disconnectAllSocialConnections( CommonConstants.REGION_ID_COLUMN, regionId );
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception occurred while parsing the region id.Reason :" + e.getMessage(), e);
@@ -357,6 +368,11 @@ public class HierarchyManagementController {
 
 				removeBranchFromSession(branchId, session);
 				LOG.debug("Successfully executed service to deactivate branch");
+				
+				//update profile name and url
+				organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.BRANCH_ID_COLUMN, branchId );
+				//remove social media connections
+				socialManagementService.disconnectAllSocialConnections( CommonConstants.BRANCH_ID_COLUMN, branchId );
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception occurred while parsing branch id", e);

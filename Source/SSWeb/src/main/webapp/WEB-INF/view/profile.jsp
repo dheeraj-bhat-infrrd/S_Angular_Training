@@ -571,7 +571,6 @@
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
 </div>
-<script src='//www.google.com/recaptcha/api.js'></script>
 <script type="text/javascript" src="https://apis.google.com/js/client:plusone.js" async="async"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/date.js"></script>
@@ -582,6 +581,7 @@
 <script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
+<script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
     $(document).ready(function(){
     	if($('#social-token-container').children('.social-item-icon').length == 0) {
