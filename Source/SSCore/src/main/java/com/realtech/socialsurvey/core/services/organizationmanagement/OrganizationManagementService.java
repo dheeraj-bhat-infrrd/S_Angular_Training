@@ -8,7 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -1188,14 +1190,14 @@ public interface OrganizationManagementService
 
     public List<Branch> getBranchesForBranchIds( Set<Long> branchIds ) throws InvalidInputException;
 
-
     /**
-     * Method to set profileurl of user to <firstname>-<lastname>-<userID> on delete
+     * Method to change profileurl of entity on delete
      * JIRA SS-1365
-     *
-     * @param userId
+     * 
+     * @param entityType
+     * @param entityId
      * @throws InvalidInputException
      */
-    void updateProfileUrlForDeletedUser( long userId ) throws InvalidInputException;
+    void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException;
 
 }

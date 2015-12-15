@@ -45,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -56,7 +57,9 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -65,6 +68,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -118,6 +122,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private ZillowUpdateService zillowUpdateService;
+
+    @Autowired
+    private SettingsSetter settingsSetter;
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -1096,5 +1103,225 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         socialUpdateAction.setSocialMediaSource( socialMedia );
 
         socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+    }
+    
+
+    /**
+     * Method to disconnect user from all social connections
+     * 
+     * @param entityType
+     * @param entityId
+     * @throws InvalidInputException 
+     */
+    @Override
+    public void disconnectAllSocialConnections( String entityType, long entityId ) throws InvalidInputException
+    {
+        //Check for validity of entityType and entityId
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Entity type cannot be empty" );
+        }
+
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "Invalid entity ID entered. ID : " + entityId );
+        }
+
+        //Unset settings for each social media source
+        boolean unset = CommonConstants.UNSET_SETTINGS;
+        String collection = null;
+        OrganizationUnitSettings unitSettings = null;
+        SocialMediaTokens mediaTokens = null;
+        //Get social media tokens and unit settings
+        // Check for the collection to update
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            unitSettings = organizationManagementService.getCompanySettings( entityId );
+            collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "Unit settings null for type company and ID : " + entityId );
+            }
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            unitSettings = organizationManagementService.getRegionSettings( entityId );
+            collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "Unit settings null for type region and ID : " + entityId );
+            }
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            try {
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+            } catch ( NoRecordsFetchedException e ) {
+                throw new InvalidInputException( "Unit settings null for type branch and ID : " + entityId );
+            }
+            collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "Unit settings null for type branch and ID : " + entityId );
+            }
+        } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            unitSettings = userManagementService.getUserSettings( entityId );
+            collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "Unit settings null for type agent and ID : " + entityId );
+            }
+        } else {
+            throw new InvalidInputException( "Invalid entity type : " + entityType );
+        }
+
+        //Check if social media tokens exist
+        if ( unitSettings.getSocialMediaTokens() == null ) {
+            LOG.debug( "No social media tokens exist for entityType : " + entityType + " entityId : " + entityId );
+            return;
+        }
+
+        mediaTokens = unitSettings.getSocialMediaTokens();
+        try {
+            if ( mediaTokens.getFacebookToken() != null ) {
+                String socialMedia = CommonConstants.FACEBOOK_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.FACEBOOK;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+            if ( mediaTokens.getTwitterToken() != null ) {
+                String socialMedia = CommonConstants.TWITTER_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.TWITTER;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+            if ( mediaTokens.getGoogleToken() != null ) {
+                String socialMedia = CommonConstants.GOOGLE_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.GOOGLE_PLUS;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+            if ( mediaTokens.getLinkedInToken() != null ) {
+                String socialMedia = CommonConstants.LINKEDIN_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.LINKED_IN;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+            if ( mediaTokens.getZillowToken() != null ) {
+                String socialMedia = CommonConstants.ZILLOW_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.ZILLOW;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+            if ( mediaTokens.getYelpToken() != null ) {
+                String socialMedia = CommonConstants.YELP_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.YELP;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+            if ( mediaTokens.getRealtorToken() != null ) {
+                String socialMedia = CommonConstants.REALTOR_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.REALTOR;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+            if ( mediaTokens.getLendingTreeToken() != null ) {
+                String socialMedia = CommonConstants.LENDINGTREE_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.LENDING_TREE;
+                //disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, unitSettings, collection );
+                //Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                //update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
+        } catch ( ProfileNotFoundException e ) {
+            throw new InvalidInputException( "Profile not found for entityType : " + entityType + " and entityID : " + entityId );
+        }
+    }
+
+
+    /**
+     * Method to set settings status by entity type
+     * 
+     * @param entityType
+     * @param entityId
+     * @param settings
+     * @param setValue
+     * @throws InvalidInputException
+     */
+    void updateSettingsSetStatusByEntityType( String entityType, long entityId, SettingsForApplication settings,
+        boolean setValue ) throws InvalidInputException
+    {
+        //Null checks for entityType and entityId
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entity type : " + entityType );
+        }
+
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "Invalid entity ID : " + entityId );
+        }
+        try {
+            switch ( entityType ) {
+                case CommonConstants.COMPANY_ID_COLUMN:
+                    //update SETTINGS_SET_STATUS to unset in COMPANY table
+                    Company company = organizationManagementService.getCompanyById( entityId );
+                    if ( company != null ) {
+                        settingsSetter.setSettingsValueForCompany( company, settings, setValue );
+                        userManagementService.updateCompany( company );
+                    }
+                    break;
+
+                case CommonConstants.REGION_ID_COLUMN:
+                    //update SETTINGS_SET_STATUS to unset in REGION table
+                    Region region = userManagementService.getRegionById( entityId );
+                    if ( region != null ) {
+                        settingsSetter.setSettingsValueForRegion( region, settings, setValue );
+                        userManagementService.updateRegion( region );
+                    }
+                    break;
+
+                case CommonConstants.BRANCH_ID_COLUMN:
+                    //update SETTINGS_SET_STATUS to unset in BRANCH table
+                    Branch branch = userManagementService.getBranchById( entityId );
+                    if ( branch != null ) {
+                        settingsSetter.setSettingsValueForBranch( branch, settings, setValue );
+                        userManagementService.updateBranch( branch );
+                    }
+                    break;
+
+                case CommonConstants.AGENT_ID_COLUMN:
+                    break;
+                default:
+                    throw new InvalidInputException( "Invalid entity type : " + entityType );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException occured while setting values for company. Reason : ", e );
+        }
     }
 }
