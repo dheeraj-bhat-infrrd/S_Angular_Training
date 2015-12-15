@@ -1068,3 +1068,94 @@ function validateCompanyInformationForm() {
 	}
 	return true;
 }
+
+//Functions for home page
+function resizeHomePageFunc(){
+	var winW = window.innerWidth;
+	if (winW < 768) {
+		var offset = winW - 114 - 50;
+		$('.reg-cap-txt').css('width',offset+'px');
+		if ($('#pro-wrapper-top').html() == "") {
+			$('#pro-wrapper-top').html($('#pro-wrapper').html());
+			$('#pro-wrapper').html('');
+		}
+	} else {
+		if ($('#pro-wrapper').html() == "") {
+			$('#pro-wrapper').html($('#pro-wrapper-top').html());
+			$('#pro-wrapper-top').html('');
+		}
+	}
+}
+
+function loginUserHomePage() {
+	if (validateLoginForm('login-form')) {
+		$('#login-form').submit();
+		showOverlay();
+	}
+}
+
+function submitRegistrationFormHomePage() {
+	if (validatePreRegistrationForm('reg-form')) {
+		$('#registration-form').submit();
+		showOverlay();
+	}
+}
+
+function submitFindProFormHomePage() {
+	$('#find-pro-form').submit();
+	showOverlay();
+}
+
+//Initialize home page
+function initializeHomePage() {
+	resizeHomePageFunc();
+	$(window).resize(resizeHomePageFunc);
+	
+	// Functions to trigger form validation of various input elements
+	if ($('#message').val() != "") {
+		showRegErr($('#message').val());
+	}
+	
+	// Login form
+	$('#login-form').on('keyup', 'input', function(e) {
+		if (e.which == 13) {
+			$('#login-submit').trigger('click');
+		}
+	});
+
+	$('#login-form').on('click', '#login-submit', function() {
+		loginUserHomePage();
+	});
+
+	$('#registration-form').on('click', '#reg-submit', function(e) {
+		e.preventDefault();
+		submitRegistrationFormHomePage();
+	});
+
+	$('#registration-form').on('keyup', 'input', function(e) {
+		// detect enter
+		if (e.which == 13) {
+			$('#reg-submit').trigger('click');
+		}
+	});
+
+	$('#reg-err-pu-close').click(function() {
+		hideRegErr();
+	});
+
+	// Find a pro
+	$('#find-pro-form').on('click', '#find-pro-submit', function(e) {
+		e.preventDefault();
+		submitFindProFormHomePage();
+	});
+
+	$('#find-pro-form').on('keyup', 'input', function(e) {
+		if (e.which == 13) {
+			$('#find-pro-submit').trigger('click');
+		}
+	});
+
+	$('#header-search-icn').click(function(e) {
+		$('#pro-wrapper-top').slideToggle(200);
+	});
+}
