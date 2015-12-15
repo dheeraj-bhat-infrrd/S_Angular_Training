@@ -5398,7 +5398,97 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
         return branches;
     }
+    
 
+    /**
+     * Method to change profileurl of entity on delete
+     * JIRA SS-1365
+     * 
+     * @param entityType
+     * @param entityId
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException
+    {
+        LOG.info( "Updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
+        
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entityType : " + entityType );
+        }
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "Invalid Id passed for entityType : " + entityType + ". Id : " + entityId );
+        }
+        String collectionName = null;
+        OrganizationUnitSettings unitSettings = null;
+        switch ( entityType ) {
+            case CommonConstants.AGENT_ID_COLUMN:
+                unitSettings = userManagementService.getUserSettings( entityId );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                break;
+                
+            case CommonConstants.BRANCH_ID_COLUMN:
+                try {
+                    unitSettings = getBranchSettingsDefault( entityId );
+                } catch ( NoRecordsFetchedException e ) {
+                    throw new InvalidInputException( "No branch setting exists for ID : " + entityId );
+                }
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                break;
+                
+            case CommonConstants.REGION_ID_COLUMN:
+                unitSettings = getRegionSettings( entityId );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                break;
+
+            default:
+                throw new InvalidInputException( "Invalid entity type : " + entityType );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "No unit setting with the entity type : " + entityType + " ID : " + entityId + " found." );
+        }
+
+        //Get the contact details
+        ContactDetailsSettings contactDetails = unitSettings.getContact_details();
+        if ( contactDetails == null ) {
+            throw new InvalidInputException( "Invalid profile name found for userID : " + entityId );
+        }
+
+        //Get name
+        if ( contactDetails.getName() == null || contactDetails.getName().isEmpty() ) {
+            throw new InvalidInputException( "Name cannot be empty. (entityType : " + entityType + " ID : " + entityId );
+        }
+        String name = contactDetails.getName();
+        //Convert to lower case
+        name = name.toLowerCase();
+        //Replace space with -
+        name = name.replace( ' ', '-' );
+        
+        //Set profile name
+        String newProfileName = name + "-" + entityId;
+        
+
+        //Get existing profileUrl
+        String existingProfileUrl = unitSettings.getProfileUrl();
+        if ( existingProfileUrl == null || existingProfileUrl.isEmpty() ) {
+            throw new InvalidInputException( "Existing profile url cannot be empty" );
+        }
+        String subUrl = existingProfileUrl.substring( 0, existingProfileUrl.lastIndexOf( '/' ) );
+        String newProfileUrl = subUrl + "/" + newProfileName;
+        if ( newProfileUrl.equals( existingProfileUrl ) ) {
+            LOG.debug( "There is no need to update profile url." );
+
+        } else {
+            //Update profileUrl in Mongo
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, newProfileUrl, unitSettings, collectionName );
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, newProfileName, unitSettings, collectionName );
+            
+        }
+        LOG.info( "Finished updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
+    }
 
     /**
      * Method to fetch regions connected to zillow
