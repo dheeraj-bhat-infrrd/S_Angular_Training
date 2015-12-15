@@ -11,7 +11,7 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left">
-				<spring:message code="label.title.complaintregsettings.key" />
+	 			<spring:message code="label.title.complaintregsettings.key" />
 			</div>
 		</div>
 	</div>
@@ -27,10 +27,10 @@
 		<div class="complaint-cont">
 			<form id="comp-reg-form" method="post">
 				<!-- Mail Id Input -->
-				<div class="bd-hr-form-item clearfix">
+				<div class="bd-hr-form-item clearfix comp-top-mar" >
 					<div class="float-left compl-input-text"><spring:message code="label.complaintreg.mail.text" /></div>
-					<div class="float-left bd-frm-right"><input class="bd-frm-rt-txt compl-input" name="mailId"
-						id="comp-mailId" value="${complaintRegSettings.mailId}" placeholder='<spring:message code="label.addmultipleemailids.key"/>'></div>
+					<div class="float-left bd-frm-right comp-email-input"><input class="bd-frm-rt-txt compl-input" name="mailId"
+						id="comp-mailId" value="${complaintRegSettings.mailId}" placeholder='<spring:message code="label.addmultipleemail.key"/>'></div>
 				</div>
 
 				<div class="clearfix compl-type-sel-cont">
@@ -49,30 +49,40 @@
 							autocomplete="off" value="${complaintRegSettings.rating}" readonly>
 						<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 					</div>
-					<div class="float-left compl-option-sel">
-						<div class="mood-text">
-							<spring:message	code="label.complaintreg.or.text" />
+
+
+
+					<div class="float-left compl-option-sel clearfix">
+						<div class="float-left mood-text">
+							<spring:message code="label.complaintreg.or.text" />
 						</div>
-					</div>
-					<div class="float-left compl-option-sel">
-						<div id="comp-mood-unpleasant" class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="unpleasant">
-							<div id="comp-mood-unpleasant-icn" class="sq-smile-icn-text sq-smile-sad-text compl-sml-txt compl-sq-smile-sad-text-disabled">
+						<div id="comp-mood-unpleasant"
+							class="float-left comp-sq-smile-icn-container compl-input-cont opacity-red"
+							data-mood="unpleasant">
+							<div id="comp-mood-unpleasant-icn"
+								class="sq-smile-icn-text sq-smile-sad-text compl-sml-txt compl-sq-smile-sad-text-disabled">
 								<spring:message code="label.complaint.sad.text" />
 							</div>
 						</div>
 					</div>
-					<div class="float-left compl-option-sel">
-						<div class="mood-text">
-							<spring:message	code="label.complaintreg.or.text" />
+
+
+					<div class="float-left compl-option-sel clearfix">
+						<div class="float-left mood-text">
+							<spring:message code="label.complaintreg.or.text" />
 						</div>
-					</div>
-					<div class="float-left compl-option-sel">
-						<div id="comp-mood-ok" class="sq-smile-icn-container compl-input-cont opacity-red" data-mood="ok">
-							<div id="comp-mood-ok-icn" class="sq-smile-icn-text sq-smile-neutral-text compl-sml-txt compl-sq-smile-sad-text-disabled">
+
+						<div id="comp-mood-ok"
+							class="float-left comp-sq-smile-icn-container compl-input-cont opacity-red"
+							data-mood="ok">
+							<div id="comp-mood-ok-icn"
+								class="sq-smile-icn-text sq-smile-neutral-text compl-sml-txt compl-sq-smile-sad-text-disabled">
 								<spring:message code="label.complaint.ok.text" />
 							</div>
 						</div>
 					</div>
+
+
 				</div>
 				<input type="hidden" id="comp-mood" name="mood"/> 
 				<div id="comp-reg-form-submit" class="bd-btn-save cursor-pointer compl-save-btn">Save</div>

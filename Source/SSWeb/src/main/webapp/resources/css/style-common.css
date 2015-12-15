@@ -2804,6 +2804,13 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
     margin-bottom: 10px;
     cursor:pointer;
 }
+.comp-sq-smile-icn-container {
+    
+    height: 62px;
+    line-height: 62px;
+    margin-bottom: 10px;
+    cursor:pointer;
+}
 
 .sq-smile-icn-text {
     margin-left: 0px;
@@ -2812,6 +2819,9 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
     border-radius: 3px;
     color: #fff;
     font-size: 18px;
+}
+.comp-top-mar{
+margin-top:10px;
 }
 
 .sq-smile-happy-text {
@@ -7889,16 +7899,18 @@ label.url-change-input-label {
     height: 40px;
     line-height: 40px;
     font-size: 16px;
+    margin-left: 5px;
 }
 
 .compl-input {
-	width: 500px;
-	max-width: 100%;
+	    width: 100%;
+    min-width: 270px;
 }
 
 .comp-rating-post {
 	height: 40px;
 	line-height: 40px;
+	margin-left:5px;
 }
 
 .search-panel-item {
