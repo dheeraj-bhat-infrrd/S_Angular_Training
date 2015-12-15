@@ -689,7 +689,38 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
             if ( surveyDetails != null ) {
                 for ( SurveyDetails survey : surveyDetails ) {
-                    if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+
+                    List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                        .getSharedOn();
+                    if ( sharedOnAgent != null ) {
+                        socialPostCount += sharedOnAgent.size();
+                    }
+                    if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                        for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                            .getBranchMediaPostDetailsList() ) {
+                            if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                            }
+                        }
+                    }
+                    if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
+                        for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
+                            .getRegionMediaPostDetailsList() ) {
+                            if ( regionMediaPostDetails.getSharedOn() != null ) {
+                                socialPostCount += regionMediaPostDetails.getSharedOn().size();
+                            }
+                        }
+                    }
+                    if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null ) {
+                        List<String> sharedOnCompany = survey.getSocialMediaPostDetails().getCompanyMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnCompany != null ) {
+                            socialPostCount += sharedOnCompany.size();
+                        }
+                    }
+
+                
+                    /*if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                         List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
                             .getSharedOn();
                         if ( sharedOnAgent != null ) {
@@ -785,7 +816,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                             }
                         }
 
-                    }
+                    }*/
                 }
 
             }
