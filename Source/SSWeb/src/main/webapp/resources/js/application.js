@@ -416,8 +416,8 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-
-	showProfileDetails(newProfileName, 0, 90);
+	//get profile data for all the records , noOfDays = -1
+	showProfileDetails(newProfileName, 0, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -431,8 +431,8 @@ function showRegionAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-
-	showProfileDetails(newProfileName, newProfileValue, 90);
+	//get profile data for all the records , noOfDays = -1
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -446,8 +446,8 @@ function showBranchAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-
-	showProfileDetails(newProfileName, newProfileValue, 90);
+	//get profile data for all the records , noOfDays = -1
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -461,8 +461,8 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
-
-	showProfileDetails(newProfileName, 0, 90);
+	//get profile data for all the records , noOfDays = -1
+	showProfileDetails(newProfileName, 0, -1);
 	bindSelectButtons();
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
@@ -1316,10 +1316,7 @@ $(document).on('click touchstart', '.bd-srv-tbl-row', function() {
             $(this).find('.srv-tbl-move-up').hide();
             $(this).find('.srv-tbl-move-dn').hide();
 		}
-	} else {
-		// $(this).find('.srv-tbl-rem').hide();
-		// $(this).find('.srv-tbl-edit').hide();
-	}
+	} 
 });
 
 $(document).on('mouseover', '.bd-srv-tbl-row', function() {

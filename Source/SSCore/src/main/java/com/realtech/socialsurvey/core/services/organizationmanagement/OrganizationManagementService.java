@@ -1200,4 +1200,28 @@ public interface OrganizationManagementService
      */
     void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException;
 
+    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
+
+
+    public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException;
+
+
+    public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException;
+
+
+    public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
+        NoRecordsFetchedException, ProfileNotFoundException;
+
+
+    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds );
+
+
+    public Map<String, Set<Long>> getAllIdsUnderCompanyConnectedToZillow( long iden );
+
+
+    public Map<String, Set<Long>> getAllIdsUnderBranchConnectedToZillow( long branchId );
+
 }
