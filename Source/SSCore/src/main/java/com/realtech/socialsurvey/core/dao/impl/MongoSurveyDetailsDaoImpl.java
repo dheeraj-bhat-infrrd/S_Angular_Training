@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,11 +33,13 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -70,6 +73,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     private SurveyPreInitiationService surveyPreInitiationService;
 
 
+    @Autowired
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+
     /*
      * Method to fetch survey details on the basis of agentId and customer email.
      */
@@ -93,7 +100,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return surveys.get( CommonConstants.INITIAL_INDEX );
     }
 
-    
+
     @Override
     public SurveyDetails getSurveyBySurveyMongoId( String surveyMongoId )
     {
@@ -102,6 +109,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method getSurveyBySurveyMongoId() finished" );
         return survey;
     }
+
 
     /*
      * Method to insert survey details into the SURVEY_DETAILS collection.
@@ -237,8 +245,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.upsert( query, update, ABS_REPORTER_DETAILS_COLLECTION );
         LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
     }
-    
-    
+
+
     @Override
     public void updateSurveyAsUnAbusive( String surveyMongoId )
     {
@@ -255,7 +263,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).is( surveyMongoId ) );
         mongoTemplate.remove( query, ABS_REPORTER_DETAILS_COLLECTION );
-        
+
         LOG.info( "Method updateSurveyAsUnAbusive() to mark survey as unAbusive finished." );
     }
 
@@ -292,9 +300,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
         }
-        if(filterAbusive){
-    		query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(false));
-    	}
+        if ( filterAbusive ) {
+            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
+        }
         query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
         LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
@@ -462,7 +470,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Override
     @SuppressWarnings ( "unchecked")
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin )
+        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, long zillowTotalReviewScore )
     {
         LOG.info( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName
             + " columnValue:" + columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive );
@@ -529,7 +537,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         double rating = 0;
         if ( result != null && reviewsCount > 0 ) {
             List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get( "result" );
-            rating = (double) basicDBObject.get( 0 ).get( "total_score" ) / reviewsCount;
+            if ( includeZillow ) {
+                double totalRating = reviewsCount > 0 ? (double) basicDBObject.get( 0 ).get( "total_score" ) : 0;
+                if ( zillowReviewCount > 0 ) {
+                    reviewsCount += zillowReviewCount;
+                    totalRating += zillowTotalReviewScore;
+                }
+                if ( zillowReviewCount > 0 || reviewsCount > 0 )
+                    rating = totalRating / reviewsCount;
+            } else
+                rating = (double) basicDBObject.get( 0 ).get( "total_score" ) / reviewsCount;
+        } else if ( includeZillow ) {
+            if ( zillowReviewCount > 0 )
+                rating = zillowTotalReviewScore / zillowReviewCount;
         }
         LOG.info( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished." );
         return rating;
@@ -611,8 +631,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
-        Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( numberOfDays );
+
+        Date endDate = null;
+        Date startDate = null;
+        if ( numberOfDays >= 0 ) {
+            endDate = Calendar.getInstance().getTime();
+            startDate = getNdaysBackDate( numberOfDays );
+        }
+
         Query query = new Query();
         if ( columnName == null ) {
         } else {
@@ -650,13 +676,51 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
             }
 
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+            if ( startDate != null && endDate == null ) {
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+            } else if ( startDate == null && endDate != null ) {
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+            } else if ( startDate != null && endDate != null ) {
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+            }
+
 
             List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
             if ( surveyDetails != null ) {
                 for ( SurveyDetails survey : surveyDetails ) {
-                    if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+
+                    List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
+                        .getSharedOn();
+                    if ( sharedOnAgent != null ) {
+                        socialPostCount += sharedOnAgent.size();
+                    }
+                    if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null ) {
+                        for ( BranchMediaPostDetails branchMediaPostDetails : survey.getSocialMediaPostDetails()
+                            .getBranchMediaPostDetailsList() ) {
+                            if ( branchMediaPostDetails.getSharedOn() != null ) {
+                                socialPostCount += branchMediaPostDetails.getSharedOn().size();
+                            }
+                        }
+                    }
+                    if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null ) {
+                        for ( RegionMediaPostDetails regionMediaPostDetails : survey.getSocialMediaPostDetails()
+                            .getRegionMediaPostDetailsList() ) {
+                            if ( regionMediaPostDetails.getSharedOn() != null ) {
+                                socialPostCount += regionMediaPostDetails.getSharedOn().size();
+                            }
+                        }
+                    }
+                    if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null ) {
+                        List<String> sharedOnCompany = survey.getSocialMediaPostDetails().getCompanyMediaPostDetails()
+                            .getSharedOn();
+                        if ( sharedOnCompany != null ) {
+                            socialPostCount += sharedOnCompany.size();
+                        }
+                    }
+
+                
+                    /*if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                         List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
                             .getSharedOn();
                         if ( sharedOnAgent != null ) {
@@ -752,7 +816,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                             }
                         }
 
-                    }
+                    }*/
                 }
 
             }
@@ -861,7 +925,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
-        boolean fetchAbusive, boolean notRecommended )
+        boolean fetchAbusive, boolean notRecommended, boolean includeZillow, long zillowReviewCount )
     {
         LOG.info( "Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue
             + " startScore:" + startScore + " limitScore:" + limitScore + " and fetchAbusive:" + fetchAbusive );
@@ -898,6 +962,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
 
         long feedBackCount = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
+        if ( includeZillow && !notRecommended ) {
+            // get zillow review count based on column name
+            feedBackCount += zillowReviewCount;
+        }
         LOG.info( "Method getFeedBacksCount executed successfully.Returning feedBackCount:" + feedBackCount );
         return feedBackCount;
     }
@@ -960,295 +1028,346 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to increase reminder count by 1, updateReminderCount() finished." );
     }
 
+
     @Override
-    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive) throws InvalidInputException{
-    	LOG.info("Getting completed survey count for "+organizationUnitColumn+" with value "+organizationUnitColumnValue);
-    	if(organizationUnitColumn == null || organizationUnitColumn.isEmpty()){
-    		LOG.warn("organizationUnitColumn is empty");
-    		throw new InvalidInputException("organizationUnitColumn is empty");
-    	}
-    	if(organizationUnitColumnValue <= 0l){
-    		LOG.warn("organizationUnitColumnValue is invalid");
-    		throw new InvalidInputException("organizationUnitColumnValue is invalid");
-    	}
-    	Query query = new Query();
-    	query.addCriteria(Criteria.where(organizationUnitColumn).is(organizationUnitColumnValue));
-    	query.addCriteria(Criteria.where(CommonConstants.SURVEY_SOURCE_COLUMN).ne(CommonConstants.SURVEY_SOURCE_ZILLOW));
-    	query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
-    	if(filterAbusive){
-    		query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(false));
-    	}
-    	if(startDate != null && endDate == null){
-    		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
-    	}
-    	if(endDate != null && startDate == null){
-    		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
-    	}
-    	if(startDate != null && endDate != null){
-    		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)));
-    	}
-    	LOG.debug("Query: "+query.toString());
-    	long count = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
-    	LOG.info("Found "+count+" completed surveys");
-    	return count;
+    public long getCompletedSurveyCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
+        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
+    {
+        LOG.info( "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
+        if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
+            LOG.warn( "organizationUnitColumn is empty" );
+            throw new InvalidInputException( "organizationUnitColumn is empty" );
+        }
+        if ( organizationUnitColumnValue <= 0l ) {
+            LOG.warn( "organizationUnitColumnValue is invalid" );
+            throw new InvalidInputException( "organizationUnitColumnValue is invalid" );
+        }
+        Query query = new Query();
+        query.addCriteria( Criteria.where( organizationUnitColumn ).is( organizationUnitColumnValue ) );
+        // Commented as Zillow surveys are not stored in database, SS-1276
+        // query.addCriteria(Criteria.where(CommonConstants.SURVEY_SOURCE_COLUMN).ne(CommonConstants.SURVEY_SOURCE_ZILLOW));
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        if ( filterAbusive ) {
+            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
+        }
+        if ( startDate != null && endDate == null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+        }
+        if ( endDate != null && startDate == null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+        }
+        if ( startDate != null && endDate != null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
+                .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+        }
+        LOG.debug( "Query: " + query.toString() );
+        long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Found " + count + " completed surveys" );
+        return count;
     }
 
-    @SuppressWarnings("unchecked")
-	@Override
-    public Map<Integer, Integer> getCompletedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException{
-    	Map<Integer, Integer> aggregatedResult = null;
-    	LOG.info("Aggregating completed surveys. Input organizationUnitColumn: "+organizationUnitColumn+" \t organizationUnitColumnValue: "+organizationUnitColumnValue+" \t startDate: "+startDate+" \t endDate: "+endDate+" \t aggregateBy: "+aggregateBy);
-    	if(aggregateBy == null || aggregateBy.isEmpty()){
-    		LOG.debug("aggregate by field is empty");
-    		throw new InvalidInputException("aggregate by field is empty");
-    	}
-    	LOG.debug("Getting the result aggregated by "+aggregateBy);
-    	// DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
-    	// Using BasicDBObject for aggregation
-    	BasicDBList pipeline = new BasicDBList();
-    	if(organizationUnitColumn != null && !organizationUnitColumn.isEmpty()){
-    		// adding organization unit
-    		pipeline.add(new BasicDBObject("$match", new BasicDBObject(organizationUnitColumn, organizationUnitColumnValue)));
-    	}
-    	// match survey stage
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.STAGE_COLUMN,CommonConstants.SURVEY_STAGE_COMPLETE)));
-    	// match non zillow survey
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
-    	// match non abusive survey
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.IS_ABUSIVE_COLUMN,false)));
-    	// match start date
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN,new BasicDBObject("$gte", new Date(startDate.getTime())))));
-    	// match end date
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN,new BasicDBObject("$lte", new Date(endDate.getTime())))));
-    	// add projection
-    	BasicDBObject projectionObject = new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN, 1);
-    	BasicDBList modifiedOnList = new BasicDBList();
-    	modifiedOnList.add("$modifiedOn");
-    	BasicDBObject yearDBObject = new BasicDBObject("$year", modifiedOnList);
-		BasicDBList multiplyDBList = new BasicDBList();
-		multiplyDBList.add(yearDBObject);
-		multiplyDBList.add(100);
-		BasicDBObject multiplyDBObject = new BasicDBObject("$multiply",multiplyDBList);
-		BasicDBList addDBList = new BasicDBList();
-		addDBList.add(multiplyDBObject);
-    	BasicDBObject groupColObjectValue = null;
-    	if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
-    		BasicDBObject weekDBObject = new BasicDBObject("$week", modifiedOnList);
-    		addDBList.add(weekDBObject);
-    	}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
-    		BasicDBObject monthDBObject = new BasicDBObject("$month", modifiedOnList);
-    		addDBList.add(monthDBObject);
-    	}
-    	groupColObjectValue = new BasicDBObject("$add",addDBList);
-    	projectionObject.append("groupCol", groupColObjectValue);
-    	pipeline.add(new BasicDBObject("$project",projectionObject));
-    	// grouping
-    	pipeline.add(new BasicDBObject("$group",new BasicDBObject("_id","$groupCol").append("count", new BasicDBObject("$sum",1))));
-    	BasicDBObject aggregationObject = new BasicDBObject("aggregate",SURVEY_DETAILS_COLLECTION).append("pipeline",pipeline);
-    	
-    	CommandResult aggregateResult = mongoTemplate.executeCommand(aggregationObject);
-    	
-    	List<BasicDBObject> aggregatedData = null;
-    	if(aggregateResult.containsField("result")){
-    		aggregatedData = (List<BasicDBObject>) aggregateResult.get("result");
-    		if(aggregatedData.size() > 0){
-    			aggregatedResult = new HashMap<>();
-	    		for(BasicDBObject data: aggregatedData){
-	    			aggregatedResult.put(Integer.parseInt(data.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()),Integer.parseInt(data.get( "count" ).toString()));
-	    		}
-    		}
-    	}
-    	LOG.info("Returning aggregating completed survey results");
-    	return aggregatedResult;
-    }
-    
-    @SuppressWarnings("unchecked")
-	@Override
-    public Map<Integer, Integer> getClickedSurveyAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException{
-    	Map<Integer, Integer> aggregatedResult = null;
-    	LOG.info("Aggregating clicked surveys. Input organizationUnitColumn: "+organizationUnitColumn+" \t organizationUnitColumnValue: "+organizationUnitColumnValue+" \t startDate: "+startDate+" \t endDate: "+endDate+" \t aggregateBy: "+aggregateBy);
-    	if(aggregateBy == null || aggregateBy.isEmpty()){
-    		LOG.debug("aggregate by field is empty");
-    		throw new InvalidInputException("aggregate by field is empty");
-    	}
-    	LOG.debug("Getting the result aggregated by "+aggregateBy);
-    	// DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
-    	// Using BasicDBObject for aggregation
-    	BasicDBList pipeline = new BasicDBList();
-    	if(organizationUnitColumn != null && !organizationUnitColumn.isEmpty()){
-    		// adding organization unit
-    		pipeline.add(new BasicDBObject("$match", new BasicDBObject(organizationUnitColumn, organizationUnitColumnValue)));
-    	}
-    	// match non zillow survey
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
-    	// match start date
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.CREATED_ON,new BasicDBObject("$gte", new Date(startDate.getTime())))));
-    	// match end date
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.CREATED_ON,new BasicDBObject("$lte", new Date(endDate.getTime())))));
-    	// add projection
-    	BasicDBObject projectionObject = new BasicDBObject(CommonConstants.CREATED_ON, 1);
-    	BasicDBList createdOnList = new BasicDBList();
-    	createdOnList.add("$createdOn");
-    	BasicDBObject yearDBObject = new BasicDBObject("$year", createdOnList);
-		BasicDBList multiplyDBList = new BasicDBList();
-		multiplyDBList.add(yearDBObject);
-		multiplyDBList.add(100);
-		BasicDBObject multiplyDBObject = new BasicDBObject("$multiply",multiplyDBList);
-		BasicDBList addDBList = new BasicDBList();
-		addDBList.add(multiplyDBObject);
-    	BasicDBObject groupColObjectValue = null;
-    	if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
-    		BasicDBObject weekDBObject = new BasicDBObject("$week", createdOnList);
-    		addDBList.add(weekDBObject);
-    	}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
-    		BasicDBObject monthDBObject = new BasicDBObject("$month", createdOnList);
-    		addDBList.add(monthDBObject);
-    	}
-    	groupColObjectValue = new BasicDBObject("$add",addDBList);
-    	projectionObject.append("groupCol", groupColObjectValue);
-    	pipeline.add(new BasicDBObject("$project",projectionObject));
-    	// grouping
-    	pipeline.add(new BasicDBObject("$group",new BasicDBObject("_id","$groupCol").append("count", new BasicDBObject("$sum",1))));
-    	BasicDBObject aggregationObject = new BasicDBObject("aggregate",SURVEY_DETAILS_COLLECTION).append("pipeline",pipeline);
-    	
-    	CommandResult aggregateResult = mongoTemplate.executeCommand(aggregationObject);
-    	
-    	List<BasicDBObject> aggregatedData = null;
-    	if(aggregateResult.containsField("result")){
-    		aggregatedData = (List<BasicDBObject>) aggregateResult.get("result");
-    		if(aggregatedData.size() > 0){
-    			aggregatedResult = new HashMap<>();
-	    		for(BasicDBObject data: aggregatedData){
-	    			aggregatedResult.put(Integer.parseInt(data.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()),Integer.parseInt(data.get( "count" ).toString()));
-	    		}
-    		}
-    	}
-    	LOG.info("Returning aggregating completed survey results");
-    	return aggregatedResult;
-    }
-    
-    @SuppressWarnings("unchecked")
+
+    @SuppressWarnings ( "unchecked")
     @Override
-    public Map<Integer, Integer> getSocialPostsAggregationCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy) throws InvalidInputException{
-    	Map<Integer, Integer> aggregatedResult = null;
-    	LOG.info("Aggregating completed surveys. Input organizationUnitColumn: "+organizationUnitColumn+" \t organizationUnitColumnValue: "+organizationUnitColumnValue+" \t startDate: "+startDate+" \t endDate: "+endDate+" \t aggregateBy: "+aggregateBy);
-    	if(aggregateBy == null || aggregateBy.isEmpty()){
-    		LOG.debug("aggregate by field is empty");
-    		throw new InvalidInputException("aggregate by field is empty");
-    	}
-    	LOG.debug("Getting the result aggregated by "+aggregateBy);
-    	// DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
-    	// Using BasicDBObject for aggregation
-    	BasicDBList pipeline = new BasicDBList();
-    	if(organizationUnitColumn != null && !organizationUnitColumn.isEmpty()){
-    		// adding organization unit
-    		pipeline.add(new BasicDBObject("$match", new BasicDBObject(organizationUnitColumn, organizationUnitColumnValue)));
-    	}
-    	// match mood as great
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MOOD_COLUMN, "Great")));
-    	// match agreed to share
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.AGREE_SHARE_COLUMN, "true")));
-    	// match if social media post details exists
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, new BasicDBObject("$exists", true))));
-    	// match start date
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN,new BasicDBObject("$gte", new Date(startDate.getTime())))));
-    	// match end date
-    	pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN,new BasicDBObject("$lte", new Date(endDate.getTime())))));
-    	// add projection level 1
-    	BasicDBObject firstProjectionObject = new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN, 1);
-    	// add agent post detail column
-    	firstProjectionObject.append(CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN+"."+CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN, 1);
-    	// add company post detail column
-    	firstProjectionObject.append(CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN+"."+CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN, 1);
-    	// add region post detail column
-    	firstProjectionObject.append(CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN+"."+CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN, 1);
-    	// add branch post detail column
-    	firstProjectionObject.append(CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN+"."+CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN, 1);
-    	// add to pieline
-    	pipeline.add(new BasicDBObject("$project", firstProjectionObject));
-    	// unwind region media post column as it is an array
-    	pipeline.add(new BasicDBObject("$unwind","$"+CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN+"."+CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN));
-    	// unwind branch media post column as it is an array
-    	pipeline.add(new BasicDBObject("$unwind","$"+CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN+"."+CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN));
-    	
-    	// add projection level 2 to get count of each level
-    	BasicDBObject secondProjectionObject = new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN, 1);
-    	BasicDBList agentPostCountDBList = new BasicDBList();
-    	agentPostCountDBList.add("$socialMediaPostDetails.agentMediaPostDetails.sharedOn");
-    	agentPostCountDBList.add(new BasicDBList());
-    	BasicDBObject agentPostsCount = new BasicDBObject("$size",new BasicDBObject("$ifNull", agentPostCountDBList));
-    	secondProjectionObject.append("agentPostsCount", agentPostsCount);
-    	
-    	BasicDBList regionPostCountDBList = new BasicDBList();
-    	regionPostCountDBList.add("$socialMediaPostDetails.regionMediaPostDetailsList.sharedOn");
-    	regionPostCountDBList.add(new BasicDBList());
-    	BasicDBObject regionPostsCount = new BasicDBObject("$size",new BasicDBObject("$ifNull", regionPostCountDBList));
-    	secondProjectionObject.append("regionPostsCount", regionPostsCount);
-    	
-    	BasicDBList branchPostCountDBList = new BasicDBList();
-    	branchPostCountDBList.add("$socialMediaPostDetails.branchMediaPostDetailsList.sharedOn");
-    	branchPostCountDBList.add(new BasicDBList());
-    	BasicDBObject branchPostsCount = new BasicDBObject("$size", new BasicDBObject("$ifNull", branchPostCountDBList));
-    	secondProjectionObject.append("branchPostsCount", branchPostsCount);
-    	
-    	BasicDBList companyPostCountDBList = new BasicDBList();
-    	companyPostCountDBList.add("$socialMediaPostDetails.companyMediaPostDetails.sharedOn");
-    	companyPostCountDBList.add(new BasicDBList());
-    	BasicDBObject companyPostsCount = new BasicDBObject("$size", new BasicDBObject("$ifNull", companyPostCountDBList));
-    	secondProjectionObject.append("companyPostsCount", companyPostsCount);
-    	pipeline.add(new BasicDBObject("$project", secondProjectionObject));
-    	
-    	BasicDBObject thirdProjectionObject = new BasicDBObject(CommonConstants.MODIFIED_ON_COLUMN, 1);
-    	BasicDBList modifiedOnList = new BasicDBList();
-    	
-    	BasicDBList countAdditionList = new BasicDBList();
-    	countAdditionList.add("$agentPostsCount");
-    	countAdditionList.add("$regionPostsCount");
-    	countAdditionList.add("$branchPostsCount");
-    	countAdditionList.add("$companyPostsCount");
-    	
-    	thirdProjectionObject.append("postsCount", new BasicDBObject("$add",countAdditionList));
-    	
-    	modifiedOnList.add("$modifiedOn");
-    	BasicDBObject yearDBObject = new BasicDBObject("$year", modifiedOnList);
-		BasicDBList multiplyDBList = new BasicDBList();
-		multiplyDBList.add(yearDBObject);
-		multiplyDBList.add(100);
-		BasicDBObject multiplyDBObject = new BasicDBObject("$multiply",multiplyDBList);
-		BasicDBList addDBList = new BasicDBList();
-		addDBList.add(multiplyDBObject);
-    	BasicDBObject groupColObjectValue = null;
-    	if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_WEEK)){
-    		BasicDBObject weekDBObject = new BasicDBObject("$week", modifiedOnList);
-    		addDBList.add(weekDBObject);
-    	}else if(aggregateBy.equals(CommonConstants.AGGREGATE_BY_MONTH)){
-    		BasicDBObject monthDBObject = new BasicDBObject("$month", modifiedOnList);
-    		addDBList.add(monthDBObject);
-    	}
-    	groupColObjectValue = new BasicDBObject("$add",addDBList);
-    	thirdProjectionObject.append("groupCol", groupColObjectValue);
-    	pipeline.add(new BasicDBObject("$project",thirdProjectionObject));
-    	// grouping
-    	pipeline.add(new BasicDBObject("$group",new BasicDBObject("_id","$groupCol").append("count", new BasicDBObject("$sum","$postsCount"))));
-    	BasicDBObject aggregationObject = new BasicDBObject("aggregate",SURVEY_DETAILS_COLLECTION).append("pipeline",pipeline);
-    	
-    	CommandResult aggregateResult = mongoTemplate.executeCommand(aggregationObject);
-    	
-    	List<BasicDBObject> aggregatedData = null;
-    	if(aggregateResult.containsField("result")){
-    		aggregatedData = (List<BasicDBObject>) aggregateResult.get("result");
-    		if(aggregatedData.size() > 0){
-    			aggregatedResult = new HashMap<>();
-	    		for(BasicDBObject data: aggregatedData){
-	    			aggregatedResult.put(Integer.parseInt(data.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()),Integer.parseInt(data.get( "count" ).toString()));
-	    		}
-    		}
-    	}
-    	LOG.info("Returning aggregating completed survey results");
-    	return aggregatedResult;
+    public Map<Integer, Integer> getCompletedSurveyAggregationCount( String organizationUnitColumn,
+        long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy )
+        throws InvalidInputException
+    {
+        Map<Integer, Integer> aggregatedResult = null;
+        LOG.info( "Aggregating completed surveys. Input organizationUnitColumn: " + organizationUnitColumn
+            + " \t organizationUnitColumnValue: " + organizationUnitColumnValue + " \t startDate: " + startDate
+            + " \t endDate: " + endDate + " \t aggregateBy: " + aggregateBy );
+        if ( aggregateBy == null || aggregateBy.isEmpty() ) {
+            LOG.debug( "aggregate by field is empty" );
+            throw new InvalidInputException( "aggregate by field is empty" );
+        }
+        LOG.debug( "Getting the result aggregated by " + aggregateBy );
+        // DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
+        // Using BasicDBObject for aggregation
+        BasicDBList pipeline = new BasicDBList();
+        if ( organizationUnitColumn != null && !organizationUnitColumn.isEmpty() ) {
+            // adding organization unit
+            pipeline
+                .add( new BasicDBObject( "$match", new BasicDBObject( organizationUnitColumn, organizationUnitColumnValue ) ) );
+        }
+        // match survey stage
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN,
+            CommonConstants.SURVEY_STAGE_COMPLETE ) ) );
+        // Commented as Zillow surveys are not stored in database, SS-1276
+        // match non zillow survey
+        // pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
+        // match non abusive survey
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN, false ) ) );
+        // match start date
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, new BasicDBObject(
+            "$gte", new Date( startDate.getTime() ) ) ) ) );
+        // match end date
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, new BasicDBObject(
+            "$lte", new Date( endDate.getTime() ) ) ) ) );
+        // add projection
+        BasicDBObject projectionObject = new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, 1 );
+        BasicDBList modifiedOnList = new BasicDBList();
+        modifiedOnList.add( "$modifiedOn" );
+        BasicDBObject yearDBObject = new BasicDBObject( "$year", modifiedOnList );
+        BasicDBList multiplyDBList = new BasicDBList();
+        multiplyDBList.add( yearDBObject );
+        multiplyDBList.add( 100 );
+        BasicDBObject multiplyDBObject = new BasicDBObject( "$multiply", multiplyDBList );
+        BasicDBList addDBList = new BasicDBList();
+        addDBList.add( multiplyDBObject );
+        BasicDBObject groupColObjectValue = null;
+        if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_WEEK ) ) {
+            BasicDBObject weekDBObject = new BasicDBObject( "$week", modifiedOnList );
+            addDBList.add( weekDBObject );
+        } else if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_MONTH ) ) {
+            BasicDBObject monthDBObject = new BasicDBObject( "$month", modifiedOnList );
+            addDBList.add( monthDBObject );
+        }
+        groupColObjectValue = new BasicDBObject( "$add", addDBList );
+        projectionObject.append( "groupCol", groupColObjectValue );
+        pipeline.add( new BasicDBObject( "$project", projectionObject ) );
+        // grouping
+        pipeline.add( new BasicDBObject( "$group", new BasicDBObject( "_id", "$groupCol" ).append( "count", new BasicDBObject(
+            "$sum", 1 ) ) ) );
+        BasicDBObject aggregationObject = new BasicDBObject( "aggregate", SURVEY_DETAILS_COLLECTION ).append( "pipeline",
+            pipeline );
+
+        CommandResult aggregateResult = mongoTemplate.executeCommand( aggregationObject );
+
+        List<BasicDBObject> aggregatedData = null;
+        if ( aggregateResult.containsField( "result" ) ) {
+            aggregatedData = (List<BasicDBObject>) aggregateResult.get( "result" );
+            if ( aggregatedData.size() > 0 ) {
+                aggregatedResult = new HashMap<>();
+                for ( BasicDBObject data : aggregatedData ) {
+                    aggregatedResult.put( Integer.parseInt( data.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                        Integer.parseInt( data.get( "count" ).toString() ) );
+                }
+            }
+        }
+        LOG.info( "Returning aggregating completed survey results" );
+        return aggregatedResult;
     }
-    
-    
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Integer, Integer> getClickedSurveyAggregationCount( String organizationUnitColumn,
+        long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy )
+        throws InvalidInputException
+    {
+        Map<Integer, Integer> aggregatedResult = null;
+        LOG.info( "Aggregating clicked surveys. Input organizationUnitColumn: " + organizationUnitColumn
+            + " \t organizationUnitColumnValue: " + organizationUnitColumnValue + " \t startDate: " + startDate
+            + " \t endDate: " + endDate + " \t aggregateBy: " + aggregateBy );
+        if ( aggregateBy == null || aggregateBy.isEmpty() ) {
+            LOG.debug( "aggregate by field is empty" );
+            throw new InvalidInputException( "aggregate by field is empty" );
+        }
+        LOG.debug( "Getting the result aggregated by " + aggregateBy );
+        // DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
+        // Using BasicDBObject for aggregation
+        BasicDBList pipeline = new BasicDBList();
+        if ( organizationUnitColumn != null && !organizationUnitColumn.isEmpty() ) {
+            // adding organization unit
+            pipeline
+                .add( new BasicDBObject( "$match", new BasicDBObject( organizationUnitColumn, organizationUnitColumnValue ) ) );
+        }
+        // Commented as Zillow surveys are not stored in database, SS-1276
+        // match non zillow survey
+        // pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
+        // match start date
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.CREATED_ON, new BasicDBObject( "$gte",
+            new Date( startDate.getTime() ) ) ) ) );
+        // match end date
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.CREATED_ON, new BasicDBObject( "$lte",
+            new Date( endDate.getTime() ) ) ) ) );
+        // add projection
+        BasicDBObject projectionObject = new BasicDBObject( CommonConstants.CREATED_ON, 1 );
+        BasicDBList createdOnList = new BasicDBList();
+        createdOnList.add( "$createdOn" );
+        BasicDBObject yearDBObject = new BasicDBObject( "$year", createdOnList );
+        BasicDBList multiplyDBList = new BasicDBList();
+        multiplyDBList.add( yearDBObject );
+        multiplyDBList.add( 100 );
+        BasicDBObject multiplyDBObject = new BasicDBObject( "$multiply", multiplyDBList );
+        BasicDBList addDBList = new BasicDBList();
+        addDBList.add( multiplyDBObject );
+        BasicDBObject groupColObjectValue = null;
+        if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_WEEK ) ) {
+            BasicDBObject weekDBObject = new BasicDBObject( "$week", createdOnList );
+            addDBList.add( weekDBObject );
+        } else if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_MONTH ) ) {
+            BasicDBObject monthDBObject = new BasicDBObject( "$month", createdOnList );
+            addDBList.add( monthDBObject );
+        }
+        groupColObjectValue = new BasicDBObject( "$add", addDBList );
+        projectionObject.append( "groupCol", groupColObjectValue );
+        pipeline.add( new BasicDBObject( "$project", projectionObject ) );
+        // grouping
+        pipeline.add( new BasicDBObject( "$group", new BasicDBObject( "_id", "$groupCol" ).append( "count", new BasicDBObject(
+            "$sum", 1 ) ) ) );
+        BasicDBObject aggregationObject = new BasicDBObject( "aggregate", SURVEY_DETAILS_COLLECTION ).append( "pipeline",
+            pipeline );
+
+        CommandResult aggregateResult = mongoTemplate.executeCommand( aggregationObject );
+
+        List<BasicDBObject> aggregatedData = null;
+        if ( aggregateResult.containsField( "result" ) ) {
+            aggregatedData = (List<BasicDBObject>) aggregateResult.get( "result" );
+            if ( aggregatedData.size() > 0 ) {
+                aggregatedResult = new HashMap<>();
+                for ( BasicDBObject data : aggregatedData ) {
+                    aggregatedResult.put( Integer.parseInt( data.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                        Integer.parseInt( data.get( "count" ).toString() ) );
+                }
+            }
+        }
+        LOG.info( "Returning aggregating completed survey results" );
+        return aggregatedResult;
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Integer, Integer> getSocialPostsAggregationCount( String organizationUnitColumn,
+        long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, String aggregateBy )
+        throws InvalidInputException
+    {
+        Map<Integer, Integer> aggregatedResult = null;
+        LOG.info( "Aggregating completed surveys. Input organizationUnitColumn: " + organizationUnitColumn
+            + " \t organizationUnitColumnValue: " + organizationUnitColumnValue + " \t startDate: " + startDate
+            + " \t endDate: " + endDate + " \t aggregateBy: " + aggregateBy );
+        if ( aggregateBy == null || aggregateBy.isEmpty() ) {
+            LOG.debug( "aggregate by field is empty" );
+            throw new InvalidInputException( "aggregate by field is empty" );
+        }
+        LOG.debug( "Getting the result aggregated by " + aggregateBy );
+        // DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
+        // Using BasicDBObject for aggregation
+        BasicDBList pipeline = new BasicDBList();
+        if ( organizationUnitColumn != null && !organizationUnitColumn.isEmpty() ) {
+            // adding organization unit
+            pipeline
+                .add( new BasicDBObject( "$match", new BasicDBObject( organizationUnitColumn, organizationUnitColumnValue ) ) );
+        }
+        // match mood as great
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MOOD_COLUMN, "Great" ) ) );
+        // match agreed to share
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.AGREE_SHARE_COLUMN, "true" ) ) );
+        // match if social media post details exists
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN,
+            new BasicDBObject( "$exists", true ) ) ) );
+        // match start date
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, new BasicDBObject(
+            "$gte", new Date( startDate.getTime() ) ) ) ) );
+        // match end date
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, new BasicDBObject(
+            "$lte", new Date( endDate.getTime() ) ) ) ) );
+        // add projection level 1
+        BasicDBObject firstProjectionObject = new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, 1 );
+        // add agent post detail column
+        firstProjectionObject.append( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+            + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN, 1 );
+        // add company post detail column
+        firstProjectionObject.append( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+            + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN, 1 );
+        // add region post detail column
+        firstProjectionObject.append( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN, 1 );
+        // add branch post detail column
+        firstProjectionObject.append( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+            + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN, 1 );
+        // add to pieline
+        pipeline.add( new BasicDBObject( "$project", firstProjectionObject ) );
+        // unwind region media post column as it is an array
+        pipeline.add( new BasicDBObject( "$unwind", "$" + CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN ) );
+        // unwind branch media post column as it is an array
+        pipeline.add( new BasicDBObject( "$unwind", "$" + CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+            + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN ) );
+
+        // add projection level 2 to get count of each level
+        BasicDBObject secondProjectionObject = new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, 1 );
+        BasicDBList agentPostCountDBList = new BasicDBList();
+        agentPostCountDBList.add( "$socialMediaPostDetails.agentMediaPostDetails.sharedOn" );
+        agentPostCountDBList.add( new BasicDBList() );
+        BasicDBObject agentPostsCount = new BasicDBObject( "$size", new BasicDBObject( "$ifNull", agentPostCountDBList ) );
+        secondProjectionObject.append( "agentPostsCount", agentPostsCount );
+
+        BasicDBList regionPostCountDBList = new BasicDBList();
+        regionPostCountDBList.add( "$socialMediaPostDetails.regionMediaPostDetailsList.sharedOn" );
+        regionPostCountDBList.add( new BasicDBList() );
+        BasicDBObject regionPostsCount = new BasicDBObject( "$size", new BasicDBObject( "$ifNull", regionPostCountDBList ) );
+        secondProjectionObject.append( "regionPostsCount", regionPostsCount );
+
+        BasicDBList branchPostCountDBList = new BasicDBList();
+        branchPostCountDBList.add( "$socialMediaPostDetails.branchMediaPostDetailsList.sharedOn" );
+        branchPostCountDBList.add( new BasicDBList() );
+        BasicDBObject branchPostsCount = new BasicDBObject( "$size", new BasicDBObject( "$ifNull", branchPostCountDBList ) );
+        secondProjectionObject.append( "branchPostsCount", branchPostsCount );
+
+        BasicDBList companyPostCountDBList = new BasicDBList();
+        companyPostCountDBList.add( "$socialMediaPostDetails.companyMediaPostDetails.sharedOn" );
+        companyPostCountDBList.add( new BasicDBList() );
+        BasicDBObject companyPostsCount = new BasicDBObject( "$size", new BasicDBObject( "$ifNull", companyPostCountDBList ) );
+        secondProjectionObject.append( "companyPostsCount", companyPostsCount );
+        pipeline.add( new BasicDBObject( "$project", secondProjectionObject ) );
+
+        BasicDBObject thirdProjectionObject = new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, 1 );
+        BasicDBList modifiedOnList = new BasicDBList();
+
+        BasicDBList countAdditionList = new BasicDBList();
+        countAdditionList.add( "$agentPostsCount" );
+        countAdditionList.add( "$regionPostsCount" );
+        countAdditionList.add( "$branchPostsCount" );
+        countAdditionList.add( "$companyPostsCount" );
+
+        thirdProjectionObject.append( "postsCount", new BasicDBObject( "$add", countAdditionList ) );
+
+        modifiedOnList.add( "$modifiedOn" );
+        BasicDBObject yearDBObject = new BasicDBObject( "$year", modifiedOnList );
+        BasicDBList multiplyDBList = new BasicDBList();
+        multiplyDBList.add( yearDBObject );
+        multiplyDBList.add( 100 );
+        BasicDBObject multiplyDBObject = new BasicDBObject( "$multiply", multiplyDBList );
+        BasicDBList addDBList = new BasicDBList();
+        addDBList.add( multiplyDBObject );
+        BasicDBObject groupColObjectValue = null;
+        if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_WEEK ) ) {
+            BasicDBObject weekDBObject = new BasicDBObject( "$week", modifiedOnList );
+            addDBList.add( weekDBObject );
+        } else if ( aggregateBy.equals( CommonConstants.AGGREGATE_BY_MONTH ) ) {
+            BasicDBObject monthDBObject = new BasicDBObject( "$month", modifiedOnList );
+            addDBList.add( monthDBObject );
+        }
+        groupColObjectValue = new BasicDBObject( "$add", addDBList );
+        thirdProjectionObject.append( "groupCol", groupColObjectValue );
+        pipeline.add( new BasicDBObject( "$project", thirdProjectionObject ) );
+        // grouping
+        pipeline.add( new BasicDBObject( "$group", new BasicDBObject( "_id", "$groupCol" ).append( "count", new BasicDBObject(
+            "$sum", "$postsCount" ) ) ) );
+        BasicDBObject aggregationObject = new BasicDBObject( "aggregate", SURVEY_DETAILS_COLLECTION ).append( "pipeline",
+            pipeline );
+
+        CommandResult aggregateResult = mongoTemplate.executeCommand( aggregationObject );
+
+        List<BasicDBObject> aggregatedData = null;
+        if ( aggregateResult.containsField( "result" ) ) {
+            aggregatedData = (List<BasicDBObject>) aggregateResult.get( "result" );
+            if ( aggregatedData.size() > 0 ) {
+                aggregatedResult = new HashMap<>();
+                for ( BasicDBObject data : aggregatedData ) {
+                    aggregatedResult.put( Integer.parseInt( data.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString() ),
+                        Integer.parseInt( data.get( "count" ).toString() ) );
+                }
+            }
+        }
+        LOG.info( "Returning aggregating completed survey results" );
+        return aggregatedResult;
+    }
+
+
     @Override
     public List<SurveyDetails> getIncompleteSurveyCustomers( long companyId, int surveyReminderInterval, int maxReminders )
     {
@@ -1327,9 +1446,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ) ) );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         ListIterator<SurveyDetails> surveyIterator = surveys.listIterator();
+        SurveyDetails surveyDetail;
         while ( surveyIterator.hasNext() ) {
-            if ( surveyIterator.next().getRemindersForSocialPosts() != null
-                && surveyIterator.next().getRemindersForSocialPosts().size() >= maxReminders ) {
+            surveyDetail = surveyIterator.next();
+            if ( surveyDetail.getRemindersForSocialPosts() != null
+                && surveyDetail.getRemindersForSocialPosts().size() >= maxReminders ) {
                 surveyIterator.remove();
             }
         }
@@ -1378,41 +1499,54 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ),
-            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            aggregation = new TypedAggregation<SurveyDetails>(
+                SurveyDetails.class,
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+                Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
+                    .match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation
+                    .match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         } else if ( startDate != null && endDate == null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
-            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            aggregation = new TypedAggregation<SurveyDetails>(
+                SurveyDetails.class,
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+                Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
+                    .match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ), Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         else if ( startDate == null && endDate != null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), 
-            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            aggregation = new TypedAggregation<SurveyDetails>(
+                SurveyDetails.class,
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+                Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
+                    .match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ), Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         else {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
-            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
+            aggregation = new TypedAggregation<SurveyDetails>(
+                SurveyDetails.class,
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+                Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).avg( CommonConstants.SCORE_COLUMN ).as( "score" ) );
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
+
+        //create rating format to format survey score
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
 
         if ( result != null ) {
             @SuppressWarnings ( "unchecked") List<BasicDBObject> averageSCore = (List<BasicDBObject>) result.getRawResults()
@@ -1427,8 +1561,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 }
 
                 double score = Double.parseDouble( o.get( "score" ).toString() );
-                score = new BigDecimal( score ).setScale( CommonConstants.DECIMALS_TO_ROUND_OFF, RoundingMode.HALF_UP )
-                    .doubleValue();
+                try {
+                    score = Double.parseDouble( ratingFormat.format( score ) );
+                } catch ( NumberFormatException e ) {
+                    LOG.error( "Error while parsing survey score " );
+                }
                 agentRankingReport.setAverageScore( score );
 
                 agentReportData.put( agentId, agentRankingReport );
@@ -1443,37 +1580,45 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         TypedAggregation<SurveyDetails> aggregation;
         if ( startDate != null && endDate != null ) {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where(columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), 
-            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            aggregation = new TypedAggregation<SurveyDetails>(
+                SurveyDetails.class,
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+                Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
+                    .match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation
+                    .match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         } else if ( startDate != null && endDate == null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            aggregation = new TypedAggregation<SurveyDetails>(
+                SurveyDetails.class,
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+                Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
+                    .match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ), Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         else if ( startDate == null && endDate != null )
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), 
-            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            aggregation = new TypedAggregation<SurveyDetails>(
+                SurveyDetails.class,
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                // Commented as Zillow surveys are not stored in database, SS-1276
+                // Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+                Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
+                    .match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ), Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         else {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, 
-            		Aggregation.match( Criteria.where( columnName ).is( columnValue ) ), 
-            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
-            		Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), 
-            		Aggregation.group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
+            aggregation = new TypedAggregation<SurveyDetails>(
+                SurveyDetails.class,
+                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
+                //            		Commented as Zillow surveys are not stored in database, SS-1276
+                //            		Aggregation.match( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) ),
+                Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
+                Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ), Aggregation
+                    .group( CommonConstants.AGENT_ID_COLUMN ).count().as( "count" ) );
         }
 
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
@@ -1553,36 +1698,38 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
-    @Override
-    public void removeZillowSurveysByEntity( String entityType, long entityId )
-    {
-        LOG.info( "Method removeZillowSurveysByEntity() started" );
-        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
-            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
-        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
-        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
-        LOG.info( "Method removeZillowSurveysByEntity() finished" );
-    }
+    // Commented as Zillow surveys are not stored in database, SS-1276
+    //    @Override
+    //    public void removeZillowSurveysByEntity( String entityType, long entityId )
+    //    {
+    //        LOG.info( "Method removeZillowSurveysByEntity() started" );
+    //        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
+    //            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+    //        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+    //        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+    //        LOG.info( "Method removeZillowSurveysByEntity() finished" );
+    //    }
 
-
-    @Override
-    public void removeExcessZillowSurveysByEntity( String entityType, long entityId )
-    {
-        LOG.info( "Method removeExcessZillowSurveysByEntity() started" );
-        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
-            CommonConstants.SURVEY_SOURCE_ZILLOW ) );
-        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
-        query.with( new Sort( Sort.Direction.ASC, "createdOn" ) );
-        List<DBObject> surveys = mongoTemplate.find( query, DBObject.class, SURVEY_DETAILS_COLLECTION );
-        int count = surveys.size();
-        if ( count > 10 ) {
-            int noOfSurveysToRemove = count - 10;
-            for ( int i = 0; i < noOfSurveysToRemove; i++ ) {
-                mongoTemplate.remove( surveys.get( i ), SURVEY_DETAILS_COLLECTION );
-            }
-        }
-        LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
-    }
+    //    Commented as Zillow surveys are not stored in database, SS-1276
+    //    @Override
+    //    public void removeExcessZillowSurveysByEntity( String entityType, long entityId )
+    //    {
+    //        LOG.info( "Method removeExcessZillowSurveysByEntity() started" );
+    //        
+    //                Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is(
+    //                    CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+    //                query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+    //                query.with( new Sort( Sort.Direction.ASC, "createdOn" ) );
+    //                List<DBObject> surveys = mongoTemplate.find( query, DBObject.class, SURVEY_DETAILS_COLLECTION );
+    //                int count = surveys.size();
+    //                if ( count > 10 ) {
+    //                    int noOfSurveysToRemove = count - 10;
+    //                    for ( int i = 0; i < noOfSurveysToRemove; i++ ) {
+    //                        mongoTemplate.remove( surveys.get( i ), SURVEY_DETAILS_COLLECTION );
+    //                    }
+    //                }
+    //        LOG.info( "Method removeExcessZillowSurveysByEntity() finished" );
+    //    }
 
 
     @Override
@@ -1626,12 +1773,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //create AbuseReporterDetails object for the surveys reported abusive by application
         AbuseReporterDetails absReporterDetailForApp = new AbuseReporterDetails();
         Set<ReporterDetail> abuseReportersForApp = new HashSet<ReporterDetail>();
-        abuseReportersForApp.add( new ReporterDetail( CommonConstants.REPORT_ABUSE_BY_APPLICSTION_NAME , CommonConstants.REPORT_ABUSE_BY_APPLICSTION_EMAIL ) );
+        abuseReportersForApp.add( new ReporterDetail( CommonConstants.REPORT_ABUSE_BY_APPLICSTION_NAME,
+            CommonConstants.REPORT_ABUSE_BY_APPLICSTION_EMAIL ) );
         absReporterDetailForApp.setAbuseReporters( abuseReportersForApp );
-        
+
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = new ArrayList<AbusiveSurveyReportWrapper>();
         for ( SurveyDetails survey : surveys ) {
-            if(survey.isAbuseRepByUser()){
+            if ( survey.isAbuseRepByUser() ) {
                 if ( absReporterDetails != null && absReporterDetails.size() > 0 ) {
                     boolean reporterDetailsFound = false;
                     for ( AbuseReporterDetails absReporterDetail : absReporterDetails ) {
@@ -1648,10 +1796,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     // to handle existing surveys where reporter info not saved
                     abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, null ) );
                 }
-            }else{
-                
+            } else {
+
                 abusiveSurveyReports.add( new AbusiveSurveyReportWrapper( survey, absReporterDetailForApp ) );
-            }            
+            }
         }
 
         LOG.info( "Method getSurveysReporetedAsAbusive() to retrieve surveys marked as abusive finished." );

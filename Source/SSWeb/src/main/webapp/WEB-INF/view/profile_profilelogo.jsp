@@ -18,8 +18,8 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-<c:if test="${not empty profileSettings && not empty profileSettings.logoThumbnail}">
-	<c:set value="${profileSettings.logoThumbnail}" var="profilelogo"></c:set>
+<c:if test="${not empty profileSettings && not empty profileSettings.logo}">
+	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
 	<c:set value="${profileSettings.lockSettings}" var="lock"></c:set>
 </c:if>
 
@@ -61,8 +61,14 @@
 					<input type="file" id="prof-logo" class="con_img_inp_file">
 				</form>
 			</c:when>
-			<c:when	test="${not parentLock.isLogoLocked && not lock.isLogoLocked && profilemasterid != 4}">
+			<c:when	test="${not parentLock.isLogoLocked && not lock.isLogoLocked && profilemasterid != 4 && isLogoSetByEntity}">
 				<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="prof-img-lock-item prof-img-lock"></div>
+				<form class="form_contact_image" enctype="multipart/form-data">
+					<input type="file" id="prof-logo" class="con_img_inp_file">
+				</form>
+			</c:when>
+			<c:when	test="${not parentLock.isLogoLocked && not lock.isLogoLocked && profilemasterid != 4 && not isLogoSetByEntity}">
+				<div id="prof-logo-lock" data-state="unlocked" data-control="user" class=""></div>
 				<form class="form_contact_image" enctype="multipart/form-data">
 					<input type="file" id="prof-logo" class="con_img_inp_file">
 				</form>

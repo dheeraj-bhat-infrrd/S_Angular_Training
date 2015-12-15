@@ -105,8 +105,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 							CommonConstants.COMPANY_ID_COLUMN, companyId));
 				}
 			}
-			long initialIndex = 0;
-			criteria.add(Restrictions.gt(CommonConstants.AGENT_ID_COLUMN, initialIndex));
+			// JIRA: SS-1357: Begin
+			criteria.add(Restrictions.in(CommonConstants.STATUS_COLUMN, new Integer[]{CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED}));
+			// JIRA: SS-1357: End
 			criteria.addOrder(Order.desc(CommonConstants.MODIFIED_ON_COLUMN));
 			return criteria.list();
 		}

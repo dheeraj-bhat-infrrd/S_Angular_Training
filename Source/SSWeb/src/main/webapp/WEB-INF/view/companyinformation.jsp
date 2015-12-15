@@ -43,13 +43,13 @@
 	<div class="hm-header-main-wrapper">
 		<div class="container">
 			<div class="hm-header-row hm-header-row-main clearfix">
-				<div class="hm-header-row-left text-center padding-10"><spring:message code="label.signupstartjourney.key" /></div>
+				<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.signupstartjourney.key" /></div>
 			</div>
 		</div>
 	</div>
 	
 	<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
-		<div class="container reg_panel_container">
+		<div class="container reg_panel_container" id="company-info-load">
 			<div class="reg_header"><spring:message code="label.companysettings.header.key"/></div>
 			
 			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data" autocomplete="off" >
@@ -198,7 +198,7 @@ $(document).ready(function() {
 		countryCode = $('#country-code').val();
 	}
 	if(countryCode == "US"){
-		showStateCityRow("state-city-row", "com-state");
+		showStateCityRow("state-city-row", "com-state", "com-city");
 		if( $('input[name="country"]').val() == null || $('input[name="country"]').val() == "" ){
 			$('input[name="country"]').val("United States");
 			$('#country-code').val(countryCode);
@@ -238,14 +238,18 @@ $(document).ready(function() {
 	}
 	
 	$('#company-info-submit').click(function() {
-		if(logo){
+		if(logo && logoSuccess && !isFormSubmitted ){
 			submitCompanyInfoForm();
 		}
-		else{
-			$('#overlay-toast').html('Logo is uploading please wait');
+		
+		if(!logoSuccess){
+			$('#overlay-toast').html('uploading logo please wait');
 			showToast();
 		}
-		
+		if(!logo){
+			$('#overlay-toast').html('Please upload files of type jpeg, png or jpg');
+			showToast();
+		}
 	});
 	
 	$('#icn-file').click(function(){
@@ -277,7 +281,7 @@ $(document).ready(function() {
 				}
 			}
 			if(ui.item.code=="US"){
-				showStateCityRow("state-city-row", "com-state");
+				showStateCityRow("state-city-row", "com-state", "com-city");
 			}else{
 				hideStateCityRow("state-city-row", "com-state");
 			}
@@ -296,15 +300,6 @@ $(document).ready(function() {
 	}).autocomplete("instance")._renderItem = function(ul, item) {
 		return $("<li>").append(item.label).appendTo(ul);
   	};
-  	/* $("#com-country").keydown(function(e){
-  	    if( e.keyCode != $.ui.keyCode.TAB) return; 
-  	    
-   	   e.keyCode = $.ui.keyCode.DOWN;
-   	   $(this).trigger(e);
-
-   	   e.keyCode = $.ui.keyCode.ENTER;
-   	   $(this).trigger(e);
-   	}); */
 });
 
 $('#com-state').on('change',function(e){
@@ -318,13 +313,15 @@ $('#com-state').on('change',function(e){
 $('#com-city').bind('focus', function(){ 
 	if($('#com-state').val() &&  $('#com-state').val() != ""){
 		$(this).trigger('keydown');
-		$(this).autocomplete("search");		
+		//$(this).autocomplete("search");		
 	}
 });
-
+ var isFormSubmitted=false;
 function submitCompanyInfoForm() {
 	if (validateCompanyInformationForm('company-info-div')) {
+		isFormSubmitted=true;
 		$('#company-info-form').submit();
+		
 	}
 }
 
@@ -338,19 +335,22 @@ $('input').keypress(function(e){
 
 // Logo upload
 var logo=true;
+var logoSuccess=true;
 $("#com-logo").on("change", function() {
-	logo =false;
+	logo=true;
 	if(!logoValidate("#com-logo")){
+		logo =false;
 		return false;
 	}
+	logoSuccess=false;
 	var formData = new FormData();
 	formData.append("logo", $('#com-logo').prop("files")[0]);
 	formData.append("logo_name", $('#com-logo').prop("files")[0].name);
-	callAjaxPOSTWithTextData("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
+	callAjaxPOSTWithTextDataLogo("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
 });
 
 function uploadImageSuccessCallback(response) {
-	logo=true;
+	logoSuccess=true;
 	var success = "Logo has been uploaded successfully";
 	if (success != response.trim()) {
 		$('#com-logo').val('');
@@ -359,81 +359,6 @@ function uploadImageSuccessCallback(response) {
 	} else {
 		showInfo(response);
 	}
-}
-
-function validateCountry() {
-	var country = $.trim($('#com-country').val());
-	if (country == "") {
-		showError('Please enter country name');
-		return false;
-	} else {
-		var countryCode = $.trim($('#country-code').val());
-		if (countryCode == "") {
-			showError('Please enter valid country name');
-			return false;
-		} else {
-			return true;
-		}
-	}
-}
-
-function validateCompanyInformationForm(elementId) {
-	isCompanyInfoPageValid = true;
-	var isFocussed = false;
-	//var isSmallScreen = false;
-	if($(window).width()<768){
-		isSmallScreen = true;
-	}
-	
-	if(!validateCompany('com-company')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-company').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if(!validateAddress1('com-address1')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-address1').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if(!validateAddress2('com-address2')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-address2').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if(!validateCountry('com-country')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-country').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if(!validateCountryZipcode('com-zipcode')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-zipcode').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	if(!validatePhoneNumber('com-contactno')){
-		isCompanyInfoPageValid = false;
-		if(!isFocussed){
-			$('#com-contactno').focus();
-			isFocussed=true;
-		}
-		return isCompanyInfoPageValid;
-	}
-	return isCompanyInfoPageValid;
 }
 </script>
 

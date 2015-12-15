@@ -29,7 +29,6 @@
 						&nbsp&nbsp&nbsp&nbsp[Link] : Url of the survey,
 						<br />
 						&nbsp&nbsp&nbsp&nbsp[Name] : Customer Name,
-						&nbsp&nbsp&nbsp&nbsp[FirstName] : Customer First Name,
 						&nbsp&nbsp&nbsp&nbsp[AgentName] : User Name,
 						&nbsp&nbsp&nbsp&nbsp[AgentSignature] : User's Signature,
 						<br />

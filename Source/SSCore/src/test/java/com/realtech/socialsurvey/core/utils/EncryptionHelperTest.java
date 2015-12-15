@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
+
 public class EncryptionHelperTest
 {
     @InjectMocks
@@ -17,20 +18,25 @@ public class EncryptionHelperTest
 
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
+    public static void setUpBeforeClass() throws Exception
+    {}
+
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
+    public static void tearDownAfterClass() throws Exception
+    {}
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
         MockitoAnnotations.initMocks( this );
     }
 
 
     @After
-    public void tearDown() throws Exception {}
+    public void tearDown() throws Exception
+    {}
 
 
     @Test ( expected = InvalidInputException.class)
@@ -107,5 +113,33 @@ public class EncryptionHelperTest
     public void testDecodeBase64WithEmptyPlainText() throws InvalidInputException
     {
         encryptionHelper.decodeBase64( TestConstants.TEST_EMPTY_STRING );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void encryptAES256BytesTestPlainTextNull() throws InvalidInputException
+    {
+        encryptionHelper.encryptAES256Bytes( null, null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void encryptAES256BytesTestKeyNull() throws InvalidInputException
+    {
+        encryptionHelper.encryptAES256Bytes( "test".getBytes(), null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void decryptAES256BytesTestPlainTextNull() throws InvalidInputException
+    {
+        encryptionHelper.decryptAES256Bytes( null, null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void decryptAES256BytesTestKeyNull() throws InvalidInputException
+    {
+        encryptionHelper.decryptAES256Bytes( "test".getBytes(), null );
     }
 }

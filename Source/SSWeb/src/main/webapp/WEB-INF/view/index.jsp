@@ -47,7 +47,6 @@
 						<div class="float-left h-email-wrapper">
 							<div class="h-lbl">email address</div>
 							<div class="h-inp-wrapper">
-								<div class="m-inp-img m-inp-img-uname"></div>
 								<input type="email" class="h-inp" placeholder="Email Address" id="login-user-id" name="j_username">
 							</div>
 						</div>
@@ -57,7 +56,6 @@
 								<div class="float-right fgt-pwd"><span id="forgot-pwd" onclick ="openForgotPasswordPage();">Forgot Password?</span></div>
 							</div>
 							<div class="h-inp-wrapper">
-								<div class="m-inp-img m-inp-img-pwd"></div>
 								<input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password">
 							</div>
 						</div>
@@ -72,11 +70,6 @@
 			</div>
 			
 			<div class="hero-txt-wrapper">
-				<!-- <span class="txt-bold">read, write</span> and 
-				<span class="txt-bold">Share </span>reviews<br/>
-                <span class="txt-header-small">Social Survey is where </span>
-                <span class="txt-bold txt-header-small">Professionals</span> <span class="txt-header-small">and</span>
-                <span class="txt-bold txt-header-small">Customers </span><span class="txt-header-small">connect</span> -->
                 <span style="color: #333;">Enterprise Reputation Management</span><br/>
                 <span> <a target="_blank" class="anchor-home" style="font-size: 20px; color: #2a6496;" href="https://www.socialsurvey.me/survey/scott-harris-talks-about-socialsurvey-2/">To Learn More Click Here</a></span>
 			</div>
@@ -133,13 +126,10 @@
 						<div class="reg-txt-top1">Start Your Free Trial.</div>
 						<div class="reg-txt-top2">Sign up Now. It takes less than 2 minutes.</div>
 						<div class="clearfix reg-item reg-item-bord-top">
-							<div class="m-inp-img-fname m-inp-img"></div>
-							<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
 							<input id="reg-fname" name="firstName" class="reg-inp reg-inp-1 reg-inp-1-adj" value="${firstname}" placeholder="First Name">
 							<input id="reg-lname" name="lastName" class="reg-inp reg-inp-2" value="${lastname}" placeholder="Last Name">
 						</div>
 						<div class="clearfix reg-item">
-							<div class="m-inp-img-email m-inp-img"></div>
 							<input type="email" name="emailId" id="reg-email" class="reg-inp reg-inp-3" value="${emailid}" placeholder="Email">
 						</div>
 						<div class="clearfix reg-captcha-wrapper reg-item">
@@ -178,8 +168,6 @@
 				<form id="find-pro-form" method="GET" action="./findapro.do">
 					<div class="pro-right-wrapper clearfix float-left">
 						<div class="blue-ext-right"></div>
-						<div class="m-inp-img-fname m-inp-img"></div>
-						<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
 						<input id="find-pro-first-name" name="find-pro-first-name" class="pro-inp" placeholder="First Name">
 						<input id="find-pro-last-name" name="find-pro-last-name" class="pro-inp" placeholder="Last Name">
 						<input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Search">
@@ -202,7 +190,6 @@
 		</div>
 	</div>
  
-<script src='//www.google.com/recaptcha/api.js'></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
 	if (!window.jQuery) { document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>'); }
@@ -210,126 +197,10 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
 <script>
 $(document).ready(function(){
-	var captchaText=true;
-	resizeFunc();
-	$(window).resize(resizeFunc);
-	
-	function resizeFunc(){
-		var winW = window.innerWidth;
-		if (winW < 768) {
-			var offset = winW - 114 - 50;
-			$('.reg-cap-txt').css('width',offset+'px');
-			if ($('#pro-wrapper-top').html() == "") {
-				$('#pro-wrapper-top').html($('#pro-wrapper').html());
-				$('#pro-wrapper').html('');
-			}
-		} else {
-			if ($('#pro-wrapper').html() == "") {
-				$('#pro-wrapper').html($('#pro-wrapper-top').html());
-				$('#pro-wrapper-top').html('');
-			}
-		}
-	}
-	
-  	// Login form
-  	$('#login-form input').on('keyup',function(e){
-		  if(e.which == 13){
-			  $('#login-submit').trigger('click');
-		  }
-  	});
-  	
-	$('#login-submit').click(function(){
-		loginUser();
-	});
-	
-	function loginUser() {
-		if (validateLoginForm('login-form')) {
-			$('#login-form').submit();
-			showOverlay();
-		}
-	}
-
-	// Functions to trigger form validation of various input elements
-	if ($('#message').val() != "") {
-		showRegErr($('#message').val());
-	}
-
-	$('#reg-submit').click(function(e) {
-		e.preventDefault();
-		submitRegistrationForm();
-	});
-
-	$('#registration-form input').keyup(function(e){
-		// detect enter
-		if (e.which==13){
-			$('#reg-submit').trigger('click');
-		}
-	});
-	
-	function submitRegistrationForm() {
-		if (validatePreRegistrationForm('reg-form')) {
-			$('#registration-form').submit();
-			showOverlay();
-		}
-	}
-	
-	function captchaLoaded() {
-		var imgData = $(".recaptcha_image_cell").html();
-		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
-		if(challenge == undefined){
-			Recaptcha.reload();
-		}else{
-			$(".reg-captcha-img").html(imgData);
-		}
-	}
-	
-	$(".reg-cap-reload").click(function(){
-		Recaptcha.reload();
-	});
-	
-	$(".reg-cap-sound").click(function(){
-		if (captchaText == true) {
-			$("#recaptcha_switch_audio").click();
-			captchaText=false;
-			$(this).addClass('reg-cap-text');
-		}
-		else {
-			$("#recaptcha_switch_img").click();
-			captchaText=true;
-			$(this).removeClass('reg-cap-text');
-		}
-	});
-	
-	$(".reg-cap-info").click(function(){
-		$("#recaptcha_whatsthis").click();
-	});
-	
-	$('#reg-err-pu-close').click(function(){
-		hideRegErr();
-	});
-	
-	// Find a pro
-	$('#find-pro-submit').click(function(e) {
-		e.preventDefault();
-		submitFindProForm();
-	});
-
-	function submitFindProForm() {
-		$('#find-pro-form').submit();
-		showOverlay();
-	}
-
-	$('#find-pro-form input').on('keyup',function(e){
-		if(e.which == 13){
-			$('#find-pro-submit').trigger('click');
-		}
-	});
-	
-	$('#header-search-icn').click(function(e) {
-		$('#pro-wrapper-top').slideToggle(200);
-	});
+	initializeHomePage();
 });
 </script>
 

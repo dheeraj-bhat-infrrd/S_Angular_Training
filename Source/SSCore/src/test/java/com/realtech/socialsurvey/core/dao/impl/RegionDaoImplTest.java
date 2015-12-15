@@ -43,4 +43,10 @@ public class RegionDaoImplTest
     public void testGetRegionForRegionIdsWithEmptyRegionIds() throws InvalidInputException{
         regionDaoImpl.getRegionForRegionIds( new HashSet<Long>() );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetRegionIdsForCompanyIdWithInvalidCompanyId() throws InvalidInputException{
+        regionDaoImpl.getRegionIdsForCompanyId( 0 );
+    }
 }
