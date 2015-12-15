@@ -5140,12 +5140,13 @@ width: 50%;
 }
 
 .bd-frm-rt-txt-area {
-	width: 400px;
+	width: 90%;
 	padding: 10px;
 	height: 182px;
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+	min-width:180px;
 }
 
 .bd-dd-img {
