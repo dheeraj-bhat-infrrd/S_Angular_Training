@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -469,7 +470,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Override
     @SuppressWarnings ( "unchecked")
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin, boolean includeZillow )
+        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, long zillowTotalReviewScore )
     {
         LOG.info( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName
             + " columnValue:" + columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive );
@@ -537,21 +538,18 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( result != null && reviewsCount > 0 ) {
             List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get( "result" );
             if ( includeZillow ) {
-                long zillowReviewCount = getZillowReviewCountBasedOnColumnNameAndId( columnName, columnValue );
                 double totalRating = reviewsCount > 0 ? (double) basicDBObject.get( 0 ).get( "total_score" ) : 0;
                 if ( zillowReviewCount > 0 ) {
                     reviewsCount += zillowReviewCount;
-                    totalRating += ( getZillowReviewAverageBasedOnColumnNameAndId( columnName, columnValue ) * zillowReviewCount );
+                    totalRating += zillowTotalReviewScore;
                 }
                 if ( zillowReviewCount > 0 || reviewsCount > 0 )
                     rating = totalRating / reviewsCount;
             } else
                 rating = (double) basicDBObject.get( 0 ).get( "total_score" ) / reviewsCount;
         } else if ( includeZillow ) {
-            long zillowReviewCount = getZillowReviewCountBasedOnColumnNameAndId( columnName, columnValue );
-            double zillowRating = getZillowReviewAverageBasedOnColumnNameAndId( columnName, columnValue ) * zillowReviewCount;
             if ( zillowReviewCount > 0 )
-                rating = zillowRating / zillowReviewCount;
+                rating = zillowTotalReviewScore / zillowReviewCount;
         }
         LOG.info( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished." );
         return rating;
@@ -633,8 +631,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
-        Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( numberOfDays );
+
+        Date endDate = null;
+        Date startDate = null;
+        if ( numberOfDays >= 0 ) {
+            endDate = Calendar.getInstance().getTime();
+            startDate = getNdaysBackDate( numberOfDays );
+        }
+
         Query query = new Query();
         if ( columnName == null ) {
         } else {
@@ -672,7 +676,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
             }
 
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+            if ( startDate != null && endDate == null ) {
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+            } else if ( startDate == null && endDate != null ) {
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+            } else if ( startDate != null && endDate != null ) {
+                query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+            }
+
 
             List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
@@ -883,7 +894,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
-        boolean fetchAbusive, boolean notRecommended, boolean includeZillow )
+        boolean fetchAbusive, boolean notRecommended, boolean includeZillow, long zillowReviewCount )
     {
         LOG.info( "Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue
             + " startScore:" + startScore + " limitScore:" + limitScore + " and fetchAbusive:" + fetchAbusive );
@@ -922,7 +933,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         long feedBackCount = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
         if ( includeZillow && !notRecommended ) {
             // get zillow review count based on column name
-            long zillowReviewCount = getZillowReviewCountBasedOnColumnNameAndId( columnName, columnValue );
             feedBackCount += zillowReviewCount;
         }
         LOG.info( "Method getFeedBacksCount executed successfully.Returning feedBackCount:" + feedBackCount );
@@ -1502,6 +1512,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
 
+        //create rating format to format survey score
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
+
         if ( result != null ) {
             @SuppressWarnings ( "unchecked") List<BasicDBObject> averageSCore = (List<BasicDBObject>) result.getRawResults()
                 .get( "result" );
@@ -1515,8 +1530,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 }
 
                 double score = Double.parseDouble( o.get( "score" ).toString() );
-                score = new BigDecimal( score ).setScale( CommonConstants.DECIMALS_TO_ROUND_OFF, RoundingMode.HALF_UP )
-                    .doubleValue();
+                try {
+                    score = Double.parseDouble( ratingFormat.format( score ) );
+                } catch ( NumberFormatException e ) {
+                    LOG.error( "Error while parsing survey score " );
+                }
                 agentRankingReport.setAverageScore( score );
 
                 agentReportData.put( agentId, agentRankingReport );
@@ -2016,60 +2034,5 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
 
         return surveyCountForEntities;
-    }
-
-
-    long getZillowReviewCountBasedOnColumnNameAndId( String columnName, long iden )
-    {
-        OrganizationUnitSettings unitSettings = getOrganizationUnitSettingsByColumnNameAndId( columnName, iden );
-        if ( unitSettings != null )
-            return unitSettings.getZillowReviewCount();
-        else
-            return 0;
-    }
-
-
-    long getZillowReviewAverageBasedOnColumnNameAndId( String columnName, long iden )
-    {
-        OrganizationUnitSettings unitSettings = getOrganizationUnitSettingsByColumnNameAndId( columnName, iden );
-        if ( unitSettings != null )
-            return unitSettings.getZillowReviewAverage();
-        else
-            return 0;
-    }
-
-
-    OrganizationUnitSettings getOrganizationUnitSettingsByColumnNameAndId( String columnName, long iden )
-    {
-        try {
-            if ( columnName == null || columnName.isEmpty() ) {
-                throw new InvalidInputException(
-                    "column name is null or empty while getting organization unit settings based on column name and id" );
-            }
-            if ( iden <= 0l ) {
-                throw new InvalidInputException(
-                    "Invalid id passed while getting organization unit settings based on column name and id" );
-            }
-            LOG.debug( "Getting organization unit settings based on column name :" + columnName + " and id : " + iden );
-            switch ( columnName ) {
-                case CommonConstants.COMPANY_ID_COLUMN:
-                    return organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( iden,
-                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-                case CommonConstants.REGION_ID_COLUMN:
-                    return organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( iden,
-                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-                case CommonConstants.BRANCH_ID_COLUMN:
-                    return organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( iden,
-                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                case CommonConstants.AGENT_ID_COLUMN:
-                    return organizationUnitSettingsDao.fetchAgentSettingsById( iden );
-                default:
-                    throw new InvalidInputException(
-                        "Invalid column name passed to fetch organization unit settings based on column name" );
-            }
-        } catch ( Exception e ) {
-            LOG.error( "Exception occurred while fetching Organization unit settings based on column name and id. Reason : ", e );
-        }
-        return null;
     }
 }
