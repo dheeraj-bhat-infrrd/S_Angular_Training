@@ -4402,7 +4402,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         reviewCount += companySettings.getZillowReviewCount();
                         totalScore += ( companySettings.getZillowReviewAverage() * companySettings.getZillowReviewCount() );
                     }
-                    if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
+                    /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
                         Set<Long> regionIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_REGION );
                         if ( regionIds != null && !regionIds.isEmpty() ) {
                             List<OrganizationUnitSettings> regionSetttingsList = organizationUnitSettingsDao
@@ -4450,7 +4450,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 }
                             }
                         }
-                    }
+                    }*/
                     break;
                 case CommonConstants.REGION_ID_COLUMN:
                     OrganizationUnitSettings regionSetttings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
@@ -4460,7 +4460,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         reviewCount += regionSetttings.getZillowReviewCount();
                         totalScore += ( regionSetttings.getZillowReviewAverage() * regionSetttings.getZillowReviewCount() );
                     }
-                    if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
+                    /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
                         Set<Long> branchIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH );
                         if ( branchIds != null && !branchIds.isEmpty() ) {
                             List<OrganizationUnitSettings> branchSetttingsList = organizationUnitSettingsDao
@@ -4492,7 +4492,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 }
                             }
                         }
-                    }
+                    }*/
                     break;
                 case CommonConstants.BRANCH_ID_COLUMN:
                     OrganizationUnitSettings branchSetttings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
@@ -4502,7 +4502,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         reviewCount += branchSetttings.getZillowReviewCount();
                         totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings.getZillowReviewCount() );
                     }
-                    if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
+                    /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
                         Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
                         if ( individualIds != null && !individualIds.isEmpty() ) {
                             List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
@@ -4518,7 +4518,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 }
                             }
                         }
-                    }
+                    }*/
                     break;
                 case CommonConstants.AGENT_ID_COLUMN:
                     AgentSettings agentSetttings = organizationUnitSettingsDao.fetchAgentSettingsById( iden );
