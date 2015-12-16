@@ -2,10 +2,10 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 
@@ -14,7 +14,6 @@ import javax.persistence.Table;
  */
 @Entity
 @Table ( name = "CRM_BATCH_TRACKER")
-@NamedQuery ( name = "CrmMaster.findAll", query = "SELECT c FROM CrmBatchTracker c")
 public class CrmBatchTracker implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -31,6 +30,9 @@ public class CrmBatchTracker implements Serializable
     
     @Column ( name = "BRANCH_ID")
     private long branchId;
+    
+    @Column ( name = "AGENT_ID")
+    private long agentId;
 
     @Column ( name = "SOURCE")
     private String source;
@@ -113,6 +115,16 @@ public class CrmBatchTracker implements Serializable
     }
 
 
+
+    public long getAgentId()
+    {
+        return agentId;
+    }
+
+    public void setAgentId( long agentId )
+    {
+        this.agentId = agentId;
+    }
 
     public String getSource()
     {
