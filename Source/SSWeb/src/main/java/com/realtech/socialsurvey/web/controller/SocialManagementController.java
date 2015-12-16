@@ -64,7 +64,6 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialMonitorData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
 import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -1704,7 +1703,7 @@ public class SocialManagementController
     }
 
 
-    @SuppressWarnings ( "unchecked")
+    @SuppressWarnings ( { "unchecked", "unused" })
     @RequestMapping ( value = "/zillowSaveInfo")
     @ResponseBody
     public String saveZillowDetails( Model model, HttpServletRequest request )
@@ -1881,6 +1880,8 @@ public class SocialManagementController
                     Company company = userManagementService.getCompanyById( companySettings.getIden() );
                     if(company != null){
                     	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                    	//Set IS_ZILLOW_CONNECTED to true
+                    	company.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
                     	userManagementService.updateCompany( company );
                     }
                     for ( ProfileStage stage : companySettings.getProfileStages() ) {
@@ -1909,6 +1910,8 @@ public class SocialManagementController
                     Region region = userManagementService.getRegionById( regionSettings.getIden() );
                     if(region != null){
                     	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                        //Set IS_ZILLOW_CONNECTED to true
+                        region.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
                     	userManagementService.updateRegion( region );
                     }
                     for ( ProfileStage stage : regionSettings.getProfileStages() ) {
@@ -1936,6 +1939,8 @@ public class SocialManagementController
                     Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                     if(branch != null){
                     	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                        //Set IS_ZILLOW_CONNECTED to true
+                        branch.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
                     	userManagementService.updateBranch( branch );
                     }
                     for ( ProfileStage stage : branchSettings.getProfileStages() ) {
@@ -1959,6 +1964,12 @@ public class SocialManagementController
                     mediaTokens = socialManagementService.checkOrAddZillowLastUpdated(mediaTokens);
                     mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                     agentSettings.setSocialMediaTokens( mediaTokens );
+                    User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
+                    if(agent != null){
+                        //Set IS_ZILLOW_CONNECTED to true
+                        agent.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                        userManagementService.updateUser( agent );
+                    }
                     for ( ProfileStage stage : agentSettings.getProfileStages() ) {
                         if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
                             stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -2068,6 +2079,7 @@ public class SocialManagementController
                 throw new InvalidInputException( "Social media can not be null or empty" );
             }
 
+            boolean isZillow = false;
             boolean unset = CommonConstants.UNSET_SETTINGS;
             SettingsForApplication settings;
             
@@ -2090,6 +2102,7 @@ public class SocialManagementController
     			
     		case CommonConstants.ZILLOW_SOCIAL_SITE:
     			settings = SettingsForApplication.ZILLOW;
+    			isZillow = true;
                 break;
 
     		default:
@@ -2108,6 +2121,10 @@ public class SocialManagementController
                 Company company = user.getCompany();
                 if(company != null){
                 	settingsSetter.setSettingsValueForCompany(company, settings, unset);
+                	//Set IS_ZILLOW_CONNECTED to false
+                	if ( isZillow ) {
+                        company.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    }
                 	userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -2120,6 +2137,10 @@ public class SocialManagementController
                 Region region = userManagementService.getRegionById(entityId);
                 if(region != null){
                 	settingsSetter.setSettingsValueForRegion(region, settings, unset);
+                    //Set IS_ZILLOW_CONNECTED to false
+                    if ( isZillow ) {
+                        region.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    }
                 	userManagementService.updateRegion( region );
                 }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -2132,6 +2153,10 @@ public class SocialManagementController
                 Branch branch = userManagementService.getBranchById(entityId);
                 if(branch != null){
                 	settingsSetter.setSettingsValueForBranch(branch, settings, unset);
+                    //Set IS_ZILLOW_CONNECTED to false
+                    if ( isZillow ) {
+                        branch.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    }
                 	userManagementService.updateBranch( branch );
                 }
             }
@@ -2141,6 +2166,13 @@ public class SocialManagementController
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
+                //Set IS_ZILLOW_CONNECTED to false
+                if ( isZillow ) {
+                    User agent = userManagementService.getUserByUserId( unitSettings.getIden() );
+                    agent.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    userManagementService.updateUser( user );
+                }
+                
             }
             profileSettings.setSocialMediaTokens(unitSettings.getSocialMediaTokens());
             

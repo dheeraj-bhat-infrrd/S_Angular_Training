@@ -893,4 +893,8 @@ public interface CommonConstants
 
     // Zillow fetch failure response
     public static final String ZILLOW_FETCH_FAIL_RESPONSE = "{\"zillowCallBreak\":true}";
+    
+    //Zillow connection
+    public static final int ZILLOW_CONNECTED = 1;
+    public static final int ZILLOW_DISCONNECTED = 0;
 }
