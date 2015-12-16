@@ -210,7 +210,10 @@ $(document).on('click',  function(e){
 			$('#report-abuse-overlay').hide();
 			enableBodyScroll();
 		}
-	
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
 });
 
 $(document).on('keyup',  function(e){
@@ -221,6 +224,10 @@ $(document).on('keyup',  function(e){
 		}
 		if($('#report-abuse-overlay' ).is(':visible')){
 			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
 			enableBodyScroll();
 		}
 	}
@@ -252,7 +259,7 @@ $(document).on('click', '.hr-dd-item', function(e) {
 });
 
 $(document).on('click', '.restart-survey-mail-txt', function(e) {
-	
+	e.stopPropagation();
 	confirmRetakeSurveyReminderMail(this);
 	
 	
