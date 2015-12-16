@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -1646,7 +1647,7 @@ public class DashboardController
 
 
     /*
-     * Method to download file containing incomplete surveys
+     * Method to download file agent ranking report
      */
     @RequestMapping ( value = "/downloadagentrankingreport")
     public void getAgentRankingFile( Model model, HttpServletRequest request, HttpServletResponse response )
@@ -2094,5 +2095,78 @@ public class DashboardController
 
         return JspResolver.LINKEDIN_IMPORT_SOCIAL_LINKS;
     }
+
+
+    /*
+     * Method to download file agent ranking report
+     */
+    @RequestMapping ( value = "/downloaduseradoptionreport")
+    public void getUserAdoptionReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() started." );
+        User user = sessionHelper.getCurrentUser();
+
+        //        if(user.isCompanyAdmin())
+        //            throw new UnsupportedOperationException("User is not authorized to perform this action");
+
+
+        try {
+            String columnName = request.getParameter( "columnName" );
+            if ( columnName == null || columnName.isEmpty() ) {
+                LOG.error( "Invalid value (null/empty) passed for column name." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for column name." );
+            }
+
+            long iden = 0;
+            String columnValue = request.getParameter( "columnValue" );
+            if ( columnValue != null && !columnValue.isEmpty() ) {
+                try {
+                    iden = Long.parseLong( columnValue );
+                } catch ( NumberFormatException e ) {
+                    LOG.error(
+                        "NumberFormatExcept;ion caught while parsing columnValue in getUserAdoptionReportFile(). Nested exception is ",
+                        e );
+                    throw e;
+                }
+            }
+
+            try {
+                Company company = organizationManagementService.getCompanyById( iden );
+                String profileLevel = getProfileLevel( columnName );
+                String fileName = "User_Adoption_Report-" + profileLevel + "-" + company.getCompany() + "-"
+                    + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = dashboardService.downloadUserAdoptionReportData( iden );
+                response.setContentType( EXCEL_FORMAT );
+                String headerKey = CONTENT_DISPOSITION_HEADER;
+                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
+                response.setHeader( headerKey, headerValue );
+
+                // write into file
+                OutputStream responseStream = null;
+                try {
+                    responseStream = response.getOutputStream();
+                    workbook.write( responseStream );
+                } catch ( IOException e ) {
+                    LOG.error( "IOException caught in getUserAdoptionReportFile(). Nested exception is ", e );
+                } finally {
+                    try {
+                        responseStream.close();
+                    } catch ( IOException e ) {
+                        LOG.error( "IOException caught in getUserAdoptionReportFile(). Nested exception is ", e );
+                    }
+                }
+                response.flushBuffer();
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException caught in getUserAdoptionReportFile(). Nested exception is ", e );
+                throw e;
+            } catch ( IOException e ) {
+                LOG.error( "IOException caught in getUserAdoptionReportFile(). Nested exception is ", e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in getUserAdoptionReportFile(). Nested exception is ", e );
+        }
+        LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() finished." );
+    }
+
 }
 // JIRA SS-137 : by RM-05 : EOC
