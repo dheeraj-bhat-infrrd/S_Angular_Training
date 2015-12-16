@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
@@ -37,6 +38,7 @@ public class SetCompanyIdInSocialPosts
     /**
      * Method to set company IDs in Social Posts
      */
+    @Transactional
     public void setCompanyIdInSocialPosts()
     {
         LOG.info( "Started Method setCompanyIdInSocialPost()" );
