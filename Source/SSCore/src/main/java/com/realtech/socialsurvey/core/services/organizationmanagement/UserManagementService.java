@@ -472,5 +472,8 @@ public interface UserManagementService
 
 
     public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException;
+
+
+    public void updateUser( User user );
 }
 // JIRA SS-34 BY RM02 BOC
