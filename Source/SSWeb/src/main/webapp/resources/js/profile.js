@@ -1632,8 +1632,6 @@ function twitterFn(loop) {
 
 var zillowHierarchyMap = {};
 function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
-	// TODO: Should delete the below return after fixing issue
-	return;
 	if (iden == undefined || iden == "") {
 		return;
 	}
