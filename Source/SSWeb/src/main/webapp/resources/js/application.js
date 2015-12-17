@@ -205,12 +205,29 @@ $(document).on('click',  function(e){
 		$('#overlay-send-survey').hide();
 		enableBodyScroll();
 	}
+	
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
 });
 
 $(document).on('keyup',  function(e){
 	if (e.keyCode == 27){
 		if($('#overlay-send-survey').is(':visible')){
 			$('#overlay-send-survey').hide();
+			enableBodyScroll();
+		}
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
 			enableBodyScroll();
 		}
 	}
@@ -242,7 +259,7 @@ $(document).on('click', '.hr-dd-item', function(e) {
 });
 
 $(document).on('click', '.restart-survey-mail-txt', function(e) {
-	
+	e.stopPropagation();
 	confirmRetakeSurveyReminderMail(this);
 	
 	
@@ -307,6 +324,7 @@ function retakeSurveyReminderMail(element) {
 }
 
 $(document).on('click', '.report-abuse-txt', function(e) {
+	e.stopPropagation();
 	var reviewElement = $(this).parent().parent().parent().parent();
 	var payload = {
 		"customerEmail" : reviewElement.attr('data-customeremail'),
@@ -322,12 +340,16 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	// Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
 	$('.rpa-report-btn').off('click');
-	
+	disableBodyScroll();
 	$('#report-abuse-overlay').show();
 	$('.rpa-cancel-btn').on('click', function() {
 		$('#report-abuse-overlay').hide();
-	});
+		enableBodyScroll();
+	}); 
+	
+	
 	$('.rpa-report-btn').on('click', function() {
+		
 		var reportText = $("#report-abuse-txtbox").val();
 		if (validateReportAbuseUserForm(reportText)) {
 			showOverlay();
@@ -336,6 +358,8 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 		}
 	});
 });
+
+
 
 function validateReportAbuseUserForm(reportText) {
 	//check if report text is empty
