@@ -1252,8 +1252,8 @@ public class SurveyManagementController
 
             //update shared on
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
-            SocialMediaPostDetails socialMediaPostDetails = null;
-            if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+            SocialMediaPostDetails socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
+            if ( socialMediaPostDetails == null ) {
                 socialMediaPostDetails = new SocialMediaPostDetails();
 
             }
@@ -1326,8 +1326,8 @@ public class SurveyManagementController
 
                 //update shared on
                 SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
-                SocialMediaPostDetails socialMediaPostDetails = null;
-                if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+                SocialMediaPostDetails socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
+                if ( socialMediaPostDetails == null ) {
                     socialMediaPostDetails = new SocialMediaPostDetails();
 
                 }
