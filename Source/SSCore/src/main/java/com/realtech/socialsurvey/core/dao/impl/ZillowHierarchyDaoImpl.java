@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.amazonaws.regions.Regions;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -57,7 +57,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
             + ", getZillowAverageAndTotalScoreForAllUnderBranch started" );
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery( fetchIdsUnderBranchQuery );
-        query.setParameter( "isZillowConnected", CommonConstants.YES );
+        //query.setParameter( "isZillowConnected", CommonConstants.YES );
         query.setParameter( "agentProfileMasterId", CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
         query.setParameter( "branchId", branchId );
         query.setParameter( "status", CommonConstants.STATUS_INACTIVE );
@@ -412,7 +412,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery( fetchUserIdsUnderCompanyQuery );
         query.setParameterList( "statuses",
-            Arrays.asList( new int[] { CommonConstants.STATUS_ACTIVE, CommonConstants.STATUS_INACTIVE, } ) );
+            Arrays.asList( new int[] { CommonConstants.STATUS_ACTIVE, CommonConstants.STATUS_NOT_VERIFIED, } ) );
         query.setParameter( "isZillowConnected", CommonConstants.YES );
         query.setParameter( "companyId", companyId );
 
@@ -460,7 +460,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery( fetchUserIdsUnderRegionQuery );
         query.setParameterList( "statuses",
-            Arrays.asList( new int[] { CommonConstants.STATUS_ACTIVE, CommonConstants.STATUS_INACTIVE, } ) );
+            Arrays.asList( new int[] { CommonConstants.STATUS_ACTIVE, CommonConstants.STATUS_NOT_VERIFIED, } ) );
         query.setParameter( "isZillowConnected", CommonConstants.YES );
         query.setParameter( "regionId", regionId );
         query.setParameter( "profileMasterId", CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
@@ -507,10 +507,13 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         LOG.info( "Method called to fetch users under branch for branch id : " + branchId + " in batch started" );
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createSQLQuery( fetchUserIdsUnderRegionQuery );
-        query.setParameterList( "statuses",
-            Arrays.asList( new int[] { CommonConstants.STATUS_ACTIVE, CommonConstants.STATUS_INACTIVE, } ) );
-        query.setParameter( "isZillowConnected", CommonConstants.YES );
+        Query query = session.createSQLQuery( fetchUserIdsUnderBranchQuery );
+        List<Integer> statusesList = new ArrayList<Integer>();
+        statusesList.add( CommonConstants.STATUS_ACTIVE );
+        statusesList.add( CommonConstants.STATUS_NOT_VERIFIED );
+        query.setParameterList( "statuses", statusesList );
+        //query.setParameter( "statuses", CommonConstants.STATUS_ACTIVE );
+        //query.setParameter( "isZillowConnected", CommonConstants.YES );
         query.setParameter( "branchId", branchId );
         query.setParameter( "profileMasterId", CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
 
@@ -519,14 +522,16 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
         if ( batchSize > -1 )
             query.setMaxResults( batchSize );
 
-        List<Object[]> rows = (List<Object[]>) query.list();
+        @SuppressWarnings ( "unchecked")
+        List<Long> rows = query.list();
+        //List<Object[]> rows = (List<Object[]>) query.list();
 
         Set<Long> userIds = new HashSet<Long>();
 
         if ( rows != null && !rows.isEmpty() ) {
-            for ( Object[] row : rows ) {
-                if ( row[0] != null ) {
-                    long userId = Long.parseLong( String.valueOf( row[0] ) );
+            for ( Object row : rows ) {
+                if ( row != null ) {
+                    long userId = Long.parseLong( String.valueOf( row ) );
                     if ( userId > 0 )
                         userIds.add( userId );
                 }
