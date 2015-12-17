@@ -711,24 +711,19 @@ function populateSurveyStatisticsList(columnName) {
 	$("#graph-sel-div").show();
 	
 	var options = "";
-	var optionsForGraph = "";
 	if ((columnName == "companyId") && (accountType == "ENTERPRISE" || accountType == "COMPANY")) {
 		options += "<option value=companyId>Company</option>";
-		optionsForGraph += "<option value=companyId>Company</option>";
 	}
 	if ((columnName == "companyId") && (accountType == "ENTERPRISE")) {
 		options += "<option value=regionName>Region</option>";
-		optionsForGraph += "<option value=regionName>Region</option>";
 	}
 	if (accountType == "ENTERPRISE" || accountType == "COMPANY") {
 		if (columnName == "companyId" || columnName == "regionId") {
-			options += "<option value=branchName>Branch</option>";
-			optionsForGraph += "<option value=branchName>Branch</option>";
+			options += "<option value=branchName>Office</option>";
 		}
 	}
 	if (columnName == "companyId" || columnName == "regionId" || columnName == "branchId") {
 		options += "<option value=displayName>Individual</option>";
-		optionsForGraph += "<option value=displayName>Individual</option>";
 	}
 	
 	$("#selection-list").html(options);
