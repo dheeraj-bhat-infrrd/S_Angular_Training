@@ -912,14 +912,10 @@ function validateRegFirstName(elementId) {
 		if (nameRegex.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
-			// $('#overlay-toast').html('Please enter a valid first name.');
-			// showToast();
 			showRegErr('Please enter a valid first name');
 			return false;
 		}
 	} else {
-		// $('#overlay-toast').html('Please enter first name.');
-		// showToast();
 		showRegErr('Please enter first name');
 		return false;
 	}
@@ -931,8 +927,6 @@ function validateRegLastName(elementId) {
 		if ($('#' + elementId).val() == ""||lastNameRegEx.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
-			// $('#overlay-toast').html('Please enter a valid last name.');
-			// showToast();
 			showRegErr('Please enter a valid last name.');
 			return false;
 		}
