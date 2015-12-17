@@ -897,4 +897,7 @@ public interface CommonConstants
     //Zillow connection
     public static final int ZILLOW_CONNECTED = 1;
     public static final int ZILLOW_DISCONNECTED = 0;
+
+    // MySQL IS_ZILLOW_CONNECTED column name constant
+    public static final String IS_ZILLOW_CONNECTED_COLUMN = "IS_ZILLOW_CONNECTED";
 }

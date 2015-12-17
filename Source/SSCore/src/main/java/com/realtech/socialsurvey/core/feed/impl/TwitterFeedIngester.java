@@ -55,7 +55,7 @@ public class TwitterFeedIngester implements Runnable
         try {
             processor.preProcess( iden, collectionName, token );
             List<Status> statuses = processor.fetchFeed( iden, collectionName, token );
-            boolean anyRecordInserted = processor.processFeed( statuses, collectionName );
+            boolean anyRecordInserted = processor.processFeed( iden, statuses, collectionName, token );
             processor.postProcess( iden, collectionName, anyRecordInserted );
         } catch ( NonFatalException e ) {
             LOG.error( "Exception caught while processesing tweets for " + collectionName + " with iden: " + iden, e );
