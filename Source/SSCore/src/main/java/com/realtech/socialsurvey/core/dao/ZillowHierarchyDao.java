@@ -18,25 +18,25 @@ public interface ZillowHierarchyDao
     public Map<String, Long> getZillowReviewCountAndTotalScoreForAllUnderCompany( long companyId ) throws InvalidInputException;
 
 
-    public Set<Long> getRegionsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
+    public Set<Long> getRegionIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException;
 
 
-    public Set<Long> getBranchesUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
+    public Set<Long> getBranchIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException;
 
 
-    public Set<Long> getBranchesUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize )
+    public Set<Long> getBranchIdsUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize )
         throws InvalidInputException;
 
 
-    public Set<Long> getUsersUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
+    public Set<Long> getUserIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException;
 
 
-    public Set<Long> getUsersUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize ) throws InvalidInputException;
+    public Set<Long> getUserIdsUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize ) throws InvalidInputException;
 
 
-    public Set<Long> getUsersUnderBranchConnectedToZillow( long branchId, int startIndex, int batchSize ) throws InvalidInputException;
+    public Set<Long> getUserIdsUnderBranchConnectedToZillow( long branchId, int startIndex, int batchSize ) throws InvalidInputException;
 
 }
