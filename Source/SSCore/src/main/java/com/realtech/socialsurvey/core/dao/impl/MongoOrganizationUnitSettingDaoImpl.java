@@ -683,7 +683,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Update update = new Update();
         update.set( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN, zillowReviewCount );
         update.set( CommonConstants.ZILLOW_REVIEW_AVERAGE_COLUMN, zillowReviewAverage );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Timestamp( new Date().getTime() ) );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.info( "Method call ended updateZillowReviewScoreAndAverage() for updating zillow count and average in collection : " +  collectionName);
     }
