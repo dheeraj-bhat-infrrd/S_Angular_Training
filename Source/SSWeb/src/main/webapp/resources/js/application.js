@@ -61,10 +61,6 @@ var listOfBranchesForAdmin;
 var isUserManagementAuthorized = true;
 var isAddUser = true;
 
-//pagination variables for pro List page
-var rowSize = 10;
-var startIndex = 0;
-
 //Variables for editprofile page
 var editProfileForYelp = false;
 var editProfileForLicense = false;
@@ -4822,10 +4818,6 @@ function authenticate(socialNetwork) {
 
 function authenticateZillow() {
 	openAuthPageZillow();
-	
-	/*payload = {
-		'socialNetwork' : socialNetwork
-	};*/
 }
 
 // update yelp profile url
@@ -4904,309 +4896,8 @@ function showProfileLink(source, profileUrl){
 	}
 }
 
-function adjustTextContainerWidthOnResize() {
-	var parentWidth = $('.ctnt-list-item').width();
-	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
-	var textContainerWidth = parentWidth - imgWidth - 35;
-	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
-}
-
-// Function to validate the first name pattern
-function validateProFirstNamePattern(elementId) {
-	if ($('#' + elementId).val() != "") {
-		if (firstNamePatternRegex.test($('#' + elementId).val().trim()) == true) {
-			return true;
-		} else {
-			$('#overlay-toast').html('Please enter a first name pattern.');
-			showToast();
-			return false;
-		}
-	} else {
-		$('#overlay-toast').html('Please enter a first name pattern.');
-		showToast();
-		return false;
-	}
-}
-
-// Function to validate the last name pattern
-function validateProLastNamePattern(elementId) {
-	if ($('#' + elementId).val() != "") {
-		if (lastNamePatternRegEx.test($('#' + elementId).val().trim()) == true) {
-			return true;
-		} else {
-			$('#overlay-toast').html('Please enter a valid last name pattern.');
-			showToast();
-			return false;
-		}
-	} else {
-		return false;
-	}
-}
-
-// Function to validate registration form
-function validateFindProForm() {
-	$("#serverSideerror").hide();
-	if (!validateProFirstNamePattern('find-pro-first-name') && !validateProLastNamePattern('find-pro-last-name')) {
-		$('#find-pro-first-name').focus();
-		return false;
-	}
-	return true;
-}
-
-function submitFindAProForm() {
-	if (validateFindProForm()) {
-		$('#find-pro-form').submit();
-		//showOverlay();
-	} else {
-		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
-			showError("Please enter either a valid First Name or Last Name to search for");
-	}
-}
-
-$('#find-pro-submit').click(function(e) {
-	e.preventDefault();
-	submitFindAProForm();
-});
-
-$('#find-pro-form input').keypress(function(e) {
-	// detect enter
-	if (e.which==13) {
-		e.preventDefault();
-		submitFindAProForm();
-	}
-});
-
-/**
- * Method to fetch users list based on the criteria i.e if profile level is specified,
- *  bring all users of that level else search based on first/last name
- * @param newIndex
- */
-function fetchUsers(newIndex) {
-	showOverlay();
-	var profileLevel = $("#fp-profile-level-fetch-info").data("profile-level");
-	var iden = $("#fp-profile-level-fetch-info").data("iden");
-	
-	if (profileLevel != undefined && profileLevel != "") {
-		fetchUsersByProfileLevel(iden, profileLevel, newIndex);
-	} else {
-		var formData = new FormData();
-		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
-		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
-		formData.append("find-pro-start-index", newIndex);
-		formData.append("find-pro-row-size", rowSize);
-		
-		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
-			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
-		else
-			hideOverlay();
-	}
-}
-
-function updatePaginationBtnsForProList() {
-	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
-	var total = parseInt($('#pro-paginate-btn').attr("data-total"));
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	
-	//update previous button
-	if(start == 0) {
-		$('#pro-prev').removeClass('paginate-button');
-	} else {
-		$('#pro-prev').addClass('paginate-button');
-	}
-	
-	//update next button
-	if(start + batch >= total) {
-		$('#pro-next').removeClass('paginate-button');
-	} else {
-		$('#pro-next').addClass('paginate-button');
-	}
-	
-	//update page no
-	var pageNo = 0;
-	if(start < total){
-		pageNo = start / batch + 1;	
-	} else {
-		pageNo = start / batch;
-	}
-	$('#sel-page-prolist').val(pageNo);
-}
-
-//Click events proList pagination buttons
-$(document).on('click', '#pro-next.paginate-button', function(e) {
-	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	
-	start += batch;
-	$('#pro-paginate-btn').attr("data-start", start);
-	fetchUsers(start);
-});
-
-$(document).on('click', '#pro-prev.paginate-button', function(e) {
-	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	
-	start -= batch;
-	$('#pro-paginate-btn').attr("data-start", start);
-	fetchUsers(start);
-});
-
-$(document).on('keypress', '#sel-page-prolist', function(e) {
-	//if the letter is not digit then don't type anything
-	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-		return false;
-	}
-	var totalPage = parseInt($('#pro-total-pages').text());
-	var prevPageNoVal = parseInt($('#sel-page-prolist').val());
-	if(prevPageNoVal == NaN) {
-		prevPageNoVal = 0;
-	}
-	var pageNo = prevPageNoVal + String.fromCharCode(e.which);
-	pageNo = parseInt(pageNo);
-	if(pageNo >= totalPage || pageNo <= 0) {
-		return false;
-	}
-});
-
-$(document).on('keyup', '#sel-page-prolist', function(e) {
-	if(e.which == 13) {
-		$(this).trigger('blur');	
-	}
-});
-
-$(document).on('blur', '#sel-page-prolist', function(e) {
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	var pageNoVal = parseInt($('#sel-page-prolist').val());
-	start = (pageNoVal - 1) * batch;
-	$('#pro-paginate-btn').attr("data-start", start);
-	fetchUsers(start);
-});
-
-function paginateUsersProList(response) {
-	var reponseJson = $.parseJSON(response);
-	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	
-	// error message
-	if (reponseJson.errMessage) {
-		showError(reponseJson.errMessage);
-		$('#ctnt-list-wrapper').append("No Profiles found");
-	}
-	else {
-		if(start == 0) {
-			var usersSize = reponseJson.userFound;
-			if (usersSize > 0) {
-				$('#srch-num').text(usersSize);
-				$('#pro-paginate-btn').show().attr("data-total", usersSize);
-				var totalPage = 0;
-				if (usersSize % batch == 0) {
-					totalPage = parseInt(usersSize / batch);
-				} else {
-					totalPage = parseInt(usersSize / batch + 1);
-				}
-				
-				$('#pro-total-pages').text(totalPage);
-			} 
-			$('#srch-num-list').show();
-		}
-		paintProList(reponseJson.users);
-	}
-	updatePaginationBtnsForProList();
-	scrollToTop();
-	hideOverlay();
-}
-
-function paintProList(usersList) {
-	if (usersList != undefined) {
-		var usersSize = usersList.length;
-		/*if (usersSize > 0) {
-			$('#fp-users-size').val(usersSize);
-		}*/
-		
-		var usersHtml = "";
-		if (usersSize > 0) {
-			$.each(usersList, function(i, user) {
-				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
-				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '" data-profilename="' + user.profileUrl + '">';
-				
-				if (user.profileImageUrl != undefined && user.profileImageUrl.trim() != "") {
-					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
-				} else {
-					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
-				}
-				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">'
-					+ '<div class="ctnt-item-name user-display-name">' + user.displayName + '</div>';
-
-				if (user.title != undefined) {
-					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
-				}
-				if (user.location != undefined) {
-					usersHtml = usersHtml + '<div class="pro-addr-cont">' + user.location;
-	            	if (user.industry != undefined) {
-	            		usersHtml += " | " + user.industry;
-	            	}
-	            	usersHtml += "</div>";
-	            }
-				if (user.aboutMe != undefined) {
-					usersHtml = usersHtml + '<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
-				}
-				
-				var reviewCount = 0;
-				if (user.reviewCount) {
-					reviewCount  = user.reviewCount;
-				}
-				
-				var reviewScore = 0;
-				if (user.reviewScore) {
-					reviewScore  = user.reviewScore;
-				}
-				
-				usersHtml = usersHtml + '</div>';
-				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap clearfix">'
-					+ '<div class="float-left ctnt-review-score" data-score="' + reviewScore + '"></div>'
-					+ '<div class="float-left ctnt-review-count" user="' + user.userId + '">' + reviewCount + ' Review(s)</div>'
-				+ '</div>';
-				usersHtml = usersHtml + '</div>';
-			});
-			$('#ctnt-list-wrapper').html(usersHtml);
-			
-			$('.ctnt-review-score').each(function(){
-				changeRatingPattern($(this).attr("data-score"), $(this));
-				$(this).append(" - ");
-			});
-			
-			$(".ctnt-list-item").click(function(e){
-				var agentProfileName = $(this).attr("data-profilename");
-				// var url = window.location.origin + "/pages" + agentProfileName;
-				var url = getLocationOrigin() + "/pages" + agentProfileName;
-				window.open(url);
-			});
-		}
-	}
-}
-
-
-function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
-	if (iden == undefined) {
-		return;
-	}
-	var url = getLocationOrigin() + "/rest/profile/individuals/" + iden
-	+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
-	callAjaxGET(url, fetchUsersByProfileLevelCallback, false);
-}
-
-function fetchUsersByProfileLevelCallback(data) {
-	var response = $.parseJSON(data);
-	if (response != undefined) {
-		paginateUsersProList(response.entity);
-	}
-}
-
 $(document).on('click', '.ctnt-review-btn', function(){
 	initSurveyReview($(this).attr('user'));
-});
-
-//Functions for survey question page
-$(document).on('click', '.sq-np-item-next', function() {
 });
 
 /*
@@ -5217,17 +4908,7 @@ function initSurvey(firstName, lastName, email, agentId, agentName, grecaptchare
 	this.agentId = agentId;
 	this.agentName = agentName;
 	customerEmail = email;
-	/*var payload = {
-		"agentId" : agentId,
-		"firstName" : firstName,
-		"lastName" : lastName,
-		"customerEmail" : email,
-		"g-recaptcha-response" : grecaptcharesponse,
-		"relationship" : relationship
-	};*/
 	
-	
-	//$('input[relationship]').val(relationship);
 	$('input[g-recaptcha-response]').val(grecaptcharesponse);
 	
 	if($('#cust-agent-verify').hasClass('bd-check-img-checked')){
@@ -5245,7 +4926,6 @@ function initSurveyWithUrl(q) {
 		"q" : q
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "triggersurveywithurl",
 		url : getLocationOrigin() + surveyUrl + "triggersurveywithurl",
 		type : "GET",
 		cache : false,
@@ -5282,7 +4962,6 @@ function initSurveyWithUrl(q) {
 }
 
 function showPageNotFoundError(){
-	//window.location = window.location.origin + surveyUrl + "notfound";
 	window.location = getLocationOrigin() + surveyUrl + "notfound";
 }
 
@@ -5293,7 +4972,6 @@ function loadAgentPic(agentId){
 		"agentId" : agentId
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "displaypiclocationofagent",
 		url : getLocationOrigin() + surveyUrl + "displaypiclocationofagent",
 		type : "GET",
 		dataType : "text",
@@ -5925,7 +5603,6 @@ function clearForm(){
 // Starting click events.
 
 // Code to be executed on click of stars of rating question.
-
 $('.sq-star').click(function() {
 	$(this).parent().find('.sq-star').removeClass('sq-full-star');
 	$(this).parent().find('.sq-star').removeClass('sq-full-star-click');
@@ -5967,7 +5644,6 @@ $('.sq-star').hover(function() {
 });
 
 // Code to be executed on click of next for all types of questions.
-
 $('.sq-np-item-next')
 		.click(
 				function() {
@@ -6056,7 +5732,6 @@ $('.sq-np-item-next')
 				});
 
 // Code to be executed on click of previous for star and smile questions.
-
 $('.sq-np-item-prev').click(function() {
 	$("#pst-srvy-div").hide();
 	if (qno == 0) {
@@ -6200,17 +5875,8 @@ $('#start-btn').click(function() {
 		return;
 	}
 	
-	/*if (!validateUserEmailId('email')) {
-		$('#overlay-toast').html('Please enter valid Email Id!');
-		showToast();
-		return;
-	}*/
-	
-	
 	var agentId = $('#prof-container').attr("data-agentId");
 	var agentName = $('#prof-container').attr("data-agentName");
-	//var e = document.getElementById("cust-agnt-rel");
-	//var relationship = e.options[e.selectedIndex].value;
 	initSurvey(firstName, lastName, email, agentId, agentName,
 			grecaptcharesponse);
 	
@@ -6233,8 +5899,6 @@ $('input[type="range"]').rangeslider({
 	handleClass : 'rangeslider__handle',
 
 	onSlide : function(position, value) {
-		// $('div[quest-no="' + survQuesNo + '"]').find(
-		// '.sq-slider-val').html(value);
 		$('#range-slider-value').html(value);
 	},
 	// Callback function

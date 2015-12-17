@@ -777,18 +777,40 @@ function signupUser() {
 	}
 }
 
+function initializeSingupPage() {
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
+			showError($('#message').val());
+		} else {
+			showInfo($('#message').val());
+		}
+	}
+
+	$('#signup-submit').click(function(e){
+		signupUser();
+	});
+   
+	$('input').keypress(function(e){
+		// detect enter
+		if (e.which==13){
+			e.preventDefault();
+			signupUser();
+		}
+	});
+}
+
 function validateSignUpForm(){
 	hideError();
 	if(!validateFirstName('sign-fname')) {
-		$('sign-fname').focus();
+		$('#sign-fname').focus();
 		return false;
 	}
 	if(!validateLastName('sign-lname')) {
-		$('sign-lname').focus();
+		$('#sign-lname').focus();
 		return false;
 	}
-	if(!validateEmailId('sign-email', true)) {
-		$('sign-email').focus();
+	if(!validateEmailId('sign-email')) {
+		$('#sign-email').focus();
 		return false;
 	}
 	return true;
@@ -799,8 +821,8 @@ function validateMultipleEmailIds(elementId){
 	var emailIdStr = $('#'+elementId).val();
 	if (emailIdStr != "") {
 		emailIdStr = emailIdStr.trim();
-		var emailIds  = emailIdStr.split(",")
-		for (i = 0; i < emailIds.length; i++) { 
+		var emailIds  = emailIdStr.split(",");
+		for (var i = 0; i < emailIds.length; i++) { 
 			if (emailRegex.test(emailIds[i].trim()) == false) {
 				showErrorMobileAndWeb('Please enter a valid Email Address');
 				return false;
@@ -1158,4 +1180,327 @@ function initializeHomePage() {
 	$('#header-search-icn').click(function(e) {
 		$('#pro-wrapper-top').slideToggle(200);
 	});
+}
+
+//Functions for find a pro page
+//pagination variables for pro List page
+var rowSize = 10;
+var startIndex = 0;
+
+
+//Function to initialiize find a pro page
+function initializeFindAProPage() {
+	startIndex = 0;
+	fetchUsers(startIndex);
+	adjustTextContainerWidthOnResize();
+	
+	$(window).resize(function() {
+		if ($(window).width() < 768) {
+			adjustTextContainerWidthOnResize();
+		}
+	});
+	
+
+	$('#find-pro-form').on('click', '#find-pro-submit', function(e) {
+		e.preventDefault();
+		submitFindAProForm();
+	});
+
+	$('#find-pro-form').on('keypress', 'input', function(e) {
+		// detect enter
+		if (e.which==13) {
+			e.preventDefault();
+			submitFindAProForm();
+		}
+	});
+	
+
+	//Click events proList pagination buttons
+	$('#pro-paginate-btn').on('click', '#pro-next.paginate-button', function(e) {
+		var start = parseInt($('#pro-paginate-btn').attr("data-start"));
+		var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+		
+		start += batch;
+		$('#pro-paginate-btn').attr("data-start", start);
+		fetchUsers(start);
+	});
+
+	$('#pro-paginate-btn').on('click', '#pro-prev.paginate-button', function(e) {
+		var start = parseInt($('#pro-paginate-btn').attr("data-start"));
+		var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+		
+		start -= batch;
+		$('#pro-paginate-btn').attr("data-start", start);
+		fetchUsers(start);
+	});
+
+	$('#pro-paginate-btn').on('keypress', '#sel-page-prolist', function(e) {
+		//if the letter is not digit then don't type anything
+		if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+			return false;
+		}
+		var totalPage = parseInt($('#pro-total-pages').text());
+		var prevPageNoVal = parseInt($('#sel-page-prolist').val());
+		if(prevPageNoVal == NaN) {
+			prevPageNoVal = 0;
+		}
+		var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+		pageNo = parseInt(pageNo);
+		if(pageNo >= totalPage || pageNo <= 0) {
+			return false;
+		}
+	});
+
+	$('#pro-paginate-btn').on('keyup', '#sel-page-prolist', function(e) {
+		if(e.which == 13) {
+			$(this).trigger('blur');	
+		}
+	});
+
+	$('#pro-paginate-btn').on('blur', '#sel-page-prolist', function(e) {
+		var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+		var pageNoVal = parseInt($('#sel-page-prolist').val());
+		start = (pageNoVal - 1) * batch;
+		$('#pro-paginate-btn').attr("data-start", start);
+		fetchUsers(start);
+	});
+}
+
+/**
+ * Method to fetch users list based on the criteria i.e if profile level is specified,
+ *  bring all users of that level else search based on first/last name
+ * @param newIndex
+ */
+function fetchUsers(newIndex) {
+	showOverlay();
+	var profileLevel = $("#fp-profile-level-fetch-info").data("profile-level");
+	var iden = $("#fp-profile-level-fetch-info").data("iden");
+	
+	if (profileLevel != undefined && profileLevel != "") {
+		fetchUsersByProfileLevel(iden, profileLevel, newIndex);
+	} else {
+		var formData = new FormData();
+		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
+		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
+		formData.append("find-pro-start-index", newIndex);
+		formData.append("find-pro-row-size", rowSize);
+		
+		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
+			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
+		else
+			hideOverlay();
+	}
+}
+
+
+//Function to validate registration form
+function validateFindProForm() {
+	$("#serverSideerror").hide();
+	if (!validateProFirstNamePattern('find-pro-first-name') && !validateProLastNamePattern('find-pro-last-name')) {
+		$('#find-pro-first-name').focus();
+		return false;
+	}
+	return true;
+}
+
+function submitFindAProForm() {
+	if (validateFindProForm()) {
+		$('#find-pro-form').submit();
+		//showOverlay();
+	} else {
+		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
+			showError("Please enter either a valid First Name or Last Name to search for");
+	}
+}
+
+//Function to update the pagination buttons
+function updatePaginationBtnsForProList() {
+	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
+	var total = parseInt($('#pro-paginate-btn').attr("data-total"));
+	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+	
+	//update previous button
+	if(start == 0) {
+		$('#pro-prev').removeClass('paginate-button');
+	} else {
+		$('#pro-prev').addClass('paginate-button');
+	}
+	
+	//update next button
+	if(start + batch >= total) {
+		$('#pro-next').removeClass('paginate-button');
+	} else {
+		$('#pro-next').addClass('paginate-button');
+	}
+	
+	//update page no
+	var pageNo = 0;
+	if(start < total){
+		pageNo = start / batch + 1;	
+	} else {
+		pageNo = start / batch;
+	}
+	$('#sel-page-prolist').val(pageNo);
+}
+
+function paginateUsersProList(response) {
+	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
+	
+	// error message
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#ctnt-list-wrapper').append("No Profiles found");
+	}
+	else {
+		if(start == 0) {
+			var usersSize = reponseJson.userFound;
+			if (usersSize > 0) {
+				$('#srch-num').text(usersSize);
+				$('#pro-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+				
+				$('#pro-total-pages').text(totalPage);
+			} 
+			$('#srch-num-list').show();
+		}
+		paintProList(reponseJson.users);
+	}
+	updatePaginationBtnsForProList();
+	scrollToTop();
+	hideOverlay();
+}
+
+function paintProList(usersList) {
+	if (usersList != undefined) {
+		var usersSize = usersList.length;
+		
+		var usersHtml = "";
+		if (usersSize > 0) {
+			$.each(usersList, function(i, user) {
+				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
+				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '" data-profilename="' + user.profileUrl + '">';
+				
+				if (user.profileImageUrl != undefined && user.profileImageUrl.trim() != "") {
+					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
+				} else {
+					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
+				}
+				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">'
+					+ '<div class="ctnt-item-name user-display-name">' + user.displayName + '</div>';
+
+				if (user.title != undefined) {
+					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
+				}
+				if (user.location != undefined) {
+					usersHtml = usersHtml + '<div class="pro-addr-cont">' + user.location;
+	            	if (user.industry != undefined) {
+	            		usersHtml += " | " + user.industry;
+	            	}
+	            	usersHtml += "</div>";
+	            }
+				if (user.aboutMe != undefined) {
+					usersHtml = usersHtml + '<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
+				}
+				
+				var reviewCount = 0;
+				if (user.reviewCount) {
+					reviewCount  = user.reviewCount;
+				}
+				
+				var reviewScore = 0;
+				if (user.reviewScore) {
+					reviewScore  = user.reviewScore;
+				}
+				
+				usersHtml = usersHtml + '</div>';
+				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap clearfix">'
+					+ '<div class="float-left ctnt-review-score" data-score="' + reviewScore + '"></div>'
+					+ '<div class="float-left ctnt-review-count" user="' + user.userId + '">' + reviewCount + ' Review(s)</div>'
+				+ '</div>';
+				usersHtml = usersHtml + '</div>';
+			});
+			$('#ctnt-list-wrapper').html(usersHtml);
+			
+			$('.ctnt-review-score').each(function(){
+				changeRatingPattern($(this).attr("data-score"), $(this));
+				$(this).append(" - ");
+			});
+			
+			$(".ctnt-list-item").click(function(e){
+				var agentProfileName = $(this).attr("data-profilename");
+				// var url = window.location.origin + "/pages" + agentProfileName;
+				var url = getLocationOrigin() + "/pages" + agentProfileName;
+				window.open(url);
+			});
+		}
+	}
+}
+
+/**
+ * Function to fetch the users by profile level in pro list page
+ * @param iden
+ * @param profileLevel - office/region/company
+ * @param startIndex
+ */
+function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
+	if (iden == undefined) {
+		return;
+	}
+	var url = getLocationOrigin() + "/rest/profile/individuals/" + iden
+	+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
+	callAjaxGET(url, function() {
+		var response = $.parseJSON(data);
+		if (response != undefined) {
+			paginateUsersProList(response.entity);
+		}
+	}, false);
+}
+
+
+//Function to adjust image width
+function adjustTextContainerWidthOnResize() {
+	var parentWidth = $('.ctnt-list-item').width();
+	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
+	var textContainerWidth = parentWidth - imgWidth - 35;
+	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
+}
+
+
+//Function to validate the first name pattern
+function validateProFirstNamePattern(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (firstNamePatternRegex.test($('#' + elementId).val().trim()) == true) {
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter a first name pattern.');
+			showToast();
+			return false;
+		}
+	} else {
+		$('#overlay-toast').html('Please enter a first name pattern.');
+		showToast();
+		return false;
+	}
+}
+
+//Function to validate the last name pattern
+function validateProLastNamePattern(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (lastNamePatternRegEx.test($('#' + elementId).val().trim()) == true) {
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter a valid last name pattern.');
+			showToast();
+			return false;
+		}
+	} else {
+		return false;
+	}
 }
