@@ -7,6 +7,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+
+import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -36,23 +38,9 @@ public class ZillowHierarchyDaoImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetIdsUnderBranchConnectedToZillowWithInvalidBranchId() throws InvalidInputException
-    {
-        zillowHierarchyDaoImpl.getIdsUnderBranchConnectedToZillow( 0 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
     public void testGetZillowReviewCountAndTotalScoreForAllUnderBranchWithInvalidBranchId() throws InvalidInputException
     {
         zillowHierarchyDaoImpl.getZillowReviewCountAndTotalScoreForAllUnderBranch( 0 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testGetIdsUnderRegionConnectedToZillowWithInvalidRegionId() throws InvalidInputException
-    {
-        zillowHierarchyDaoImpl.getIdsUnderRegionConnectedToZillow( 0 );
     }
 
 
@@ -64,15 +52,50 @@ public class ZillowHierarchyDaoImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetIdsUnderCompanyConnectedToZillowWithInvalidCompanyId() throws InvalidInputException
+    public void testGetZillowReviewCountAndTotalScoreForAllUnderCompanyWithInvalidCompanyId() throws InvalidInputException
     {
-        zillowHierarchyDaoImpl.getIdsUnderCompanyConnectedToZillow( 0 );
+        zillowHierarchyDaoImpl.getZillowReviewCountAndTotalScoreForAllUnderCompany( 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetZillowReviewCountAndTotalScoreForAllUnderCompanyWithInvalidBranchId() throws InvalidInputException
+    public void testGetRegionIdsUnderCompanyConnectedToZillowWithInvalidCompanyId() throws InvalidInputException
     {
-        zillowHierarchyDaoImpl.getZillowReviewCountAndTotalScoreForAllUnderCompany( 0 );
+        zillowHierarchyDaoImpl.getRegionIdsUnderCompanyConnectedToZillow( 0, TestConstants.TEST_INT, TestConstants.TEST_INT );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchIdsUnderCompanyConnectedToZillowWithInvalidCompanyId() throws InvalidInputException
+    {
+        zillowHierarchyDaoImpl.getBranchIdsUnderCompanyConnectedToZillow( 0, TestConstants.TEST_INT, TestConstants.TEST_INT );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchIdsUnderRegionConnectedToZillowWithInvalidRegionId() throws InvalidInputException
+    {
+        zillowHierarchyDaoImpl.getBranchIdsUnderRegionConnectedToZillow( 0, TestConstants.TEST_INT, TestConstants.TEST_INT );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUserIdsUnderCompanyConnectedToZillowWithInvalidCompanyId() throws InvalidInputException
+    {
+        zillowHierarchyDaoImpl.getUserIdsUnderCompanyConnectedToZillow( 0, TestConstants.TEST_INT, TestConstants.TEST_INT );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUserIdsUnderRegionConnectedToZillowWithInvalidRegionId() throws InvalidInputException
+    {
+        zillowHierarchyDaoImpl.getUserIdsUnderRegionConnectedToZillow( 0, TestConstants.TEST_INT, TestConstants.TEST_INT );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUserIdsUnderBranchConnectedToZillowWithInvalidBranchId() throws InvalidInputException
+    {
+        zillowHierarchyDaoImpl.getUserIdsUnderBranchConnectedToZillow( 0, TestConstants.TEST_INT, TestConstants.TEST_INT );
     }
 }
