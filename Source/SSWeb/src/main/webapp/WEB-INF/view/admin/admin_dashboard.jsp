@@ -39,9 +39,8 @@
 				<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
 					<div class="dsh-inp-wrapper float-left">
-						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
-							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
-						<div id="dsh-srch-res"></div>
+						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />" data-prev-val="" data-search-target='icons'>
+						<div id="dsh-srch-res" class="dsh-sel-dropdwn-cont"></div>
 					</div>
 				</div>
 				<div class="clearfix dash-sel-wrapper">
@@ -74,9 +73,8 @@
 				<div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
 					<div class="dsh-inp-wrapper float-left">
-						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
-							onkeyup="searchBranchRegionOrAgent(this.value, 'graph')">
-						<div id="dsh-grph-srch-res"></div>
+						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />" data-prev-val="" data-search-target='graph'>
+						<div id="dsh-grph-srch-res" class="dsh-sel-dropdwn-cont"></div>
 					</div>
 				</div>
 				
@@ -135,9 +133,8 @@
 								<div class="float-left dash-sel-lbl">Choose</div>
 								<div class="dsh-inp-wrapper float-left">
 									<input id="admin-report-dwn" class="dash-sel-item" type="text"
-										placeholder="Start typing..."
-										onkeyup="searchBranchRegionOrAgent(this.value, 'reports')">
-									<div id="dsh-srch-report"></div>
+										placeholder="Start typing..." data-prev-val="" data-search-target='reports'>
+									<div id="dsh-srch-report" class="dsh-sel-dropdwn-cont"></div>
 								</div>
 							</div>
 						</div>
@@ -188,5 +185,8 @@ $(document).ready(function() {
 	bindDatePickerForCompanyReport();
 	bindDatePickerforSurveyDownload();
 	bindDatePickerforIndividualSurveyDownload();
+	bindAutosuggestForIndividualRegionBranchSearch('dsh-sel-item');
+	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
+	bindAutosuggestForIndividualRegionBranchSearch('admin-report-dwn');
 });
 </script>
