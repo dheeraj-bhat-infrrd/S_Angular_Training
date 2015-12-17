@@ -5755,10 +5755,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         switch ( profileType ) {
-            case CommonConstants.PROFILE_LEVEL_COMPANY:
+            case CommonConstants.PROFILE_TYPE_COMPANY:
                 return zillowHierarchyDao.getBranchIdsUnderCompanyConnectedToZillow( iden, batch_size, start_index );
 
-            case CommonConstants.PROFILE_LEVEL_REGION:
+            case CommonConstants.PROFILE_TYPE_REGION:
                 return zillowHierarchyDao.getBranchIdsUnderRegionConnectedToZillow( iden, batch_size, start_index );
 
             default:
@@ -5770,8 +5770,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden, int batch_size,
-        int start_index ) throws InvalidInputException
+    public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden,
+        int start_index, int batch_size ) throws InvalidInputException
     {
         if ( profileType == null || profileType.isEmpty() ) {
             LOG.error( "profile type passed cannot be null or empty in getAllUsersUnderProfileTypeConnectedToZillow" );
@@ -5785,13 +5785,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         switch ( profileType ) {
-            case CommonConstants.PROFILE_LEVEL_COMPANY:
+            case CommonConstants.PROFILE_TYPE_COMPANY:
                 return zillowHierarchyDao.getUserIdsUnderCompanyConnectedToZillow( iden, batch_size, start_index );
 
-            case CommonConstants.PROFILE_LEVEL_REGION:
+            case CommonConstants.PROFILE_TYPE_REGION:
                 return zillowHierarchyDao.getUserIdsUnderRegionConnectedToZillow( iden, batch_size, start_index );
 
-            case CommonConstants.PROFILE_LEVEL_BRANCH:
+            case CommonConstants.PROFILE_TYPE_BRANCH:
                 return zillowHierarchyDao.getUserIdsUnderBranchConnectedToZillow( iden, batch_size, start_index );
 
             default:
