@@ -267,13 +267,13 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @throws InvalidInputException
      * */
     @Override
-    public Set<Long> getRegionsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
+    public Set<Long> getRegionIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException
     {
 
         if ( companyId <= 0l ) {
-            LOG.error( "Invalid companyId passed in getRegionsUnderCompanyConnectedToZillow" );
-            throw new InvalidInputException( "Invalid companyId passed in getRegionsUnderCompanyConnectedToZillow" );
+            LOG.error( "Invalid companyId passed in getRegionIdsUnderCompanyConnectedToZillow" );
+            throw new InvalidInputException( "Invalid companyId passed in getRegionIdsUnderCompanyConnectedToZillow" );
         }
 
         LOG.info( "Method called to fetch regions under company for company id : " + companyId + " in batch started" );
@@ -311,13 +311,13 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @throws InvalidInputException
      * */
     @Override
-    public Set<Long> getBranchesUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
+    public Set<Long> getBranchIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException
     {
 
         if ( companyId <= 0l ) {
-            LOG.error( "Invalid companyId passed in getBranchesUnderCompanyConnectedToZillow" );
-            throw new InvalidInputException( "Invalid companyId passed in getBranchesUnderCompanyConnectedToZillow" );
+            LOG.error( "Invalid companyId passed in getBranchIdsUnderCompanyConnectedToZillow" );
+            throw new InvalidInputException( "Invalid companyId passed in getBranchIdsUnderCompanyConnectedToZillow" );
         }
 
         LOG.info( "Method called to fetch branches under company for company id : " + companyId + " in batch started" );
@@ -355,13 +355,13 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @throws InvalidInputException
      * */
     @Override
-    public Set<Long> getBranchesUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize )
+    public Set<Long> getBranchIdsUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize )
         throws InvalidInputException
     {
 
         if ( regionId <= 0l ) {
-            LOG.error( "Invalid regionId passed in getBranchesUnderRegionConnectedToZillow" );
-            throw new InvalidInputException( "Invalid regionId passed in getBranchesUnderRegionConnectedToZillow" );
+            LOG.error( "Invalid regionId passed in getBranchIdsUnderRegionConnectedToZillow" );
+            throw new InvalidInputException( "Invalid regionId passed in getBranchIdsUnderRegionConnectedToZillow" );
         }
 
         LOG.info( "Method called to fetch branches under region for region id : " + regionId + " in batch started" );
@@ -399,13 +399,13 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @throws InvalidInputException
      * */
     @Override
-    public Set<Long> getUsersUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
+    public Set<Long> getUserIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException
     {
 
         if ( companyId <= 0l ) {
-            LOG.error( "Invalid companyId passed in getUsersUnderCompanyConnectedToZillow" );
-            throw new InvalidInputException( "Invalid companyId passed in getUsersUnderCompanyConnectedToZillow" );
+            LOG.error( "Invalid companyId passed in getUserIdsUnderCompanyConnectedToZillow" );
+            throw new InvalidInputException( "Invalid companyId passed in getUserIdsUnderCompanyConnectedToZillow" );
         }
 
         LOG.info( "Method called to fetch users under company for company id : " + companyId + " in batch started" );
@@ -447,13 +447,13 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @throws InvalidInputException
      * */
     @Override
-    public Set<Long> getUsersUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize )
+    public Set<Long> getUserIdsUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize )
         throws InvalidInputException
     {
 
         if ( regionId <= 0l ) {
-            LOG.error( "Invalid regionId passed in getUsersUnderRegionConnectedToZillow" );
-            throw new InvalidInputException( "Invalid regionId passed in getUsersUnderRegionConnectedToZillow" );
+            LOG.error( "Invalid regionId passed in getUserIdsUnderRegionConnectedToZillow" );
+            throw new InvalidInputException( "Invalid regionId passed in getUserIdsUnderRegionConnectedToZillow" );
         }
 
         LOG.info( "Method called to fetch users under region for region id : " + regionId + " in batch started" );
@@ -496,13 +496,13 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @throws InvalidInputException
      * */
     @Override
-    public Set<Long> getUsersUnderBranchConnectedToZillow( long branchId, int startIndex, int batchSize )
+    public Set<Long> getUserIdsUnderBranchConnectedToZillow( long branchId, int startIndex, int batchSize )
         throws InvalidInputException
     {
 
         if ( branchId <= 0l ) {
-            LOG.error( "Invalid branchId passed in getUsersUnderBranchConnectedToZillow" );
-            throw new InvalidInputException( "Invalid branchId passed in getUsersUnderBranchConnectedToZillow" );
+            LOG.error( "Invalid branchId passed in getUserIdsUnderBranchConnectedToZillow" );
+            throw new InvalidInputException( "Invalid branchId passed in getUserIdsUnderBranchConnectedToZillow" );
         }
 
         LOG.info( "Method called to fetch users under branch for branch id : " + branchId + " in batch started" );
