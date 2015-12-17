@@ -114,18 +114,12 @@
 		</div>
 	</div>
 	<jsp:include page="footer_new.jsp"></jsp:include>
-	<jsp:include page="scripts.jsp"></jsp:include>
+	<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
+	<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
+	<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 	<script>
 	$(document).ready(function() {
-		startIndex = 0;
-		fetchUsers(startIndex);
-		adjustTextContainerWidthOnResize();
-		
-		$(window).resize(function() {
-			if ($(window).width() < 768) {
-				adjustTextContainerWidthOnResize();
-			}
-		});
+		initializeFindAProPage();
 	});
 	</script>
 </body>

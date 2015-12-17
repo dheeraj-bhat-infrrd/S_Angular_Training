@@ -90,35 +90,13 @@
 </div>
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
 $(document).ready(function(){
-
-	if ($('#message').val() != "") {
-		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
-			showError($('#message').val());
-		} else {
-			showInfo($('#message').val());
-		}
-	}
-
-	$('#signup-submit').click(function(e){
-		signupUser();
-	});
-   
-	$('input').keypress(function(e){
-		// detect enter
-		if (e.which==13){
-			e.preventDefault();
-			signupUser();
-		}
-	});
-	
+	initializeSingupPage();
 });
 </script>
-
 </body>
 </html>
