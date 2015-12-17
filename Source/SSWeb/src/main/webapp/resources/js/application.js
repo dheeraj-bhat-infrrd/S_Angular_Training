@@ -408,6 +408,87 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	
 	getIncompleteSurveyCount(colName, colValue);
 	fetchReviewsOnDashboard(false);
+	
+	bindAutosuggestForIndividualRegionBranchSearch('dsh-sel-item');
+	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
+}
+
+function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
+	//Bind keyup on search for region, branch, individual for dashboard
+	$('#'+elementId).on('keyup', function(e) {
+		var value = $(this).val();
+		var prevVal = $(this).attr('data-prev-val');
+		
+		if(value != prevVal){
+			$(this).attr('data-prev-val', value);
+			searchBranchRegionOrAgent(value, $(this).attr('data-search-target'));			
+		}
+		//Detect arrow key down
+		else if(e.which == 40) {
+			if($(this).next().is(':visible')) {
+				var parentElement = $(this).next();
+				var selectedElement = parentElement.find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0 && selectedElement.next('.dsh-res-display') && selectedElement.next('.dsh-res-display').length > 0) {
+					selectedElement.removeClass('dsh-res-hover');
+					selectedElement.next('.dsh-res-display').addClass('dsh-res-hover');
+					
+					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
+					//check if the top of current selected element is over the parents top
+					if((updatedSelectedElement.offset().top - parentElement.offset().top + updatedSelectedElement[0].clientHeight) > parentElement[0].clientHeight) {
+						var scrollTopPos = parentElement[0].scrollTop + updatedSelectedElement[0].clientHeight;
+						parentElement[0].scrollTop = scrollTopPos;
+					}
+				} else {
+					$(this).next().children('.dsh-res-display').removeClass('dsh-res-hover');
+					$(this).next().children('.dsh-res-display').first('.dsh-res-display').addClass('dsh-res-hover');
+					parentElement[0].scrollTop = 0;
+				}
+			}
+		}
+		//Detect arrow key up
+		else if(e.which == 38) {
+			if($(this).next().is(':visible')) {
+				var parentElement = $(this).next();
+				var selectedElement = parentElement.find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0 && selectedElement.prev('.dsh-res-display') && selectedElement.prev('.dsh-res-display').length > 0) {
+					selectedElement.removeClass('dsh-res-hover');
+					selectedElement.prev('.dsh-res-display').addClass('dsh-res-hover');
+					
+					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
+					//check if the top of current selected element is over the parents top
+					if((updatedSelectedElement.offset().top - parentElement.offset().top) < 0) {
+						var scrollTopPos = parentElement[0].scrollTop - updatedSelectedElement[0].clientHeight;
+						parentElement[0].scrollTop = scrollTopPos;
+					}
+				} else {
+					$(this).next().children('.dsh-res-display').removeClass('dsh-res-hover');
+					$(this).next().children('.dsh-res-display').last('.dsh-res-display').addClass('dsh-res-hover');
+					parentElement[0].scrollTop = parentElement[0].scrollHeight;
+				}
+			}
+		}
+		
+		//Detect enter key
+		else if(e.which == 13) {
+			if($(this).next().is(':visible')) {
+				var selectedElement = $(this).next().find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0) {
+					selectedElement.click();
+				}
+			}
+		}
+	});
+	
+	$('#'+elementId).on('blur', function(e) {
+		if($(this).next().is(':visible')) {
+			var selectedElement = $(this).next().find('.dsh-res-hover');
+			if(selectedElement && selectedElement.length > 0) {
+				selectedElement.click();
+			} else {
+				$(this).next().children('.dsh-res-display').first().click();
+			}
+		}
+	});
 }
 
 function showCompanyAdminFlow(newProfileName, newProfileValue) {
@@ -1003,8 +1084,21 @@ function paintSurveyGraph() {
 		}
 	};
 
+	removeAllPreviousGraphToolTip();
+	
 	var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 	chart.draw(data, options);
+}
+
+
+//Function to remove all previous tool tips popped up from charts
+function removeAllPreviousGraphToolTip() {
+	$('.footer-main-wrapper').nextAll("div").filter(
+			function() {
+				return $(this).css("display") == "none"
+						&& $(this).css("position") == "absolute"
+							&& $(this).children().css("font-family") == "Arial";
+			}).remove();
 }
 
 function convertYearWeekKeyToDate(key) {
@@ -1049,6 +1143,13 @@ function getKeysFromGraphFormat(format) {
 	return keys;
 }
 
+//Detect mousedown event to close to autocomplete list on outside click
+$(document).mousedown(function(event) {
+	if($('.dsh-res-display').is(':visible') && !$(event.target).hasClass('dsh-res-display')) {
+		$('.dsh-res-display').parent().hide();
+	}
+});
+
 //Being called from dashboard.jsp on key up event.
 function searchBranchRegionOrAgent(searchKeyword, flow) {
 	var e;
@@ -1073,16 +1174,33 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 	callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
 		if (flow == 'icons'){
 			$('#dsh-srch-res').addClass('dsh-sb-dd');
-			$('#dsh-srch-res').html(data);
+			$('#dsh-srch-res').html(data).show().perfectScrollbar();
+			$('#dsh-srch-res').perfectScrollbar('update');
+			if($('#dsh-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#dsh-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-srch-res').hide();
+			}
 		} else if (flow == 'graph'){
 			$('#dsh-grph-srch-res').addClass('dsh-sb-dd');
-			$('#dsh-grph-srch-res').html(data);
+			$('#dsh-grph-srch-res').html(data).show().perfectScrollbar();
+			$('#dsh-grph-srch-res').perfectScrollbar('update');
+			if($('#dsh-grph-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-grph-srch-res').hide();
+			}
 		} else if (flow == 'reports'){
 			$('#dsh-srch-report').addClass('dsh-sb-dd');
-			$('#dsh-srch-report').html(data);
+			$('#dsh-srch-report').html(data).show().perfectScrollbar();
+			$('#dsh-srch-report').perfectScrollbar('update');
+			if($('#dsh-srch-report').children('div.dsh-res-display').length <= 0) {
+				$('#dsh-srch-report').removeClass('dsh-sb-dd');
+				$('#dsh-srch-report').hide();
+			}
 		}
-		$('.dsh-res-display').click(function() {
-			
+		
+		$('.dsh-res-display').off('click');
+		$('.dsh-res-display').click(function(event) {
+			event.stopPropagation();
 			var value = $(this).data('attr');
 			if (searchColumn == "regionName") {
 				columnName = "regionId";
@@ -1096,15 +1214,21 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			
 			if (flow == 'icons'){
 			    $('#dsh-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-sel-item').val($(this).html());
+				$('#dsh-sel-item').val($(this).html()).attr('data-prev-val',"");
+				lastColNameForCount = columnName;
+				lastColValueForCount = value;
+				showSurveyStatistics(columnName, value);
 			}
 			else if (flow == 'graph') {
 				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-grph-sel-item').val($(this).html());
+				$('#dsh-grph-sel-item').val($(this).html()).attr('data-prev-val',"");
+				lastColNameForGraph = columnName;
+				lastColValueForGraph = value;
+				showSurveyStatisticsGraphically(columnName, value);
 			}
 			else if (flow == 'reports'){
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
-				$('#admin-report-dwn').val($(this).html());
+				$('#admin-report-dwn').val($(this).html()).attr('data-prev-val',"");
 				$('#report-sel').attr('data-iden',columnName);
 				$('#report-sel').attr('data-idenVal',value);
 				if (searchColumn == "displayName") {
@@ -1114,20 +1238,17 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 					$('#dsh-admin-rep-bnt').show();
 					$('#dsh-ind-rep-bnt').hide();
 				}
-				
-			}
-			
-			if (flow == 'icons'){
-				lastColNameForCount = columnName;
-				lastColValueForCount = value;
-				showSurveyStatistics(columnName, value);
-			}
-			else if (flow == 'graph'){
-				lastColNameForGraph = columnName;
-				lastColValueForGraph = value;
-				showSurveyStatisticsGraphically(columnName, value);
 			}
 			$('.dsh-res-display').hide();
+		});
+		$('.dsh-res-display').off('mouseover');
+		$('.dsh-res-display').on('mouseover',function(){
+			$('.dsh-res-display').removeClass('dsh-res-hover');
+			$(this).addClass('dsh-res-hover');
+		});
+		$('.dsh-res-display').off('mouseout');
+		$('.dsh-res-display').on('mouseout',function(){
+			$(this).removeClass('dsh-res-hover');
 		});
 	}, payload, true);
 }
@@ -1169,26 +1290,6 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName,disableEle) 
 		}
 	});
 }
-
-/*function changeRatingPattern(rating, ratingParent) {
-	var counter = 0;
-	ratingParent.children().each(function() {
-		$(this).addClass("icn-no-star");
-		$(this).removeClass("icn-half-star");
-		$(this).removeClass("icn-full-star");
-
-		if (rating >= counter) {
-			if (rating - counter >= 1) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-full-star");
-			} else if (rating - counter == 0.5) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-half-star");
-			}
-		}
-		counter++;
-	});
-}*/
 
 function showDisplayPic() {
 	$.ajax({
@@ -1247,7 +1348,6 @@ function showSurveyRequestPage(){
 		$('#srv-req-pop').find('.survey-request-popup').html(data);
 		
 	},true);
-	//window.open('./redirecttosurveyrequestpage.do', '_self');
 }
 
 $(document).on('click','#dashboard-sel',function(e){
@@ -1259,7 +1359,6 @@ $(document).on('click','.da-dd-item',function(e){
 	showOverlay();
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
-	//$('#da-dd-wrapper-profiles').perfectScrollbar('update');
 	
 	attrName = $(this).attr('data-column-type');
 	attrVal = $(this).attr('data-column-value');
@@ -10054,8 +10153,6 @@ function attachAutocompleteUserListDropdown(){
 		minLength : 0,
 		select : function (event, ui) {
 			event.stopPropagation();
-			var element = event.target;
-			
 			$('#selected-user-txt').val(ui.item.value);
 			$('#selected-user-txt').attr('val', ui.item.value);
 			$('#selected-userid-hidden').val(ui.item.userId);

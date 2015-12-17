@@ -49,9 +49,8 @@
 				<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
 					<div class="dsh-inp-wrapper float-left">
-						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
-							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
-						<div id="dsh-srch-res"></div>
+						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />" data-prev-val="" data-search-target='icons'>
+						<div id="dsh-srch-res" class="dsh-sel-dropdwn-cont"></div>
 					</div>
 				</div>
 				<div class="clearfix dash-sel-wrapper">
@@ -67,8 +66,7 @@
 			<div class="pos-relative">
 			 <div id="mid-dash" class="hide" > </div>
 			<div id="dash-survey-status" >
-			
-				Populated by dashboard_surveystatus.jsp
+				<!--  Populated by dashboard_surveystatus.jsp -->
 			</div>
 			</div> 
 		</div>
@@ -84,9 +82,8 @@
 				<div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
 					<div class="dsh-inp-wrapper float-left">
-						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
-							onkeyup="searchBranchRegionOrAgent(this.value, 'graph')">
-						<div id="dsh-grph-srch-res"></div>
+						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />" data-prev-val="" data-search-target='graph'>
+						<div id="dsh-grph-srch-res" class="dsh-sel-dropdwn-cont"></div>
 					</div>
 				</div>
 				<div class="clearfix dash-sel-wrapper">
@@ -96,9 +93,6 @@
 						<option value="60"><spring:message code="label.duration.two.key" /></option>
 						<option value="90" selected><spring:message code="label.duration.three.key" /></option>
 						<option value="365"><spring:message code="label.duration.four.key" /></option>
-						<%-- <option value="weekly"><spring:message code="label.format.one.key" /></option>
-						<option value="monthly"><spring:message code="label.format.two.key" /></option>
-						<option value="yearly"><spring:message code="label.format.three.key" /></option> --%>
 					</select>
 				</div>
 				
