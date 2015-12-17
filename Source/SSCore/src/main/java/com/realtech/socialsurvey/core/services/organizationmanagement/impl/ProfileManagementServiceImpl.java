@@ -4346,14 +4346,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         Map<String, Set<Long>> hierarchyIdsMap = new HashMap<String, Set<Long>>();
         switch ( profileLevel ) {
             case CommonConstants.COMPANY_ID_COLUMN:
-                hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
+                //hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
                 break;
             case CommonConstants.REGION_ID_COLUMN:
 //                hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet( Arrays
 //                    .asList( new Long[] { iden } ) ) );
                 break;
             case CommonConstants.BRANCH_ID_COLUMN:
-                hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
+                //hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
                 break;
             default:
                 LOG.error( "Invalid profile level while getting ids under a profile level and id" );
