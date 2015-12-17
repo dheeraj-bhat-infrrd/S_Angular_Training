@@ -8115,6 +8115,9 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
+	case 5:
+		window.location.href = "/downloaduseradoptionreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		break;
 	default:
 		break;
 	}
