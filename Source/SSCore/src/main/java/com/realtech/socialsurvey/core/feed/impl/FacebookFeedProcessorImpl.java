@@ -113,6 +113,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
     @Transactional
     public void preProcess( long iden, String collection, FacebookToken token )
     {
+    	LOG.debug("Processing: "+iden+" for collection "+collection+" with token "+token.getFacebookAccessTokenToPost());
         List<FeedStatus> statuses = null;
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.FEED_SOURCE_COLUMN, FEED_SOURCE );
@@ -191,6 +192,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
                 break;
         }
         profileId = iden;
+        LOG.debug("Setting profile id: "+profileId+". Iden was "+iden+" with token "+token.getFacebookAccessTokenToPost()+" and collection "+collection);
     }
 
 
@@ -198,7 +200,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
     @Transactional
     public List<Post> fetchFeed( long iden, String collection, FacebookToken token ) throws NonFatalException
     {
-        LOG.info( "Getting posts for " + collection + " with id: " + iden );
+        LOG.info( "Getting posts for " + collection + " with id: " + iden+" with token "+token.getFacebookAccessTokenToPost() );
 
         // Settings Consumer and Access Tokens
         Facebook facebook = new FacebookFactory().getInstance();
@@ -224,7 +226,9 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
                 resultList = facebook.fetchNext( resultList.getPaging() );
                 posts.addAll( resultList );
             }
-
+            if(posts != null && posts.size() > 0){
+            	LOG.debug("Post for id "+iden+" and posted by: "+posts.get(CommonConstants.INITIAL_INDEX).getFrom().getName());
+            }
             status.setRetries( RETRIES_INITIAL );
         } catch ( FacebookException e ) {
             LOG.error( "Exception in Facebook feed extration. Reason: " + e.getMessage() );
@@ -265,7 +269,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
     @Override
     public boolean processFeed( List<Post> posts, String collection ) throws NonFatalException
     {
-        LOG.info( "Process posts for organizationUnit " + collection );
+        LOG.info( "Process posts for organizationUnit " + collection +" and profile id "+profileId );
         if ( posts == null || posts.isEmpty() ) {
             return false;
         }
@@ -338,7 +342,7 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             lastFetchedPostId = post.getId();
 
             // pushing to mongo
-
+            LOG.debug("Posting for id "+profileId+" for collection "+collection+" with posted by "+feed.getPostedBy());
             mongoTemplate.insert( feed, CommonConstants.SOCIAL_POST_COLLECTION );
             inserted = true;
         }
