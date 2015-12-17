@@ -69,7 +69,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( DashboardServiceImpl.class );
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( "MM/dd/yyyy" );
+    
+    //SS-1354: Using date format from CommonConstants
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
     private static Map<String, Integer> weightageColumns;
 
     @Autowired
@@ -481,7 +483,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        
+        //SS-1354: Using date format from CommonConstants
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // This data needs to be written (List<Object>)
@@ -558,7 +562,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        
+        //SS-1354: Using date format from CommonConstants
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // Sorting SurveyResults
@@ -668,7 +674,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        
+        //SS-1354: Using date format from CommonConstants
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // Sorting SurveyResults
@@ -852,7 +860,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        
+        //SS-1354: Using date format from CommonConstants
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // Sorting AgentRankingReports
