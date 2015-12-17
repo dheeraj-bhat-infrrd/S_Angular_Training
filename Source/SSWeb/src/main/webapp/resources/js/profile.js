@@ -952,9 +952,10 @@ function fetchReviewsScroll(isNextBatch) {
 		else if(doFetchHeirarchyIds) {
 			doFetchHeirarchyIds = false;
 			fetchHeirarchyIdsConectedToZillow(profileLevel, currentProfileIden, isNextBatch);
-		} else if(zillowHierarchyMap != undefined) {
-			fetchZillowReviewsFromZillowHierarchyMap(isNextBatch);
-		}
+		} /*
+		else if(zillowHierarchyMap != undefined) {
+			fetchZillowReviewsFromZillowHierarchyMap(profileLevel, currentProfileIden, isNextBatch);
+		}*/
 		doFetchZillowReviews = false;
 	}
 }
@@ -1631,39 +1632,67 @@ function twitterFn(loop) {
 }
 
 var zillowHierarchyMap = {};
+var zillowHStart = 0;
+var zillowHBatchSize = 10;
+var curHierarchyLevel = "";
 function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	if (iden == undefined || iden == "") {
 		return;
 	}
-
+	
+	var newHierarchyLevel = "";
 	var url = "/rest/profile/";
 	if (profileLevel == 'COMPANY') {
 		url += "company/";
+		newHierarchyLevel = "REGION";
 	} else if (profileLevel == 'REGION') {
 		url += "region/";
+		newHierarchyLevel = "BRANCH";
 	} else if (profileLevel == 'BRANCH') {
 		url += "branch/";
+		newHierarchyLevel = "INDIVIDUAL";
 	} else if (profileLevel == 'INDIVIDUAL') {
 		return;
 	}
+	if (curHierarchyLevel == "") {
+		curHierarchyLevel = newHierarchyLevel;
+	}
 	url += iden + '/fetchhierarchyconnectedtozillow';
-	callAjaxGET(url, function(data) {
+	var payload = {
+			"start" : zillowHStart,
+			"numRows" : zillowHBatchSize,
+			"currentHierarchyLevel" : curHierarchyLevel
+	};
+	callAjaxGetWithPayloadData(url, function(data) {
 	    if (data != undefined && data != "") {
 	        var responseJson = $.parseJSON(data);
 	        if (responseJson != undefined) {
 	            var result = $.parseJSON(responseJson.entity);
-	            if (result != undefined) {
-	                zillowHierarchyMap.regionIds = result.region;
-	                zillowHierarchyMap.branchIds = result.branch;
-	                zillowHierarchyMap.individualIds = result.individual;
-	                fetchZillowReviewsFromZillowHierarchyMap(isNextBatch);
+	            var length = Object.keys(result).length;
+	            if (result == undefined || length == 0){
+	            	switch(curHierarchyLevel){
+	            	case "REGION":
+	            		curHierarchyLevel = "BRANCH";
+	            		break;
+	            		
+	            	case "BRANCH":
+	            		curHierarchyLevel = "INDIVIDUAL";
+	            		break;
+	            		
+	            	default:
+	            		return;
+	            		
+	            	}
+	            	zillowHStart = 0;
+	            } else {
+	                fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, result, curHierarchyLevel, isNextBatch);
 	            }
 	        }
 	    }
-	}, false);
+	}, payload, false, false);
 }
 
-function fetchZillowReviewsFromZillowHierarchyMap(isNextBatch) {
+function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, result, curHierarchyLevel, isNextBatch) {
 	if(isZillowReviewsCallRunning) {
 		//If it is not next batch and reviews are still loading check for if reviews are there
 		//If there show them otherwise wait for the reviews to load
@@ -1675,25 +1704,45 @@ function fetchZillowReviewsFromZillowHierarchyMap(isNextBatch) {
 		return; //Return if zillow reviews are still loading
 	}
 	if (!zillowCallBreak) {
-	    var regionIds = zillowHierarchyMap.regionIds;
-	    if (regionIds != undefined && regionIds.length > 0) {
-	        fetchZillowReviewsBasedOnProfile('REGION', regionIds[0], isNextBatch);
-	        regionIds.shift();
-	        return;
-	    }
-	    var branchIds = zillowHierarchyMap.branchIds;
-	    if (branchIds != undefined && branchIds.length > 0) {
-	        fetchZillowReviewsBasedOnProfile('BRANCH', branchIds[0], isNextBatch);
-	        branchIds.shift();
-	        return;
-	    }
-	    var individualIds = zillowHierarchyMap.individualIds;
-	    if (individualIds != undefined && individualIds.length > 0) {
-	        for (var i = 0; i < individualIds.length; i++) {
-	            fetchZillowReviewsBasedOnProfile('INDIVIDUAL', individualIds[0], isNextBatch);
-	        }
-	        individualIds.shift();
-	        return;
+		switch(curHierarchyLevel){
+			case "REGION":
+			    var regionIds = result;
+			    if (regionIds != undefined && regionIds.length > 0) {
+			        fetchZillowReviewsBasedOnProfile('REGION', regionIds[0], isNextBatch);
+			        regionIds.shift();
+			        return;
+			    } else {
+			    	zillowHStart += zillowHBatchSize;
+			    	fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
+			    }
+			    break;
+			    
+			case "BRANCH":
+			    var branchIds = result;
+			    if (branchIds != undefined && branchIds.length > 0) {
+			        fetchZillowReviewsBasedOnProfile('BRANCH', branchIds[0], isNextBatch);
+			        branchIds.shift();
+			        return;
+			    } else {
+			    	zillowHStart += zillowHBatchSize;
+			    	fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
+			    }
+			    break;
+			    
+			case "INDIVIDUAL":
+			    var individualIds = result;
+			    if (individualIds != undefined && individualIds.length > 0) {
+			        fetchZillowReviewsBasedOnProfile('INDIVIDUAL', individualIds[0], isNextBatch);
+			        individualIds.shift();
+			        return;
+			    } else {
+			    	zillowHStart += zillowHBatchSize;
+			    	fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
+			    }
+			    break;
+			    
+			default:
+				return;
 	    }
 	}
 }

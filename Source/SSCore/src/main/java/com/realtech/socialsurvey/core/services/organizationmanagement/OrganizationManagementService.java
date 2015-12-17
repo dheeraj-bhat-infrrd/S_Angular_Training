@@ -1216,7 +1216,7 @@ public interface OrganizationManagementService
         throws InvalidInputException;
 
 
-    public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden, int batch_size, int start_index )
-        throws InvalidInputException;
+    public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index,
+        int batch_size ) throws InvalidInputException;
 
 }
