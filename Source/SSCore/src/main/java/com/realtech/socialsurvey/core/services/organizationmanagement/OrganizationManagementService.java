@@ -8,7 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -1189,28 +1191,31 @@ public interface OrganizationManagementService
     public List<Branch> getBranchesForBranchIds( Set<Long> branchIds ) throws InvalidInputException;
 
 
-    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
+//    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
 
 
-    public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException;
+//    public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException;
 
 
-    public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException, NoRecordsFetchedException;
+//    public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException;
+//    public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException;
 
 
-    public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException;
+//    public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
+//        NoRecordsFetchedException, ProfileNotFoundException;
 
 
-    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds );
+//    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds );
 
 
     public Map<String, Set<Long>> getAllIdsUnderCompanyConnectedToZillow( long iden );
 
 
     public Map<String, Set<Long>> getAllIdsUnderBranchConnectedToZillow( long branchId );
+
+
+    public Map<String, Set<Long>> getAllIdsUnderRegionConnectedToZillow( long regionId );
 
 }

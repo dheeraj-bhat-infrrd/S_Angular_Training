@@ -1982,8 +1982,7 @@ public class ProfileController
             hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
         } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
             // get all branches, individuals under a region connected to zillow
-            hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet<Long>( Arrays
-                .asList( new Long[] { iden } ) ) );
+            hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionConnectedToZillow( iden );
         } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
             // get all individuals under branch connected with zillow
             hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
