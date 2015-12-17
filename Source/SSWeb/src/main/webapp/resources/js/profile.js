@@ -952,10 +952,10 @@ function fetchReviewsScroll(isNextBatch) {
 		else if(doFetchHeirarchyIds) {
 			doFetchHeirarchyIds = false;
 			fetchHeirarchyIdsConectedToZillow(profileLevel, currentProfileIden, isNextBatch);
-		} /*
-		else if(zillowHierarchyMap != undefined) {
+		} 
+		else if(zillowHierarchyList != undefined) {
 			fetchZillowReviewsFromZillowHierarchyMap(profileLevel, currentProfileIden, isNextBatch);
-		}*/
+		}
 		doFetchZillowReviews = false;
 	}
 }
@@ -1631,7 +1631,7 @@ function twitterFn(loop) {
     }
 }
 
-var zillowHierarchyMap = {};
+var zillowHierarchyList = [];
 var zillowHStart = 0;
 var zillowHBatchSize = 10;
 var curHierarchyLevel = "";
@@ -1667,8 +1667,9 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	    if (data != undefined && data != "") {
 	        var responseJson = $.parseJSON(data);
 	        if (responseJson != undefined) {
-	            var result = $.parseJSON(responseJson.entity);
-	            var length = Object.keys(result).length;
+	            var result = responseJson;
+	            
+	            var length = result.length;
 	            if (result == undefined || length == 0){
 	            	switch(curHierarchyLevel){
 	            	case "REGION":
@@ -1683,19 +1684,23 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	            		return;
 	            		
 	            	}
+	            	zillowHierarchyList = [];
 	            	zillowHStart = 0;
 	            } else {
-	                fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, result, curHierarchyLevel, isNextBatch);
+	            	zillowHierarchyList = result;
+	                fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, isNextBatch);
 	            }
 	        }
 	    }
-	}, payload, false, false);
+	}, payload, false);
 }
 
-function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, result, curHierarchyLevel, isNextBatch) {
+function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, isNextBatch) {
 	if(isZillowReviewsCallRunning) {
 		//If it is not next batch and reviews are still loading check for if reviews are there
 		//If there show them otherwise wait for the reviews to load
+		if(isNextBatch == undefined)
+			isNextBatch = true;
 		if(!isNextBatch) {
 			setTimeout(function() {
 				fetchReviewsScroll(isNextBatch);
@@ -1706,7 +1711,7 @@ function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, result, cu
 	if (!zillowCallBreak) {
 		switch(curHierarchyLevel){
 			case "REGION":
-			    var regionIds = result;
+			    var regionIds = zillowHierarchyList;
 			    if (regionIds != undefined && regionIds.length > 0) {
 			        fetchZillowReviewsBasedOnProfile('REGION', regionIds[0], isNextBatch);
 			        regionIds.shift();
@@ -1718,7 +1723,7 @@ function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, result, cu
 			    break;
 			    
 			case "BRANCH":
-			    var branchIds = result;
+			    var branchIds = zillowHierarchyList;
 			    if (branchIds != undefined && branchIds.length > 0) {
 			        fetchZillowReviewsBasedOnProfile('BRANCH', branchIds[0], isNextBatch);
 			        branchIds.shift();
@@ -1730,7 +1735,7 @@ function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, result, cu
 			    break;
 			    
 			case "INDIVIDUAL":
-			    var individualIds = result;
+			    var individualIds = zillowHierarchyList;
 			    if (individualIds != undefined && individualIds.length > 0) {
 			        fetchZillowReviewsBasedOnProfile('INDIVIDUAL', individualIds[0], isNextBatch);
 			        individualIds.shift();
