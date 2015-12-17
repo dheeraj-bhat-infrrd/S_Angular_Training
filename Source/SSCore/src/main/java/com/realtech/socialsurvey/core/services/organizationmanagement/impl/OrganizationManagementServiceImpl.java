@@ -58,6 +58,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -272,6 +273,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private GenericDao<LoopProfileMapping, Long> loopProfileMappingDao;
 
+    @Autowired
+    private ZillowHierarchyDao zillowHierarchyDao;
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -5400,11 +5403,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    /**
+    /*/**
      * Method to fetch regions connected to zillow
      * @param regionIds
      * */
-    @Override
+    /*@Override
     @Transactional
     public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds )
     {
@@ -5436,15 +5439,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getRegionsConnectedToZillow called to fetch regions connected to zillow for region ids : "
             + regionIds );
         return zillowConnectedRegionIds;
-    }
+    }*/
 
 
-    /**
+    /*/**
      * Method to fetch branches connected to zillow
      * @param regionIds
      * @throws InvalidInputException
      * */
-    @Override
+   /* @Override
     @Transactional
     public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException
     {
@@ -5472,21 +5475,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method to fetch branch settings for branch ids : " + branchIds
             + ", getBranchesUnderRegionConnectedToZillow call ended" );
         return zillowConnectedBranchIds;
-    }
+    }*/
 
 
-    /**
+    /*/**
      * Method to fetch individuals for regions connected to zillow
      * @param regionIds
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      * */
-    @Override
+    /*@Override
     @Transactional
     public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException,
         NoRecordsFetchedException
     {
-        if ( regionIds == null || regionIds.isEmpty() )
+        if ( regionIds == null || regionIds.isEmpty() )regionId
             throw new InvalidInputException(
                 "Region ids passed cannot be null or empty in getIndividualsForRegionsConnectedWithZillow()" );
         List<AgentSettings> agentSettingsList = profileManagementService.getIndividualsByRegionIds( regionIds );
@@ -5502,15 +5505,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         return zillowConnectedIndividualIds;
-    }
+    }*/
 
 
-    /**
+    /*/**
      * Method to fetch individuals for company connected to zillow
      * @param regionIds
      * @throws InvalidInputException
      * */
-    @Override
+    /*@Override
     @Transactional
     public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
         ProfileNotFoundException, NoRecordsFetchedException
@@ -5530,15 +5533,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         return zillowConnectedIndividualIds;
-    }
+    }*/
 
 
-    /**
+    /*/**
      * Method to fetch individuals for branches connected to zillow
      * @param regionIds
      * @throws InvalidInputException
      * */
-    @Override
+    /*@Override
     @Transactional
     public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException
     {
@@ -5558,13 +5561,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         return zillowConnectedIndividualIds;
-    }
+    }*/
 
 
-    /**
+   /* /**
      * Method to get all the ids of regions, branches and individuals under a company connected to zillow
      * */
-    @Override
+   /* @Override
     public Map<String, Set<Long>> getAllIdsUnderCompanyConnectedToZillow( long companyId )
     {
         Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
@@ -5649,13 +5652,38 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Could not fetch unit settings for company id : " + companyId, e );
         }
         return hierarchyIdsMap;
-    }
+    }*/
 
 
     /**
-     * Method to get all the ids of branches and individuals under a region connected to zillow
+     * Method to get all the ids of regions, branches and individuals under a company connected to zillow
      * */
     @Override
+    @Transactional
+    public Map<String, Set<Long>> getAllIdsUnderCompanyConnectedToZillow( long companyId )
+    {
+
+        try {
+            if ( companyId <= 0l ) {
+                LOG.error( "Invalid company Id passed in getAllIdsUnderCompanyConnectedToZillow" );
+                throw new InvalidInputException( "Invalid company Id passed in getAllIdsUnderCompanyConnectedToZillow" );
+            }
+
+            return zillowHierarchyDao.getIdsUnderCompanyConnectedToZillow( companyId );
+        } catch ( InvalidInputException e ) {
+            LOG.error(
+                "InvalidInputException occurred while fetching ids under company connected to zillow. Nested Exception is : "
+                    + companyId, e );
+        }
+        return null;
+    }
+
+
+    /*
+    /**
+     * Method to get all the ids of branches and individuals under a region connected to zillow
+     * */
+    /*@Override
     public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds )
     {
         Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
@@ -5696,13 +5724,32 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Could not found unit settings for region ids : " + regionIds, e );
         }
         return hierarchyIdsMap;
+    }*/
+
+
+    @Override
+    @Transactional
+    public Map<String, Set<Long>> getAllIdsUnderRegionConnectedToZillow( long regionId )
+    {
+
+        try {
+            if ( regionId <= 0l ) {
+                LOG.error( "Invalid region Id passed in getAllIdsUnderRegionConnectedToZillow" );
+                throw new InvalidInputException( "Invalid region Id passed in getAllIdsUnderRegionConnectedToZillow" );
+            }
+            return zillowHierarchyDao.getIdsUnderRegionConnectedToZillow( regionId );
+        } catch ( InvalidInputException e ) {
+            LOG.error(
+                "InvalidInputException occurred while fetching ids under region connected to zillow. Nested Exception is : ", e );
+        }
+        return null;
     }
 
-
+    /*
     /**
      * Method to get all individual ids under a region connected to zillow
      * */
-    @Override
+    /*@Override
     public Map<String, Set<Long>> getAllIdsUnderBranchConnectedToZillow( long branchId )
     {
         Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
@@ -5716,6 +5763,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Could not fetch individuals under branch id: " + branchId, e );
         }
         return hierarchyIdsMap;
+    }*/
+
+
+    @Override
+    @Transactional
+    public Map<String, Set<Long>> getAllIdsUnderBranchConnectedToZillow( long branchId )
+    {
+        try {
+            if ( branchId <= 0l ) {
+                LOG.error( "Invalid branch Id passed in getAllIdsUnderBranchConnectedToZillow" );
+                throw new InvalidInputException( "Invalid branch Id passed in getAllIdsUnderBranchConnectedToZillow" );
+            }
+
+            return zillowHierarchyDao.getIdsUnderBranchConnectedToZillow( branchId );
+        } catch ( InvalidInputException e ) {
+            LOG.error(
+                "InvalidInputException occurred while fetching ids under branch connected to zillow. Nested Exception is : ", e );
+        }
+        return null;
+
     }
 }
 // JIRA: SS-27: By RM05: EOC
