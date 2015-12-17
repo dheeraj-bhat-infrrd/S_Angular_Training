@@ -5655,30 +5655,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }*/
 
 
-    /**
-     * Method to get all the ids of regions, branches and individuals under a company connected to zillow
-     * */
-    @Override
-    @Transactional
-    public Map<String, Set<Long>> getAllIdsUnderCompanyConnectedToZillow( long companyId )
-    {
-
-        try {
-            if ( companyId <= 0l ) {
-                LOG.error( "Invalid company Id passed in getAllIdsUnderCompanyConnectedToZillow" );
-                throw new InvalidInputException( "Invalid company Id passed in getAllIdsUnderCompanyConnectedToZillow" );
-            }
-
-            return zillowHierarchyDao.getIdsUnderCompanyConnectedToZillow( companyId );
-        } catch ( InvalidInputException e ) {
-            LOG.error(
-                "InvalidInputException occurred while fetching ids under company connected to zillow. Nested Exception is : "
-                    + companyId, e );
-        }
-        return null;
-    }
-
-
     /*
     /**
      * Method to get all the ids of branches and individuals under a region connected to zillow
@@ -5727,24 +5703,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }*/
 
 
-    @Override
-    @Transactional
-    public Map<String, Set<Long>> getAllIdsUnderRegionConnectedToZillow( long regionId )
-    {
-
-        try {
-            if ( regionId <= 0l ) {
-                LOG.error( "Invalid region Id passed in getAllIdsUnderRegionConnectedToZillow" );
-                throw new InvalidInputException( "Invalid region Id passed in getAllIdsUnderRegionConnectedToZillow" );
-            }
-            return zillowHierarchyDao.getIdsUnderRegionConnectedToZillow( regionId );
-        } catch ( InvalidInputException e ) {
-            LOG.error(
-                "InvalidInputException occurred while fetching ids under region connected to zillow. Nested Exception is : ", e );
-        }
-        return null;
-    }
-
     /*
     /**
      * Method to get all individual ids under a region connected to zillow
@@ -5765,24 +5723,81 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return hierarchyIdsMap;
     }*/
 
+    @Override
+    @Transactional
+    public Set<Long> getAllRegionsUnderCompanyConnectedToZillow( long companyId, int batch_size, int start_index )
+        throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            LOG.error( "Invalid companyId passed in getAllRegionsUnderCompanyConnectedToZillow" );
+            throw new InvalidInputException( "Invalid companyId passed in getAllRegionsUnderCompanyConnectedToZillow" );
+        }
+
+        return zillowHierarchyDao.getRegionIdsUnderCompanyConnectedToZillow( companyId, start_index, batch_size );
+    }
+
 
     @Override
     @Transactional
-    public Map<String, Set<Long>> getAllIdsUnderBranchConnectedToZillow( long branchId )
+    public Set<Long> getAllBranchesUnderProfileTypeConnectedToZillow( String profileType, long iden, int batch_size,
+        int start_index ) throws InvalidInputException
     {
-        try {
-            if ( branchId <= 0l ) {
-                LOG.error( "Invalid branch Id passed in getAllIdsUnderBranchConnectedToZillow" );
-                throw new InvalidInputException( "Invalid branch Id passed in getAllIdsUnderBranchConnectedToZillow" );
-            }
 
-            return zillowHierarchyDao.getIdsUnderBranchConnectedToZillow( branchId );
-        } catch ( InvalidInputException e ) {
-            LOG.error(
-                "InvalidInputException occurred while fetching ids under branch connected to zillow. Nested Exception is : ", e );
+        if ( profileType == null || profileType.isEmpty() ) {
+            LOG.error( "profile type passed cannot be null or empty in getAllBranchesUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException(
+                "profile type passed cannot be null or empty in getAllBranchesUnderProfileTypeConnectedToZillow" );
         }
-        return null;
 
+        if ( iden <= 0l ) {
+            LOG.error( "Invalid id passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException( "Invalid id passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
+
+        switch ( profileType ) {
+            case CommonConstants.PROFILE_LEVEL_COMPANY:
+                return zillowHierarchyDao.getBranchIdsUnderCompanyConnectedToZillow( iden, batch_size, start_index );
+
+            case CommonConstants.PROFILE_LEVEL_REGION:
+                return zillowHierarchyDao.getBranchIdsUnderRegionConnectedToZillow( iden, batch_size, start_index );
+
+            default:
+                throw new InvalidInputException(
+                    "Invalid profile type passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden, int batch_size,
+        int start_index ) throws InvalidInputException
+    {
+        if ( profileType == null || profileType.isEmpty() ) {
+            LOG.error( "profile type passed cannot be null or empty in getAllUsersUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException(
+                "profile type passed cannot be null or empty in getAllUsersUnderProfileTypeConnectedToZillow" );
+        }
+
+        if ( iden <= 0l ) {
+            LOG.error( "Invalid id passed in getAllUsersUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException( "Invalid id passed in getAllUsersUnderProfileTypeConnectedToZillow" );
+        }
+
+        switch ( profileType ) {
+            case CommonConstants.PROFILE_LEVEL_COMPANY:
+                return zillowHierarchyDao.getUserIdsUnderCompanyConnectedToZillow( iden, batch_size, start_index );
+
+            case CommonConstants.PROFILE_LEVEL_REGION:
+                return zillowHierarchyDao.getUserIdsUnderRegionConnectedToZillow( iden, batch_size, start_index );
+
+            case CommonConstants.PROFILE_LEVEL_BRANCH:
+                return zillowHierarchyDao.getUserIdsUnderBranchConnectedToZillow( iden, batch_size, start_index );
+
+            default:
+                throw new InvalidInputException(
+                    "Invalid profile type passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
     }
 }
 // JIRA: SS-27: By RM05: EOC
