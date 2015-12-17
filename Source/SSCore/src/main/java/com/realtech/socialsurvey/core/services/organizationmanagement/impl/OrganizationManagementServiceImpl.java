@@ -5771,7 +5771,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden,
-        int start_index, int batch_size ) throws InvalidInputException
+        int batch_size, int start_index ) throws InvalidInputException
     {
         if ( profileType == null || profileType.isEmpty() ) {
             LOG.error( "profile type passed cannot be null or empty in getAllUsersUnderProfileTypeConnectedToZillow" );
@@ -5786,13 +5786,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         switch ( profileType ) {
             case CommonConstants.PROFILE_TYPE_COMPANY:
-                return zillowHierarchyDao.getUserIdsUnderCompanyConnectedToZillow( iden, batch_size, start_index );
+                return zillowHierarchyDao.getUserIdsUnderCompanyConnectedToZillow( iden, start_index, batch_size );
 
             case CommonConstants.PROFILE_TYPE_REGION:
-                return zillowHierarchyDao.getUserIdsUnderRegionConnectedToZillow( iden, batch_size, start_index );
+                return zillowHierarchyDao.getUserIdsUnderRegionConnectedToZillow( iden, start_index, batch_size );
 
             case CommonConstants.PROFILE_TYPE_BRANCH:
-                return zillowHierarchyDao.getUserIdsUnderBranchConnectedToZillow( iden, batch_size, start_index );
+                return zillowHierarchyDao.getUserIdsUnderBranchConnectedToZillow( iden, start_index, batch_size );
 
             default:
                 throw new InvalidInputException(
