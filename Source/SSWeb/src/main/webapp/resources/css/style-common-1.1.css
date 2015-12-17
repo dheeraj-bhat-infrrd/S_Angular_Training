@@ -219,13 +219,13 @@ a, a:hover, a:visited{
 }
 
 .c-pic-bot-3 {
-    background: url(../csssprites/home.png) no-repeat -462px 0px;
+    background: url(../csssprites/home.png) no-repeat -693px 0px;
     background-size: auto 100%;
     margin-right: 5px;
 }
 
 .c-pic-bot-4 {
-    background: url(../csssprites/home.png) no-repeat -693px 0px;
+    background: url(../csssprites/home.png) no-repeat -462px 0px;
     background-size: auto 100%;
 }
 
