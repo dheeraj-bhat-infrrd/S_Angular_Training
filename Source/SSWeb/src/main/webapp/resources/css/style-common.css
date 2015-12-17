@@ -5466,10 +5466,12 @@ td.v-tbl-spacer {
 
 .v-icn-close {
 	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
 }
 
 .v-icn-edit {
 	background: url('../images/edit-1.png') no-repeat center;
+	cursor: pointer;
 }
 
 .user-info-sing-out {
@@ -7248,6 +7250,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	cursor: pointer;
 }
 
+.dsh-res-hover {
+	background: #5cc7ef;
+	color: #fff;
+}
+
 .user-edit-btn {
 	background-color: #3E9DCB;
 	color: #fff;
@@ -7970,3 +7977,6 @@ label.url-change-input-label {
 	margin-bottom: 10px;
 }
 
+.dsh-sel-dropdwn-cont {
+	max-height: 200px;
+}
