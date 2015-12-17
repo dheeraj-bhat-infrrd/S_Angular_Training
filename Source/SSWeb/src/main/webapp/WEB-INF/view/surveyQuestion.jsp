@@ -18,7 +18,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
-	<script src='//www.google.com/recaptcha/api.js'></script>
 </head>
 
 <body>
@@ -368,6 +367,7 @@
 <script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/application.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
+<script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
 <script>
 $(document).ready(function() {
 	$("div[data-ques-type]").hide();
