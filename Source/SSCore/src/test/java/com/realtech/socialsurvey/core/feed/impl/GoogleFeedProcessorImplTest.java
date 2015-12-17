@@ -50,7 +50,7 @@ public class GoogleFeedProcessorImplTest
     @Test
     public void testProcessFeedPostsEmpty() throws NonFatalException
     {
-        assertFalse( "", googleFeedProcessorImpl.processFeed( new ArrayList<GooglePlusPost>(), null ) );
+        assertFalse( "", googleFeedProcessorImpl.processFeed( 0l, new ArrayList<GooglePlusPost>(), null, null ) );
     }
 
 

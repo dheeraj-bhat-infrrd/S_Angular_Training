@@ -104,7 +104,6 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
     private String facebookUri;
 
     private FeedStatus status;
-    private long profileId;
     private Date lastFetchedTill;
     private String lastFetchedPostId = "";
 
@@ -191,8 +190,6 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
                 }
                 break;
         }
-        profileId = iden;
-        LOG.debug("Setting profile id: "+profileId+". Iden was "+iden+" with token "+token.getFacebookAccessTokenToPost()+" and collection "+collection);
     }
 
 
@@ -267,9 +264,9 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
 
     @Override
-    public boolean processFeed( List<Post> posts, String collection ) throws NonFatalException
+    public boolean processFeed( long iden, List<Post> posts, String collection, FacebookToken token ) throws NonFatalException
     {
-        LOG.info( "Process posts for organizationUnit " + collection +" and profile id "+profileId );
+        LOG.info( "Process posts for organizationUnit " + collection +" and iden "+iden );
         if ( posts == null || posts.isEmpty() ) {
             return false;
         }
@@ -300,14 +297,15 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
             feed.setPostedBy( post.getFrom().getName() );
             feed.setTimeInMillis( post.getUpdatedTime().getTime() );
             feed.setPostUrl( facebookUri.concat( post.getId() ) );
+            feed.setToken(token.getFacebookAccessTokenToPost());
             switch ( collection ) {
                 case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-                    feed.setCompanyId( profileId );
+                    feed.setCompanyId( iden );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-                    feed.setRegionId( profileId );
-                    Region region = regionDao.findById( Region.class, profileId );
+                    feed.setRegionId( iden );
+                    Region region = regionDao.findById( Region.class, iden );
                     if ( region != null ) {
                         Company company = region.getCompany();
                         if ( company !=  null ) {
@@ -317,32 +315,32 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-                    Branch branch = branchDao.findById( Branch.class, profileId );
+                    Branch branch = branchDao.findById( Branch.class, iden );
                     if ( branch != null ) {
                         Company company = branch.getCompany();
                         if ( company != null ) {
                             feed.setCompanyId( company.getCompanyId() );
                         }
                     }
-                    feed.setBranchId( profileId );
+                    feed.setBranchId( iden );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-                    User user = userDao.findById( User.class, profileId );
+                    User user = userDao.findById( User.class, iden );
                     if ( user != null ) {
                         Company company = user.getCompany();
                         if ( company != null ) {
                             feed.setCompanyId( company.getCompanyId() );
                         }
                     }
-                    feed.setAgentId( profileId );
+                    feed.setAgentId( iden );
                     break;
             }
 
             lastFetchedPostId = post.getId();
 
             // pushing to mongo
-            LOG.debug("Posting for id "+profileId+" for collection "+collection+" with posted by "+feed.getPostedBy());
+            LOG.debug("Posting for id "+iden+" for collection "+collection+" with posted by "+feed.getPostedBy());
             mongoTemplate.insert( feed, CommonConstants.SOCIAL_POST_COLLECTION );
             inserted = true;
         }
@@ -365,13 +363,13 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 
         if ( anyRecordInserted ) {
             if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, iden );
             }
         }
 
