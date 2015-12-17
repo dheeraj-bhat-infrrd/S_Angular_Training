@@ -1882,6 +1882,8 @@ public class SocialManagementController
                     	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
                     	//Set IS_ZILLOW_CONNECTED to true
                     	company.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                    	company.setZillowAverageScore( 0.0 );
+                    	company.setZillowReviewCount( 0 );
                     	userManagementService.updateCompany( company );
                     }
                     for ( ProfileStage stage : companySettings.getProfileStages() ) {
@@ -1912,6 +1914,8 @@ public class SocialManagementController
                     	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
                         //Set IS_ZILLOW_CONNECTED to true
                         region.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                        region.setZillowAverageScore( 0.0 );
+                        region.setZillowReviewCount( 0 );
                     	userManagementService.updateRegion( region );
                     }
                     for ( ProfileStage stage : regionSettings.getProfileStages() ) {
@@ -1941,6 +1945,8 @@ public class SocialManagementController
                     	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
                         //Set IS_ZILLOW_CONNECTED to true
                         branch.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                        branch.setZillowAverageScore( 0.0 );
+                        branch.setZillowReviewCount( 0 );
                     	userManagementService.updateBranch( branch );
                     }
                     for ( ProfileStage stage : branchSettings.getProfileStages() ) {
@@ -1968,6 +1974,8 @@ public class SocialManagementController
                     if(agent != null){
                         //Set IS_ZILLOW_CONNECTED to true
                         agent.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                        agent.setZillowAverageScore( 0.0 );
+                        agent.setZillowReviewCount( 0 );
                         userManagementService.updateUser( agent );
                     }
                     for ( ProfileStage stage : agentSettings.getProfileStages() ) {
@@ -2124,6 +2132,8 @@ public class SocialManagementController
                 	//Set IS_ZILLOW_CONNECTED to false
                 	if ( isZillow ) {
                         company.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                        company.setZillowAverageScore( 0.0 );
+                        company.setZillowReviewCount( 0 );
                     }
                 	userManagementService.updateCompany( company );
                 }
@@ -2140,6 +2150,8 @@ public class SocialManagementController
                     //Set IS_ZILLOW_CONNECTED to false
                     if ( isZillow ) {
                         region.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                        region.setZillowAverageScore( 0.0 );
+                        region.setZillowReviewCount( 0 );
                     }
                 	userManagementService.updateRegion( region );
                 }
@@ -2156,6 +2168,8 @@ public class SocialManagementController
                     //Set IS_ZILLOW_CONNECTED to false
                     if ( isZillow ) {
                         branch.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                        branch.setZillowAverageScore( 0.0 );
+                        branch.setZillowReviewCount( 0 );
                     }
                 	userManagementService.updateBranch( branch );
                 }
@@ -2170,7 +2184,9 @@ public class SocialManagementController
                 if ( isZillow ) {
                     User agent = userManagementService.getUserByUserId( unitSettings.getIden() );
                     agent.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
-                    userManagementService.updateUser( user );
+                    agent.setZillowAverageScore( 0.0 );
+                    agent.setZillowReviewCount( 0 );
+                    userManagementService.updateUser( agent );
                 }
                 
             }
