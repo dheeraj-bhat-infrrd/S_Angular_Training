@@ -102,7 +102,6 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
     private GenericDao<User, Long> userDao;
 
     private FeedStatus status;
-    private long profileId;
     private Timestamp lastFetchedTill;
     private String lastFetchedPostId = "";
 
@@ -184,7 +183,6 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
                 }
                 break;
         }
-        profileId = iden;
     }
 
 
@@ -253,7 +251,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 
     @Override
-    public boolean processFeed( List<Status> tweets, String collection ) throws NonFatalException
+    public boolean processFeed( long iden, List<Status> tweets, String collection, TwitterToken token ) throws NonFatalException
     {
         LOG.info( "Process tweets for organizationUnit " + collection );
         boolean inserted = false;
@@ -271,6 +269,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
             post.setPostId( String.valueOf( tweet.getId() ) );
             post.setPostedBy( tweet.getUser().getName() );
             post.setTimeInMillis( tweet.getCreatedAt().getTime() );
+            post.setToken(token.getTwitterAccessToken());
 
             String[] twitterHref = tweet.getText().split( twitterUriSplitStr );
             if ( twitterHref.length > 1 ) {
@@ -279,40 +278,40 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
             }
             switch ( collection ) {
                 case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-                    post.setCompanyId( profileId );
+                    post.setCompanyId( iden );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-                    Region region = regionDao.findById( Region.class, profileId );
+                    Region region = regionDao.findById( Region.class, iden );
                     if ( region != null ) {
                         Company company = region.getCompany();
                         if ( company !=  null ) {
                             post.setCompanyId( company.getCompanyId() );
                         }
                     }
-                    post.setRegionId( profileId );
+                    post.setRegionId( iden );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-                    Branch branch = branchDao.findById( Branch.class, profileId );
+                    Branch branch = branchDao.findById( Branch.class, iden );
                     if ( branch != null ) {
                         Company company = branch.getCompany();
                         if ( company != null ) {
                             post.setCompanyId( company.getCompanyId() );
                         }
                     }
-                    post.setBranchId( profileId );
+                    post.setBranchId( iden );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-                    User user = userDao.findById( User.class, profileId );
+                    User user = userDao.findById( User.class, iden );
                     if ( user != null ) {
                         Company company = user.getCompany();
                         if ( company != null ) {
                             post.setCompanyId( company.getCompanyId() );
                         }
                     }
-                    post.setAgentId( profileId );
+                    post.setAgentId( iden );
                     break;
             }
 
@@ -341,13 +340,13 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
         if ( anyRecordInserted ) {
             if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, iden );
             }
         }
 

@@ -12,6 +12,8 @@ public class SocialPost {
 	private String postedBy;
 	private String postUrl;
 	private String _id;
+	private String token;
+
 	public String get_id() {
 		return _id;
 	}
@@ -98,6 +100,14 @@ public class SocialPost {
 
 	public void setPostUrl(String postUrl) {
 		this.postUrl = postUrl;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 }
