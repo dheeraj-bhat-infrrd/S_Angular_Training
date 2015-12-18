@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -54,9 +55,11 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
     {
         if ( collectionName == null || collectionName.isEmpty() ) {
             LOG.error( "Collection name passed cannot be null or empty" );
+            return;
         }
         if ( iden <= 0l ) {
             LOG.error( "Invalid iden passed as argument" );
+            return;
         }
         LOG.info( "Updating the zillow review count and average in collection : " + collectionName );
         try {
@@ -122,10 +125,7 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
                     LOG.error( "Invalid collection name specified for updating zillow average and collection" );
                     return;
             }
-            // update mongo with zillow review score and average
-            organizationUnitSettingsDao.updateZillowReviewScoreAndAverage( collectionName, iden, zillowReviewCount,
-                zillowAverage );
-        } catch ( InvalidInputException e ) {
+        } catch ( Exception e ) {
             LOG.error( "Exception occurred while updating zillow review count and average. Reason : " + e );
         }
         LOG.info( "Updated the zillow review count and average in collection : " + collectionName );
