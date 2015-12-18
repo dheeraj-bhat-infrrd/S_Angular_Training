@@ -3900,8 +3900,9 @@ img.prof-image {
 .sq-img-adj {
 	position: absolute;
 	top: 0;
-	width: 50px;
-	height: 40px;
+	width: 26px;
+	height: 26px;
+	margin: 6px 12px;
 }
 
 .bg-black-info {
