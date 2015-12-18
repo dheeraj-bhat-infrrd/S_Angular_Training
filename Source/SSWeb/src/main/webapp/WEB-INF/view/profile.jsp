@@ -576,7 +576,6 @@
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
