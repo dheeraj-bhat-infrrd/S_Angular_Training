@@ -47,7 +47,7 @@ public class SurveyDetails
     private SocialMediaPostDetails socialMediaPostDetails;
     private boolean underResolution;
     private boolean isAbuseRepByUser;
-
+    private SocialMediaPostErrors socialMediaPostErrors;
 
     public String get_id()
     {
@@ -536,5 +536,17 @@ public class SurveyDetails
     public void setAbuseRepByUser( boolean isAbuseRepByUser )
     {
         this.isAbuseRepByUser = isAbuseRepByUser;
+    }
+
+
+    public SocialMediaPostErrors getSocialMediaPostErrors()
+    {
+        return socialMediaPostErrors;
+    }
+
+
+    public void setSocialMediaPostErrors( SocialMediaPostErrors socialMediaPostErrors )
+    {
+        this.socialMediaPostErrors = socialMediaPostErrors;
     }
 }
