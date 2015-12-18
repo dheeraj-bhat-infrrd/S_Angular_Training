@@ -2012,6 +2012,9 @@ public class ProfileController
         } catch ( InvalidInputException iie ) {
             LOG.error(
                 "InvalidInputException occurred while fetching ids for profile type and current hierarchy type. Reason : ", iie );
+        } catch ( Exception e ) {
+            LOG.error(
+                "Exception occurred while fetching ids for profile type and current hierarchy type. Reason : ", e );
         }
         return json;
 
