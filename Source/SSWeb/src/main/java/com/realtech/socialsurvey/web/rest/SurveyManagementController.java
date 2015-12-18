@@ -405,7 +405,7 @@ public class SurveyManagementController
         model.addAttribute( "agentName", agentName );
         model.addAttribute( "agentEmail", agentEmail );
         LOG.info( "Method to start survey initiateSurvey() finished." );
-        return JspResolver.SHOW_SURVEY_QUESTIONS;
+        return JspResolver.SHOW_SURVEY_FORM;
     }
 
 
@@ -499,7 +499,7 @@ public class SurveyManagementController
             model.addAttribute( "lastName", lastName );
             model.addAttribute( "customerEmail", customerEmail );
             model.addAttribute( "relation", custRelationWithAgent );
-            return JspResolver.SHOW_SURVEY_QUESTIONS;
+            return JspResolver.SHOW_SURVEY_FORM;
         }
         LOG.info( "Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started." );
         return JspResolver.SURVEY_INVITE_SUCCESSFUL;

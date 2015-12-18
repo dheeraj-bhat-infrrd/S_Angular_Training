@@ -1455,7 +1455,7 @@ function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
 	}
 	var url = getLocationOrigin() + "/rest/profile/individuals/" + iden
 	+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
-	callAjaxGET(url, function() {
+	callAjaxGET(url, function(data) {
 		var response = $.parseJSON(data);
 		if (response != undefined) {
 			paginateUsersProList(response.entity);
@@ -1502,5 +1502,284 @@ function validateProLastNamePattern(elementId) {
 		}
 	} else {
 		return false;
+	}
+}
+
+//Functions for take survey module
+function checkCharacterLimit(element) {
+	$('#toast-container').hide();
+	if(element.value.length >= 500){
+		$('#overlay-toast').html('Maximum charter limit 500');
+		showToast();		
+	}
+}
+
+
+//Resize function for take survey page
+function resizeFuncTakeSurveyPage() {
+	var winW = getWindowWidth();
+	var winH = getWindowHeight();
+	if (winW < 768) {
+		minH = winH - 50 - 50 - 5 - 1;
+	} else {
+		minH = winH - 80 - 78 - 78 - 1;
+	}
+	$('.min-height-container').css('min-height', minH + 'px');
+}
+
+function initializeTakeSurveyPage() {
+	resizeFuncTakeSurveyPage();
+	$(window).resize(function() {
+		resizeFuncTakeSurveyPage();
+	});
+	
+	$("div[data-ques-type]").hide();
+	var q = $('#prof-container').attr("data-q");
+	
+	if(q != undefined && q!=""){
+		initSurveyWithUrl(q);
+	}
+	else{
+		var agentId = $('#prof-container').attr("data-agentid");
+		$("div[data-ques-type='user-details']").show();
+		loadAgentPic(agentId);
+	}
+
+	$('.sq-pts-red').hover(function() {
+		$('.pts-hover-1').show();
+	}, function() {
+		$('.pts-hover-1').hide();
+	});
+
+	$('.sq-pts-org').hover(function() {
+		$('.pts-hover-2').show();
+	}, function() {
+		$('.pts-hover-2').hide();
+	});
+
+	$('.sq-pts-lgreen').hover(function() {
+		$('.pts-hover-3').show();
+	}, function() {
+		$('.pts-hover-3').hide();
+	});
+
+	$('.sq-pts-military').hover(function() {
+		$('.pts-hover-4').show();
+	}, function() {
+		$('.pts-hover-4').hide();
+	});
+
+	$('.sq-pts-dgreen').hover(function() {
+		$('.pts-hover-5').show();
+	}, function() {
+		$('.pts-hover-5').hide();
+	});
+
+	$('.st-checkbox-on').click(function() {
+		$(this).hide();
+		$(this).parent().find('.st-checkbox-off').show();
+	});
+
+	$('.st-checkbox-off').click(function() {
+		$(this).hide();
+		$(this).parent().find('.st-checkbox-on').show();
+	});
+
+	$('#cust-agent-verify').on('click',function(){
+		if($(this).hasClass('bd-check-img-checked')){
+			$(this).removeClass('bd-check-img-checked');
+		}else{
+			$(this).addClass('bd-check-img-checked');
+		}
+	});
+}
+
+function initializeSurveyFormPage() {
+	resizeFuncTakeSurveyPage();
+	$(window).resize(function() {
+		resizeFuncTakeSurveyPage();
+	});
+	
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
+			showError($('#message').val());
+		} else {
+			showInfo($('#message').val());
+		}
+	}
+
+	$('#cust-agent-verify').on('click',function(){
+		if($(this).hasClass('bd-check-img-checked')){
+			$(this).removeClass('bd-check-img-checked');
+		}else{
+			$(this).addClass('bd-check-img-checked');
+		}
+	});
+	
+	$('#start-btn').click(function() {
+		
+		//Check if the form is valid
+		if(!validateSurveyForm()) {
+			return;
+		}
+		firstName = $('#firstName').val().trim();
+		lastName = $('#lastName').val().trim();
+		var email = $('#email').val().trim();
+		var grecaptcharesponse = $('#g-recaptcha-response').val();
+		var agentId = $('#prof-container').attr("data-agentId");
+		var agentName = $('#prof-container').attr("data-agentName");
+		initSurvey(firstName, lastName, email, agentId, agentName,
+				grecaptcharesponse);
+		
+		// Google analytics for reviews
+		ga('send', {
+			'hitType': 'event',
+			'eventCategory': 'review',
+			'eventAction': 'click',
+			'eventLabel': 'Reviews',
+			'eventValue': agentId
+		});
+	});
+}
+
+/*
+ * Function to initiate survey. It hits controller to get list of all the
+ * questions which are shown one after one to the customer.
+ */
+function initSurvey(firstName, lastName, email, agentId, agentName, grecaptcharesponse) {
+	this.agentId = agentId;
+	this.agentName = agentName;
+	customerEmail = email;
+	
+	$('input[g-recaptcha-response]').val(grecaptcharesponse);
+	
+	if($('#cust-agent-verify').hasClass('bd-check-img-checked')){
+		$('#overlay-toast').html("Verify that you have done business with the agent");
+		showToast();
+		return false;
+	}
+	
+	$('#survey-request-form').submit();
+}
+
+//Validate survey form
+function validateSurveyForm() {
+	if (!validateUserFirstName('firstName')) {
+		$('#overlay-toast').html('Please enter valid First Name!');
+		showToast();
+		return false;
+	}
+	if (!validateUserEmailId('email')) {
+		$('#overlay-toast').html('Please enter valid Email Id!');
+		showToast();
+		return false;
+	}
+	
+	var agentEmail = $('#prof-container').attr("data-agent-email");
+	var email = $('#email').val().trim();
+	if(agentEmail.toUpperCase() == email.toUpperCase()){
+		$('#overlay-toast').html('Agents can not take survey for themselves!');
+		showToast();
+		return false;
+	}
+	return true;
+}
+
+//Function to validate the first name
+function validateUserFirstName(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			if (nameRegex.test($('#' + elementId).val()) == true) {
+				return true;
+			} else {
+				$('#overlay-toast').html('Please enter a valid first name.');
+				showToast();
+				return false;
+			}
+		} else {
+			$('#overlay-toast').html('please enter first name.');
+			showToast();
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			if (nameRegex.test($('#' + elementId).val()) == true) {
+				$('#' + elementId).next('.input-error-2').hide();
+				return true;
+			} else {
+				$('#' + elementId).next('.input-error-2').html('Please enter a valid first name.');
+				$('#' + elementId).next('.input-error-2').show();
+				return false;
+			}
+		} else {
+			$('#' + elementId).next('.input-error-2').html('Please enter first name.');
+			$('#' + elementId).next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+// Function to validate the last name
+function validateUserLastName(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			if (lastNameRegEx.test($('#' + elementId).val()) == true) {
+				return true;
+			} else {
+				$('#overlay-toast').html('Please enter a valid last name.');
+				showToast();
+				return false;
+			}
+		} else {
+			return true;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			if (lastNameRegEx.test($('#' + elementId).val()) == true) {
+				$('#' + elementId).next('.input-error-2').hide();
+				return true;
+			} else {
+				$('#' + elementId).next('.input-error-2').html('Please enter a valid last name.');
+				$('#' + elementId).next('.input-error-2').show();
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+}
+
+
+//Function to validate email id in a form
+function validateUserEmailId(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			if (emailRegex.test($('#' + elementId).val()) == true) {
+				return true;
+			} else {
+				$('#overlay-toast').html('Please enter a valid email id.');
+				showToast();
+				return false;
+			}
+		} else {
+			$('#overlay-toast').html('Please enter email id.');
+			showToast();
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			if (emailRegex.test($('#' + elementId).val()) == true) {
+				$('#' + elementId).next('.input-error-2').hide();
+				return true;
+			} else {
+				$('#' + elementId).next('.input-error-2').html('Please enter a valid email id.');
+				$('#' + elementId).next('.input-error-2').show();
+				return false;
+			}
+		} else {
+			$('#' + elementId).next('.input-error-2').html('Please enter email id.');
+			$('#' + elementId).next('.input-error-2').show();
+			return false;
+		}
 	}
 }
