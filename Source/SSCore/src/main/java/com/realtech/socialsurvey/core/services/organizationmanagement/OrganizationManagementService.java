@@ -1209,10 +1209,10 @@ public interface OrganizationManagementService
 
 //    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds );
 
-    public Set<Long> getAllRegionsUnderCompanyConnectedToZillow( long iden, int batch_size, int start_index ) throws InvalidInputException;
+    public Set<Long> getAllRegionsUnderCompanyConnectedToZillow( long iden, int start_index, int batch_size ) throws InvalidInputException;
 
 
-    public Set<Long> getAllBranchesUnderProfileTypeConnectedToZillow( String profileType, long iden, int batch_size, int start_index )
+    public Set<Long> getAllBranchesUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index, int batch_size )
         throws InvalidInputException;
 
 

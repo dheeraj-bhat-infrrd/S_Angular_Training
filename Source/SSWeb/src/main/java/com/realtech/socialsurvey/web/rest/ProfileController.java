@@ -1970,43 +1970,41 @@ public class ProfileController
      * */
     @ResponseBody
     @RequestMapping ( value = "/{profileType}/{iden}/fetchhierarchyconnectedtozillow")
-    public Response getIdsOfHeirarchyConnectedWithZillow( @PathVariable String profileType, @PathVariable long iden,
+    public String getIdsOfHeirarchyConnectedWithZillow( @PathVariable String profileType, @PathVariable long iden,
         @QueryParam ( value = "start") Integer start, @QueryParam ( value = "numRows") Integer numRows,
         @QueryParam ( value = "currentHierarchyLevel") String currentHierarchyLevel )
     {
-
+        String json = null;
         LOG.info( "Method getIdsOfHeirarchyConnectedWithZillow started to get ids of hierarchy under " + profileType
             + " and id: " + iden + " for currentHierarchyLevel:" + currentHierarchyLevel + " connected with zillow" );
-        Response response = null;
         Set<Long> ids = null;
         try {
             if ( profileType.equals( PROFILE_TYPE_COMPANY ) ) {
                 if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_REGION ) ) {
-                    ids = organizationManagementService.getAllRegionsUnderCompanyConnectedToZillow( iden, numRows, start );
+                    ids = organizationManagementService.getAllRegionsUnderCompanyConnectedToZillow( iden, start, numRows );
                 } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
-                    ids = organizationManagementService.getAllBranchesUnderProfileTypeConnectedToZillow( profileType, iden,
-                        numRows, start );
+                    ids = organizationManagementService.getAllBranchesUnderProfileTypeConnectedToZillow( profileType, iden, start
+                        , numRows );
                 } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden,
-                        numRows, start );
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
                 }
             } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
                 if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
-                    ids = organizationManagementService.getAllBranchesUnderProfileTypeConnectedToZillow( profileType, iden,
-                        numRows, start );
+                    ids = organizationManagementService.getAllBranchesUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
                 } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden,
-                        numRows, start );
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
                 }
             } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
                 if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden,
-                        numRows, start );
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
                 }
             }
             if ( ids != null && !ids.isEmpty() ) {
-                String json = new Gson().toJson( ids );
-                response = Response.ok( json ).build();
+                json = new Gson().toJson( ids );
             }
             LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " for currentHierarchyLevel:"
                 + currentHierarchyLevel + " connected with zillow" );
@@ -2015,7 +2013,7 @@ public class ProfileController
             LOG.error(
                 "InvalidInputException occurred while fetching ids for profile type and current hierarchy type. Reason : ", iie );
         }
-        return response;
+        return json;
 
     }
 }
