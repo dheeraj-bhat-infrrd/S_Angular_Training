@@ -23,4 +23,3 @@
 <script src="${initParam.resourcesPath}/resources/js/application.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/admin.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
