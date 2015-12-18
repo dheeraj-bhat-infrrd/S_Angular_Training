@@ -196,7 +196,7 @@ function retrieveState() {
 /*
  * Click event to close survey popup
  */
-$(document).on('click',  function(e){
+/*$(document).on('click',  function(e){
 	if($('#overlay-send-survey').is(':visible')){
 		$('#overlay-send-survey').hide();
 		enableBodyScroll();
@@ -227,7 +227,7 @@ $(document).on('keyup',  function(e){
 			enableBodyScroll();
 		}
 	}
-});
+});*/
 
 $(document).on('click', '#welcome-popup-invite', function(e){
 	e.stopPropagation();
@@ -336,7 +336,7 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	// Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
 	$('.rpa-report-btn').off('click');
-	disableBodyScroll();
+	//disableBodyScroll();
 	$('#report-abuse-overlay').show();
 	$('.rpa-cancel-btn').on('click', function() {
 		$('#report-abuse-overlay').hide();
