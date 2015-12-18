@@ -131,5 +131,14 @@ public interface SocialManagementService
     void updateSocialConnectionsHistory( String entityType, long entityId, SocialMediaTokens mediaTokens, String socialMedia,
         String action ) throws InvalidInputException, ProfileNotFoundException;
 
+    /**
+     * Method to disconnect user from all social connections
+     * 
+     * @param entityType
+     * @param entityId
+     * @throws InvalidInputException 
+     */
+    void disconnectAllSocialConnections( String entityType, long entityId ) throws InvalidInputException;
+
 }
 // JIRA SS-34 BY RM02 BOC

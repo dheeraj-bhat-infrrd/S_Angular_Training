@@ -4391,152 +4391,144 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         Map<String, Long> totalAverageAndCountMap = new HashMap<String, Long>();
         long reviewCount = 0;
         long totalScore = 0;
-        try {
-            Map<String, Set<Long>> hierarchyIdsMap = getIdsUnderAProfileLevel( profileLevel, iden );
-            switch ( profileLevel ) {
-                case CommonConstants.COMPANY_ID_COLUMN:
-                    OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-                        iden, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-                    if ( companySettings != null && companySettings.getZillowReviewCount() > 0
-                        && companySettings.getZillowReviewAverage() > 0 ) {
-                        reviewCount += companySettings.getZillowReviewCount();
-                        totalScore += ( companySettings.getZillowReviewAverage() * companySettings.getZillowReviewCount() );
-                    }
-                    if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
-                        Set<Long> regionIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_REGION );
-                        if ( regionIds != null && !regionIds.isEmpty() ) {
-                            List<OrganizationUnitSettings> regionSetttingsList = organizationUnitSettingsDao
-                                .fetchOrganizationUnitSettingsForMultipleIds( regionIds,
-                                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-                            if ( regionSetttingsList != null && !regionSetttingsList.isEmpty() ) {
-                                for ( OrganizationUnitSettings regionSetttings : regionSetttingsList ) {
-                                    if ( regionSetttings != null && regionSetttings.getZillowReviewCount() > 0
-                                        && regionSetttings.getZillowReviewAverage() > 0 ) {
-                                        reviewCount += regionSetttings.getZillowReviewCount();
-                                        totalScore += ( regionSetttings.getZillowReviewAverage() * regionSetttings
-                                            .getZillowReviewCount() );
-                                    }
-                                }
-                            }
-                        }
-                        Set<Long> branchIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH );
-                        if ( branchIds != null && !branchIds.isEmpty() ) {
-                            List<OrganizationUnitSettings> branchSetttingsList = organizationUnitSettingsDao
-                                .fetchOrganizationUnitSettingsForMultipleIds( branchIds,
-                                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                            if ( branchSetttingsList != null && !branchSetttingsList.isEmpty() ) {
-                                for ( OrganizationUnitSettings branchSetttings : branchSetttingsList ) {
-                                    if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
-                                        && branchSetttings.getZillowReviewAverage() > 0 ) {
-                                        reviewCount += branchSetttings.getZillowReviewCount();
-                                        totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings
-                                            .getZillowReviewCount() );
-                                    }
-                                }
-                            }
-                        }
-                        Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
-                        if ( individualIds != null && !individualIds.isEmpty() ) {
-                            List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
-                                .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
-                            if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
-                                for ( AgentSettings agentSetttings : agentSetttingsList ) {
-                                    if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
-                                        && agentSetttings.getZillowReviewAverage() > 0 ) {
-                                        reviewCount += agentSetttings.getZillowReviewCount();
-                                        totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
-                                            .getZillowReviewCount() );
-                                    }
+        //Map<String, Set<Long>> hierarchyIdsMap = getIdsUnderAProfileLevel( profileLevel, iden );
+        switch ( profileLevel ) {
+            case CommonConstants.COMPANY_ID_COLUMN:
+                OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                    iden, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                if ( companySettings != null && companySettings.getZillowReviewCount() > 0
+                    && companySettings.getZillowReviewAverage() > 0 ) {
+                    reviewCount += companySettings.getZillowReviewCount();
+                    totalScore += ( companySettings.getZillowReviewAverage() * companySettings.getZillowReviewCount() );
+                }
+                /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
+                    Set<Long> regionIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_REGION );
+                    if ( regionIds != null && !regionIds.isEmpty() ) {
+                        List<OrganizationUnitSettings> regionSetttingsList = organizationUnitSettingsDao
+                            .fetchOrganizationUnitSettingsForMultipleIds( regionIds,
+                                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                        if ( regionSetttingsList != null && !regionSetttingsList.isEmpty() ) {
+                            for ( OrganizationUnitSettings regionSetttings : regionSetttingsList ) {
+                                if ( regionSetttings != null && regionSetttings.getZillowReviewCount() > 0
+                                    && regionSetttings.getZillowReviewAverage() > 0 ) {
+                                    reviewCount += regionSetttings.getZillowReviewCount();
+                                    totalScore += ( regionSetttings.getZillowReviewAverage() * regionSetttings
+                                        .getZillowReviewCount() );
                                 }
                             }
                         }
                     }
-                    break;
-                case CommonConstants.REGION_ID_COLUMN:
-                    OrganizationUnitSettings regionSetttings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-                        iden, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-                    if ( regionSetttings != null && regionSetttings.getZillowReviewCount() > 0
-                        && regionSetttings.getZillowReviewAverage() > 0 ) {
-                        reviewCount += regionSetttings.getZillowReviewCount();
-                        totalScore += ( regionSetttings.getZillowReviewAverage() * regionSetttings.getZillowReviewCount() );
-                    }
-                    if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
-                        Set<Long> branchIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH );
-                        if ( branchIds != null && !branchIds.isEmpty() ) {
-                            List<OrganizationUnitSettings> branchSetttingsList = organizationUnitSettingsDao
-                                .fetchOrganizationUnitSettingsForMultipleIds( branchIds,
-                                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                            if ( branchSetttingsList != null && !branchSetttingsList.isEmpty() ) {
-                                for ( OrganizationUnitSettings branchSetttings : branchSetttingsList ) {
-                                    if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
-                                        && branchSetttings.getZillowReviewAverage() > 0 ) {
-                                        reviewCount += branchSetttings.getZillowReviewCount();
-                                        totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings
-                                            .getZillowReviewCount() );
-                                    }
-                                }
-                            }
-                        }
-                        Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
-                        if ( individualIds != null && !individualIds.isEmpty() ) {
-                            List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
-                                .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
-                            if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
-                                for ( AgentSettings agentSetttings : agentSetttingsList ) {
-                                    if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
-                                        && agentSetttings.getZillowReviewAverage() > 0 ) {
-                                        reviewCount += agentSetttings.getZillowReviewCount();
-                                        totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
-                                            .getZillowReviewCount() );
-                                    }
+                    Set<Long> branchIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH );
+                    if ( branchIds != null && !branchIds.isEmpty() ) {
+                        List<OrganizationUnitSettings> branchSetttingsList = organizationUnitSettingsDao
+                            .fetchOrganizationUnitSettingsForMultipleIds( branchIds,
+                                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                        if ( branchSetttingsList != null && !branchSetttingsList.isEmpty() ) {
+                            for ( OrganizationUnitSettings branchSetttings : branchSetttingsList ) {
+                                if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
+                                    && branchSetttings.getZillowReviewAverage() > 0 ) {
+                                    reviewCount += branchSetttings.getZillowReviewCount();
+                                    totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings
+                                        .getZillowReviewCount() );
                                 }
                             }
                         }
                     }
-                    break;
-                case CommonConstants.BRANCH_ID_COLUMN:
-                    OrganizationUnitSettings branchSetttings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-                        iden, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                    if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
-                        && branchSetttings.getZillowReviewAverage() > 0 ) {
-                        reviewCount += branchSetttings.getZillowReviewCount();
-                        totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings.getZillowReviewCount() );
-                    }
-                    if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
-                        Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
-                        if ( individualIds != null && !individualIds.isEmpty() ) {
-                            List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
-                                .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
-                            if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
-                                for ( AgentSettings agentSetttings : agentSetttingsList ) {
-                                    if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
-                                        && agentSetttings.getZillowReviewAverage() > 0 ) {
-                                        reviewCount += agentSetttings.getZillowReviewCount();
-                                        totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
-                                            .getZillowReviewCount() );
-                                    }
+                    Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
+                    if ( individualIds != null && !individualIds.isEmpty() ) {
+                        List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
+                            .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
+                        if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
+                            for ( AgentSettings agentSetttings : agentSetttingsList ) {
+                                if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
+                                    && agentSetttings.getZillowReviewAverage() > 0 ) {
+                                    reviewCount += agentSetttings.getZillowReviewCount();
+                                    totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
+                                        .getZillowReviewCount() );
                                 }
                             }
                         }
                     }
-                    break;
-                case CommonConstants.AGENT_ID_COLUMN:
-                    AgentSettings agentSetttings = organizationUnitSettingsDao.fetchAgentSettingsById( iden );
-                    if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
-                        && agentSetttings.getZillowReviewAverage() > 0 ) {
-                        reviewCount += agentSetttings.getZillowReviewCount();
-                        totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings.getZillowReviewCount() );
+                }*/
+                break;
+            case CommonConstants.REGION_ID_COLUMN:
+                OrganizationUnitSettings regionSetttings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                    iden, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                if ( regionSetttings != null && regionSetttings.getZillowReviewCount() > 0
+                    && regionSetttings.getZillowReviewAverage() > 0 ) {
+                    reviewCount += regionSetttings.getZillowReviewCount();
+                    totalScore += ( regionSetttings.getZillowReviewAverage() * regionSetttings.getZillowReviewCount() );
+                }
+                /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
+                    Set<Long> branchIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH );
+                    if ( branchIds != null && !branchIds.isEmpty() ) {
+                        List<OrganizationUnitSettings> branchSetttingsList = organizationUnitSettingsDao
+                            .fetchOrganizationUnitSettingsForMultipleIds( branchIds,
+                                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                        if ( branchSetttingsList != null && !branchSetttingsList.isEmpty() ) {
+                            for ( OrganizationUnitSettings branchSetttings : branchSetttingsList ) {
+                                if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
+                                    && branchSetttings.getZillowReviewAverage() > 0 ) {
+                                    reviewCount += branchSetttings.getZillowReviewCount();
+                                    totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings
+                                        .getZillowReviewCount() );
+                                }
+                            }
+                        }
                     }
-                    break;
-                default:
-                    LOG.error( "Invalid profile level while getting ids under a profile level" );
-            }
-        } catch ( ProfileNotFoundException pne ) {
-            LOG.error( "ProfileNotFoundException occurred while getting total review count and score to be fetched for profile level : "
-                + profileLevel + ",Reason : " + pne );
-        } catch ( InvalidInputException iie ) {
-            LOG.error( "InvalidInputException occurred while getting total review count and score to be fetched for profile level : "
-                + profileLevel + ",Reason : " + iie );
+                    Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
+                    if ( individualIds != null && !individualIds.isEmpty() ) {
+                        List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
+                            .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
+                        if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
+                            for ( AgentSettings agentSetttings : agentSetttingsList ) {
+                                if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
+                                    && agentSetttings.getZillowReviewAverage() > 0 ) {
+                                    reviewCount += agentSetttings.getZillowReviewCount();
+                                    totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
+                                        .getZillowReviewCount() );
+                                }
+                            }
+                        }
+                    }
+                }*/
+                break;
+            case CommonConstants.BRANCH_ID_COLUMN:
+                OrganizationUnitSettings branchSetttings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                    iden, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
+                    && branchSetttings.getZillowReviewAverage() > 0 ) {
+                    reviewCount += branchSetttings.getZillowReviewCount();
+                    totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings.getZillowReviewCount() );
+                }
+                /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
+                    Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
+                    if ( individualIds != null && !individualIds.isEmpty() ) {
+                        List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
+                            .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
+                        if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
+                            for ( AgentSettings agentSetttings : agentSetttingsList ) {
+                                if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
+                                    && agentSetttings.getZillowReviewAverage() > 0 ) {
+                                    reviewCount += agentSetttings.getZillowReviewCount();
+                                    totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
+                                        .getZillowReviewCount() );
+                                }
+                            }
+                        }
+                    }
+                }*/
+                break;
+            case CommonConstants.AGENT_ID_COLUMN:
+                AgentSettings agentSetttings = organizationUnitSettingsDao.fetchAgentSettingsById( iden );
+                if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
+                    && agentSetttings.getZillowReviewAverage() > 0 ) {
+                    reviewCount += agentSetttings.getZillowReviewCount();
+                    totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings.getZillowReviewCount() );
+                }
+                break;
+            default:
+                LOG.error( "Invalid profile level while getting ids under a profile level" );
         }
 
         totalAverageAndCountMap.put( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN, reviewCount );
