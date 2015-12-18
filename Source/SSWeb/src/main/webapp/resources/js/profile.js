@@ -949,7 +949,7 @@ function fetchReviewsScroll(isNextBatch) {
 		if (doFetchZillowReviews && profileJson.socialMediaTokens != undefined
 				&& profileJson.socialMediaTokens.zillowToken != undefined)
 			fetchZillowReviewsBasedOnProfile(profileLevel,currentProfileIden, isNextBatch);
-		else if(doFetchHeirarchyIds) {
+		else if(doFetchHeirarchyIds && !doStopZillowIdFetch) {
 			doFetchHeirarchyIds = false;
 			fetchHeirarchyIdsConectedToZillow(profileLevel, currentProfileIden, isNextBatch);
 		} 
@@ -965,6 +965,12 @@ function fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden,
 	
 	if(startIndex == 0) {
 		stopFetchReviewPagination = false;
+		zillowHierarchyList = [];
+		zillowHStart = 0;
+		zillowHBatchSize = 10;
+		curHierarchyLevel = "";
+		doStopZillowIdFetch = false;
+		doFetchHeirarchyIds = true;
 		reviewsNextBatch = [];
 		$("#prof-review-item").html('');
 	}
@@ -1054,7 +1060,7 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	}, true);
 	if(profileLevel == 'INDIVIDUAL')
 		doFetchHeirarchyIds = false;
-	if(doFetchHeirarchyIds) {
+	if(doFetchHeirarchyIds && !doStopZillowIdFetch) {
 		doFetchHeirarchyIds = false;
 		fetchHeirarchyIdsConectedToZillow(profileLevel, currentProfileIden, isNextBatch);
 	}
@@ -1635,8 +1641,10 @@ var zillowHierarchyList = [];
 var zillowHStart = 0;
 var zillowHBatchSize = 10;
 var curHierarchyLevel = "";
+var doStopZillowIdFetch = false;
+var isZillowIdFetchRunning = false;
 function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
-	if (iden == undefined || iden == "") {
+	if (iden == undefined || iden == "" || isZillowIdFetchRunning) {
 		return;
 	}
 	
@@ -1663,35 +1671,56 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 			"numRows" : zillowHBatchSize,
 			"currentHierarchyLevel" : curHierarchyLevel
 	};
+	isZillowIdFetchRunning = true;
 	callAjaxGetWithPayloadData(url, function(data) {
 	    if (data != undefined && data != "") {
 	        var responseJson = $.parseJSON(data);
 	        if (responseJson != undefined) {
+	        	// synchronised this increment
+		    	zillowHStart += zillowHBatchSize;
 	            var result = responseJson;
 	            
 	            var length = result.length;
 	            if (result == undefined || length == 0){
 	            	switch(curHierarchyLevel){
-	            	case "REGION":
-	            		curHierarchyLevel = "BRANCH";
-	            		break;
-	            		
-	            	case "BRANCH":
-	            		curHierarchyLevel = "INDIVIDUAL";
-	            		break;
-	            		
-	            	default:
-	            		return;
-	            		
+		            	case "REGION":
+		            		curHierarchyLevel = "BRANCH";
+		            		break;
+		            		
+		            	case "BRANCH":
+		            		curHierarchyLevel = "INDIVIDUAL";
+		            		break;
+		            		
+		            	default:
+		            		doStopZillowIdFetch = true;
 	            	}
 	            	zillowHierarchyList = [];
 	            	zillowHStart = 0;
-	            } else {
+	            } 
+	            
+	            if(result != undefined && length > 0) {
 	            	zillowHierarchyList = result;
-	                fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, isNextBatch);
+	                /*fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, isNextBatch);*/
+	            	fetchReviewsScroll(isNextBatch);
 	            }
 	        }
+	    } else {
+	    	switch(curHierarchyLevel){
+	        	case "REGION":
+	        		curHierarchyLevel = "BRANCH";
+	        		break;
+	        		
+	        	case "BRANCH":
+	        		curHierarchyLevel = "INDIVIDUAL";
+	        		break;
+	        		
+	        	default:
+	        		doStopZillowIdFetch = true;
+	    	}
+	    	zillowHierarchyList = [];
+	    	zillowHStart = 0;
 	    }
+	    isZillowIdFetchRunning = false;
 	}, payload, false);
 }
 
@@ -1717,8 +1746,8 @@ function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, isNextBatc
 			        regionIds.shift();
 			        return;
 			    } else {
-			    	zillowHStart += zillowHBatchSize;
-			    	fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
+			    	if(!doStopZillowIdFetch)
+			    		fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
 			    }
 			    break;
 			    
@@ -1729,8 +1758,8 @@ function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, isNextBatc
 			        branchIds.shift();
 			        return;
 			    } else {
-			    	zillowHStart += zillowHBatchSize;
-			    	fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
+			    	if(!doStopZillowIdFetch)
+			    		fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
 			    }
 			    break;
 			    
@@ -1741,8 +1770,8 @@ function fetchZillowReviewsFromZillowHierarchyMap(profileLevel, iden, isNextBatc
 			        individualIds.shift();
 			        return;
 			    } else {
-			    	zillowHStart += zillowHBatchSize;
-			    	fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
+			    	if(!doStopZillowIdFetch)
+			    		fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
 			    }
 			    break;
 			    
