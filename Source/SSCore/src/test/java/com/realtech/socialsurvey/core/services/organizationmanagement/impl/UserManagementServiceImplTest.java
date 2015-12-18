@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -839,5 +840,11 @@ public class UserManagementServiceImplTest
     public void testGetUsersByUserIdsForNullList() throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         userManagementServiceImpl.getUsersByUserIds( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUsersByUserIdsForEmptyList() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.getUsersByUserIds( new HashSet<Long>() );
     }
 }
