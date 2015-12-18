@@ -132,10 +132,12 @@
          <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
          <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
          <script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
-         <script src="${initParam.resourcesPath}/resources/js/googletracking.js" defer="defer" async="async"></script>
          <script>
             $(document).ready(function() {
             	initializeSurveyFormPage();
+            	
+            	//update google analytics
+            	updateGoogleTrackingId();
             });
          </script>
       </div>
