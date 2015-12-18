@@ -576,8 +576,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             }
             profileManagementService.updateProfileStages( profileStageList, unitSettings, collectionName );
         }
-        if ( socialMedia.equalsIgnoreCase( CommonConstants.ZILLOW_SOCIAL_SITE ) )
-            zillowUpdateService.updateZillowReviewCountAndAverage( collectionName, organizationUnitSettings.getIden(), 0, 0 );
 
         LOG.debug( "Method disconnectSocialNetwork() finished" );
 
