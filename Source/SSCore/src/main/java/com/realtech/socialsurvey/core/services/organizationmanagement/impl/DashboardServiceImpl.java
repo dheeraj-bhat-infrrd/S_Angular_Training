@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -21,6 +22,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
@@ -36,6 +38,7 @@ import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -66,7 +69,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( DashboardServiceImpl.class );
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( "MM/dd/yyyy" );
+    
+    //SS-1354: Using date format from CommonConstants
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
     private static Map<String, Integer> weightageColumns;
 
     @Autowired
@@ -86,6 +91,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private UserProfileDao userProfileDao;
+
+    @Autowired
+    private CompanyDao companyDao;
 
 
     @Transactional
@@ -475,7 +483,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        
+        //SS-1354: Using date format from CommonConstants
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // This data needs to be written (List<Object>)
@@ -552,7 +562,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        
+        //SS-1354: Using date format from CommonConstants
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // Sorting SurveyResults
@@ -662,7 +674,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        
+        //SS-1354: Using date format from CommonConstants
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // Sorting SurveyResults
@@ -846,7 +860,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
+        
+        //SS-1354: Using date format from CommonConstants
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // Sorting AgentRankingReports
@@ -907,5 +923,104 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         return workbook;
     }
 
+
+    /**
+     * Method to create excel file for user adoption report.
+     */
+    @Override
+    @Transactional
+    public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
+        }
+
+        boolean activeUserFound = true;
+        // get all user and admin under a company data grouped by branches
+        List<Object[]> rows = companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( companyId );
+
+        // get all active user and admin under a company data grouped by branches
+        Map<Long, Integer> branchIdAccountUserCountMap = companyDao
+            .getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( companyId );
+
+        // check whether report info are available
+        if ( rows == null || rows.isEmpty() ) {
+            LOG.error( "No user and admin record found for the company id : " + companyId );
+            throw new NoRecordsFetchedException( "No user and admin record found for the company id : " + companyId );
+        }
+
+        if ( branchIdAccountUserCountMap == null || branchIdAccountUserCountMap.isEmpty() ) {
+            LOG.warn( "No active user and admin record found for the company id : " + companyId );
+            activeUserFound = false;
+        }
+
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        Integer counter = 1;
+
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> userAdoptionReportToPopulate = new ArrayList<>();
+
+        for ( Object[] row : rows ) {
+            userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
+            if ( row[2] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
+                userAdoptionReportToPopulate.add( String.valueOf( row[2] ) );
+            else
+                userAdoptionReportToPopulate.add( "" );
+            if ( row[3] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[3] ) ) )
+                userAdoptionReportToPopulate.add( String.valueOf( row[3] ) );
+            else
+                userAdoptionReportToPopulate.add( "" );
+            long branchId = Long.parseLong( String.valueOf( row[0] ) );
+            Integer userCount = new Integer( String.valueOf( row[4] ) );
+            Integer activeUserCount = activeUserFound && branchIdAccountUserCountMap.get( branchId ) != null ? branchIdAccountUserCountMap
+                .get( branchId ) : 0;
+            Double adoptionRate = ( new Double( activeUserCount ) / new Double( userCount ) ) * 100;
+            userAdoptionReportToPopulate.add( userCount );
+            userAdoptionReportToPopulate.add( activeUserCount );
+
+            userAdoptionReportToPopulate.add( adoptionRate );
+
+            data.put( ( ++counter ).toString(), userAdoptionReportToPopulate );
+            userAdoptionReportToPopulate = new ArrayList<>();
+        }
+
+        // Setting up headers
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_COMPANY );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_REGION );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_BRANCH );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_TOTAL_USERS );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ACTIVE_USERS );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ADOPTION_RATES );
+
+        data.put( "1", userAdoptionReportToPopulate );
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        DecimalFormat decimalFormat = new DecimalFormat( "#0" );
+        decimalFormat.setRoundingMode( RoundingMode.DOWN );
+
+        int rownum = 0;
+        for ( String key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String )
+                    cell.setCellValue( (String) obj );
+                else if ( obj instanceof Integer )
+                    cell.setCellValue( (Integer) obj );
+                else if ( obj instanceof Double )
+                    cell.setCellValue( decimalFormat.format( obj ) );
+            }
+        }
+        return workbook;
+    }
 }
 // JIRA SS-137 BY RM05:EOC

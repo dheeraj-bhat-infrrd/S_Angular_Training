@@ -2804,6 +2804,13 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
     margin-bottom: 10px;
     cursor:pointer;
 }
+.comp-sq-smile-icn-container {
+    
+    height: 62px;
+    line-height: 62px;
+    margin-bottom: 10px;
+    cursor:pointer;
+}
 
 .sq-smile-icn-text {
     margin-left: 0px;
@@ -2812,6 +2819,9 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
     border-radius: 3px;
     color: #fff;
     font-size: 18px;
+}
+.comp-top-mar{
+margin-top:10px;
 }
 
 .sq-smile-happy-text {
@@ -5130,12 +5140,13 @@ width: 50%;
 }
 
 .bd-frm-rt-txt-area {
-	width: 400px;
+	width: 90%;
 	padding: 10px;
 	height: 182px;
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+	min-width:180px;
 }
 
 .bd-dd-img {
@@ -5456,10 +5467,12 @@ td.v-tbl-spacer {
 
 .v-icn-close {
 	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
 }
 
 .v-icn-edit {
 	background: url('../images/edit-1.png') no-repeat center;
+	cursor: pointer;
 }
 
 .user-info-sing-out {
@@ -7238,6 +7251,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 	cursor: pointer;
 }
 
+.dsh-res-hover {
+	background: #5cc7ef;
+	color: #fff;
+}
+
 .user-edit-btn {
 	background-color: #3E9DCB;
 	color: #fff;
@@ -7889,16 +7907,18 @@ label.url-change-input-label {
     height: 40px;
     line-height: 40px;
     font-size: 16px;
+    margin-left: 5px;
 }
 
 .compl-input {
-	width: 500px;
-	max-width: 100%;
+	    width: 100%;
+    min-width: 270px;
 }
 
 .comp-rating-post {
 	height: 40px;
 	line-height: 40px;
+	margin-left:5px;
 }
 
 .search-panel-item {
@@ -7958,3 +7978,6 @@ label.url-change-input-label {
 	margin-bottom: 10px;
 }
 
+.dsh-sel-dropdwn-cont {
+	max-height: 200px;
+}

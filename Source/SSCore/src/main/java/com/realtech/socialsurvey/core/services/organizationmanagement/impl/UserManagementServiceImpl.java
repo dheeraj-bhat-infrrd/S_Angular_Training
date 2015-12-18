@@ -73,6 +73,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UtilitySer
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
@@ -172,6 +173,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private UtilityService utilityService;
 
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -497,10 +500,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method to deactivate user " + userIdToRemove + " called." );
         User userToBeDeactivated = userDao.findById( User.class, userIdToRemove );
-        if(userToBeDeactivated == null){
-            throw new InvalidInputException("No user found in databse for user id : " + userIdToRemove);
+        if ( userToBeDeactivated == null ) {
+            throw new InvalidInputException( "No user found in databse for user id : " + userIdToRemove );
         }
-        
+
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
         userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
@@ -519,6 +522,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         // Marks all the user profiles for given user as inactive.
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
+
+        //update profile url in mongo if needed
+        organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
+
+        //Disconnect social connections(ensure that social connections history is updated)
+        socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
 
         LOG.info( "Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished." );
     }
