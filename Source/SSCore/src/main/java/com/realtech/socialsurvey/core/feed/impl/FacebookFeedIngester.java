@@ -56,7 +56,7 @@ public class FacebookFeedIngester implements Runnable
         	LOG.debug("FacebookFeedIngester: "+this.toString());
             processor.preProcess( iden, collectionName, token );
             List<Post> posts = processor.fetchFeed( iden, collectionName, token );
-            boolean anyRecordInserted = processor.processFeed( posts, collectionName );
+            boolean anyRecordInserted = processor.processFeed( iden, posts, collectionName, token );
             processor.postProcess( iden, collectionName, anyRecordInserted );
         } catch ( NonFatalException e ) {
             LOG.error( "Exception caught while processesing facebook statuses for " + collectionName + " with iden: " + iden, e );
