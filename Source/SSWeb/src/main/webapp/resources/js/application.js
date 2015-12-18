@@ -4195,104 +4195,6 @@ function validateUserInviteDetails() {
 	return isFormValid;
 }
 
-// Function to validate email id in a form
-function validateUserEmailId(elementId) {
-	if ($(window).width() < 768) {
-		if ($('#' + elementId).val() != "") {
-			if (emailRegex.test($('#' + elementId).val()) == true) {
-				return true;
-			} else {
-				$('#overlay-toast').html('Please enter a valid email id.');
-				showToast();
-				return false;
-			}
-		} else {
-			$('#overlay-toast').html('Please enter email id.');
-			showToast();
-			return false;
-		}
-	} else {
-		if ($('#' + elementId).val() != "") {
-			if (emailRegex.test($('#' + elementId).val()) == true) {
-				$('#' + elementId).next('.input-error-2').hide();
-				return true;
-			} else {
-				$('#' + elementId).next('.input-error-2').html('Please enter a valid email id.');
-				$('#' + elementId).next('.input-error-2').show();
-				return false;
-			}
-		} else {
-			$('#' + elementId).next('.input-error-2').html('Please enter email id.');
-			$('#' + elementId).next('.input-error-2').show();
-			return false;
-		}
-	}
-}
-
-// Function to validate the first name
-function validateUserFirstName(elementId) {
-	if ($(window).width() < 768) {
-		if ($('#' + elementId).val() != "") {
-			if (nameRegex.test($('#' + elementId).val()) == true) {
-				return true;
-			} else {
-				$('#overlay-toast').html('Please enter a valid first name.');
-				showToast();
-				return false;
-			}
-		} else {
-			$('#overlay-toast').html('please enter first name.');
-			showToast();
-			return false;
-		}
-	} else {
-		if ($('#' + elementId).val() != "") {
-			if (nameRegex.test($('#' + elementId).val()) == true) {
-				$('#' + elementId).next('.input-error-2').hide();
-				return true;
-			} else {
-				$('#' + elementId).next('.input-error-2').html('Please enter a valid first name.');
-				$('#' + elementId).next('.input-error-2').show();
-				return false;
-			}
-		} else {
-			$('#' + elementId).next('.input-error-2').html('Please enter first name.');
-			$('#' + elementId).next('.input-error-2').show();
-			return false;
-		}
-	}
-}
-
-// Function to validate the last name
-function validateUserLastName(elementId) {
-	if ($(window).width() < 768) {
-		if ($('#' + elementId).val() != "") {
-			if (lastNameRegEx.test($('#' + elementId).val()) == true) {
-				return true;
-			} else {
-				$('#overlay-toast').html('Please enter a valid last name.');
-				showToast();
-				return false;
-			}
-		} else {
-			return true;
-		}
-	} else {
-		if ($('#' + elementId).val() != "") {
-			if (lastNameRegEx.test($('#' + elementId).val()) == true) {
-				$('#' + elementId).next('.input-error-2').hide();
-				return true;
-			} else {
-				$('#' + elementId).next('.input-error-2').html('Please enter a valid last name.');
-				$('#' + elementId).next('.input-error-2').show();
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
-}
-
 /**
  * Function to check if branch name entered is null or empty
  */
@@ -4895,26 +4797,6 @@ $(document).on('click', '.ctnt-review-btn', function(){
 	initSurveyReview($(this).attr('user'));
 });
 
-/*
- * Function to initiate survey. It hits controller to get list of all the
- * questions which are shown one after one to the customer.
- */
-function initSurvey(firstName, lastName, email, agentId, agentName, grecaptcharesponse) {
-	this.agentId = agentId;
-	this.agentName = agentName;
-	customerEmail = email;
-	
-	$('input[g-recaptcha-response]').val(grecaptcharesponse);
-	
-	if($('#cust-agent-verify').hasClass('bd-check-img-checked')){
-		$('#overlay-toast').html("Verify that you have done business with the agent");
-		showToast();
-		return false;
-	}
-	
-	$('#survey-request-form').submit();
-}
-
 function initSurveyWithUrl(q) {
 	var success = false;
 	var payload = {
@@ -5195,7 +5077,6 @@ function retakeSurveyRequest(){
 			"lastName" : lastName,
 			"agentName" : agentName
 	};
-	//callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
 	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true);
 	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
 	showToast();
@@ -5425,32 +5306,6 @@ function showMasterQuestionPage(){
 			if(isAbusive == false){
 				onlyPostToSocialSurvey = false;
 			}
-			/*$('#social-post-lnk').show();
-			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
-				$('.sq-btn-social-wrapper').css({
-					"float" : "none",
-					"width" : "100%"
-				});
-				$('.sq-btn-post-social').css({
-					"float" : "none"
-				});
-			}
-			if (yelpEnabled && (mood == 'Great')){
-				$('#ylp-btn').show();
-				//var yelpElement = document.getElementById('ylp-btn');
-				//shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
-			}
-			else {
-				$('#ylp-btn').parent().remove();
-			}
-			if (googleEnabled && (mood == 'Great')){
-				var googleElement = document.getElementById('ggl-btn');
-				shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
-			}
-			else {
-				$('#ggl-btn').parent().remove();
-			}*/
-			
 			if(mood == 'Great') {
 				$('#social-post-links').show();
 			}
@@ -5845,47 +5700,7 @@ $('#sq-sad-smile').click(function() {
 	$(this).removeClass('opacity-red');
 });
 
-$('#start-btn').click(function() {
-	firstName = $('#firstName').val().trim();
-	lastName = $('#lastName').val().trim();
-	var email = $('#email').val().trim();
-	var grecaptcharesponse = $('#g-recaptcha-response').val();
-	// var recaptcha_challenge_field = $('#recaptcha_challenge_field').val();
-	
-	if (!validateUserFirstName('firstName')) {
-		$('#overlay-toast').html('Please enter valid First Name!');
-		showToast();
-		return;
-	}
-	if (!validateUserEmailId('email')) {
-		$('#overlay-toast').html('Please enter valid Email Id!');
-		showToast();
-		return;
-	}
-	
-	var agentEmail = $('#prof-container').attr("data-agent-email");
-	if(agentEmail.toUpperCase() == email.toUpperCase()){
-		$('#overlay-toast').html('Agents can not take survey for themselves!');
-		showToast();
-		return;
-	}
-	
-	var agentId = $('#prof-container').attr("data-agentId");
-	var agentName = $('#prof-container').attr("data-agentName");
-	initSurvey(firstName, lastName, email, agentId, agentName,
-			grecaptcharesponse);
-	
-	// Google analytics for reviews
-	ga('send', {
-		'hitType': 'event',
-		'eventCategory': 'review',
-		'eventAction': 'click',
-		'eventLabel': 'Reviews',
-		'eventValue': agentId
-	});
-});
-
-$('input[type="range"]').rangeslider({
+/*$('input[type="range"]').rangeslider({
 	polyfill : false,
 
 	// Default CSS classes
@@ -5901,7 +5716,7 @@ $('input[type="range"]').rangeslider({
 		$('#range-slider-value').html(value);
 		storeCustomerAnswer(value);
 	},
-});
+});*/
 
 $('.sq-pts-red').click(function() {
 	$('.sq-pts-item-hover').removeClass('showHoverTab');
@@ -5944,22 +5759,18 @@ $('.sq-pts-dgreen').click(function() {
 });
 
 $('#ylp-btn').click(function(e) {
-	//e.stopImmediatePropagation();
 	updateSharedOn("yelp", agentId, customerEmail);
 });
 
 $('#ggl-btn').click(function(e) {
-	//e.stopImmediatePropagation();
 	updateSharedOn("google", agentId, customerEmail);
 });
 
 $('#zillow-btn').click(function(e) {
-	//e.stopImmediatePropagation();
 	updateSharedOn("zillow", agentId, customerEmail);
 });
 
 $('#lt-btn').click(function(e) {
-	//e.stopImmediatePropagation();
 	updateSharedOn("lendingtree", agentId, customerEmail);
 });
 
