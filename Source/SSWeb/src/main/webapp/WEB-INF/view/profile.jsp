@@ -61,7 +61,6 @@
     <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
-	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
@@ -577,9 +576,6 @@
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
@@ -634,6 +630,9 @@
         		'eventValue': gaName
         	});
 		}, 2000);
+    	
+    	//update google analytics
+    	updateGoogleTrackingId();
     });
 </script>
 </body>

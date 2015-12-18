@@ -240,10 +240,12 @@
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/application.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
 <script>
 $(document).ready(function() {
 	initializeTakeSurveyPage();
+	
+	//update google analytics
+	updateGoogleTrackingId();
 });
 </script>
 </div>
