@@ -2,7 +2,6 @@
 <jsp:include page="admin_header.jsp" />
 <div id="main-content"></div>
 <jsp:include page="admin_scripts.jsp"/>
-<script src="${initParam.resourcesPath}/resources/js/activesession.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 	onpopstate = function(event) {
