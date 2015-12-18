@@ -1,18 +1,16 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +18,6 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -32,9 +28,12 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
     private static final String fetchIdsUnderBranchQuery = "select distinct CASE WHEN br.IS_ZILLOW_CONNECTED = :isZillowConnected THEN br.BRANCH_ID ELSE -1 END AS BRANCH_ID , br.ZILLOW_REVIEW_COUNT as BRANCH_ZILLOW_COUNT, br.ZILLOW_AVERAGE_SCORE as BRANCH_ZILLOW_AVERAGE, CASE WHEN us.IS_ZILLOW_CONNECTED = :isZillowConnected THEN us_pro.USER_ID ELSE -1 END AS USER_ID , us.ZILLOW_REVIEW_COUNT  as INDIVIDUAL_ZILLOW_COUNT, us.ZILLOW_AVERAGE_SCORE as INDIVIDUAL_ZILLOW_AVERAGE from BRANCH as br LEFT join USER_PROFILE as us_pro ON br.BRANCH_ID = us_pro.BRANCH_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status LEFT join USERS as us on us_pro.USER_ID = us.USER_ID where br.BRANCH_ID = :branchId and ( br.IS_ZILLOW_CONNECTED = :isZillowConnected OR us.IS_ZILLOW_CONNECTED = :isZillowConnected  )";
     private static final String fetchIdsUnderRegionQuery = "select distinct CASE WHEN reg.IS_ZILLOW_CONNECTED = :isZillowConnected THEN reg.REGION_ID ELSE -1 END AS REGION_ID, reg.ZILLOW_REVIEW_COUNT as REGION_ZILLOW_COUNT , reg.ZILLOW_AVERAGE_SCORE as REGION_ZILLOW_AVERAGE , CASE WHEN br.IS_ZILLOW_CONNECTED = :isZillowConnected THEN br.BRANCH_ID ELSE -1 END AS BRANCH_ID , br.ZILLOW_REVIEW_COUNT as BRANCH_ZILLOW_COUNT , br.ZILLOW_AVERAGE_SCORE as BRANCH_ZILLOW_AVERAGE , CASE WHEN us.IS_ZILLOW_CONNECTED = :isZillowConnected THEN us_pro.USER_ID ELSE -1 END AS USER_ID , us.ZILLOW_REVIEW_COUNT as INDIVIDUAL_ZILLOW_COUNT , us.ZILLOW_AVERAGE_SCORE as INDIVIDUAL_ZILLOW_AVERAGE from REGION as reg LEFT join BRANCH as br ON reg.REGION_ID = br.REGION_ID and br.STATUS != :status LEFT join USER_PROFILE as us_pro ON br.BRANCH_ID = us_pro.BRANCH_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status LEFT join USERS as us on us_pro.USER_ID = us.USER_ID where reg.REGION_ID = :regionId and (reg.IS_ZILLOW_CONNECTED = :isZillowConnected OR br.IS_ZILLOW_CONNECTED = :isZillowConnected OR us.IS_ZILLOW_CONNECTED = :isZillowConnected )";
     private static final String fetchIdsUnderCompanyQuery = "select distinct CASE WHEN co.IS_ZILLOW_CONNECTED = :isZillowConnected THEN co.COMPANY_ID ELSE -1 END AS COMPANY_ID , co.ZILLOW_REVIEW_COUNT as COMPANY_ZILLOW_COUNT , co.ZILLOW_AVERAGE_SCORE as COMPANY_ZILLOW_AVERAGE , CASE WHEN reg.IS_ZILLOW_CONNECTED = :isZillowConnected THEN reg.REGION_ID ELSE -1 END AS REGION_ID , reg.ZILLOW_REVIEW_COUNT as REGION_ZILLOW_COUNT , reg.ZILLOW_AVERAGE_SCORE as REGION_ZILLOW_AVERAGE , CASE WHEN br.IS_ZILLOW_CONNECTED = :isZillowConnected THEN br.BRANCH_ID ELSE -1 END AS BRANCH_ID , br.ZILLOW_REVIEW_COUNT  as BRANCH_ZILLOW_COUNT , br.ZILLOW_AVERAGE_SCORE as BRANCH_ZILLOW_AVERAGE , CASE WHEN us.IS_ZILLOW_CONNECTED = :isZillowConnected THEN us_pro.USER_ID ELSE -1 END AS USER_ID , us.ZILLOW_REVIEW_COUNT as INDIVIDUAL_ZILLOW_COUNT , us.ZILLOW_AVERAGE_SCORE as INDIVIDUAL_ZILLOW_AVERAGE from COMPANY as co LEFT join REGION as reg ON co.COMPANY_ID = reg.COMPANY_ID and reg.STATUS != :status LEFT join BRANCH as br ON reg.REGION_ID = br.REGION_ID and br.STATUS != :status LEFT join USER_PROFILE as us_pro ON br.BRANCH_ID = us_pro.BRANCH_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status LEFT join USERS as us on us_pro.USER_ID = us.USER_ID where co.COMPANY_ID = :companyId and (co.IS_ZILLOW_CONNECTED = :isZillowConnected OR reg.IS_ZILLOW_CONNECTED = :isZillowConnected OR br.IS_ZILLOW_CONNECTED = :isZillowConnected OR us.IS_ZILLOW_CONNECTED = :isZillowConnected)";
-    private static final String fetchUserIdsUnderCompanyQuery = "SELECT USER_ID FROM USERS WHERE STATUS IN (:statuses) AND IS_ZILLOW_CONNECTED=:isZillowConnected AND COMPANY_ID=:companyId";
-    private static final String fetchUserIdsUnderRegionQuery = "SELECT DISTINCT(U.USER_ID) FROM USERS U, USER_PROFILE UP WHERE U.STATUS IN (:statuses) AND U.IS_ZILLOW_CONNECTED=1 AND UP.STATUS IN (:statuses) AND U.USER_ID = UP.USER_ID AND UP.REGION_ID=:regionId AND UP.PROFILES_MASTER_ID = :profileMasterId";
-    private static final String fetchUserIdsUnderBranchQuery = "SELECT DISTINCT(U.USER_ID) FROM USERS U, USER_PROFILE UP WHERE  U.STATUS IN (:statuses) AND  U.IS_ZILLOW_CONNECTED=1 AND UP.STATUS IN (:statuses) AND U.USER_ID = UP.USER_ID AND UP.BRANCH_ID=:branchId AND UP.PROFILES_MASTER_ID = :profileMasterId";
+    private static final String fetchUserIdsUnderCompanyQuery = "SELECT DISTINCT(U.USER_ID) AS USER_ID FROM USERS U, USER_PROFILE UP  WHERE U.STATUS IN ( :statuses ) AND U.IS_ZILLOW_CONNECTED = :isZillowConnected AND U.COMPANY_ID = :companyId AND U.COMPANY_ID = UP.COMPANY_ID AND UP.PROFILES_MASTER_ID = :profilesMasterId AND UP.STATUS = :status ORDER BY U.USER_ID ASC";
+    private static final String fetchUserIdsUnderRegionQuery = "SELECT DISTINCT(U.USER_ID) AS USER_ID FROM USERS U, USER_PROFILE UP WHERE U.STATUS IN (:statuses) AND U.IS_ZILLOW_CONNECTED=:isZillowConnected AND UP.STATUS = :status AND U.USER_ID = UP.USER_ID AND UP.REGION_ID=:regionId AND UP.PROFILES_MASTER_ID = :profileMasterId ORDER BY U.USER_ID ASC";
+    private static final String fetchUserIdsUnderBranchQuery = "SELECT DISTINCT(U.USER_ID) AS USER_ID FROM USERS U, USER_PROFILE UP WHERE  U.STATUS IN ( :statuses ) AND  U.IS_ZILLOW_CONNECTED = :isZillowConnected AND UP.STATUS = :status AND U.USER_ID = UP.USER_ID AND UP.BRANCH_ID = :branchId AND UP.PROFILES_MASTER_ID = :profileMasterId ORDER BY U.USER_ID ASC";
+    private static final String fetchRegionIdsUnderCompanyQuery = "SELECT REGION_ID FROM REGION WHERE COMPANY_ID = :companyId AND IS_ZILLOW_CONNECTED = :isZillowConnected AND STATUS != :status  ORDER BY REGION_ID ASC";
+    private static final String fetchBranchIdsUnderCompanyQuery = "SELECT BRANCH_ID FROM BRANCH WHERE COMPANY_ID = :companyId AND IS_ZILLOW_CONNECTED = :isZillowConnected AND STATUS != :status ORDER BY BRANCH_ID ASC";
+    private static final String fetchBranchIdsUnderRegionQuery = "SELECT BRANCH_ID FROM BRANCH WHERE REGION_ID = :regionId AND IS_ZILLOW_CONNECTED = :isZillowConnected AND STATUS != :status ORDER BY BRANCH_ID ASC";
 
     @Autowired
     SessionFactory sessionFactory;
@@ -45,6 +44,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param branchId
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Map<String, Long> getZillowReviewCountAndTotalScoreForAllUnderBranch( long branchId ) throws InvalidInputException
     {
@@ -57,7 +57,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
             + ", getZillowAverageAndTotalScoreForAllUnderBranch started" );
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery( fetchIdsUnderBranchQuery );
-        //query.setParameter( "isZillowConnected", CommonConstants.YES );
+        query.setParameter( "isZillowConnected", CommonConstants.YES );
         query.setParameter( "agentProfileMasterId", CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
         query.setParameter( "branchId", branchId );
         query.setParameter( "status", CommonConstants.STATUS_INACTIVE );
@@ -103,6 +103,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param regionId
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Map<String, Long> getZillowReviewCountAndTotalScoreForAllUnderRegion( long regionId ) throws InvalidInputException
     {
@@ -178,6 +179,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param regionId
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Map<String, Long> getZillowReviewCountAndTotalScoreForAllUnderCompany( long companyId ) throws InvalidInputException
     {
@@ -266,6 +268,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param batchSize
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Set<Long> getRegionIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException
@@ -278,26 +281,29 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         LOG.info( "Method called to fetch regions under company for company id : " + companyId + " in batch started" );
         Session session = sessionFactory.getCurrentSession();
-        Criteria criteria = session.createCriteria( Region.class );
-        criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-        criteria.add( Restrictions.eq( CommonConstants.IS_ZILLOW_CONNECTED_COLUMN, CommonConstants.YES ) );
-        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        Query query = session.createSQLQuery( fetchRegionIdsUnderCompanyQuery )
+            .addScalar( "REGION_ID", StandardBasicTypes.LONG );
+
+        query.setParameter( "isZillowConnected", CommonConstants.YES );
+        query.setParameter( "companyId", companyId );
+        query.setParameter( "status", CommonConstants.STATUS_INACTIVE );
 
         if ( startIndex > -1 )
-            criteria.setFirstResult( startIndex );
+            query.setFirstResult( startIndex );
         if ( batchSize > -1 )
-            criteria.setMaxResults( batchSize );
+            query.setMaxResults( batchSize );
 
-        List<Region> regions = (List<Region>) criteria.list();
-
+        List<Long> ids = (List<Long>) query.list();
         Set<Long> regionIds = new HashSet<Long>();
 
-        if ( regions != null && !regions.isEmpty() ) {
-            for ( Region region : regions ) {
-                if ( region != null && region.getRegionId() > 0 )
-                    regionIds.add( region.getRegionId() );
+        if ( ids != null && !ids.isEmpty() ) {
+            for ( Long id : ids ) {
+                if ( id > 0 ) {
+                    regionIds.add( id );
+                }
             }
         }
+
         LOG.info( "Method called to fetch regions under company for company id : " + companyId + " in batch ended" );
         return regionIds;
     }
@@ -310,6 +316,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param batchSize
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Set<Long> getBranchIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException
@@ -322,24 +329,26 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         LOG.info( "Method called to fetch branches under company for company id : " + companyId + " in batch started" );
         Session session = sessionFactory.getCurrentSession();
-        Criteria criteria = session.createCriteria( Branch.class );
-        criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-        criteria.add( Restrictions.eq( CommonConstants.IS_ZILLOW_CONNECTED_COLUMN, CommonConstants.YES ) );
-        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        Query query = session.createSQLQuery( fetchBranchIdsUnderCompanyQuery )
+            .addScalar( "BRANCH_ID", StandardBasicTypes.LONG );
+
+        query.setParameter( "isZillowConnected", CommonConstants.YES );
+        query.setParameter( "companyId", companyId );
+        query.setParameter( "status", CommonConstants.STATUS_INACTIVE );
 
         if ( startIndex > -1 )
-            criteria.setFirstResult( startIndex );
+            query.setFirstResult( startIndex );
         if ( batchSize > -1 )
-            criteria.setMaxResults( batchSize );
+            query.setMaxResults( batchSize );
 
-        List<Branch> branches = (List<Branch>) criteria.list();
-
+        List<Long> ids = (List<Long>) query.list();
         Set<Long> branchIds = new HashSet<Long>();
 
-        if ( branches != null && !branches.isEmpty() ) {
-            for ( Branch branch : branches ) {
-                if ( branch != null && branch.getBranchId() > 0 )
-                    branchIds.add( branch.getBranchId() );
+        if ( ids != null && !ids.isEmpty() ) {
+            for ( Long id : ids ) {
+                if ( id > 0 ) {
+                    branchIds.add( id );
+                }
             }
         }
         LOG.info( "Method called to fetch branches under company for company id : " + companyId + " in batch ended" );
@@ -354,6 +363,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param batchSize
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Set<Long> getBranchIdsUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize )
         throws InvalidInputException
@@ -366,24 +376,25 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         LOG.info( "Method called to fetch branches under region for region id : " + regionId + " in batch started" );
         Session session = sessionFactory.getCurrentSession();
-        Criteria criteria = session.createCriteria( Branch.class );
-        criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
-        criteria.add( Restrictions.eq( CommonConstants.IS_ZILLOW_CONNECTED_COLUMN, CommonConstants.YES ) );
-        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        Query query = session.createSQLQuery( fetchBranchIdsUnderRegionQuery ).addScalar( "BRANCH_ID", StandardBasicTypes.LONG );
+
+        query.setParameter( "isZillowConnected", CommonConstants.YES );
+        query.setParameter( "regionId", regionId );
+        query.setParameter( "status", CommonConstants.STATUS_INACTIVE );
 
         if ( startIndex > -1 )
-            criteria.setFirstResult( startIndex );
+            query.setFirstResult( startIndex );
         if ( batchSize > -1 )
-            criteria.setMaxResults( batchSize );
+            query.setMaxResults( batchSize );
 
-        List<Branch> branches = (List<Branch>) criteria.list();
-
+        List<Long> ids = (List<Long>) query.list();
         Set<Long> branchIds = new HashSet<Long>();
 
-        if ( branches != null && !branches.isEmpty() ) {
-            for ( Branch branch : branches ) {
-                if ( branch != null && branch.getBranchId() > 0 )
-                    branchIds.add( branch.getBranchId() );
+        if ( ids != null && !ids.isEmpty() ) {
+            for ( Long id : ids ) {
+                if ( id > 0 ) {
+                    branchIds.add( id );
+                }
             }
         }
         LOG.info( "Method called to fetch branches under region for region id : " + regionId + " in batch ended" );
@@ -398,6 +409,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param batchSize
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Set<Long> getUserIdsUnderCompanyConnectedToZillow( long companyId, int startIndex, int batchSize )
         throws InvalidInputException
@@ -410,27 +422,29 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         LOG.info( "Method called to fetch users under company for company id : " + companyId + " in batch started" );
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createSQLQuery( fetchUserIdsUnderCompanyQuery );
-        query.setParameterList( "statuses",
-            Arrays.asList( new int[] { CommonConstants.STATUS_ACTIVE, CommonConstants.STATUS_NOT_VERIFIED, } ) );
+        Query query = session.createSQLQuery( fetchUserIdsUnderCompanyQuery ).addScalar( "USER_ID", StandardBasicTypes.LONG );
+        List<Integer> statusesList = new ArrayList<Integer>();
+        statusesList.add( CommonConstants.STATUS_ACTIVE );
+        statusesList.add( CommonConstants.STATUS_NOT_VERIFIED );
+
+        query.setParameterList( "statuses", statusesList );
         query.setParameter( "isZillowConnected", CommonConstants.YES );
         query.setParameter( "companyId", companyId );
+        query.setParameter( "status", CommonConstants.STATUS_ACTIVE );
+        query.setParameter( "profilesMasterId", CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
 
         if ( startIndex > -1 )
             query.setFirstResult( startIndex );
         if ( batchSize > -1 )
             query.setMaxResults( batchSize );
 
-        List<Object[]> rows = (List<Object[]>) query.list();
-
+        List<Long> ids = (List<Long>) query.list();
         Set<Long> userIds = new HashSet<Long>();
 
-        if ( rows != null && !rows.isEmpty() ) {
-            for ( Object[] row : rows ) {
-                if ( row[0] != null ) {
-                    long userId = Long.parseLong( String.valueOf( row[0] ) );
-                    if ( userId > 0 )
-                        userIds.add( userId );
+        if ( ids != null && !ids.isEmpty() ) {
+            for ( Long id : ids ) {
+                if ( id > 0 ) {
+                    userIds.add( id );
                 }
             }
         }
@@ -446,6 +460,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param batchSize
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Set<Long> getUserIdsUnderRegionConnectedToZillow( long regionId, int startIndex, int batchSize )
         throws InvalidInputException
@@ -458,9 +473,13 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         LOG.info( "Method called to fetch users under region for region id : " + regionId + " in batch started" );
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createSQLQuery( fetchUserIdsUnderRegionQuery );
-        query.setParameterList( "statuses",
-            Arrays.asList( new int[] { CommonConstants.STATUS_ACTIVE, CommonConstants.STATUS_NOT_VERIFIED, } ) );
+        Query query = session.createSQLQuery( fetchUserIdsUnderRegionQuery ).addScalar( "USER_ID", StandardBasicTypes.LONG );
+        List<Integer> statusesList = new ArrayList<Integer>();
+        statusesList.add( CommonConstants.STATUS_ACTIVE );
+        statusesList.add( CommonConstants.STATUS_NOT_VERIFIED );
+
+        query.setParameterList( "statuses", statusesList );
+        query.setParameter( "status", CommonConstants.STATUS_ACTIVE );
         query.setParameter( "isZillowConnected", CommonConstants.YES );
         query.setParameter( "regionId", regionId );
         query.setParameter( "profileMasterId", CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
@@ -470,16 +489,14 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
         if ( batchSize > -1 )
             query.setMaxResults( batchSize );
 
-        List<Object[]> rows = (List<Object[]>) query.list();
+        List<Long> ids = (List<Long>) query.list();
 
         Set<Long> userIds = new HashSet<Long>();
 
-        if ( rows != null && !rows.isEmpty() ) {
-            for ( Object[] row : rows ) {
-                if ( row[0] != null ) {
-                    long userId = Long.parseLong( String.valueOf( row[0] ) );
-                    if ( userId > 0 )
-                        userIds.add( userId );
+        if ( ids != null && !ids.isEmpty() ) {
+            for ( Long id : ids ) {
+                if ( id > 0 ) {
+                    userIds.add( id );
                 }
             }
         }
@@ -495,6 +512,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
      * @param batchSize
      * @throws InvalidInputException
      * */
+    @SuppressWarnings ( "unchecked")
     @Override
     public Set<Long> getUserIdsUnderBranchConnectedToZillow( long branchId, int startIndex, int batchSize )
         throws InvalidInputException
@@ -507,13 +525,15 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         LOG.info( "Method called to fetch users under branch for branch id : " + branchId + " in batch started" );
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createSQLQuery( fetchUserIdsUnderBranchQuery );
+        Query query = session.createSQLQuery( fetchUserIdsUnderBranchQuery ).addScalar( "USER_ID", StandardBasicTypes.LONG );
+
         List<Integer> statusesList = new ArrayList<Integer>();
         statusesList.add( CommonConstants.STATUS_ACTIVE );
         statusesList.add( CommonConstants.STATUS_NOT_VERIFIED );
+
         query.setParameterList( "statuses", statusesList );
-        //query.setParameter( "statuses", CommonConstants.STATUS_ACTIVE );
-        //query.setParameter( "isZillowConnected", CommonConstants.YES );
+        query.setParameter( "status", CommonConstants.STATUS_ACTIVE );
+        query.setParameter( "isZillowConnected", CommonConstants.YES );
         query.setParameter( "branchId", branchId );
         query.setParameter( "profileMasterId", CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
 
@@ -522,18 +542,14 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
         if ( batchSize > -1 )
             query.setMaxResults( batchSize );
 
-        @SuppressWarnings ( "unchecked")
-        List<Long> rows = query.list();
-        //List<Object[]> rows = (List<Object[]>) query.list();
+        List<Long> ids = (List<Long>) query.list();
 
         Set<Long> userIds = new HashSet<Long>();
 
-        if ( rows != null && !rows.isEmpty() ) {
-            for ( Object row : rows ) {
-                if ( row != null ) {
-                    long userId = Long.parseLong( String.valueOf( row ) );
-                    if ( userId > 0 )
-                        userIds.add( userId );
+        if ( ids != null && !ids.isEmpty() ) {
+            for ( long id : ids ) {
+                if ( id > 0 ) {
+                    userIds.add( id );
                 }
             }
         }

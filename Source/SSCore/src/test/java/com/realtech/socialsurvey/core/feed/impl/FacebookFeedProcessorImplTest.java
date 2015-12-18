@@ -49,13 +49,13 @@ public class FacebookFeedProcessorImplTest
     @Test
     public void testProcessFeedPostsNull() throws NonFatalException
     {
-        assertFalse( "", facebookFeedProcessorImpl.processFeed( null, null ) );
+        assertFalse( "", facebookFeedProcessorImpl.processFeed( 0l, null, null, null ) );
     }
 
 
     @Test
     public void testProcessFeedPostsEmpty() throws NonFatalException
     {
-        assertFalse( "", facebookFeedProcessorImpl.processFeed( new ArrayList<Post>(), null ) );
+        assertFalse( "", facebookFeedProcessorImpl.processFeed( 0l, new ArrayList<Post>(), null, null ) );
     }
 }
