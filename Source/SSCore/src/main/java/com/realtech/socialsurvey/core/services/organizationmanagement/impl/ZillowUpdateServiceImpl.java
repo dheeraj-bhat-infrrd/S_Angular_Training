@@ -127,6 +127,7 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
             }
         } catch ( Exception e ) {
             LOG.error( "Exception occurred while updating zillow review count and average. Reason : " + e );
+            return;
         }
         LOG.info( "Updated the zillow review count and average in collection : " + collectionName );
     }
