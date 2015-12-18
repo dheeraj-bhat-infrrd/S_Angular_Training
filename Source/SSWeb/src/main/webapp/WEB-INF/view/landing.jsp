@@ -2,7 +2,6 @@
 <jsp:include page="header.jsp" />
 <div id="main-content"></div>
 <jsp:include page="scripts.jsp"/>
-<script src="${initParam.resourcesPath}/resources/js/activesession.js"></script>
 <script type="text/javascript" async src="//platform.twitter.com/widgets.js" async="async"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
