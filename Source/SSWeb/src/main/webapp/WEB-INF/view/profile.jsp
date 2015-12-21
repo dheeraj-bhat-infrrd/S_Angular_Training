@@ -121,8 +121,8 @@
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder='<spring:message code="label.publicprofile.reportabuse.key"/>'></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
-    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer"><spring:message code="label.report.key"/></div>
-    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer"><spring:message code="label.cancel.key"/></div>
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer float-left"><spring:message code="label.report.key"/></div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer float-right"><spring:message code="label.cancel.key"/></div>
     		</div>
     	</div>
     </div>

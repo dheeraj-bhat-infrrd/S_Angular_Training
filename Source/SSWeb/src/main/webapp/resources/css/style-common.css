@@ -7066,12 +7066,12 @@ span.review-complete-txt{
 }
 
 .rpa-btn {
-    margin: 10px 64px;
-    display: inline-block;
+	margin: 0px 15px 15px;
 }
 
 .rpa-overlay-btn-cont {
-    margin: 0 -30px;
+	padding: 0 15px;
+	margin: 0 -15px;
 }
 
 textarea.report-abuse-txtbox {
