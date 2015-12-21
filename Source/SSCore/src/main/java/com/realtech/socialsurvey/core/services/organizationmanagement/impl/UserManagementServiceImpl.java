@@ -3106,6 +3106,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException
     {
         LOG.info( "Method to find users on the basis of user ids started for user ids : " + userIds );
+        if ( userIds == null || userIds.size() <= 0 ) {
+            throw new InvalidInputException( "Invalid input parameter : Null or empty User Id List passed " );
+        }
         List<UserFromSearch> userList = userProfileDao.getUserFromSearchByUserIds( userIds );
         if ( userList == null ) {
             throw new InvalidInputException( "User not found for userId:" + userIds );
