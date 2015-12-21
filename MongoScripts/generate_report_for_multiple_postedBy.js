@@ -21,32 +21,49 @@ sources.forEach(function(source){
     //For agents
     db.getCollection('SOCIAL_POST').find({agentId:{$exists:true},agentId:{$ne:-1},source:source},{agentId:1, postedBy:1, _id:0}).snapshot().forEach(
         function(e){
-            if(!(contains(agentIds, e.agentId.toNumber())))
-                agentIds.push(e.agentId.toNumber());
+        
+        	var agentId = e.agentId;
+		    if(typeof agentId === 'object'){
+		            agentId = agentId.toNumber()
+		    }
+		    if(!(contains(agentIds, agentId)))
+		            agentIds.push(agentId);
         }
     );
     
     //For branches
     db.getCollection('SOCIAL_POST').find({branchId:{$exists:true},branchId:{$ne:-1}, agentId:-1,source:source},{branchId:1, postedBy:1, _id:0}).snapshot().forEach(
         function(e){
-            if(!(contains(branchIds, e.branchId.toNumber())))
-                branchIds.push(e.branchId.toNumber());
+            var branchId = e.branchId;
+		    if(typeof branchId === 'object'){
+		            branchId = branchId.toNumber()
+		    }
+		    if(!(contains(branchIds, branchId)))
+		            branchIds.push(branchId);
         }
     );
     
     //For regions
     db.getCollection('SOCIAL_POST').find({regionId:{$exists:true},regionId:{$ne:-1}, branchId:-1, agentId:-1, source:source},{regionId:1, postedBy:1, _id:0}).snapshot().forEach(
         function(e){
-            if(!(contains(regionIds, e.regionId.toNumber())))
-                regionIds.push(e.regionId.toNumber());
+            var regionId = e.regionId;
+		    if(typeof regionId === 'object'){
+		            regionId = regionId.toNumber()
+		    }
+		    if(!(contains(regionIds, regionId)))
+		            regionIds.push(regionId);
         }
     );
     
     //For companies
     db.getCollection('SOCIAL_POST').find({companyId:{$exists:true}, companyId:{$ne:-1}, regionId: -1, branchId:-1, agentId:-1, source:source},{companyId:1, postedBy:1, _id:0}).snapshot().forEach(
         function(e){
-            if(!(contains(companyIds, e.companyId.toNumber())))
-                companyIds.push(e.companyId.toNumber());
+            var companyId = e.companyId;
+		    if(typeof companyId === 'object'){
+		            companyId = companyId.toNumber()
+		    }
+		    if(!(contains(companyIds, companyId)))
+		            companyIds.push(companyId);
         }
     );
 
