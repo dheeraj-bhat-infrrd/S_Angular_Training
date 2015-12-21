@@ -3359,7 +3359,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public OrganizationUnitSettings fillUnitSettings( OrganizationUnitSettings unitSettings, String currentProfileName,
         OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
         OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
-        Map<SettingsForApplication, OrganizationUnit> map )
+        Map<SettingsForApplication, OrganizationUnit> map , boolean isFetchRequiredDataFromHierarchy )
     {
 
         if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
@@ -3369,16 +3369,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             regionUnitSettings = unitSettings;
             regionUnitSettings = setAggregateBasicData( regionUnitSettings, companyUnitSettings );
             regionUnitSettings = setAggregateProfileData( regionUnitSettings, companyUnitSettings, regionUnitSettings, null,
-                null, map );
+                null, map , isFetchRequiredDataFromHierarchy );
             return regionUnitSettings;
         } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
             branchUnitSettings = setAggregateBasicData( branchUnitSettings, regionUnitSettings );
             branchUnitSettings = setAggregateProfileData( branchUnitSettings, companyUnitSettings, regionUnitSettings,
-                branchUnitSettings, null, map );
+                branchUnitSettings, null, map , isFetchRequiredDataFromHierarchy);
             return branchUnitSettings;
         } else if ( currentProfileName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             agentUnitSettings = setAggregateProfileData( agentUnitSettings, companyUnitSettings, regionUnitSettings,
-                branchUnitSettings, agentUnitSettings, map );
+                branchUnitSettings, agentUnitSettings, map , isFetchRequiredDataFromHierarchy );
             return agentUnitSettings;
         } else {
             return null;
@@ -3410,7 +3410,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     private OrganizationUnitSettings setAggregateProfileData( OrganizationUnitSettings userProfile,
         OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
         OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
-        Map<SettingsForApplication, OrganizationUnit> map )
+        Map<SettingsForApplication, OrganizationUnit> map, boolean isFetchRequiredDataFromHierarchy )
     {
         //Set logoThumbnail along with logo
         for ( Map.Entry<SettingsForApplication, OrganizationUnit> entry : map.entrySet() ) {
@@ -3608,120 +3608,145 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                /*if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    socialMediaTokens.setFacebookToken( companyUnitSettings.getSocialMediaTokens().getFacebookToken() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    socialMediaTokens.setFacebookToken( regionUnitSettings.getSocialMediaTokens().getFacebookToken() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    socialMediaTokens.setFacebookToken( branchUnitSettings.getSocialMediaTokens().getFacebookToken() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    socialMediaTokens.setFacebookToken( agentUnitSettings.getSocialMediaTokens().getFacebookToken() );
-                }*/
+                //get facebook token from upper hierarchy in case of public profile page.
+                if ( isFetchRequiredDataFromHierarchy ) {
+                    if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                        socialMediaTokens.setFacebookToken( companyUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                        socialMediaTokens.setFacebookToken( regionUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                        socialMediaTokens.setFacebookToken( branchUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                        socialMediaTokens.setFacebookToken( agentUnitSettings.getSocialMediaTokens().getFacebookToken() );
+                    }
+                }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.GOOGLE_PLUS ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                /*if ( socialMediaTokens == null ) {
+                if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    socialMediaTokens.setGoogleToken( companyUnitSettings.getSocialMediaTokens().getGoogleToken() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    socialMediaTokens.setGoogleToken( regionUnitSettings.getSocialMediaTokens().getGoogleToken() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    socialMediaTokens.setGoogleToken( branchUnitSettings.getSocialMediaTokens().getGoogleToken() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    socialMediaTokens.setGoogleToken( agentUnitSettings.getSocialMediaTokens().getGoogleToken() );
-                }*/
+                //get google plus token from upper hierarchy in case of public profile page.
+                if ( isFetchRequiredDataFromHierarchy ) {
+                    if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                        socialMediaTokens.setGoogleToken( companyUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                        socialMediaTokens.setGoogleToken( regionUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                        socialMediaTokens.setGoogleToken( branchUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                        socialMediaTokens.setGoogleToken( agentUnitSettings.getSocialMediaTokens().getGoogleToken() );
+                    }
+                }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.TWITTER ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                /*if ( socialMediaTokens == null ) {
+                if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    socialMediaTokens.setTwitterToken( companyUnitSettings.getSocialMediaTokens().getTwitterToken() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    socialMediaTokens.setTwitterToken( regionUnitSettings.getSocialMediaTokens().getTwitterToken() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    socialMediaTokens.setTwitterToken( branchUnitSettings.getSocialMediaTokens().getTwitterToken() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    socialMediaTokens.setTwitterToken( agentUnitSettings.getSocialMediaTokens().getTwitterToken() );
-                }*/
+                //get twitter token from upper hierarchy in case of public profile page.
+                if ( isFetchRequiredDataFromHierarchy ) {
+                    if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                        socialMediaTokens.setTwitterToken( companyUnitSettings.getSocialMediaTokens().getTwitterToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                        socialMediaTokens.setTwitterToken( regionUnitSettings.getSocialMediaTokens().getTwitterToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                        socialMediaTokens.setTwitterToken( branchUnitSettings.getSocialMediaTokens().getTwitterToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                        socialMediaTokens.setTwitterToken( agentUnitSettings.getSocialMediaTokens().getTwitterToken() );
+                    }
+                }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.LINKED_IN ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                /*if ( socialMediaTokens == null ) {
+                if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    socialMediaTokens.setLinkedInToken( companyUnitSettings.getSocialMediaTokens().getLinkedInToken() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    socialMediaTokens.setLinkedInToken( regionUnitSettings.getSocialMediaTokens().getLinkedInToken() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    socialMediaTokens.setLinkedInToken( branchUnitSettings.getSocialMediaTokens().getLinkedInToken() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    socialMediaTokens.setLinkedInToken( agentUnitSettings.getSocialMediaTokens().getLinkedInToken() );
-                }*/
+                //get twitter token from upper hierarchy in case of public profile page.
+                if ( isFetchRequiredDataFromHierarchy ) {
+                    if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                        socialMediaTokens.setLinkedInToken( companyUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                        socialMediaTokens.setLinkedInToken( regionUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                        socialMediaTokens.setLinkedInToken( branchUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                        socialMediaTokens.setLinkedInToken( agentUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                    }
+                }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.LENDING_TREE ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                /*if ( socialMediaTokens == null ) {
+                if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    socialMediaTokens.setLendingTreeToken( companyUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    socialMediaTokens.setLendingTreeToken( regionUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    socialMediaTokens.setLendingTreeToken( branchUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    socialMediaTokens.setLendingTreeToken( agentUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
-                }*/
+                //get lending tree token from upper hierarchy in case of public profile page.
+                if ( isFetchRequiredDataFromHierarchy ) {
+                    if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                        socialMediaTokens
+                            .setLendingTreeToken( companyUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                        socialMediaTokens.setLendingTreeToken( regionUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                        socialMediaTokens.setLendingTreeToken( branchUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                        socialMediaTokens.setLendingTreeToken( agentUnitSettings.getSocialMediaTokens().getLendingTreeToken() );
+                    }
+                }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.YELP ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                /*if ( socialMediaTokens == null ) {
+                if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    socialMediaTokens.setYelpToken( companyUnitSettings.getSocialMediaTokens().getYelpToken() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    socialMediaTokens.setYelpToken( regionUnitSettings.getSocialMediaTokens().getYelpToken() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    socialMediaTokens.setYelpToken( branchUnitSettings.getSocialMediaTokens().getYelpToken() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    socialMediaTokens.setYelpToken( agentUnitSettings.getSocialMediaTokens().getYelpToken() );
-                }*/
+                //get yelp token from upper hierarchy in case of public profile page.
+                if ( isFetchRequiredDataFromHierarchy ) {
+                    if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                        socialMediaTokens.setYelpToken( companyUnitSettings.getSocialMediaTokens().getYelpToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                        socialMediaTokens.setYelpToken( regionUnitSettings.getSocialMediaTokens().getYelpToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                        socialMediaTokens.setYelpToken( branchUnitSettings.getSocialMediaTokens().getYelpToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                        socialMediaTokens.setYelpToken( agentUnitSettings.getSocialMediaTokens().getYelpToken() );
+                    }
+                }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.REALTOR ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                /*if ( socialMediaTokens == null ) {
+                if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    socialMediaTokens.setRealtorToken( companyUnitSettings.getSocialMediaTokens().getRealtorToken() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    socialMediaTokens.setRealtorToken( regionUnitSettings.getSocialMediaTokens().getRealtorToken() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    socialMediaTokens.setRealtorToken( branchUnitSettings.getSocialMediaTokens().getRealtorToken() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    socialMediaTokens.setRealtorToken( agentUnitSettings.getSocialMediaTokens().getRealtorToken() );
-                }*/
+                //get realtor token from upper hierarchy in case of public profile page.
+                if ( isFetchRequiredDataFromHierarchy ) {
+                    if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                        socialMediaTokens.setRealtorToken( companyUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                        socialMediaTokens.setRealtorToken( regionUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                        socialMediaTokens.setRealtorToken( branchUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                        socialMediaTokens.setRealtorToken( agentUnitSettings.getSocialMediaTokens().getRealtorToken() );
+                    }
+                }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             } else if ( entry.getKey() == SettingsForApplication.ZILLOW ) {
                 SocialMediaTokens socialMediaTokens = userProfile.getSocialMediaTokens();
-                /*if ( socialMediaTokens == null ) {
+                if ( socialMediaTokens == null ) {
                     socialMediaTokens = new SocialMediaTokens();
                 }
-                if ( entry.getValue() == OrganizationUnit.COMPANY ) {
-                    socialMediaTokens.setZillowToken( companyUnitSettings.getSocialMediaTokens().getZillowToken() );
-                } else if ( entry.getValue() == OrganizationUnit.REGION ) {
-                    socialMediaTokens.setZillowToken( regionUnitSettings.getSocialMediaTokens().getZillowToken() );
-                } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
-                    socialMediaTokens.setZillowToken( branchUnitSettings.getSocialMediaTokens().getZillowToken() );
-                } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
-                    socialMediaTokens.setZillowToken( agentUnitSettings.getSocialMediaTokens().getZillowToken() );
-                }*/
+                //get zillow token from upper hierarchy in case of public profile page.
+                if ( isFetchRequiredDataFromHierarchy ) {
+                    if ( entry.getValue() == OrganizationUnit.COMPANY ) {
+                        socialMediaTokens.setZillowToken( companyUnitSettings.getSocialMediaTokens().getZillowToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.REGION ) {
+                        socialMediaTokens.setZillowToken( regionUnitSettings.getSocialMediaTokens().getZillowToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.BRANCH ) {
+                        socialMediaTokens.setZillowToken( branchUnitSettings.getSocialMediaTokens().getZillowToken() );
+                    } else if ( entry.getValue() == OrganizationUnit.AGENT ) {
+                        socialMediaTokens.setZillowToken( agentUnitSettings.getSocialMediaTokens().getZillowToken() );
+                    }
+                }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
             }
         }
@@ -3804,36 +3829,36 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     /**
      * Code to fetch zillow reviews on profile page load
      */
-//    Commented as Zillow surveys are not stored in database, SS-1276
-//    @Override
-//    public void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException
-//    {
-//        if ( profile == null || collection == null || collection.isEmpty() ) {
-//            LOG.info( "Invalid parameters passed to updateZillowFeed for fetching zillow feed" );
-//            throw new InvalidInputException( "Invalid parameters passed to updateZillowFeed for fetching zillow feed" );
-//        }
-//        LOG.info( "Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection );
-//        if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null ) {
-//            // fetching zillow feed
-//            LOG.debug( "Fetching zillow feed for " + profile.getId() + " from " + collection );
-//            fetchFeedFromZillow( profile, collection );
-//            String entityType = "";
-//            if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-//                entityType = CommonConstants.COMPANY_ID_COLUMN;
-//            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-//                entityType = CommonConstants.REGION_ID_COLUMN;
-//            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-//                entityType = CommonConstants.BRANCH_ID_COLUMN;
-//            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-//                entityType = CommonConstants.AGENT_ID_COLUMN;
-//            }
-//            surveyHandler.deleteExcessZillowSurveysByEntity( entityType, profile.getIden() );
-//        } else {
-//            LOG.info( "Zillow is not added for the profile" );
-//            throw new InvalidInputException( "Zillow is not added for the profile" );
-//        }
-//        LOG.info( "Method to update zillow feed finished." );
-//    }
+    //    Commented as Zillow surveys are not stored in database, SS-1276
+    //    @Override
+    //    public void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException
+    //    {
+    //        if ( profile == null || collection == null || collection.isEmpty() ) {
+    //            LOG.info( "Invalid parameters passed to updateZillowFeed for fetching zillow feed" );
+    //            throw new InvalidInputException( "Invalid parameters passed to updateZillowFeed for fetching zillow feed" );
+    //        }
+    //        LOG.info( "Method to update zillow feed called for ID :" + profile.getIden() + " of collection : " + collection );
+    //        if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null ) {
+    //            // fetching zillow feed
+    //            LOG.debug( "Fetching zillow feed for " + profile.getId() + " from " + collection );
+    //            fetchFeedFromZillow( profile, collection );
+    //            String entityType = "";
+    //            if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+    //                entityType = CommonConstants.COMPANY_ID_COLUMN;
+    //            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+    //                entityType = CommonConstants.REGION_ID_COLUMN;
+    //            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+    //                entityType = CommonConstants.BRANCH_ID_COLUMN;
+    //            } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+    //                entityType = CommonConstants.AGENT_ID_COLUMN;
+    //            }
+    //            surveyHandler.deleteExcessZillowSurveysByEntity( entityType, profile.getIden() );
+    //        } else {
+    //            LOG.info( "Zillow is not added for the profile" );
+    //            throw new InvalidInputException( "Zillow is not added for the profile" );
+    //        }
+    //        LOG.info( "Method to update zillow feed finished." );
+    //    }
 
 
     private Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
@@ -3970,6 +3995,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 //            LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
 //        }
 //    }
+
     @SuppressWarnings ( "unchecked")
     List<SurveyDetails> fetchZillowFeeds( OrganizationUnitSettings profile, String collectionName )
         throws InvalidInputException, UnavailableException
@@ -4346,19 +4372,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     User user = userDao.findById( User.class, iden );
                     long zillowReviewCount = 0;
                     long zillowTotalScore = 0;
-                    if(user != null ){
+                    if ( user != null ) {
                         zillowReviewCount = user.getZillowReviewCount();
                         zillowTotalScore = (long) ( user.getZillowAverageScore() * zillowReviewCount );
                     }
                     Map<String, Long> zillowTotalScoreAndAverageMap = new HashMap<String, Long>();
-                    zillowTotalScoreAndAverageMap.put(CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN, zillowReviewCount);
-                    zillowTotalScoreAndAverageMap.put(CommonConstants.ZILLOW_TOTAL_SCORE, zillowTotalScore);
+                    zillowTotalScoreAndAverageMap.put( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN, zillowReviewCount );
+                    zillowTotalScoreAndAverageMap.put( CommonConstants.ZILLOW_TOTAL_SCORE, zillowTotalScore );
                     return zillowTotalScoreAndAverageMap;
                 default:
                     LOG.error( "Invalid profile level passed while getting ids under a profile level" );
             }
         } catch ( Exception e ) {
-            LOG.error( "Exception occurred while fetching zillow total score and average for profile level and id. Reason : ", e);
+            LOG.error( "Exception occurred while fetching zillow total score and average for profile level and id. Reason : ",
+                e );
         }
         return null;
     }

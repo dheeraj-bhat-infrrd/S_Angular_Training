@@ -2068,7 +2068,6 @@ public class SocialManagementController
                 .getAttribute( CommonConstants.USER_ACCOUNT_SETTINGS );
         SocialMediaTokens mediaTokens = null;
         try {
-            User user = sessionHelper.getCurrentUser();
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
@@ -2112,13 +2111,13 @@ public class SocialManagementController
             // Check for the collection to update
             OrganizationUnitSettings unitSettings = null;
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                unitSettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 userSettings.setCompanySettings( unitSettings );
                 //update SETTINGS_SET_STATUS to unset in COMPANY table
-                Company company = user.getCompany();
+                Company company = userManagementService.getCompanyById( entityId );
                 if(company != null){
                 	settingsSetter.setSettingsValueForCompany(company, settings, unset);
                 	//Set IS_ZILLOW_CONNECTED to false

@@ -6,9 +6,11 @@ package com.realtech.socialsurvey.web.profile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
@@ -124,7 +127,7 @@ public class ProfileViewController
             if ( companyProfile == null ) {
                 throw new ProfileNotFoundException( "No settings found for company while fetching company profile" );
             }
-            
+
             /*if ( companyProfile.getSocialMediaTokens() != null
                 && companyProfile.getSocialMediaTokens().getZillowToken() != null )
                 profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );*/
@@ -149,6 +152,7 @@ public class ProfileViewController
             // should show all review count
             long reviewsCount = profileManagementService.getReviewsCount( companyId, -1,
                 -1, CommonConstants.PROFILE_LEVEL_COMPANY, false, false, true, zillowReviewCount );
+            
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -247,7 +251,8 @@ public class ProfileViewController
             }
 
             regionProfile = profileManagementService.fillUnitSettings( regionProfile,
-                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null, map );
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null, map,
+                true );
 
 
             /*if ( regionProfile.getSocialMediaTokens() != null && regionProfile.getSocialMediaTokens().getZillowToken() != null )
@@ -381,8 +386,8 @@ public class ProfileViewController
             }
             branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
-                null, map );
-            
+                null, map, true );
+
             /*if ( branchProfile.getSocialMediaTokens() != null && branchProfile.getSocialMediaTokens().getZillowToken() != null )
                 profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );*/
             // aggregated social profile urls
@@ -489,8 +494,8 @@ public class ProfileViewController
 
         // check for profiles and redirect to company if admin only
         try {
-        	// get the user composite object
-        	userCompositeObject = profileManagementService.getCompositeUserObjectByProfileName(agentProfileName, true);
+            // get the user composite object
+            userCompositeObject = profileManagementService.getCompositeUserObjectByProfileName( agentProfileName, true );
             User user = userCompositeObject.getUser();
             List<UserProfile> userProfiles = user.getUserProfiles();
             if ( userProfiles == null || userProfiles.size() < 1 ) {
@@ -534,7 +539,7 @@ public class ProfileViewController
                     throw new ProfileNotFoundException( "Unable to find agent profile for profile name " + agentProfileName );
                 }
                 Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( individualProfile );
-                LOG.debug("Got the primary hierarchy.");
+                LOG.debug( "Got the primary hierarchy." );
                 if ( hierarchyMap == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
                     throw new FatalException( "Unable to fetch primary profile for this user " + individualProfile.getIden() );
@@ -542,33 +547,33 @@ public class ProfileViewController
                 companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
                 regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
                 branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-                LOG.debug("Company ID : " + companyId + " Region ID : " + regionId +" Branch ID : " + branchId);
+                LOG.debug( "Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId );
 
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
 
-                LOG.debug("Getting settings by organization unit map");
-                settingsByOrganizationUnitMap = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
-                    individualProfile.getIden() );
-                LOG.debug("Extracted settings by organization unit map");
+                LOG.debug( "Getting settings by organization unit map" );
+                settingsByOrganizationUnitMap = profileManagementService.getPrimaryHierarchyByEntity(
+                    CommonConstants.AGENT_ID_COLUMN, individualProfile.getIden() );
+                LOG.debug( "Extracted settings by organization unit map" );
                 if ( settingsByOrganizationUnitMap == null ) {
                     LOG.error( "Unable to fetch primary profile for this user " );
                     throw new FatalException( "Unable to fetch primary profile this user " + individualProfile.getIden() );
                 }
 
-                LOG.debug("Filling the unit settings in the profile");
+                LOG.debug( "Filling the unit settings in the profile" );
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, individualProfile, settingsByOrganizationUnitMap );
-                LOG.debug("Finished filling the unit settings in the profile");
+                    branchProfile, individualProfile, settingsByOrganizationUnitMap, true );
+                LOG.debug( "Finished filling the unit settings in the profile" );
                 //TODO: delink the zillow call from here
                 /**LOG.debug("Getting zillow feed");
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null )
-					profileManagementService.updateZillowFeed(
-							individualProfile,
-							CommonConstants.AGENT_SETTINGS_COLLECTION);
+                	profileManagementService.updateZillowFeed(
+                			individualProfile,
+                			CommonConstants.AGENT_SETTINGS_COLLECTION);
                 LOG.debug("Fetched zillow feed");*/
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
@@ -583,9 +588,9 @@ public class ProfileViewController
                 //individualProfile.setDisclaimer( disclaimer );
 
                 //set survey settings in individual profile
-                if(individualProfile.getSurvey_settings() == null)
-                	individualProfile.setSurvey_settings(companyProfile.getSurvey_settings());
-                
+                if ( individualProfile.getSurvey_settings() == null )
+                    individualProfile.setSurvey_settings( companyProfile.getSurvey_settings() );
+
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
 
@@ -726,19 +731,19 @@ public class ProfileViewController
             String message = request.getParameter( "message" );
 
             if ( validateCaptcha.equals( CommonConstants.YES_STRING ) ) {
-            	
-            	try {
-	                if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
-	                    request.getParameter( "g-recaptcha-response" ) ) ) {
-	                    LOG.error( "Captcha Validation failed!" );
-	                    throw new InvalidInputException( "Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA );
-	                    
-	                }
-            	} catch (InvalidInputException e) {
-            		returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
-	                        DisplayMessageType.SUCCESS_MESSAGE ).toString();
-	                    return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
-            	}
+
+                try {
+                    if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
+                        request.getParameter( "g-recaptcha-response" ) ) ) {
+                        LOG.error( "Captcha Validation failed!" );
+                        throw new InvalidInputException( "Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA );
+
+                    }
+                } catch ( InvalidInputException e ) {
+                    returnMessage = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_CAPTCHA,
+                        DisplayMessageType.SUCCESS_MESSAGE ).toString();
+                    return makeJsonMessage( CommonConstants.STATUS_INACTIVE, returnMessage );
+                }
             }
 
             LOG.debug( "Sending mail to :  " + profileName + " from : " + senderMailId );

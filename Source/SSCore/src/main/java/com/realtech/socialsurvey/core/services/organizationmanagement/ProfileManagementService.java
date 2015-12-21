@@ -368,7 +368,8 @@ public interface ProfileManagementService
      * @param maxScore
      * @return
      */
-    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive, boolean notRecommended );
+    public long getReviewsCountForCompany( long companyId, double minScore, double maxScore, boolean fetchAbusive,
+        boolean notRecommended );
 
 
     /**
@@ -383,8 +384,8 @@ public interface ProfileManagementService
      * @return
      * @throws InvalidInputException
      */
-    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive, boolean notRecommended )
-        throws InvalidInputException;
+    public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
+        boolean notRecommended ) throws InvalidInputException;
 
 
     /**
@@ -570,7 +571,7 @@ public interface ProfileManagementService
     public OrganizationUnitSettings fillUnitSettings( OrganizationUnitSettings unitSettings, String currentProfileName,
         OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
         OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
-        Map<SettingsForApplication, OrganizationUnit> map );
+        Map<SettingsForApplication, OrganizationUnit> map, boolean isFetchRequiredDataFromHierarchy );
 
 
     public OrganizationUnitSettings getRegionProfileByBranch( OrganizationUnitSettings branchSettings )
@@ -597,8 +598,8 @@ public interface ProfileManagementService
      * @param collection
      * @throws InvalidInputException
      */
-//  Commented as Zillow surveys are not stored in database, SS-1276
-//  void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
+    //  Commented as Zillow surveys are not stored in database, SS-1276
+    //  void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
 
 
     Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,
@@ -616,7 +617,8 @@ public interface ProfileManagementService
         String profileLevel, Date startDate, Date endDate ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<SurveyDetails> fetchZillowData( OrganizationUnitSettings profile, String collection ) throws InvalidInputException, UnavailableException;
+    public List<SurveyDetails> fetchZillowData( OrganizationUnitSettings profile, String collection )
+        throws InvalidInputException, UnavailableException;
 
 
     public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow, long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException;
@@ -626,8 +628,8 @@ public interface ProfileManagementService
         boolean notRecommended, boolean includeZillow, long zillowReviewCount ) throws InvalidInputException;
 
 
-    public List<AgentSettings> getIndividualsForCompany( long companyId ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException;
+    public List<AgentSettings> getIndividualsForCompany( long companyId ) throws InvalidInputException,
+        NoRecordsFetchedException, ProfileNotFoundException;
 
 
     public Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden );
