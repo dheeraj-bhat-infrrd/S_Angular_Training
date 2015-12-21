@@ -101,10 +101,10 @@ sources.forEach(function(source){
 						]
 					);
 					modifiedTimes = modifiedTimes.toArray();
-					if(modifiedTimes != undefined){
+					if(modifiedTimes != undefined && modifiedTimes[0] != undefined){
 						var firstModifiedTime = modifiedTimes[0].firstModifiedTime.toNumber();
 						var lastModifiedTime = modifiedTimes[0].lastModifiedTime.toNumber();
-						strToPrint += firstModifiedTime + "," + lastModifiedTime;
+						strToPrint += new Date(firstModifiedTime) + "," + new Date(lastModifiedTime);
 					} else {
 						strToPrint += "something went wrong";
                     }
@@ -145,10 +145,10 @@ sources.forEach(function(source){
 					);
 					
 					modifiedTimes = modifiedTimes.toArray();
-					if(modifiedTimes != undefined){
+					if(modifiedTimes != undefined && modifiedTimes[0] != undefined){
 						var firstModifiedTime = modifiedTimes[0].firstModifiedTime.toNumber();
 						var lastModifiedTime = modifiedTimes[0].lastModifiedTime.toNumber();
-						strToPrint += firstModifiedTime + "," + lastModifiedTime;
+						strToPrint += new Date(firstModifiedTime) + "," + new Date(lastModifiedTime);
 					} else {
 						strToPrint += "something went wrong";
                     }
@@ -189,10 +189,10 @@ sources.forEach(function(source){
 					);
 					
 					modifiedTimes = modifiedTimes.toArray();
-					if(modifiedTimes != undefined){
+					if(modifiedTimes != undefined && modifiedTimes[0] != undefined){
 						var firstModifiedTime = modifiedTimes[0].firstModifiedTime.toNumber();
 						var lastModifiedTime = modifiedTimes[0].lastModifiedTime.toNumber();
-						strToPrint += firstModifiedTime + "," + lastModifiedTime;
+						strToPrint += new Date(firstModifiedTime) + "," + new Date(lastModifiedTime);
 					} else {
 						strToPrint += "something went wrong";
                     }
@@ -233,10 +233,10 @@ sources.forEach(function(source){
 					);
 					
 					modifiedTimes = modifiedTimes.toArray();
-					if(modifiedTimes != undefined){
+					if(modifiedTimes != undefined && modifiedTimes[0] != undefined){
 						var firstModifiedTime = modifiedTimes[0].firstModifiedTime.toNumber();
 						var lastModifiedTime = modifiedTimes[0].lastModifiedTime.toNumber();
-						strToPrint += firstModifiedTime + "," + lastModifiedTime;
+						strToPrint += new Date(firstModifiedTime) + "," + new Date(lastModifiedTime);
 					} else {
 						strToPrint += "something went wrong";
                     }
