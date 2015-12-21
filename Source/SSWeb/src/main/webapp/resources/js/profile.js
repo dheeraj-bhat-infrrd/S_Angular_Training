@@ -1673,6 +1673,7 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	};
 	isZillowIdFetchRunning = true;
 	callAjaxGetWithPayloadData(url, function(data) {
+		isZillowIdFetchRunning = false;
 	    if (data != undefined && data != "") {
 	        var responseJson = $.parseJSON(data);
 	        if (responseJson != undefined) {
@@ -1708,10 +1709,14 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	    	switch(curHierarchyLevel){
 	        	case "REGION":
 	        		curHierarchyLevel = "BRANCH";
+	        		if(!isNextBatch)
+	        			fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
 	        		break;
 	        		
 	        	case "BRANCH":
 	        		curHierarchyLevel = "INDIVIDUAL";
+	        		if(!isNextBatch)
+	        			fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch);
 	        		break;
 	        		
 	        	default:
@@ -1720,7 +1725,6 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	    	zillowHierarchyList = [];
 	    	zillowHStart = 0;
 	    }
-	    isZillowIdFetchRunning = false;
 	}, payload, false);
 }
 

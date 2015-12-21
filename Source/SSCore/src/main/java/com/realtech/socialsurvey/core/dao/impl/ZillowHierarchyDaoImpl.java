@@ -25,9 +25,9 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 {
     private static final Logger LOG = LoggerFactory.getLogger( ZillowHierarchyDaoImpl.class );
-    private static final String fetchIdsUnderBranchQuery = "select distinct CASE WHEN br.IS_ZILLOW_CONNECTED = :isZillowConnected THEN br.BRANCH_ID ELSE -1 END AS BRANCH_ID , br.ZILLOW_REVIEW_COUNT as BRANCH_ZILLOW_COUNT, br.ZILLOW_AVERAGE_SCORE as BRANCH_ZILLOW_AVERAGE, CASE WHEN us.IS_ZILLOW_CONNECTED = :isZillowConnected THEN us_pro.USER_ID ELSE -1 END AS USER_ID , us.ZILLOW_REVIEW_COUNT  as INDIVIDUAL_ZILLOW_COUNT, us.ZILLOW_AVERAGE_SCORE as INDIVIDUAL_ZILLOW_AVERAGE from BRANCH as br LEFT join USER_PROFILE as us_pro ON br.BRANCH_ID = us_pro.BRANCH_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status LEFT join USERS as us on us_pro.USER_ID = us.USER_ID where br.BRANCH_ID = :branchId and ( br.IS_ZILLOW_CONNECTED = :isZillowConnected OR us.IS_ZILLOW_CONNECTED = :isZillowConnected  )";
-    private static final String fetchIdsUnderRegionQuery = "select distinct CASE WHEN reg.IS_ZILLOW_CONNECTED = :isZillowConnected THEN reg.REGION_ID ELSE -1 END AS REGION_ID, reg.ZILLOW_REVIEW_COUNT as REGION_ZILLOW_COUNT , reg.ZILLOW_AVERAGE_SCORE as REGION_ZILLOW_AVERAGE , CASE WHEN br.IS_ZILLOW_CONNECTED = :isZillowConnected THEN br.BRANCH_ID ELSE -1 END AS BRANCH_ID , br.ZILLOW_REVIEW_COUNT as BRANCH_ZILLOW_COUNT , br.ZILLOW_AVERAGE_SCORE as BRANCH_ZILLOW_AVERAGE , CASE WHEN us.IS_ZILLOW_CONNECTED = :isZillowConnected THEN us_pro.USER_ID ELSE -1 END AS USER_ID , us.ZILLOW_REVIEW_COUNT as INDIVIDUAL_ZILLOW_COUNT , us.ZILLOW_AVERAGE_SCORE as INDIVIDUAL_ZILLOW_AVERAGE from REGION as reg LEFT join BRANCH as br ON reg.REGION_ID = br.REGION_ID and br.STATUS != :status LEFT join USER_PROFILE as us_pro ON br.BRANCH_ID = us_pro.BRANCH_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status LEFT join USERS as us on us_pro.USER_ID = us.USER_ID where reg.REGION_ID = :regionId and (reg.IS_ZILLOW_CONNECTED = :isZillowConnected OR br.IS_ZILLOW_CONNECTED = :isZillowConnected OR us.IS_ZILLOW_CONNECTED = :isZillowConnected )";
-    private static final String fetchIdsUnderCompanyQuery = "select distinct CASE WHEN co.IS_ZILLOW_CONNECTED = :isZillowConnected THEN co.COMPANY_ID ELSE -1 END AS COMPANY_ID , co.ZILLOW_REVIEW_COUNT as COMPANY_ZILLOW_COUNT , co.ZILLOW_AVERAGE_SCORE as COMPANY_ZILLOW_AVERAGE , CASE WHEN reg.IS_ZILLOW_CONNECTED = :isZillowConnected THEN reg.REGION_ID ELSE -1 END AS REGION_ID , reg.ZILLOW_REVIEW_COUNT as REGION_ZILLOW_COUNT , reg.ZILLOW_AVERAGE_SCORE as REGION_ZILLOW_AVERAGE , CASE WHEN br.IS_ZILLOW_CONNECTED = :isZillowConnected THEN br.BRANCH_ID ELSE -1 END AS BRANCH_ID , br.ZILLOW_REVIEW_COUNT  as BRANCH_ZILLOW_COUNT , br.ZILLOW_AVERAGE_SCORE as BRANCH_ZILLOW_AVERAGE , CASE WHEN us.IS_ZILLOW_CONNECTED = :isZillowConnected THEN us_pro.USER_ID ELSE -1 END AS USER_ID , us.ZILLOW_REVIEW_COUNT as INDIVIDUAL_ZILLOW_COUNT , us.ZILLOW_AVERAGE_SCORE as INDIVIDUAL_ZILLOW_AVERAGE from COMPANY as co LEFT join REGION as reg ON co.COMPANY_ID = reg.COMPANY_ID and reg.STATUS != :status LEFT join BRANCH as br ON reg.REGION_ID = br.REGION_ID and br.STATUS != :status LEFT join USER_PROFILE as us_pro ON br.BRANCH_ID = us_pro.BRANCH_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status LEFT join USERS as us on us_pro.USER_ID = us.USER_ID where co.COMPANY_ID = :companyId and (co.IS_ZILLOW_CONNECTED = :isZillowConnected OR reg.IS_ZILLOW_CONNECTED = :isZillowConnected OR br.IS_ZILLOW_CONNECTED = :isZillowConnected OR us.IS_ZILLOW_CONNECTED = :isZillowConnected)";
+    private static final String fetchIdsUnderBranchQuery = "select distinct CASE WHEN br.IS_ZILLOW_CONNECTED = :isZillowConnected THEN br.BRANCH_ID ELSE -1 END AS BRANCH_ID, br.ZILLOW_REVIEW_COUNT as BRANCH_ZILLOW_COUNT, br.ZILLOW_AVERAGE_SCORE as BRANCH_ZILLOW_AVERAGE, us.USER_ID AS USER_IDS, us.ZILLOW_REVIEW_COUNT AS INDIVIDUALS_REVIEW_COUNT, us.ZILLOW_AVERAGE_SCORE AS INDIVIDUALS_REVIEW_AVERAGE from BRANCH br LEFT JOIN (select us_pro.BRANCH_ID, group_concat(usInner.USER_ID) as USER_ID, group_concat(usInner.ZILLOW_REVIEW_COUNT) as ZILLOW_REVIEW_COUNT, group_concat(usInner.ZILLOW_AVERAGE_SCORE) as ZILLOW_AVERAGE_SCORE FROM USERS as usInner JOIN USER_PROFILE as us_pro ON us_pro.USER_ID = usInner.USER_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status where (case when usInner.IS_ZILLOW_CONNECTED = :isZillowConnected THEN 1 = 1 ELSE 1 = 0 END) and us_pro.BRANCH_ID  = :branchId group by us_pro.BRANCH_ID) as us on br.BRANCH_ID = us.BRANCH_ID where br.BRANCH_ID = :branchId";
+    private static final String fetchIdsUnderRegionQuery = "select distinct CASE WHEN reg.IS_ZILLOW_CONNECTED = :isZillowConnected THEN reg.REGION_ID ELSE -1 END AS REGION_ID , reg.ZILLOW_REVIEW_COUNT as REGION_ZILLOW_COUNT, reg.ZILLOW_AVERAGE_SCORE as REGION_ZILLOW_AVERAGE, br.BRANCH_ID AS BRANCH_IDS, br.ZILLOW_REVIEW_COUNT AS BRANCHES_REVIEW_COUNT, br.ZILLOW_AVERAGE_SCORE AS BRANCHES_REVIEW_AVERAGE, us.USER_ID AS USER_IDS, us.ZILLOW_REVIEW_COUNT AS INDIVIDUALS_REVIEW_COUNT, us.ZILLOW_AVERAGE_SCORE AS INDIVIDUALS_REVIEW_AVERAGE from REGION reg left JOIN (select brInner.REGION_ID, group_concat(brInner.BRANCH_ID) as BRANCH_ID, group_concat(brInner.ZILLOW_REVIEW_COUNT) as ZILLOW_REVIEW_COUNT, group_concat(brInner.ZILLOW_AVERAGE_SCORE) as ZILLOW_AVERAGE_SCORE FROM BRANCH as brInner where brInner.STATUS != :status and (case when brInner.IS_ZILLOW_CONNECTED = :isZillowConnected THEN 1 = 1 ELSE 1 = 0 END) and brInner.REGION_ID  = :regionId group by brInner.REGION_ID) as br on br.REGION_ID = reg.REGION_ID left JOIN (select us_pro.REGION_ID, Group_concat(usInner.USER_ID) as USER_ID, group_concat(usInner.ZILLOW_REVIEW_COUNT) as ZILLOW_REVIEW_COUNT, group_concat(usInner.ZILLOW_AVERAGE_SCORE) as ZILLOW_AVERAGE_SCORE FROM USERS as usInner JOIN USER_PROFILE as us_pro ON us_pro.USER_ID = usInner.USER_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status where (case when usInner.IS_ZILLOW_CONNECTED = :isZillowConnected THEN 1 = 1 ELSE 1 = 0 END) and us_pro.REGION_ID  = :regionId group by us_pro.REGION_ID) as us on us.REGION_ID = reg.REGION_ID where reg.REGION_ID = :regionId";
+    private static final String fetchIdsUnderCompanyQuery = "select distinct CASE WHEN co.IS_ZILLOW_CONNECTED = :isZillowConnected THEN co.COMPANY_ID ELSE -1 END AS COMPANY_ID,co.ZILLOW_REVIEW_COUNT as COMPANY_ZILLOW_COUNT, co.ZILLOW_AVERAGE_SCORE as COMPANY_ZILLOW_AVERAGE , reg.REGION_ID AS REGION_IDS , reg.ZILLOW_REVIEW_COUNT as REGIONS_ZILLOW_COUNT, reg.ZILLOW_AVERAGE_SCORE as REGIONS_ZILLOW_AVERAGE, br.BRANCH_ID AS BRANCH_IDS, br.ZILLOW_REVIEW_COUNT AS BRANCHES_REVIEW_COUNT, br.ZILLOW_AVERAGE_SCORE AS BRANCHES_REVIEW_AVERAGE, us.USER_ID AS USER_IDS, us.ZILLOW_REVIEW_COUNT AS INDIVIDUALS_REVIEW_COUNT, us.ZILLOW_AVERAGE_SCORE AS INDIVIDUALS_REVIEW_AVERAGE from COMPANY co left JOIN (select regInner.COMPANY_ID, group_concat(regInner.REGION_ID) as REGION_ID , group_concat(regInner.ZILLOW_REVIEW_COUNT) as ZILLOW_REVIEW_COUNT, group_concat(regInner.ZILLOW_AVERAGE_SCORE) as ZILLOW_AVERAGE_SCORE FROM REGION as regInner where regInner.STATUS != :status and (case when regInner.IS_ZILLOW_CONNECTED = :isZillowConnected THEN 1 = 1 ELSE 1 = 0 END) and regInner.COMPANY_ID  = :companyId group by regInner.COMPANY_ID)  as reg on reg.COMPANY_ID = co.COMPANY_ID left JOIN (select brInner.COMPANY_ID, group_concat(brInner.BRANCH_ID) as BRANCH_ID, group_concat(brInner.ZILLOW_REVIEW_COUNT) as ZILLOW_REVIEW_COUNT, group_concat(brInner.ZILLOW_AVERAGE_SCORE) as ZILLOW_AVERAGE_SCORE FROM BRANCH as brInner where brInner.STATUS != :status and (case when brInner.IS_ZILLOW_CONNECTED = :isZillowConnected THEN 1 = 1 ELSE 1 = 0 END) and brInner.COMPANY_ID  = :companyId group by brInner.COMPANY_ID)  as br on br.COMPANY_ID = co.COMPANY_ID left JOIN (select usInner.COMPANY_ID, group_concat(usInner.USER_ID) as USER_ID, group_concat(usInner.ZILLOW_REVIEW_COUNT) as ZILLOW_REVIEW_COUNT, group_concat(usInner.ZILLOW_AVERAGE_SCORE) as ZILLOW_AVERAGE_SCORE FROM USERS as usInner JOIN USER_PROFILE as us_pro ON us_pro.USER_ID = usInner.USER_ID and us_pro.PROFILES_MASTER_ID = :agentProfileMasterId and us_pro.STATUS != :status where (case when usInner.IS_ZILLOW_CONNECTED = :isZillowConnected THEN 1 = 1 ELSE 1 = 0 END) and us_pro.COMPANY_ID  = :companyId group by us_pro.COMPANY_ID) as us on us.COMPANY_ID = co.COMPANY_ID where co.COMPANY_ID = :companyId";
     private static final String fetchUserIdsUnderCompanyQuery = "SELECT DISTINCT(U.USER_ID) AS USER_ID FROM USERS U, USER_PROFILE UP  WHERE U.STATUS IN ( :statuses ) AND U.IS_ZILLOW_CONNECTED = :isZillowConnected AND U.COMPANY_ID = :companyId AND U.COMPANY_ID = UP.COMPANY_ID AND UP.PROFILES_MASTER_ID = :profilesMasterId AND UP.STATUS = :status ORDER BY U.USER_ID ASC";
     private static final String fetchUserIdsUnderRegionQuery = "SELECT DISTINCT(U.USER_ID) AS USER_ID FROM USERS U, USER_PROFILE UP WHERE U.STATUS IN (:statuses) AND U.IS_ZILLOW_CONNECTED=:isZillowConnected AND UP.STATUS = :status AND U.USER_ID = UP.USER_ID AND UP.REGION_ID=:regionId AND UP.PROFILES_MASTER_ID = :profileMasterId ORDER BY U.USER_ID ASC";
     private static final String fetchUserIdsUnderBranchQuery = "SELECT DISTINCT(U.USER_ID) AS USER_ID FROM USERS U, USER_PROFILE UP WHERE  U.STATUS IN ( :statuses ) AND  U.IS_ZILLOW_CONNECTED = :isZillowConnected AND UP.STATUS = :status AND U.USER_ID = UP.USER_ID AND UP.BRANCH_ID = :branchId AND UP.PROFILES_MASTER_ID = :profileMasterId ORDER BY U.USER_ID ASC";
@@ -73,19 +73,44 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         long totalReviewCount = 0;
         long totalScore = 0;
+        List<Long> zillowConnectedIndividualIds = new ArrayList<Long>();
 
         LOG.info( "Parsing the information recieved for branch id : " + branchId );
         for ( Object[] row : rows ) {
+            //  row [0] - branch_id
+            //  row [1] - branch zillow count
+            //  row [2] - branch zillow average
+            //  row [3] - user_id
+            //  row [4] - individuals review count
+            //  row [5] - individuals review average
             Long zillowConnectedBranchId = new Long( String.valueOf( row[0] ) );
-            Long zillowConnectedIndividualId = new Long( String.valueOf( row[3] ) );
-            if ( zillowConnectedIndividualId != -1 ) {
-                long reviewCount = new Long( String.valueOf( row[4] ) );
-                totalReviewCount += reviewCount;
-                totalScore += new Double( String.valueOf( row[5] ) ) * reviewCount;
-            } else if ( zillowConnectedBranchId != -1 ) {
+            if ( zillowConnectedBranchId != -1 ) {
                 long reviewCount = new Long( String.valueOf( row[1] ) );
                 totalReviewCount += reviewCount;
                 totalScore += new Double( String.valueOf( row[2] ) ) * reviewCount;
+            }
+            String reviewCounts = String.valueOf( row[4] );
+            String reviewAverages = String.valueOf( row[5] );
+            String userIds = String.valueOf( row[3] );
+            if ( reviewCounts.contains( "," ) && reviewAverages.contains( "," ) ) {
+                String[] reviewCountArr = reviewCounts.split( "," );
+                String[] reviewAveragesArr = reviewAverages.split( "," );
+                String[] userIdsArr = userIds.split( "," );
+                if ( reviewCountArr.length == reviewAveragesArr.length ) {
+                    for ( int i = 0; i < reviewCountArr.length; i++ ) {
+                        Long userId = Long.parseLong( userIdsArr[i] );
+                        if ( !zillowConnectedIndividualIds.contains( userId ) ) {
+                            long reviewCount = new Long( String.valueOf( reviewCountArr[i] ) );
+                            totalReviewCount += reviewCount;
+                            totalScore += new Double( String.valueOf( reviewAveragesArr[i] ) ) * reviewCount;
+                            zillowConnectedIndividualIds.add( userId );
+                        }
+                    }
+                }
+            } else {
+                long reviewCount = new Long( reviewCounts );
+                totalReviewCount += reviewCount;
+                totalScore += new Double( reviewAverages ) * reviewCount;
             }
         }
         LOG.info( "Parsed the information recieved for branch id : " + branchId );
@@ -132,36 +157,71 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
 
         Set<Long> zillowConnectedIndividualIds = new HashSet<Long>();
         Set<Long> zillowConnectedBranchIds = new HashSet<Long>();
-        Set<Long> zillowConnectedRegionIds = new HashSet<Long>();
         long totalReviewCount = 0;
         long totalScore = 0;
 
         LOG.info( "Parsing the information recieved for region id : " + regionId );
         for ( Object[] row : rows ) {
+            //  row [0] - region_id
+            //  row [1] - region zillow count
+            //  row [2] - region zillow average
+            //  row [3] - branch_id
+            //  row [4] - branch zillow count
+            //  row [5] - branch zillow average
+            //  row [6] - user_id
+            //  row [7] - individuals review count
+            //  row [8] - individuals review average
             Long zillowConnectedRegionId = new Long( String.valueOf( row[0] ) );
-            Long zillowConnectedBranchId = new Long( String.valueOf( row[3] ) );
-            Long zillowConnectedIndividualId = new Long( String.valueOf( row[6] ) );
-            if ( zillowConnectedIndividualId != -1 ) {
-                if ( !zillowConnectedIndividualIds.contains( zillowConnectedIndividualId ) ) {
-                    long reviewCount = new Long( String.valueOf( row[7] ) );
-                    totalReviewCount += reviewCount;
-                    totalScore += new Double( String.valueOf( row[8] ) ) * reviewCount;
-                    zillowConnectedIndividualIds.add( zillowConnectedIndividualId );
+            if ( zillowConnectedRegionId != -1 ) {
+                long reviewCount = new Long( String.valueOf( row[1] ) );
+                totalReviewCount += reviewCount;
+                totalScore += new Double( String.valueOf( row[2] ) ) * reviewCount;
+            }
+            String branchReviewCounts = String.valueOf( row[4] );
+            String branchReviewAverages = String.valueOf( row[5] );
+            String branchIds = String.valueOf( row[3] );
+            if ( branchReviewCounts.contains( "," ) && branchReviewAverages.contains( "," ) ) {
+                String[] reviewCountArr = branchReviewCounts.split( "," );
+                String[] reviewAveragesArr = branchReviewAverages.split( "," );
+                String[] branchIdsArr = branchIds.split( "," );
+                if ( reviewCountArr.length == reviewAveragesArr.length ) {
+                    for ( int i = 0; i < reviewCountArr.length; i++ ) {
+                        Long branchId = Long.parseLong( branchIdsArr[i] );
+                        if ( !zillowConnectedBranchIds.contains( branchId ) ) {
+                            long reviewCount = new Long( String.valueOf( reviewCountArr[i] ) );
+                            totalReviewCount += reviewCount;
+                            totalScore += new Double( String.valueOf( reviewAveragesArr[i] ) ) * reviewCount;
+                            zillowConnectedBranchIds.add( branchId );
+                        }
+                    }
                 }
-            } else if ( zillowConnectedBranchId != -1 ) {
-                if ( !zillowConnectedBranchIds.contains( zillowConnectedBranchId ) ) {
-                    long reviewCount = new Long( String.valueOf( row[4] ) );
-                    totalReviewCount += reviewCount;
-                    totalScore += new Double( String.valueOf( row[5] ) ) * reviewCount;
-                    zillowConnectedBranchIds.add( zillowConnectedBranchId );
+            } else {
+                long reviewCount = new Long( branchReviewCounts );
+                totalReviewCount += reviewCount;
+                totalScore += new Double( branchReviewAverages ) * reviewCount;
+            }
+            String individualReviewCounts = String.valueOf( row[7] );
+            String individualReviewAverages = String.valueOf( row[8] );
+            String userIds = String.valueOf( row[6] );
+            if ( individualReviewCounts.contains( "," ) && individualReviewAverages.contains( "," ) ) {
+                String[] reviewCountArr = individualReviewCounts.split( "," );
+                String[] reviewAveragesArr = individualReviewAverages.split( "," );
+                String[] userIdsArr = userIds.split( "," );
+                if ( reviewCountArr.length == reviewAveragesArr.length ) {
+                    for ( int i = 0; i < reviewCountArr.length; i++ ) {
+                        Long userId = Long.parseLong( userIdsArr[i] );
+                        if ( !zillowConnectedIndividualIds.contains( userId ) ) {
+                            long reviewCount = new Long( String.valueOf( reviewCountArr[i] ) );
+                            totalReviewCount += reviewCount;
+                            totalScore += new Double( String.valueOf( reviewAveragesArr[i] ) ) * reviewCount;
+                            zillowConnectedIndividualIds.add( userId );
+                        }
+                    }
                 }
-            } else if ( zillowConnectedRegionId != -1 ) {
-                if ( !zillowConnectedRegionIds.contains( zillowConnectedRegionId ) ) {
-                    long reviewCount = new Long( String.valueOf( row[1] ) );
-                    totalReviewCount += reviewCount;
-                    totalScore += new Double( String.valueOf( row[2] ) ) * reviewCount;
-                    zillowConnectedRegionIds.add( zillowConnectedRegionId );
-                }
+            } else {
+                long reviewCount = new Long( individualReviewCounts );
+                totalReviewCount += reviewCount;
+                totalScore += new Double( individualReviewAverages ) * reviewCount;
             }
         }
         LOG.info( "Parsed the information recieved for region id : " + regionId );
@@ -209,46 +269,98 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
         Set<Long> zillowConnectedIndividualIds = new HashSet<Long>();
         Set<Long> zillowConnectedBranchIds = new HashSet<Long>();
         Set<Long> zillowConnectedRegionIds = new HashSet<Long>();
-        Set<Long> zillowConnectedCompanyIds = new HashSet<Long>();
         long totalReviewCount = 0;
         long totalScore = 0;
 
         LOG.info( "Parsing the information recieved for company id : " + companyId );
         for ( Object[] row : rows ) {
+            //  row [0] - region_id
+            //  row [1] - region zillow count
+            //  row [2] - region zillow average
+            //  row [3] - region_id
+            //  row [4] - region zillow count
+            //  row [5] - region zillow average
+            //  row [6] - branch_id
+            //  row [7] - branch zillow count
+            //  row [8] - branch zillow average
+            //  row [9] - user_id
+            //  row [10] - individuals review count
+            //  row [11] - individuals review average
             Long zillowConnectedCompanyId = new Long( String.valueOf( row[0] ) );
-            Long zillowConnectedRegionId = new Long( String.valueOf( row[3] ) );
-            Long zillowConnectedBranchId = new Long( String.valueOf( row[6] ) );
-            Long zillowConnectedIndividualId = new Long( String.valueOf( row[9] ) );
-            if ( zillowConnectedIndividualId != -1 ) {
-                if ( !zillowConnectedIndividualIds.contains( zillowConnectedIndividualId ) ) {
-                    if ( row[10] != null && row[11] != null ) {
-                        long reviewCount = new Long( String.valueOf( row[10] ) );
-                        totalReviewCount += reviewCount;
-                        totalScore += new Double( String.valueOf( row[11] ) ) * reviewCount;
-                        zillowConnectedIndividualIds.add( zillowConnectedIndividualId );
+            if ( zillowConnectedCompanyId != -1 ) {
+                long reviewCount = new Long( String.valueOf( row[1] ) );
+                totalReviewCount += reviewCount;
+                totalScore += new Double( String.valueOf( row[2] ) ) * reviewCount;
+            }
+
+            String regionReviewCounts = String.valueOf( row[4] );
+            String regionReviewAverages = String.valueOf( row[5] );
+            String regionIds = String.valueOf( row[3] );
+            if ( regionReviewCounts.contains( "," ) && regionReviewAverages.contains( "," ) ) {
+                String[] reviewCountArr = regionReviewCounts.split( "," );
+                String[] reviewAveragesArr = regionReviewAverages.split( "," );
+                String[] regionIdsArr = regionIds.split( "," );
+                if ( reviewCountArr.length == reviewAveragesArr.length ) {
+                    for ( int i = 0; i < reviewCountArr.length; i++ ) {
+                        Long regionId = Long.parseLong( regionIdsArr[i] );
+                        if ( !zillowConnectedRegionIds.contains( regionId ) ) {
+                            long reviewCount = new Long( String.valueOf( reviewCountArr[i] ) );
+                            totalReviewCount += reviewCount;
+                            totalScore += new Double( String.valueOf( reviewAveragesArr[i] ) ) * reviewCount;
+                            zillowConnectedRegionIds.add( regionId );
+                        }
                     }
                 }
-            } else if ( zillowConnectedBranchId != -1 ) {
-                if ( !zillowConnectedBranchIds.contains( zillowConnectedBranchId ) ) {
-                    long reviewCount = new Long( String.valueOf( row[7] ) );
-                    totalReviewCount += reviewCount;
-                    totalScore += new Double( String.valueOf( row[8] ) ) * reviewCount;
-                    zillowConnectedBranchIds.add( zillowConnectedBranchId );
+            } else {
+                long reviewCount = new Long( regionReviewCounts );
+                totalReviewCount += reviewCount;
+                totalScore += new Double( regionReviewAverages ) * reviewCount;
+            }
+            String branchReviewCounts = String.valueOf( row[7] );
+            String branchReviewAverages = String.valueOf( row[8] );
+            String branchIds = String.valueOf( row[6] );
+            if ( branchReviewCounts.contains( "," ) && branchReviewAverages.contains( "," ) ) {
+                String[] reviewCountArr = branchReviewCounts.split( "," );
+                String[] reviewAveragesArr = branchReviewAverages.split( "," );
+                String[] branchIdsArr = branchIds.split( "," );
+                if ( reviewCountArr.length == reviewAveragesArr.length ) {
+                    for ( int i = 0; i < reviewCountArr.length; i++ ) {
+                        Long branchId = Long.parseLong( branchIdsArr[i] );
+                        if ( !zillowConnectedBranchIds.contains( branchId ) ) {
+                            long reviewCount = new Long( String.valueOf( reviewCountArr[i] ) );
+                            totalReviewCount += reviewCount;
+                            totalScore += new Double( String.valueOf( reviewAveragesArr[i] ) ) * reviewCount;
+                            zillowConnectedBranchIds.add( branchId );
+                        }
+                    }
                 }
-            } else if ( zillowConnectedRegionId != -1 ) {
-                if ( !zillowConnectedRegionIds.contains( zillowConnectedRegionId ) ) {
-                    long reviewCount = new Long( String.valueOf( row[4] ) );
-                    totalReviewCount += reviewCount;
-                    totalScore += new Double( String.valueOf( row[5] ) ) * reviewCount;
-                    zillowConnectedRegionIds.add( zillowConnectedRegionId );
+            } else {
+                long reviewCount = new Long( branchReviewCounts );
+                totalReviewCount += reviewCount;
+                totalScore += new Double( branchReviewAverages ) * reviewCount;
+            }
+            String individualReviewCounts = String.valueOf( row[10] );
+            String individualReviewAverages = String.valueOf( row[11] );
+            String userIds = String.valueOf( row[9] );
+            if ( individualReviewCounts.contains( "," ) && individualReviewAverages.contains( "," ) ) {
+                String[] reviewCountArr = individualReviewCounts.split( "," );
+                String[] reviewAveragesArr = individualReviewAverages.split( "," );
+                String[] userIdsArr = userIds.split( "," );
+                if ( reviewCountArr.length == reviewAveragesArr.length ) {
+                    for ( int i = 0; i < reviewCountArr.length; i++ ) {
+                        Long userId = Long.parseLong( userIdsArr[i] );
+                        if ( !zillowConnectedIndividualIds.contains( userId ) ) {
+                            long reviewCount = new Long( String.valueOf( reviewCountArr[i] ) );
+                            totalReviewCount += reviewCount;
+                            totalScore += new Double( String.valueOf( reviewAveragesArr[i] ) ) * reviewCount;
+                            zillowConnectedIndividualIds.add( userId );
+                        }
+                    }
                 }
-            } else if ( zillowConnectedCompanyId != -1 ) {
-                if ( !zillowConnectedCompanyIds.contains( zillowConnectedCompanyId ) ) {
-                    long reviewCount = new Long( String.valueOf( row[1] ) );
-                    totalReviewCount += reviewCount;
-                    totalScore += new Double( String.valueOf( row[2] ) ) * reviewCount;
-                    zillowConnectedCompanyIds.add( zillowConnectedCompanyId );
-                }
+            } else {
+                long reviewCount = new Long( individualReviewCounts );
+                totalReviewCount += reviewCount;
+                totalScore += new Double( individualReviewAverages ) * reviewCount;
             }
         }
         LOG.info( "Parsed the information recieved for company id : " + companyId );
