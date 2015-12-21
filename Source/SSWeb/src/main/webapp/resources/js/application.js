@@ -5497,9 +5497,6 @@ $('.sq-star').hover(function() {
 $('.sq-np-item-next')
 		.click(
 				function() {
-					if (questionDetails.questionType == "sb-master") {
-						showMasterQuestionPage();
-					}
 
 					if (questionDetails.questionType == "sb-sel-mcq"
 							&& customerResponse != undefined) {
@@ -5537,6 +5534,12 @@ $('.sq-np-item-next')
 							return;
 						}
 					} else if (questionDetails.questionType == "sb-master") {
+						if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
+							$('#overlay-toast').html('Please answer this question.');
+							showToast();
+						} else {
+							showMasterQuestionPage();
+						}
 						return;
 					}
 					$(".sq-star").removeClass('sq-full-star');
