@@ -62,7 +62,38 @@ sources.forEach(function(source){
                             });
             //Add record to report if multiple postedBy values exist
             if(postedBy.length > 1){
-                print("agentId," + e + "," + source + "," + postedBy.toString().replace(/,/g ,"|"));
+            
+            	var strToPrint = "agentId," + e + "," + source;
+            	//Get first and last modified time
+            	var postedBys = postedBy.toString().split(/,/g);
+            	postedBys.forEach(function(postOwner){
+            		strToPrint +="," + postOwner + ",";
+		        	var modifiedTimes = db.getCollection('SOCIAL_POST').aggregate(
+						[
+							{ 
+								$match : {$and : [ { agentId : e }, { source:source }, {postedBy : postOwner} ] }
+							},
+							{
+								$group:
+									{
+										_id : "$agentId",
+										firstModifiedTime : { $min : "$timeInMillis" },
+										lastModifiedTime : {$max : "$timeInMillis" }
+									}
+							 }
+						]
+					);
+					modifiedTimes = modifiedTimes.toArray();
+					if(modifiedTimes != undefined){
+						var firstModifiedTime = modifiedTimes[0].firstModifiedTime.toNumber();
+						var lastModifiedTime = modifiedTimes[0].lastModifiedTime.toNumber();
+						strToPrint += firstModifiedTime + "," + lastModifiedTime;
+					} else {
+						strToPrint += "something went wrong";
+                    }
+				});
+				
+                print(strToPrint);
             }
     });
 	
@@ -76,7 +107,37 @@ sources.forEach(function(source){
                             });
             //Add record to report if multiple postedBy values exist
             if(postedBy.length > 1){
-                print("branchId," + e + "," + source + "," + postedBy.toString().replace(/,/g ,"|"));
+            	var strToPrint = "branchId," + e + "," + source;
+                var postedBys = postedBy.toString().split(/,/g);
+            	postedBys.forEach(function(postOwner){
+            		strToPrint +="," + postOwner + ",";
+		        	var modifiedTimes = db.SOCIAL_POST.aggregate(
+						[
+							{ 
+								$match : {$and : [ { branchId : e }, { source:source }, {postedBy : postOwner} ] }
+							},
+							{
+								$group:
+									{
+										_id : "$branchId",
+										firstModifiedTime : { $min : "$timeInMillis" },
+										lastModifiedTime : {$max : "$timeInMillis" }
+									}
+							 }
+						]
+					);
+					
+					modifiedTimes = modifiedTimes.toArray();
+					if(modifiedTimes != undefined){
+						var firstModifiedTime = modifiedTimes[0].firstModifiedTime.toNumber();
+						var lastModifiedTime = modifiedTimes[0].lastModifiedTime.toNumber();
+						strToPrint += firstModifiedTime + "," + lastModifiedTime;
+					} else {
+						strToPrint += "something went wrong";
+                    }
+				});
+				
+                print(strToPrint);
             }
     });
 	
@@ -90,7 +151,37 @@ sources.forEach(function(source){
                             });
             //Add record to report if multiple postedBy values exist
             if(postedBy.length > 1){
-                print("regionId," + e + "," + source + "," + postedBy.toString().replace(/,/g ,"|"));
+                var strToPrint = "regionId," + e + "," + source;
+                var postedBys = postedBy.toString().split(/,/g);
+            	postedBys.forEach(function(postOwner){
+            		strToPrint +="," + postOwner + ",";
+		        	var modifiedTimes = db.SOCIAL_POST.aggregate(
+						[
+							{ 
+								$match : {$and : [ { regionId : e }, { source:source }, {postedBy : postOwner} ] }
+							},
+							{
+								$group:
+									{
+										_id : "$regionId",
+										firstModifiedTime : { $min : "$timeInMillis" },
+										lastModifiedTime : {$max : "$timeInMillis" }
+									}
+							 }
+						]
+					);
+					
+					modifiedTimes = modifiedTimes.toArray();
+					if(modifiedTimes != undefined){
+						var firstModifiedTime = modifiedTimes[0].firstModifiedTime.toNumber();
+						var lastModifiedTime = modifiedTimes[0].lastModifiedTime.toNumber();
+						strToPrint += firstModifiedTime + "," + lastModifiedTime;
+					} else {
+						strToPrint += "something went wrong";
+                    }
+				});
+				
+                print(strToPrint);
             }
     });
 	
@@ -104,7 +195,37 @@ sources.forEach(function(source){
                             });
             //Add record to report if multiple postedBy values exist
             if(postedBy.length > 1){
-                print("companyId," + e + "," + source + "," + postedBy.toString().replace(/,/g ,"|"));
+                var strToPrint = "companyId," + e + "," + source;
+                var postedBys = postedBy.toString().split(/,/g);
+            	postedBys.forEach(function(postOwner){
+            		strToPrint +="," + postOwner + ",";
+		        	var modifiedTimes = db.SOCIAL_POST.aggregate(
+						[
+							{ 
+								$match : {$and : [ { companyId : e }, { source:source }, {postedBy : postOwner} ] }
+							},
+							{
+								$group:
+									{
+										_id : "$companyId",
+										firstModifiedTime : { $min : "$timeInMillis" },
+										lastModifiedTime : {$max : "$timeInMillis" }
+									}
+							 }
+						]
+					);
+					
+					modifiedTimes = modifiedTimes.toArray();
+					if(modifiedTimes != undefined){
+						var firstModifiedTime = modifiedTimes[0].firstModifiedTime.toNumber();
+						var lastModifiedTime = modifiedTimes[0].lastModifiedTime.toNumber();
+						strToPrint += firstModifiedTime + "," + lastModifiedTime;
+					} else {
+						strToPrint += "something went wrong";
+                    }
+				});
+				
+                print(strToPrint);
             }
     });
     
