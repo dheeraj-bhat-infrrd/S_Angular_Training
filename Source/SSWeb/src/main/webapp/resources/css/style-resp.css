@@ -1601,8 +1601,8 @@
 	clear:both;
 	}
 	.dsh-date-picker{
-	width:25%;
-	padding:0px;
+		width:20%;
+		padding:0px;
 	}
 	.dash-size{
 	min-height:498px;
@@ -1951,7 +1951,7 @@
 	clear:both;
 	}
 	.dsh-date-picker{
-	width:25%;
+		width:20%;
 	}
 	.dash-size{
 	min-height:340px;

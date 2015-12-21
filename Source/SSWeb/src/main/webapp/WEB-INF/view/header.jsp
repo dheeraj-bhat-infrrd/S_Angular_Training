@@ -101,8 +101,8 @@
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
-    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer">Report</div>
-    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer">Cancel</div>
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer float-left"><spring:message code="label.report.key"/></div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer float-right"><spring:message code="label.cancel.key"/></div>
     		</div>
     	</div>
     </div>

@@ -576,17 +576,40 @@
 	.wc-step2-body-row-hdr {
 	    font-size: 14px;
 	}
-	.bd-cust-rad-item-adj{
-	margin-left: 0px; 
-	float: none;
+	.bd-cust-rad-item-adj {
+		margin-left: 0px;
+		float: none;
 	}
-	.manage-team-radio{
-	width:50%;
-}
-.compl-option-sel{
-	float:none;
-}
-.comp-email-input{
-	float:none;
-}
+	.manage-team-radio {
+		width: 50%;
+	}
+	.compl-option-sel {
+		float: none;
+	}
+	.comp-email-input {
+		float: none;
+	}
+	/*Dashboard statistcs download*/
+	.dash-btn-dl-sd-admin {
+		height: auto;
+		min-height: 32px;
+	}
+	.dsh-date-picker {
+		width: 35%;
+		text-align: center;
+	}
+	.dash-download-sel-item {
+		width: 100%;
+		border-bottom: 1px solid #009FE0;
+	}
+	.dash-down-go-button {
+		width: 25%;
+		height: 32px;
+	}
+	.overlay-disable-wrapper {	
+		width: 100%;
+	}
+	.rpa-btn {
+		width: 130px;
+	}
 }
