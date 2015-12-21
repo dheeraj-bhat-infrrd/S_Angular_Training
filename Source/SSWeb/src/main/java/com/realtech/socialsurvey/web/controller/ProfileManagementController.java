@@ -2925,7 +2925,7 @@ public class ProfileManagementController
 
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.YELP, true );
                     userManagementService.updateRegion( region );
                 }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
