@@ -68,7 +68,6 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
@@ -300,7 +299,7 @@ public class ProfileManagementController
 
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
-                    map );
+                    map , false);
 
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
@@ -360,7 +359,7 @@ public class ProfileManagementController
                 }
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, null, map );
+                    branchProfile, null, map , false);
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
                 branchProfile.setDisclaimer( disclaimer );
@@ -427,7 +426,7 @@ public class ProfileManagementController
 
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, individualProfile, map );
+                    branchProfile, individualProfile, map , false);
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
                 String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
                 individualProfile.setDisclaimer( disclaimer );
@@ -2926,7 +2925,7 @@ public class ProfileManagementController
 
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.YELP, true );
                     userManagementService.updateRegion( region );
                 }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {

@@ -901,4 +901,11 @@ public interface CommonConstants
     public static final String HEADER_TOTAL_USERS = "Total Users ";
     public static final String HEADER_ACTIVE_USERS = "Active Users";
     public static final String HEADER_ADOPTION_RATES = "Adoption Rates";
+    
+    //Zillow connection
+    public static final int ZILLOW_CONNECTED = 1;
+    public static final int ZILLOW_DISCONNECTED = 0;
+
+    // MySQL IS_ZILLOW_CONNECTED column name constant
+    public static final String IS_ZILLOW_CONNECTED_COLUMN = "IS_ZILLOW_CONNECTED";
 }
