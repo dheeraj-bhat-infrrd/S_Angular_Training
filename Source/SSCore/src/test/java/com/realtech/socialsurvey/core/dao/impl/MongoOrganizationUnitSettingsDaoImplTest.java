@@ -176,25 +176,4 @@ public class MongoOrganizationUnitSettingsDaoImplTest
     {
         mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test", "test", "test", false, false );
     }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testUpdateZillowReviewScoreAndAverageWithNullCollectionName() throws InvalidInputException
-    {
-        mongoOrganizationUnitSettingDaoImpl.updateZillowReviewScoreAndAverage( null, 1, 0, 0 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testUpdateZillowReviewScoreAndAverageWithEmptyCollectionName() throws InvalidInputException
-    {
-        mongoOrganizationUnitSettingDaoImpl.updateZillowReviewScoreAndAverage( TestConstants.TEST_EMPTY_STRING, 1, 0, 0 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testUpdateZillowReviewScoreAndAverageWithInvalidIden() throws InvalidInputException
-    {
-        mongoOrganizationUnitSettingDaoImpl.updateZillowReviewScoreAndAverage( TestConstants.TEST_STRING, 0, 0, 0 );
-    }
 }
