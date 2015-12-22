@@ -7631,13 +7631,8 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 }
 
-// Update Disclaimer details
-$(document).on('click', '#disclaimer-text', function() {
-	$('#disclaimer-text').addClass('prof-name-edit');
-});
-
+//Update Disclaimer details
 $(document).on('blur', '#disclaimer-text', function() {
-	$('#disclaimer-text').removeClass('prof-name-edit');
 	
 	var disclaimer = $('#disclaimer-text').val().trim();
 	if (disclaimer == undefined || disclaimer == "") {
