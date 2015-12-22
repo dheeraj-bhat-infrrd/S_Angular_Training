@@ -1381,7 +1381,9 @@ public class SocialManagementController
 
         String agentProfileLink = "";
         AgentSettings agentSettings;
+        String custDisplayName = null;
         try {
+            custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
             agentSettings = userManagementService.getUserSettings( agentId );
             if ( agentSettings != null && agentSettings.getProfileUrl() != null ) {
                 agentProfileLink = agentSettings.getProfileUrl();
@@ -1389,8 +1391,6 @@ public class SocialManagementController
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException caught in postToFacebook(). Nested exception is ", e );
         }
-        
-        String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 
         String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for "
             + agentName + " on Social Survey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
@@ -1522,8 +1522,10 @@ public class SocialManagementController
         ratingFormat.setMinimumFractionDigits( 1 );
         ratingFormat.setMaximumFractionDigits( 1 );
         String agentProfileLink = "";
+        String custDisplayName = null;
         AgentSettings agentSettings;
         try {
+            custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
             agentSettings = userManagementService.getUserSettings( agentId );
             if ( agentSettings != null && agentSettings.getProfileUrl() != null ) {
                 agentProfileLink = agentSettings.getProfileUrl();
@@ -1533,7 +1535,6 @@ public class SocialManagementController
         }
 
         User user = sessionHelper.getCurrentUser();
-        String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
         List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
         String message = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for " + agentName
             + " on SocialSurvey ";
