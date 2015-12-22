@@ -714,4 +714,24 @@ public class UserManagementServiceImplTest
     {
         userManagementServiceImpl.getUserSettings(  0l );
     }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetActiveUserByEmailAndCompanyForNullEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetActiveUserByEmailAndCompanyForEmptyEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, "" );
+    }
+    
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testGetActiveUserByEmailAndCompanyForNoCompanyFound() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, "test" );
+    }
 }
