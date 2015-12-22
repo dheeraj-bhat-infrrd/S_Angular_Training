@@ -8515,7 +8515,12 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 
 
 //Disconnect social media
-function disconnectSocialMedia(socialMedia) {
+function disconnectSocialMedia(socialMedia, isAutoLogin) {
+	if(isAutoLogin) {
+		$('#overlay-toast').html('You are not authorized to disconnect from ' + socialMedia);
+		showToast();
+		return;
+	}
 	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
 		return;
 	}
