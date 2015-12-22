@@ -108,9 +108,11 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                long reviewCount = new Long( reviewCounts );
-                totalReviewCount += reviewCount;
-                totalScore += new Double( reviewAverages ) * reviewCount;
+                if ( reviewCounts != null ) {
+                    long reviewCount = new Long( reviewCounts );
+                    totalReviewCount += reviewCount;
+                    totalScore += new Double( reviewAverages ) * reviewCount;
+                }
             }
         }
         LOG.info( "Parsed the information recieved for branch id : " + branchId );
@@ -196,9 +198,11 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                long reviewCount = new Long( branchReviewCounts );
-                totalReviewCount += reviewCount;
-                totalScore += new Double( branchReviewAverages ) * reviewCount;
+                if ( branchReviewCounts != null ) {
+                    long reviewCount = new Long( branchReviewCounts );
+                    totalReviewCount += reviewCount;
+                    totalScore += new Double( branchReviewAverages ) * reviewCount;
+                }
             }
             String individualReviewCounts = String.valueOf( row[7] );
             String individualReviewAverages = String.valueOf( row[8] );
@@ -219,9 +223,11 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                long reviewCount = new Long( individualReviewCounts );
-                totalReviewCount += reviewCount;
-                totalScore += new Double( individualReviewAverages ) * reviewCount;
+                if ( individualReviewCounts != null ) {
+                    long reviewCount = new Long( individualReviewCounts );
+                    totalReviewCount += reviewCount;
+                    totalScore += new Double( individualReviewAverages ) * reviewCount;
+                }
             }
         }
         LOG.info( "Parsed the information recieved for region id : " + regionId );
@@ -312,9 +318,11 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                long reviewCount = new Long( regionReviewCounts );
-                totalReviewCount += reviewCount;
-                totalScore += new Double( regionReviewAverages ) * reviewCount;
+                if ( regionReviewCounts != null ) {
+                    long reviewCount = new Long( regionReviewCounts );
+                    totalReviewCount += reviewCount;
+                    totalScore += new Double( regionReviewAverages ) * reviewCount;
+                }
             }
             String branchReviewCounts = String.valueOf( row[7] );
             String branchReviewAverages = String.valueOf( row[8] );
@@ -335,9 +343,11 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                long reviewCount = new Long( branchReviewCounts );
-                totalReviewCount += reviewCount;
-                totalScore += new Double( branchReviewAverages ) * reviewCount;
+                if ( branchReviewCounts != null ) {
+                    long reviewCount = new Long( branchReviewCounts );
+                    totalReviewCount += reviewCount;
+                    totalScore += new Double( branchReviewAverages ) * reviewCount;
+                }
             }
             String individualReviewCounts = String.valueOf( row[10] );
             String individualReviewAverages = String.valueOf( row[11] );
@@ -358,9 +368,11 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                long reviewCount = new Long( individualReviewCounts );
-                totalReviewCount += reviewCount;
-                totalScore += new Double( individualReviewAverages ) * reviewCount;
+                if ( individualReviewCounts != null ) {
+                    long reviewCount = new Long( individualReviewCounts );
+                    totalReviewCount += reviewCount;
+                    totalScore += new Double( individualReviewAverages ) * reviewCount;
+                }
             }
         }
         LOG.info( "Parsed the information recieved for company id : " + companyId );
