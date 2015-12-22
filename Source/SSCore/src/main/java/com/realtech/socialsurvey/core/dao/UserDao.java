@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -23,6 +24,8 @@ public interface UserDao extends GenericDao<User, Long> {
 	public List<User> fetchUsersByEmailId(List<String> emailIds);
 
 	public void deleteUsersByCompanyId(long companyId);
+
+    User getActiveUserByEmailAndCompany( String emailId, Company company ) throws NoRecordsFetchedException;
 
 	// JIRA SS-76 by RM-06 : EOC
 
