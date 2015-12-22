@@ -2995,6 +2995,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
+    public void updateUser( User user )
+    {
+        userDao.update( user );
+
+    }
+
+
+    @Override
+    @Transactional
     public Region getRegionById( long id )
     {
         Region region = regionDao.findById( Region.class, id );
