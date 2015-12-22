@@ -20,8 +20,8 @@
 		</div>
 	</div>
 	<div class="container v-sm-container">
-		<div >
-			<div id="search-panel" class="float-left clearfix" style="width:100%">
+		<div class="clearfix">
+			<div id="search-panel" class="float-left clearfix search-panel-right-sm" >
 				<div id="hierarchy-selection-panel" class="float-left clearfix hierarchy-selection-panel v-um-header">
  					<select id="select-hierarchy-level" class="float-left dash-sel-item-sm">
 						<option value="companyId" data-entity="company"><spring:message code="label.company.key" /></option>
@@ -41,6 +41,8 @@
 					<span id="sm-search-icn" class="um-search-icn" onclick="postsSearch();"></span>
 				</div>
 			
+			
+			</div>
 			<div class="sm-btn-dl-sd-admin  search-panel-item v-um-header">
 				<div id="dsh-dwnld-report-btn" class="sm-down-rep-button float-left cursor-pointer">
 					<spring:message code="label.downloadsocialmonitordata.click" />
@@ -48,10 +50,9 @@
 				<select id="download-survey-reports" class="float-left dash-download-sel-item hide">
 					<option value=3 data-report="social-monitor"><spring:message code="label.downloadsurveydata.three.key" /></option>
 				</select>
-				<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
+				<input id="dsh-start-date" class="dsh-date-picker sm-date-picker-wid"  placeholder="<spring:message code="label.startdate.key" />">
 				<span>-</span>
-				<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />">
-			</div>
+				<input id="dsh-end-date" class="dsh-date-picker sm-date-picker-wid" placeholder="<spring:message code="label.enddate.key" />">
 			</div>
 		</div>
 		<div class="v-sm-tbl-wrapper" id="social-post-list">
