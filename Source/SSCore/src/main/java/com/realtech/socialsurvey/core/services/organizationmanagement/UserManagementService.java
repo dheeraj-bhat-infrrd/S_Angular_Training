@@ -475,5 +475,8 @@ public interface UserManagementService
 
 
     public void updateUser( User user );
+    
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
+        NoRecordsFetchedException;
 }
 // JIRA SS-34 BY RM02 BOC
