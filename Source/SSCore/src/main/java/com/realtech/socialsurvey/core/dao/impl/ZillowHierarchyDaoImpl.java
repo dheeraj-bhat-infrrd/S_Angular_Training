@@ -108,7 +108,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                if ( reviewCounts != null ) {
+                if ( reviewCounts != null && !reviewCounts.equalsIgnoreCase( "null" ) ) {
                     long reviewCount = new Long( reviewCounts );
                     totalReviewCount += reviewCount;
                     totalScore += new Double( reviewAverages ) * reviewCount;
@@ -198,7 +198,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                if ( branchReviewCounts != null ) {
+                if ( branchReviewCounts != null && !branchReviewCounts.equals( "null" ) ) {
                     long reviewCount = new Long( branchReviewCounts );
                     totalReviewCount += reviewCount;
                     totalScore += new Double( branchReviewAverages ) * reviewCount;
@@ -223,7 +223,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                if ( individualReviewCounts != null ) {
+                if ( individualReviewCounts != null && !individualReviewCounts.equals( "null" ) ) {
                     long reviewCount = new Long( individualReviewCounts );
                     totalReviewCount += reviewCount;
                     totalScore += new Double( individualReviewAverages ) * reviewCount;
@@ -318,7 +318,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                if ( regionReviewCounts != null ) {
+                if ( regionReviewCounts != null && !regionReviewCounts.equalsIgnoreCase( "null" ) ) {
                     long reviewCount = new Long( regionReviewCounts );
                     totalReviewCount += reviewCount;
                     totalScore += new Double( regionReviewAverages ) * reviewCount;
@@ -343,7 +343,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                if ( branchReviewCounts != null ) {
+                if ( branchReviewCounts != null && !branchReviewCounts.equals( "null" ) ) {
                     long reviewCount = new Long( branchReviewCounts );
                     totalReviewCount += reviewCount;
                     totalScore += new Double( branchReviewAverages ) * reviewCount;
@@ -368,7 +368,7 @@ public class ZillowHierarchyDaoImpl implements ZillowHierarchyDao
                     }
                 }
             } else {
-                if ( individualReviewCounts != null ) {
+                if ( individualReviewCounts != null && !individualReviewCounts.equals( "null" )  ) {
                     long reviewCount = new Long( individualReviewCounts );
                     totalReviewCount += reviewCount;
                     totalScore += new Double( individualReviewAverages ) * reviewCount;
