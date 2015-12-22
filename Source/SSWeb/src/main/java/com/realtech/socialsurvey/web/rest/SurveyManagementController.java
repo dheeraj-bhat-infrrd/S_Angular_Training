@@ -296,8 +296,10 @@ public class SurveyManagementController
                             .getMoodList().contains( mood.toLowerCase() ) ) ) ) {
                         survey.setUnderResolution( true );
                         surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
+                        
+                        //SS-1435: Send survey details too.
                         emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), customerName,
-                            customerEmail, mood, surveyScore );
+                            customerEmail, mood, surveyScore, surveyDetail );
                     }
 
                 }
