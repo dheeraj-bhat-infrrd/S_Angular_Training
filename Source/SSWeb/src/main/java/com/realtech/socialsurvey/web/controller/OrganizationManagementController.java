@@ -1218,7 +1218,6 @@ public class OrganizationManagementController
                 originalSurveySettings.setAutoPostEnabled( isAutopostEnabled );
                 originalSurveySettings.setShow_survey_above_score( (float) minPostRating );
                 originalSurveySettings.setAuto_post_score( (float) minPostRating );
-                originalSurveySettings.setAuto_post_score( (float) minPostRating );
 
                 LOG.info( "Updating Survey Settings Min score" );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL,
