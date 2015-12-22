@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -271,6 +273,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private GenericDao<LoopProfileMapping, Long> loopProfileMappingDao;
 
+    @Autowired
+    private ZillowHierarchyDao zillowHierarchyDao;
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -5396,6 +5400,494 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<Branch> branches = branchDao.getBranchForBranchIds( branchIds );
         LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
         return branches;
+    }
+    
+
+    /**
+     * Method to change profileurl of entity on delete
+     * JIRA SS-1365
+     * 
+     * @param entityType
+     * @param entityId
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException
+    {
+        LOG.info( "Updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
+        
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entityType : " + entityType );
+        }
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "Invalid Id passed for entityType : " + entityType + ". Id : " + entityId );
+        }
+        String collectionName = null;
+        OrganizationUnitSettings unitSettings = null;
+        switch ( entityType ) {
+            case CommonConstants.AGENT_ID_COLUMN:
+                unitSettings = userManagementService.getUserSettings( entityId );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                break;
+                
+            case CommonConstants.BRANCH_ID_COLUMN:
+                try {
+                    unitSettings = getBranchSettingsDefault( entityId );
+                } catch ( NoRecordsFetchedException e ) {
+                    throw new InvalidInputException( "No branch setting exists for ID : " + entityId );
+                }
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                break;
+                
+            case CommonConstants.REGION_ID_COLUMN:
+                unitSettings = getRegionSettings( entityId );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                break;
+
+            default:
+                throw new InvalidInputException( "Invalid entity type : " + entityType );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "No unit setting with the entity type : " + entityType + " ID : " + entityId + " found." );
+        }
+
+        //Get the contact details
+        ContactDetailsSettings contactDetails = unitSettings.getContact_details();
+        if ( contactDetails == null ) {
+            throw new InvalidInputException( "Invalid profile name found for userID : " + entityId );
+        }
+
+        //Get name
+        if ( contactDetails.getName() == null || contactDetails.getName().isEmpty() ) {
+            throw new InvalidInputException( "Name cannot be empty. (entityType : " + entityType + " ID : " + entityId );
+        }
+        String name = contactDetails.getName();
+        //Convert to lower case
+        name = name.toLowerCase();
+        //Replace space with -
+        name = name.replace( ' ', '-' );
+        
+        //Set profile name
+        String newProfileName = name + "-" + entityId;
+        
+
+        //Get existing profileUrl
+        String existingProfileUrl = unitSettings.getProfileUrl();
+        if ( existingProfileUrl == null || existingProfileUrl.isEmpty() ) {
+            throw new InvalidInputException( "Existing profile url cannot be empty" );
+        }
+        String subUrl = existingProfileUrl.substring( 0, existingProfileUrl.lastIndexOf( '/' ) );
+        String newProfileUrl = subUrl + "/" + newProfileName;
+        if ( newProfileUrl.equals( existingProfileUrl ) ) {
+            LOG.debug( "There is no need to update profile url." );
+
+        } else {
+            //Update profileUrl in Mongo
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, newProfileUrl, unitSettings, collectionName );
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, newProfileName, unitSettings, collectionName );
+            
+        }
+        LOG.info( "Finished updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
+    }
+
+    /*/**
+     * Method to fetch regions connected to zillow
+     * @param regionIds
+     * */
+    /*@Override
+    @Transactional
+    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds )
+    {
+        if ( regionIds == null || regionIds.isEmpty() ) {
+            LOG.error( "Region ids passed cannot be null or empty " );
+            return null;
+        }
+        LOG.info( "Method getRegionsConnectedToZillow called to fetch regions connected to zillow for region ids : "
+            + regionIds );
+        Set<Long> zillowConnectedRegionIds = new HashSet<Long>();
+        LOG.info( "Fetching region setings for regions ids" );
+        List<OrganizationUnitSettings> regionSettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsForMultipleIds( new HashSet<Long>( regionIds ),
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        LOG.info( "Fetched region setings for regions ids" );
+        if ( regionSettings == null || regionSettings.isEmpty() ) {
+            LOG.error( "Region settings could not be found for region ids : " + regionIds );
+            return null;
+        }
+        // Checking whether any region settings has zillow token set
+        LOG.info( "Checking whether any region settings has zillow token set" );
+        for ( OrganizationUnitSettings regionSetting : regionSettings ) {
+            if ( regionSetting != null && regionSetting.getSocialMediaTokens() != null
+                && regionSetting.getSocialMediaTokens().getZillowToken() != null ) {
+                zillowConnectedRegionIds.add( regionSetting.getIden() );
+            }
+        }
+        LOG.info( "Found " + zillowConnectedRegionIds.size() + " regions connected to zillow" );
+        LOG.info( "Method getRegionsConnectedToZillow called to fetch regions connected to zillow for region ids : "
+            + regionIds );
+        return zillowConnectedRegionIds;
+    }*/
+
+
+    /*/**
+     * Method to fetch branches connected to zillow
+     * @param regionIds
+     * @throws InvalidInputException
+     * */
+   /* @Override
+    @Transactional
+    public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException
+    {
+        if ( branchIds == null || branchIds.isEmpty() ) {
+            LOG.error( "Branch ids passed cannot be null or empty in getBranchesUnderRegionsConnectedToZillow()" );
+            throw new InvalidInputException(
+                "Branch ids passed cannot be null or empty in getBranchesUnderRegionsConnectedToZillow()" );
+        }
+        LOG.info( "Method to fetch branch settings for branch ids : " + branchIds
+            + ", getBranchesUnderRegionConnectedToZillow called" );
+        List<OrganizationUnitSettings> branchSettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsForMultipleIds( branchIds,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        if ( branchSettings == null || branchSettings.isEmpty() ) {
+            LOG.error( "Branch settings could not be found for branch ids : " + branchIds );
+            return null;
+        }
+        LOG.info( "Fitering branch ids which have zillow social media token" );
+        Set<Long> zillowConnectedBranchIds = new HashSet<Long>();
+        for ( OrganizationUnitSettings branchSetting : branchSettings ) {
+            if ( branchSetting != null && branchSetting.getSocialMediaTokens() != null
+                && branchSetting.getSocialMediaTokens().getZillowToken() != null )
+                zillowConnectedBranchIds.add( branchSetting.getIden() );
+        }
+        LOG.info( "Method to fetch branch settings for branch ids : " + branchIds
+            + ", getBranchesUnderRegionConnectedToZillow call ended" );
+        return zillowConnectedBranchIds;
+    }*/
+
+
+    /*/**
+     * Method to fetch individuals for regions connected to zillow
+     * @param regionIds
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * */
+    /*@Override
+    @Transactional
+    public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        if ( regionIds == null || regionIds.isEmpty() )regionId
+            throw new InvalidInputException(
+                "Region ids passed cannot be null or empty in getIndividualsForRegionsConnectedWithZillow()" );
+        List<AgentSettings> agentSettingsList = profileManagementService.getIndividualsByRegionIds( regionIds );
+        Set<Long> zillowConnectedIndividualIds = new HashSet<Long>();
+        if ( agentSettingsList == null || agentSettingsList.isEmpty() ) {
+            LOG.error( "Agents settings could not be found for regions ids : " + regionIds );
+            return null;
+        }
+        for ( AgentSettings agentSettings : agentSettingsList ) {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getZillowToken() != null ) {
+                zillowConnectedIndividualIds.add( agentSettings.getIden() );
+            }
+        }
+        return zillowConnectedIndividualIds;
+    }*/
+
+
+    /*/**
+     * Method to fetch individuals for company connected to zillow
+     * @param regionIds
+     * @throws InvalidInputException
+     * */
+    /*@Override
+    @Transactional
+    public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
+        ProfileNotFoundException, NoRecordsFetchedException
+    {
+        if ( companyId <= 0l )
+            throw new InvalidInputException( "Invalid company id passed in getIndividualsForRegionsConnectedWithZillow()" );
+        List<AgentSettings> agentSettingsList = profileManagementService.getIndividualsForCompany( companyId );
+        Set<Long> zillowConnectedIndividualIds = new HashSet<Long>();
+        if ( agentSettingsList == null || agentSettingsList.isEmpty() ) {
+            LOG.error( "Agents settings could not be found for company id : " + companyId );
+            return null;
+        }
+        for ( AgentSettings agentSettings : agentSettingsList ) {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getZillowToken() != null ) {
+                zillowConnectedIndividualIds.add( agentSettings.getIden() );
+            }
+        }
+        return zillowConnectedIndividualIds;
+    }*/
+
+
+    /*/**
+     * Method to fetch individuals for branches connected to zillow
+     * @param regionIds
+     * @throws InvalidInputException
+     * */
+    /*@Override
+    @Transactional
+    public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException
+    {
+        if ( branchIds == null || branchIds.isEmpty() )
+            throw new InvalidInputException(
+                "Branch ids passed cannot be null or empty in getIndividualsForBranchesConnectedWithZillow()" );
+        List<AgentSettings> agentSettingsList = profileManagementService.getIndividualsByBranchIds( branchIds );
+        Set<Long> zillowConnectedIndividualIds = new HashSet<Long>();
+        if ( agentSettingsList == null || agentSettingsList.isEmpty() ) {
+            LOG.error( "Agents settings could not be found for branch ids : " + branchIds );
+            return null;
+        }
+        for ( AgentSettings agentSettings : agentSettingsList ) {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getZillowToken() != null ) {
+                zillowConnectedIndividualIds.add( agentSettings.getIden() );
+            }
+        }
+        return zillowConnectedIndividualIds;
+    }*/
+
+
+   /* /**
+     * Method to get all the ids of regions, branches and individuals under a company connected to zillow
+     * */
+   /* @Override
+    public Map<String, Set<Long>> getAllIdsUnderCompanyConnectedToZillow( long companyId )
+    {
+        Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
+        try {
+            if ( companyId <= 0l ) {
+                LOG.error( "Invalid company Id passed in getAllIdsUnderCompanyConnectedToZillow" );
+                throw new InvalidInputException( "Invalid company Id passed in getAllIdsUnderCompanyConnectedToZillow" );
+            }
+
+            // Fetch all regions under company
+            List<Region> regions = getRegionsForCompany( companyId );
+            Set<Long> regionIds = new HashSet<Long>();
+
+            if ( regions == null || regions.isEmpty() ) {
+                LOG.info( "Could not find regions for company id: " + companyId );
+            } else {
+
+                for ( Region region : regions ) {
+                    regionIds.add( region.getRegionId() );
+                }
+
+                // Get Regions connected to zillow
+                Set<Long> zillowConnectedRegions = getRegionsConnectedToZillow( regionIds );
+
+                if ( zillowConnectedRegions != null && !zillowConnectedRegions.isEmpty() )
+                    hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_REGION, zillowConnectedRegions );
+
+                hierarchyIdsMap.putAll( getAllIdsUnderRegionsConnectedToZillow( regionIds ) );
+
+                Set<Long> branchIds = new HashSet<Long>();
+
+                // Fetch all branches under company
+                List<Branch> branches = getBranchesUnderCompany( companyId );
+
+                if ( branches == null || branches.isEmpty() ) {
+                    LOG.info( "Could not find branches under company id: " + companyId );
+                } else {
+                    for ( Branch branch : branches ) {
+                        branchIds.add( branch.getBranchId() );
+                    }
+
+                    // Get all Branches under regions of a company connected to zillow
+                    Set<Long> zillowConnectedBranches = getBranchesConnectedToZillow( branchIds );
+
+                    if ( zillowConnectedBranches != null && !zillowConnectedBranches.isEmpty() ) {
+                        if ( hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH ) != null
+                            && !hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH ).isEmpty() ) {
+                            Set<Long> existingBranchIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH );
+                            zillowConnectedBranches.addAll( existingBranchIds );
+                            hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_BRANCH, zillowConnectedBranches );
+                        } else
+                            hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_BRANCH, zillowConnectedBranches );
+                    }
+                }
+
+                // Get all individuals under company
+                List<AgentSettings> individualSettingsList = profileManagementService.getIndividualsForCompany( companyId );
+                Set<Long> zillowConnectedIndividuals = new HashSet<Long>();
+                if ( hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL ) != null
+                    && !hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL ).isEmpty() )
+                    zillowConnectedIndividuals.addAll( hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL ) );
+                if ( individualSettingsList != null && !individualSettingsList.isEmpty() ) {
+                    for ( AgentSettings individualSettings : individualSettingsList ) {
+                        if ( individualSettings != null && individualSettings.getSocialMediaTokens() != null
+                            && individualSettings.getSocialMediaTokens().getZillowToken() != null ) {
+                            zillowConnectedIndividuals.add( individualSettings.getIden() );
+                        }
+                    }
+                } else {
+                    LOG.info( "Could not find individuals for company id: " + companyId );
+                }
+
+                if ( zillowConnectedIndividuals != null && !zillowConnectedIndividuals.isEmpty() ) {
+                    hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_INDIVIDUAL, zillowConnectedIndividuals );
+                }
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Could not fetch unit settings for company id : " + companyId, e );
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "Could not fetch unit settings for company id : " + companyId, e );
+        } catch ( ProfileNotFoundException e ) {
+            LOG.error( "Could not fetch unit settings for company id : " + companyId, e );
+        }
+        return hierarchyIdsMap;
+    }*/
+
+
+    /*
+    /**
+     * Method to get all the ids of branches and individuals under a region connected to zillow
+     * */
+    /*@Override
+    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds )
+    {
+        Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
+        try {
+            // Fetch all branches under regions
+            List<Branch> branches = getBranchesByRegionIds( regionIds );
+            Set<Long> branchIds = new HashSet<Long>();
+            Set<Long> zillowConnectedIndividualIds = new HashSet<Long>();
+
+            if ( branches == null || branches.isEmpty() ) {
+                LOG.info( "Could not find branches for region ids: " + regionIds );
+            } else {
+                for ( Branch branch : branches ) {
+                    branchIds.add( branch.getBranchId() );
+                }
+
+                // Get Branches connected to zillow
+                Set<Long> zillowConnectedBranches = getBranchesConnectedToZillow( branchIds );
+                if ( zillowConnectedBranches != null && !zillowConnectedBranches.isEmpty() )
+                    hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_BRANCH, zillowConnectedBranches );
+
+                // Get individuals under branches of region 
+                Set<Long> individualIdsUnderBranch = getIndividualsForBranchesConnectedWithZillow( branchIds );
+
+                // get all individuals under regions
+                Set<Long> individualIdsUnderRegion = getIndividualsForRegionsConnectedWithZillow( regionIds );
+
+                if ( individualIdsUnderRegion != null && !individualIdsUnderRegion.isEmpty() )
+                    zillowConnectedIndividualIds.addAll( individualIdsUnderRegion );
+                if ( individualIdsUnderBranch != null && !individualIdsUnderBranch.isEmpty() )
+                    zillowConnectedIndividualIds.addAll( individualIdsUnderBranch );
+                if ( zillowConnectedIndividualIds != null && !zillowConnectedIndividualIds.isEmpty() )
+                    hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_INDIVIDUAL, zillowConnectedIndividualIds );
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Could not fetch unit settings for region ids : " + regionIds, e );
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "Could not found unit settings for region ids : " + regionIds, e );
+        }
+        return hierarchyIdsMap;
+    }*/
+
+
+    /*
+    /**
+     * Method to get all individual ids under a region connected to zillow
+     * */
+    /*@Override
+    public Map<String, Set<Long>> getAllIdsUnderBranchConnectedToZillow( long branchId )
+    {
+        Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
+        try {
+            // get all individuals under branch connected with zillow,
+            Set<Long> individualIds = getIndividualsForBranchesConnectedWithZillow( new HashSet<Long>(
+                Arrays.asList( new Long[] { branchId } ) ) );
+            if ( individualIds != null && !individualIds.isEmpty() )
+                hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_INDIVIDUAL, individualIds );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Could not fetch individuals under branch id: " + branchId, e );
+        }
+        return hierarchyIdsMap;
+    }*/
+
+    @Override
+    @Transactional
+    public Set<Long> getAllRegionsUnderCompanyConnectedToZillow( long companyId, int start_index, int batch_size )
+        throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            LOG.error( "Invalid companyId passed in getAllRegionsUnderCompanyConnectedToZillow" );
+            throw new InvalidInputException( "Invalid companyId passed in getAllRegionsUnderCompanyConnectedToZillow" );
+        }
+
+        return zillowHierarchyDao.getRegionIdsUnderCompanyConnectedToZillow( companyId, start_index, batch_size );
+    }
+
+
+    @Override
+    @Transactional
+    public Set<Long> getAllBranchesUnderProfileTypeConnectedToZillow( String profileType, long iden,
+        int start_index, int batch_size ) throws InvalidInputException
+    {
+
+        if ( profileType == null || profileType.isEmpty() ) {
+            LOG.error( "profile type passed cannot be null or empty in getAllBranchesUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException(
+                "profile type passed cannot be null or empty in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
+
+        if ( iden <= 0l ) {
+            LOG.error( "Invalid id passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException( "Invalid id passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
+
+        switch ( profileType ) {
+            case CommonConstants.PROFILE_TYPE_COMPANY:
+                return zillowHierarchyDao.getBranchIdsUnderCompanyConnectedToZillow( iden, start_index , batch_size);
+
+            case CommonConstants.PROFILE_TYPE_REGION:
+                return zillowHierarchyDao.getBranchIdsUnderRegionConnectedToZillow( iden, start_index , batch_size );
+
+            default:
+                throw new InvalidInputException(
+                    "Invalid profile type passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden,
+        int start_index, int batch_size ) throws InvalidInputException
+    {
+        if ( profileType == null || profileType.isEmpty() ) {
+            LOG.error( "profile type passed cannot be null or empty in getAllUsersUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException(
+                "profile type passed cannot be null or empty in getAllUsersUnderProfileTypeConnectedToZillow" );
+        }
+
+        if ( iden <= 0l ) {
+            LOG.error( "Invalid id passed in getAllUsersUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException( "Invalid id passed in getAllUsersUnderProfileTypeConnectedToZillow" );
+        }
+
+        switch ( profileType ) {
+            case CommonConstants.PROFILE_TYPE_COMPANY:
+                return zillowHierarchyDao.getUserIdsUnderCompanyConnectedToZillow( iden, start_index , batch_size );
+
+            case CommonConstants.PROFILE_TYPE_REGION:
+                return zillowHierarchyDao.getUserIdsUnderRegionConnectedToZillow( iden, start_index , batch_size);
+
+            case CommonConstants.PROFILE_TYPE_BRANCH:
+                return zillowHierarchyDao.getUserIdsUnderBranchConnectedToZillow( iden, start_index , batch_size );
+
+            default:
+                throw new InvalidInputException(
+                    "Invalid profile type passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
     }
 }
 // JIRA: SS-27: By RM05: EOC

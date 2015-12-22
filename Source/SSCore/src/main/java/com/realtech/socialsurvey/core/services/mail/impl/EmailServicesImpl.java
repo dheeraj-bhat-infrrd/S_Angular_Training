@@ -1534,7 +1534,7 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl )
+        String surveyLink, String logoUrl ) throws InvalidInputException
     {
 
         LOG.info( "Sending manual survey reminder mail." );

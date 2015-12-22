@@ -881,4 +881,31 @@ public interface CommonConstants
     // Zillow Organization Unit Settings Mongo Column constants
     public static final String ZILLOW_REVIEW_COUNT_COLUMN = "zillowReviewCount";
     public static final String ZILLOW_REVIEW_AVERAGE_COLUMN = "zillowReviewAverage";
+
+    // Zillow total score constant
+    public static final String ZILLOW_TOTAL_SCORE = "zillowTotalScore";
+
+    // Profile url constants
+    public static final String PROFILE_TYPE_COMPANY = "company";
+    public static final String PROFILE_TYPE_REGION = "region";
+    public static final String PROFILE_TYPE_BRANCH = "branch";
+    public static final String PROFILE_TYPE_INDIVIDUAL = "individual";
+
+    // Zillow fetch failure response
+    public static final String ZILLOW_FETCH_FAIL_RESPONSE = "{\"zillowCallBreak\":true}";
+
+    // Constants for User Adoption Report
+    public static final String HEADER_COMPANY = "Company";
+    public static final String HEADER_REGION = "Region";
+    public static final String HEADER_BRANCH = "Branch";
+    public static final String HEADER_TOTAL_USERS = "Total Users ";
+    public static final String HEADER_ACTIVE_USERS = "Active Users";
+    public static final String HEADER_ADOPTION_RATES = "Adoption Rates";
+    
+    //Zillow connection
+    public static final int ZILLOW_CONNECTED = 1;
+    public static final int ZILLOW_DISCONNECTED = 0;
+
+    // MySQL IS_ZILLOW_CONNECTED column name constant
+    public static final String IS_ZILLOW_CONNECTED_COLUMN = "IS_ZILLOW_CONNECTED";
 }

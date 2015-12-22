@@ -128,58 +128,10 @@ public class MongoSurveyDetailsDaoImplTest
 
 
     @Test
-    public void testGetOrganizationUnitSettingsByColumnNameAndIdWithNullColumnName()
-    {
-        assertNull( mongoSurveyDetailsDaoImpl.getOrganizationUnitSettingsByColumnNameAndId( null, 1 ) );
-    }
-
-
-    @Test
-    public void testGetOrganizationUnitSettingsByColumnNameAndIdWithEmptyColumnName()
-    {
-        assertNull( mongoSurveyDetailsDaoImpl.getOrganizationUnitSettingsByColumnNameAndId( TestConstants.TEST_EMPTY_STRING, 1 ) );
-    }
-
-
-    @Test
-    public void testGetOrganizationUnitSettingsByColumnNameAndIdWithInvalidId()
-    {
-        assertNull( mongoSurveyDetailsDaoImpl.getOrganizationUnitSettingsByColumnNameAndId( TestConstants.TEST_STRING, 0 ) );
-    }
-
-
-    @Test
-    public void testGetOrganizationUnitSettingsByColumnNameAndIdWithInvalidColumnName()
-    {
-        assertNull( mongoSurveyDetailsDaoImpl.getOrganizationUnitSettingsByColumnNameAndId( TestConstants.TEST_STRING, 1 ) );
-    }
-
-
-    @Test
-    public void testGetZillowReviewCountBasedOnColumnNameAndIdAndIdWheOrganiztionUnitSettingsIsNull()
-    {
-        Mockito.doReturn( null ).when( mongoSurveyDetailsDaoImpl )
-            .getOrganizationUnitSettingsByColumnNameAndId( TestConstants.TEST_STRING, 1 );
-        assertEquals( "Zillow review count does not match expected", 0,
-            mongoSurveyDetailsDaoImpl.getZillowReviewCountBasedOnColumnNameAndId( TestConstants.TEST_STRING, 1 ) );
-    }
-
-
-    @Test
-    public void testGetZillowReviewAverageBasedOnColumnNameAndIdAndIdWheOrganiztionUnitSettingsIsNull()
-    {
-        Mockito.doReturn( null ).when( mongoSurveyDetailsDaoImpl )
-            .getOrganizationUnitSettingsByColumnNameAndId( TestConstants.TEST_STRING, 1 );
-        assertEquals( "Zillow review average does not match expected", 0,
-            mongoSurveyDetailsDaoImpl.getZillowReviewAverageBasedOnColumnNameAndId( TestConstants.TEST_STRING, 1 ) );
-    }
-
-
-    @Test
     public void testGetFeedBacksCountWithIncludeZillowReviewsAsTrueAndNotRecommendedTrue()
     {
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
-        long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( TestConstants.TEST_STRING, 2, 3.5, 3.5, false, true, true );
+        long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( TestConstants.TEST_STRING, 2, 3.5, 3.5, false, true, true, 2 );
         assertEquals( "FeedBack count does not match expected", 10, count );
     }
 
@@ -187,17 +139,9 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetFeedBacksCountWithIncludeZillowReviewsAsTrueAndNotRecommendedFalse()
     {
-        OrganizationUnitSettings organizationUnitSettings = new OrganizationUnitSettings();
-        organizationUnitSettings.setZillowReviewCount( 2 );
-        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( Mockito.anyLong(), Mockito.anyString() ) )
-            .thenReturn( organizationUnitSettings );
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
-        Mockito.doReturn( organizationUnitSettings ).when( mongoSurveyDetailsDaoImpl )
-            .getOrganizationUnitSettingsByColumnNameAndId( CommonConstants.COMPANY_ID_COLUMN, 1 );
-        Mockito.doReturn( 2l ).when( mongoSurveyDetailsDaoImpl )
-            .getZillowReviewCountBasedOnColumnNameAndId( CommonConstants.COMPANY_ID_COLUMN, 1 );
         long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 3.5, 3.5, false, false,
-            true );
+            true, 2 );
         assertEquals( "FeedBack count does not match expected", 12, count );
     }
 
@@ -207,7 +151,7 @@ public class MongoSurveyDetailsDaoImplTest
     {
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
         long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 3.5, 3.5, false, false,
-            false );
+            false, 2 );
         assertEquals( "FeedBack count does not match expected", 10, count );
     }
 
@@ -217,7 +161,7 @@ public class MongoSurveyDetailsDaoImplTest
     {
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 2l );
         long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 0, 3.0, false, true,
-            false );
+            false, 2 );
         assertEquals( "FeedBack count does not match expected", 2, count );
     }
 
@@ -225,24 +169,13 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetRatingForPastNdaysWithIncludeZillowReviewsAsTrueWhenReviewCountIsZero()
     {
-        OrganizationUnitSettings organizationUnitSettings = new OrganizationUnitSettings();
-        organizationUnitSettings.setZillowReviewCount( 10 );
-        organizationUnitSettings.setZillowReviewAverage( 4 );
         Mockito.when(
             mongoTemplate.aggregate( (TypedAggregation<SurveyDetails>) Mockito.any(), Mockito.anyString(),
                 Mockito.eq( SurveyDetails.class ) ) ).thenReturn(
             new AggregationResults<SurveyDetails>( new ArrayList<SurveyDetails>(), new BasicDBObject() ) );
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 0l );
-        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( Mockito.anyLong(), Mockito.anyString() ) )
-            .thenReturn( organizationUnitSettings );
-        Mockito.doReturn( organizationUnitSettings ).when( mongoSurveyDetailsDaoImpl )
-            .getOrganizationUnitSettingsByColumnNameAndId( CommonConstants.COMPANY_ID_COLUMN, 1 );
-        Mockito.doReturn( 10l ).when( mongoSurveyDetailsDaoImpl )
-            .getZillowReviewCountBasedOnColumnNameAndId( CommonConstants.COMPANY_ID_COLUMN, 1 );
-        Mockito.doReturn( 4l ).when( mongoSurveyDetailsDaoImpl )
-            .getZillowReviewAverageBasedOnColumnNameAndId( CommonConstants.COMPANY_ID_COLUMN, 1 );
         double average = mongoSurveyDetailsDaoImpl.getRatingForPastNdays( CommonConstants.COMPANY_ID_COLUMN, 2, 90, false,
-            false, true );
+            false, true, 10, 40 );
         assertEquals( "Average does not match expected", 4, average, 0 );
     }
 
@@ -250,23 +183,12 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetRatingForPastNdaysWithIncludeZillowReviewsAsTrueWhenResultsIsNull()
     {
-        OrganizationUnitSettings organizationUnitSettings = new OrganizationUnitSettings();
-        organizationUnitSettings.setZillowReviewCount( 10 );
-        organizationUnitSettings.setZillowReviewAverage( 4 );
         Mockito.when(
             mongoTemplate.aggregate( (TypedAggregation<SurveyDetails>) Mockito.any(), Mockito.anyString(),
                 Mockito.eq( SurveyDetails.class ) ) ).thenReturn( null );
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
-        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( Mockito.anyLong(), Mockito.anyString() ) )
-            .thenReturn( organizationUnitSettings );
-        Mockito.doReturn( organizationUnitSettings ).when( mongoSurveyDetailsDaoImpl )
-            .getOrganizationUnitSettingsByColumnNameAndId( CommonConstants.COMPANY_ID_COLUMN, 1 );
-        Mockito.doReturn( 10l ).when( mongoSurveyDetailsDaoImpl )
-            .getZillowReviewCountBasedOnColumnNameAndId( CommonConstants.COMPANY_ID_COLUMN, 1 );
-        Mockito.doReturn( 40l ).when( mongoSurveyDetailsDaoImpl )
-            .getZillowReviewAverageBasedOnColumnNameAndId( CommonConstants.COMPANY_ID_COLUMN, 1 );
         double average = mongoSurveyDetailsDaoImpl.getRatingForPastNdays( CommonConstants.COMPANY_ID_COLUMN, 2, 90, false,
-            false, true );
+            false, true, 10, 40 );
         assertEquals( "Average does not match expected", 4, average, 0 );
     }
 }

@@ -1792,7 +1792,7 @@ button.paypal.is-active {
 	min-width : 120px;
 	float: left;
 	margin-left: 15px;
-	margin-top: 3%;
+	margin-top: 25px;
 }
 
 .tweet-panel-item,.posts-panel-item {
@@ -2804,6 +2804,13 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
     margin-bottom: 10px;
     cursor:pointer;
 }
+.comp-sq-smile-icn-container {
+    
+    height: 62px;
+    line-height: 62px;
+    margin-bottom: 10px;
+    cursor:pointer;
+}
 
 .sq-smile-icn-text {
     margin-left: 0px;
@@ -2812,6 +2819,9 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
     border-radius: 3px;
     color: #fff;
     font-size: 18px;
+}
+.comp-top-mar{
+margin-top:10px;
 }
 
 .sq-smile-happy-text {
@@ -3210,8 +3220,8 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
 }
 
 .ov-payment-container {
-	height: 100%;
-	overflow: auto;
+	/* height: 100%;
+	overflow: auto; */
 }
 
 .ov-payment-shadow {
@@ -3890,8 +3900,9 @@ img.prof-image {
 .sq-img-adj {
 	position: absolute;
 	top: 0;
-	width: 50px;
-	height: 40px;
+	width: 26px;
+	height: 26px;
+	margin: 6px 12px;
 }
 
 .bg-black-info {
@@ -4131,7 +4142,7 @@ img.prof-image {
 	border-radius: 3px;
 	padding-left: 5px;
 	outline: none;
-	min-width: 200px;
+	min-width: 215px;
 }
 
 
@@ -4261,7 +4272,7 @@ img.prof-image {
 
 .sm-btn-dl-sd-admin{
 	
-	float: left;
+	float: right;
 	margin-right: 10px;
 	color: #009FE0;
 	border-radius: 3px;
@@ -4269,7 +4280,7 @@ img.prof-image {
 	border: 1px solid #009FE0;
 	height: 32px;
 	width: 25%;
-	min-width: 215px;
+	min-width: 240px;
 	max-width: 90%;
 	max-width: calc(100% - 20px);
 	text-align: center;
@@ -4922,7 +4933,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 }
 
 .bd-hr-tabs-header-item {
-	width: 25%;
+	width: 30%;
 }
 
 .bd-hdr-active {
@@ -4969,7 +4980,7 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	margin: 30px auto;
 }
 
-.bd-frm-left {
+/* .bd-frm-left { 
 	line-height: 40px;
 	margin-right: 20px;
 	width: 200px;
@@ -4977,16 +4988,43 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	text-align: right;
 	font-family: opensanslight;
 	font-weight: bold !important;
+} */
+
+.bd-frm-left { 
+	line-height: 40px;
+	margin-right: 20px;
+	width: 25%;
+	min-width: 96px;
+	min-height: 10px;
+	text-align: right;
+	font-family: opensanslight;
+	font-weight: bold !important;
 }
 
-.bd-frm-rt-txt {
+.bd-frm-right{
+width: 50%;
+    min-width: 150px;
+}
+
+/* .bd-frm-rt-txt {
 	width: 275px;
 	padding: 0 10px;
 	height: 40px;
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+
+} */
+.bd-frm-rt-txt {
+	width: 80%;
+	padding: 0 10px;
+	height: 40px;
+	border-radius: 4px;
+	box-shadow: none;
+	border: 1px solid #dcdcdc;
+	min-width: 180px;
 	background: #fff;
+
 }
 
 .bd-hr-form-item {
@@ -4997,12 +5035,20 @@ select.rfr_txt_fld,select.rfr_input_fld{
 	position: relative;
 }
 
-.bd-frm-rt-dd-list {
+/* .bd-frm-rt-dd-list {
 	position: absolute;
 	top: 39px;
 	border: 1px solid #dcdcdc;
 	width: 275px;
 	z-index: 999;
+} */
+.bd-frm-rt-dd-list {
+	position: absolute;
+	top: 39px;
+	border: 1px solid #dcdcdc;
+	width: 80%;
+	z-index: 999;
+	min-width:180px;
 }
 
 .bd-frm-rt-dd-item {
@@ -5095,12 +5141,13 @@ select.rfr_txt_fld,select.rfr_input_fld{
 }
 
 .bd-frm-rt-txt-area {
-	width: 400px;
+	width: 90%;
 	padding: 10px;
 	height: 182px;
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+	min-width:180px;
 }
 
 .bd-dd-img {
@@ -5421,10 +5468,12 @@ td.v-tbl-spacer {
 
 .v-icn-close {
 	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
 }
 
 .v-icn-edit {
 	background: url('../images/edit-1.png') no-repeat center;
+	cursor: pointer;
 }
 
 .user-info-sing-out {
@@ -7017,12 +7066,12 @@ span.review-complete-txt{
 }
 
 .rpa-btn {
-    margin: 10px 64px;
-    display: inline-block;
+	margin: 0px 15px 15px;
 }
 
 .rpa-overlay-btn-cont {
-    margin: 0 -30px;
+	padding: 0 15px;
+	margin: 0 -15px;
 }
 
 textarea.report-abuse-txtbox {
@@ -7201,6 +7250,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .dsh-res-display {
 	padding: 0 10px;
 	cursor: pointer;
+}
+
+.dsh-res-hover {
+	background: #5cc7ef;
+	color: #fff;
 }
 
 .user-edit-btn {
@@ -7854,16 +7908,18 @@ label.url-change-input-label {
     height: 40px;
     line-height: 40px;
     font-size: 16px;
+    margin-left: 5px;
 }
 
 .compl-input {
-	width: 500px;
-	max-width: 100%;
+	    width: 100%;
+    min-width: 270px;
 }
 
 .comp-rating-post {
 	height: 40px;
 	line-height: 40px;
+	margin-left:5px;
 }
 
 .search-panel-item {
@@ -7896,4 +7952,43 @@ label.url-change-input-label {
 }
 .abuse-report-col {
     word-break: break-word;
+}
+.manage-team-radio{
+	width:70%;
+}
+
+/*Payment page styles*/
+.update-card-details-txt {
+	display: block;
+	width: 100% !important;
+	min-width: 100px !important;
+	margin-bottom: 10px;
+	height: 40px;
+	padding: 0 10px;
+}
+
+.card-det-adj {
+	margin-bottom: 30px;
+}
+
+.card-err-txt {
+	line-height: 24px;
+	padding-left: 10px;
+	font-size: 12px;
+	color: #DE3838;
+	margin-bottom: 10px;
+}
+
+.dsh-sel-dropdwn-cont {
+	max-height: 200px;
+}
+.date-wid-pick{
+	width:27%;
+}
+.search-panel-right-sm{
+	width: 70%;
+	margin-bottom: 20px;
+}
+.sm-date-picker-wid{
+	width:27% !important; 
 }

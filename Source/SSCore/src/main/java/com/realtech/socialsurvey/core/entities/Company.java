@@ -110,6 +110,15 @@ public class Company implements Serializable {
 	@OneToMany(mappedBy = "company")
 	private List<RemovedUser> removedUsers;
 
+    @Column ( name = "IS_ZILLOW_CONNECTED")
+    private int isZillowConnected;
+
+    @Column ( name = "ZILLOW_REVIEW_COUNT")
+    private int zillowReviewCount;
+
+    @Column ( name = "ZILLOW_AVERAGE_SCORE")
+    private double zillowAverageScore;
+
 	public Company() {}
 
 	public long getCompanyId() {
@@ -458,4 +467,52 @@ public class Company implements Serializable {
 
 		return removedUser;
 	}
+
+    /**
+     * @return the isZillowConnected
+     */
+    public int getIsZillowConnected()
+    {
+        return isZillowConnected;
+    }
+
+    /**
+     * @param isZillowConnected the isZillowConnected to set
+     */
+    public void setIsZillowConnected( int isZillowConnected )
+    {
+        this.isZillowConnected = isZillowConnected;
+    }
+
+    /**
+     * @return the zillowReviewCount
+     */
+    public int getZillowReviewCount()
+    {
+        return zillowReviewCount;
+    }
+
+    /**
+     * @param zillowReviewCount the zillowReviewCount to set
+     */
+    public void setZillowReviewCount( int zillowReviewCount )
+    {
+        this.zillowReviewCount = zillowReviewCount;
+    }
+
+    /**
+     * @return the zillowAverageScore
+     */
+    public double getZillowAverageScore()
+    {
+        return zillowAverageScore;
+    }
+
+    /**
+     * @param zillowAverageScore the zillowAverageScore to set
+     */
+    public void setZillowAverageScore( double zillowAverageScore )
+    {
+        this.zillowAverageScore = zillowAverageScore;
+    }
 }

@@ -80,6 +80,7 @@ public interface JspResolver {
 	public static final String SURVEY_BUILDER_QUESTION_EDIT = "buildSurvey_questionedit";
 	public static final String SURVEY_BUILDER_QUESTION_NEW = "buildSurvey_questionnew";
 	public static final String SHOW_SURVEY_QUESTIONS = "surveyQuestion";
+	public static final String SHOW_SURVEY_FORM = "surveyForm";
 	public static final String SURVEY_REQUEST = "surveyRequest";
 	public static final String SURVEY_INVITE_SUCCESSFUL = "survey-request-successful";
 

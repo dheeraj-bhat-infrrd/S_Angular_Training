@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -713,5 +714,156 @@ public class UserManagementServiceImplTest
     public void testGetUserSettingsForInvalidAgentId() throws InvalidInputException, NoRecordsFetchedException
     {
         userManagementServiceImpl.getUserSettings(  0l );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignUserToCompanyForNullAdmin() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.assignUserToCompany( null, 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignUserToCompanyForInvalidUserId() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.assignUserToCompany( new User(), 0l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignUserToRegionForNullAdmin() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.assignUserToRegion( null, 0l, 0l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignUserToRegionForInvalidUserId() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.assignUserToRegion( new User(), 0l, 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testAssignUserToRegionForInvalidRegionId() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.assignUserToRegion( new User(), 1l, 10l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testInsertAgentSettingsForNullUser() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.insertAgentSettings( null );
+    }
+    
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGenerateIndividualProfileNameForInvalidUserId() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.generateIndividualProfileName( 0l, "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGenerateIndividualProfileNameForNullEmailId() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.generateIndividualProfileName( 1l, "test", null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGenerateIndividualProfileNameForEmptyEmailId() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.generateIndividualProfileName( 1l, "test", "" );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateProfileUrlInRegionSettingsForNullSettings() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateProfileUrlInRegionSettings( "test", "test", null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateProfileUrlInAgentSettingsForNullSettings() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateProfileUrlInAgentSettings( "test", "test", null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateProfileUrlInCompanySettingsForNullSettings() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateProfileUrlInCompanySettings( "test", "test", null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateProfileUrlInBranchSettingsForNullSettings() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateProfileUrlInBranchSettings( "test", "test", null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserOnCompleteRegistrationForNullUser() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateUserOnCompleteRegistration( null, "test", 01, "test", "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserCountModificationNotificationForNull() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateUserCountModificationNotification( null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testIsValidApiKeyForNullApiKey() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.isValidApiKey( null, "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testIsValidApiKeyForEmptyApiKey() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.isValidApiKey( "", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testIsValidApiKeyForNullApiScret() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.isValidApiKey( "test", null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testIsValidApiKeyForEmptyApiScret() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.isValidApiKey( "test", "" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUsersByUserIdsForNullList() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.getUsersByUserIds( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUsersByUserIdsForEmptyList() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.getUsersByUserIds( new HashSet<Long>() );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetActiveUserByEmailAndCompanyForNullEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetActiveUserByEmailAndCompanyForEmptyEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, "" );
+    }
+    
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testGetActiveUserByEmailAndCompanyForNoCompanyFound() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, "test" );
     }
 }
