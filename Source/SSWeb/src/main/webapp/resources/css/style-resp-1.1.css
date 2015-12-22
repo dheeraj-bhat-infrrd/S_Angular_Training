@@ -273,36 +273,41 @@
 		text-align: center;
 		width: 100%;
 	}
-	.popupUrl{
-	
-	font-size: 14px;
-	width: 350px;
-}
-.urlPopupButton{
-	width: 335px;
-	margin-left: 30px;
-}
-
-.profileForm {
-   
-    margin-left: 2%;
-}
+	.popupUrl {
+		font-size: 14px;
+		width: 350px;
+	}
+	.urlPopupButton {
+		width: 335px;
+		margin-left: 30px;
+	}
+	.profileForm {
+		margin-left: 2%;
+	}
 	.tweet-icn-sm {
-	height: 32px;
-	width: 32px;
-	margin-right:0px;
-}
-.sm-post-row {
-	padding-left: 0px;
-	
-}
-.sm-prof-name {
-	line-height: 30px;
-}
-.sm-custom-img{
-	width:40px;
-	height:40px;
-}
+		height: 32px;
+		width: 32px;
+		margin-right: 0px;
+	}
+	.sm-post-row {
+		padding-left: 0px;
+	}
+	.sm-prof-name {
+		line-height: 30px;
+	}
+	.sm-custom-img {
+		width: 40px;
+		height: 40px;
+	}
+	.reg-prof-url {
+		line-height: 59px;
+		padding-left: 20px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		border-bottom: 1px solid #dcdcdc;
+		border-top: 1px solid #dcdcdc;
+	}
 }
 
 
