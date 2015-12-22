@@ -7992,3 +7992,6 @@ label.url-change-input-label {
 .sm-date-picker-wid{
 	width:27% !important; 
 }
+.social-auth-disabled {
+	cursor: auto !important; 
+}
