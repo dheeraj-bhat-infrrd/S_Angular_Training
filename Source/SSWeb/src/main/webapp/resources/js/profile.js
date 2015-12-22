@@ -1706,6 +1706,8 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	            }
 	        }
 	    } else {
+	    	zillowHierarchyList = [];
+        	zillowHStart = 0;
 	    	switch(curHierarchyLevel){
 	        	case "REGION":
 	        		curHierarchyLevel = "BRANCH";
@@ -1722,8 +1724,6 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	        	default:
 	        		doStopZillowIdFetch = true;
 	    	}
-	    	zillowHierarchyList = [];
-	    	zillowHStart = 0;
 	    }
 	}, payload, false);
 }
