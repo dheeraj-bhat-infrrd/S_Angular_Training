@@ -343,10 +343,11 @@ public interface EmailServices
      * @param companyName
      * @param survey
      * @param surveyLink
+     * @throws InvalidInputException 
      */
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl );
+        String surveyLink, String logoUrl ) throws InvalidInputException;
 
 
     void sendZillowCallExceededMailToAdmin( int count ) throws InvalidInputException, UndeliveredEmailException;

@@ -73,6 +73,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UtilitySer
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
@@ -172,6 +173,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private UtilityService utilityService;
 
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -497,10 +500,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method to deactivate user " + userIdToRemove + " called." );
         User userToBeDeactivated = userDao.findById( User.class, userIdToRemove );
-        if(userToBeDeactivated == null){
-            throw new InvalidInputException("No user found in databse for user id : " + userIdToRemove);
+        if ( userToBeDeactivated == null ) {
+            throw new InvalidInputException( "No user found in databse for user id : " + userIdToRemove );
         }
-        
+
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
         userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
@@ -519,6 +522,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         // Marks all the user profiles for given user as inactive.
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
+
+        //update profile url in mongo if needed
+        organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
+
+        //Disconnect social connections(ensure that social connections history is updated)
+        socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
 
         LOG.info( "Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished." );
     }
@@ -831,7 +840,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
             user.setReviewCount( reviewCount );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
-                CommonConstants.NO_LIMIT, false, false, false ) );
+                CommonConstants.NO_LIMIT, false, false, false, 0, 0 ) );
             users.add( user );
         }
         LOG.info( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );
@@ -1988,6 +1997,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "assignUserToCompany : admin parameter is null" );
             throw new InvalidInputException( "assignUserToCompany : admin parameter is null" );
         }
+        if ( userId <= 0l ) {
+            LOG.error( "assignUserToCompany : userId parameter is null" );
+            throw new InvalidInputException( "assignUserToCompany : userId parameter is null" );
+        }
         LOG.info( "Method to assign user to a branch called for user : " + admin.getUserId() );
         User user = getUserByUserId( userId );
 
@@ -2099,6 +2112,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "assignUserToRegion : admin parameter is null" );
             throw new InvalidInputException( "assignUserToRegion : admin parameter is null" );
         }
+        
+        if ( userId <= 0l ) {
+            LOG.error( "assignUserToRegion : userId parameter is null" );
+            throw new InvalidInputException( "assignUserToRegion : userId parameter is null" );
+        }
+        if ( regionId <= 0l ) {
+            LOG.error( "assignUserToRegion : regionId parameter is null" );
+            throw new InvalidInputException( "assignUserToRegion : regionId parameter is null" );
+        }
         LOG.info( "Method to assign user to a branch called for user : " + admin.getUserId() );
         User user = getUserByUserId( userId );
 
@@ -2163,6 +2185,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void insertAgentSettings( User user ) throws InvalidInputException
     {
+        if(user ==null){
+            throw new InvalidInputException("passed parameter user is null");
+        }
         LOG.info( "Inserting agent settings. User id: " + user.getUserId() );
         AgentSettings agentSettings = new AgentSettings();
         agentSettings.setIden( user.getUserId() );
@@ -2233,6 +2258,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "emailId is null or empty while generating agent profile name" );
         }
+        if ( userId <= 0l  ) {
+            throw new InvalidInputException( "Wrong parameter passed : passed userId is invalid" );
+        }
         String profileName = null;
         String input = null;
         if ( name != null && !name.isEmpty() ) {
@@ -2266,11 +2294,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param profileName
      * @param profileUrl
      * @param agentSettings
+     * @throws InvalidInputException 
      */
     @Override
-    public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings )
+    public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        if(agentSettings == null){
+            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        }
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
             profileName, agentSettings );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
@@ -2287,10 +2319,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param branchSettings
      */
     @Override
-    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings )
+    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in BRANCH SETTINGS started" );
-
+        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        if(branchSettings == null){
+            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, branchSettings,
             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
@@ -2311,10 +2346,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param regionSettings
      */
     @Override
-    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings )
+    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in REGION SETTINGS started" );
-
+        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        if(regionSettings == null){
+            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, regionSettings,
             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
@@ -2336,10 +2374,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Override
     public void updateProfileUrlInCompanySettings( String profileName, String profileUrl,
-        OrganizationUnitSettings companySettings )
+        OrganizationUnitSettings companySettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in COMPANY SETTINGS started" );
-
+        LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
+        if(companySettings == null){
+            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, companySettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -2954,6 +2995,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
+    public void updateUser( User user )
+    {
+        userDao.update( user );
+
+    }
+
+
+    @Override
+    @Transactional
     public Region getRegionById( long id )
     {
         Region region = regionDao.findById( Region.class, id );
@@ -3065,11 +3115,37 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException
     {
         LOG.info( "Method to find users on the basis of user ids started for user ids : " + userIds );
+        if ( userIds == null || userIds.size() <= 0 ) {
+            throw new InvalidInputException( "Invalid input parameter : Null or empty User Id List passed " );
+        }
         List<UserFromSearch> userList = userProfileDao.getUserFromSearchByUserIds( userIds );
         if ( userList == null ) {
             throw new InvalidInputException( "User not found for userId:" + userIds );
         }
         LOG.info( "Method to find users on the basis of user ids ended for user ids : " + userIds );
         return userList;
+    }
+    
+    
+    // Method to return active user with provided email and company
+    @Transactional
+    @Override
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
+        }
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null ) {
+            throw new NoRecordsFetchedException( "No company found with the id " + companyId );
+        }
+        User user = userDao.getActiveUserByEmailAndCompany( emailId, company );
+
+        LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
+        return user;
     }
 }

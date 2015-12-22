@@ -117,7 +117,6 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
     private String googleShareURI;
 
     private FeedStatus status;
-    private long profileId;
     private Timestamp lastFetchedTill;
     private String lastFetchedPostId;
     private String nextPageToken;
@@ -207,7 +206,6 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
                 break;
         }
 
-        profileId = iden;
     }
 
 
@@ -391,7 +389,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 
 
     @Override
-    public boolean processFeed( List<GooglePlusPost> posts, String collection ) throws NonFatalException
+    public boolean processFeed( long iden, List<GooglePlusPost> posts, String collection, GoogleToken token ) throws NonFatalException
     {
         LOG.info( "Process tweets for organizationUnit " + collection );
         Date lastFetchedOn = null;
@@ -401,7 +399,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
             if ( post.getId().equalsIgnoreCase( status.getLastFetchedPostId() ) ) {
                 break;
             }
-            if ( lastFetchedTill == null ) {
+            if ( lastFetchedTill == null || lastFetchedTill.before( post.getCreatedOn() ) ) {
                 socialPost = new GooglePlusSocialPost();
                 socialPost.setPost( post );
                 lastFetchedOn = post.getCreatedOn();
@@ -411,58 +409,47 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
                 socialPost.setPostId( post.getId() );
                 socialPost.setTimeInMillis( post.getCreatedOn().getTime() );
                 socialPost.setPostUrl( post.getUrl() );
-            }
-
-            if ( lastFetchedTill != null && lastFetchedTill.before( post.getCreatedOn() ) ) {
-                socialPost = new GooglePlusSocialPost();
-                socialPost.setPost( post );
-                lastFetchedOn = post.getCreatedOn();
-                socialPost.setPostText( post.getPost() );
-                socialPost.setPostedBy( post.getPostedBy() );
-                socialPost.setSource( FEED_SOURCE );
-                socialPost.setPostId( post.getId() );
-                socialPost.setTimeInMillis( post.getCreatedOn().getTime() );
-                socialPost.setPostUrl( post.getUrl() );
+                socialPost.setToken(token.getGoogleAccessToken());
             }
 
             if ( socialPost == null )
                 break;
             switch ( collection ) {
                 case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
-                    socialPost.setCompanyId( profileId );
+                    socialPost.setCompanyId( iden );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION:
-                    Region region = regionDao.findById( Region.class, profileId );
+                    Region region = regionDao.findById( Region.class, iden );
                     if ( region != null ) {
                         Company company = region.getCompany();
                         if ( company !=  null ) {
                             socialPost.setCompanyId( company.getCompanyId() );
                         }
                     }
-                    socialPost.setRegionId( profileId );
+                    socialPost.setRegionId( iden );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION:
-                    Branch branch = branchDao.findById( Branch.class, profileId );
+                    Branch branch = branchDao.findById( Branch.class, iden );
                     if ( branch != null ) {
                         Company company = branch.getCompany();
                         if ( company != null ) {
                             socialPost.setCompanyId( company.getCompanyId() );
                         }
                     }
-                    socialPost.setBranchId( profileId );
+                    socialPost.setBranchId( iden );
                     break;
 
                 case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION:
-                    User user = userDao.findById( User.class, profileId );
+                    User user = userDao.findById( User.class, iden );
                     if ( user != null ) {
                         Company company = user.getCompany();
                         if ( company != null ) {
                             socialPost.setCompanyId( company.getCompanyId() );
                         }
                     }
-                    socialPost.setAgentId( profileId );
+                    socialPost.setAgentId( iden );
                     break;
             }
 
@@ -491,13 +478,13 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
         status.setLastFetchedPostId( lastFetchedPostId );
         if ( anyRecordInserted ) {
             if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.COMPANY_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.REGION_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.BRANCH_ID_COLUMN, iden );
             } else if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, profileId );
+                surveyHandler.updateModifiedOnColumnForEntity( CommonConstants.AGENT_ID_COLUMN, iden );
             }
         }
 

@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,11 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
@@ -29,10 +33,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -86,44 +92,56 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Autowired
     private UserProfileDao userProfileDao;
 
+    @Autowired
+    private CompanyDao companyDao;
+
+
     @Transactional
     @Override
-    public long getAllSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException{
-    	LOG.info("Get all survey count for "+columnName+" and value "+columnValue+" with number of days: "+numberOfDays);
-    	
-    	if(columnName == null || columnName.isEmpty()){
-    	    throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
-    	}
-    	if(columnValue <= 0l ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+    public long getAllSurveyCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
+    {
+        LOG.info( "Get all survey count for " + columnName + " and value " + columnValue + " with number of days: "
+            + numberOfDays );
+
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
-    	
-    	Timestamp endDate = new Timestamp(System.currentTimeMillis());
-    	Calendar startTime =  Calendar.getInstance();
-    	startTime.add(Calendar.DATE, -1*numberOfDays);
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
+        }
+
+        Calendar startTime = Calendar.getInstance();
+        startTime.add( Calendar.DATE, -1 * numberOfDays );
         // strip the time component of start time
-        startTime.set(Calendar.HOUR_OF_DAY, 0);
-        startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.SECOND, 0);
-        startTime.set(Calendar.MILLISECOND, 0);
-        Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
-    	long completedSurveyCount = getCompletedSurveyCount(columnName, columnValue, startDate, endDate, true);
-    	// TODO: remove hard coding
+        startTime.set( Calendar.HOUR_OF_DAY, 0 );
+        startTime.set( Calendar.MINUTE, 0 );
+        startTime.set( Calendar.SECOND, 0 );
+        startTime.set( Calendar.MILLISECOND, 0 );
+
+        Timestamp startDate = null;
+        Timestamp endDate = null;
+        if ( numberOfDays >= 0 ) {
+            startDate = new Timestamp( startTime.getTimeInMillis() );
+            endDate = new Timestamp( System.currentTimeMillis() );
+        }
+
+        long completedSurveyCount = getCompletedSurveyCount( columnName, columnValue, startDate, endDate, true );
+        // TODO: remove hard coding
         long companyId = -1;
         long agentId = -1;
         Set<Long> agentIds = null;
-        if(columnName.equals("companyId")){
-        	// agent list will be null
-        	companyId = columnValue;
-        }else if(columnName.equals("agentId")){
-        	// agent list will have one element, the agent id
-        	agentId = columnValue;
-        }else if(columnName.equals("regionId")){
-        	agentIds = userProfileDao.findUserIdsByRegion(columnValue);
-        }else if(columnName.equals("branchId")){
-        	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
+        if ( columnName.equals( "companyId" ) ) {
+            // agent list will be null
+            companyId = columnValue;
+        } else if ( columnName.equals( "agentId" ) ) {
+            // agent list will have one element, the agent id
+            agentId = columnValue;
+        } else if ( columnName.equals( "regionId" ) ) {
+            agentIds = userProfileDao.findUserIdsByRegion( columnValue );
+        } else if ( columnName.equals( "branchId" ) ) {
+            agentIds = userProfileDao.findUserIdsByBranch( columnValue );
         }
-    	//long incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds);
+        //long incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds);
         //JIRA SS-1350 begin
         long incompleteSurveyCount = 0;
         if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
@@ -131,77 +149,92 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds );
         }
         //JIRA SS-1350 end
-        LOG.debug("Completed survey: "+completedSurveyCount);
-    	LOG.debug("Incomplete survey: "+incompleteSurveyCount);
-    	return completedSurveyCount+incompleteSurveyCount;
+        LOG.debug( "Completed survey: " + completedSurveyCount );
+        LOG.debug( "Incomplete survey: " + incompleteSurveyCount );
+        return completedSurveyCount + incompleteSurveyCount;
     }
-    
+
+
     @Override
-    public long getCompleteSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException{
-    	LOG.info("Get completed survey count for "+columnName+" and value "+columnValue+" with number of days: "+numberOfDays);
-    	
-    	if(columnName == null || columnName.isEmpty()){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
-        }
-        if(columnValue <= 0l ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
-        }
-        
-    	Timestamp endDate = new Timestamp(System.currentTimeMillis());
-    	Calendar startTime =  Calendar.getInstance();
-    	startTime.add(Calendar.DATE, -1*numberOfDays);
-        // strip the time component of start time
-        startTime.set(Calendar.HOUR_OF_DAY, 0);
-        startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.SECOND, 0);
-        startTime.set(Calendar.MILLISECOND, 0);
-        Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
-    	return getCompletedSurveyCount(columnName, columnValue, startDate, endDate, true);
-    }
-    
-    private long getCompletedSurveyCount(String columnName, long columnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive) throws InvalidInputException{
-    	return surveyDetailsDao.getCompletedSurveyCount(columnName, columnValue, startDate, endDate, filterAbusive);
-    }
-    
-    @Override
-    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
+    public long getCompleteSurveyCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
     {
-        if(columnName == null || columnName.isEmpty()){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        LOG.info( "Get completed survey count for " + columnName + " and value " + columnValue + " with number of days: "
+            + numberOfDays );
+
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
-        if(columnValue <= 0l ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
-        
+
+
+        Calendar startTime = Calendar.getInstance();
+        startTime.add( Calendar.DATE, -1 * numberOfDays );
+        // strip the time component of start time
+        startTime.set( Calendar.HOUR_OF_DAY, 0 );
+        startTime.set( Calendar.MINUTE, 0 );
+        startTime.set( Calendar.SECOND, 0 );
+        startTime.set( Calendar.MILLISECOND, 0 );
+
+        Timestamp startDate = null;
+        Timestamp endDate = null;
+        if ( numberOfDays >= 0 ) {
+            startDate = new Timestamp( startTime.getTimeInMillis() );
+            endDate = new Timestamp( System.currentTimeMillis() );
+        }
+        return getCompletedSurveyCount( columnName, columnValue, startDate, endDate, true );
+    }
+
+
+    private long getCompletedSurveyCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
+        boolean filterAbusive ) throws InvalidInputException
+    {
+        return surveyDetailsDao.getCompletedSurveyCount( columnName, columnValue, startDate, endDate, filterAbusive );
+    }
+
+
+    @Override
+    public long getClickedSurveyCountForPastNdays( String columnName, long columnValue, int numberOfDays )
+        throws InvalidInputException
+    {
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
+        }
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
+        }
+
         return surveyDetailsDao.getClickedSurveyCount( columnName, columnValue, numberOfDays, true );
     }
 
 
     @Override
-    public long getSocialPostsForPastNdaysWithHierarchy( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
+    public long getSocialPostsForPastNdaysWithHierarchy( String columnName, long columnValue, int numberOfDays )
+        throws InvalidInputException
     {
-        if(columnName == null || columnName.isEmpty()){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
-        if(columnValue <= 0l ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
-        
+
         return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue );
     }
 
 
     @Override
-    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin ) throws InvalidInputException
+    public double getSurveyScore( String columnName, long columnValue, int numberOfDays, boolean realtechAdmin )
+        throws InvalidInputException
     {
-        if(columnName == null || columnName.isEmpty()){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
-        if(columnValue <= 0l ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
-        
-        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false );
+        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false, 0, 0 );
     }
 
 
@@ -210,20 +243,20 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         OrganizationUnitSettings organizationUnitSettings ) throws InvalidInputException
     {
         LOG.info( "Method to calculate profile completion percentage started." );
-        
-        if(columnName == null || columnName.isEmpty()){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
-        if(columnValue <= 0l ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
-        if(user == null ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter user is null");
+        if ( user == null ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter user is null" );
         }
-        if(organizationUnitSettings == null ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter organizationUnitSettings is null");
+        if ( organizationUnitSettings == null ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter organizationUnitSettings is null" );
         }
-        
+
         int totalWeight = 0;
         double currentWeight = 0;
         if ( weightageColumns.containsKey( "email" ) ) {
@@ -281,13 +314,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      * profile completeness.
      */
     @Override
-    public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness ) throws InvalidInputException
+    public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness )
+        throws InvalidInputException
     {
         LOG.info( "Method to calculate number of badges started." );
-        if(surveyScore < 0 || surveyCount < 0 || socialPosts < 0 || profileCompleteness < 0){
-            throw new InvalidInputException("Invalid input parameter : should not be less than zero");
+        if ( surveyScore < 0 || surveyCount < 0 || socialPosts < 0 || profileCompleteness < 0 ) {
+            throw new InvalidInputException( "Invalid input parameter : should not be less than zero" );
         }
-        
+
         int badges = 0;
         double normalizedSurveyScore = surveyScore * 25 / CommonConstants.MAX_SURVEY_SCORE;
         double normalizedProfileCompleteness = profileCompleteness * 25 / 100;
@@ -315,76 +349,81 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public Map<String, Map<Integer, Integer>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
         boolean realtechAdmin ) throws ParseException, InvalidInputException
     {
-    	LOG.info("Getting survey details for graph for "+columnName+" with value "+columnValue+" for number of days "+numberOfDays+". Reatech admin flag: "+realtechAdmin);
-        
-    	if(columnName == null || columnName.isEmpty()){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column name is null or empty");
+        LOG.info( "Getting survey details for graph for " + columnName + " with value " + columnValue + " for number of days "
+            + numberOfDays + ". Reatech admin flag: " + realtechAdmin );
+
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
-        if(columnValue <= 0l ){
-            throw new InvalidInputException("Wrong input parameter : passed input parameter column value is invalid");
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
-    	
-    	String criteria = "";
+
+        String criteria = "";
         Calendar startTime = Calendar.getInstance();
         switch ( numberOfDays ) {
             case 30:
                 criteria = CommonConstants.AGGREGATE_BY_WEEK;
-                startTime.add(Calendar.DATE, -30);
+                startTime.add( Calendar.DATE, -30 );
                 break;
             case 60:
                 criteria = CommonConstants.AGGREGATE_BY_WEEK;
-                startTime.add(Calendar.DATE, -60);
+                startTime.add( Calendar.DATE, -60 );
                 break;
             case 90:
                 criteria = CommonConstants.AGGREGATE_BY_WEEK;
-                startTime.add(Calendar.DATE, -90);
+                startTime.add( Calendar.DATE, -90 );
                 break;
             case 365:
                 criteria = CommonConstants.AGGREGATE_BY_MONTH;
-                startTime.add(Calendar.DATE, -365);
+                startTime.add( Calendar.DATE, -365 );
                 break;
         }
         // strip the time component of start time
-        startTime.set(Calendar.HOUR_OF_DAY, 0);
-        startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.SECOND, 0);
-        startTime.set(Calendar.MILLISECOND, 0);
-        
-        Timestamp startDate = new Timestamp(startTime.getTimeInMillis());
-        Timestamp endDate = new Timestamp(System.currentTimeMillis());
-        LOG.debug("Getting sent surveys aggregation");
-        Map<Integer, Integer> completedSurveys = surveyDetailsDao.getCompletedSurveyAggregationCount(columnName, columnValue, startDate, endDate, criteria);
+        startTime.set( Calendar.HOUR_OF_DAY, 0 );
+        startTime.set( Calendar.MINUTE, 0 );
+        startTime.set( Calendar.SECOND, 0 );
+        startTime.set( Calendar.MILLISECOND, 0 );
+
+        Timestamp startDate = new Timestamp( startTime.getTimeInMillis() );
+        Timestamp endDate = new Timestamp( System.currentTimeMillis() );
+        LOG.debug( "Getting sent surveys aggregation" );
+        Map<Integer, Integer> completedSurveys = surveyDetailsDao.getCompletedSurveyAggregationCount( columnName, columnValue,
+            startDate, endDate, criteria );
         // Since the values will be modified while aggregating total surveys, copying the value to another map
         Map<Integer, Integer> completedSurveyToBeProcessed = null;
-        if(completedSurveys != null && completedSurveys.size() > 0){
-        	completedSurveyToBeProcessed = new HashMap<>();
-        	completedSurveyToBeProcessed.putAll(completedSurveys);
+        if ( completedSurveys != null && completedSurveys.size() > 0 ) {
+            completedSurveyToBeProcessed = new HashMap<>();
+            completedSurveyToBeProcessed.putAll( completedSurveys );
         }
         // TODO: remove hard coding
         long companyId = -1;
         long agentId = -1;
         Set<Long> agentIds = null;
-        if(columnName.equals("companyId")){
-        	// agent list will be null
-        	companyId = columnValue;
-        }else if(columnName.equals("agentId")){
-        	// agent list will have one element, the agent id
-        	agentId = columnValue;
-        }else if(columnName.equals("regionId")){
-        	agentIds = userProfileDao.findUserIdsByRegion(columnValue);
-        }else if(columnName.equals("branchId")){
-        	agentIds = userProfileDao.findUserIdsByBranch(columnValue);
+        if ( columnName.equals( "companyId" ) ) {
+            // agent list will be null
+            companyId = columnValue;
+        } else if ( columnName.equals( "agentId" ) ) {
+            // agent list will have one element, the agent id
+            agentId = columnValue;
+        } else if ( columnName.equals( "regionId" ) ) {
+            agentIds = userProfileDao.findUserIdsByRegion( columnValue );
+        } else if ( columnName.equals( "branchId" ) ) {
+            agentIds = userProfileDao.findUserIdsByBranch( columnValue );
         }
-        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds, criteria);
-        LOG.debug("Aggregating completed and incomplete surveys");
-        Map<Integer, Integer> allSurveysSent = aggregateAllSurveysSent(incompleteSurveys, completedSurveyToBeProcessed);
-        
-        LOG.debug("Getting clicked surveys");
-        Map<Integer, Integer> clickedSurveys = surveyDetailsDao.getClickedSurveyAggregationCount(columnName, columnValue, startDate, endDate, criteria);
-        
-        LOG.debug("Getting social posts count.");
-        Map<Integer, Integer> socialPosts = surveyDetailsDao.getSocialPostsAggregationCount(columnName, columnValue, startDate, endDate, criteria);
-        
+        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount( companyId,
+            agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds, criteria );
+        LOG.debug( "Aggregating completed and incomplete surveys" );
+        Map<Integer, Integer> allSurveysSent = aggregateAllSurveysSent( incompleteSurveys, completedSurveyToBeProcessed );
+
+        LOG.debug( "Getting clicked surveys" );
+        Map<Integer, Integer> clickedSurveys = surveyDetailsDao.getClickedSurveyAggregationCount( columnName, columnValue,
+            startDate, endDate, criteria );
+
+        LOG.debug( "Getting social posts count." );
+        Map<Integer, Integer> socialPosts = surveyDetailsDao.getSocialPostsAggregationCount( columnName, columnValue,
+            startDate, endDate, criteria );
+
         Map<String, Map<Integer, Integer>> map = new HashMap<String, Map<Integer, Integer>>();
         map.put( "clicked", clickedSurveys );
         map.put( "sent", allSurveysSent );
@@ -394,29 +433,36 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
 
 
-    Map<Integer, Integer> aggregateAllSurveysSent(Map<Integer, Integer> incompleteSurveys, Map<Integer, Integer> completedSurveys){
-    	LOG.debug("Aggregating all surveys");
-    	if((incompleteSurveys == null || incompleteSurveys.size() == 0) && (completedSurveys != null && completedSurveys.size() > 0)){
-    		return completedSurveys;
-    	}else if((completedSurveys == null || completedSurveys.size() == 0) && (incompleteSurveys != null && incompleteSurveys.size() > 0)){
-    		return incompleteSurveys;
-    	}else if((completedSurveys == null || completedSurveys.size() == 0) && (incompleteSurveys == null || incompleteSurveys.size() > 0)){
-    		return null;
-    	}else{
-    		// both the maps are present
-    		for(Integer incompleteSurveyKey : incompleteSurveys.keySet()){
-    			if(completedSurveys.containsKey(incompleteSurveyKey)){
-    				int totalValue = incompleteSurveys.get(incompleteSurveyKey) + completedSurveys.get(incompleteSurveyKey);
-    				incompleteSurveys.put(incompleteSurveyKey, totalValue);
-    				// remove the object from the other map
-    				completedSurveys.remove(incompleteSurveyKey);
-    			}
-    		}
-    		// there might be some records left in the completed survey which needs to be put in the other map
-    		incompleteSurveys.putAll(completedSurveys);
-    		return incompleteSurveys;
-    	}
+    Map<Integer, Integer> aggregateAllSurveysSent( Map<Integer, Integer> incompleteSurveys,
+        Map<Integer, Integer> completedSurveys )
+    {
+        LOG.debug( "Aggregating all surveys" );
+        if ( ( incompleteSurveys == null || incompleteSurveys.size() == 0 )
+            && ( completedSurveys != null && completedSurveys.size() > 0 ) ) {
+            return completedSurveys;
+        } else if ( ( completedSurveys == null || completedSurveys.size() == 0 )
+            && ( incompleteSurveys != null && incompleteSurveys.size() > 0 ) ) {
+            return incompleteSurveys;
+        } else if ( ( completedSurveys == null || completedSurveys.size() == 0 )
+            && ( incompleteSurveys == null || incompleteSurveys.size() > 0 ) ) {
+            return null;
+        } else {
+            // both the maps are present
+            for ( Integer incompleteSurveyKey : incompleteSurveys.keySet() ) {
+                if ( completedSurveys.containsKey( incompleteSurveyKey ) ) {
+                    int totalValue = incompleteSurveys.get( incompleteSurveyKey ) + completedSurveys.get( incompleteSurveyKey );
+                    incompleteSurveys.put( incompleteSurveyKey, totalValue );
+                    // remove the object from the other map
+                    completedSurveys.remove( incompleteSurveyKey );
+                }
+            }
+            // there might be some records left in the completed survey which needs to be put in the other map
+            incompleteSurveys.putAll( completedSurveys );
+            return incompleteSurveys;
+        }
     }
+
+
     /*
      * Method to create excel file from all the incomplete survey data.
      */
@@ -424,11 +470,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public XSSFWorkbook downloadIncompleteSurveyData( List<SurveyPreInitiation> surveyDetails, String fileLocation )
         throws IOException, InvalidInputException
     {
-        if(fileLocation == null || fileLocation.isEmpty()){
-            throw new InvalidInputException("Invalid input parameter : passed input parameter fileLocation is null or empty");
+        if ( fileLocation == null || fileLocation.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter fileLocation is null or empty" );
         }
-        if(surveyDetails == null){
-            throw new InvalidInputException("Invalid input parameter : passed input parameter surveyDetails is null");
+        if ( surveyDetails == null ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter surveyDetails is null" );
         }
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -495,19 +541,20 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         return workbook;
     }
 
+
     /*
      * Method to create excel file for Social posts.
      */
     @Override
     public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName ) throws InvalidInputException
     {
-        if(fileName == null || fileName.isEmpty()){
-            throw new InvalidInputException("Invalid input parameter : passed input parameter fileName is null or empty");
+        if ( fileName == null || fileName.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter fileName is null or empty" );
         }
-        if(socialPosts == null){
-            throw new InvalidInputException("Invalid input parameter : passed input parameter surveyDetails is null");
+        if ( socialPosts == null ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter surveyDetails is null" );
         }
-        
+
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -605,7 +652,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         return workbook;
     }
 
-    
+
     /*
      * Method to create excel file from all the completed survey data.
      */
@@ -613,13 +660,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileLocation )
         throws IOException, InvalidInputException
     {
-        if(fileLocation == null || fileLocation.isEmpty()){
-            throw new InvalidInputException("Invalid input parameter : passed input parameter fileLocation is null or empty");
+        if ( fileLocation == null || fileLocation.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter fileLocation is null or empty" );
         }
-        if(surveyDetails == null){
-            throw new InvalidInputException("Invalid input parameter : passed input parameter surveyDetails is null");
+        if ( surveyDetails == null ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter surveyDetails is null" );
         }
-        
+
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -634,6 +681,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
         // Sorting SurveyResults
         Collections.sort( surveyDetails, new SurveyResultsComparator() );
+        
+        //create rating format to format survey score
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
 
         // Finding max questions
         int max = 0;
@@ -672,21 +724,23 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     surveyDetailsToPopulate.add( MongoSocialPostDaoImpl.KEY_SOURCE_SS );
                 }
 
-                surveyDetailsToPopulate.add( survey.getScore() );
+                //add score
+                surveyDetailsToPopulate.add( ratingFormat.format( survey.getScore() ));
                 for ( SurveyResponse response : survey.getSurveyResponse() ) {
                     surveyDetailsToPopulate.add( response.getAnswer() );
                 }
 
                 surveyDetailsToPopulate.add( survey.getMood() );
                 surveyDetailsToPopulate.add( survey.getReview() );
-                if(survey.getMood()!= null && survey.getMood().equals(CommonConstants.SURVEY_MOOD_GREAT) && survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty()){
-                	String status = survey.getAgreedToShare();
+                if ( survey.getMood() != null && survey.getMood().equals( CommonConstants.SURVEY_MOOD_GREAT )
+                    && survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty() ) {
+                    String status = survey.getAgreedToShare();
                     if ( status.equals( "true" ) ) {
                         surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
                     } else {
                         surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
                     }
-                }else {
+                } else {
                     surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
                 }
                 /*if ( survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty() ) {
@@ -701,29 +755,37 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 } else {
                     surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
                 }*/
-                if(survey.getSocialMediaPostDetails() != null){
-                	Set<String> socialMedia = new HashSet<>();
-                	if(survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null && survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() != null && !survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn().isEmpty()){
-                		socialMedia.addAll(survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn());
-                	}
-                	if(survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null && !survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn().isEmpty()){
-                		socialMedia.addAll(survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn());
-                	}
-                	if(survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null && !survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList().isEmpty()){
-                		for(RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList()){
-                			if(regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty()){
-                				socialMedia.addAll(regionMediaDetail.getSharedOn());
-                			}
-                		}
-                	}
-                	if(survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null && !survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList().isEmpty()){
-                		for(BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList()){
-                			if(branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty()){
-                				socialMedia.addAll(branchMediaDetail.getSharedOn());
-                			}
-                		}
-                	}
-                	 surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
+                if ( survey.getSocialMediaPostDetails() != null ) {
+                    Set<String> socialMedia = new HashSet<>();
+                    if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null
+                        && survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() != null
+                        && !survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn().isEmpty() ) {
+                        socialMedia.addAll( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() );
+                    }
+                    if ( survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
+                        && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null
+                        && !survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn().isEmpty() ) {
+                        socialMedia.addAll( survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() );
+                    }
+                    if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null
+                        && !survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList().isEmpty() ) {
+                        for ( RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails()
+                            .getRegionMediaPostDetailsList() ) {
+                            if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() ) {
+                                socialMedia.addAll( regionMediaDetail.getSharedOn() );
+                            }
+                        }
+                    }
+                    if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null
+                        && !survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList().isEmpty() ) {
+                        for ( BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails()
+                            .getBranchMediaPostDetailsList() ) {
+                            if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() ) {
+                                socialMedia.addAll( branchMediaDetail.getSharedOn() );
+                            }
+                        }
+                    }
+                    surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
                 }
 
                 data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
@@ -783,14 +845,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public XSSFWorkbook downloadAgentRankingData( List<AgentRankingReport> agentDetails, String fileLocation )
         throws IOException, InvalidInputException
     {
-        
-        if(fileLocation == null || fileLocation.isEmpty()){
-            throw new InvalidInputException("Invalid input parameter : passed input parameter fileLocation is null or empty");
+
+        if ( fileLocation == null || fileLocation.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter fileLocation is null or empty" );
         }
-        if(agentDetails == null){
-            throw new InvalidInputException("Invalid input parameter : passed input parameter agentDetails is null");
+        if ( agentDetails == null ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter agentDetails is null" );
         }
-        
+
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -861,5 +923,104 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         return workbook;
     }
 
+
+    /**
+     * Method to create excel file for user adoption report.
+     */
+    @Override
+    @Transactional
+    public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
+        }
+
+        boolean activeUserFound = true;
+        // get all user and admin under a company data grouped by branches
+        List<Object[]> rows = companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( companyId );
+
+        // get all active user and admin under a company data grouped by branches
+        Map<Long, Integer> branchIdAccountUserCountMap = companyDao
+            .getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( companyId );
+
+        // check whether report info are available
+        if ( rows == null || rows.isEmpty() ) {
+            LOG.error( "No user and admin record found for the company id : " + companyId );
+            throw new NoRecordsFetchedException( "No user and admin record found for the company id : " + companyId );
+        }
+
+        if ( branchIdAccountUserCountMap == null || branchIdAccountUserCountMap.isEmpty() ) {
+            LOG.warn( "No active user and admin record found for the company id : " + companyId );
+            activeUserFound = false;
+        }
+
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        Integer counter = 1;
+
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> userAdoptionReportToPopulate = new ArrayList<>();
+
+        for ( Object[] row : rows ) {
+            userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
+            if ( row[2] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
+                userAdoptionReportToPopulate.add( String.valueOf( row[2] ) );
+            else
+                userAdoptionReportToPopulate.add( "" );
+            if ( row[3] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[3] ) ) )
+                userAdoptionReportToPopulate.add( String.valueOf( row[3] ) );
+            else
+                userAdoptionReportToPopulate.add( "" );
+            long branchId = Long.parseLong( String.valueOf( row[0] ) );
+            Integer userCount = new Integer( String.valueOf( row[4] ) );
+            Integer activeUserCount = activeUserFound && branchIdAccountUserCountMap.get( branchId ) != null ? branchIdAccountUserCountMap
+                .get( branchId ) : 0;
+            Double adoptionRate = ( new Double( activeUserCount ) / new Double( userCount ) ) * 100;
+            userAdoptionReportToPopulate.add( userCount );
+            userAdoptionReportToPopulate.add( activeUserCount );
+
+            userAdoptionReportToPopulate.add( adoptionRate );
+
+            data.put( ( ++counter ).toString(), userAdoptionReportToPopulate );
+            userAdoptionReportToPopulate = new ArrayList<>();
+        }
+
+        // Setting up headers
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_COMPANY );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_REGION );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_BRANCH );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_TOTAL_USERS );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ACTIVE_USERS );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ADOPTION_RATES );
+
+        data.put( "1", userAdoptionReportToPopulate );
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        DecimalFormat decimalFormat = new DecimalFormat( "#0" );
+        decimalFormat.setRoundingMode( RoundingMode.DOWN );
+
+        int rownum = 0;
+        for ( String key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String )
+                    cell.setCellValue( (String) obj );
+                else if ( obj instanceof Integer )
+                    cell.setCellValue( (Integer) obj );
+                else if ( obj instanceof Double )
+                    cell.setCellValue( decimalFormat.format( obj ) );
+            }
+        }
+        return workbook;
+    }
 }
 // JIRA SS-137 BY RM05:EOC

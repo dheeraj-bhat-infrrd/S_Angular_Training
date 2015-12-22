@@ -51,5 +51,22 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
         LOG.info( "Method to get all the regions for region ids, deleteRegionsByCompanyId() finished." );
         return criteria.list();
     }
+
+
+    /**
+     * Method to fetch Region ids under a company
+     * */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Long> getRegionIdsForCompanyId( long companyId ) throws InvalidInputException
+    {
+        if ( companyId <= 0 )
+            throw new InvalidInputException( "Invalid company id passed in getRegionIdsForCompanyId method" );
+        LOG.info( "Method to get all the regions ids for a company id : " + companyId + ",getRegionIdsForCompanyId() started." );
+        Criteria criteria = getSession().createCriteria( Region.class );
+        criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+        LOG.info( "Method to get all the regions ids for a company id : " + companyId + ",getRegionIdsForCompanyId() finished." );
+        return criteria.list();
+    }
 }
 // JIRA SS-42 By RM-05 EOC

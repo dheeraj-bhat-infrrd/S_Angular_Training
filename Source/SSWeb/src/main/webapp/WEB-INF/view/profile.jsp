@@ -61,7 +61,6 @@
     <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
-	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
@@ -122,8 +121,8 @@
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder='<spring:message code="label.publicprofile.reportabuse.key"/>'></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
-    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer"><spring:message code="label.report.key"/></div>
-    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer"><spring:message code="label.cancel.key"/></div>
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer float-left"><spring:message code="label.report.key"/></div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer float-right"><spring:message code="label.cancel.key"/></div>
     		</div>
     	</div>
     </div>
@@ -571,17 +570,14 @@
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
 </div>
-<script src='//www.google.com/recaptcha/api.js'></script>
 <script type="text/javascript" src="https://apis.google.com/js/client:plusone.js" async="async"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/date.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/googletracking.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
+<script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
     $(document).ready(function(){
     	if($('#social-token-container').children('.social-item-icon').length == 0) {
@@ -634,6 +630,9 @@
         		'eventValue': gaName
         	});
 		}, 2000);
+    	
+    	//update google analytics
+    	updateGoogleTrackingId();
     });
 </script>
 </body>
