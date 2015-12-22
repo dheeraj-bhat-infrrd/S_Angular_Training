@@ -362,9 +362,10 @@ function paintProfilePage(result) {
             	address=address.replace(/,/g,"");
             	
             	if (apikey == undefined) {
-            		fetchGoogleMapApi();
+            		fetchGoogleMapApi(function() {
+            			$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>');
+					});
             	}
-            	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>');
             }
 		}
 		
@@ -1731,3 +1732,30 @@ $('#prof-review-item').on('click', '.ppl-share-icns', function() {
 	}
 	window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 });
+
+/**
+ * JS functions to fetch API Key for google maps
+ * 
+ */
+
+var apikey;
+
+
+//Function for google map api key
+function fetchGoogleMapApi(callBackFunction) {
+	
+	$.ajax({
+		url : window.location.origin + "/fetchgooglemapapikey.do",
+		type : "GET",
+		dataType : "html",
+		async : true,
+		success : function(data) {
+			apikey = data;
+			if(callBackFunction != undefined)
+				callBackFunction();
+		},
+		error : function(e) {
+			redirectErrorpage();
+		}
+	});
+}
