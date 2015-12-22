@@ -16,8 +16,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -26,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
 public class DashboardServiceImplTest
@@ -36,6 +39,9 @@ public class DashboardServiceImplTest
 
     @Mock
     private SurveyPreInitiationDao surveyPreInitiationDao;
+
+    @Mock
+    private CompanyDao companyDao;
 
 
     @BeforeClass
@@ -357,5 +363,34 @@ public class DashboardServiceImplTest
     public void testAggregateAllSurveysSentForCompleteAndIncompleteSurveysNull()
     {
         assertNull( dashboardServiceImpl.aggregateAllSurveysSent( null, null ) );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadUserAdoptionReportDataWithInvalidCompanyId() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        dashboardServiceImpl.downloadUserAdoptionReportData( 0 );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testDownloadUserAdoptionReportDataWhenRowsIsNull() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn( null );
+        Mockito.when( companyDao.getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
+            new HashMap<Long, Integer>() );
+        dashboardServiceImpl.downloadUserAdoptionReportData( 1 );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testDownloadUserAdoptionReportDataWhenRowsIsEmpty() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
+            new ArrayList<Object[]>() );
+        Mockito.when( companyDao.getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
+            new HashMap<Long, Integer>() );
+        dashboardServiceImpl.downloadUserAdoptionReportData( 1 );
     }
 }

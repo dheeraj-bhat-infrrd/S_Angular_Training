@@ -58,6 +58,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -272,6 +273,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private GenericDao<LoopProfileMapping, Long> loopProfileMappingDao;
 
+    @Autowired
+    private ZillowHierarchyDao zillowHierarchyDao;
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -1570,7 +1573,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Region upgradeDefaultRegion( Region region ) throws InvalidInputException
+    Region upgradeDefaultRegion( Region region ) throws InvalidInputException
     {
 
         LOG.info( "Upgrading the default region to a user made region" );
@@ -1597,7 +1600,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Branch upgradeDefaultBranch( Branch branch ) throws InvalidInputException
+    Branch upgradeDefaultBranch( Branch branch ) throws InvalidInputException
     {
 
         LOG.info( "Upgrading default branch to a user made branch" );
@@ -1627,7 +1630,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Region fetchDefaultRegion( Company company ) throws InvalidInputException
+    Region fetchDefaultRegion( Company company ) throws InvalidInputException
     {
 
         if ( company == null ) {
@@ -1646,7 +1649,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Fetching all regions for company with id : " + company.getCompanyId() );
         List<Region> regionList = regionDao.findByKeyValue( Region.class, queries );
 
-        if ( regionList.isEmpty() || regionList == null ) {
+        if (  regionList == null || regionList.isEmpty() ) {
             LOG.info( "No regions found for company with id : " + company.getCompanyId() );
             defaultRegion = null;
         }
@@ -1673,7 +1676,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Branch fetchDefaultBranch( Company company ) throws InvalidInputException
+    Branch fetchDefaultBranch( Company company ) throws InvalidInputException
     {
 
         if ( company == null ) {
@@ -1692,7 +1695,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Fetching all branches for company with id : " + company.getCompanyId() );
         List<Branch> branchList = branchDao.findByKeyValue( Branch.class, queries );
 
-        if ( branchList.isEmpty() || branchList == null ) {
+        if ( branchList == null || branchList.isEmpty() ) {
             LOG.info( "No branches found for company with id : " + company.getCompanyId() );
             defaultBranch = null;
         }
@@ -1721,7 +1724,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws SolrException
      * @throws NoRecordsFetchedException
      */
-    private void upgradeToCompany( Company company ) throws InvalidInputException, SolrException, NoRecordsFetchedException
+    void upgradeToCompany( Company company ) throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
 
         LOG.info( "Upgrading to Company" );
@@ -1763,7 +1766,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws SolrException
      * @throws NoRecordsFetchedException
      */
-    private void upgradeToEnterprise( Company company, int fromAccountsMasterId ) throws InvalidInputException, SolrException,
+    void upgradeToEnterprise( Company company, int fromAccountsMasterId ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException
     {
 
@@ -2291,7 +2294,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail ) throws InvalidInputException
+    Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail ) throws InvalidInputException
     {
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
@@ -2477,7 +2480,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param userProfiles
      * @return
      */
-    private int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
+    int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
     {
 
         LOG.debug( "Method checkWillNewProfileBePrimary called in OrganizationManagementService for email id"
@@ -5490,11 +5493,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Finished updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
     }
 
-    /**
+    /*/**
      * Method to fetch regions connected to zillow
      * @param regionIds
      * */
-    @Override
+    /*@Override
     @Transactional
     public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds )
     {
@@ -5526,15 +5529,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getRegionsConnectedToZillow called to fetch regions connected to zillow for region ids : "
             + regionIds );
         return zillowConnectedRegionIds;
-    }
+    }*/
 
 
-    /**
+    /*/**
      * Method to fetch branches connected to zillow
      * @param regionIds
      * @throws InvalidInputException
      * */
-    @Override
+   /* @Override
     @Transactional
     public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException
     {
@@ -5562,21 +5565,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method to fetch branch settings for branch ids : " + branchIds
             + ", getBranchesUnderRegionConnectedToZillow call ended" );
         return zillowConnectedBranchIds;
-    }
+    }*/
 
 
-    /**
+    /*/**
      * Method to fetch individuals for regions connected to zillow
      * @param regionIds
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      * */
-    @Override
+    /*@Override
     @Transactional
     public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException,
         NoRecordsFetchedException
     {
-        if ( regionIds == null || regionIds.isEmpty() )
+        if ( regionIds == null || regionIds.isEmpty() )regionId
             throw new InvalidInputException(
                 "Region ids passed cannot be null or empty in getIndividualsForRegionsConnectedWithZillow()" );
         List<AgentSettings> agentSettingsList = profileManagementService.getIndividualsByRegionIds( regionIds );
@@ -5592,15 +5595,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         return zillowConnectedIndividualIds;
-    }
+    }*/
 
 
-    /**
+    /*/**
      * Method to fetch individuals for company connected to zillow
      * @param regionIds
      * @throws InvalidInputException
      * */
-    @Override
+    /*@Override
     @Transactional
     public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
         ProfileNotFoundException, NoRecordsFetchedException
@@ -5620,15 +5623,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         return zillowConnectedIndividualIds;
-    }
+    }*/
 
 
-    /**
+    /*/**
      * Method to fetch individuals for branches connected to zillow
      * @param regionIds
      * @throws InvalidInputException
      * */
-    @Override
+    /*@Override
     @Transactional
     public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException
     {
@@ -5648,13 +5651,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         return zillowConnectedIndividualIds;
-    }
+    }*/
 
 
-    /**
+   /* /**
      * Method to get all the ids of regions, branches and individuals under a company connected to zillow
      * */
-    @Override
+   /* @Override
     public Map<String, Set<Long>> getAllIdsUnderCompanyConnectedToZillow( long companyId )
     {
         Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
@@ -5739,13 +5742,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Could not fetch unit settings for company id : " + companyId, e );
         }
         return hierarchyIdsMap;
-    }
+    }*/
 
 
+    /*
     /**
      * Method to get all the ids of branches and individuals under a region connected to zillow
      * */
-    @Override
+    /*@Override
     public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds )
     {
         Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
@@ -5786,13 +5790,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Could not found unit settings for region ids : " + regionIds, e );
         }
         return hierarchyIdsMap;
-    }
+    }*/
 
 
+    /*
     /**
      * Method to get all individual ids under a region connected to zillow
      * */
-    @Override
+    /*@Override
     public Map<String, Set<Long>> getAllIdsUnderBranchConnectedToZillow( long branchId )
     {
         Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
@@ -5806,6 +5811,83 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Could not fetch individuals under branch id: " + branchId, e );
         }
         return hierarchyIdsMap;
+    }*/
+
+    @Override
+    @Transactional
+    public Set<Long> getAllRegionsUnderCompanyConnectedToZillow( long companyId, int start_index, int batch_size )
+        throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            LOG.error( "Invalid companyId passed in getAllRegionsUnderCompanyConnectedToZillow" );
+            throw new InvalidInputException( "Invalid companyId passed in getAllRegionsUnderCompanyConnectedToZillow" );
+        }
+
+        return zillowHierarchyDao.getRegionIdsUnderCompanyConnectedToZillow( companyId, start_index, batch_size );
+    }
+
+
+    @Override
+    @Transactional
+    public Set<Long> getAllBranchesUnderProfileTypeConnectedToZillow( String profileType, long iden,
+        int start_index, int batch_size ) throws InvalidInputException
+    {
+
+        if ( profileType == null || profileType.isEmpty() ) {
+            LOG.error( "profile type passed cannot be null or empty in getAllBranchesUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException(
+                "profile type passed cannot be null or empty in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
+
+        if ( iden <= 0l ) {
+            LOG.error( "Invalid id passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException( "Invalid id passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
+
+        switch ( profileType ) {
+            case CommonConstants.PROFILE_TYPE_COMPANY:
+                return zillowHierarchyDao.getBranchIdsUnderCompanyConnectedToZillow( iden, start_index , batch_size);
+
+            case CommonConstants.PROFILE_TYPE_REGION:
+                return zillowHierarchyDao.getBranchIdsUnderRegionConnectedToZillow( iden, start_index , batch_size );
+
+            default:
+                throw new InvalidInputException(
+                    "Invalid profile type passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden,
+        int start_index, int batch_size ) throws InvalidInputException
+    {
+        if ( profileType == null || profileType.isEmpty() ) {
+            LOG.error( "profile type passed cannot be null or empty in getAllUsersUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException(
+                "profile type passed cannot be null or empty in getAllUsersUnderProfileTypeConnectedToZillow" );
+        }
+
+        if ( iden <= 0l ) {
+            LOG.error( "Invalid id passed in getAllUsersUnderProfileTypeConnectedToZillow" );
+            throw new InvalidInputException( "Invalid id passed in getAllUsersUnderProfileTypeConnectedToZillow" );
+        }
+
+        switch ( profileType ) {
+            case CommonConstants.PROFILE_TYPE_COMPANY:
+                return zillowHierarchyDao.getUserIdsUnderCompanyConnectedToZillow( iden, start_index , batch_size );
+
+            case CommonConstants.PROFILE_TYPE_REGION:
+                return zillowHierarchyDao.getUserIdsUnderRegionConnectedToZillow( iden, start_index , batch_size);
+
+            case CommonConstants.PROFILE_TYPE_BRANCH:
+                return zillowHierarchyDao.getUserIdsUnderBranchConnectedToZillow( iden, start_index , batch_size );
+
+            default:
+                throw new InvalidInputException(
+                    "Invalid profile type passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+        }
     }
 }
 // JIRA: SS-27: By RM05: EOC

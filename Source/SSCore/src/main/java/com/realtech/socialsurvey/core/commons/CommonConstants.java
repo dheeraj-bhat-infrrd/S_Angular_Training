@@ -893,4 +893,19 @@ public interface CommonConstants
 
     // Zillow fetch failure response
     public static final String ZILLOW_FETCH_FAIL_RESPONSE = "{\"zillowCallBreak\":true}";
+
+    // Constants for User Adoption Report
+    public static final String HEADER_COMPANY = "Company";
+    public static final String HEADER_REGION = "Region";
+    public static final String HEADER_BRANCH = "Branch";
+    public static final String HEADER_TOTAL_USERS = "Total Users ";
+    public static final String HEADER_ACTIVE_USERS = "Active Users";
+    public static final String HEADER_ADOPTION_RATES = "Adoption Rates";
+    
+    //Zillow connection
+    public static final int ZILLOW_CONNECTED = 1;
+    public static final int ZILLOW_DISCONNECTED = 0;
+
+    // MySQL IS_ZILLOW_CONNECTED column name constant
+    public static final String IS_ZILLOW_CONNECTED_COLUMN = "IS_ZILLOW_CONNECTED";
 }

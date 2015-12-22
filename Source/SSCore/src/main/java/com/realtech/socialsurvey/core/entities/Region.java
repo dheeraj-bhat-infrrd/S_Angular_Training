@@ -62,6 +62,15 @@ public class Region implements Serializable {
 	@Column(name = "STATUS")
 	private int status;
 
+    @Column ( name = "IS_ZILLOW_CONNECTED")
+    private int isZillowConnected;
+
+    @Column ( name = "ZILLOW_REVIEW_COUNT")
+    private int zillowReviewCount;
+
+    @Column ( name = "ZILLOW_AVERAGE_SCORE")
+    private double zillowAverageScore;
+
 	@Transient
 	private String regionName;
 
@@ -283,7 +292,55 @@ public class Region implements Serializable {
 		this.company = company;
 	}
 
-	@Override
+	/**
+     * @return the isZillowConnected
+     */
+    public int getIsZillowConnected()
+    {
+        return isZillowConnected;
+    }
+
+    /**
+     * @param isZillowConnected the isZillowConnected to set
+     */
+    public void setIsZillowConnected( int isZillowConnected )
+    {
+        this.isZillowConnected = isZillowConnected;
+    }
+
+    /**
+     * @return the zillowReviewCount
+     */
+    public int getZillowReviewCount()
+    {
+        return zillowReviewCount;
+    }
+
+    /**
+     * @param zillowReviewCount the zillowReviewCount to set
+     */
+    public void setZillowReviewCount( int zillowReviewCount )
+    {
+        this.zillowReviewCount = zillowReviewCount;
+    }
+
+    /**
+     * @return the zillowAverageScore
+     */
+    public double getZillowAverageScore()
+    {
+        return zillowAverageScore;
+    }
+
+    /**
+     * @param zillowAverageScore the zillowAverageScore to set
+     */
+    public void setZillowAverageScore( double zillowAverageScore )
+    {
+        this.zillowAverageScore = zillowAverageScore;
+    }
+
+    @Override
 	public String toString() {
 		return "Region [regionId=" + regionId + ", createdBy=" + createdBy + ", createdOn=" + createdOn + ", isDefaultBySystem=" + isDefaultBySystem
 				+ ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + ", region=" + region + ", status=" + status + ", address1="

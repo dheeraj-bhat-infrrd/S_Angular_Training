@@ -78,9 +78,18 @@ $(document).ready(function() {
 	<c:if test="${not empty pageNames}">
 		$("#page").append(saveButton);
 	</c:if>
-	
+	 
 	saveButton.click(function() {
+		
+		if ( $(this).data('requestRunning') ) {
+			return;
+	    }
+		disable(this);
 		var selectedPage=$('input:radio[name=pageselection]:checked').val();
+		if(selectedPage == undefined){
+			enable(this);
+			return;
+		}
 		var selectedAccessFacebookToken;
 		var selectedProfileUrl;
 		<c:forEach var="page" items="${pageNames}"  varStatus="loop">
@@ -100,9 +109,12 @@ $(document).ready(function() {
 			data : facebookToken,
 			async : false,
 			complete :function(e){
+				enable(this);
+				parentWindow.loadSocialMediaUrlInSettingsPage();
 				setTimeout(function() {
 					window.close();
 				}, 3000);
+				
 			},
 			error : function(e) {
 				if(e.status == 504) {
@@ -170,6 +182,20 @@ function fetchSocialProfileUrl(payload, callBackFunction){
 		}
 	});
 }
+function disable(disableEle) {
+
+	if (disableEle) {
+		$(disableEle).data('requestRunning', true);
+		disableIcon = true;
+	}
+}
+function enable(disableEle) {
+	if (disableEle ) {
+		$(disableEle).data("requestRunning", false);
+		disableIcon = false;
+	}
+}
+
 </script>
 
 </body>

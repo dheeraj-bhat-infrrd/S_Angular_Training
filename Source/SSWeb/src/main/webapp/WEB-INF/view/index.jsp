@@ -134,22 +134,7 @@
 						</div>
 						<div class="clearfix reg-captcha-wrapper reg-item">
 							<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
-							<!-- <div class="reg-captcha-img"></div>
-							<div class="reg-captcha-btns clearfix">
-								<input class="float-left reg-cap-txt" name="captchaResponse" 
-									placeholder="Type the above text" autocomplete="off" autocorrect="off" autocapitalize="off">
-								<div class="clearfix reg-btns-wrapper float-right">
-									<div class="float-left reg-cap-img reg-cap-reload"></div>
-									<div class="float-left reg-cap-img reg-cap-sound"></div>
-									<div class="float-left reg-cap-img reg-cap-info"></div>
-								</div>
-							</div>
-							-->
 						</div>
-						<!-- <div id="outer_captcha" style="display: none;">
-							<div id="recaptcha"></div>
-						</div>
-						 -->
 						<div class="clearfix reg-item">
 							<input id="reg-submit"  type="submit" class="reg-inp reg-btn" value="Join Now">
 						</div>
@@ -194,7 +179,6 @@
 <script>
 	if (!window.jQuery) { document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>'); }
 </script>
-<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>

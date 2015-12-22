@@ -1792,7 +1792,7 @@ button.paypal.is-active {
 	min-width : 120px;
 	float: left;
 	margin-left: 15px;
-	margin-top: 3%;
+	margin-top: 25px;
 }
 
 .tweet-panel-item,.posts-panel-item {
@@ -3900,8 +3900,9 @@ img.prof-image {
 .sq-img-adj {
 	position: absolute;
 	top: 0;
-	width: 50px;
-	height: 40px;
+	width: 26px;
+	height: 26px;
+	margin: 6px 12px;
 }
 
 .bg-black-info {
@@ -4141,7 +4142,7 @@ img.prof-image {
 	border-radius: 3px;
 	padding-left: 5px;
 	outline: none;
-	min-width: 200px;
+	min-width: 215px;
 }
 
 
@@ -4271,7 +4272,7 @@ img.prof-image {
 
 .sm-btn-dl-sd-admin{
 	
-	float: left;
+	float: right;
 	margin-right: 10px;
 	color: #009FE0;
 	border-radius: 3px;
@@ -4279,7 +4280,7 @@ img.prof-image {
 	border: 1px solid #009FE0;
 	height: 32px;
 	width: 25%;
-	min-width: 215px;
+	min-width: 240px;
 	max-width: 90%;
 	max-width: calc(100% - 20px);
 	text-align: center;
@@ -5140,12 +5141,13 @@ width: 50%;
 }
 
 .bd-frm-rt-txt-area {
-	width: 400px;
+	width: 90%;
 	padding: 10px;
 	height: 182px;
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+	min-width:180px;
 }
 
 .bd-dd-img {
@@ -5466,10 +5468,12 @@ td.v-tbl-spacer {
 
 .v-icn-close {
 	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
 }
 
 .v-icn-edit {
 	background: url('../images/edit-1.png') no-repeat center;
+	cursor: pointer;
 }
 
 .user-info-sing-out {
@@ -7062,12 +7066,12 @@ span.review-complete-txt{
 }
 
 .rpa-btn {
-    margin: 10px 64px;
-    display: inline-block;
+	margin: 0px 15px 15px;
 }
 
 .rpa-overlay-btn-cont {
-    margin: 0 -30px;
+	padding: 0 15px;
+	margin: 0 -15px;
 }
 
 textarea.report-abuse-txtbox {
@@ -7246,6 +7250,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .dsh-res-display {
 	padding: 0 10px;
 	cursor: pointer;
+}
+
+.dsh-res-hover {
+	background: #5cc7ef;
+	color: #fff;
 }
 
 .user-edit-btn {
@@ -7970,3 +7979,16 @@ label.url-change-input-label {
 	margin-bottom: 10px;
 }
 
+.dsh-sel-dropdwn-cont {
+	max-height: 200px;
+}
+.date-wid-pick{
+	width:27%;
+}
+.search-panel-right-sm{
+	width: 70%;
+	margin-bottom: 20px;
+}
+.sm-date-picker-wid{
+	width:27% !important; 
+}
