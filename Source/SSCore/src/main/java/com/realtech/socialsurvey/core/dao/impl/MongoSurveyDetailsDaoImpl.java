@@ -690,8 +690,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             if ( surveyDetails != null ) {
                 for ( SurveyDetails survey : surveyDetails ) {
 
-                    List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
-                        .getSharedOn();
+                    List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn();
                     if ( sharedOnAgent != null ) {
                         socialPostCount += sharedOnAgent.size();
                     }
@@ -719,7 +718,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         }
                     }
 
-                
+
                     /*if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                         List<String> sharedOnAgent = survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
                             .getSharedOn();
@@ -906,8 +905,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( rows > -1 ) {
             query.limit( rows );
         }
+        
+        query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
 
-        if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) )
+        /*if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) )
             query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
         else if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE ) ) {
             query.with( new Sort( Sort.Direction.DESC, CommonConstants.SCORE_COLUMN ) );
@@ -915,7 +916,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         } else {
             query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
             query.with( new Sort( Sort.Direction.DESC, CommonConstants.SCORE_COLUMN ) );
-        }
+        }*/
         List<SurveyDetails> surveysWithReviews = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
         LOG.info( "Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() finished." );
@@ -1418,7 +1419,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
         Update update = new Update();
-        update.inc( CommonConstants.REMINDER_COUNT_COLUMN, 1 );
         Date date = new Date();
         update.set( CommonConstants.MODIFIED_ON_COLUMN, date );
         update.set( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST, date );
@@ -1435,15 +1435,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to get list of customers who have not yet shared their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() started." );
         Date cutOffDate = getNdaysBackDate( surveyReminderInterval );
         Query query = new Query();
-        if ( maxReminders > 0 )
-            query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
-                new Criteria().orOperator( Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).lte( cutOffDate ),
-                    Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ),
-                Criteria.where( CommonConstants.SCORE_COLUMN ).gte( autopostScore ) ) );
-        else
-            query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
-                new Criteria().orOperator( Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).lte( cutOffDate ),
-                    Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ) ) );
+
+        query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
+            new Criteria().orOperator( Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).lte( cutOffDate ),
+                Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ),
+            Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
+            Criteria.where( CommonConstants.SCORE_COLUMN ).gte( autopostScore ),
+            Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ),
+            Criteria.where( CommonConstants.MOOD_COLUMN ).is( CommonConstants.SURVEY_MOOD_GREAT ) ) );
+
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         ListIterator<SurveyDetails> surveyIterator = surveys.listIterator();
         SurveyDetails surveyDetail;

@@ -296,8 +296,10 @@ public class SurveyManagementController
                             .getMoodList().contains( mood.toLowerCase() ) ) ) ) {
                         survey.setUnderResolution( true );
                         surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
+                        
+                        //SS-1435: Send survey details too.
                         emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), customerName,
-                            customerEmail, mood, surveyScore );
+                            customerEmail, mood, surveyScore, surveyDetail );
                     }
 
                 }
@@ -405,7 +407,7 @@ public class SurveyManagementController
         model.addAttribute( "agentName", agentName );
         model.addAttribute( "agentEmail", agentEmail );
         LOG.info( "Method to start survey initiateSurvey() finished." );
-        return JspResolver.SHOW_SURVEY_QUESTIONS;
+        return JspResolver.SHOW_SURVEY_FORM;
     }
 
 
@@ -499,7 +501,7 @@ public class SurveyManagementController
             model.addAttribute( "lastName", lastName );
             model.addAttribute( "customerEmail", customerEmail );
             model.addAttribute( "relation", custRelationWithAgent );
-            return JspResolver.SHOW_SURVEY_QUESTIONS;
+            return JspResolver.SHOW_SURVEY_FORM;
         }
         LOG.info( "Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started." );
         return JspResolver.SURVEY_INVITE_SUCCESSFUL;
@@ -1252,8 +1254,8 @@ public class SurveyManagementController
 
             //update shared on
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
-            SocialMediaPostDetails socialMediaPostDetails = null;
-            if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+            SocialMediaPostDetails socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
+            if ( socialMediaPostDetails == null ) {
                 socialMediaPostDetails = new SocialMediaPostDetails();
 
             }
@@ -1326,8 +1328,8 @@ public class SurveyManagementController
 
                 //update shared on
                 SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
-                SocialMediaPostDetails socialMediaPostDetails = null;
-                if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+                SocialMediaPostDetails socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
+                if ( socialMediaPostDetails == null ) {
                     socialMediaPostDetails = new SocialMediaPostDetails();
 
                 }

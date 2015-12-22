@@ -2995,6 +2995,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
+    public void updateUser( User user )
+    {
+        userDao.update( user );
+
+    }
+
+
+    @Override
+    @Transactional
     public Region getRegionById( long id )
     {
         Region region = regionDao.findById( Region.class, id );
@@ -3106,11 +3115,37 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException
     {
         LOG.info( "Method to find users on the basis of user ids started for user ids : " + userIds );
+        if ( userIds == null || userIds.size() <= 0 ) {
+            throw new InvalidInputException( "Invalid input parameter : Null or empty User Id List passed " );
+        }
         List<UserFromSearch> userList = userProfileDao.getUserFromSearchByUserIds( userIds );
         if ( userList == null ) {
             throw new InvalidInputException( "User not found for userId:" + userIds );
         }
         LOG.info( "Method to find users on the basis of user ids ended for user ids : " + userIds );
         return userList;
+    }
+    
+    
+    // Method to return active user with provided email and company
+    @Transactional
+    @Override
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
+        }
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null ) {
+            throw new NoRecordsFetchedException( "No company found with the id " + companyId );
+        }
+        User user = userDao.getActiveUserByEmailAndCompany( emailId, company );
+
+        LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
+        return user;
     }
 }

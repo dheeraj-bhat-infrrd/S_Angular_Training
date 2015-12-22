@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.servlet.UnavailableException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -1038,8 +1036,7 @@ public class ProfileManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testUpdateEmailVerificationStatusWhenEmailTypePersonalAndPersonalEmailToVerifyIsNull()
-        throws NonFatalException
+    public void testUpdateEmailVerificationStatusWhenEmailTypePersonalAndPersonalEmailToVerifyIsNull() throws NonFatalException
     {
         ContactDetailsSettings contact_details = new ContactDetailsSettings();
         contact_details.setMail_ids( new MailIdSettings() );
@@ -1642,257 +1639,136 @@ public class ProfileManagementServiceImplTest
 
 
     @Test
-    public void testGetIdsUnderAProfileLevelWithNullColumnName() throws InvalidInputException, ProfileNotFoundException
+    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithNullProfileLevel()
     {
-        assertNull( "Ids returned do not match expected", profileManagementServiceImpl.getIdsForColumnName( null, 1 ) );
+        assertNull( "Heirarchy level to Ids map is not as expected",
+            profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForProfileLevel( null, 1 ) );
     }
 
 
     @Test
-    public void testGetIdsUnderAProfileLevelWithEmptyColumnName() throws InvalidInputException, ProfileNotFoundException
+    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithEmptyProfileLevel()
     {
-        assertNull( "Ids returned do not match expected",
-            profileManagementServiceImpl.getIdsForColumnName( TestConstants.TEST_EMPTY_STRING, 1 ) );
+        assertNull( "Heirarchy level to Ids map is not as expected",
+            profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForProfileLevel( TestConstants.TEST_EMPTY_STRING, 1 ) );
     }
 
 
     @Test
-    public void testGetIdsUnderAProfileLevelWithInvalidIden() throws InvalidInputException, ProfileNotFoundException
+    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithInvalidIden()
     {
-        assertNull( "Ids returned do not match expected",
-            profileManagementServiceImpl.getIdsForColumnName( TestConstants.TEST_STRING, 0 ) );
+        assertNull( "Heirarchy level to Ids map is not as expected",
+            profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForProfileLevel( TestConstants.TEST_STRING, 0 ) );
     }
 
 
     @Test
-    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithNullColumnName() throws InvalidInputException,
-        ProfileNotFoundException
+    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithInvalidProfileLevel()
     {
-        assertNull( "Ids returned do not match expected",
-            profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForColumnName( null, 1 ) );
+        assertNull( "Heirarchy level to Ids map is not as expected",
+            profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForProfileLevel( TestConstants.TEST_STRING, 1 ) );
     }
 
 
-    @Test
-    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithEmptyColumnName() throws InvalidInputException,
-        ProfileNotFoundException
+    @Test ( expected = InvalidInputException.class)
+    public void testLockSettingsTillRegionWithNullCompanySettings() throws InvalidInputException
     {
-        assertNull( "Ids returned do not match expected",
-            profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForColumnName( TestConstants.TEST_EMPTY_STRING, 1 ) );
+        profileManagementServiceImpl.lockSettingsTillRegion( null, new OrganizationUnitSettings() );
     }
 
 
-    @Test
-    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithInvalidIden() throws InvalidInputException,
-        ProfileNotFoundException
+    @Test ( expected = InvalidInputException.class)
+    public void testLockSettingsTillBranchWithNullCompanySettings() throws InvalidInputException
     {
-        assertNull( "Ids returned do not match expected",
-            profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForColumnName( TestConstants.TEST_STRING, 0 ) );
+        profileManagementServiceImpl.lockSettingsTillBranch( null, new OrganizationUnitSettings(),
+            new OrganizationUnitSettings() );
     }
 
 
-    @Test
-    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithInvalidColumnName() throws InvalidInputException,
-        ProfileNotFoundException
+    @Test ( expected = InvalidInputException.class)
+    public void testAggregateRegionProfileWithNullCompanySettings() throws InvalidInputException
     {
-        Map<String, Set<Long>> hierarchyIdsMap = new HashMap<String, Set<Long>>();
-        Set<Long> ids = new HashSet<Long>();
-        ids.add( 2l );
-
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_REGION, ids );
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_BRANCH, ids );
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_INDIVIDUAL, ids );
-
-        Map<String, Long> zillowInfo = profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForColumnName(
-            TestConstants.TEST_STRING, 1 );
-
-        assertEquals( "Zillow review count does not match expected", 0,
-            zillowInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ).longValue() );
-        assertEquals( "Zillow total score does not match expected", 0,
-            zillowInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ).longValue() );
+        profileManagementServiceImpl.aggregateRegionProfile( null, new OrganizationUnitSettings() );
     }
 
 
-    @Test
-    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithCompanyIdAsColumnNameWhenHierarchyIdsArePresent()
-        throws InvalidInputException, ProfileNotFoundException
+    @Test ( expected = InvalidInputException.class)
+    public void testAggregateRegionProfileWithNullRegionSettings() throws InvalidInputException
     {
-        Map<String, Set<Long>> hierarchyIdsMap = new HashMap<String, Set<Long>>();
-        Set<Long> ids = new HashSet<Long>();
-        ids.add( 2l );
-
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_REGION, ids );
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_BRANCH, ids );
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_INDIVIDUAL, ids );
-
-        ZillowToken zillowToken = new ZillowToken();
-        zillowToken.setZillowProfileLink( "http://www.zillow.com/profile/test/" );
-        zillowToken.setZillowScreenName( "test" );
-        SocialMediaTokens socialMediaTokens = new SocialMediaTokens();
-        socialMediaTokens.setZillowToken( zillowToken );
-
-        OrganizationUnitSettings profileOrganizationUnitSettings = new OrganizationUnitSettings();
-        profileOrganizationUnitSettings.setSocialMediaTokens( socialMediaTokens );
-        profileOrganizationUnitSettings.setZillowReviewAverage( 5 );
-        profileOrganizationUnitSettings.setZillowReviewCount( 10 );
-
-        AgentSettings agentSettings = new AgentSettings();
-        agentSettings.setSocialMediaTokens( socialMediaTokens );
-        agentSettings.setZillowReviewAverage( 5 );
-        agentSettings.setZillowReviewCount( 10 );
-
-        List<AgentSettings> agentSettingsList = new ArrayList<AgentSettings>();
-        agentSettingsList.add( agentSettings );
-
-        List<OrganizationUnitSettings> organizationUnitSettingsList = new ArrayList<OrganizationUnitSettings>();
-        organizationUnitSettingsList.add( profileOrganizationUnitSettings );
-
-        Mockito.doReturn( hierarchyIdsMap ).when( profileManagementServiceImpl )
-            .getIdsForColumnName( Mockito.anyString(), Mockito.anyLong() );
-        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( Mockito.anyLong(), Mockito.anyString() ) )
-            .thenReturn( profileOrganizationUnitSettings );
-        Mockito.when(
-            organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds( Mockito.anySetOf( Long.class ),
-                Mockito.anyString() ) ).thenReturn( organizationUnitSettingsList );
-        Mockito.when( organizationUnitSettingsDao.fetchMultipleAgentSettingsById( Mockito.anyListOf( Long.class ) ) )
-            .thenReturn( agentSettingsList );
-        Map<String, Long> zillowInfo = profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForColumnName(
-            CommonConstants.COMPANY_ID_COLUMN, 1 );
-
-        assertEquals( "Zillow review count does not match expected", 40,
-            zillowInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ).longValue() );
-        assertEquals( "Zillow total score does not match expected", 200, zillowInfo.get( CommonConstants.ZILLOW_TOTAL_SCORE )
-            .longValue() );
+        profileManagementServiceImpl.aggregateRegionProfile( new OrganizationUnitSettings(), null );
     }
 
 
-    @Test
-    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithRegionIdAsColumnNameWhenHierarchyIdsArePresent()
-        throws InvalidInputException, ProfileNotFoundException
+    @Test ( expected = InvalidInputException.class)
+    public void testAggregateBranchProfileWithNullCompanySettings() throws InvalidInputException
     {
-        Map<String, Set<Long>> hierarchyIdsMap = new HashMap<String, Set<Long>>();
-        Set<Long> ids = new HashSet<Long>();
-        ids.add( 2l );
-
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_BRANCH, ids );
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_INDIVIDUAL, ids );
-
-        ZillowToken zillowToken = new ZillowToken();
-        zillowToken.setZillowProfileLink( "http://www.zillow.com/profile/test/" );
-        zillowToken.setZillowScreenName( "test" );
-        SocialMediaTokens socialMediaTokens = new SocialMediaTokens();
-        socialMediaTokens.setZillowToken( zillowToken );
-
-        OrganizationUnitSettings profileOrganizationUnitSettings = new OrganizationUnitSettings();
-        profileOrganizationUnitSettings.setSocialMediaTokens( socialMediaTokens );
-        profileOrganizationUnitSettings.setZillowReviewAverage( 5 );
-        profileOrganizationUnitSettings.setZillowReviewCount( 10 );
-
-        AgentSettings agentSettings = new AgentSettings();
-        agentSettings.setSocialMediaTokens( socialMediaTokens );
-        agentSettings.setZillowReviewAverage( 5 );
-        agentSettings.setZillowReviewCount( 10 );
-
-        List<AgentSettings> agentSettingsList = new ArrayList<AgentSettings>();
-        agentSettingsList.add( agentSettings );
-
-        List<OrganizationUnitSettings> organizationUnitSettingsList = new ArrayList<OrganizationUnitSettings>();
-        organizationUnitSettingsList.add( profileOrganizationUnitSettings );
-
-        Mockito.doReturn( hierarchyIdsMap ).when( profileManagementServiceImpl )
-            .getIdsForColumnName( Mockito.anyString(), Mockito.anyLong() );
-        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( Mockito.anyLong(), Mockito.anyString() ) )
-            .thenReturn( profileOrganizationUnitSettings );
-        Mockito.when(
-            organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds( Mockito.anySetOf( Long.class ),
-                Mockito.anyString() ) ).thenReturn( organizationUnitSettingsList );
-        Mockito.when( organizationUnitSettingsDao.fetchMultipleAgentSettingsById( Mockito.anyListOf( Long.class ) ) )
-            .thenReturn( agentSettingsList );
-        Map<String, Long> zillowInfo = profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForColumnName(
-            CommonConstants.REGION_ID_COLUMN, 1 );
-
-        assertEquals( "Zillow review count does not match expected", 30,
-            zillowInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ).longValue() );
-        assertEquals( "Zillow total score does not match expected", 150, zillowInfo.get( CommonConstants.ZILLOW_TOTAL_SCORE )
-            .longValue() );
+        profileManagementServiceImpl.aggregateBranchProfile( null, new OrganizationUnitSettings(),
+            new OrganizationUnitSettings() );
     }
 
 
-    @Test
-    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithBranchIdAsColumnNameWhenHierarchyIdsArePresent()
-        throws InvalidInputException, ProfileNotFoundException
+    @Test ( expected = InvalidInputException.class)
+    public void testAggregateBranchProfileWithNullBranchSettings() throws InvalidInputException
     {
-        Map<String, Set<Long>> hierarchyIdsMap = new HashMap<String, Set<Long>>();
-        Set<Long> ids = new HashSet<Long>();
-        ids.add( 2l );
-
-        hierarchyIdsMap.put( CommonConstants.PROFILE_TYPE_INDIVIDUAL, ids );
-
-        ZillowToken zillowToken = new ZillowToken();
-        zillowToken.setZillowProfileLink( "http://www.zillow.com/profile/test/" );
-        zillowToken.setZillowScreenName( "test" );
-        SocialMediaTokens socialMediaTokens = new SocialMediaTokens();
-        socialMediaTokens.setZillowToken( zillowToken );
-
-        OrganizationUnitSettings profileOrganizationUnitSettings = new OrganizationUnitSettings();
-        profileOrganizationUnitSettings.setSocialMediaTokens( socialMediaTokens );
-        profileOrganizationUnitSettings.setZillowReviewAverage( 5 );
-        profileOrganizationUnitSettings.setZillowReviewCount( 10 );
-
-        AgentSettings agentSettings = new AgentSettings();
-        agentSettings.setSocialMediaTokens( socialMediaTokens );
-        agentSettings.setZillowReviewAverage( 5 );
-        agentSettings.setZillowReviewCount( 10 );
-
-        List<AgentSettings> agentSettingsList = new ArrayList<AgentSettings>();
-        agentSettingsList.add( agentSettings );
-
-        List<OrganizationUnitSettings> organizationUnitSettingsList = new ArrayList<OrganizationUnitSettings>();
-        organizationUnitSettingsList.add( profileOrganizationUnitSettings );
-
-        Mockito.doReturn( hierarchyIdsMap ).when( profileManagementServiceImpl )
-            .getIdsForColumnName( Mockito.anyString(), Mockito.anyLong() );
-        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( Mockito.anyLong(), Mockito.anyString() ) )
-            .thenReturn( profileOrganizationUnitSettings );
-        Mockito.when(
-            organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds( Mockito.anySetOf( Long.class ),
-                Mockito.anyString() ) ).thenReturn( organizationUnitSettingsList );
-        Mockito.when( organizationUnitSettingsDao.fetchMultipleAgentSettingsById( Mockito.anyListOf( Long.class ) ) )
-            .thenReturn( agentSettingsList );
-        Map<String, Long> zillowInfo = profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForColumnName(
-            CommonConstants.BRANCH_ID_COLUMN, 1 );
-
-        assertEquals( "Zillow review count does not match expected", 20,
-            zillowInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ).longValue() );
-        assertEquals( "Zillow total score does not match expected", 100, zillowInfo.get( CommonConstants.ZILLOW_TOTAL_SCORE )
-            .longValue() );
+        profileManagementServiceImpl.aggregateBranchProfile( new OrganizationUnitSettings(), new OrganizationUnitSettings(),
+            null );
     }
 
 
-    @Test
-    public void testGetZillowTotalScoreAndReviewCountForProfileLevelWithAgentIdAsColumnNameWhenHierarchyIdsArePresent()
-        throws InvalidInputException, ProfileNotFoundException
+    @Test ( expected = InvalidInputException.class)
+    public void testAggregateAgentProfileWithNullCompanySettings() throws InvalidInputException
     {
-
-        ZillowToken zillowToken = new ZillowToken();
-        zillowToken.setZillowProfileLink( "http://www.zillow.com/profile/test/" );
-        zillowToken.setZillowScreenName( "test" );
-        SocialMediaTokens socialMediaTokens = new SocialMediaTokens();
-        socialMediaTokens.setZillowToken( zillowToken );
-
-        AgentSettings agentSettings = new AgentSettings();
-        agentSettings.setSocialMediaTokens( socialMediaTokens );
-        agentSettings.setZillowReviewAverage( 5 );
-        agentSettings.setZillowReviewCount( 10 );
-
-        Mockito.when( organizationUnitSettingsDao.fetchAgentSettingsById( Mockito.anyLong() ) ).thenReturn( agentSettings );
-        Map<String, Long> zillowInfo = profileManagementServiceImpl.getZillowTotalScoreAndReviewCountForColumnName(
-            CommonConstants.AGENT_ID_COLUMN, 1 );
-
-        assertEquals( "Zillow review count does not match expected", 10,
-            zillowInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ).longValue() );
-        assertEquals( "Zillow total score does not match expected", 50, zillowInfo.get( CommonConstants.ZILLOW_TOTAL_SCORE )
-            .longValue() );
+        profileManagementServiceImpl.aggregateAgentProfile( null, new OrganizationUnitSettings(),
+            new OrganizationUnitSettings(), new OrganizationUnitSettings() );
     }
-    /**getPrimaryHierarchyByEntity test cases on the settingslogic*/
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testAggregateAgentProfileWithNullAgentSettings() throws InvalidInputException
+    {
+        profileManagementServiceImpl.aggregateAgentProfile( new OrganizationUnitSettings(), new OrganizationUnitSettings(),
+            new OrganizationUnitSettings(), null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetIdenColumnNameFromProfileLevelWithNullProfileLevel() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getIdenColumnNameFromProfileLevel( null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetIdenColumnNameFromProfileLevelWithEmptyProfileLevel() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getIdenColumnNameFromProfileLevel( TestConstants.TEST_EMPTY_STRING );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetIdenColumnNameFromProfileLevelWithInvalidProfileLevel() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getIdenColumnNameFromProfileLevel( TestConstants.TEST_STRING );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsByProfileLevelWithNullProfileLevel() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getAgentIdsByProfileLevel( null, 1 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsByProfileLevelWithEmptyProfileLevel() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getAgentIdsByProfileLevel( TestConstants.TEST_EMPTY_STRING, 1 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsByProfileLevelWithInvalidProfileLevel() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getAgentIdsByProfileLevel( TestConstants.TEST_STRING, 1 );
+    }
 }

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -795,5 +796,74 @@ public class UserManagementServiceImplTest
     public void testupdateProfileUrlInBranchSettingsForNullSettings() throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         userManagementServiceImpl.updateProfileUrlInBranchSettings( "test", "test", null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserOnCompleteRegistrationForNullUser() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateUserOnCompleteRegistration( null, "test", 01, "test", "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateUserCountModificationNotificationForNull() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.updateUserCountModificationNotification( null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testIsValidApiKeyForNullApiKey() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.isValidApiKey( null, "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testIsValidApiKeyForEmptyApiKey() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.isValidApiKey( "", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testIsValidApiKeyForNullApiScret() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.isValidApiKey( "test", null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testIsValidApiKeyForEmptyApiScret() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.isValidApiKey( "test", "" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUsersByUserIdsForNullList() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.getUsersByUserIds( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUsersByUserIdsForEmptyList() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        userManagementServiceImpl.getUsersByUserIds( new HashSet<Long>() );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetActiveUserByEmailAndCompanyForNullEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetActiveUserByEmailAndCompanyForEmptyEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, "" );
+    }
+    
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testGetActiveUserByEmailAndCompanyForNoCompanyFound() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, "test" );
     }
 }

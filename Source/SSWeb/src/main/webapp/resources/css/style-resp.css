@@ -1592,17 +1592,18 @@
 	}
 	.search-panel-item{
 	margin-left:20px;
-	width:200px;
+	width:270px;
 	}
 	.v-um-hdr-search-sm{
 	clear:both;
 	}
 	.sm-btn-dl-sd-admin{
 	clear:both;
+	float:none;
 	}
 	.dsh-date-picker{
-	width:25%;
-	padding:0px;
+		width:20%;
+		padding:0px;
 	}
 	.dash-size{
 	min-height:498px;
@@ -1942,16 +1943,18 @@
 	.search-panel-item{
 	margin-left:20px;
 	
-	width:200px;
+	width:215px;
 	}
 	.v-um-hdr-search-sm{
 	clear:right;
 	}
 	.sm-btn-dl-sd-admin{
 	clear:both;
+	float:none;
+	
 	}
 	.dsh-date-picker{
-	width:25%;
+		width:20%;
 	}
 	.dash-size{
 	min-height:340px;
