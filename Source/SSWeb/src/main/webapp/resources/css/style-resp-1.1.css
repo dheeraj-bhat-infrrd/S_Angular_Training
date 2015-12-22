@@ -294,7 +294,8 @@
 }
 .sm-post-row {
 	padding-left: 0px;
-	
+	     width: 60%; 
+    min-width: 250px;
 }
 .sm-prof-name {
 	line-height: 30px;
@@ -302,6 +303,16 @@
 .sm-custom-img{
 	width:40px;
 	height:40px;
+}
+.sm-default-img{
+	width:40px;
+	height:40px;
+}
+.dash-sel-item-sm{
+	width:270px;
+}
+.sm-prof-name{
+	margin-top: 15px;
 }
 }
 

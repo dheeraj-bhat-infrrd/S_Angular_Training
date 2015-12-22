@@ -1592,13 +1592,14 @@
 	}
 	.search-panel-item{
 	margin-left:20px;
-	width:200px;
+	width:270px;
 	}
 	.v-um-hdr-search-sm{
 	clear:both;
 	}
 	.sm-btn-dl-sd-admin{
 	clear:both;
+	float:none;
 	}
 	.dsh-date-picker{
 		width:20%;
@@ -1942,13 +1943,15 @@
 	.search-panel-item{
 	margin-left:20px;
 	
-	width:200px;
+	width:215px;
 	}
 	.v-um-hdr-search-sm{
 	clear:right;
 	}
 	.sm-btn-dl-sd-admin{
 	clear:both;
+	float:none;
+	
 	}
 	.dsh-date-picker{
 		width:20%;
