@@ -1107,7 +1107,7 @@ function paintHiddenReviewsCount(data) {
 			.attr("data-nr-review-count", responseJson.entity)
 			.html(reviewsSizeHtml);
 			
-			$("#prof-hidden-review-count").click(function(){
+			/*$("#prof-hidden-review-count").click(function(){
 				$('#prof-review-item').html('');
 				$(this).hide();
 				startIndex = 0;
@@ -1117,7 +1117,7 @@ function paintHiddenReviewsCount(data) {
 				var profileLevel = $("#profile-fetch-info").attr("profile-level");
 				doFetchZillowReviews = true;
 				fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, 0 , true);
-			});
+			});*/
 		}
 	}
 }
@@ -1136,7 +1136,7 @@ $(document).on('click', '#sort-by-feature',function(e){
 	fetchReviewsBasedOnProfileLevel(profileLevel, currentProfileIden, startIndex, numOfRows, minScore , true);
 });
 
-$(document).on('click', '#sort-by-date',function(e){
+$(document).on('click', '#sort-by-date, #prof-hidden-review-count',function(e){
 	e.stopImmediatePropagation();
 	$("#prof-hidden-review-count").hide();
 	$('#prof-review-item').html('');
