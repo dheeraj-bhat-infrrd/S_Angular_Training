@@ -1286,7 +1286,7 @@ public class UserManagementController
                 }
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
-                    map );
+                    map , true);
             } catch ( InvalidInputException e ) {
                 LOG.error( "Error occured while fetching region profile", e );
             }
@@ -1318,7 +1318,7 @@ public class UserManagementController
                 }
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, null, map );
+                    branchProfile, null, map , true);
             } catch ( InvalidInputException e ) {
                 LOG.error( "Error occured while fetching branch profile", e );
             } catch ( NoRecordsFetchedException e ) {
@@ -1359,7 +1359,7 @@ public class UserManagementController
 
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, individualProfile, map );
+                    branchProfile, individualProfile, map , true );
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
             } catch ( NoRecordsFetchedException e ) {
