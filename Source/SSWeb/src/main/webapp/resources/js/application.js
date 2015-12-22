@@ -5196,15 +5196,22 @@ function showFeedbackPage(mood) {
 			if( (Boolean(autoPost) == false)){
 				$('#shr-pst-cb').val('false');
 				$('#shr-post-chk-box').addClass('bd-check-img-checked');
+			} else {
+				$('#shr-pst-cb').val('true');
+				$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 			}
 		}
 		break;
 	case "OK":
 		question = neutralText;
+		$('#shr-pst-cb').val('false');//Update the agree to share checkbox false if mood is ok
+		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$("#ques-text-textarea").html(question);
 		break;
 	case "Unpleasant":
 		question = sadText;
+		$('#shr-pst-cb').val('false');//Update the agree to share checkbox false if mood is unpleasant
+		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$("#ques-text-textarea").html(question);
 		break;
 	}
@@ -5308,7 +5315,7 @@ function showMasterQuestionPage(){
 			}
 			if(mood == 'Great') {
 				$('#social-post-links').show();
-			}
+			} 
 		}
 		
 		//call method to post the review and update the review count
