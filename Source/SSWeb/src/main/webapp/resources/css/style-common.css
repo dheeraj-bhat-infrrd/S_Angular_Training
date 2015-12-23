@@ -7882,7 +7882,7 @@ label.url-change-input-label {
 }
 
 .compl-box-txt {
-	line-height: 50px;
+	line-height: 40px;
 }
 
 .compl-save-btn {
@@ -7899,6 +7899,10 @@ label.url-change-input-label {
 }
 
 .compl-option-sel {
+    margin: 0 10px;
+}
+
+.compl-option-drop{
     margin: 0 10px;
 }
 
@@ -7991,6 +7995,12 @@ label.url-change-input-label {
 }
 .sm-date-picker-wid{
 	width:27% !important; 
+}
+.compl-check-height{
+	height:40px;
+}
+.compl-rating-drop-wid{
+	margin-left: 5px;
 }
 .social-auth-disabled {
 	cursor: auto !important; 
