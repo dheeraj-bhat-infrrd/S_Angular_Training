@@ -76,7 +76,7 @@
 				<div id="company" class="dsh-txt-3 hide">${company}</div>
 			</c:if>
 		</div>
-		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}">
+		<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
 			<div id="dsh-btn1" class="dsh-btn-complete float-left"><spring:message code="label.sendsurvey.btn.key" /></div>
 			<div id="dsh-btn2" class="dsh-btn-complete dsh-btn-orange float-left hide"></div>
 			<div id="dsh-btn3" class="dsh-btn-complete dsh-btn-green float-left hide"></div>

@@ -80,7 +80,7 @@
 				<div class="reg_form_row clearfix">
 					<div class="float-left rfr_lbl"><spring:message code="label.profilepage.key" /></div>
 					<div class="float-left rfr_txt">
-						<div class="reg-prof-url"><a href="${profileUrl}" target="_blank">${profileUrl}</a></div>
+						<div class="reg-prof-url rfr_txt_fld"><a href="${profileUrl}" target="_blank">${profileUrl}</a></div>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">

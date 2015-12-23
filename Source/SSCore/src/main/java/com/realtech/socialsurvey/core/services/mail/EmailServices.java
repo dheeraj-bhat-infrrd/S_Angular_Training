@@ -361,7 +361,8 @@ public interface EmailServices
         String agentEmail, String companyName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood, String rating )
+    //SS-1435: Send survey details too
+    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood, String rating, String surveyDetail )
         throws InvalidInputException, UndeliveredEmailException;
 
 
