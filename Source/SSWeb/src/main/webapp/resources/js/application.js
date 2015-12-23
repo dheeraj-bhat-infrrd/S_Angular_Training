@@ -5522,15 +5522,22 @@ function showFeedbackPage(mood) {
 			if( (Boolean(autoPost) == false)){
 				$('#shr-pst-cb').val('false');
 				$('#shr-post-chk-box').addClass('bd-check-img-checked');
+			} else {
+				$('#shr-pst-cb').val('true');
+				$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 			}
 		}
 		break;
 	case "OK":
 		question = neutralText;
+		$('#shr-pst-cb').val('false');//Update the agree to share checkbox false if mood is ok
+		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$("#ques-text-textarea").html(question);
 		break;
 	case "Unpleasant":
 		question = sadText;
+		$('#shr-pst-cb').val('false');//Update the agree to share checkbox false if mood is unpleasant
+		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$("#ques-text-textarea").html(question);
 		break;
 	}
@@ -5660,7 +5667,7 @@ function showMasterQuestionPage(){
 			
 			if(mood == 'Great') {
 				$('#social-post-links').show();
-			}
+			} 
 		}
 		
 		//call method to post the review and update the review count
@@ -5851,9 +5858,6 @@ $('.sq-star').hover(function() {
 $('.sq-np-item-next')
 		.click(
 				function() {
-					if (questionDetails.questionType == "sb-master") {
-						showMasterQuestionPage();
-					}
 
 					if (questionDetails.questionType == "sb-sel-mcq"
 							&& customerResponse != undefined) {
@@ -5891,6 +5895,12 @@ $('.sq-np-item-next')
 							return;
 						}
 					} else if (questionDetails.questionType == "sb-master") {
+						if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
+							$('#overlay-toast').html('Please answer this question.');
+							showToast();
+						} else {
+							showMasterQuestionPage();
+						}
 						return;
 					}
 					$(".sq-star").removeClass('sq-full-star');
