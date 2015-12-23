@@ -629,4 +629,17 @@
 	.rpa-btn {
 		width: 130px;
 	}
+	.compl-input-cont{
+	width:250px;
+	}
+	.submit-comp-btn{
+	width: 245px;
+    margin-left: 27px;
+	}
+	.com-reg-or{
+	margin-top: 10px;
+	}
+	.compl-save-btn{
+	margin-top:0px;
+	}
 }
