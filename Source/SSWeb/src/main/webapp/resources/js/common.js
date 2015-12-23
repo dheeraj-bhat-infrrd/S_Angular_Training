@@ -609,7 +609,12 @@ function openForgotPasswordPage(){
 }
 
 // Dashboard popup click functions
-function openAuthPage(socialNetwork) {
+function openAuthPage(socialNetwork, isAutoLogin) {
+	if(isAutoLogin) {
+		$('#overlay-toast').html('You are not authorized to connect to ' + socialNetwork);
+		showToast();
+		return;
+	}
 	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
 }
 function openAuthPageZillow(disableEle) {
@@ -622,6 +627,13 @@ function openAuthPageRegistration(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
 }
 function openAuthPageDashboard(socialNetwork, columnName, columnValue) {
+	//check if user is autologged in
+	if($('#pro-cmplt-stars').attr('data-autologin') == 'true') {
+		$('#overlay-toast').html('You are not authorized to connect to ' + socialNetwork);
+		showToast();
+		return;
+	}
+	
 	window.open("./socialauth.do?social=" + socialNetwork + "&columnName="
 			+ columnName + "&columnValue=" + columnValue, "Authorization Page",
 			"width=800,height=600,scrollbars=yes");
