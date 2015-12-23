@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,15 +34,8 @@ public class CompanyDaoImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetAllUsersAndAdminsUnderACompanyGroupedByBranchesWithInvalidCompanyId() throws InvalidInputException
+    public void testGetUserAdoptionDataWithInvalidCompanyId() throws InvalidInputException
     {
-        companyDaoImpl.getAllUsersAndAdminsUnderACompanyGroupedByBranches( 0 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testGetAllActiveUsersAndAdminsUnderACompanyGroupedByBranchesWithInvalidCompanyId() throws InvalidInputException
-    {
-        companyDaoImpl.getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( 0 );
+        companyDaoImpl.getUserAdoptionData( 0 );
     }
 }
