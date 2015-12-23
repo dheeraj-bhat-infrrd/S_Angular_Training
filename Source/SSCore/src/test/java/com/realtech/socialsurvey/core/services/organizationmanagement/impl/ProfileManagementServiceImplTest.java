@@ -682,6 +682,14 @@ public class ProfileManagementServiceImplTest
     }
 
 
+    @Test ( expected = InvalidInputException.class)
+    public void testGetIndividualsForCompanyWithInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException,
+        ProfileNotFoundException
+    {
+        profileManagementServiceImpl.getIndividualsForCompany( 0 );
+    }
+
+
     @Test ( expected = ProfileNotFoundException.class)
     public void testGetRegionByProfileNameWithNullCompanyProfileName() throws InvalidInputException, ProfileNotFoundException
     {
@@ -722,32 +730,40 @@ public class ProfileManagementServiceImplTest
     }
 
 
-    /**
-     * Below test case will not work as getBranchByProfileName call getCompanyProfileByProfileName
-     * */
-
-
-    //    @Test ( expected = RuntimeException.class)
+    @Test ( expected = ProfileNotFoundException.class)
     public void testGetBranchByProfileNameWhenCompanySettingsIsNull() throws InvalidInputException, ProfileNotFoundException
     {
-        Mockito.when( profileManagementServiceImpl.getCompanyProfileByProfileName( TestConstants.TEST_STRING ) ).thenReturn(
-            null );
+        Mockito.doReturn( null ).when( profileManagementServiceImpl )
+            .getCompanyProfileByProfileName( TestConstants.TEST_STRING );
         profileManagementServiceImpl.getBranchByProfileName( TestConstants.TEST_STRING, TestConstants.TEST_STRING );
     }
 
 
-    /**
-     * Below test case will not work as getBranchByProfileName call getCompanyProfileByProfileName
-     * */
-
-    //    @Test ( expected = RuntimeException.class)
+    @Test ( expected = ProfileNotFoundException.class)
     public void testGetBranchByProfileNameWhenBranchSettingsIsNull() throws InvalidInputException, ProfileNotFoundException
     {
+        Mockito.doReturn( new OrganizationUnitSettings() ).when( profileManagementServiceImpl )
+            .getCompanyProfileByProfileName( TestConstants.TEST_STRING );
         Mockito.when( utils.generateBranchProfileUrl( Mockito.anyString(), Mockito.anyString() ) ).thenReturn(
             TestConstants.TEST_STRING );
         Mockito.when(
             organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl( Mockito.anyString(), Mockito.anyString() ) )
             .thenReturn( null );
+        profileManagementServiceImpl.getBranchByProfileName( TestConstants.TEST_STRING, TestConstants.TEST_STRING );
+    }
+
+
+    @Test ( expected = ProfileNotFoundException.class)
+    public void testGetBranchByProfileNameWhenBranchIsNull() throws InvalidInputException, ProfileNotFoundException
+    {
+        Mockito.doReturn( new OrganizationUnitSettings() ).when( profileManagementServiceImpl )
+            .getCompanyProfileByProfileName( TestConstants.TEST_STRING );
+        Mockito.when( utils.generateBranchProfileUrl( Mockito.anyString(), Mockito.anyString() ) ).thenReturn(
+            TestConstants.TEST_STRING );
+        Mockito.when(
+            organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl( Mockito.anyString(), Mockito.anyString() ) )
+            .thenReturn( new OrganizationUnitSettings() );
+        Mockito.when( branchDao.findById( Mockito.eq( Branch.class ), Mockito.anyLong() ) ).thenReturn( null );
         profileManagementServiceImpl.getBranchByProfileName( TestConstants.TEST_STRING, TestConstants.TEST_STRING );
     }
 
@@ -968,14 +984,14 @@ public class ProfileManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testGetAverageRatingsWithInvalidIden() throws InvalidInputException
     {
-        profileManagementServiceImpl.getAverageRatings( 0, TestConstants.TEST_STRING, false );
+        profileManagementServiceImpl.getAverageRatings( 0, TestConstants.TEST_STRING, false, false, 0, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testGetReviewsCountWithInvalidIden() throws InvalidInputException
     {
-        profileManagementServiceImpl.getReviewsCount( 0, 0, 0, TestConstants.TEST_STRING, false, false );
+        profileManagementServiceImpl.getReviewsCount( 0, 0, 0, TestConstants.TEST_STRING, false, false, false, 0 );
     }
 
 

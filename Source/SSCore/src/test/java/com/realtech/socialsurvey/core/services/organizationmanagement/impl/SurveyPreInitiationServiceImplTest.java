@@ -41,4 +41,25 @@ public class SurveyPreInitiationServiceImplTest
         surveyPreInitiationServiceImpl.getIncompleteSurvey( 0, TestConstants.TEST_INT, TestConstants.TEST_INT,
             TestConstants.TEST_INT, TestConstants.TEST_INT, CommonConstants.PROFILE_LEVEL_COMPANY, null, null, false );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsByProfileLevelWithNullProfileLevel() throws InvalidInputException
+    {
+        surveyPreInitiationServiceImpl.getAgentIdsByProfileLevel( null, 1 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsByProfileLevelWithEmptyProfileLevel() throws InvalidInputException
+    {
+        surveyPreInitiationServiceImpl.getAgentIdsByProfileLevel( TestConstants.TEST_EMPTY_STRING, 1 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsByProfileLevelWithInvalidProfileLevel() throws InvalidInputException
+    {
+        surveyPreInitiationServiceImpl.getAgentIdsByProfileLevel( TestConstants.TEST_STRING, 1 );
+    }
 }
