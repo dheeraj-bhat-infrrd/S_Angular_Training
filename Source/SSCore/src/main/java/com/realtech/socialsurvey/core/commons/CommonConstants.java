@@ -762,6 +762,7 @@ public interface CommonConstants
     public static final String COMPANY_ADMIN_SWITCH_USER_ID = "companyAdminSwitchId";
     public static final String REGION_ADMIN_SWITCH_USER_ID = "regionAdminSwitchId";
     public static final String BRANCH_ADMIN_SWITCH_USER_ID = "branchAdminSwitchId";
+    public static final String IS_AUTO_LOGIN = "isAutoLogin";
 
     public static final String PATTERN_FIRST = "patternFirst";
 
@@ -910,4 +911,11 @@ public interface CommonConstants
     public static final String HEADER_PUBLIC_PROFILE_URL = "Public profile URL";
     public static final String HEADER_IS_AGENT = "Is Agent";
     public static final String HEADER_STATE = "State";
+
+    //Zillow connection
+    public static final int ZILLOW_CONNECTED = 1;
+    public static final int ZILLOW_DISCONNECTED = 0;
+
+    // MySQL IS_ZILLOW_CONNECTED column name constant
+    public static final String IS_ZILLOW_CONNECTED_COLUMN = "IS_ZILLOW_CONNECTED";
 }
