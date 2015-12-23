@@ -163,5 +163,33 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 		}
 		LOG.info("Method to fetch all the users by email id, deleteUsersByCompanyId() finished.");
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.realtech.socialsurvey.core.dao.UserDao#getActiveUserByEmailAndCompany(java.lang.String, com.realtech.socialsurvey.core.entities.Company)
+	 */
+	@Override
+    public User getActiveUserByEmailAndCompany(String emailId , Company company) throws NoRecordsFetchedException {
+        LOG.debug("Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : " + emailId);
+        Criteria criteria = getSession().createCriteria(User.class);
+        try {
+            criteria.add(Restrictions.eq(CommonConstants.LOGIN_NAME, emailId));
+            criteria.add(Restrictions.eq(CommonConstants.COMPANY, company ));
+            Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
+                    Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED),
+                    Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
+            criteria.add(criterion);
+        }
+        catch (HibernateException hibernateException) {
+            throw new DatabaseException("Exception caught in getActiveUserByEmailAndCompany() ", hibernateException);
+        }
+        @SuppressWarnings("unchecked") List<User> users = criteria.list();
+        if (users == null || users.isEmpty()) {
+            LOG.debug("No active users found with the emaild id " + emailId);
+            throw new NoRecordsFetchedException("No active user found for the emailid");
+        }
+        LOG.debug("Method getActiveUserByEmailAndCompany() successfull, active user with the emailId " + emailId);
+        return users.get(CommonConstants.INITIAL_INDEX);
+    }
 }
 // JIRA SS-42 By RM-05 EOC
