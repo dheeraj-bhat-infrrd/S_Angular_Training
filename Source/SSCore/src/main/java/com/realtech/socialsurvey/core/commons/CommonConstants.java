@@ -166,6 +166,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_COLUMN = "batchType";
     
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
+    public static final String IS_PRIMARY_COLUMN = "isPrimary";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -901,4 +902,12 @@ public interface CommonConstants
     public static final String HEADER_TOTAL_USERS = "Total Users ";
     public static final String HEADER_ACTIVE_USERS = "Active Users";
     public static final String HEADER_ADOPTION_RATES = "Adoption Rates";
+    
+    
+    // Constants for Billing Report
+    public static final String HEADER_USER_ID = "User ID";
+    public static final String HEADER_LOGIN_ID = "Login ID";
+    public static final String HEADER_PUBLIC_PROFILE_URL = "Public profile URL";
+    public static final String HEADER_IS_AGENT = "Is Agent";
+    public static final String HEADER_STATE = "State";
 }
