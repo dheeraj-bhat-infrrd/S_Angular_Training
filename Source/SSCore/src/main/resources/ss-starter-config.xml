@@ -472,14 +472,13 @@
 			<list>
 				<ref bean="sitemapjobdetail" />
 				<ref bean="emailreaderjobdetail" />
-				<ref bean="incompletesocialpostjobdetail" />
+				<!-- <ref bean="incompletesocialpostjobdetail" /> -->
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
 				<ref bean="socialpostsimportjobdetail" />
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
-				<ref bean="crmdataagentidmapperjobdetail" />
 				<ref bean="imageloaderjobdetail" />
 				<ref bean="fileuploadjobdetail" />
 				<ref bean="dotloopjobdetail" />
@@ -495,7 +494,7 @@
 			<list>
 				<ref bean="sitemapgeneratorcron" />
 				<ref bean="emailreadercron" />
-				<ref bean="incompletesocialpostcron" />
+				<!-- <ref bean="incompletesocialpostcron" /> -->
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
