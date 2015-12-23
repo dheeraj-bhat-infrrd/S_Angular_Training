@@ -7631,13 +7631,8 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 }
 
-// Update Disclaimer details
-$(document).on('click', '#disclaimer-text', function() {
-	$('#disclaimer-text').addClass('prof-name-edit');
-});
-
+//Update Disclaimer details
 $(document).on('blur', '#disclaimer-text', function() {
-	$('#disclaimer-text').removeClass('prof-name-edit');
 	
 	var disclaimer = $('#disclaimer-text').val().trim();
 	if (disclaimer == undefined || disclaimer == "") {
@@ -8515,7 +8510,12 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 
 
 //Disconnect social media
-function disconnectSocialMedia(socialMedia) {
+function disconnectSocialMedia(socialMedia, isAutoLogin) {
+	if(isAutoLogin) {
+		$('#overlay-toast').html('You are not authorized to disconnect from ' + socialMedia);
+		showToast();
+		return;
+	}
 	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
 		return;
 	}

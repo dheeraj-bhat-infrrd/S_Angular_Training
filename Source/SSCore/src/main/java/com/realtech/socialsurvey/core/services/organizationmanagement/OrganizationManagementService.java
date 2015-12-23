@@ -1200,28 +1200,32 @@ public interface OrganizationManagementService
      */
     void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException;
 
-    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
+//    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
 
 
-    public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException;
+//    public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException;
 
 
-    public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException, NoRecordsFetchedException;
+//    public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException;
+//    public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException;
 
 
-    public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException;
+//    public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
+//        NoRecordsFetchedException, ProfileNotFoundException;
 
 
-    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds );
+//    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds );
+
+    public Set<Long> getAllRegionsUnderCompanyConnectedToZillow( long iden, int start_index, int batch_size ) throws InvalidInputException;
 
 
-    public Map<String, Set<Long>> getAllIdsUnderCompanyConnectedToZillow( long iden );
+    public Set<Long> getAllBranchesUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index, int batch_size )
+        throws InvalidInputException;
 
 
-    public Map<String, Set<Long>> getAllIdsUnderBranchConnectedToZillow( long branchId );
+    public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index,
+        int batch_size ) throws InvalidInputException;
 
 }
