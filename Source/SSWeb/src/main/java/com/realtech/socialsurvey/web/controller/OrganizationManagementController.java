@@ -2155,6 +2155,9 @@ public class OrganizationManagementController
 
             if ( superAdminUserId != null )
                 newSession.setAttribute( CommonConstants.REALTECH_USER_ID, superAdminUserId );
+            
+            //Set the autologin attribute as true
+            newSession.setAttribute( CommonConstants.IS_AUTO_LOGIN, "true" );
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
 
         } catch ( NonFatalException e ) {

@@ -1970,30 +1970,53 @@ public class ProfileController
      * */
     @ResponseBody
     @RequestMapping ( value = "/{profileType}/{iden}/fetchhierarchyconnectedtozillow")
-    public Response getIdsOfHeirarchyConnectedWithZillow( @PathVariable String profileType, @PathVariable long iden )
-    {/**
-         * Method to fetch all ids under a profile level connected to zillow
-         * */
-        Response response = null;
-        LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " connected with zillow" );
-        Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
-        if ( profileType.equals( PROFILE_TYPE_COMPANY ) ) {
-            // get all region and branches, individuals under a region connected to zillow
-            hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
-        } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
-            // get all branches, individuals under a region connected to zillow
-            hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet<Long>( Arrays
-                .asList( new Long[] { iden } ) ) );
-        } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
-            // get all individuals under branch connected with zillow
-            hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
+    public String getIdsOfHeirarchyConnectedWithZillow( @PathVariable String profileType, @PathVariable long iden,
+        @QueryParam ( value = "start") Integer start, @QueryParam ( value = "numRows") Integer numRows,
+        @QueryParam ( value = "currentHierarchyLevel") String currentHierarchyLevel )
+    {
+        String json = null;
+        LOG.info( "Method getIdsOfHeirarchyConnectedWithZillow started to get ids of hierarchy under " + profileType
+            + " and id: " + iden + " for currentHierarchyLevel:" + currentHierarchyLevel + " connected with zillow" );
+        Set<Long> ids = null;
+        try {
+            if ( profileType.equals( PROFILE_TYPE_COMPANY ) ) {
+                if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_REGION ) ) {
+                    ids = organizationManagementService.getAllRegionsUnderCompanyConnectedToZillow( iden, start, numRows );
+                } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
+                    ids = organizationManagementService.getAllBranchesUnderProfileTypeConnectedToZillow( profileType, iden, start
+                        , numRows );
+                } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
+                }
+            } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
+                if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
+                    ids = organizationManagementService.getAllBranchesUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
+                } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
+                }
+            } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
+                if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
+                }
+            }
+            if ( ids != null && !ids.isEmpty() ) {
+                json = new Gson().toJson( ids );
+            }
+            LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " for currentHierarchyLevel:"
+                + currentHierarchyLevel + " connected with zillow" );
+            LOG.info( "Method getIdsOfHeirarchyConnectedWithZillow ended" );
+        } catch ( InvalidInputException iie ) {
+            LOG.error(
+                "InvalidInputException occurred while fetching ids for profile type and current hierarchy type. Reason : ", iie );
+        } catch ( Exception e ) {
+            LOG.error(
+                "Exception occurred while fetching ids for profile type and current hierarchy type. Reason : ", e );
         }
-        if ( !hierarchyIdsMap.isEmpty() ) {
-            String json = new Gson().toJson( hierarchyIdsMap );
-            response = Response.ok( json ).build();
-        }
-        LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " connected with zillow" );
-        return response;
+        return json;
 
     }
 }
