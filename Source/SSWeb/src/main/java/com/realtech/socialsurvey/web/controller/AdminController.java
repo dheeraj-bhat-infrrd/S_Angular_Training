@@ -481,6 +481,9 @@ public class AdminController
             User newUser = userManagementService.getUserByUserId( id );
 
             HttpSession newSession = request.getSession( true );
+            
+            //Set the autologin attribute as true
+            newSession.setAttribute( CommonConstants.IS_AUTO_LOGIN, "true" );
             newSession.setAttribute( CommonConstants.REALTECH_USER_ID, adminUser.getUserId() );
 
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
