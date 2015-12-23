@@ -135,12 +135,12 @@ public class ImageProcessorImpl implements ImageProcessor {
 		return cloudFrontUrl;
 	}
 
-	private String getThumbnailImageName(String originalImageName, String extension) {
+	String getThumbnailImageName(String originalImageName, String extension) {
 		LOG.debug("Getting thumbnail name for " + originalImageName);
 		return originalImageName.substring(originalImageName.lastIndexOf("/")+1, originalImageName.lastIndexOf("." + extension)) + "-t." + extension;
 	}
 
-	private void deleteTempFile(File file) {
+	 void deleteTempFile(File file) {
 		LOG.debug("Deleting file: " + file.getAbsolutePath());
 		FileUtils.deleteQuietly(file);
 	}
