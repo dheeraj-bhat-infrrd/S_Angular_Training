@@ -47,7 +47,7 @@ public class OrganizationUnitSettings {
 	private boolean isProfileImageProcessed;
 	private boolean isLogoImageProcessed;
 	private long zillowReviewCount;
-	private long zillowReviewAverage;
+	private double zillowReviewAverage;
 
 	public String getId() {
 		return id;
@@ -331,12 +331,12 @@ public class OrganizationUnitSettings {
         this.zillowReviewCount = zillowReviewCount;
     }
 
-    public long getZillowReviewAverage()
+    public double getZillowReviewAverage()
     {
         return zillowReviewAverage;
     }
 
-    public void setZillowReviewAverage( long zillowReviewAverage )
+    public void setZillowReviewAverage( double zillowReviewAverage )
     {
         this.zillowReviewAverage = zillowReviewAverage;
     }
