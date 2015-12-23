@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -80,5 +79,14 @@ public interface DashboardService
 
 
     public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    /**
+     * Method to create excel file for billing report data
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    XSSFWorkbook downloadBillingReport( long companyId ) throws InvalidInputException;
 }
 // JIRA SS-137 BY RM05:EOC

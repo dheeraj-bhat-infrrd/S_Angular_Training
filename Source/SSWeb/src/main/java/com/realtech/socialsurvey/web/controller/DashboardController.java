@@ -2168,5 +2168,71 @@ public class DashboardController
         LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() finished." );
     }
 
+
+    /**
+     * Controller to generate and download the billing report
+     * @param model
+     * @param request
+     * @param response
+     */
+    @RequestMapping ( value = "/downloadbillingreport")
+    public void getBillingReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get billing report file getBillingReportFile() started." );
+        User user = sessionHelper.getCurrentUser();
+        if ( !( user.isSuperAdmin() ) ) {
+            throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+        }
+        try {
+
+            long iden = 0;
+            String columnValue = request.getParameter( "columnValue" );
+            if ( columnValue != null && !columnValue.isEmpty() ) {
+                try {
+                    iden = Long.parseLong( columnValue );
+                } catch ( NumberFormatException e ) {
+                    LOG.error(
+                        "NumberFormatExcept;ion caught while parsing columnValue in getUserAdoptionReportFile(). Nested exception is ",
+                        e );
+                    throw e;
+                }
+            }
+
+            try {
+                Company company = organizationManagementService.getCompanyById( iden );
+                String fileName = "Billing_Report-" + CommonConstants.COMPANY + "-" + company.getCompany() + "-"
+                    + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = dashboardService.downloadBillingReport( iden );
+                response.setContentType( EXCEL_FORMAT );
+                String headerKey = CONTENT_DISPOSITION_HEADER;
+                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
+                response.setHeader( headerKey, headerValue );
+
+                // write into file
+                OutputStream responseStream = null;
+                try {
+                    responseStream = response.getOutputStream();
+                    workbook.write( responseStream );
+                } catch ( IOException e ) {
+                    LOG.error( "IOException caught in getBillingReportFile(). Nested exception is ", e );
+                } finally {
+                    try {
+                        responseStream.close();
+                    } catch ( IOException e ) {
+                        LOG.error( "IOException caught in getBillingReportFile(). Nested exception is ", e );
+                    }
+                }
+                response.flushBuffer();
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException caught in getBillingReportFile(). Nested exception is ", e );
+                throw e;
+            } catch ( IOException e ) {
+                LOG.error( "IOException caught in getBillingReportFile(). Nested exception is ", e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in getBillingReportFile(). Nested exception is ", e );
+        }
+        LOG.info( "Method to get billing report file getBillingReportFile() finished." );
+    }
 }
 // JIRA SS-137 : by RM-05 : EOC

@@ -20,8 +20,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BillingReportData;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -29,6 +32,7 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 
 
 public class DashboardServiceImplTest
@@ -43,6 +47,11 @@ public class DashboardServiceImplTest
     @Mock
     private CompanyDao companyDao;
 
+    @Mock
+    private OrganizationManagementService organizationManagementService;
+    
+    @Mock
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
@@ -392,5 +401,41 @@ public class DashboardServiceImplTest
         Mockito.when( companyDao.getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
             new HashMap<Long, Integer>() );
         dashboardServiceImpl.downloadUserAdoptionReportData( 1 );
+    }
+    
+    //Test cases for DownloadBillingReport
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadBillingReportForInvalidCompanyId() throws InvalidInputException
+    {
+        dashboardServiceImpl.downloadBillingReport( -1 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadBillingReportForInvalidCompany() throws InvalidInputException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
+        dashboardServiceImpl.downloadBillingReport( 2 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadBillingReportForInvalidCompanySettings() throws InvalidInputException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
+        Mockito.when( organizationManagementService.getCompanySettings( Mockito.anyLong() ) ).thenReturn( null );
+        dashboardServiceImpl.downloadBillingReport( 2 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadBillingReportForInvalidAgentSettings() throws InvalidInputException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
+        Mockito.when( organizationManagementService.getCompanySettings( Mockito.anyLong() ) ).thenReturn( null );
+        Mockito.when( companyDao.getAllUsersInCompanyForBillingReport( Mockito.anyLong() ) ).thenReturn(
+            new ArrayList<BillingReportData>() );
+        Mockito.when( organizationUnitSettingsDao.fetchAgentSettingsById( Mockito.anyLong() ) ).thenReturn( null );
+        dashboardServiceImpl.downloadBillingReport( 2 );
     }
 }
