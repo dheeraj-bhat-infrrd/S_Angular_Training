@@ -8002,3 +8002,6 @@ label.url-change-input-label {
 .compl-rating-drop-wid{
 	margin-left: 5px;
 }
+.social-auth-disabled {
+	cursor: auto !important; 
+}
