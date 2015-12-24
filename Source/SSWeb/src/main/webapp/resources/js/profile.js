@@ -1398,6 +1398,13 @@ function fetchPublicPosts(isNextBatch) {
 	if(profileLevel == 'COMPANY'){
 		//Fectch the reviews for company
 		url += "company/";
+		//TODO:Remove this 
+		//Stop the public post for the given company page
+		if(currentProfileName.trim() == 'allied-mortgage-group') {
+			$('#recent-post-container').remove();
+			doStopPublicPostPagination = true;
+			return;
+		}
 	}
 	else if(profileLevel == 'REGION'){
 		//Fetch the reviews for region
@@ -1428,7 +1435,7 @@ function fetchPublicPosts(isNextBatch) {
 		if(posts.errorCode != undefined || (publicPostStartIndex == 0 && posts.length <= 0)) {
 			$('#recent-post-container').remove();
 			doStopPublicPostPagination = true;
-			return
+			return;
 		}
 		
 		//Check if request is for next batch
