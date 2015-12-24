@@ -2253,8 +2253,8 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		if($("#hr-individual-tab").hasClass("bd-hdr-active"))
-			hideAdminPrivilegesChk();
+		//if($("#hr-individual-tab").hasClass("bd-hdr-active"))
+		hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
@@ -7483,6 +7483,9 @@ function fetchPublicPostEditProfile(isNextBatch) {
 
 function paintPosts(posts) {
 	var divToPopulate = "";
+	var postsLength = posts.length;
+	var elementClass;
+	$('#prof-posts').children('.tweet-panel-item').removeClass('bord-bot-none');
 	$.each(posts, function(i, post) {
 		var iconClass = "";
 		var href="javascript:void(0)";
@@ -7508,7 +7511,13 @@ function paintPosts(posts) {
 		}
 		var hrefComplet='<a href='+href+' target="_blank">';
 		
-		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'		
+		elementClass = "tweet-panel-item bord-bot-dc clearfix";
+		
+		if(i >= postsLength - 1) {
+			elementClass += " bord-bot-none";
+		}
+		
+		divToPopulate += '<div class="'+elementClass+'">'		
 				+ hrefComplet
 				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
 				+"</a>"
