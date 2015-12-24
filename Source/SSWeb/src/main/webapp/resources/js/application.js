@@ -8521,7 +8521,7 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 //Disconnect social media
 function disconnectSocialMedia(socialMedia, isAutoLogin) {
 	if(isAutoLogin) {
-		$('#overlay-toast').html('You are not authorized to disconnect from ' + socialMedia);
+		$('#overlay-toast').html('Insufficient permission to disconnect from ' + socialMedia);
 		showToast();
 		return;
 	}
