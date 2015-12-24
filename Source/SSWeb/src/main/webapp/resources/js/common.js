@@ -638,6 +638,11 @@ function openAuthPageDashboard(socialNetwork, columnName, columnValue) {
 			+ columnName + "&columnValue=" + columnValue, "Authorization Page",
 			"width=800,height=600,scrollbars=yes");
 }
+function openAuthPageDashboardZillow(disableEle){
+	callAjaxGET("/socialauth.do?social=zillow", function(data) {
+		createZillowProfileUrlPopup( data);
+	}, true,disableEle);
+}
 function postOnSocialNetworkOnce(socialNetwork, firstName, lastName, agentName, rating, review) {
 	window.open("./social/socialauthinsession?social=" + socialNetwork
 			+ "&firstName=" + firstName + "&lastName=" + lastName
