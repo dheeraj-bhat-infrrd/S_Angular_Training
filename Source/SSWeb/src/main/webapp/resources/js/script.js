@@ -289,11 +289,11 @@ function validateFirstName(elementId){
 		if (nameRegex.test($('#'+elementId).val()) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter a valid first name');
+			showError('Please enter a valid first name');
 			return false;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter a valid first name');
+		showError('Please enter a valid first name');
 		return false;
 	}
 }
@@ -306,7 +306,7 @@ function validateLastName(elementId){
 		if ($('#'+elementId).val() == ""||lastNameRegEx.test($('#'+elementId).val()) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter a valid last name');
+			showError('Please enter a valid last name');
 			return false;
 		}
 	
@@ -1782,4 +1782,168 @@ function validateUserEmailId(elementId) {
 			return false;
 		}
 	}
+}
+
+//Functions for complete registration page
+function initializeCompleteRegistrationPage() {
+	
+	//show error message on page load
+	if ($('#message').val() != "") {
+		showError($('#message').val());
+	}
+
+	
+	$('#comp-reg-submit').click(function(e){
+		submitCompleteRegistrationForm();
+	});
+	
+	$('input').keypress(function(e){
+		// detect enter
+		if (e.which==13){
+			e.preventDefault();
+			submitCompleteRegistrationForm();
+		}
+	});
+	
+	$('#complete-reg-fname').blur(function(){
+		if (validateFirstName(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#complete-reg-lname').blur(function(){
+		if (validateLastName(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#complete-reg-user-id').blur(function() {
+		if (validateEmailId(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#complete-reg-pwd').blur(function() {
+		if (validatePassword(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#complete-reg-cnf-pwd').blur(function() {
+		if (validateConfirmPassword('complete-reg-pwd', this.id)) {
+			hideError();
+		}
+	});
+}
+
+function validateCompleteRegistrationForm() {
+	if(!validateFirstName('complete-reg-fname')){
+		$('#complete-reg-fname').focus();
+		return false;
+	}
+	if(!validateLastName('complete-reg-lname')){
+		$('#complete-reg-lname').focus();
+		return false;
+	}
+	if(!validateEmailId('complete-reg-user-id')){
+		$('#complete-reg-user-id').focus();
+		return false;
+	}
+	if(!validatePassword('complete-reg-pwd')){
+		$('#complete-reg-pwd').focus();
+		return false;
+	}
+	if(!validateConfirmPassword('complete-reg-pwd', 'complete-reg-cnf-pwd')){
+		$('#complete-reg-cnf-pwd').focus();
+		return false;
+	}
+	return true;
+}
+
+function submitCompleteRegistrationForm() {
+	if(validateCompleteRegistrationForm()){
+		$('#complete-registration-form').submit();
+	}
+}
+
+//Function for user registration page when a company is registered
+function submitRegistrationPageForm() {
+	if (validateRegistrationpageForm('reg-form')) {
+		$('#registration-form').submit();
+		showOverlay();
+	}
+}
+
+function validateRegistrationpageForm(id) {
+	// Validate form input elements
+	if (!validateFirstName('reg-fname')) {
+			$('#reg-fname').focus();
+		return false;
+	}
+	 if (!validateLastName('reg-lname')) {
+			$('#reg-lname').focus();
+		return false;
+	} 
+	if (!validateEmailId('reg-email')) {
+			$('#reg-email').focus();
+		return false;
+	}
+	if (!validatePassword('reg-pwd')) {
+			$('#reg-pwd').focus();
+		return false;
+	}
+	if (!validateConfirmPassword('reg-pwd', 'reg-conf-pwd')) {
+			$('#reg-conf-pwd').focus();
+		return false;
+	}
+	return true;
+}
+
+function initializeUserCompanyRegistrationPage() {
+	if ($('#message').val() != "") {
+		showError($('#message').val());
+	}
+	
+	$('#reg-submit').click(function(e) {
+		submitRegistrationPageForm();
+	});
+	
+	$('input').keypress(function(e){
+    	if (e.which==13){
+    		e.preventDefault();
+    		submitRegistrationPageForm();
+    	}
+	});
+
+
+	// Functions to trigger form validation of various input elements
+	$('#reg-fname').blur(function() {
+		if (validateFirstName(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#reg-lname').blur(function() {
+		if (validateLastName(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#reg-email').blur(function() {
+		if (validateEmailId(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#reg-pwd').blur(function() {
+		if (validatePassword(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#reg-conf-pwd').blur(function(){
+		if (validateConfirmPassword('reg-pwd', this.id)) {
+			hideError();
+		}
+	});
 }
