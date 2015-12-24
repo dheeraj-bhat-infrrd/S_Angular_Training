@@ -609,13 +609,18 @@ function openForgotPasswordPage(){
 }
 
 // Dashboard popup click functions
-function openAuthPage(socialNetwork, isAutoLogin) {
+function openAuthPage(socialNetwork, isAutoLogin, element) {
 	if(isAutoLogin) {
 		$('#overlay-toast').html('You are not authorized to connect to ' + socialNetwork);
 		showToast();
 		return;
 	}
-	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	
+	var dataLink = $(element).attr('data-link');
+	
+	confirmSocialAuth(socialNetwork, function() {
+		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	}, dataLink);
 }
 function openAuthPageZillow(disableEle) {
 	callAjaxGET("/socialauth.do?social=zillow", function(data) {
@@ -634,9 +639,11 @@ function openAuthPageDashboard(socialNetwork, columnName, columnValue) {
 		return;
 	}
 	
-	window.open("./socialauth.do?social=" + socialNetwork + "&columnName="
-			+ columnName + "&columnValue=" + columnValue, "Authorization Page",
-			"width=800,height=600,scrollbars=yes");
+	confirmSocialAuth(socialNetwork, function() {
+		window.open("./socialauth.do?social=" + socialNetwork + "&columnName="
+				+ columnName + "&columnValue=" + columnValue, "Authorization Page",
+				"width=800,height=600,scrollbars=yes");
+	});
 }
 function postOnSocialNetworkOnce(socialNetwork, firstName, lastName, agentName, rating, review) {
 	window.open("./social/socialauthinsession?social=" + socialNetwork

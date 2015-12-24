@@ -9953,3 +9953,29 @@ function hideActiveUserLogoutOverlay() {
 	
 	$('#overlay-cancel').unbind('click');
 }
+
+
+/**
+* Functions to confirm social authentication
+*/
+function confirmSocialAuth(socialNetwork, callBackFunction, link) {
+	
+	var message = "";
+	
+	if(link && link.trim() != "" ) {
+		message = "Are you sure you want to disconnect your previous connection to " + socialNetwork + " and connect again";
+	} else {
+		message = "Are you sure you want to connect to " + socialNetwork;
+	}
+	
+	$('#overlay-header').html("Confirm user Authentication");
+	$("#overlay-text").html(message);
+	$('#overlay-continue').html("Ok").click(function() {
+		if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
+			$('#overlay-main').hide();
+			callBackFunction();
+		}
+	});
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-main').show();
+}
