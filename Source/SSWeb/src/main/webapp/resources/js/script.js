@@ -19,6 +19,7 @@ var pageInitialized = false;
 var currentPhoneRegEx; //Vary the phone regex according to masking
 var stateList; //usStateList
 var cityLookupList; //cityLookupList
+var phoneFormat = '(ddd) ddd-dddd'; //defualt phone format
 
 function buildMessageDiv(){
 	if($('.err-nw-wrapper').length == 0){
@@ -1946,4 +1947,99 @@ function initializeUserCompanyRegistrationPage() {
 			hideError();
 		}
 	});
+}
+
+var isFormSubmitted=false;
+//Logo upload
+var logo=true;
+var logoSuccess=true;
+
+//Functions for company information page
+function initializeCompanyInformationPage() {
+	var verticalVal = $('#select-vertical').attr('data-value');
+	if(verticalVal && verticalVal != ""){
+		$('#select-vertical').val(verticalVal);
+	}
+	
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
+			showError($('#message').val());
+		} else {
+			showInfo($('#message').val());
+		}
+	}
+	
+	//Mask phone number
+	if($('#com-phone-format').val() || $('#com-phone-format').val() != ''){
+		phoneFormat = $('#com-phone-format').val();
+	}
+	
+	currentPhoneRegEx = phoneFormat; 
+	
+	$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+	$('#company-info-submit').click(function() {
+		if(logo && logoSuccess && !isFormSubmitted ){
+			submitCompanyInfoForm();
+		}
+		if(!logoSuccess){
+			$('#overlay-toast').html('uploading logo please wait');
+			showToast();
+		}
+		if(!logo){
+			$('#overlay-toast').html('Please upload files of type jpeg, png or jpg');
+			showToast();
+		}
+	});
+	
+	$('#icn-file').click(function(){
+		$('#com-logo').trigger('click');
+	});
+	
+	$('#com-logo').change(function(){
+		var fileAdd = $(this).val().split('\\');
+		$('#com-logo-decoy').val(fileAdd[fileAdd.length - 1]);
+	});
+	// Integrating autocomplete with country input text field
+	attachAutocompleteCountry('com-country', 'country-code', 'com-state', 'state-city-row', 'com-city', 'com-contactno');
+	
+	$('input').keypress(function(e){
+		// detect enter
+		if (e.which==13){
+			e.preventDefault();
+			submitCompanyInfoForm();
+		}
+	});
+
+	$("#com-logo").on("change", function() {
+		logo=true;
+		if(!logoValidate("#com-logo")){
+			logo =false;
+			return false;
+		}
+		logoSuccess=false;
+		var formData = new FormData();
+		formData.append("logo", $('#com-logo').prop("files")[0]);
+		formData.append("logo_name", $('#com-logo').prop("files")[0].name);
+		callAjaxPOSTWithTextDataLogo("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
+	});
+}
+
+function submitCompanyInfoForm() {
+	if (validateCompanyInformationForm('company-info-div')) {
+		isFormSubmitted=true;
+		$('#company-info-form').submit();
+		
+	}
+}
+
+function uploadImageSuccessCallback(response) {
+	logoSuccess=true;
+	var success = "Logo has been uploaded successfully";
+	if (success != response.trim()) {
+		$('#com-logo').val('');
+		$('#com-logo-decoy').val('');
+		showError(response);
+	} else {
+		showInfo(response);
+	}
 }
