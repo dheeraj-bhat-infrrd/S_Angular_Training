@@ -1175,10 +1175,14 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 		e = document.getElementById("graph-sel-list");		
 	} else if (flow == 'reports') {
 		e = document.getElementById("report-sel");	
-	} else {
+	} else if (flow != 'bill'){
 		return false;
 	}
-	searchColumn = e.options[e.selectedIndex].value;
+	if(flow == 'bill'){
+		searchColumn = "company";
+	} else {
+		searchColumn = e.options[e.selectedIndex].value;
+	}
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue,
@@ -1210,6 +1214,15 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			if($('#dsh-srch-report').children('div.dsh-res-display').length <= 0) {
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
 				$('#dsh-srch-report').hide();
+			}
+		} else if (flow == 'bill'){
+			$('#dsh-br-srch-res').addClass('dsh-sb-dd');
+			$('#dsh-br-srch-res').html(data).show().perfectScrollbar();
+			$('#dsh-br-srch-res').perfectScrollbar('update');
+			if($('#dsh-br-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#dsh-br-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-br-srch-res').hide();
+				$('#dsh-bill-rep-bnt').hide();
 			}
 		}
 		
@@ -1253,6 +1266,12 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 					$('#dsh-admin-rep-bnt').show();
 					$('#dsh-ind-rep-bnt').hide();
 				}
+			}
+			else if (flow == 'bill'){
+				$('#dsh-br-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-br-company-item').val($(this).html()).attr('data-prev-val',"");
+				$('#dsh-bill-rep-bnt').show();
+				$('#dsh-bill-rep-bnt').attr('data-idenVal',value);
 			}
 			$('.dsh-res-display').hide();
 		});

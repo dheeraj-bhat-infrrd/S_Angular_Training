@@ -1962,6 +1962,18 @@
 	#top-dash{
 	min-height:340px;
 	}
+	.dash-btn-dl-br {
+	color: #009FE0;
+	border-radius: 3px;
+	line-height: 32px;
+	margin-top: 2px;
+	border: 1px solid #009FE0;
+	height: 32px;
+	width: 160px;
+	text-align: center;
+	font-size: 13px;
+	text-transform: initial;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
