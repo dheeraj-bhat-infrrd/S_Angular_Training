@@ -1041,12 +1041,12 @@ function attachFocusEventCity(stateId, cityId) {
   	$('#'+cityId).bind('focus', function(){ 
   		if($('#'+stateId).val() &&  $('#'+stateId).val() != ""){
   			$(this).trigger('keydown');
-  			$(this).autocomplete("search");		
+  			//$(this).autocomplete("search");		
   		}
   	});
 }
 
-function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId, cityId) {
+function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId, cityId, phoneNumberId) {
 	
 	//check for the existing value of country code and set defualt to us if not set
 	var countryCode = "US";
@@ -1090,6 +1090,15 @@ function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityR
 				showStateCityRow(stateCityRowId, stateId, cityId);
 			}else{
 				hideStateCityRow(stateCityRowId, stateId);
+			}
+			
+			if(phoneNumberId) {
+				//update phone number masking
+				var phoneNumberElement = $('#'+phoneNumberId);
+				phoneNumberElement.unmask();
+				phoneFormat = phoneFormatList[ui.item.code];
+				currentPhoneRegEx = phoneFormat;
+				phoneNumberElement.mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 			}
 			return false;
 		},
