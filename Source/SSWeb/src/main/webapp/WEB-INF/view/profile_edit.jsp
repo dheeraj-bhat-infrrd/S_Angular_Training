@@ -170,7 +170,7 @@
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
 							<div id="icn-fb" class="float-left social-item-icon icn-fb ${socialDisabled}" data-source="facebook" data-link="${fbLink}" onclick="openAuthPage('facebook', ${isAutoLogin}, this);" title="Facebook"></div>
-							<div id="icn-twit" class="float-left social-item-icon icn-twit ${socialDisabled}" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage('twitter', ${isAutoLogin}, this););" title="Twitter"></div>
+							<div id="icn-twit" class="float-left social-item-icon icn-twit ${socialDisabled}" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage('twitter', ${isAutoLogin}, this);" title="Twitter"></div>
 							<div id="icn-lin" class="float-left social-item-icon icn-lin ${socialDisabled}" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage('linkedin', ${isAutoLogin}, this);" title="LinkedIn"></div>
                             <div id="icn-gplus" class="float-left social-item-icon icn-gplus ${socialDisabled}" data-source="google" data-link="${googleLink}" onclick="openAuthPage('google', ${isAutoLogin}, this);" title="Google+"></div>
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-source="yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>

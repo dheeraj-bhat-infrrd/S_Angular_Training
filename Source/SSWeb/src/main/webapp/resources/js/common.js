@@ -611,7 +611,7 @@ function openForgotPasswordPage(){
 // Dashboard popup click functions
 function openAuthPage(socialNetwork, isAutoLogin, element) {
 	if(isAutoLogin) {
-		$('#overlay-toast').html('You are not authorized to connect to ' + socialNetwork);
+		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
 		showToast();
 		return;
 	}
@@ -634,7 +634,7 @@ function openAuthPageRegistration(socialNetwork) {
 function openAuthPageDashboard(socialNetwork, columnName, columnValue) {
 	//check if user is autologged in
 	if($('#pro-cmplt-stars').attr('data-autologin') == 'true') {
-		$('#overlay-toast').html('You are not authorized to connect to ' + socialNetwork);
+		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
 		showToast();
 		return;
 	}
