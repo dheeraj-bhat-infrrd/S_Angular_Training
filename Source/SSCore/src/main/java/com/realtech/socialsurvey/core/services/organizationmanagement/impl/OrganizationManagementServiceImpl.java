@@ -354,7 +354,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws InvalidInputException
      * @throws SolrException
      */
-    private void createDefaultHierarchy( User user, AccountType accountType ) throws InvalidInputException, SolrException
+    void createDefaultHierarchy( User user, AccountType accountType ) throws InvalidInputException, SolrException
     {
         LOG.debug( "Method createDefaultHierarchy started for user : " + user.getLoginName() );
 
@@ -450,7 +450,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /*
      * This method adds a new company into the COMPANY table.
      */
-    private Company addCompany( User user, String companyName, int isRegistrationComplete, String vertical, String billingMode )
+    Company addCompany( User user, String companyName, int isRegistrationComplete, String vertical, String billingMode )
     {
         LOG.debug( "Method addCompany started for user " + user.getLoginName() );
         Company company = new Company();
@@ -481,7 +481,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param company
      * @return
      */
-    private User updateCompanyForUser( User user, Company company )
+    User updateCompanyForUser( User user, Company company )
     {
         LOG.debug( "Method updateCompanyForUser started for user " + user.getLoginName() );
         user.setCompany( company );
@@ -498,7 +498,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param user
      * @param company
      */
-    private void updateCompanyForUserProfile( User user, Company company )
+    void updateCompanyForUserProfile( User user, Company company )
     {
         LOG.debug( "Method updateCompanyForUserProfile started for user " + user.getLoginName() );
         user = userDao.findById( User.class, user.getUserId() );
@@ -524,7 +524,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param organizationalDetails
      * @throws InvalidInputException
      */
-    private void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
+    void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
         throws InvalidInputException
     {
         LOG.debug( "Method addOrganizationalDetails called." );
@@ -725,7 +725,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private String generateProfileNameForCompany( String companyName, long iden ) throws InvalidInputException
+    String generateProfileNameForCompany( String companyName, long iden ) throws InvalidInputException
     {
         LOG.debug( "Generating profile name for companyName:" + companyName + " and iden:" + iden );
         String profileName = null;
@@ -1120,7 +1120,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         SurveySettings surveySettings ) throws InvalidInputException
     {
         if ( unitSettings == null ) {
-            throw new InvalidInputException( "Company settings cannot be null." );
+            throw new InvalidInputException( "Unit settings cannot be null." );
         }
 
         LOG.info( "Updating unitSettings: " + unitSettings + " with surveySettings: " + surveySettings );
@@ -1573,7 +1573,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Region upgradeDefaultRegion( Region region ) throws InvalidInputException
+    Region upgradeDefaultRegion( Region region ) throws InvalidInputException
     {
 
         LOG.info( "Upgrading the default region to a user made region" );
@@ -1600,7 +1600,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Branch upgradeDefaultBranch( Branch branch ) throws InvalidInputException
+    Branch upgradeDefaultBranch( Branch branch ) throws InvalidInputException
     {
 
         LOG.info( "Upgrading default branch to a user made branch" );
@@ -1630,7 +1630,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Region fetchDefaultRegion( Company company ) throws InvalidInputException
+    Region fetchDefaultRegion( Company company ) throws InvalidInputException
     {
 
         if ( company == null ) {
@@ -1649,7 +1649,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Fetching all regions for company with id : " + company.getCompanyId() );
         List<Region> regionList = regionDao.findByKeyValue( Region.class, queries );
 
-        if ( regionList.isEmpty() || regionList == null ) {
+        if (  regionList == null || regionList.isEmpty() ) {
             LOG.info( "No regions found for company with id : " + company.getCompanyId() );
             defaultRegion = null;
         }
@@ -1676,7 +1676,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Branch fetchDefaultBranch( Company company ) throws InvalidInputException
+    Branch fetchDefaultBranch( Company company ) throws InvalidInputException
     {
 
         if ( company == null ) {
@@ -1695,7 +1695,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Fetching all branches for company with id : " + company.getCompanyId() );
         List<Branch> branchList = branchDao.findByKeyValue( Branch.class, queries );
 
-        if ( branchList.isEmpty() || branchList == null ) {
+        if ( branchList == null || branchList.isEmpty() ) {
             LOG.info( "No branches found for company with id : " + company.getCompanyId() );
             defaultBranch = null;
         }
@@ -1724,7 +1724,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws SolrException
      * @throws NoRecordsFetchedException
      */
-    private void upgradeToCompany( Company company ) throws InvalidInputException, SolrException, NoRecordsFetchedException
+    void upgradeToCompany( Company company ) throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
 
         LOG.info( "Upgrading to Company" );
@@ -1766,7 +1766,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws SolrException
      * @throws NoRecordsFetchedException
      */
-    private void upgradeToEnterprise( Company company, int fromAccountsMasterId ) throws InvalidInputException, SolrException,
+    void upgradeToEnterprise( Company company, int fromAccountsMasterId ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException
     {
 
@@ -2294,7 +2294,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail ) throws InvalidInputException
+    Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail ) throws InvalidInputException
     {
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
@@ -2480,7 +2480,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param userProfiles
      * @return
      */
-    private int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
+    int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
     {
 
         LOG.debug( "Method checkWillNewProfileBePrimary called in OrganizationManagementService for email id"
@@ -3190,7 +3190,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public List<UserProfile> getAllUserProfilesInBranch( long branchId ) throws InvalidInputException
     {
         if ( branchId <= 0l ) {
-            throw new InvalidInputException( "RegionId is not set in getAllUserProfilesForBranch" );
+            throw new InvalidInputException( "BranchId is not set in getAllUserProfilesForBranch" );
         }
         LOG.info( "Fetching the list of users for branch :" + branchId );
 
@@ -3493,7 +3493,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param organizationSettings
      * @throws InvalidInputException
      */
-    private void generateAndSetBranchProfileNameAndUrl( Branch branch, OrganizationUnitSettings organizationSettings )
+    void generateAndSetBranchProfileNameAndUrl( Branch branch, OrganizationUnitSettings organizationSettings )
         throws InvalidInputException
     {
         LOG.debug( "Method to generate branch profile name called for branch: " + branch );
@@ -3553,7 +3553,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param branch
      * @return
      */
-    private ContactDetailsSettings getContactDetailsSettingsFromBranch( Branch branch )
+    ContactDetailsSettings getContactDetailsSettingsFromBranch( Branch branch )
     {
         LOG.debug( "Method getContactDetailsSettingsFromBranch called for branch :" + branch );
         ContactDetailsSettings contactSettings = new ContactDetailsSettings();
@@ -3598,7 +3598,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param region
      * @return
      */
-    private ContactDetailsSettings getContactDetailsSettingsFromRegion( Region region )
+    ContactDetailsSettings getContactDetailsSettingsFromRegion( Region region )
     {
         LOG.debug( "Method getContactDetailsSettingsFromRegion called for branch :" + region );
         ContactDetailsSettings contactSettings = new ContactDetailsSettings();
@@ -3720,7 +3720,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    private void generateAndSetRegionProfileNameAndUrl( Region region, OrganizationUnitSettings organizationSettings )
+    void generateAndSetRegionProfileNameAndUrl( Region region, OrganizationUnitSettings organizationSettings )
         throws InvalidInputException
     {
         LOG.debug( "Method generateAndSetRegionProfileNameAndUrl called for region: " + region );
@@ -3782,7 +3782,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      */
     @SuppressWarnings ( "unused")
-    private boolean isRegionViewAllowed( List<UserProfile> userProfiles )
+    boolean isRegionViewAllowed( List<UserProfile> userProfiles )
     {
         // TODO implement this
         return true;
@@ -3796,7 +3796,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      */
     @SuppressWarnings ( "unused")
-    private boolean isBranchViewAllowed( List<UserProfile> userProfiles )
+    boolean isBranchViewAllowed( List<UserProfile> userProfiles )
     {
         // TODO implement this
         return true;
@@ -4722,7 +4722,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    private void performPreCompanyDeletions( long companyId )
+    void performPreCompanyDeletions( long companyId )
     {
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.COMPANY_ID_COLUMN, companyId );
@@ -5886,7 +5886,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             default:
                 throw new InvalidInputException(
-                    "Invalid profile type passed in getAllBranchesUnderProfileTypeConnectedToZillow" );
+                    "Invalid profile type passed in getAllUsersUnderProfileTypeConnectedToZillow" );
         }
     }
 }
