@@ -320,6 +320,9 @@
 		border-bottom: 1px solid #dcdcdc;
 		border-top: 1px solid #dcdcdc;
 	}
+	.position-align{
+	padding-left: 30px;
+	}
 }
 
 
@@ -654,6 +657,9 @@
 	input.zillow-input{
 	width:80px;
 	padding: 5px 0 5px 3px;
+	}
+	.position-align{
+	padding-left: 20px;
 	}
 	
 }
