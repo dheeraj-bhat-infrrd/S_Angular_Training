@@ -1088,7 +1088,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             //First Name
             billingReportToPopulate.add( reportRow.getFirstName() );
             //Last Name
-            if ( reportRow.getLastName() == null || reportRow.getLastName().isEmpty() ) {
+            if ( reportRow.getLastName() == null || reportRow.getLastName().isEmpty() || reportRow.getLastName().equalsIgnoreCase( "null" ) ) {
                 billingReportToPopulate.add( "" );
             } else {
                 billingReportToPopulate.add( reportRow.getLastName() );
@@ -1113,54 +1113,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 billingReportToPopulate.add( CommonConstants.NO_STRING );
             }
             //State
-            if ( agentSettings.getContact_details() == null || agentSettings.getContact_details().getState() == null
-                || agentSettings.getContact_details().getState().isEmpty() ) {
-                if ( reportRow.getBranch().equals( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
-                    if ( reportRow.getRegion().equals( CommonConstants.DEFAULT_REGION_NAME ) ) {
-                        if ( companySettings.getContact_details() == null
-                            || companySettings.getContact_details().getState() == null
-                            || companySettings.getContact_details().getState().isEmpty() ) {
-                            throw new InvalidInputException( "Unable to get contact details for company ID : " + companyId );
-                        }
-                        billingReportToPopulate.add( companySettings.getContact_details().getState() );
-                    } else {
-                        //Check if regionSettings already exists for the current region in the map
-                        if ( regionsSettings.containsKey( reportRow.getRegionId() ) ) {
-                            String state = regionsSettings.get( reportRow.getRegionId() ).getContact_details().getState();
-                            billingReportToPopulate.add( state );
-                        } else {
-                            //The regionSettings doesn't  yet exist in the map
-                            OrganizationUnitSettings regionSettings = organizationManagementService
-                                .getRegionSettings( reportRow.getRegionId() );
-                            String state = regionSettings.getContact_details().getState();
-                            billingReportToPopulate.add( state );
-                            //Add to map
-                            regionsSettings.put( reportRow.getRegionId(), regionSettings );
-                        }
-                    }
-                } else {
-                    //Check if branchSettings already exists in the map
-                    if ( branchesSettings.containsKey( reportRow.getBranchId() ) ) {
-                        String state = branchesSettings.get( reportRow.getBranchId() ).getContact_details().getState();
-                        billingReportToPopulate.add( state );
-                    } else {
-                        //The branchSettings doesn't yet exist in the map
-                        try {
-                            OrganizationUnitSettings branchSettings = organizationManagementService
-                                .getBranchSettingsDefault( reportRow.getBranchId() );
-                            String state = branchSettings.getContact_details().getState();
-                            billingReportToPopulate.add( state );
-                            //Add to map
-                            branchesSettings.put( reportRow.getBranchId(), branchSettings );
-                        } catch ( NoRecordsFetchedException e ) {
-                            throw new InvalidInputException( "branch settings don't exist for the branch ID : "
-                                + reportRow.getBranchId() );
-                        }
-                    }
-                }
-            } else {
-                billingReportToPopulate.add( agentSettings.getContact_details().getState() );
-            }
+            billingReportToPopulate.add( getStateForUser( agentSettings, companySettings, reportRow, companyId,
+                regionsSettings, branchesSettings ) );
             //Region name
             billingReportToPopulate.add( reportRow.getRegion() );
 
@@ -1210,7 +1164,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         return workbook;
     }
-    
+
 
     /**
      * Method to check if user is agent or not
@@ -1225,6 +1179,96 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             }
         }
         return false;
+    }
+
+
+    private String getStateForUser( AgentSettings agentSettings, OrganizationUnitSettings companySettings,
+        BillingReportData reportRow, long companyId, Map<Long, OrganizationUnitSettings> regionsSettings,
+        Map<Long, OrganizationUnitSettings> branchesSettings ) throws InvalidInputException
+    {
+        if ( companySettings.getContact_details() == null || companySettings.getContact_details().getState() == null
+            || companySettings.getContact_details().getState().isEmpty() ) {
+            throw new InvalidInputException( "Unable to get contact details for company ID : " + companyId );
+        }
+        String companyState = companySettings.getContact_details().getState();
+        if ( agentSettings.getContact_details() == null || agentSettings.getContact_details().getState() == null
+            || agentSettings.getContact_details().getState().isEmpty() ) {
+            if ( reportRow.getBranch().equals( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
+                //Get state from region/company
+                return getRegionState( reportRow, companyState, regionsSettings );
+            } else {
+                //Check if branchSettings already exists in the map
+                if ( branchesSettings.containsKey( reportRow.getBranchId() ) ) {
+                    OrganizationUnitSettings branchSettings = branchesSettings.get( reportRow.getBranchId() );
+                    if ( branchSettings.getContact_details() == null || branchSettings.getContact_details().getState() == null
+                        || branchSettings.getContact_details().getState().isEmpty() ) {
+                        //get state from region/company
+                        return getRegionState( reportRow, companyState, regionsSettings );
+                    } else {
+                        return branchSettings.getContact_details().getState();
+                    }
+                } else {
+                    //The branchSettings doesn't yet exist in the map
+                    try {
+                        OrganizationUnitSettings branchSettings = organizationManagementService
+                            .getBranchSettingsDefault( reportRow.getBranchId() );
+                        //Add to map
+                        branchesSettings.put( reportRow.getBranchId(), branchSettings );
+                        if ( branchSettings.getContact_details() == null
+                            || branchSettings.getContact_details().getState() == null
+                            || branchSettings.getContact_details().getState().isEmpty() ) {
+                            //get state from region/company
+                            return getRegionState( reportRow, companyState, regionsSettings );
+                        } else {
+                            return branchSettings.getContact_details().getState();
+                        }
+                    } catch ( NoRecordsFetchedException e ) {
+                        throw new InvalidInputException( "branch settings don't exist for the branch ID : "
+                            + reportRow.getBranchId() );
+                    }
+                }
+            }
+        } else {
+            return agentSettings.getContact_details().getState();
+        }
+    }
+
+
+    /**
+     * Get the state of the region
+     * @param reportRow
+     * @param companyState
+     * @param regionsSettings
+     * @return
+     * @throws InvalidInputException
+     */
+    private String getRegionState( BillingReportData reportRow, String companyState,
+        Map<Long, OrganizationUnitSettings> regionsSettings ) throws InvalidInputException
+    {
+        if ( reportRow.getRegion().equals( CommonConstants.DEFAULT_REGION_NAME ) ) {
+            return companyState;
+        } else {
+            //Check if regionSettings already exists for the current region in the map
+            if ( regionsSettings.containsKey( reportRow.getRegionId() ) ) {
+                OrganizationUnitSettings regionSettings = regionsSettings.get( reportRow.getRegionId() );
+                if ( regionSettings.getContact_details() == null || regionSettings.getContact_details().getState() == null
+                    || regionSettings.getContact_details().getState().isEmpty() ) {
+                    return companyState;
+                }
+                return regionSettings.getContact_details().getState();
+            } else {
+                //The regionSettings doesn't  yet exist in the map
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( reportRow
+                    .getRegionId() );
+                //Add to map
+                regionsSettings.put( reportRow.getRegionId(), regionSettings );
+                if ( regionSettings.getContact_details() == null || regionSettings.getContact_details().getState() == null
+                    || regionSettings.getContact_details().getState().isEmpty() ) {
+                    return companyState;
+                }
+                return regionSettings.getContact_details().getState();
+            }
+        }
     }
 }
 // JIRA SS-137 BY RM05:EOC

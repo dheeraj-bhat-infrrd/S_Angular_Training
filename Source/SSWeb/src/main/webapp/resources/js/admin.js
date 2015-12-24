@@ -291,6 +291,11 @@ function downloadCompanyReport() {
 			+ startDate + "&endDate=" + endDate;
 }
 
+function downloadBillingReport() {
+	var companyId = $('#dsh-bill-rep-bnt').attr('data-idenval');
+	window.location.href = "/downloadbillingreport.do?columnValue=" + companyId;
+}
+
 function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 	if(startIndexCmp == 0) {
 		isAbuseReportRequestRunning = false;

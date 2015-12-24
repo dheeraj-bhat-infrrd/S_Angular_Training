@@ -25,6 +25,22 @@
 			</div>
 		</div>
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
+			<div class="dash-sub-head float-left">Billing Report</div>
+			<div id="dsh-billing-report-div" class="clearfix dash-sel-wrapper">
+					<div class="float-left dash-sel-lbl">Company</div>
+					<div class="dsh-inp-wrapper float-left">
+						<input id="dsh-br-company-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />" data-prev-val="" data-search-target='bill'>
+						<div id="dsh-br-srch-res" class="dsh-sel-dropdwn-cont"></div>
+					</div>
+					<div class="dwnl-bnt-col float-right">
+						<div id="dsh-bill-rep-bnt" class="float-right dash-btn-dl-br">
+							<div class="dsh-br-dwnld-btn float-left cursor-pointer"
+								onclick="downloadBillingReport()">Download Report</div>
+						</div>
+					</div>
+			</div>
+		</div>
+		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="float-left stats-left clearfix">
 				<div class="dash-sub-head"><spring:message code="label.surveystatus.key" /></div>
 				<div id="region-div" class="clearfix dash-sel-wrapper">
@@ -185,8 +201,10 @@ $(document).ready(function() {
 	bindDatePickerForCompanyReport();
 	bindDatePickerforSurveyDownload();
 	bindDatePickerforIndividualSurveyDownload();
+	$('#dsh-bill-rep-bnt').hide();
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-sel-item');
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
 	bindAutosuggestForIndividualRegionBranchSearch('admin-report-dwn');
+	bindAutosuggestForIndividualRegionBranchSearch('dsh-br-company-item');
 });
 </script>
