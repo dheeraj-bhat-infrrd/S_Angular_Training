@@ -642,4 +642,18 @@
 	.compl-save-btn{
 	margin-top:0px;
 	}
+	.zillow-input-container,.zillow-example-cont{
+	font-size:12px;
+	}
+	.zillow-input-container,.zillow-example-cont{
+	width:100%;
+	}
+	.zillow-exm-profilename{
+	padding:3px;
+	}
+	input.zillow-input{
+	width:80px;
+	padding: 5px 0 5px 3px;
+	}
+	
 }
