@@ -42,6 +42,14 @@ public class ImageProcessorImpl implements ImageProcessor {
 	@Override
 	public String processImage(String imageFileName, String imageType)
 			throws ImageProcessingException, InvalidInputException {
+        if ( imageFileName == null || imageFileName.isEmpty() ) {
+            LOG.error( "Image File Name is empty" );
+            throw new InvalidInputException( "Image File Name is empty" );
+        }
+        if ( imageType == null || imageType.isEmpty() ) {
+            LOG.error( "Image Type is empty" );
+            throw new InvalidInputException( "Image Type is empty" );
+        }
 		LOG.info("Processing images for " + imageFileName);
 		// get the image
 		BufferedImage sourceImage = getImageFromCloud(imageFileName);
@@ -127,12 +135,12 @@ public class ImageProcessorImpl implements ImageProcessor {
 		return cloudFrontUrl;
 	}
 
-	private String getThumbnailImageName(String originalImageName, String extension) {
+	String getThumbnailImageName(String originalImageName, String extension) {
 		LOG.debug("Getting thumbnail name for " + originalImageName);
 		return originalImageName.substring(originalImageName.lastIndexOf("/")+1, originalImageName.lastIndexOf("." + extension)) + "-t." + extension;
 	}
 
-	private void deleteTempFile(File file) {
+	 void deleteTempFile(File file) {
 		LOG.debug("Deleting file: " + file.getAbsolutePath());
 		FileUtils.deleteQuietly(file);
 	}
