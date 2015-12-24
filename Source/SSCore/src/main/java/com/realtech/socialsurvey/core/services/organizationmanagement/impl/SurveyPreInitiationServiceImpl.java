@@ -70,7 +70,7 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 		return surveys;
 	}
 
-	private Set<Long> getAgentIdsByProfileLevel(String profileLevel, long iden) throws InvalidInputException {
+	Set<Long> getAgentIdsByProfileLevel(String profileLevel, long iden) throws InvalidInputException {
 		if (profileLevel == null || profileLevel.isEmpty()) {
 			throw new InvalidInputException("profile level is null or empty while getting agents");
 		}
