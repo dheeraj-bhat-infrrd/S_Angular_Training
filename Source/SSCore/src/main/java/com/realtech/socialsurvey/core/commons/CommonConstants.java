@@ -893,4 +893,8 @@ public interface CommonConstants
 
     // Zillow fetch failure response
     public static final String ZILLOW_FETCH_FAIL_RESPONSE = "{\"zillowCallBreak\":true}";
+    
+    // sections that can be hidden from public profile page
+    public static final String HIDE_RECENT_POSTS = "recent_posts";
+    public static final String HIDE_SOCIAL_REVIEW = "social_reviews";
 }
