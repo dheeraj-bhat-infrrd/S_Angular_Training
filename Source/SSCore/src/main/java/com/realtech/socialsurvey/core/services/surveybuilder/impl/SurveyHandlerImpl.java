@@ -1435,11 +1435,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                                 + user.getUserId() );
                         }
 
-                        long surveyClosedTime = survey.getEngagementClosedTime().getTime();
+                        /*long surveyClosedTime = survey.getEngagementClosedTime().getTime();
                         long currentTime = System.currentTimeMillis();
                         if ( checkIfRecordHasExpired( surveyClosedTime, currentTime, validSurveyInterval ) ) {
                             status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                        }
+                        }*/
                     }
                 }
 

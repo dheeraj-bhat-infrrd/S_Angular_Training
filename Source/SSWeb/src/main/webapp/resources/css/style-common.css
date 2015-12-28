@@ -6529,6 +6529,10 @@ tr.u-tbl-header td {
 	padding-top: 10px;
 }
 
+.tweet-panel-item.bord-bot-none {
+	border-bottom: none !important;
+}
+
 .sm-tweet-item {
 	padding-left: 10px;
 	clear: none;

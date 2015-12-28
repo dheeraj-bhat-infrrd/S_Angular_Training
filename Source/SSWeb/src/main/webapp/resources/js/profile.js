@@ -1402,6 +1402,13 @@ function fetchPublicPosts(isNextBatch) {
 	
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	
+	//if recent posts are to be hidden
+	if(profileJson.hideSectionsFromProfilePage && ($.inArray("recent_posts", profileJson.hideSectionsFromProfilePage) > -1) ) {
+		$('#recent-post-container').remove();
+		doStopPublicPostPagination = true;
+		return;
+	}
+	
 	var url = getLocationOrigin() + "/rest/profile/";
 	if(profileLevel == 'COMPANY'){
 		//Fectch the reviews for company
@@ -1436,7 +1443,7 @@ function fetchPublicPosts(isNextBatch) {
 		if(posts.errorCode != undefined || (publicPostStartIndex == 0 && posts.length <= 0)) {
 			$('#recent-post-container').remove();
 			doStopPublicPostPagination = true;
-			return
+			return;
 		}
 		
 		//Check if request is for next batch
@@ -1461,6 +1468,9 @@ function fetchPublicPosts(isNextBatch) {
 function paintPublicPosts(posts) {
 	
 	var divToPopulate = "";
+	var postsLength = posts.length;
+	var elementClass;
+	$('#prof-posts').children('.tweet-panel-item').removeClass('bord-bot-none');
 	$.each(posts, function(i, post) {
 		var iconClass = "";
 		var href="javascript:void(0)";
@@ -1483,7 +1493,12 @@ function paintPublicPosts(posts) {
 			 href= post.postUrl;
 		}
 		var hrefComplet='<a href='+href+' target="_blank">';
-		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
+		elementClass = "tweet-panel-item bord-bot-dc clearfix";
+		
+		if(i >= postsLength - 1) {
+			elementClass += " bord-bot-none";
+		}
+		divToPopulate += '<div class="'+elementClass+'">'
 			+ hrefComplet
 			+ '<div class="tweet-icn '+ iconClass +' float-left"></div>'
 			+ "</a>"
