@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1123,12 +1124,20 @@ public class ProfileManagementController
                 // for individual set vertical/industry
                 // contactDetailsSettings.setIndustry(vertical);
                 contactDetailsSettings = updateBasicDetail( contactDetailsSettings, name, title, location );
+                // Fix for SS-1442 : Last name is not updated to blank when updated agent name contains only first name
+                if ( name.indexOf( " " ) != -1 ) {
+                    contactDetailsSettings.setFirstName( name.substring( 0, name.indexOf( ' ' ) ) );
+                    contactDetailsSettings.setLastName( name.substring( name.indexOf( ' ' ) + 1 ) );
+                } else {
+                    contactDetailsSettings.setFirstName( name );
+                    contactDetailsSettings.setLastName( "" );
+                }
                 contactDetailsSettings = profileManagementService.updateAgentContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
                 agentSettings.setContact_details( contactDetailsSettings );
 
-                // update user name
-                profileManagementService.updateIndividualName( user.getUserId(), agentSettings.getIden(), name );
+                // update user name; not needed as we are updating the user's first name and last name below
+                // profileManagementService.updateIndividualName( user.getUserId(), agentSettings.getIden(), name );
 
                 /*
                  * agentSettings.setVertical(vertical);
@@ -1150,7 +1159,13 @@ public class ProfileManagementController
                     user.setLastName( name.substring( name.indexOf( ' ' ) + 1 ) );
                 } else {
                     userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, name );
+                    // Fix for SS-1442 : Last name is not updated to blank when updated agent name contains only first name
+                    userMap.put( CommonConstants.USER_LAST_NAME_SOLR, "" );
+                    user.setFirstName( name );
+                    user.setLastName( "" );
                 }
+                user.setModifiedBy( String.valueOf( agentSettings.getIden() ) );
+                user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                 userManagementService.updateUser( user, userMap );
             } else {
                 throw new InvalidInputException( "Invalid input exception occurred in upadting Basic details.",
