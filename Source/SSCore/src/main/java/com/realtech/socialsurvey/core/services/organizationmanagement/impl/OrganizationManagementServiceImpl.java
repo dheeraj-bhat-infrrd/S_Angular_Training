@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -2008,8 +2007,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
         regions = regionDao.findProjectionsByKeyValue( Region.class, columnNames, queries );
+        
+        populateAddressOfRegionFromSolr(regions, companyId);
 
         return regions;
+    }
+    
+    /*
+     * Method to query Solr for the region address and populate the given Region list
+     */
+    private void populateAddressOfRegionFromSolr(List<Region> regions, long companyId){
+    	try {
+			String regionsSearchedString = solrSearchService.fetchRegionsByCompany(companyId, -1);            
+			Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
+			List<RegionFromSearch> regionSearchedList = new Gson().fromJson( regionsSearchedString, searchedRegionsList );
+			
+			for (RegionFromSearch regionFromSearch : regionSearchedList) {
+				for (Region region : regions) {
+					if(region.getRegionId() == regionFromSearch.getRegionId()){
+						region.setAddress1(regionFromSearch.getAddress1());
+						region.setAddress2(regionFromSearch.getAddress2());
+					}
+				}
+			}
+		} catch (SolrException e) {
+			LOG.error("SolrException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e);
+		} catch (MalformedURLException e) {
+			LOG.error("MalformedURLException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e);
+		} catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e);
+		}
     }
 
 
@@ -2092,15 +2119,54 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         Map<String, Object> queries = new HashMap<String, Object>();
 
         Company company = companyDao.findById( Company.class, companyId );
+        Region defaultRegion = getDefaultRegionForCompany( company );
+        
         queries.put( CommonConstants.COMPANY_COLUMN, company );
-        queries.put( CommonConstants.REGION_COLUMN, getDefaultRegionForCompany( company ) );
+        queries.put( CommonConstants.REGION_COLUMN, defaultRegion );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
 
         branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
+        
+        populateAddressOfBranchFromSolr(branches, defaultRegion.getRegionId(), null, null);
+        
         LOG.info( "Method getBranchesUnderCompany executed sucessfully" );
 
         return branches;
+    }
+    
+    /*
+     * Method to query Solr for the branch address and populate the given Branch list
+     */
+    private void populateAddressOfBranchFromSolr(List<Branch> branches, long regionId, Set<Long> branchIds, Company company){
+    	try {
+			String branchesSearchedString = null;
+			
+			if(regionId == 0){
+				branchesSearchedString = solrSearchService.searchBranches("", company, CommonConstants.BRANCH_ID_SOLR, branchIds, 0, -1);
+			}
+			else{
+				branchesSearchedString = solrSearchService.searchBranchesByRegion(regionId, 0, -1);            
+			}
+			
+			if(branchesSearchedString != null){
+				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
+				List<BranchFromSearch> branchSearchedList = new Gson().fromJson( branchesSearchedString, searchedBranchesList );
+				
+				for (BranchFromSearch branchFromSearch : branchSearchedList) {
+					for (Branch branch : branches) {
+						if(branch.getBranchId() == branchFromSearch.getBranchId()){
+							branch.setAddress1(branchFromSearch.getAddress1());
+							branch.setAddress2(branchFromSearch.getAddress2());
+						}
+					}
+				}
+			}
+		} catch (SolrException e) {
+			LOG.error("SolrException while searching for branches for region ID: " + regionId + ". Reason : " + e.getMessage(), e);
+		} catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while searching for branches for region ID: " + regionId + ". Reason : " + e.getMessage(), e);
+		}
     }
 
 
@@ -2214,6 +2280,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
         branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
+        
+        populateAddressOfBranchFromSolr(branches, regionId, null, null);
+        
         LOG.info( "Method getBranchesByRegionId completed successfully" );
         return branches;
     }
@@ -5383,6 +5452,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Method getRegionsForRegionIds called to get Region for regionIds : " + regionIds );
         List<Region> regions = regionDao.getRegionForRegionIds( regionIds );
+        
+        populateAddressOfRegionFromSolr(regions, regions.get(0).getCompany().getCompanyId());
+        
         LOG.info( "Method getRegionsForRegionIds called to get Region for regionIds : " + regionIds );
         return regions;
     }
@@ -5398,7 +5470,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
         List<Branch> branches = branchDao.getBranchForBranchIds( branchIds );
-        LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
+        
+        populateAddressOfBranchFromSolr(branches, 0, branchIds, branches.get(0).getCompany());
+        LOG.info( "Method getBranchesForBranchIds finished getting Branch for branchIds : " + branchIds );
         return branches;
     }
     
