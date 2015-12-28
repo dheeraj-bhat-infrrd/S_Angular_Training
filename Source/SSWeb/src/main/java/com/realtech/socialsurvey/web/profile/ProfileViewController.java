@@ -553,11 +553,6 @@ public class ProfileViewController
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
                 // migrating the hideSectionsFromProfilePage value from company to branch
                 individualProfile.setHideSectionsFromProfilePage(companyProfile.getHideSectionsFromProfilePage());
-
-                //TODO: remove this
-                //Added company name in profile name
-                model.addAttribute( "comName", user.getCompany().getCompany() );
-                
                 // aggregated social profile urls
                 /*                SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
                                     CommonConstants.AGENT_ID );

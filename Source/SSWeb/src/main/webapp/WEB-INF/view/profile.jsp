@@ -593,9 +593,6 @@
     	profileJson = ${profileJson};
         var gaLabel;
         var gaName;
-        //TODO:remove this
-        comName = "${comName}";
-        
         /**
 	    	If region profile name is mentioned, fetch the region profile 
     		since this would be a call to fetch region profile page 
