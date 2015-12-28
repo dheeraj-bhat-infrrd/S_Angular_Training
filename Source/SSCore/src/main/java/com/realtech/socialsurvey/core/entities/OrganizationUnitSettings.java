@@ -48,6 +48,7 @@ public class OrganizationUnitSettings {
 	private boolean isLogoImageProcessed;
 	private long zillowReviewCount;
 	private double zillowReviewAverage;
+	private String[] hideSectionsFromProfilePage;
 
 	public String getId() {
 		return id;
@@ -321,27 +322,31 @@ public class OrganizationUnitSettings {
 		this.isLogoImageProcessed = isLogoImageProcessed;
 	}
 
-	public long getZillowReviewCount()
-    {
-        return zillowReviewCount;
-    }
+	public long getZillowReviewCount() {
+		return zillowReviewCount;
+	}
 
-    public void setZillowReviewCount( long zillowReviewCount )
-    {
-        this.zillowReviewCount = zillowReviewCount;
-    }
+	public void setZillowReviewCount(long zillowReviewCount) {
+		this.zillowReviewCount = zillowReviewCount;
+	}
 
-    public double getZillowReviewAverage()
-    {
-        return zillowReviewAverage;
-    }
+	public double getZillowReviewAverage() {
+		return zillowReviewAverage;
+	}
 
-    public void setZillowReviewAverage( double zillowReviewAverage )
-    {
-        this.zillowReviewAverage = zillowReviewAverage;
-    }
+	public void setZillowReviewAverage(double zillowReviewAverage) {
+		this.zillowReviewAverage = zillowReviewAverage;
+	}
 
-    @Override
+	public String[] getHideSectionsFromProfilePage() {
+		return hideSectionsFromProfilePage;
+	}
+
+	public void setHideSectionsFromProfilePage(String[] hideSectionsFromProfilePage) {
+		this.hideSectionsFromProfilePage = hideSectionsFromProfilePage;
+	}
+
+	@Override
 	public String toString() {
 		return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion + ", profileName="
 				+ profileName + ", profileUrl=" + profileUrl + ", profileImageUrl=" + profileImageUrl + ", logo=" + logo + ", isLocationEnabled="
