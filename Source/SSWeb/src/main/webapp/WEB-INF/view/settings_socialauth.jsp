@@ -23,7 +23,7 @@
 	</c:choose>
 	<div
 		class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj ${socialDisabled}"
-		onclick="openAuthPage('facebook', ${isAutoLogin});"></div>
+		onclick="openAuthPage('facebook', ${isAutoLogin}, this);" data-link="${facebookLink}"></div>
 	<div id="edt-prof-fb-lnk" class="float-left soc-nw-icn-link"
 		data-social='facebook'>${facebookLink}</div>
 </div>
@@ -39,7 +39,7 @@
 	</c:choose>
 	<div
 		class="float-left soc-nw-icns cursor-pointer icn-wide-twitter soc-nw-adj ${socialDisabled}"
-		onclick="openAuthPage('twitter', ${isAutoLogin});"></div>
+		onclick="openAuthPage('twitter', ${isAutoLogin}, this);" data-link="${twitterLink}"></div>
 	<div id="edt-prof-twt-lnk" class="float-left soc-nw-icn-link"
 		data-social='twitter'>${twitterLink}</div>
 </div>
@@ -55,7 +55,7 @@
 	</c:choose>
 	<div
 		class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj ${socialDisabled}"
-		onclick="openAuthPage('linkedin', ${isAutoLogin});"></div>
+		onclick="openAuthPage('linkedin', ${isAutoLogin}, this);" data-link="${linkedinLink}"></div>
 	<div id="edt-prof-linkedin-lnk" class="float-left soc-nw-icn-link"
 		data-social='linkedin'>${linkedinLink}</div>
 </div>
@@ -71,7 +71,7 @@
 	</c:choose>
 	<div
 		class="float-left soc-nw-icns cursor-pointer icn-wide-gplus soc-nw-adj ${socialDisabled}"
-		onclick="openAuthPage('google', ${isAutoLogin});"></div>
+		onclick="openAuthPage('google', ${isAutoLogin}, this);" data-link="${googleLink}"></div>
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
 		data-social='google'>${googleLink}</div>
 </div>

@@ -121,7 +121,7 @@ public class MongoForwardMailDetailsDaoImpl implements ForwardMailDetailsDao
      * @return
      * @throws InvalidInputException
      */
-    private void updateStatusOfForwardMailDetails( String id ) throws InvalidInputException
+    void updateStatusOfForwardMailDetails( String id ) throws InvalidInputException
     {
         if ( id == null || id.isEmpty() )
             throw new InvalidInputException( "Id passed cannot be null or empty" );

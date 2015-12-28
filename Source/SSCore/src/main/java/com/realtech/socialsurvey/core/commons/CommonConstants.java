@@ -900,7 +900,7 @@ public interface CommonConstants
     public static final String HEADER_COMPANY = "Company";
     public static final String HEADER_REGION = "Region";
     public static final String HEADER_BRANCH = "Branch";
-    public static final String HEADER_TOTAL_USERS = "Total Users ";
+    public static final String HEADER_INVITED_USERS = "Invited Users ";
     public static final String HEADER_ACTIVE_USERS = "Active Users";
     public static final String HEADER_ADOPTION_RATES = "Adoption Rates";
     
@@ -918,4 +918,8 @@ public interface CommonConstants
 
     // MySQL IS_ZILLOW_CONNECTED column name constant
     public static final String IS_ZILLOW_CONNECTED_COLUMN = "IS_ZILLOW_CONNECTED";
+    
+    // sections that can be hidden from public profile page
+    public static final String HIDE_RECENT_POSTS = "recent_posts";
+    public static final String HIDE_SOCIAL_REVIEW = "social_reviews";
 }

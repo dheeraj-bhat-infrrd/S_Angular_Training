@@ -946,23 +946,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
         }
 
-        boolean activeUserFound = true;
-        // get all user and admin under a company data grouped by branches
-        List<Object[]> rows = companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( companyId );
-
-        // get all active user and admin under a company data grouped by branches
-        Map<Long, Integer> branchIdAccountUserCountMap = companyDao
-            .getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( companyId );
+        // get user adoption data
+        List<Object[]> rows = companyDao.getUserAdoptionData( companyId );
 
         // check whether report info are available
         if ( rows == null || rows.isEmpty() ) {
-            LOG.error( "No user and admin record found for the company id : " + companyId );
-            throw new NoRecordsFetchedException( "No user and admin record found for the company id : " + companyId );
-        }
-
-        if ( branchIdAccountUserCountMap == null || branchIdAccountUserCountMap.isEmpty() ) {
-            LOG.warn( "No active user and admin record found for the company id : " + companyId );
-            activeUserFound = false;
+            LOG.error( "No user adoption data found for the company id : " + companyId );
+            throw new NoRecordsFetchedException( "No user adoption data found for the company id : " + companyId );
         }
 
         // Blank workbook
@@ -977,24 +967,27 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         List<Object> userAdoptionReportToPopulate = new ArrayList<>();
 
         for ( Object[] row : rows ) {
-            userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
-            if ( row[2] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
+            // row 0 - company
+            // row 1 - region
+            // row 2 - branch
+            // row 3 - invited users
+            // row 4 - active users
+            // row 5 - adoption rate
+            userAdoptionReportToPopulate.add( String.valueOf( row[0] ) );
+            if ( row[1] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[1] ) ) )
+                userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
+            else
+                userAdoptionReportToPopulate.add( "" );
+            if ( row[2] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
                 userAdoptionReportToPopulate.add( String.valueOf( row[2] ) );
             else
                 userAdoptionReportToPopulate.add( "" );
-            if ( row[3] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[3] ) ) )
-                userAdoptionReportToPopulate.add( String.valueOf( row[3] ) );
-            else
-                userAdoptionReportToPopulate.add( "" );
-            long branchId = Long.parseLong( String.valueOf( row[0] ) );
-            Integer userCount = new Integer( String.valueOf( row[4] ) );
-            Integer activeUserCount = activeUserFound && branchIdAccountUserCountMap.get( branchId ) != null ? branchIdAccountUserCountMap
-                .get( branchId ) : 0;
-            Double adoptionRate = ( new Double( activeUserCount ) / new Double( userCount ) ) * 100;
+            Integer userCount = new Integer( String.valueOf( row[3] ) );
+            Integer activeUserCount = new Integer( String.valueOf( row[4] ) );
+            String adoptionRate = String.valueOf( row[5] ).replace( "\\.00", "" );
             userAdoptionReportToPopulate.add( userCount );
             userAdoptionReportToPopulate.add( activeUserCount );
-
-            userAdoptionReportToPopulate.add( adoptionRate );
+            userAdoptionReportToPopulate.add( adoptionRate != "null" ? adoptionRate : "0%" );
 
             data.put( ( ++counter ).toString(), userAdoptionReportToPopulate );
             userAdoptionReportToPopulate = new ArrayList<>();
@@ -1004,7 +997,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_COMPANY );
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_REGION );
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_BRANCH );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_TOTAL_USERS );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_INVITED_USERS );
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_ACTIVE_USERS );
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_ADOPTION_RATES );
 

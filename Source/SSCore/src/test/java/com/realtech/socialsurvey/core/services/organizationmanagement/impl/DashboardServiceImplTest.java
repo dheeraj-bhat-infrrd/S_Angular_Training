@@ -395,9 +395,7 @@ public class DashboardServiceImplTest
     @Test ( expected = NoRecordsFetchedException.class)
     public void testDownloadUserAdoptionReportDataWhenRowsIsNull() throws InvalidInputException, NoRecordsFetchedException
     {
-        Mockito.when( companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn( null );
-        Mockito.when( companyDao.getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
-            new HashMap<Long, Integer>() );
+        Mockito.when( companyDao.getUserAdoptionData( Mockito.anyLong() ) ).thenReturn( null );
         dashboardServiceImpl.downloadUserAdoptionReportData( 1 );
     }
 
@@ -405,10 +403,7 @@ public class DashboardServiceImplTest
     @Test ( expected = NoRecordsFetchedException.class)
     public void testDownloadUserAdoptionReportDataWhenRowsIsEmpty() throws InvalidInputException, NoRecordsFetchedException
     {
-        Mockito.when( companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
-            new ArrayList<Object[]>() );
-        Mockito.when( companyDao.getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
-            new HashMap<Long, Integer>() );
+        Mockito.when( companyDao.getUserAdoptionData( Mockito.anyLong() ) ).thenReturn( new ArrayList<Object[]>() );
         dashboardServiceImpl.downloadUserAdoptionReportData( 1 );
     }
     
