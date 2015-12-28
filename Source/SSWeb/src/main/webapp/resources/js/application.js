@@ -518,12 +518,12 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 	//get profile data for all the records , noOfDays = -1
-	showProfileDetails(newProfileName, 0, -1);
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
-	showSurveyStatistics(newProfileName, 0);
-	showSurveyStatisticsGraphically(newProfileName, 0);
+	showSurveyStatistics(newProfileName, newProfileValue);
+	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
 
 function showRegionAdminFlow(newProfileName, newProfileValue) {
@@ -563,7 +563,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
 	//get profile data for all the records , noOfDays = -1
-	showProfileDetails(newProfileName, 0, -1);
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
