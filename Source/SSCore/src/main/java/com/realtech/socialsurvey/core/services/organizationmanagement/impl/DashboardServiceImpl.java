@@ -1171,7 +1171,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      * @param userId
      * @throws InvalidInputException 
      */
-    private boolean isUserAnAgent( List<Long> profilesMasters ) throws InvalidInputException
+    boolean isUserAnAgent( List<Long> profilesMasters )
     {
         for ( Long profilesMaster : profilesMasters ) {
             if ( profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
@@ -1181,11 +1181,40 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         return false;
     }
 
-
-    private String getStateForUser( AgentSettings agentSettings, OrganizationUnitSettings companySettings,
+    /**
+     * Method to get the state for a user
+     * @param agentSettings
+     * @param companySettings
+     * @param reportRow
+     * @param companyId
+     * @param regionsSettings
+     * @param branchesSettings
+     * @return
+     * @throws InvalidInputException
+     */
+    String getStateForUser( AgentSettings agentSettings, OrganizationUnitSettings companySettings,
         BillingReportData reportRow, long companyId, Map<Long, OrganizationUnitSettings> regionsSettings,
         Map<Long, OrganizationUnitSettings> branchesSettings ) throws InvalidInputException
     {
+        LOG.info( "Method getStateForUser started" );
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid companyID for ID : " + companyId );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company Settings empty for companyID : " + companyId );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings null!" );
+        }
+        if ( reportRow == null ) {
+            throw new InvalidInputException( "Billing Report row is null" );
+        }
+        if ( regionsSettings == null ) {
+            throw new InvalidInputException( "Regions Settings is null" );
+        }
+        if ( branchesSettings == null ) {
+            throw new InvalidInputException( "Branches Settings is null" );
+        }
         if ( companySettings.getContact_details() == null || companySettings.getContact_details().getState() == null
             || companySettings.getContact_details().getState().isEmpty() ) {
             throw new InvalidInputException( "Unable to get contact details for company ID : " + companyId );
@@ -1242,9 +1271,19 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      * @return
      * @throws InvalidInputException
      */
-    private String getRegionState( BillingReportData reportRow, String companyState,
+    String getRegionState( BillingReportData reportRow, String companyState,
         Map<Long, OrganizationUnitSettings> regionsSettings ) throws InvalidInputException
     {
+        LOG.info( "Method getRegionState started" );
+        if ( reportRow == null ) {
+            throw new InvalidInputException( "Billing Report row is null" );
+        }
+        if ( companyState == null || companyState.isEmpty() ) {
+            throw new InvalidInputException( "Company State cannot be empty!" );
+        }
+        if ( regionsSettings == null ) {
+            throw new InvalidInputException( "Regions Settings is null" );
+        }
         if ( reportRow.getRegion().equals( CommonConstants.DEFAULT_REGION_NAME ) ) {
             return companyState;
         } else {
