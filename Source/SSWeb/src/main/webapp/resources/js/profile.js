@@ -1389,55 +1389,33 @@ function fetchPublicPostsScroll(isNextBatch) {
 	}
 }
 
-var comName;
 //Function to paint posts
 function fetchPublicPosts(isNextBatch) {
 	
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	
+	//if recent posts are to be hidden
+	if(profileJson.hideSectionsFromProfilePage && ($.inArray("recent_posts", profileJson.hideSectionsFromProfilePage) > -1) ) {
+		$('#recent-post-container').remove();
+		doStopPublicPostPagination = true;
+		return;
+	}
+	
 	var url = getLocationOrigin() + "/rest/profile/";
 	if(profileLevel == 'COMPANY'){
 		//Fectch the reviews for company
 		url += "company/";
-		//TODO:Remove this 
-		//Stop the public post for the given company page
-		if(currentProfileName.trim() == 'allied-mortgage-group') {
-			$('#recent-post-container').remove();
-			doStopPublicPostPagination = true;
-			return;
-		}
 	}
 	else if(profileLevel == 'REGION'){
 		//Fetch the reviews for region
 		url += "region/"+companyProfileName+"/";
-		//TODO:Remove this 
-		//Stop the public post for the given company page
-		if(companyProfileName.trim() == 'allied-mortgage-group') {
-			$('#recent-post-container').remove();
-			doStopPublicPostPagination = true;
-			return;
-		}
 	}
 	else if(profileLevel == 'BRANCH') {
 		//Fetch the reviews for branch
-		//TODO:Remove this 
-		//Stop the public post for the given company page
-		if(companyProfileName.trim() == 'allied-mortgage-group') {
-			$('#recent-post-container').remove();
-			doStopPublicPostPagination = true;
-			return;
-		}
 		url += "branch/"+companyProfileName+"/";
 	}
 	else if(profileLevel == 'INDIVIDUAL'){
 		//Fetch the reviews for individual
-		//TODO:Remove this 
-		//Stop the public post for the given company page
-		if(comName.trim() == 'Allied Mortgage Group') {
-			$('#recent-post-container').remove();
-			doStopPublicPostPagination = true;
-			return;
-		}
 	}
 	
 	url += currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
