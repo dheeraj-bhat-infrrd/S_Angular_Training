@@ -407,13 +407,13 @@ public class SocialManagementController
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );*/
                 companySettings.setSocialMediaTokens( mediaTokens );
-                for ( ProfileStage stage : companySettings.getProfileStages() ) {
+                /*for ( ProfileStage stage : companySettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
                     }
                 }
                 profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );*/
                 userSettings.setCompanySettings( companySettings );
                 String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
                 model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -429,13 +429,13 @@ public class SocialManagementController
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );*/
                 regionSettings.setSocialMediaTokens( mediaTokens );
-                for ( ProfileStage stage : regionSettings.getProfileStages() ) {
+                /*for ( ProfileStage stage : regionSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
                     }
                 }
                 profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );*/
                 userSettings.getRegionSettings().put( entityId, regionSettings );
                 String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
                 model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -451,13 +451,13 @@ public class SocialManagementController
                 /*mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );*/
                 branchSettings.setSocialMediaTokens( mediaTokens );
-                for ( ProfileStage stage : branchSettings.getProfileStages() ) {
+                /*for ( ProfileStage stage : branchSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
                     }
                 }
                 profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );*/
                 userSettings.getBranchSettings().put( entityId, branchSettings );
                 String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
                 model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -474,13 +474,13 @@ public class SocialManagementController
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
                 //mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
-                for ( ProfileStage stage : agentSettings.getProfileStages() ) {
+                /*for ( ProfileStage stage : agentSettings.getProfileStages() ) {
                     if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
                         stage.setStatus( CommonConstants.STATUS_INACTIVE );
                     }
                 }
                 profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );*/
                 userSettings.setAgentSettings( agentSettings );
                 String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
                 model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -556,6 +556,13 @@ public class SocialManagementController
                 	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
                 	userManagementService.updateCompany( company );
                 }
+                for ( ProfileStage stage : companySettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                 updated = true;
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
@@ -573,6 +580,13 @@ public class SocialManagementController
                 	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
                 	userManagementService.updateRegion( region );
                 }
+                for ( ProfileStage stage : regionSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                 updated = true;
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -590,7 +604,14 @@ public class SocialManagementController
                 	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.FACEBOOK, CommonConstants.SET_SETTINGS);
                 	userManagementService.updateBranch( branch );
                 }
-                
+
+                for ( ProfileStage stage : branchSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 updated = true;
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
@@ -602,6 +623,13 @@ public class SocialManagementController
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
+                for ( ProfileStage stage : agentSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 updated = true;
             }
             if ( !updated ) {
