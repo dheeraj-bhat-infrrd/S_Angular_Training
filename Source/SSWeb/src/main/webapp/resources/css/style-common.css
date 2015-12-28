@@ -8005,3 +8005,6 @@ label.url-change-input-label {
 .social-auth-disabled {
 	cursor: auto !important; 
 }
+.share-plus-height{
+	height:33px;
+}
