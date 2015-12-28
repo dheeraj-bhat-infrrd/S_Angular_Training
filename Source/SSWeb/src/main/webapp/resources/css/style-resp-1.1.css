@@ -320,6 +320,9 @@
 		border-bottom: 1px solid #dcdcdc;
 		border-top: 1px solid #dcdcdc;
 	}
+	.position-align{
+	padding-left: 30px;
+	}
 }
 
 
@@ -629,4 +632,34 @@
 	.rpa-btn {
 		width: 130px;
 	}
+	.compl-input-cont{
+	width:250px;
+	}
+	.submit-comp-btn{
+	width: 245px;
+    margin-left: 27px;
+	}
+	.com-reg-or{
+	margin-top: 10px;
+	}
+	.compl-save-btn{
+	margin-top:0px;
+	}
+	.zillow-input-container,.zillow-example-cont{
+	font-size:12px;
+	}
+	.zillow-input-container,.zillow-example-cont{
+	width:100%;
+	}
+	.zillow-exm-profilename{
+	padding:3px;
+	}
+	input.zillow-input{
+	width:80px;
+	padding: 5px 0 5px 3px;
+	}
+	.position-align{
+	padding-left: 20px;
+	}
+	
 }
