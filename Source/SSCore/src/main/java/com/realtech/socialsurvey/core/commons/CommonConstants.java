@@ -909,4 +909,8 @@ public interface CommonConstants
 
     // MySQL IS_ZILLOW_CONNECTED column name constant
     public static final String IS_ZILLOW_CONNECTED_COLUMN = "IS_ZILLOW_CONNECTED";
+    
+    // sections that can be hidden from public profile page
+    public static final String HIDE_RECENT_POSTS = "recent_posts";
+    public static final String HIDE_SOCIAL_REVIEW = "social_reviews";
 }
