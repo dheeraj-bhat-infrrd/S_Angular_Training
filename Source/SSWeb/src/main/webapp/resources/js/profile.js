@@ -765,7 +765,7 @@ function paintReviews(result){
 			reviewItem.agentName = "us";
 		reviewsHtml += '	</div>';
 		
-		reviewsHtml += '	<div class="ppl-share-wrapper clearfix">';
+		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height">';
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
