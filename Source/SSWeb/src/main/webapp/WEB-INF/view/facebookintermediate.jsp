@@ -43,12 +43,17 @@
 		</div>
 	</div>
 </div>
+<%-- <input type="hidden" id="md-token" value="${mediaTokens}"> --%>
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script>
 $(document).ready(function() {
+	//Get media tokens from model
+	/* var mediaTokens = $('#md-token').val(); */
+	var mediaTokens = '${mediaTokens}';
+	console.log("MediaTokens : " + mediaTokens);
 	// Onload before auth Url
 	var waitMessage = "${message}";
 	if (parseInt(waitMessage) == 1) {
@@ -100,7 +105,8 @@ $(document).ready(function() {
 		</c:forEach>
 		var facebookToken = {
 			'selectedAccessFacebookToken' : selectedAccessFacebookToken,
-			'selectedProfileUrl' :  selectedProfileUrl
+			'selectedProfileUrl' :  selectedProfileUrl,
+			'mediaTokens' : mediaTokens
 		};
 		$.ajax({
 			url : './saveSelectedAccessFacebookToken.do',

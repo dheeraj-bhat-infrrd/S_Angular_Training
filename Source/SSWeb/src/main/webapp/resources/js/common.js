@@ -609,13 +609,18 @@ function openForgotPasswordPage(){
 }
 
 // Dashboard popup click functions
-function openAuthPage(socialNetwork, isAutoLogin) {
+function openAuthPage(socialNetwork, isAutoLogin, element) {
 	if(isAutoLogin) {
-		$('#overlay-toast').html('You are not authorized to connect to ' + socialNetwork);
+		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
 		showToast();
 		return;
 	}
-	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	
+	var dataLink = $(element).attr('data-link');
+	
+	confirmSocialAuth(socialNetwork, function() {
+		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	}, dataLink);
 }
 function openAuthPageZillow(disableEle) {
 	callAjaxGET("/socialauth.do?social=zillow", function(data) {
@@ -629,14 +634,16 @@ function openAuthPageRegistration(socialNetwork) {
 function openAuthPageDashboard(socialNetwork, columnName, columnValue) {
 	//check if user is autologged in
 	if($('#pro-cmplt-stars').attr('data-autologin') == 'true') {
-		$('#overlay-toast').html('You are not authorized to connect to ' + socialNetwork);
+		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
 		showToast();
 		return;
 	}
 	
-	window.open("./socialauth.do?social=" + socialNetwork + "&columnName="
-			+ columnName + "&columnValue=" + columnValue, "Authorization Page",
-			"width=800,height=600,scrollbars=yes");
+	confirmSocialAuth(socialNetwork, function() {
+		window.open("./socialauth.do?social=" + socialNetwork + "&columnName="
+				+ columnName + "&columnValue=" + columnValue, "Authorization Page",
+				"width=800,height=600,scrollbars=yes");
+	});
 }
 function openAuthPageDashboardZillow(disableEle){
 	callAjaxGET("/socialauth.do?social=zillow", function(data) {
@@ -1039,12 +1046,12 @@ function attachFocusEventCity(stateId, cityId) {
   	$('#'+cityId).bind('focus', function(){ 
   		if($('#'+stateId).val() &&  $('#'+stateId).val() != ""){
   			$(this).trigger('keydown');
-  			$(this).autocomplete("search");		
+  			//$(this).autocomplete("search");		
   		}
   	});
 }
 
-function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId, cityId) {
+function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId, cityId, phoneNumberId) {
 	
 	//check for the existing value of country code and set defualt to us if not set
 	var countryCode = "US";
@@ -1088,6 +1095,15 @@ function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityR
 				showStateCityRow(stateCityRowId, stateId, cityId);
 			}else{
 				hideStateCityRow(stateCityRowId, stateId);
+			}
+			
+			if(phoneNumberId) {
+				//update phone number masking
+				var phoneNumberElement = $('#'+phoneNumberId);
+				phoneNumberElement.unmask();
+				phoneFormat = phoneFormatList[ui.item.code];
+				currentPhoneRegEx = phoneFormat;
+				phoneNumberElement.mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
 			}
 			return false;
 		},
