@@ -182,7 +182,7 @@
 <script src="${initParam.resourcesPath}/resources/js/jquery.mask.js"></script>
 <script>
 $(document).ready(function() {
-	initializeCompanyInformationPage();
+	companyRegistration.initializePage();
 });
 </script>
 
