@@ -7614,7 +7614,7 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 		openAuthPageDashboard('google', columnName, columnValue);
 	}
 	else if(task=='ZILLOW_PRF'){
-		openAuthPageDashboard('zillow', columnName, columnValue);
+		openAuthPageDashboardZillow('#dsh-btn3');
 	}
 	else if(task=='YELP_PRF'){
 		showMainContent('./showprofilepage.do');
