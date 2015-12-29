@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -2008,8 +2007,42 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
         regions = regionDao.findProjectionsByKeyValue( Region.class, columnNames, queries );
+        
+        //SS-1421: populate the address of the regions from Solr before sending this list back
+        populateAddressOfRegionFromSolr(regions, companyId);
 
         return regions;
+    }
+    
+    /*
+     * SS-1421: Method to query Solr for the region address and populate the given Region list
+     */
+    private void populateAddressOfRegionFromSolr(List<Region> regions, long companyId){
+    	try {
+    		
+    		//Get the regions in the company from Solr
+			String regionsSearchedString = solrSearchService.fetchRegionsByCompany(companyId, Integer.MAX_VALUE);            
+			Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
+			List<RegionFromSearch> regionSearchedList = new Gson().fromJson( regionsSearchedString, searchedRegionsList );
+			
+			//Iterate over the searched regions
+			for (RegionFromSearch regionFromSearch : regionSearchedList) {
+				for (Region region : regions) {
+					if(region.getRegionId() == regionFromSearch.getRegionId()){
+						
+						//populate the address into the region objects
+						region.setAddress1(regionFromSearch.getAddress1());
+						region.setAddress2(regionFromSearch.getAddress2());
+					}
+				}
+			}
+		} catch (SolrException e) {
+			LOG.error("SolrException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e);
+		} catch (MalformedURLException e) {
+			LOG.error("MalformedURLException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e);
+		} catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e);
+		}
     }
 
 
@@ -2092,15 +2125,63 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         Map<String, Object> queries = new HashMap<String, Object>();
 
         Company company = companyDao.findById( Company.class, companyId );
+        Region defaultRegion = getDefaultRegionForCompany( company );
+        
         queries.put( CommonConstants.COMPANY_COLUMN, company );
-        queries.put( CommonConstants.REGION_COLUMN, getDefaultRegionForCompany( company ) );
+        queries.put( CommonConstants.REGION_COLUMN, defaultRegion );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
 
         branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
+        
+        //SS-1421: populate the address of the branches from Solr before sending this list back
+        populateAddressOfBranchFromSolr(branches, defaultRegion.getRegionId(), null, null);
+        
         LOG.info( "Method getBranchesUnderCompany executed sucessfully" );
 
         return branches;
+    }
+    
+    /*
+     * SS-1421: Method to query Solr for the branch address and populate the given Branch list. This method
+     * caters to a) Searching for all branches within a Company as well as b) Searching for all branches within a region
+     */
+    private void populateAddressOfBranchFromSolr(List<Branch> branches, long regionId, Set<Long> branchIds, Company company){
+    	try {
+			String branchesSearchedString = null;
+			
+			//If the regionId is 0, do a Solr search for all branches under the company. Else search within the given region only.
+			if(regionId == 0){
+				branchesSearchedString = solrSearchService.searchBranches("", company, CommonConstants.BRANCH_ID_SOLR, branchIds, 0, Integer.MAX_VALUE);
+			}
+			else{
+				branchesSearchedString = solrSearchService.searchBranchesByRegion(regionId, 0, Integer.MAX_VALUE);            
+			}
+			
+			//Proceed if Solr returns a non null String
+			if(branchesSearchedString != null){
+				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
+				List<BranchFromSearch> branchSearchedList = new Gson().fromJson( branchesSearchedString, searchedBranchesList );
+				
+				//Iterate over the searched branches
+				for (BranchFromSearch branchFromSearch : branchSearchedList) {
+					for (Branch branch : branches) {
+						if(branch.getBranchId() == branchFromSearch.getBranchId()){
+							
+							//Populate the branch address into the branch objects
+							branch.setAddress1(branchFromSearch.getAddress1());
+							branch.setAddress2(branchFromSearch.getAddress2());
+						}
+					}
+				}
+			}
+		} catch (SolrException e) {
+			//Just log the exception in case there's some error fetching the branches from Solr. No need to propagate.
+			LOG.error("SolrException while searching for branches for region ID: " + regionId + ". Reason : " + e.getMessage(), e);
+		} catch (InvalidInputException e) {
+			//Just log the exception in case there's some error fetching the branches from Solr. No need to propagate.
+			LOG.error("InvalidInputException while searching for branches for region ID: " + regionId + ". Reason : " + e.getMessage(), e);
+		}
     }
 
 
@@ -2214,6 +2295,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
         branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
+        
+        //SS-1421: populate the address of the branches from Solr before sending this list back
+        populateAddressOfBranchFromSolr(branches, regionId, null, null);
+        
         LOG.info( "Method getBranchesByRegionId completed successfully" );
         return branches;
     }
@@ -5383,6 +5468,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Method getRegionsForRegionIds called to get Region for regionIds : " + regionIds );
         List<Region> regions = regionDao.getRegionForRegionIds( regionIds );
+        
+        //SS-1421: populate the address of the regions from Solr before sending this list back
+        //Use the company ID of the first region in the list
+        populateAddressOfRegionFromSolr(regions, regions.get(0).getCompany().getCompanyId());
+        
         LOG.info( "Method getRegionsForRegionIds called to get Region for regionIds : " + regionIds );
         return regions;
     }
@@ -5398,7 +5488,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
         List<Branch> branches = branchDao.getBranchForBranchIds( branchIds );
-        LOG.info( "Method getBranchesForBranchIds called to get Branch for branchIds : " + branchIds );
+        
+        //SS-1421: populate the address of the branches from Solr before sending this list back
+        populateAddressOfBranchFromSolr(branches, 0, branchIds, branches.get(0).getCompany());
+        LOG.info( "Method getBranchesForBranchIds finished getting Branch for branchIds : " + branchIds );
         return branches;
     }
     
