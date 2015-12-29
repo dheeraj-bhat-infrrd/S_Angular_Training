@@ -20,6 +20,7 @@ var currentPhoneRegEx; //Vary the phone regex according to masking
 var stateList; //usStateList
 var cityLookupList; //cityLookupList
 var phoneFormat = '(ddd) ddd-dddd'; //defualt phone format
+var selectedCountryRegEx = "";
 
 function buildMessageDiv(){
 	if($('.err-nw-wrapper').length == 0){
