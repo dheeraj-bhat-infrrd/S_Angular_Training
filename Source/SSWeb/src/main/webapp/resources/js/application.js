@@ -2889,12 +2889,15 @@ function paintHierarchyViewBranches(data,regionId) {
 	$(".tr-region-edit").slideUp(200);
 	bindUserEditClicks();
 	bindBranchListClicks();
+	bindHierarchyEvents();
+	bindAppUserLoginEvent();
 }
 
 function bindBranchListClicks(){
 	$(".branch-edit-icn").unbind('click');
 	$(".branch-edit-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
 		if($(this).attr('clicked') == "false"){
 			showBranchEdit(branchId);
@@ -2907,7 +2910,7 @@ function bindBranchListClicks(){
 	});
 	$(".branch-row").unbind('click');
 	$(".branch-row").click(function(e){
-		e.stopPropagation();
+		//e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
@@ -2922,6 +2925,7 @@ function bindBranchListClicks(){
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
@@ -2929,17 +2933,18 @@ function bindBranchListClicks(){
 
 function fetchHierarchyViewList() {
 	var url = "./fetchhierarchyviewlist.do";
-	callAjaxGET(url, paintHierarchyViewList, true);
-}
-function paintHierarchyViewList(data) {
-	$("#hierarchy-list-header").siblings().remove();
-	$("#hierarchy-list-header").after(data);
-	bindRegionListClicks();
-    $('.v-tbl-icn').click(function(e){
-        e.stopPropagation();
-    });
-    bindBranchListClicks();
-    bindUserEditClicks();
+	callAjaxGET(url, function(data) {
+		$("#hierarchy-list-header").siblings().remove();
+		$("#hierarchy-list-header").after(data);
+		bindRegionListClicks();
+	    /*$('.v-tbl-icn').click(function(e){
+	        e.stopPropagation();
+	    });*/
+	    bindBranchListClicks();
+	    bindUserEditClicks();
+	    bindHierarchyEvents();
+	    bindAppUserLoginEvent();
+	}, true);
 }
 
 function bindRegionListClicks() {
@@ -2956,6 +2961,7 @@ function bindRegionListClicks() {
 	});
 	$(".region-edit-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
 			showRegionEdit(regionId);
@@ -2968,8 +2974,43 @@ function bindRegionListClicks() {
 	});
 	$(".region-del-icn").unbind('click');
 	$(".region-del-icn").click(function(e){
+		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
 		deleteRegionPopup(regionId);
+	});
+}
+
+function bindHierarchyEvents() {
+	$('.v-tbn-icn-dropdown').off('click');
+	$('.v-tbn-icn-dropdown').on('click', function(e) {
+		e.stopPropagation();
+		var element = $(this);
+		if(element.next('.v-hr-tbl-icn-wraper').is(':visible')) {
+			$(this).next('.v-hr-tbl-icn-wraper').hide();
+		} else {
+			$('.v-hr-tbl-icn-wraper').hide();
+			$(this).next('.v-hr-tbl-icn-wraper').show();
+		}
+	});
+	$('.v-icn-wid.v-tbl-icn-sm').off('click');
+	$('.v-icn-wid.v-tbl-icn-sm').on('click', function(e) {
+		e.stopPropagation();
+		var element = $(this);
+		generateWidget(element, element.data('iden'), element.data('profile'));
+	});
+	$('.v-icn-femail').off('click');
+	$('.v-icn-femail').on('click', function(e) {
+		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
+			return;
+		}
+
+		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
+	    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
 	});
 }
 
@@ -3045,12 +3086,15 @@ function paintUsersFromBranch(data,branchId,regionId) {
 	$("#tr-branch-"+branchId).slideDown(200);
 	$(".tr-branch-edit").slideUp(200);
 	bindUserEditClicks();
+	bindHierarchyEvents();
+	bindAppUserLoginEvent();
 }
 
 function bindUserEditClicks() {
 	$(".user-edit-icn").unbind('click');
 	$('.user-edit-icn').click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		if($(this).attr('clicked') == "false") {
 			// make an ajax call and fetch the details of the user
 			var userId = $(this).attr('data-userid');
@@ -3071,6 +3115,7 @@ function bindUserEditClicks() {
 	$(".user-del-icn").click(function(e){
 		e.stopPropagation();
 		var userId = $(this).attr("data-userid");
+		$('.v-hr-tbl-icn-wraper').hide();
 		confirmDeleteUser(userId);
 	});
 }
@@ -4492,17 +4537,6 @@ $(document).on('click', '.v-icn-fmail', function() {
     var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
     var emailId = $(this).parent().find('.fetch-email').html();
     reinviteUser(firstName, lastName, emailId,'.v-icn-fmail');
-});
-
-$(document).on('click', '.v-icn-femail', function() {
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
-		return;
-	}
-
-	var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
 });
 
 /**
@@ -7726,7 +7760,8 @@ function userSwitchToCompAdmin() {
 	}, true);
 }
 
-function bindUserLoginEvent() {
+function bindAppUserLoginEvent() {
+	$('.user-login-icn').off('click');
 	$('.user-login-icn').on('click', function(e) {
 		e.stopImmediatePropagation();
 		var payload = {
@@ -8099,6 +8134,7 @@ function editProfileUrl(disableEle) {
 // Get all the required elements and show popup
 
 function generateWidget(clickedAttr , iden, profileLevel) {
+	$('.v-hr-tbl-icn-wraper').hide();
 	if($(clickedAttr).hasClass('v-tbl-icn-disabled')){
 		return;
 	}
@@ -9752,19 +9788,6 @@ function validateprofileUrlEditForm() {
 			//redirectErrorpage();
 		}
 	});
-}
-
-function attachReInvitationClickEvent(){
-	$('.v-icn-femail').click( function() {
-		if ($(this).hasClass('v-tbl-icn-disabled')) {
-			return;
-		}
-	
-		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-	    reinviteUser(firstName, lastName, emailId);
-});
 }
 
 function initializeVerticalsMasterForProfilePage() {
