@@ -257,6 +257,12 @@
         border-right: 0;
         padding: 10px 50px 10px 50px;
     }
+    .en-user-name{
+     border-bottom: 0 !important;
+    }
+    .en-form-align-left{
+    padding-left:70px !important;
+    }
     .hm-dd-wrapper{
         width: 100%;
         border-left: 0;

@@ -34,7 +34,9 @@
 			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-r${regionIdVal}-b${branch.branchId}">
 		    <td class="v-tbl-line"><div class="v-line-brnch"></div></td>
 		    <td class="v-tbl-name">${branch.branch}</td>
-		    <td class="v-tbl-add"></td>
+		    <td class="v-tbl-add"><c:if
+							test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if
+							test="${not empty branch.address2}">${branch.address2}</c:if></td>
 		    <td class="v-tbl-role"></td>
 		    <td class="v-tbl-btns v-tbl-btns-hr">
 		        <div class="v-tbn-icn-dropdown hide"></div>
