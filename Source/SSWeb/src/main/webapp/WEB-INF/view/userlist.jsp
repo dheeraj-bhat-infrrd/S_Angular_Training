@@ -141,5 +141,5 @@
 	</c:choose>
 </table>
 <script>
-	bindUserLoginEvent();
+	bindAppUserLoginEvent();
 </script>
