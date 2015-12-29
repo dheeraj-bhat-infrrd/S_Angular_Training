@@ -2021,7 +2021,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     	try {
     		
     		//Get the regions in the company from Solr
-			String regionsSearchedString = solrSearchService.fetchRegionsByCompany(companyId, -1);            
+			String regionsSearchedString = solrSearchService.fetchRegionsByCompany(companyId, Integer.MAX_VALUE);            
 			Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 			List<RegionFromSearch> regionSearchedList = new Gson().fromJson( regionsSearchedString, searchedRegionsList );
 			
@@ -2152,10 +2152,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			
 			//If the regionId is 0, do a Solr search for all branches under the company. Else search within the given region only.
 			if(regionId == 0){
-				branchesSearchedString = solrSearchService.searchBranches("", company, CommonConstants.BRANCH_ID_SOLR, branchIds, 0, -1);
+				branchesSearchedString = solrSearchService.searchBranches("", company, CommonConstants.BRANCH_ID_SOLR, branchIds, 0, Integer.MAX_VALUE);
 			}
 			else{
-				branchesSearchedString = solrSearchService.searchBranchesByRegion(regionId, 0, -1);            
+				branchesSearchedString = solrSearchService.searchBranchesByRegion(regionId, 0, Integer.MAX_VALUE);            
 			}
 			
 			//Proceed if Solr returns a non null String
