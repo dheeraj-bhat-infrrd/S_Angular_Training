@@ -12,7 +12,9 @@
 		<tr id="tr-region-${region.regionId}" clicked="false" class="v-tbl-row v-tbl-row-sel region-row" data-regionid="${region.regionId}">
            <td class="v-tbl-line"><div class="v-line-rgn"></div></td>
            <td class="v-tbl-name">${region.region}</td>
-           <td class="v-tbl-add"></td>
+           <td class="v-tbl-add"><c:if
+							test="${not empty region.address1}">${region.address1}</c:if>&nbsp;<c:if
+							test="${not empty region.address2}">${region.address2}</c:if></td>
            <td class="v-tbl-role"></td>
            <td class="v-tbl-btns">
                <div class="clearfix v-tbl-icn-wraper">
@@ -40,7 +42,9 @@
 			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-b${branch.branchId}">
            <td class="v-tbl-line"><div class="v-line-brnch v-line-comp-brnch"></div></td>
            <td class="v-tbl-name">${branch.branch}</td>
-           <td class="v-tbl-add"></td>
+           <td class="v-tbl-add"><c:if
+							test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if
+							test="${not empty branch.address2}">${branch.address2}</c:if></td>
            <td class="v-tbl-role"></td>
            <td class="v-tbl-btns">
                 <div class="clearfix v-tbl-icn-wraper">
