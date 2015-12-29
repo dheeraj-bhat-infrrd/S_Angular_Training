@@ -2892,13 +2892,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         user.setFirstName( nameArray[0] );
         String lastName = "";
         if ( nameArray.length > 1 ) {
-            for ( int i = 1; i < nameArray.length - 1; i++ ) {
+            for ( int i = 1; i <= nameArray.length - 1; i++ ) {
                 lastName += nameArray[i] + " ";
             }
         }
         if ( lastName != null && !lastName.equalsIgnoreCase( "" ) ) {
             lastName = lastName.trim();
             user.setLastName( lastName );
+        } else {
+            // Fix for SS-1442 : Last name is not updated to blank when updated agent name contains only first name
+            user.setLastName( "" );
         }
         user.setModifiedBy( String.valueOf( userId ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
