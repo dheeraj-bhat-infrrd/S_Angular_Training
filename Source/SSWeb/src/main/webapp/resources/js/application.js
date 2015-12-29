@@ -196,20 +196,17 @@ function retrieveState() {
 /*
  * Click event to close survey popup
  */
-/*$(document).on('click',  function(e){
+$(document).on('click',  function(e){
 	if($('#overlay-send-survey').is(':visible')){
 		$('#overlay-send-survey').hide();
 		enableBodyScroll();
 	}
+	if($('#report-abuse-overlay' ).is(':visible')){
+		$('#report-abuse-overlay').hide();
+		enableBodyScroll();
+	}
 	
-		if($('#report-abuse-overlay' ).is(':visible')){
-			$('#report-abuse-overlay').hide();
-			enableBodyScroll();
-		}
-		if($('#overlay-main' ).is(':visible')){
-			$('#overlay-main').hide();
-			enableBodyScroll();
-		}
+		
 });
 
 $(document).on('keyup',  function(e){
@@ -222,14 +219,33 @@ $(document).on('keyup',  function(e){
 			$('#report-abuse-overlay').hide();
 			enableBodyScroll();
 		}
+		
+	}
+});
+
+/**if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
 		if($('#overlay-main' ).is(':visible')){
 			$('#overlay-main').hide();
 			enableBodyScroll();
 		}
-	}
-});*/
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
+*/
 
 $(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+
+$(document).on('click', '#report-abuse-pop-up', function(e){
 	e.stopPropagation();
 });
 
@@ -320,6 +336,7 @@ function retakeSurveyReminderMail(element) {
 }
 
 $(document).on('click', '.report-abuse-txt', function(e) {
+	disableBodyScroll();
 	e.stopPropagation();
 	var reviewElement = $(this).parent().parent().parent().parent();
 	var payload = {
