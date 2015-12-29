@@ -6,11 +6,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -1072,6 +1076,17 @@ public class ProfileManagementController
                 profileManagementService.updateRegionName( user.getUserId(), regionSettings.getIden(), name );
                 assignments.getRegions().put( entityId, name );
 
+                //JIRA SS-1439 Fix BEGIN : Region name not updated in solr
+                Set<Long> regionIds = new HashSet<Long>( Arrays.asList( new Long[] { regionSettings.getIden() } ) );
+                List<Region> regions = organizationManagementService.getRegionsForRegionIds( regionIds );
+                if ( regions != null && regions.size() == 1 ) {
+                    Region region = regions.get( 0 );
+                    LOG.info( "Updating region details in solr for region id : " + regionSettings.getIden() );
+                    solrSearchService.addOrUpdateRegionToSolr( region );
+                    LOG.info( "Updated region details in solr for region id : " + regionSettings.getIden() );
+                }
+                //JIRA SS-1439 Fix END
+
                 userSettings.getRegionSettings().put( entityId, regionSettings );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
@@ -1088,6 +1103,17 @@ public class ProfileManagementController
                 profileManagementService.updateBranchName( user.getUserId(), branchSettings.getIden(), name );
                 assignments.getBranches().put( entityId, name );
 
+                //JIRA SS-1439 Fix BEGIN : Branch name not updated in solr
+                Set<Long> branchIds = new HashSet<Long>( Arrays.asList( new Long[] { branchSettings.getIden() } ) );
+                List<Branch> branches = organizationManagementService.getBranchesForBranchIds( branchIds );
+                if ( branches != null && branches.size() == 1 ) {
+                    Branch branch = branches.get( 0 );
+                    LOG.info( "Updating branch details in solr for branch id : " + branchSettings.getIden() );
+                    solrSearchService.addOrUpdateBranchToSolr( branch );
+                    LOG.info( "Updated branch details in solr for branch id : " + branchSettings.getIden() );
+                }
+                //JIRA SS-1439 Fix END
+
                 userSettings.getRegionSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
@@ -1098,12 +1124,20 @@ public class ProfileManagementController
                 // for individual set vertical/industry
                 // contactDetailsSettings.setIndustry(vertical);
                 contactDetailsSettings = updateBasicDetail( contactDetailsSettings, name, title, location );
+                // Fix for SS-1442 : Last name is not updated to blank when updated agent name contains only first name
+                if ( name.indexOf( " " ) != -1 ) {
+                    contactDetailsSettings.setFirstName( name.substring( 0, name.indexOf( ' ' ) ) );
+                    contactDetailsSettings.setLastName( name.substring( name.indexOf( ' ' ) + 1 ) );
+                } else {
+                    contactDetailsSettings.setFirstName( name );
+                    contactDetailsSettings.setLastName( "" );
+                }
                 contactDetailsSettings = profileManagementService.updateAgentContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
                 agentSettings.setContact_details( contactDetailsSettings );
 
-                // update user name
-                profileManagementService.updateIndividualName( user.getUserId(), agentSettings.getIden(), name );
+                // update user name; not needed as we are updating the user's first name and last name below
+                // profileManagementService.updateIndividualName( user.getUserId(), agentSettings.getIden(), name );
 
                 /*
                  * agentSettings.setVertical(vertical);
@@ -1125,7 +1159,13 @@ public class ProfileManagementController
                     user.setLastName( name.substring( name.indexOf( ' ' ) + 1 ) );
                 } else {
                     userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, name );
+                    // Fix for SS-1442 : Last name is not updated to blank when updated agent name contains only first name
+                    userMap.put( CommonConstants.USER_LAST_NAME_SOLR, "" );
+                    user.setFirstName( name );
+                    user.setLastName( "" );
                 }
+                user.setModifiedBy( String.valueOf( agentSettings.getIden() ) );
+                user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                 userManagementService.updateUser( user, userMap );
             } else {
                 throw new InvalidInputException( "Invalid input exception occurred in upadting Basic details.",
