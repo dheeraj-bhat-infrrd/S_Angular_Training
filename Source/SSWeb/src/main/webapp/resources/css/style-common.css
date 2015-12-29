@@ -306,6 +306,14 @@ a,a:hover,a:visited {
 	background: url('../csssprites/form_icons.png') no-repeat -99px 0px;
 	background-size: auto 26px;
 }
+.icn-url {
+	background: url('../images/url.png') no-repeat;
+	background-size: auto 20px;
+}
+.icn-field-id{
+	background: url('../images/field-id.png') no-repeat;
+	background-size: auto 20px;
+}
 
 .icn-confirm-password {
 	background: url('../csssprites/form_icons.png') no-repeat 0px 0px;
@@ -8008,4 +8016,16 @@ label.url-change-input-label {
 }
 .social-auth-disabled {
 	cursor: auto !important; 
+}
+.share-plus-height{
+	height:33px;
+}
+.en-icn {
+	margin-top: 12px !important;
+}
+.en-icn-pswd{
+	margin-top: 8px !important;
+}
+.en-icn-fname{
+	margin-top: 10px !important;
 }
