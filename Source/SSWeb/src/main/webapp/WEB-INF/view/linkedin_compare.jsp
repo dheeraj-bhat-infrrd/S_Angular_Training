@@ -160,7 +160,6 @@
 </div>
 
 <script>
-var selectedCountryRegEx = "";
 var phoneFormat = '(ddd) ddd-dddd';
 var profilemasterid = "${profilemasterid}";
 $(document).ready(function() {
