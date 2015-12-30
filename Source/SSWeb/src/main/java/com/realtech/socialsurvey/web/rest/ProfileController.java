@@ -737,6 +737,8 @@ public class ProfileController
             try {
                 List<SurveyDetails> reviews = profileManagementService.getReviews( companyId, minScore, maxScore, start,
                     numRows, CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, sortCriteria );
+                //This is added to get the agent's app ID and profile URL 
+                //DO NOT REMOVE!
                 profileManagementService.setAgentProfileUrlForReview( reviews );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
@@ -807,6 +809,7 @@ public class ProfileController
                     SurveySettings surveySettings = new SurveySettings();
                     surveySettings.setAutoPostEnabled( true );
                     surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile, surveySettings );
                     // update survey settings in the profile object
@@ -816,6 +819,7 @@ public class ProfileController
                     if ( regionProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         regionProfile.getSurvey_settings().setAutoPostEnabled( true );
                         regionProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                        regionProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                         organizationManagementService.updateScoreForSurvey(
                             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile,
                             regionProfile.getSurvey_settings() );
@@ -827,6 +831,9 @@ public class ProfileController
 
                 List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, minScore, maxScore, start,
                     numRows, CommonConstants.PROFILE_LEVEL_REGION, false, null, null, sortCriteria );
+                //This is added to get the agent's app ID and profile URL 
+                //DO NOT REMOVE!
+                profileManagementService.setAgentProfileUrlForReview( reviews );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
                 response = Response.ok( json ).build();
@@ -1170,6 +1177,7 @@ public class ProfileController
                 if ( branchProfile.getSurvey_settings() == null ) {
                     SurveySettings surveySettings = new SurveySettings();
                     surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     surveySettings.setAutoPostEnabled( true );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile, surveySettings );
@@ -1181,6 +1189,7 @@ public class ProfileController
                     if ( branchProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         branchProfile.getSurvey_settings().setAutoPostEnabled( true );
                         branchProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                        branchProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                         organizationManagementService.updateScoreForSurvey(
                             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile,
                             branchProfile.getSurvey_settings() );
@@ -1191,6 +1200,9 @@ public class ProfileController
                 }
                 List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, minScore, maxScore, start,
                     numRows, CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, sortCriteria );
+                //This is added to get the agent's app ID and profile URL 
+                //DO NOT REMOVE!
+                profileManagementService.setAgentProfileUrlForReview( reviews );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
                 response = Response.ok( json ).build();
@@ -1351,6 +1363,7 @@ public class ProfileController
             if ( agentProfile.getSurvey_settings() != null ) {
                 if ( agentProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                     agentProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    agentProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     agentProfile.getSurvey_settings().setAutoPostEnabled( true );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile,
@@ -1359,6 +1372,7 @@ public class ProfileController
             } else {
                 SurveySettings surveySettings = new SurveySettings();
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 surveySettings.setAutoPostEnabled( true );
                 organizationManagementService.updateScoreForSurvey(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, surveySettings );
@@ -1970,30 +1984,53 @@ public class ProfileController
      * */
     @ResponseBody
     @RequestMapping ( value = "/{profileType}/{iden}/fetchhierarchyconnectedtozillow")
-    public Response getIdsOfHeirarchyConnectedWithZillow( @PathVariable String profileType, @PathVariable long iden )
-    {/**
-         * Method to fetch all ids under a profile level connected to zillow
-         * */
-        Response response = null;
-        LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " connected with zillow" );
-        Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
-        if ( profileType.equals( PROFILE_TYPE_COMPANY ) ) {
-            // get all region and branches, individuals under a region connected to zillow
-            hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
-        } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
-            // get all branches, individuals under a region connected to zillow
-            hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet<Long>( Arrays
-                .asList( new Long[] { iden } ) ) );
-        } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
-            // get all individuals under branch connected with zillow
-            hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
+    public String getIdsOfHeirarchyConnectedWithZillow( @PathVariable String profileType, @PathVariable long iden,
+        @QueryParam ( value = "start") Integer start, @QueryParam ( value = "numRows") Integer numRows,
+        @QueryParam ( value = "currentHierarchyLevel") String currentHierarchyLevel )
+    {
+        String json = null;
+        LOG.info( "Method getIdsOfHeirarchyConnectedWithZillow started to get ids of hierarchy under " + profileType
+            + " and id: " + iden + " for currentHierarchyLevel:" + currentHierarchyLevel + " connected with zillow" );
+        Set<Long> ids = null;
+        try {
+            if ( profileType.equals( PROFILE_TYPE_COMPANY ) ) {
+                if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_REGION ) ) {
+                    ids = organizationManagementService.getAllRegionsUnderCompanyConnectedToZillow( iden, start, numRows );
+                } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
+                    ids = organizationManagementService.getAllBranchesUnderProfileTypeConnectedToZillow( profileType, iden, start
+                        , numRows );
+                } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
+                }
+            } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
+                if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
+                    ids = organizationManagementService.getAllBranchesUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
+                } else if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
+                }
+            } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
+                if ( currentHierarchyLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                    ids = organizationManagementService.getAllUsersUnderProfileTypeConnectedToZillow( profileType, iden, start,
+                        numRows );
+                }
+            }
+            if ( ids != null && !ids.isEmpty() ) {
+                json = new Gson().toJson( ids );
+            }
+            LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " for currentHierarchyLevel:"
+                + currentHierarchyLevel + " connected with zillow" );
+            LOG.info( "Method getIdsOfHeirarchyConnectedWithZillow ended" );
+        } catch ( InvalidInputException iie ) {
+            LOG.error(
+                "InvalidInputException occurred while fetching ids for profile type and current hierarchy type. Reason : ", iie );
+        } catch ( Exception e ) {
+            LOG.error(
+                "Exception occurred while fetching ids for profile type and current hierarchy type. Reason : ", e );
         }
-        if ( !hierarchyIdsMap.isEmpty() ) {
-            String json = new Gson().toJson( hierarchyIdsMap );
-            response = Response.ok( json ).build();
-        }
-        LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " connected with zillow" );
-        return response;
+        return json;
 
     }
 }

@@ -3,12 +3,15 @@ package com.realtech.socialsurvey.core.utils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.lang.WordUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 @Component
 public class EmailFormatHelper {
@@ -72,8 +75,12 @@ public class EmailFormatHelper {
 		return textFormat;
 	}
 	
-	public String getCustomerDisplayNameForEmail(String custFirstName, String custLastName) {
+	public String getCustomerDisplayNameForEmail(String custFirstName, String custLastName) throws InvalidInputException {
+	    LOG.debug( "method getCustomerDisplayNameForEmail started for first name : " + custFirstName + " and last name : " + custLastName );
 		 String customerName = custFirstName;
+		 if(custFirstName == null || custFirstName.isEmpty()){
+	            throw new InvalidInputException("Invalid parameter: passed parameter custFirstName is null or empty");
+	        }
         if(custLastName != null && !custLastName.isEmpty()){
         	customerName += " " + custLastName;
         }

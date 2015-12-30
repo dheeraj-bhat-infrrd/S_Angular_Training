@@ -17,9 +17,13 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 import facebook4j.FacebookException;
@@ -33,6 +37,12 @@ public class SocialManagementServiceImplTest
 
     @Mock
     private EmailFormatHelper emailFormatHelper;
+
+    @Mock
+    private OrganizationManagementService organizationManagementService;
+
+    @Mock
+    private UserManagementService userManagementService;
 
 
     @BeforeClass
@@ -196,5 +206,97 @@ public class SocialManagementServiceImplTest
     {
         socialManagementServiceImpl.updateSocialConnectionsHistory( CommonConstants.COMPANY_ID, 1l, new SocialMediaTokens(),
             "test", CommonConstants.SOCIAL_MEDIA_CONNECTED );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForEntityTypeNull() throws InvalidInputException
+    {
+        socialManagementServiceImpl.disconnectAllSocialConnections( null, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForEntityTypeEmpty() throws InvalidInputException
+    {
+        socialManagementServiceImpl.disconnectAllSocialConnections( "", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForEntityIdInvalid() throws InvalidInputException
+    {
+        socialManagementServiceImpl.disconnectAllSocialConnections( "agentId", 0l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForEntityTypeInvalid() throws InvalidInputException
+    {
+        socialManagementServiceImpl.disconnectAllSocialConnections( "test", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForCompanyUnitSettingsNull() throws InvalidInputException
+    {
+        Mockito.when( organizationManagementService.getCompanySettings( Mockito.anyLong() ) ).thenReturn( null );
+        socialManagementServiceImpl.disconnectAllSocialConnections( "companyId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForRegionUnitSettingsNull() throws InvalidInputException
+    {
+        Mockito.when( organizationManagementService.getRegionSettings( Mockito.anyLong() ) ).thenReturn( null );
+        socialManagementServiceImpl.disconnectAllSocialConnections( "regionId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForBranchUnitSettingsNull() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn( null );
+        socialManagementServiceImpl.disconnectAllSocialConnections( "branchId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForBranchUnitSettingsNoRecordsFetched() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenThrow(
+            new NoRecordsFetchedException() );
+        socialManagementServiceImpl.disconnectAllSocialConnections( "branchId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDisconnectAllSocialConnectionsForAgentUnitSettingsNull() throws InvalidInputException
+    {
+        Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( null );
+        socialManagementServiceImpl.disconnectAllSocialConnections( "agentId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSettingsSetStatusByEntityTypeForEntityTypeNull() throws InvalidInputException
+    {
+        socialManagementServiceImpl.updateSettingsSetStatusByEntityType( null, 1l, SettingsForApplication.FACEBOOK, false );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSettingsSetStatusByEntityTypeForEntityTypeEmpty() throws InvalidInputException
+    {
+        socialManagementServiceImpl.updateSettingsSetStatusByEntityType( "", 1l, SettingsForApplication.FACEBOOK, false );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateSettingsSetStatusByEntityTypeForEntityIdInvalid() throws InvalidInputException
+    {
+        socialManagementServiceImpl.updateSettingsSetStatusByEntityType( "agentId", 0l, SettingsForApplication.FACEBOOK, false );
     }
 }

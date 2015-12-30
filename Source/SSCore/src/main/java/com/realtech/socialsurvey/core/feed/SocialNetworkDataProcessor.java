@@ -34,13 +34,14 @@ public interface SocialNetworkDataProcessor<K, V>
 
     /**
      * Processes the list of feed.
-     * 
+     * @param iden
      * @param feed
-     * @param organizationUnit
-     * @return 
+     * @param collection
+     * @param token
+     * @return
      * @throws NonFatalException
      */
-    public boolean processFeed( List<K> feed, String collection ) throws NonFatalException;
+    public boolean processFeed( long iden, List<K> feed, String collection, V token ) throws NonFatalException;
 
 
     /**

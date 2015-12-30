@@ -218,7 +218,4 @@ public interface OrganizationUnitSettingsDao
 
     void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
-
-
-    public void updateZillowReviewScoreAndAverage( String collectionName, long iden, double zillowReviewCount, double zillowReviewAverage ) throws InvalidInputException;
 }
