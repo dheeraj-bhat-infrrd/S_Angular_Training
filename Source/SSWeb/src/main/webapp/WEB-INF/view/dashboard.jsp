@@ -187,7 +187,8 @@
 $(document).ready(function() {
 	$(document).attr("title", "Dashboard");
 
-	$(document).scroll(function() {
+	$(window).off('scroll');
+	$(window).scroll(function() {
 		if(window.location.hash.substr(1) == "dashboard") {
 			dashbaordReviewScroll();		
 		}

@@ -20,7 +20,7 @@
     <c:when test="${accountType == 'Enterprise'}">
     	<div id="bd-assign-to" class="bd-hr-form-item clearfix">
   				<div class="float-left bd-frm-left"><spring:message code="label.assignto.key"/></div>
-   			<div id="assign-to-selector" class="float-left bd-frm-right pos-relative">
+   			<div id="assign-to-selector" class="float-left bd-frm-right pos-relative" data-profile="branch">
 		    	<c:choose>
 			    	<c:when test="${isCompanyBranch}">
 			    		<input id="assign-to-txt" data-assignto="company" value='<spring:message code="label.company.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
