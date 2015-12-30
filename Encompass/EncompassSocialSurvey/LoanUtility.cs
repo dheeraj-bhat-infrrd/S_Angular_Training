@@ -123,6 +123,7 @@ namespace EncompassSocialSurvey
 
                         forLoanVM_Borrower.ReminderCounts = EncompassSocialSurverConstant.REMINDER_COUNT;
                         forLoanVM_Borrower.LastReminderTime = EncompassSocialSurverConstant.LAST_REMINDER_TIME;
+                        Logger.Debug("EngagementClosedTime for loan is : " + fieldValues[8]);
                         forLoanVM_Borrower.EngagementClosedTime = fieldValues[8];
                         forLoanVM_Borrower.Status = EncompassSocialSurverConstant.STATUS;
 

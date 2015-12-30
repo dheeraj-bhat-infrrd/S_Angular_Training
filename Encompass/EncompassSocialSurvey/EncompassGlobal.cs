@@ -51,7 +51,7 @@ namespace EncompassSocialSurvey
             {
                 Logger.Error("Caught an exception: EncompassGlobal.GetUserLoginSesssion(): ", ex);
                 String Subject = "Error while connecting to encompass";
-                String BodyText = "<br> An error has been occurred while connecting to encompass for company with id : " + companyCredential.CompanyId + " on " + DateTime.Now;
+                String BodyText = "An error has been occurred while connecting to encompass for company with id : " + companyCredential.CompanyId + " on " + DateTime.Now + ".";
                 BodyText += ex.Message;
                 CommonUtility.SendMailToAdmin(Subject, BodyText);
                 throw ex;
