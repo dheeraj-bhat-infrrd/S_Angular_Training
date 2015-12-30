@@ -73,6 +73,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UtilitySer
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
@@ -172,6 +173,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private UtilityService utilityService;
 
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -497,10 +500,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method to deactivate user " + userIdToRemove + " called." );
         User userToBeDeactivated = userDao.findById( User.class, userIdToRemove );
-        if(userToBeDeactivated == null){
-            throw new InvalidInputException("No user found in databse for user id : " + userIdToRemove);
+        if ( userToBeDeactivated == null ) {
+            throw new InvalidInputException( "No user found in databse for user id : " + userIdToRemove );
         }
-        
+
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
         userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
@@ -519,6 +522,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         // Marks all the user profiles for given user as inactive.
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
+
+        //update profile url in mongo if needed
+        organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
+
+        //Disconnect social connections(ensure that social connections history is updated)
+        socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
 
         LOG.info( "Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished." );
     }
@@ -2205,6 +2214,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             SurveySettings surveySettings = new SurveySettings();
             surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             surveySettings.setAutoPostEnabled( true );
+            surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             agentSettings.setSurvey_settings( surveySettings );
         }
 
@@ -2986,6 +2996,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
+    public void updateUser( User user )
+    {
+        userDao.update( user );
+
+    }
+
+
+    @Override
+    @Transactional
     public Region getRegionById( long id )
     {
         Region region = regionDao.findById( Region.class, id );
@@ -3097,11 +3116,37 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException
     {
         LOG.info( "Method to find users on the basis of user ids started for user ids : " + userIds );
+        if ( userIds == null || userIds.size() <= 0 ) {
+            throw new InvalidInputException( "Invalid input parameter : Null or empty User Id List passed " );
+        }
         List<UserFromSearch> userList = userProfileDao.getUserFromSearchByUserIds( userIds );
         if ( userList == null ) {
             throw new InvalidInputException( "User not found for userId:" + userIds );
         }
         LOG.info( "Method to find users on the basis of user ids ended for user ids : " + userIds );
         return userList;
+    }
+    
+    
+    // Method to return active user with provided email and company
+    @Transactional
+    @Override
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
+        }
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null ) {
+            throw new NoRecordsFetchedException( "No company found with the id " + companyId );
+        }
+        User user = userDao.getActiveUserByEmailAndCompany( emailId, company );
+
+        LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
+        return user;
     }
 }

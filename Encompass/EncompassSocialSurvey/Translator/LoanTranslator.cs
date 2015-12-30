@@ -35,11 +35,16 @@ namespace EncompassSocialSurvey.Translator
             Logger.Info("Entering the method LoanTranslator.GetLoanEntity()");
             if (loanVM == null) return null;
 
-            if (loanVM.EngagementClosedTime.Equals("//"))
+            Logger.Info("EngagementClosedTime for loan id " + loanVM.SurveySourceId + " is : " + loanVM.EngagementClosedTime);
+            if (loanVM.EngagementClosedTime.Equals("//") || string.IsNullOrEmpty(loanVM.EngagementClosedTime))
             {
                 loanVM.EngagementClosedTime = EncompassSocialSurverConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME;
             }
-
+            //check if engagement closed time is equals to zero time
+            if (loanVM.EngagementClosedTime.Equals("00/00/0000"))
+            {
+                loanVM.EngagementClosedTime = EncompassSocialSurverConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME;
+            }
             LoanEntity returnLoanEntity = null;
             try
             {
