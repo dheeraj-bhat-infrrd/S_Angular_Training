@@ -292,8 +292,10 @@ function downloadCompanyReport() {
 }
 
 function downloadBillingReport() {
-	var companyId = $('#dsh-bill-rep-bnt').attr('data-idenval');
-	window.location.href = "/downloadbillingreport.do?columnValue=" + companyId;
+	callAjaxGET("./downloadbillingreport.do", function() {
+		$('#overlay-toast').html('The Billing Report will be mailed to you shortly');
+		showToast();
+	}, true);
 }
 
 function showAbusiveReviews(startIndexCmp,batchSizeCmp) {

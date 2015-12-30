@@ -2,9 +2,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -27,15 +25,18 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 @Component("company")
 public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements CompanyDao {
 	private static final Logger LOG = LoggerFactory.getLogger(CompanyDaoImpl.class);
-    private static final String activeUsersInCompany = "select distinct subquery_Data.USER_ID,subquery_Data.FIRST_NAME,"
+    private static final String activeUsersInCompany = "select subquery_Data.COMPANY_ID, C.COMPANY, subquery_Data.USER_ID, subquery_Data.FIRST_NAME,"
         + "subquery_Data.LAST_NAME, subquery_Data.LOGIN_NAME,subquery_Data.REGION_ID,subquery_Data.BRANCH_ID,subquery_Data.REGION, "
-        + "subquery_Data.BRANCH, group_concat(distinct outer_up.PROFILES_MASTER_ID) as PROFILES_MASTER_ID From USER_PROFILE outer_up"
-        + " JOIN(Select U.USER_ID as USER_ID,U.FIRST_NAME as FIRST_NAME,U.LAST_NAME  as LAST_NAME,U.LOGIN_NAME as LOGIN_NAME,"
-        + " R.REGION_ID as REGION_ID, B.BRANCH_ID as BRANCH_ID, R.REGION as REGION, B.BRANCH as BRANCH FROM USERS U JOIN  "
-        + "(select UP.USER_ID,UP.REGION_ID,UP.BRANCH_ID FROM USER_PROFILE UP where  UP.COMPANY_ID=? and UP.STATUS IN (1,2) and UP.IS_PRIMARY=1 )"
-        + " subquery_UP  ON subquery_UP.USER_ID=U.USER_ID JOIN REGION R ON R.REGION_ID= subquery_UP.REGION_ID JOIN  "
-        + "BRANCH B ON B.BRANCH_ID=subquery_UP.BRANCH_ID ) as  subquery_Data ON outer_up.USER_ID = subquery_Data.USER_ID  "
-        + "group by outer_up.USER_ID order by outer_up.REGION_ID asc, outer_up.BRANCH_ID";
+        + "subquery_Data.BRANCH, group_concat(distinct outer_up.PROFILES_MASTER_ID) as PROFILES_MASTER_ID From USER_PROFILE outer_up JOIN"
+        + " COMPANY C ON C.BILLING_MODE='I' JOIN "
+        + "(Select U.USER_ID as USER_ID,U.FIRST_NAME as FIRST_NAME,U.LAST_NAME as LAST_NAME, U.LOGIN_NAME as LOGIN_NAME, "
+        + "R.REGION_ID as REGION_ID, B.BRANCH_ID as BRANCH_ID, R.REGION as REGION, B.BRANCH as BRANCH, U.COMPANY_ID as COMPANY_ID "
+        + "FROM USERS U JOIN (select UP.USER_ID,UP.REGION_ID,UP.BRANCH_ID FROM USER_PROFILE UP "
+        + "where UP.STATUS IN (1,2) and UP.IS_PRIMARY=1 ) subquery_UP ON subquery_UP.USER_ID=U.USER_ID JOIN REGION R ON "
+        + "R.REGION_ID = subquery_UP.REGION_ID JOIN BRANCH B ON B.BRANCH_ID = subquery_UP.BRANCH_ID JOIN "
+        + "LICENSE_DETAILS L ON L.COMPANY_ID = U.COMPANY_ID where L.ACCOUNTS_MASTER_ID = 4 ) as  subquery_Data ON "
+        + "outer_up.USER_ID = subquery_Data.USER_ID where C.COMPANY_ID = subquery_Data.COMPANY_ID "
+        + "group by outer_up.USER_ID order by subquery_Data.COMPANY_ID, outer_up.REGION_ID, outer_up.BRANCH_ID";
 
 	@Autowired
 	SessionFactory sessionFactory;
@@ -123,20 +124,25 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
     
     
     /**
-     * Method to fetch all users in company for billing report
+     * Method to fetch all users in each company for billing report
      * @param companyId
      * @return
      */
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<BillingReportData> getAllUsersInCompanyForBillingReport( long companyId ){
-        LOG.info( "Method getAllUsersInCompanyForBillingReport started for company ID : " + companyId );
+    public List<BillingReportData> getAllUsersInCompanysForBillingReport( int startIndex, int batchSize ){
+        LOG.info( "Method getAllUsersInCompanyForBillingReport started" );
         Query query = getSession().createSQLQuery( activeUsersInCompany );
-        query.setParameter( 0, companyId );
+        if ( startIndex > -1 ) {
+            query.setFirstResult( startIndex );
+        }
+        if ( batchSize > -1 ) {
+            query.setMaxResults( batchSize );
+        }
         LOG.debug( "QUERY : " + query.getQueryString() );
         List<Object[]> rows = (List<Object[]>) query.list();
         if ( rows == null || rows.isEmpty() ) {
-            LOG.error( "Cound not find any active users for the company Id and status active" );
+            LOG.debug( "Cound not find any more users in company having billing mode Invoice and of type enterprise" );
             return null;
         }
         
@@ -144,16 +150,18 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         List<BillingReportData> billingReportData = new ArrayList<BillingReportData>();
         for ( Object[] row : rows ) {
             BillingReportData reportRow = new BillingReportData();
-            reportRow.setUserId( Long.parseLong( String.valueOf( row[0] ) ) );
-            reportRow.setFirstName( String.valueOf( row[1] ) );
-            reportRow.setLastName( String.valueOf( row[2] ) );
-            reportRow.setLoginName( String.valueOf( row[3] ) );
-            reportRow.setRegionId( Long.parseLong( String.valueOf( row[4] ) ) );
-            reportRow.setBranchId( Long.parseLong( String.valueOf( row[5] ) ) );
-            reportRow.setRegion( String.valueOf( row[6] ) );
-            reportRow.setBranch( String.valueOf( row[7] ) );
+            reportRow.setCompanyId( Long.parseLong( String.valueOf( row[0] ) ) );
+            reportRow.setCompany( String.valueOf( row[1] ) );
+            reportRow.setUserId( Long.parseLong( String.valueOf( row[2] ) ) );
+            reportRow.setFirstName( String.valueOf( row[3] ) );
+            reportRow.setLastName( String.valueOf( row[4] ) );
+            reportRow.setLoginName( String.valueOf( row[5] ) );
+            reportRow.setRegionId( Long.parseLong( String.valueOf( row[6] ) ) );
+            reportRow.setBranchId( Long.parseLong( String.valueOf( row[7] ) ) );
+            reportRow.setRegion( String.valueOf( row[8] ) );
+            reportRow.setBranch( String.valueOf( row[9] ) );
             List<Long> profilesMasterIds = new ArrayList<Long>();
-            String[] profilesMastersStr = String.valueOf( row[8] ).split( "," );
+            String[] profilesMastersStr = String.valueOf( row[10] ).split( "," );
             for ( String pmId : profilesMastersStr ) {
                 long profilesMasterId = Long.parseLong( String.valueOf( pmId ) );
                 if ( !profilesMasterIds.contains( profilesMasterId ) )
@@ -163,7 +171,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
             
             billingReportData.add( reportRow );
         }
-        LOG.info( "Method getAllUsersInCompanyForBillingReport finished for company ID : " + companyId );
+        LOG.info( "Method getAllUsersInCompanyForBillingReport finished" );
         return billingReportData;
     }
 }

@@ -811,13 +811,14 @@ public interface CommonConstants
     // file upload types
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
-
+    public static final int FILE_UPLOAD_BILLING_REPORT = 3;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
     public static final String COMPANY_MEDIA_POST_DETAILS_COLUMN = "companyMediaPostDetails";
     public static final String REGION_MEDIA_POST_DETAILS_COLUMN = "regionMediaPostDetailsList";
 
+    public static final long REALTECH_ADMIN_ID = 1;
 
     public static final String BULK_SURVEY_VALID = "Valid";
 
@@ -906,6 +907,7 @@ public interface CommonConstants
     
     
     // Constants for Billing Report
+    public static final String HEADER_ADDRESS = "Address";
     public static final String HEADER_USER_ID = "User ID";
     public static final String HEADER_LOGIN_ID = "Login ID";
     public static final String HEADER_PUBLIC_PROFILE_URL = "Public profile URL";

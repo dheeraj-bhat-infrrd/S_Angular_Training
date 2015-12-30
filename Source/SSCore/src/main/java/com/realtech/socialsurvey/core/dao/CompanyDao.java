@@ -22,6 +22,6 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 
     public List<Object[]> getUserAdoptionData( long companyId ) throws InvalidInputException;
 
-    List<BillingReportData> getAllUsersInCompanyForBillingReport( long companyId );
+    List<BillingReportData> getAllUsersInCompanysForBillingReport( int startIndex, int batchSize );
 
 }
