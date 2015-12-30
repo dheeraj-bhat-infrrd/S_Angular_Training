@@ -666,6 +666,7 @@ public class OrganizationManagementController
             }
             if ( surveySettings.getShow_survey_above_score() == 0f ) {
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 surveySettings.setAutoPostEnabled( true );
                 if(accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
                 	agentSettings.setSurvey_settings(surveySettings);
@@ -1216,6 +1217,7 @@ public class OrganizationManagementController
                 }
                 originalSurveySettings.setAutoPostEnabled( isAutopostEnabled );
                 originalSurveySettings.setShow_survey_above_score( (float) minPostRating );
+                originalSurveySettings.setAuto_post_score( (float) minPostRating );
 
                 LOG.info( "Updating Survey Settings Min score" );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL,
@@ -2349,6 +2351,7 @@ public class OrganizationManagementController
                 surveySettings.setSadTextComplete( sadTextComplete );
                 surveySettings.setAutoPostEnabled( true );
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
 
                 surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
                 unitSettings.setSurvey_settings( surveySettings );
