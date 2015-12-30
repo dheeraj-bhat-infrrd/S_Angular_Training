@@ -3,10 +3,8 @@ package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -16,8 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -464,20 +460,5 @@ public class SurveyHandlerImplTest
         user.setUserProfiles( profiles );
         surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
         assertEquals( "", 1, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
-    }
-
-
-    //Tests for checkIfRecordHasExpired
-    @Test
-    public void checkIfRecordHasExpiredTestHasExpired()
-    {
-        assertTrue( surveyHandlerImpl.checkIfRecordHasExpired( 0, 0, 0 ) );
-    }
-
-
-    @Test
-    public void checkIfRecordHasExpiredTestHasNotExpired()
-    {
-        assertFalse( surveyHandlerImpl.checkIfRecordHasExpired( 0, 0, 1 ) );
     }
 }
