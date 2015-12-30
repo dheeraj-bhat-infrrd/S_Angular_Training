@@ -2270,8 +2270,8 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		//if($("#hr-individual-tab").hasClass("bd-hdr-active"))
-		hideAdminPrivilegesChk();
+		if($("#assign-to-selector").data("profile") == "individual")
+			hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
