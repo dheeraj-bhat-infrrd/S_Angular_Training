@@ -94,6 +94,8 @@ public class EmailProcessor implements Runnable
                         if ( !emailSender.sendEmailByEmailEntity( emailEntity ) ) {
                             LOG.warn( " Email Sending Failed, Trying again " );
                             errorEmails.put( emailEntity, "unable to send email" );
+                            // TODO: deleting error email for now. Should be set as a different status
+                            emailDao.deleteEmail(emailObject);
                         } else {
                             LOG.debug( "Email Sent Successfully " );
                             LOG.debug( "Removing The Email From Database" + emailObject.getId() );
@@ -102,6 +104,8 @@ public class EmailProcessor implements Runnable
                     } catch ( Exception e ) {
                         LOG.error( "Exception caught " + e.getMessage() );
                         errorEmails.put( emailEntity, e.getMessage() );
+                        // TODO: deleting error email for now. Should be set as a different status
+                        emailDao.deleteEmail(emailObject);
                     }
 
                 }

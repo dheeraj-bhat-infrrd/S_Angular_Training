@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
 // JIRA SS-137 BY RM05:BOC
@@ -75,5 +77,8 @@ public interface DashboardService
 
 
     public long getSocialPostsForPastNdaysWithHierarchy( String coumnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+
+
+    public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
 }
 // JIRA SS-137 BY RM05:EOC

@@ -22,7 +22,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
-	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
@@ -96,16 +95,18 @@
 	</div>
 	
 	<div id="report-abuse-overlay" class="overlay-main hide">
+	<div id="report-abuse-pop-up">
     	<div class="overlay-disable-wrapper">
     		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
     		<div class="ol-content">
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
-    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer">Report</div>
-    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer">Cancel</div>
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer float-left"><spring:message code="label.report.key"/></div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer float-right"><spring:message code="label.cancel.key"/></div>
     		</div>
     	</div>
+    </div>
     </div>
 	
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
@@ -132,7 +133,7 @@
 				<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
 					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
 				</c:if>
-				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
 					<div class="header-links-item" onclick="showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
@@ -147,6 +148,14 @@
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
 				<div class="header-links-item" onclick="showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></div>
 				<div class="header-links-item" onclick="showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></div>
+				<c:choose>
+					<c:when test="${ not empty realTechAdminId }">
+						<div class="header-links-item" onclick="userSwitchToAdmin();"><spring:message code="label.switch.key" /></div>
+					</c:when>
+					<c:when test="${ not empty companyAdminSwitchId || not empty regionAdminSwitchId || not empty branchAdminSwitchId}">
+						<div class="header-links-item" onclick="userSwitchToCompAdmin();"><spring:message code="label.switch.key" /></div>
+					</c:when>
+				</c:choose>
 				<a href="j_spring_security_logout"><span class="header-links-item" ><spring:message code="label.logout.key" />
 					</span>
 				</a>
