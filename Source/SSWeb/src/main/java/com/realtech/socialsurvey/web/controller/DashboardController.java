@@ -340,9 +340,6 @@ public class DashboardController
         long columnValue = 0;
         User user = sessionHelper.getCurrentUser();
         boolean realtechAdmin = user.isSuperAdmin();
-        HttpSession session = request.getSession( false );
-        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         try {
             String columnValueStr = request.getParameter( "columnValue" );
@@ -371,7 +368,7 @@ public class DashboardController
 	        model.addAttribute( "completedSurvey", dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
 	        model.addAttribute( "clickedSurvey",
 	            dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-	        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
+	        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue, numberOfDays ) );
         }catch(InvalidInputException e){
         	LOG.error("Error: "+e.getMessage(), e);
         }
