@@ -321,6 +321,7 @@
 				<entry key="applicationAdminEmail" value="${APPLICATION_ADMIN_EMAIL}" />
 				<entry key="applicationAdminName" value="${APPLICATION_ADMIN_NAME}" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="crmBatchTrackerService" value-ref="crmBatchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -568,6 +569,9 @@
 		class="com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl" />
 	<bean id="batchTrackerService"
 		class="com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl" />
+		
+	<bean id="crmBatchTrackerService"
+		class="com.realtech.socialsurvey.core.services.crmbatchtracker.impl.CRMBatchTrackerServiceImpl" />
 		
 
 	<!-- Update subscription dependencies -->

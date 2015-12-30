@@ -164,6 +164,7 @@ public interface CommonConstants
     public static final String VERTICAL_NAME = "verticalName";
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
     public static final String BATCH_TYPE_COLUMN = "batchType";
+    public static final String SOURCE_COLUMN = "source";
     
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";

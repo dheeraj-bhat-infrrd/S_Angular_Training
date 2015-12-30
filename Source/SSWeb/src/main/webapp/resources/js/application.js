@@ -196,20 +196,17 @@ function retrieveState() {
 /*
  * Click event to close survey popup
  */
-/*$(document).on('click',  function(e){
+$(document).on('click',  function(e){
 	if($('#overlay-send-survey').is(':visible')){
 		$('#overlay-send-survey').hide();
 		enableBodyScroll();
 	}
+	if($('#report-abuse-overlay' ).is(':visible')){
+		$('#report-abuse-overlay').hide();
+		enableBodyScroll();
+	}
 	
-		if($('#report-abuse-overlay' ).is(':visible')){
-			$('#report-abuse-overlay').hide();
-			enableBodyScroll();
-		}
-		if($('#overlay-main' ).is(':visible')){
-			$('#overlay-main').hide();
-			enableBodyScroll();
-		}
+		
 });
 
 $(document).on('keyup',  function(e){
@@ -222,14 +219,33 @@ $(document).on('keyup',  function(e){
 			$('#report-abuse-overlay').hide();
 			enableBodyScroll();
 		}
+		
+	}
+});
+
+/**if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
 		if($('#overlay-main' ).is(':visible')){
 			$('#overlay-main').hide();
 			enableBodyScroll();
 		}
-	}
-});*/
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
+*/
 
 $(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+
+$(document).on('click', '#report-abuse-pop-up', function(e){
 	e.stopPropagation();
 });
 
@@ -320,6 +336,7 @@ function retakeSurveyReminderMail(element) {
 }
 
 $(document).on('click', '.report-abuse-txt', function(e) {
+	disableBodyScroll();
 	e.stopPropagation();
 	var reviewElement = $(this).parent().parent().parent().parent();
 	var payload = {
@@ -518,12 +535,12 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 	//get profile data for all the records , noOfDays = -1
-	showProfileDetails(newProfileName, 0, -1);
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
-	showSurveyStatistics(newProfileName, 0);
-	showSurveyStatisticsGraphically(newProfileName, 0);
+	showSurveyStatistics(newProfileName, newProfileValue);
+	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
 
 function showRegionAdminFlow(newProfileName, newProfileValue) {
@@ -563,7 +580,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
 	//get profile data for all the records , noOfDays = -1
-	showProfileDetails(newProfileName, 0, -1);
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
@@ -2254,8 +2271,8 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		//if($("#hr-individual-tab").hasClass("bd-hdr-active"))
-		hideAdminPrivilegesChk();
+		if($("#assign-to-selector").data("profile") == "individual")
+			hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
@@ -2890,12 +2907,15 @@ function paintHierarchyViewBranches(data,regionId) {
 	$(".tr-region-edit").slideUp(200);
 	bindUserEditClicks();
 	bindBranchListClicks();
+	bindHierarchyEvents();
+	bindAppUserLoginEvent();
 }
 
 function bindBranchListClicks(){
 	$(".branch-edit-icn").unbind('click');
 	$(".branch-edit-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
 		if($(this).attr('clicked') == "false"){
 			showBranchEdit(branchId);
@@ -2908,7 +2928,7 @@ function bindBranchListClicks(){
 	});
 	$(".branch-row").unbind('click');
 	$(".branch-row").click(function(e){
-		e.stopPropagation();
+		//e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
@@ -2923,6 +2943,7 @@ function bindBranchListClicks(){
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
@@ -2930,17 +2951,18 @@ function bindBranchListClicks(){
 
 function fetchHierarchyViewList() {
 	var url = "./fetchhierarchyviewlist.do";
-	callAjaxGET(url, paintHierarchyViewList, true);
-}
-function paintHierarchyViewList(data) {
-	$("#hierarchy-list-header").siblings().remove();
-	$("#hierarchy-list-header").after(data);
-	bindRegionListClicks();
-    $('.v-tbl-icn').click(function(e){
-        e.stopPropagation();
-    });
-    bindBranchListClicks();
-    bindUserEditClicks();
+	callAjaxGET(url, function(data) {
+		$("#hierarchy-list-header").siblings().remove();
+		$("#hierarchy-list-header").after(data);
+		bindRegionListClicks();
+	    /*$('.v-tbl-icn').click(function(e){
+	        e.stopPropagation();
+	    });*/
+	    bindBranchListClicks();
+	    bindUserEditClicks();
+	    bindHierarchyEvents();
+	    bindAppUserLoginEvent();
+	}, true);
 }
 
 function bindRegionListClicks() {
@@ -2957,6 +2979,7 @@ function bindRegionListClicks() {
 	});
 	$(".region-edit-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
 			showRegionEdit(regionId);
@@ -2969,8 +2992,43 @@ function bindRegionListClicks() {
 	});
 	$(".region-del-icn").unbind('click');
 	$(".region-del-icn").click(function(e){
+		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
 		deleteRegionPopup(regionId);
+	});
+}
+
+function bindHierarchyEvents() {
+	$('.v-tbn-icn-dropdown').off('click');
+	$('.v-tbn-icn-dropdown').on('click', function(e) {
+		e.stopPropagation();
+		var element = $(this);
+		if(element.next('.v-hr-tbl-icn-wraper').is(':visible')) {
+			$(this).next('.v-hr-tbl-icn-wraper').hide();
+		} else {
+			$('.v-hr-tbl-icn-wraper').hide();
+			$(this).next('.v-hr-tbl-icn-wraper').show();
+		}
+	});
+	$('.v-icn-wid.v-tbl-icn-sm').off('click');
+	$('.v-icn-wid.v-tbl-icn-sm').on('click', function(e) {
+		e.stopPropagation();
+		var element = $(this);
+		generateWidget(element, element.data('iden'), element.data('profile'));
+	});
+	$('.v-icn-femail').off('click');
+	$('.v-icn-femail').on('click', function(e) {
+		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
+			return;
+		}
+
+		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
+	    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
 	});
 }
 
@@ -3046,12 +3104,15 @@ function paintUsersFromBranch(data,branchId,regionId) {
 	$("#tr-branch-"+branchId).slideDown(200);
 	$(".tr-branch-edit").slideUp(200);
 	bindUserEditClicks();
+	bindHierarchyEvents();
+	bindAppUserLoginEvent();
 }
 
 function bindUserEditClicks() {
 	$(".user-edit-icn").unbind('click');
 	$('.user-edit-icn').click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		if($(this).attr('clicked') == "false") {
 			// make an ajax call and fetch the details of the user
 			var userId = $(this).attr('data-userid');
@@ -3072,6 +3133,7 @@ function bindUserEditClicks() {
 	$(".user-del-icn").click(function(e){
 		e.stopPropagation();
 		var userId = $(this).attr("data-userid");
+		$('.v-hr-tbl-icn-wraper').hide();
 		confirmDeleteUser(userId);
 	});
 }
@@ -4493,17 +4555,6 @@ $(document).on('click', '.v-icn-fmail', function() {
     var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
     var emailId = $(this).parent().find('.fetch-email').html();
     reinviteUser(firstName, lastName, emailId,'.v-icn-fmail');
-});
-
-$(document).on('click', '.v-icn-femail', function() {
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
-		return;
-	}
-
-	var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
 });
 
 /**
@@ -7727,7 +7778,8 @@ function userSwitchToCompAdmin() {
 	}, true);
 }
 
-function bindUserLoginEvent() {
+function bindAppUserLoginEvent() {
+	$('.user-login-icn').off('click');
 	$('.user-login-icn').on('click', function(e) {
 		e.stopImmediatePropagation();
 		var payload = {
@@ -8100,6 +8152,7 @@ function editProfileUrl(disableEle) {
 // Get all the required elements and show popup
 
 function generateWidget(clickedAttr , iden, profileLevel) {
+	$('.v-hr-tbl-icn-wraper').hide();
 	if($(clickedAttr).hasClass('v-tbl-icn-disabled')){
 		return;
 	}
@@ -9755,19 +9808,6 @@ function validateprofileUrlEditForm() {
 	});
 }
 
-function attachReInvitationClickEvent(){
-	$('.v-icn-femail').click( function() {
-		if ($(this).hasClass('v-tbl-icn-disabled')) {
-			return;
-		}
-	
-		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-	    reinviteUser(firstName, lastName, emailId);
-});
-}
-
 function initializeVerticalsMasterForProfilePage() {
 	if (verticalsMasterList == undefined) {
 		callAjaxGETWithTextData("/fetchverticalsmaster.do", function(data) {
@@ -9808,7 +9848,8 @@ function saveZillowEmailAddress() {
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
 		if(data && data == "success") {
-			loadSocialMediaUrlInSettingsPage();
+			showProfileLinkInEditProfilePage("zillow", "${ profile.socialMediaTokens.zillowToken.zillowScreenName}");
+            loadSocialMediaUrlInSettingsPage();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {
