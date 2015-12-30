@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.integration.dotloop.DotloopIntegrationApi;
 import com.realtech.socialsurvey.core.integration.dotloop.DotloopIntergrationApiBuilder;
 import com.realtech.socialsurvey.core.integration.pos.errorhandlers.DotLoopAccessForbiddenException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.crmbatchtracker.CRMBatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -76,6 +77,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
 
     private BatchTrackerService batchTrackerService;
 
+    private CRMBatchTrackerService crmBatchTrackerService;
+
     private EmailServices emailServices;
 
     private static final String BUYING_AGENT_ROLE = "Buying Agent";
@@ -109,8 +112,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
             LOG.error( "Error in dotloop review processor", e );
             try {
                 //update batch tracker with error message
-                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_DOT_LOOP_REVIEW_PROCESSOR,
-                    e.getMessage() );
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_DOT_LOOP_REVIEW_PROCESSOR, e.getMessage() );
                 //send report bug mail to admin
                 batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_DOT_LOOP_REVIEW_PROCESSOR,
                     System.currentTimeMillis(), e );
@@ -128,6 +131,18 @@ public class DotloopReviewProcessor extends QuartzJobBean
         LOG.debug( "Inside method startDotloopFeedProcessing " );
 
         try {
+            String entityType = null; // to maintain entry in crm batch tracker
+            //get entity type and id
+            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                entityType = CommonConstants.COMPANY_ID_COLUMN;
+            } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                entityType = CommonConstants.REGION_ID_COLUMN;
+            } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                entityType = CommonConstants.BRANCH_ID_COLUMN;
+            } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+                entityType = CommonConstants.AGENT_ID_COLUMN;
+            }
+            long entityId;
             List<OrganizationUnitSettings> organizationUnitSettingsList = organizationManagementService
                 .getOrganizationUnitSettingsForCRMSource( CommonConstants.CRM_SOURCE_DOTLOOP, collectionName );
             if ( organizationUnitSettingsList != null && !organizationUnitSettingsList.isEmpty() ) {
@@ -136,6 +151,10 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     LOG.info( "Getting dotloop records for company id: " + organizationUnitSettings.getId() );
                     DotLoopCrmInfo dotLoopCrmInfo = (DotLoopCrmInfo) organizationUnitSettings.getCrm_info();
                     if ( dotLoopCrmInfo.getApi() != null && !dotLoopCrmInfo.getApi().isEmpty() ) {
+                        entityId = organizationUnitSettings.getIden();
+                        //make an entry in crm batch tracker and update last run start time
+                        crmBatchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType( entityType,
+                            entityId, CommonConstants.CRM_SOURCE_DOTLOOP );
                         LOG.debug( "API key is " + dotLoopCrmInfo.getApi() );
                         try {
                             fetchReviewfromDotloop( dotLoopCrmInfo, collectionName, organizationUnitSettings );
@@ -144,10 +163,17 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                 dotLoopCrmInfo.setRecordsBeenFetched( true );
                                 updateDotLoopCrmInfo( collectionName, organizationUnitSettings, dotLoopCrmInfo );
                             }
+
+                            // update  last run end time in crm batch tracker 
+                            crmBatchTrackerService.updateLastRunEndTimeByEntityTypeAndSourceType( entityType, entityId,
+                                CommonConstants.CRM_SOURCE_DOTLOOP );
+
                         } catch ( Exception e ) {
                             LOG.error( "Exception caught for collection " + collectionName + "having iden as "
                                 + organizationUnitSettings.getIden(), e );
-                            // TODO: send a mail to admim
+                            // update  error message in crm batch tracker 
+                            crmBatchTrackerService.updateErrorForBatchTrackerByEntityTypeAndSourceType( entityType, entityId,
+                                CommonConstants.CRM_SOURCE_DOTLOOP, e.getMessage() );
                             try {
                                 LOG.info( "Building error message for the auto post failure" );
                                 String errorMsg = "Error while processing dotloop feed for collection " + collectionName
@@ -539,6 +565,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
         applicationAdminName = (String) jobMap.get( "applicationAdminName" );
         emailServices = (EmailServices) jobMap.get( "emailServices" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
+        crmBatchTrackerService = (CRMBatchTrackerService) jobMap.get( "crmBatchTrackerService" );
     }
 
 }
