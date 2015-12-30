@@ -1394,6 +1394,13 @@ function fetchPublicPosts(isNextBatch) {
 	
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	
+	//if recent posts are to be hidden
+	if(profileJson.hideSectionsFromProfilePage && ($.inArray("recent_posts", profileJson.hideSectionsFromProfilePage) > -1) ) {
+		$('#recent-post-container').remove();
+		doStopPublicPostPagination = true;
+		return;
+	}
+	
 	var url = getLocationOrigin() + "/rest/profile/";
 	if(profileLevel == 'COMPANY'){
 		//Fectch the reviews for company
@@ -1428,7 +1435,7 @@ function fetchPublicPosts(isNextBatch) {
 		if(posts.errorCode != undefined || (publicPostStartIndex == 0 && posts.length <= 0)) {
 			$('#recent-post-container').remove();
 			doStopPublicPostPagination = true;
-			return
+			return;
 		}
 		
 		//Check if request is for next batch

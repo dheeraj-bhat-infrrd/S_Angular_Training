@@ -43,12 +43,17 @@
 		</div>
 	</div>
 </div>
+<%-- <input type="hidden" id="md-token" value="${mediaTokens}"> --%>
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script>
+var checkIfFacebookSet = false;
 $(document).ready(function() {
+	//Get media tokens from model
+	/* var mediaTokens = $('#md-token').val(); */
+	var mediaTokens = '${mediaTokens}';
 	// Onload before auth Url
 	var waitMessage = "${message}";
 	if (parseInt(waitMessage) == 1) {
@@ -100,7 +105,8 @@ $(document).ready(function() {
 		</c:forEach>
 		var facebookToken = {
 			'selectedAccessFacebookToken' : selectedAccessFacebookToken,
-			'selectedProfileUrl' :  selectedProfileUrl
+			'selectedProfileUrl' :  selectedProfileUrl,
+			'mediaTokens' : mediaTokens
 		};
 		$.ajax({
 			url : './saveSelectedAccessFacebookToken.do',
@@ -110,6 +116,7 @@ $(document).ready(function() {
 			async : false,
 			complete :function(e){
 				enable(this);
+				checkIfFacebookSet = true;
 				setTimeout(function() {
 					window.close();
 				}, 3000);
@@ -126,39 +133,41 @@ $(document).ready(function() {
 });
 
 $(window).on('unload', function(){
-	var parentWindow = null;
-	if (window.opener != null && !window.opener.closed) {
-		parentWindow = window.opener;
-	}
-	var fromDashboard = "${fromDashboard}";
-	var restful = "${restful}";
-	var flow = "${socialFlow}";
-	if(fromDashboard == 1){
-		var columnName = "${columnName}";
-		var columnValue = "${columnValue}";
-		parentWindow.showDashboardButtons(columnName, columnValue);
-	}
-	else if(restful != "1"){
-		if (flow == "registration") {
-			var payload = {
-				'socialNetwork' : "linkedin"
-			};
-			fetchSocialProfileUrl(payload, function(data) {
-				parentWindow.showLinkedInProfileUrl(data);
-				parentWindow.showProfileLink("linkedin", data);
-			});
+	if(checkIfFacebookSet){
+		var parentWindow = null;
+		if (window.opener != null && !window.opener.closed) {
+			parentWindow = window.opener;
 		}
-		else {
-			var payload = {
-				'socialNetwork' : "${socialNetwork}"
-			};
-			fetchSocialProfileUrl(payload, function(data) {
-				if(data.statusText == 'OK'){
-				//	parentWindow.loadSocialMediaUrlInSettingsPage();
-					//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
-					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);					
-				}
-			});
+		var fromDashboard = "${fromDashboard}";
+		var restful = "${restful}";
+		var flow = "${socialFlow}";
+		if(fromDashboard == 1){
+			var columnName = "${columnName}";
+			var columnValue = "${columnValue}";
+			parentWindow.showDashboardButtons(columnName, columnValue);
+		}
+		else if(restful != "1"){
+			if (flow == "registration") {
+				var payload = {
+					'socialNetwork' : "linkedin"
+				};
+				fetchSocialProfileUrl(payload, function(data) {
+					parentWindow.showLinkedInProfileUrl(data);
+					parentWindow.showProfileLink("linkedin", data);
+				});
+			}
+			else {
+				var payload = {
+					'socialNetwork' : "${socialNetwork}"
+				};
+				fetchSocialProfileUrl(payload, function(data) {
+					if(data.statusText == 'OK'){
+					//	parentWindow.loadSocialMediaUrlInSettingsPage();
+						//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
+						parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);					
+					}
+				});
+			}
 		}
 	}
 });
