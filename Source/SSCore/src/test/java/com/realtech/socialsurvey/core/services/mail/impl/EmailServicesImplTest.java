@@ -1275,28 +1275,42 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( null, null, "test", null, null );
+        emailServicesImpl.sendComplaintHandleMail( null, null, "test", null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestRecipientMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "", null, "test", null, null );
+        emailServicesImpl.sendComplaintHandleMail( "", null, "test", null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestCustomerMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "test", null, null, null, null );
+        emailServicesImpl.sendComplaintHandleMail( "test", null, null, null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestCustomerMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "test", null, "", null, null );
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "", null, null, "test" );
+    }
+    
+    //SS-1435: Test for survey details    
+    @Test ( expected = InvalidInputException.class)
+    public void sendComplaintHandleMailTestSurveyDetailNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", null, null, null );
+    }
+    
+    //SS-1435: Test for survey details
+    @Test ( expected = InvalidInputException.class)
+    public void sendComplaintHandleMailTestSurveyDetailEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", null, null, "" );
     }
 
 
