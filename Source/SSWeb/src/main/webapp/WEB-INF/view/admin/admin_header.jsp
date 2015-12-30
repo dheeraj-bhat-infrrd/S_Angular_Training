@@ -18,7 +18,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/datepicker3.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
-	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
