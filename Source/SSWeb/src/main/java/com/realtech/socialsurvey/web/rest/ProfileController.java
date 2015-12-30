@@ -809,6 +809,7 @@ public class ProfileController
                     SurveySettings surveySettings = new SurveySettings();
                     surveySettings.setAutoPostEnabled( true );
                     surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile, surveySettings );
                     // update survey settings in the profile object
@@ -818,6 +819,7 @@ public class ProfileController
                     if ( regionProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         regionProfile.getSurvey_settings().setAutoPostEnabled( true );
                         regionProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                        regionProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                         organizationManagementService.updateScoreForSurvey(
                             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile,
                             regionProfile.getSurvey_settings() );
@@ -1175,6 +1177,7 @@ public class ProfileController
                 if ( branchProfile.getSurvey_settings() == null ) {
                     SurveySettings surveySettings = new SurveySettings();
                     surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     surveySettings.setAutoPostEnabled( true );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile, surveySettings );
@@ -1186,6 +1189,7 @@ public class ProfileController
                     if ( branchProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         branchProfile.getSurvey_settings().setAutoPostEnabled( true );
                         branchProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                        branchProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                         organizationManagementService.updateScoreForSurvey(
                             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile,
                             branchProfile.getSurvey_settings() );
@@ -1359,6 +1363,7 @@ public class ProfileController
             if ( agentProfile.getSurvey_settings() != null ) {
                 if ( agentProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                     agentProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    agentProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     agentProfile.getSurvey_settings().setAutoPostEnabled( true );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile,
@@ -1367,6 +1372,7 @@ public class ProfileController
             } else {
                 SurveySettings surveySettings = new SurveySettings();
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 surveySettings.setAutoPostEnabled( true );
                 organizationManagementService.updateScoreForSurvey(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, surveySettings );

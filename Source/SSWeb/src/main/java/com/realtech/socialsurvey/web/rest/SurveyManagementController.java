@@ -1539,12 +1539,14 @@ public class SurveyManagementController
             SurveySettings surveySettings = new SurveySettings();
             surveySettings.setAutoPostEnabled( true );
             surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+            surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             organizationManagementService.updateScoreForSurvey( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
                 unitSettings, surveySettings );
         } else {
             if ( unitSettings.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                 unitSettings.getSurvey_settings().setAutoPostEnabled( true );
                 unitSettings.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                unitSettings.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 organizationManagementService.updateScoreForSurvey(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings,
                     unitSettings.getSurvey_settings() );
