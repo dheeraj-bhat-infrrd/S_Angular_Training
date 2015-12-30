@@ -36,7 +36,7 @@
 	        <td class="v-tbl-name"><spring:message code="label.name.key"/></td>
 	        <td class="v-tbl-add"><spring:message code="label.emailid.key"/></td>
 	        <td class="v-tbl-role"><spring:message code="label.role.key"/></td>
-	        <td class="v-tbl-btns"></td>
+	        <td class="v-tbl-btns v-tbl-btns-hr"></td>
 	        <td class="v-tbl-spacer"></td>
 	    </tr>
 	   	 <!--  regions and branches list appear here-->

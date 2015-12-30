@@ -2133,7 +2133,7 @@ public class DashboardController
             try {
                 Company company = organizationManagementService.getCompanyById( iden );
                 String profileLevel = getProfileLevel( columnName );
-                String fileName = "User_Adoption_Report-" + profileLevel + "-" + company.getCompany() + "-"
+                String fileName = "User_Adoption_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
                     + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
                 XSSFWorkbook workbook = dashboardService.downloadUserAdoptionReportData( iden );
                 response.setContentType( EXCEL_FORMAT );
