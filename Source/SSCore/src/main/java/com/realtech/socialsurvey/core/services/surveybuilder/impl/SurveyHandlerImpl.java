@@ -1425,22 +1425,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         survey.setAgentId( user.getUserId() );
                     }
                     surveyPreInitiationDao.update( survey );
-                    if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
-                        if ( user.getLoginPassword() != null ) {
-                            if ( user.getCreatedOn().after( survey.getEngagementClosedTime() ) ) {
-                                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                            }
-                        } else {
-                            LOG.debug( "Only a user invite has been sent so far, hence can't mark it as an old record for user "
-                                + user.getUserId() );
-                        }
-
-                        /*long surveyClosedTime = survey.getEngagementClosedTime().getTime();
-                        long currentTime = System.currentTimeMillis();
-                        if ( checkIfRecordHasExpired( surveyClosedTime, currentTime, validSurveyInterval ) ) {
-                            status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                        }*/
-                    }
                 }
 
             }
@@ -1707,18 +1691,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiationDao.save( surveyPreInitiation );
 
         LOG.debug( "Method preInitiateSurvey() finished." );
-    }
-
-
-    Boolean checkIfRecordHasExpired( long surveyClosedDate, long systemTime, int expirationDays )
-    {
-        long totalDaysInMillseconds = systemTime - surveyClosedDate;
-        int totalDays = (int) ( totalDaysInMillseconds / ( 1000 * 60 * 60 * 24 ) );
-        if ( totalDays >= expirationDays ) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
 
