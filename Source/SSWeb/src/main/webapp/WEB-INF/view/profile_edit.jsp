@@ -480,6 +480,11 @@ $(document).ready(function() {
 			$(this).addClass('icn-social-add');
 		}
 	});
+	// Fetch and paint Reviews
+	$(window).off('scroll');
+	$(window).scroll(function() {
+		fetchReviewsEditProfileScroll();
+	});
 	
 	attachPostsScrollEvent();
 });

@@ -5334,6 +5334,10 @@ tr.v-tbl-header {
 	border-top: 1px solid #dcdcdc;
 }
 
+td.v-tbl-btns {
+	position: relative;
+}
+
 .v-hr-tbl tr.v-tbl-header td {
 	font-weight: bold !important;
 }
@@ -8016,6 +8020,9 @@ label.url-change-input-label {
 }
 .social-auth-disabled {
 	cursor: auto !important; 
+}
+.v-hr-tbl-icn-wraper .v-tbl-icn {
+	font-size: 0;
 }
 .share-plus-height{
 	height:33px;
