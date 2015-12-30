@@ -18,6 +18,8 @@ namespace EncompassSocialSurvey.DAL
 
         static readonly int DEFAULT_BRANCH_ID = 0;
 
+        static readonly int DEFAULT_AGENT_ID = 0;
+
         // select spi.SURVEY_SOURCE_ID, spi.CUSTOMER_EMAIL_ID, spi.CUSTOMER_FIRST_NAME from survey_pre_initiation as spi
         private const string SELECT_QUERY = @"SELECT spi.SURVEY_PRE_INITIATION_ID, spi.SURVEY_SOURCE_ID FROM SURVEY_PRE_INITIATION as  spi
                                         WHERE spi.SURVEY_SOURCE_ID = ?SURVEY_SOURCE_ID AND spi.CUSTOMER_EMAIL_ID = ?CUSTOMER_EMAIL_ID AND spi.CUSTOMER_FIRST_NAME = ?CUSTOMER_FIRST_NAME ;";
@@ -33,6 +35,7 @@ namespace EncompassSocialSurvey.DAL
                                          COMPANY_ID
                                         , REGION_ID
                                         , BRANCH_ID
+                                        , AGENT_ID
                                         , SOURCE
                                         , RECENT_RECORD_FETCHED_START_DATE
                                         , RECENT_RECORD_FETCHED_END_DATE
@@ -44,6 +47,7 @@ namespace EncompassSocialSurvey.DAL
                                           ?COMPANY_ID
                                         , ?REGION_ID
                                         , ?BRANCH_ID
+                                        , ?AGENT_ID
                                         , ?SOURCE
                                         , ?RECENT_RECORD_FETCHED_START_DATE
                                         , ?RECENT_RECORD_FETCHED_END_DATE
@@ -143,6 +147,7 @@ namespace EncompassSocialSurvey.DAL
                 commandToInsert.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = entity.CompanyId;
                 commandToInsert.Parameters.Add("?REGION_ID", MySqlDbType.Int32).Value = DEFAULT_REGION_ID;
                 commandToInsert.Parameters.Add("?BRANCH_ID", MySqlDbType.Int32).Value = DEFAULT_BRANCH_ID;
+                commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.Int32).Value = DEFAULT_AGENT_ID;
                 commandToInsert.Parameters.Add("?RECENT_RECORD_FETCHED_START_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedStartDate;
                 commandToInsert.Parameters.Add("?RECENT_RECORD_FETCHED_END_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedEndDate;
                 commandToInsert.Parameters.Add("?ERROR", MySqlDbType.DateTime).Value = entity.error;
