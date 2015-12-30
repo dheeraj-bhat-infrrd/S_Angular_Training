@@ -4916,13 +4916,18 @@ function paintSurveyPage(jsonData) {
 	
 	
 	//If social token availiable populate the links
-	if (googleEnabled) {
-		var googleElement = document.getElementById('ggl-btn');
-		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
-		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
-	} else {
-		$('#ggl-btn').remove();
-	}
+//	if (googleEnabled) {
+//		var googleElement = document.getElementById('ggl-btn');
+//		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+//		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
+//	} else {
+//		$('#ggl-btn').remove();
+//	}
+
+	$('google-btn').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
+	$('linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&source=");
+	$('twitter-btn').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
+	$('fb-btn').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
 	
 	if (yelpEnabled) {
 		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));

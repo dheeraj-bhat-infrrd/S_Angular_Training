@@ -211,11 +211,16 @@
 						<i><span id="content" class="sq-ques-txt"></span></i>
 					</div>
 					<div id="social-post-links" class="share-social-link-cont hide">
-					 	<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Yelp</a>
-						<a id="ggl-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Google+</a>
-						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Zillow</a>
-						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn">Lending Tree</a> 
-						<div class="ppl-share-wrapper clearfix rev-ppl-share-wrapper">
+						<a id="realtor-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.REALTOR_COM.txt"/></a>
+						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.LENDING_TREE.txt"/></a>
+						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.ZILLOW.txt"/></a>
+						<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.YELP.txt"/></a>
+						<a id="google-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.GOOGLE_PLUS.txt"/></a>
+						<a id="linkedin-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.LINKEDIN.txt"/></a>
+						<a id="twitter-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.TWITTER.txt"/></a>
+						<a id="fb-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.FACEBOOK.txt"/></a>
+
+						<%-- <div class="ppl-share-wrapper clearfix rev-ppl-share-wrapper">
 							<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key"/></div>
 							<div class="float-left clearfix ppl-share-social ">
 								<a id="icn-fb-shr" target="_blank"><span class="float-left ppl-share-icns icn-fb fb-shr" title="Facebook"></span></a>
@@ -223,7 +228,7 @@
 								<a id="icn-linkedin-shr" target="_blank"><span class="float-left ppl-share-icns icn-lin lnkdn-shr" title="LinkedIn"></span></a>
 		                        <a id="icn-google-shr"  target="_blank"><span class="float-left ppl-share-icns icn-gplus yelp-shr" title="Google+"></span></a>
 							</div>
-						</div>
+						</div> --%>
 					</div>
 				</div>
 		</div>
