@@ -1,15 +1,21 @@
 package com.realtech.socialsurvey.core.services.reports.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyReportsSearch;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.reports.AdminReports;
@@ -23,6 +29,9 @@ public class AdminReportsImpl implements AdminReports
 
     @Autowired
     private CompanyDao companyDao;
+    
+    @Autowired
+    private GenericDao<FileUpload, Long> fileUploadDao;
 
 
     @Override
@@ -84,5 +93,27 @@ public class AdminReportsImpl implements AdminReports
             companyList = companyDao.findAll( Company.class );
         }
         return companyList;
+    }
+    
+    
+    /**
+     * Method to create an entry in the file upload table for billing report
+     */
+    @Override
+    @Transactional
+    public void createEntryInFileUploadForBillingReport()
+    {
+        LOG.info( "Method createEntryInFileUploadForBillingReport() started" );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( CommonConstants.REALTECH_ADMIN_ID );
+        entity.setCompany( companyDao.findById( Company.class, CommonConstants.DEFAULT_COMPANY_ID ) );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+        entity.setFileName( "" );
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+        fileUploadDao.save( entity );
+        LOG.info( "Method createEntryInFileUploadForBillingReport() finished" );
     }
 }

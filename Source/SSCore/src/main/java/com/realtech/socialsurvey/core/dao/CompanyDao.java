@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.sql.Timestamp;
 import java.util.List;
+
+import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -19,5 +21,7 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 	public List<Company> getCompaniesByDateRange(Timestamp startTime, Timestamp endTime);
 
     public List<Object[]> getUserAdoptionData( long companyId ) throws InvalidInputException;
+
+    List<BillingReportData> getAllUsersInCompanysForBillingReport( int startIndex, int batchSize );
 
 }

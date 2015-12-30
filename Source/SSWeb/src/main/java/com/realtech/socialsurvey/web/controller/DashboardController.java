@@ -64,6 +64,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.reports.AdminReports;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
@@ -120,6 +121,9 @@ public class DashboardController
 
     @Autowired
     BatchTrackerService batchTrackerService;
+    
+    @Autowired
+    private AdminReports adminReport;
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -2167,6 +2171,31 @@ public class DashboardController
         }
         LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() finished." );
     }
-
+    
+    /**
+     * Controller to generate and send billing report by mail
+     * @param model
+     * @param request
+     * @param response
+     */
+    @RequestMapping ( value = "/downloadbillingreport")
+    public void getBillingReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get billing report file getBillingReportFile() started." );
+        User user = sessionHelper.getCurrentUser();
+        if ( !( user.isSuperAdmin() ) ) {
+            throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+        }
+        //Check if a request already exists
+        try {
+            dashboardService.getBillingReportToBeSent();
+            LOG.info( "A request already exists for getting the billing report" );
+        } catch ( NoRecordsFetchedException e ) {
+            //Request doesn't already exist. Create one.
+            LOG.info( "There is no existing request for getting the billing report" );
+            adminReport.createEntryInFileUploadForBillingReport();
+        }
+        LOG.info( "Method to get billing report file getBillingReportFile() finished." );
+    }
 }
 // JIRA SS-137 : by RM-05 : EOC
