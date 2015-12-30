@@ -2119,4 +2119,113 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.generateProfileNameForCompany( TestConstants.TEST_EMPTY_STRING, 1 );
     }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityTypeNull() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( null, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityTypeEmpty() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityIdInvalid() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 0l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityUserSettingNull() throws InvalidInputException
+    {
+        Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( null );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityBranchSettingNull() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.doReturn( null ).when( organizationManagementServiceImpl ).getBranchSettingsDefault( Matchers.anyLong() );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "branchId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityRegionSettingNull() throws InvalidInputException
+    {
+        Mockito.doReturn( null ).when( organizationManagementServiceImpl ).getRegionSettings( Matchers.anyLong() );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "regionId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityInvalidEntityType() throws InvalidInputException
+    {
+        Mockito.doReturn( null ).when( organizationManagementServiceImpl ).getRegionSettings( Matchers.anyLong() );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "test", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityContactDetailsNull() throws InvalidInputException
+    {
+        AgentSettings agent = new AgentSettings();
+        Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityNameNull() throws InvalidInputException
+    {
+        AgentSettings agent = new AgentSettings();
+        agent.setContact_details( new ContactDetailsSettings() );
+        Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityNameEmpty() throws InvalidInputException
+    {
+        AgentSettings agent = new AgentSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setName( "" );
+        agent.setContact_details( contactDetails );
+        Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityExistingProfileUrlNull() throws InvalidInputException
+    {
+        AgentSettings agent = new AgentSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setName( "test" );
+        agent.setContact_details( contactDetails );
+        Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateProfileUrlForDeletedEntityExistingProfileUrlEmpty() throws InvalidInputException
+    {
+        AgentSettings agent = new AgentSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setName( "test" );
+        agent.setProfileUrl( "" );
+        agent.setContact_details( contactDetails );
+        Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
+        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+    }
 }
