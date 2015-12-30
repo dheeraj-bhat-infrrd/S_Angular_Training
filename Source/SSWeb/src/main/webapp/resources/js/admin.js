@@ -291,6 +291,13 @@ function downloadCompanyReport() {
 			+ startDate + "&endDate=" + endDate;
 }
 
+function downloadBillingReport() {
+	callAjaxGET("./downloadbillingreport.do", function() {
+		$('#overlay-toast').html('The Billing Report will be mailed to you shortly');
+		showToast();
+	}, true);
+}
+
 function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 	if(startIndexCmp == 0) {
 		isAbuseReportRequestRunning = false;

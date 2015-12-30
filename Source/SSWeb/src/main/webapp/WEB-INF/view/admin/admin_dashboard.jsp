@@ -25,6 +25,17 @@
 			</div>
 		</div>
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
+			<div class="dash-sub-head float-left">Billing Report</div>
+			<div id="dsh-billing-report-div" class="clearfix dash-sel-wrapper">
+				<div class="dwnl-bnt-col float-right">
+					<div id="dsh-bill-rep-bnt" class="float-right dash-btn-dl-br">
+						<div class="dsh-br-dwnld-btn float-left cursor-pointer"
+							onclick="downloadBillingReport()">Download Report</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="float-left stats-left clearfix">
 				<div class="dash-sub-head"><spring:message code="label.surveystatus.key" /></div>
 				<div id="region-div" class="clearfix dash-sel-wrapper">
