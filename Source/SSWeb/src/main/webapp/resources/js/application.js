@@ -196,20 +196,17 @@ function retrieveState() {
 /*
  * Click event to close survey popup
  */
-/*$(document).on('click',  function(e){
+$(document).on('click',  function(e){
 	if($('#overlay-send-survey').is(':visible')){
 		$('#overlay-send-survey').hide();
 		enableBodyScroll();
 	}
+	if($('#report-abuse-overlay' ).is(':visible')){
+		$('#report-abuse-overlay').hide();
+		enableBodyScroll();
+	}
 	
-		if($('#report-abuse-overlay' ).is(':visible')){
-			$('#report-abuse-overlay').hide();
-			enableBodyScroll();
-		}
-		if($('#overlay-main' ).is(':visible')){
-			$('#overlay-main').hide();
-			enableBodyScroll();
-		}
+		
 });
 
 $(document).on('keyup',  function(e){
@@ -222,14 +219,33 @@ $(document).on('keyup',  function(e){
 			$('#report-abuse-overlay').hide();
 			enableBodyScroll();
 		}
+		
+	}
+});
+
+/**if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
 		if($('#overlay-main' ).is(':visible')){
 			$('#overlay-main').hide();
 			enableBodyScroll();
 		}
-	}
-});*/
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
+*/
 
 $(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+
+$(document).on('click', '#report-abuse-pop-up', function(e){
 	e.stopPropagation();
 });
 
@@ -320,6 +336,7 @@ function retakeSurveyReminderMail(element) {
 }
 
 $(document).on('click', '.report-abuse-txt', function(e) {
+	disableBodyScroll();
 	e.stopPropagation();
 	var reviewElement = $(this).parent().parent().parent().parent();
 	var payload = {
@@ -518,12 +535,12 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 	//get profile data for all the records , noOfDays = -1
-	showProfileDetails(newProfileName, 0, -1);
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
-	showSurveyStatistics(newProfileName, 0);
-	showSurveyStatisticsGraphically(newProfileName, 0);
+	showSurveyStatistics(newProfileName, newProfileValue);
+	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
 
 function showRegionAdminFlow(newProfileName, newProfileValue) {
@@ -563,7 +580,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
 	//get profile data for all the records , noOfDays = -1
-	showProfileDetails(newProfileName, 0, -1);
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);

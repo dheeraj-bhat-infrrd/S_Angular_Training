@@ -95,6 +95,7 @@
 	</div>
 	
 	<div id="report-abuse-overlay" class="overlay-main hide">
+	<div id="report-abuse-pop-up">
     	<div class="overlay-disable-wrapper">
     		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
     		<div class="ol-content">
@@ -105,6 +106,7 @@
     			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer float-right"><spring:message code="label.cancel.key"/></div>
     		</div>
     	</div>
+    </div>
     </div>
 	
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
