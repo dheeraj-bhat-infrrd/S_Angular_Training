@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -45,10 +46,9 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -105,6 +105,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private GenericDao<FileUpload, Long> fileUploadDao;
 
     @Transactional
     @Override
@@ -1028,279 +1030,33 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     
 
     /**
-     * Method to create excel file for billing report data
-     * @param companyId
-     * @return
-     * @throws InvalidInputException
+     * Method to return records of billing report data based on start index and batch size
      */
     @Override
     @Transactional
-    public XSSFWorkbook downloadBillingReport( long companyId ) throws InvalidInputException
+    public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize )
     {
-        if ( companyId <= 0l ) {
-            throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
-        }
-
-        //Get company object
-        Company company = companyDao.findById( Company.class, companyId );
-
-        if ( company == null ) {
-            throw new InvalidInputException( "No company with ID : " + companyId + " exists" );
-        }
-
-        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-        if ( companySettings == null ) {
-            throw new InvalidInputException( "Company settings not found for company ID : " + companyId );
-        }
-
-        //Get users in company
-        List<BillingReportData> billingReportData = companyDao.getAllUsersInCompanyForBillingReport( companyId );
-
-        // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        Integer counter = 1;
-
-        // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> billingReportToPopulate = new ArrayList<>();
-
-        // Store regions settings in map
-        Map<Long, OrganizationUnitSettings> regionsSettings = new HashMap<Long, OrganizationUnitSettings>();
-
-        // Store regions settings in map
-        Map<Long, OrganizationUnitSettings> branchesSettings = new HashMap<Long, OrganizationUnitSettings>();
-
-        //start populating the data
-        for ( BillingReportData reportRow : billingReportData ) {
-
-            //User ID
-            billingReportToPopulate.add( reportRow.getUserId() );
-            //First Name
-            billingReportToPopulate.add( reportRow.getFirstName() );
-            //Last Name
-            if ( reportRow.getLastName() == null || reportRow.getLastName().isEmpty() || reportRow.getLastName().equalsIgnoreCase( "null" ) ) {
-                billingReportToPopulate.add( "" );
-            } else {
-                billingReportToPopulate.add( reportRow.getLastName() );
-            }
-            //Login ID
-            billingReportToPopulate.add( reportRow.getLoginName() );
-            //Public profile page url
-            AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( reportRow.getUserId() );
-
-            if ( agentSettings == null ) {
-                throw new InvalidInputException( "Agent profile null for user ID : " + reportRow.getUserId() );
-            }
-            if ( agentSettings.getCompleteProfileUrl() == null || agentSettings.getCompleteProfileUrl().isEmpty() ) {
-                billingReportToPopulate.add( "NA" );
-            } else {
-                billingReportToPopulate.add( agentSettings.getCompleteProfileUrl() );
-            }
-            //INDIVIDUAL PUBLIC PROFILE PAGE(is agent or not)
-            if ( isUserAnAgent( reportRow.getProfilesMasterIds() ) ) {
-                billingReportToPopulate.add( CommonConstants.YES_STRING );
-            } else {
-                billingReportToPopulate.add( CommonConstants.NO_STRING );
-            }
-            //State
-            billingReportToPopulate.add( getStateForUser( agentSettings, companySettings, reportRow, companyId,
-                regionsSettings, branchesSettings ) );
-            //Region name
-            billingReportToPopulate.add( reportRow.getRegion() );
-
-            //Branch name
-            billingReportToPopulate.add( reportRow.getBranch() );
-
-            data.put( ( ++counter ).toString(), billingReportToPopulate );
-            billingReportToPopulate = new ArrayList<>();
-        }
-
-        // Setting up headers
-        billingReportToPopulate.add( CommonConstants.HEADER_USER_ID );
-        billingReportToPopulate.add( CommonConstants.HEADER_FIRST_NAME );
-        billingReportToPopulate.add( CommonConstants.HEADER_LAST_NAME );
-        billingReportToPopulate.add( CommonConstants.HEADER_LOGIN_ID );
-        billingReportToPopulate.add( CommonConstants.HEADER_PUBLIC_PROFILE_URL );
-        billingReportToPopulate.add( CommonConstants.HEADER_IS_AGENT );
-        billingReportToPopulate.add( CommonConstants.HEADER_STATE );
-        billingReportToPopulate.add( CommonConstants.HEADER_REGION );
-        billingReportToPopulate.add( CommonConstants.HEADER_BRANCH );
-
-        data.put( "1", billingReportToPopulate );
-
-        // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
-        DecimalFormat decimalFormat = new DecimalFormat( "#0" );
-        decimalFormat.setRoundingMode( RoundingMode.DOWN );
-
-        int rownum = 0;
-        for ( String key : keyset ) {
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = data.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
-                    cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Double )
-                    cell.setCellValue( decimalFormat.format( obj ) );
-                else if ( obj instanceof Long )
-                    cell.setCellValue( (Long) obj );
-                else if ( obj instanceof Boolean )
-                    cell.setCellValue( (Boolean) obj );
-            }
-        }
-        return workbook;
+        LOG.info( "Method getBillingReportRecords started for startIndex : " + startIndex + " and batchSize : " + batchSize );
+        return companyDao.getAllUsersInCompanysForBillingReport( startIndex, batchSize );
     }
-
+    
+    
 
     /**
-     * Method to check if user is agent or not
-     * @param userId
-     * @throws InvalidInputException 
+     * Method to check if billing report entries exist
      */
-    boolean isUserAnAgent( List<Long> profilesMasters )
-    {
-        for ( Long profilesMaster : profilesMasters ) {
-            if ( profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                return true;
-            }
+    @Transactional
+    @Override
+    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException {
+        LOG.info("Check if billing report entries exist");
+        Map<String, Object> queries = new HashMap<>();
+        queries.put(CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT);
+        queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+        List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue(FileUpload.class, queries);
+        if (filesToBeUploaded == null || filesToBeUploaded.isEmpty()) {
+            throw new NoRecordsFetchedException("No billing report entries exist");
         }
-        return false;
-    }
-
-    /**
-     * Method to get the state for a user
-     * @param agentSettings
-     * @param companySettings
-     * @param reportRow
-     * @param companyId
-     * @param regionsSettings
-     * @param branchesSettings
-     * @return
-     * @throws InvalidInputException
-     */
-    String getStateForUser( AgentSettings agentSettings, OrganizationUnitSettings companySettings,
-        BillingReportData reportRow, long companyId, Map<Long, OrganizationUnitSettings> regionsSettings,
-        Map<Long, OrganizationUnitSettings> branchesSettings ) throws InvalidInputException
-    {
-        LOG.info( "Method getStateForUser started" );
-        if ( companyId <= 0l ) {
-            throw new InvalidInputException( "Invalid companyID for ID : " + companyId );
-        }
-        if ( companySettings == null ) {
-            throw new InvalidInputException( "Company Settings empty for companyID : " + companyId );
-        }
-        if ( agentSettings == null ) {
-            throw new InvalidInputException( "Agent settings null!" );
-        }
-        if ( reportRow == null ) {
-            throw new InvalidInputException( "Billing Report row is null" );
-        }
-        if ( regionsSettings == null ) {
-            throw new InvalidInputException( "Regions Settings is null" );
-        }
-        if ( branchesSettings == null ) {
-            throw new InvalidInputException( "Branches Settings is null" );
-        }
-        if ( companySettings.getContact_details() == null || companySettings.getContact_details().getState() == null
-            || companySettings.getContact_details().getState().isEmpty() ) {
-            throw new InvalidInputException( "Unable to get contact details for company ID : " + companyId );
-        }
-        String companyState = companySettings.getContact_details().getState();
-        if ( agentSettings.getContact_details() == null || agentSettings.getContact_details().getState() == null
-            || agentSettings.getContact_details().getState().isEmpty() ) {
-            if ( reportRow.getBranch().equals( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
-                //Get state from region/company
-                return getRegionState( reportRow, companyState, regionsSettings );
-            } else {
-                //Check if branchSettings already exists in the map
-                if ( branchesSettings.containsKey( reportRow.getBranchId() ) ) {
-                    OrganizationUnitSettings branchSettings = branchesSettings.get( reportRow.getBranchId() );
-                    if ( branchSettings.getContact_details() == null || branchSettings.getContact_details().getState() == null
-                        || branchSettings.getContact_details().getState().isEmpty() ) {
-                        //get state from region/company
-                        return getRegionState( reportRow, companyState, regionsSettings );
-                    } else {
-                        return branchSettings.getContact_details().getState();
-                    }
-                } else {
-                    //The branchSettings doesn't yet exist in the map
-                    try {
-                        OrganizationUnitSettings branchSettings = organizationManagementService
-                            .getBranchSettingsDefault( reportRow.getBranchId() );
-                        //Add to map
-                        branchesSettings.put( reportRow.getBranchId(), branchSettings );
-                        if ( branchSettings.getContact_details() == null
-                            || branchSettings.getContact_details().getState() == null
-                            || branchSettings.getContact_details().getState().isEmpty() ) {
-                            //get state from region/company
-                            return getRegionState( reportRow, companyState, regionsSettings );
-                        } else {
-                            return branchSettings.getContact_details().getState();
-                        }
-                    } catch ( NoRecordsFetchedException e ) {
-                        throw new InvalidInputException( "branch settings don't exist for the branch ID : "
-                            + reportRow.getBranchId() );
-                    }
-                }
-            }
-        } else {
-            return agentSettings.getContact_details().getState();
-        }
-    }
-
-
-    /**
-     * Get the state of the region
-     * @param reportRow
-     * @param companyState
-     * @param regionsSettings
-     * @return
-     * @throws InvalidInputException
-     */
-    String getRegionState( BillingReportData reportRow, String companyState,
-        Map<Long, OrganizationUnitSettings> regionsSettings ) throws InvalidInputException
-    {
-        LOG.info( "Method getRegionState started" );
-        if ( reportRow == null ) {
-            throw new InvalidInputException( "Billing Report row is null" );
-        }
-        if ( companyState == null || companyState.isEmpty() ) {
-            throw new InvalidInputException( "Company State cannot be empty!" );
-        }
-        if ( regionsSettings == null ) {
-            throw new InvalidInputException( "Regions Settings is null" );
-        }
-        if ( reportRow.getRegion().equals( CommonConstants.DEFAULT_REGION_NAME ) ) {
-            return companyState;
-        } else {
-            //Check if regionSettings already exists for the current region in the map
-            if ( regionsSettings.containsKey( reportRow.getRegionId() ) ) {
-                OrganizationUnitSettings regionSettings = regionsSettings.get( reportRow.getRegionId() );
-                if ( regionSettings.getContact_details() == null || regionSettings.getContact_details().getState() == null
-                    || regionSettings.getContact_details().getState().isEmpty() ) {
-                    return companyState;
-                }
-                return regionSettings.getContact_details().getState();
-            } else {
-                //The regionSettings doesn't  yet exist in the map
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( reportRow
-                    .getRegionId() );
-                //Add to map
-                regionsSettings.put( reportRow.getRegionId(), regionSettings );
-                if ( regionSettings.getContact_details() == null || regionSettings.getContact_details().getState() == null
-                    || regionSettings.getContact_details().getState().isEmpty() ) {
-                    return companyState;
-                }
-                return regionSettings.getContact_details().getState();
-            }
-        }
+        return filesToBeUploaded;
     }
 }
 // JIRA SS-137 BY RM05:EOC

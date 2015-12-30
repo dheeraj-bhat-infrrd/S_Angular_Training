@@ -64,6 +64,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.reports.AdminReports;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
@@ -120,6 +121,9 @@ public class DashboardController
 
     @Autowired
     BatchTrackerService batchTrackerService;
+    
+    @Autowired
+    private AdminReports adminReport;
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -2167,10 +2171,9 @@ public class DashboardController
         }
         LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() finished." );
     }
-
-
+    
     /**
-     * Controller to generate and download the billing report
+     * Controller to generate and send billing report by mail
      * @param model
      * @param request
      * @param response
@@ -2183,54 +2186,14 @@ public class DashboardController
         if ( !( user.isSuperAdmin() ) ) {
             throw new UnsupportedOperationException( "User is not authorized to perform this action" );
         }
+        //Check if a request already exists
         try {
-
-            long iden = 0;
-            String columnValue = request.getParameter( "columnValue" );
-            if ( columnValue != null && !columnValue.isEmpty() ) {
-                try {
-                    iden = Long.parseLong( columnValue );
-                } catch ( NumberFormatException e ) {
-                    LOG.error(
-                        "NumberFormatExcept;ion caught while parsing columnValue in getUserAdoptionReportFile(). Nested exception is ",
-                        e );
-                    throw e;
-                }
-            }
-
-            try {
-                Company company = organizationManagementService.getCompanyById( iden );
-                String fileName = "Billing_Report-" + CommonConstants.COMPANY + "-" + company.getCompany() + "-"
-                    + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadBillingReport( iden );
-                response.setContentType( EXCEL_FORMAT );
-                String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
-                // write into file
-                OutputStream responseStream = null;
-                try {
-                    responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getBillingReportFile(). Nested exception is ", e );
-                } finally {
-                    try {
-                        responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getBillingReportFile(). Nested exception is ", e );
-                    }
-                }
-                response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getBillingReportFile(). Nested exception is ", e );
-                throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getBillingReportFile(). Nested exception is ", e );
-            }
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getBillingReportFile(). Nested exception is ", e );
+            dashboardService.getBillingReportToBeSent();
+            LOG.info( "A request already exists for getting the billing report" );
+        } catch ( NoRecordsFetchedException e ) {
+            //Request doesn't already exist. Create one.
+            LOG.info( "There is no existing request for getting the billing report" );
+            adminReport.createEntryInFileUploadForBillingReport();
         }
         LOG.info( "Method to get billing report file getBillingReportFile() finished." );
     }

@@ -8,6 +8,8 @@ import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BillingReportData;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -80,13 +82,11 @@ public interface DashboardService
 
     public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
 
-
     /**
-     * Method to create excel file for billing report data
-     * @param companyId
-     * @return
-     * @throws InvalidInputException
+     * Method to return records of billing report data based on start index and batch size
      */
-    XSSFWorkbook downloadBillingReport( long companyId ) throws InvalidInputException;
+    public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize );
+
+    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException;
 }
 // JIRA SS-137 BY RM05:EOC

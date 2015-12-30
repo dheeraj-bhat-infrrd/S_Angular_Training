@@ -384,4 +384,8 @@ public interface EmailServices
 
     void sendReportBugMailToAdminForExceptionInBatch( String displayName, String batchName, String lastRunTime, String errorMsg, String exceptionStackTrace , String recipientMailId )
         throws InvalidInputException, UndeliveredEmailException;
+
+
+    void sendBillingReportMail( String firstName, String lastName, String recipientMailId,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
 }

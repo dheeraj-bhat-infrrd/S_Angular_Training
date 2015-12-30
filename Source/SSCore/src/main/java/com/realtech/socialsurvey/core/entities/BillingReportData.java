@@ -8,6 +8,8 @@ import java.util.List;
  */
 public class BillingReportData
 {
+    private long companyId;
+    private String company;
     private long userId;
     private String firstName;
     private String lastName;
@@ -17,6 +19,42 @@ public class BillingReportData
     private String region;
     private String branch;
     private List<Long> profilesMasterIds;
+
+
+    /**
+     * @return the companyId
+     */
+    public long getCompanyId()
+    {
+        return companyId;
+    }
+
+
+    /**
+     * @param companyId the companyId to set
+     */
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
+    }
+
+
+    /**
+     * @return the company
+     */
+    public String getCompany()
+    {
+        return company;
+    }
+
+
+    /**
+     * @param company the company to set
+     */
+    public void setCompany( String company )
+    {
+        this.company = company;
+    }
 
 
     /**
