@@ -61,7 +61,6 @@
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
-    <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
     <link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
     <c:if test="${not empty profile}">
@@ -582,7 +581,15 @@
                     	</c:otherwise>
                     </c:choose>
                 </div>
-                <c:if test="${not empty posts}">
+                <c:set var="postsHidden" value="no" />
+                <c:if test="${not empty profile.hideSectionsFromProfilePage}">
+					<c:forEach var="item" items="${profile.hideSectionsFromProfilePage}">
+					  <c:if test="${item == 'recent_posts'}">
+					    <c:set var="postsHidden" value="yes" />
+					  </c:if>
+					</c:forEach>
+				</c:if>
+                <c:if test="${postsHidden == 'no' && not empty posts}">
                 <div class="rt-content-main bord-bot-dc clearfix" id="recent-post-container">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Posts</div>

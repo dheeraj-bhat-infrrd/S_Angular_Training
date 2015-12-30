@@ -306,6 +306,14 @@ a,a:hover,a:visited {
 	background: url('../csssprites/form_icons.png') no-repeat -99px 0px;
 	background-size: auto 26px;
 }
+.icn-url {
+	background: url('../images/url.png') no-repeat;
+	background-size: auto 20px;
+}
+.icn-field-id{
+	background: url('../images/field-id.png') no-repeat;
+	background-size: auto 20px;
+}
 
 .icn-confirm-password {
 	background: url('../csssprites/form_icons.png') no-repeat 0px 0px;
@@ -1792,7 +1800,7 @@ button.paypal.is-active {
 	min-width : 120px;
 	float: left;
 	margin-left: 15px;
-	margin-top: 3%;
+	margin-top: 25px;
 }
 
 .tweet-panel-item,.posts-panel-item {
@@ -2804,6 +2812,13 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
     margin-bottom: 10px;
     cursor:pointer;
 }
+.comp-sq-smile-icn-container {
+    
+    height: 62px;
+    line-height: 62px;
+    margin-bottom: 10px;
+    cursor:pointer;
+}
 
 .sq-smile-icn-text {
     margin-left: 0px;
@@ -2812,6 +2827,9 @@ background: url('../csssprites/form_icons.png') no-repeat -306px 0px;      backg
     border-radius: 3px;
     color: #fff;
     font-size: 18px;
+}
+.comp-top-mar{
+margin-top:10px;
 }
 
 .sq-smile-happy-text {
@@ -3890,8 +3908,9 @@ img.prof-image {
 .sq-img-adj {
 	position: absolute;
 	top: 0;
-	width: 50px;
-	height: 40px;
+	width: 26px;
+	height: 26px;
+	margin: 6px 12px;
 }
 
 .bg-black-info {
@@ -4131,7 +4150,7 @@ img.prof-image {
 	border-radius: 3px;
 	padding-left: 5px;
 	outline: none;
-	min-width: 200px;
+	min-width: 215px;
 }
 
 
@@ -4261,7 +4280,7 @@ img.prof-image {
 
 .sm-btn-dl-sd-admin{
 	
-	float: left;
+	float: right;
 	margin-right: 10px;
 	color: #009FE0;
 	border-radius: 3px;
@@ -4269,7 +4288,7 @@ img.prof-image {
 	border: 1px solid #009FE0;
 	height: 32px;
 	width: 25%;
-	min-width: 215px;
+	min-width: 240px;
 	max-width: 90%;
 	max-width: calc(100% - 20px);
 	text-align: center;
@@ -5130,12 +5149,13 @@ width: 50%;
 }
 
 .bd-frm-rt-txt-area {
-	width: 400px;
+	width: 90%;
 	padding: 10px;
 	height: 182px;
 	border-radius: 4px;
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
+	min-width:180px;
 }
 
 .bd-dd-img {
@@ -5314,6 +5334,10 @@ tr.v-tbl-header {
 	border-top: 1px solid #dcdcdc;
 }
 
+td.v-tbl-btns {
+	position: relative;
+}
+
 .v-hr-tbl tr.v-tbl-header td {
 	font-weight: bold !important;
 }
@@ -5456,10 +5480,12 @@ td.v-tbl-spacer {
 
 .v-icn-close {
 	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
 }
 
 .v-icn-edit {
 	background: url('../images/edit-1.png') no-repeat center;
+	cursor: pointer;
 }
 
 .user-info-sing-out {
@@ -6515,6 +6541,10 @@ tr.u-tbl-header td {
 	padding-top: 10px;
 }
 
+.tweet-panel-item.bord-bot-none {
+	border-bottom: none !important;
+}
+
 .sm-tweet-item {
 	padding-left: 10px;
 	clear: none;
@@ -7052,12 +7082,12 @@ span.review-complete-txt{
 }
 
 .rpa-btn {
-    margin: 10px 64px;
-    display: inline-block;
+	margin: 0px 15px 15px;
 }
 
 .rpa-overlay-btn-cont {
-    margin: 0 -30px;
+	padding: 0 15px;
+	margin: 0 -15px;
 }
 
 textarea.report-abuse-txtbox {
@@ -7236,6 +7266,11 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .dsh-res-display {
 	padding: 0 10px;
 	cursor: pointer;
+}
+
+.dsh-res-hover {
+	background: #5cc7ef;
+	color: #fff;
 }
 
 .user-edit-btn {
@@ -7863,7 +7898,7 @@ label.url-change-input-label {
 }
 
 .compl-box-txt {
-	line-height: 50px;
+	line-height: 40px;
 }
 
 .compl-save-btn {
@@ -7883,22 +7918,28 @@ label.url-change-input-label {
     margin: 0 10px;
 }
 
+.compl-option-drop{
+    margin: 0 10px;
+}
+
 .compl-sml-txt {
     width: auto;
     padding: 0 20px;
     height: 40px;
     line-height: 40px;
     font-size: 16px;
+    margin-left: 5px;
 }
 
 .compl-input {
-	width: 500px;
-	max-width: 100%;
+	    width: 100%;
+    min-width: 270px;
 }
 
 .comp-rating-post {
 	height: 40px;
 	line-height: 40px;
+	margin-left:5px;
 }
 
 .search-panel-item {
@@ -7958,3 +7999,40 @@ label.url-change-input-label {
 	margin-bottom: 10px;
 }
 
+.dsh-sel-dropdwn-cont {
+	max-height: 200px;
+}
+.date-wid-pick{
+	width:27%;
+}
+.search-panel-right-sm{
+	width: 70%;
+	margin-bottom: 20px;
+}
+.sm-date-picker-wid{
+	width:27% !important; 
+}
+.compl-check-height{
+	height:40px;
+}
+.compl-rating-drop-wid{
+	margin-left: 5px;
+}
+.social-auth-disabled {
+	cursor: auto !important; 
+}
+.v-hr-tbl-icn-wraper .v-tbl-icn {
+	font-size: 0;
+}
+.share-plus-height{
+	height:33px;
+}
+.en-icn {
+	margin-top: 12px !important;
+}
+.en-icn-pswd{
+	margin-top: 8px !important;
+}
+.en-icn-fname{
+	margin-top: 10px !important;
+}

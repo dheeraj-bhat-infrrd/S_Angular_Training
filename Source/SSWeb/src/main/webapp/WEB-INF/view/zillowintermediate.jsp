@@ -33,7 +33,6 @@
 							</form>
 							<div class="zillow-example-cont popupUrl">
 								<div class="zillow-exm-url">
-									<span>eg.</span> 
 									<span class="zillow-url"><spring:message code="label.zillow.exampleurl.key" /></span>
 								</div>
 								<div class="zillow-exm-profile">

@@ -48,6 +48,6 @@ public class TwitterFeedProcessorImplTest
     @Test
     public void testProcessFeedPostsEmpty() throws NonFatalException
     {
-        assertFalse( "", twitterFeedProcessorImpl.processFeed( new ArrayList<Status>(), null ) );
+        assertFalse( "", twitterFeedProcessorImpl.processFeed( 0l, new ArrayList<Status>(), null, null ) );
     }
 }
