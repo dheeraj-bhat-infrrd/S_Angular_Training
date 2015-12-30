@@ -340,7 +340,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private LockSettings lockSettingsTillRegion( OrganizationUnitSettings companySettings,
+    LockSettings lockSettingsTillRegion( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
         LOG.debug( "Method lockSettingsTillRegion() called from ProfileManagementService" );
@@ -361,7 +361,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private LockSettings lockSettingsTillBranch( OrganizationUnitSettings companySettings,
+    LockSettings lockSettingsTillBranch( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
         LOG.debug( "Method lockSettingsTillBranch() called from ProfileManagementService" );
@@ -387,7 +387,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private LockSettings aggregateLockSettings( LockSettings higherLock, LockSettings parentLock )
+    LockSettings aggregateLockSettings( LockSettings higherLock, LockSettings parentLock )
     {
         LOG.debug( "Method aggregateLockSettings() called from ProfileManagementService" );
 
@@ -517,7 +517,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings aggregateRegionProfile( OrganizationUnitSettings companySettings,
+    OrganizationUnitSettings aggregateRegionProfile( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
         LOG.debug( "Method aggregateRegionProfile() called from ProfileManagementService" );
@@ -539,7 +539,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings aggregateBranchProfile( OrganizationUnitSettings companySettings,
+    OrganizationUnitSettings aggregateBranchProfile( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
         LOG.debug( "Method aggregateBranchProfile() called from ProfileManagementService" );
@@ -566,7 +566,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings aggregateAgentProfile( OrganizationUnitSettings companySettings,
+    OrganizationUnitSettings aggregateAgentProfile( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings, OrganizationUnitSettings agentSettings )
         throws InvalidInputException
     {
@@ -606,7 +606,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings aggregateProfileData( OrganizationUnitSettings parentProfile,
+    OrganizationUnitSettings aggregateProfileData( OrganizationUnitSettings parentProfile,
         OrganizationUnitSettings userProfile, LockSettings userLock )
     {
         LOG.debug( "Method aggregateProfileData() called from ProfileManagementService" );
@@ -713,6 +713,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( logo == null || logo.isEmpty() ) {
             throw new InvalidInputException( "Logo passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
+        }
         LOG.info( "Updating logo" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             logo, companySettings, collection );*/
@@ -731,6 +737,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( image == null || image.isEmpty() ) {
             throw new InvalidInputException( "image passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
         }
         LOG.info( "Updating image" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -751,6 +763,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( vertical == null || vertical.isEmpty() ) {
             throw new InvalidInputException( "vertical passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
         }
         LOG.info( "Updating vertical" );
         if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
@@ -787,7 +805,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( associations == null ) {
             throw new InvalidInputException( "Association name passed can not be null" );
         }
-
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Adding associations" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, unitSettings,
@@ -804,7 +827,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( associations == null ) {
             throw new InvalidInputException( "Association name passed can not be null" );
         }
-
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
+        }
         LOG.info( "Adding associations" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION,
             associations, agentSettings );
@@ -821,6 +849,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( lockSettings == null ) {
             throw new InvalidInputException( "LockSettings passed can not be null" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Updating lock detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_LOCK_SETTINGS, lockSettings, unitSettings, collection );
@@ -836,6 +870,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( contactDetailsSettings == null ) {
             throw new InvalidInputException( "Contact details passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
         LOG.info( "Updating contact detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -854,6 +894,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( contactDetailsSettings == null ) {
             throw new InvalidInputException( "Contact details passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
         }
         LOG.info( "Updating contact detail information" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings(
@@ -874,6 +920,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( achievements == null ) {
             throw new InvalidInputException( "Achievements passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Adding achievements" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS, achievements, unitSettings, collection );
@@ -889,6 +941,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( achievements == null ) {
             throw new InvalidInputException( "Achievements passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
+        }
         LOG.info( "Adding achievements" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS,
             achievements, agentSettings );
@@ -903,7 +961,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException
     {
         if ( authorisedIn == null ) {
-            throw new InvalidInputException( "Contact details passed can not be null" );
+            throw new InvalidInputException( "Authorised In list passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
 
         Licenses licenses = unitSettings.getLicenses();
@@ -925,7 +989,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException
     {
         if ( authorisedIn == null ) {
-            throw new InvalidInputException( "Contact details passed can not be null" );
+            throw new InvalidInputException( "Authorised In list passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
         }
 
         Licenses licenses = agentSettings.getLicenses();
@@ -950,6 +1020,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( mediaTokens == null ) {
             throw new InvalidInputException( "Media tokens passed was null" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Updating the social media tokens in profile." );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens, unitSettings, collection );
@@ -964,6 +1040,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( disclaimer == null || disclaimer.isEmpty() ) {
             throw new InvalidInputException( "disclaimer passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
         LOG.info( "Updating disclaimer" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -1394,7 +1476,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private SocialMediaTokens validateSocialMediaTokens( OrganizationUnitSettings unitSettings )
+    SocialMediaTokens validateSocialMediaTokens( OrganizationUnitSettings unitSettings )
     {
         SocialMediaTokens mediaTokens;
         if ( unitSettings.getSocialMediaTokens() == null ) {
@@ -1749,7 +1831,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @return
      * @throws InvalidInputException
      */
-    private String getIdenColumnNameFromProfileLevel( String profileLevel ) throws InvalidInputException
+    String getIdenColumnNameFromProfileLevel( String profileLevel ) throws InvalidInputException
     {
         LOG.debug( "Getting iden column name for profile level:" + profileLevel );
         String idenColumnName = null;
@@ -2428,7 +2510,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private List<CompanyPositions> sortCompanyPositions( List<CompanyPositions> positions )
+    List<CompanyPositions> sortCompanyPositions( List<CompanyPositions> positions )
     {
         LOG.debug( "Sorting company positions" );
         if ( positions != null && positions.size() > 0 ) {
@@ -2438,7 +2520,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private Set<Long> getAgentIdsByProfileLevel( String profileLevel, long iden ) throws InvalidInputException
+    Set<Long> getAgentIdsByProfileLevel( String profileLevel, long iden ) throws InvalidInputException
     {
         if ( profileLevel == null || profileLevel.isEmpty() ) {
             throw new InvalidInputException( "profile level is null or empty while getting agents" );
@@ -2675,7 +2757,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateCrumbListWithCompanyName( List<BreadCrumb> breadCrumbList, Company company )
+    void updateCrumbListWithCompanyName( List<BreadCrumb> breadCrumbList, Company company )
         throws InvalidInputException
     {
         BreadCrumb breadCrumb = new BreadCrumb();
@@ -2686,7 +2768,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateCrumbListWithBranchName( List<BreadCrumb> breadCrumbList, Branch branch ) throws InvalidInputException,
+    void updateCrumbListWithBranchName( List<BreadCrumb> breadCrumbList, Branch branch ) throws InvalidInputException,
         NoRecordsFetchedException
     {
         if ( branch.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
@@ -2699,7 +2781,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateCrumbListWithRegionName( List<BreadCrumb> breadCrumbList, Region region ) throws InvalidInputException
+    void updateCrumbListWithRegionName( List<BreadCrumb> breadCrumbList, Region region ) throws InvalidInputException
     {
         if ( region.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
             BreadCrumb breadCrumb = new BreadCrumb();
@@ -2711,7 +2793,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateCrumbListWithVerticalName( List<BreadCrumb> breadCrumbList, Company company )
+    void updateCrumbListWithVerticalName( List<BreadCrumb> breadCrumbList, Company company )
     {
         BreadCrumb breadCrumb = new BreadCrumb();
         breadCrumb.setBreadCrumbProfile( company.getVerticalsMaster().getVerticalName() );
@@ -2758,7 +2840,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Region region = regionDao.findById( Region.class, regionId );
         if ( region == null ) {
-            throw new InvalidInputException( "No region present for the specified companyId" );
+            throw new InvalidInputException( "No region present for the specified regionId" );
         }
         region.setRegion( regionName );
         region.setModifiedBy( String.valueOf( userId ) );
@@ -2777,7 +2859,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Branch branch = branchDao.findById( Branch.class, branchId );
         if ( branch == null ) {
-            throw new InvalidInputException( "No branch present for the specified companyId" );
+            throw new InvalidInputException( "No branch present for the specified branchId" );
         }
         branch.setBranch( branchName );
         branch.setModifiedBy( String.valueOf( userId ) );
@@ -2796,7 +2878,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         User user = userDao.findById( User.class, individualId );
         if ( user == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No user present for the specified individualId" );
         }
         String nameArray[] = null;
         if ( individualName != null && !individualName.equalsIgnoreCase( "" ) ) {
@@ -2810,13 +2892,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         user.setFirstName( nameArray[0] );
         String lastName = "";
         if ( nameArray.length > 1 ) {
-            for ( int i = 1; i < nameArray.length - 1; i++ ) {
+            for ( int i = 1; i <= nameArray.length - 1; i++ ) {
                 lastName += nameArray[i] + " ";
             }
         }
         if ( lastName != null && !lastName.equalsIgnoreCase( "" ) ) {
             lastName = lastName.trim();
             user.setLastName( lastName );
+        } else {
+            // Fix for SS-1442 : Last name is not updated to blank when updated agent name contains only first name
+            user.setLastName( "" );
         }
         user.setModifiedBy( String.valueOf( userId ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -2834,7 +2919,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Company company = companyDao.findById( Company.class, companyId );
         if ( company == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No company present for the specified companyId" );
         }
 
         User companyAdmin = null;
@@ -2889,7 +2974,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         User user = userDao.findById( User.class, userId );
         if ( user == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No user present for the specified userId" );
         }
         user.setEmailId( emailId );
         user.setModifiedBy( String.valueOf( userId ) );
@@ -2944,7 +3029,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private static boolean isNumeric( String str )
+    static boolean isNumeric( String str )
     {
         try {
             Double.parseDouble( str );
@@ -3387,7 +3472,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile,
+    OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile,
         OrganizationUnitSettings parentProfile )
     {
 
@@ -3407,7 +3492,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings setAggregateProfileData( OrganizationUnitSettings userProfile,
+    OrganizationUnitSettings setAggregateProfileData( OrganizationUnitSettings userProfile,
         OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
         OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
         Map<SettingsForApplication, OrganizationUnit> map, boolean isFetchRequiredDataFromHierarchy )
@@ -3861,7 +3946,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     //    }
 
 
-    private Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
+    Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
         IOException
     {
         Map<String, Object> map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
@@ -4003,7 +4088,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( profile == null )
             throw new InvalidInputException( "Profile setting passed cannot be null" );
         if ( collectionName == null || collectionName.isEmpty() ) {
-            throw new InvalidInputException( "Profile setting passed cannot be null" );
+            throw new InvalidInputException( "Collection name passed cannot be null or empty" );
         }
         LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
@@ -4291,7 +4376,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
+    boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
         long currentLockValue )
     {
         LOG.debug( "Inside method getLogoLockedByCompany " );
@@ -4305,6 +4390,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     void updateEmailIdInSolr( String emailId, long iden ) throws NonFatalException
     {
+        if ( iden <= 0 ) {
+            LOG.error( "Invalid iden passed in updateEmailIdInSolr");
+            throw new InvalidInputException( "Invalid iden passed in updateEmailIdInSolr" );
+        }
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id passed cannot be null or empty in updateEmailIdInSolr" );
+        }
         LOG.info( "Updating verified email id info into solr for user id : " + iden );
         Map<String, Object> editKeys = new HashMap<String, Object>();
         editKeys.put( CommonConstants.USER_LOGIN_NAME_SOLR, emailId );
@@ -4353,11 +4445,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden )
     {
         if ( profileLevel == null || profileLevel.isEmpty() ) {
-            LOG.error( "profile level is null or empty while getting total review count and score for a profile level and id" );
+            LOG.error( "column name is null or empty while getting total review count and score for a column name and id" );
             return null;
         }
         if ( iden <= 0l ) {
-            LOG.error( "Invalid id passed while getting total review count and score for a profile level and id" );
+            LOG.error( "Invalid id passed while getting total review count and score for a column name and id" );
             return null;
         }
         try {

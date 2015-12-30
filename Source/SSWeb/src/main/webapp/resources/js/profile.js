@@ -765,7 +765,7 @@ function paintReviews(result){
 			reviewItem.agentName = "us";
 		reviewsHtml += '	</div>';
 		
-		reviewsHtml += '	<div class="ppl-share-wrapper clearfix">';
+		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height">';
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
@@ -1220,17 +1220,17 @@ function paintIndividualDetails(result) {
 			individualDetailsHtml += '<div class="postions-content">';
 			
 			var positionObj = positions[i];
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-1 lp-row clearfix">' + positionObj.name + '</div>';
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-1 lp-row clearfix position-align">' + positionObj.name + '</div>';
 			if (positionObj.title) {
-				individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-2 lp-row clearfix">' + positionObj.title + '</div>';
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-2 lp-row clearfix position-align">' + positionObj.title + '</div>';
 			}
 			if (positionObj.startTime) {
 				var startDateDisplay = constructDate(positionObj.startTime.split("-"));
 				if (!positionObj.isCurrent && positionObj.endTime) {
 					var endDateDisplay = constructDate(positionObj.endTime.split("-"));
-					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix">' + startDateDisplay + " - " + endDateDisplay + '</div>';
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix position-align">' + startDateDisplay + " - " + endDateDisplay + '</div>';
 				} else {
-					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix">' + startDateDisplay + ' - Current</div>';
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix position-align">' + startDateDisplay + ' - Current</div>';
 				}
 			}
 			individualDetailsHtml += '</div>';
@@ -1402,6 +1402,13 @@ function fetchPublicPosts(isNextBatch) {
 	
 	var profileLevel = $("#profile-fetch-info").attr("profile-level");
 	
+	//if recent posts are to be hidden
+	if(profileJson.hideSectionsFromProfilePage && ($.inArray("recent_posts", profileJson.hideSectionsFromProfilePage) > -1) ) {
+		$('#recent-post-container').remove();
+		doStopPublicPostPagination = true;
+		return;
+	}
+	
 	var url = getLocationOrigin() + "/rest/profile/";
 	if(profileLevel == 'COMPANY'){
 		//Fectch the reviews for company
@@ -1436,7 +1443,7 @@ function fetchPublicPosts(isNextBatch) {
 		if(posts.errorCode != undefined || (publicPostStartIndex == 0 && posts.length <= 0)) {
 			$('#recent-post-container').remove();
 			doStopPublicPostPagination = true;
-			return
+			return;
 		}
 		
 		//Check if request is for next batch
@@ -1461,6 +1468,9 @@ function fetchPublicPosts(isNextBatch) {
 function paintPublicPosts(posts) {
 	
 	var divToPopulate = "";
+	var postsLength = posts.length;
+	var elementClass;
+	$('#prof-posts').children('.tweet-panel-item').removeClass('bord-bot-none');
 	$.each(posts, function(i, post) {
 		var iconClass = "";
 		var href="javascript:void(0)";
@@ -1483,7 +1493,12 @@ function paintPublicPosts(posts) {
 			 href= post.postUrl;
 		}
 		var hrefComplet='<a href='+href+' target="_blank">';
-		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
+		elementClass = "tweet-panel-item bord-bot-dc clearfix";
+		
+		if(i >= postsLength - 1) {
+			elementClass += " bord-bot-none";
+		}
+		divToPopulate += '<div class="'+elementClass+'">'
 			+ hrefComplet
 			+ '<div class="tweet-icn '+ iconClass +' float-left"></div>'
 			+ "</a>"

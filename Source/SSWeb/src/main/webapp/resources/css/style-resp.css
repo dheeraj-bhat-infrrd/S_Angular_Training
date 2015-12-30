@@ -257,6 +257,12 @@
         border-right: 0;
         padding: 10px 50px 10px 50px;
     }
+    .en-user-name{
+     border-bottom: 0 !important;
+    }
+    .en-form-align-left{
+    padding-left:70px !important;
+    }
     .hm-dd-wrapper{
         width: 100%;
         border-left: 0;
@@ -1618,6 +1624,48 @@
 	.prof-details-header .icn-social-add {
 		width: 32px;
 	}
+	.v-hr-tbl-icn-wraper {
+		display: none;
+		position: absolute;
+		right: 2px;
+		top: 33px;
+		border: 1px solid #dcdcdc;
+		border-bottom: none;
+		z-index: 9;
+	}
+	.v-hr-tbl-icn-wraper div {
+		display: none;
+	}
+	
+	.v-hr-tbl-icn-wraper .v-tbl-icn-sm {
+		display: block;
+		font-size: 14px;
+		width: 140px;
+		max-width: 140px;
+		height: 40px;
+		float: none;
+		background-color: #fff;
+		background-position: 100px;
+		padding-right: 70px;
+		padding-left: 10px;
+		line-height: 40px;
+		border-bottom: 1px solid #dcdcdc;
+	}
+	.v-tbl-icn-sm.v-icn-femail {
+		background-size: 33px;
+	}
+	.v-tbn-icn-dropdown {
+		display: block;
+		float: right;
+		clear: both;
+		width: 40px;
+		height: 40px;
+		background: url(../images/dots.png) no-repeat center;
+		cursor: pointer;
+	}
+	.v-line-rgn, .v-line-brnch, .v-line-ind {
+		height: 40px;
+	}
 }
 
 
@@ -1962,6 +2010,18 @@
 	#top-dash{
 	min-height:340px;
 	}
+	.dash-btn-dl-br {
+	color: #009FE0;
+	border-radius: 3px;
+	line-height: 32px;
+	margin-top: 2px;
+	border: 1px solid #009FE0;
+	height: 32px;
+	width: 160px;
+	text-align: center;
+	font-size: 13px;
+	text-transform: initial;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -2247,5 +2307,8 @@
     }
     .review-for-text-sm-screen {
 		display: none;
+	}
+	.v-hr-tbl-icn-wraper {
+		display: block !important;
 	}
 }

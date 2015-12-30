@@ -68,9 +68,4 @@
 </div>
 <script>
 	initializeVerticalsMasterForProfilePage();
-	
-	// Fetch and paint Reviews
-	$(window).scroll(function() {
-		fetchReviewsEditProfileScroll();
-	});
 </script>

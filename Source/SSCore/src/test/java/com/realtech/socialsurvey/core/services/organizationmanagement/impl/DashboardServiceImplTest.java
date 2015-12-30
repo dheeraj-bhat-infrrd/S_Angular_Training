@@ -18,10 +18,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -29,11 +33,13 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 
 
 public class DashboardServiceImplTest
 {
 
+    @Spy
     @InjectMocks
     private DashboardServiceImpl dashboardServiceImpl;
 
@@ -42,6 +48,15 @@ public class DashboardServiceImplTest
 
     @Mock
     private CompanyDao companyDao;
+
+    @Mock
+    private OrganizationManagementService organizationManagementService;
+
+    @Mock
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+    @Mock
+    private GenericDao<FileUpload, Long> fileUploadDao;
 
 
     @BeforeClass
@@ -377,9 +392,7 @@ public class DashboardServiceImplTest
     @Test ( expected = NoRecordsFetchedException.class)
     public void testDownloadUserAdoptionReportDataWhenRowsIsNull() throws InvalidInputException, NoRecordsFetchedException
     {
-        Mockito.when( companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn( null );
-        Mockito.when( companyDao.getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
-            new HashMap<Long, Integer>() );
+        Mockito.when( companyDao.getUserAdoptionData( Mockito.anyLong() ) ).thenReturn( null );
         dashboardServiceImpl.downloadUserAdoptionReportData( 1 );
     }
 
@@ -387,10 +400,16 @@ public class DashboardServiceImplTest
     @Test ( expected = NoRecordsFetchedException.class)
     public void testDownloadUserAdoptionReportDataWhenRowsIsEmpty() throws InvalidInputException, NoRecordsFetchedException
     {
-        Mockito.when( companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
-            new ArrayList<Object[]>() );
-        Mockito.when( companyDao.getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( Mockito.anyLong() ) ).thenReturn(
-            new HashMap<Long, Integer>() );
+        Mockito.when( companyDao.getUserAdoptionData( Mockito.anyLong() ) ).thenReturn( new ArrayList<Object[]>() );
         dashboardServiceImpl.downloadUserAdoptionReportData( 1 );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testGetBillingReportToBeSentForNoRecords() throws NoRecordsFetchedException
+    {
+        Mockito.when( fileUploadDao.findByKeyValue( Mockito.eq( FileUpload.class ), Mockito.anyMap() ) ).thenReturn( null );
+        dashboardServiceImpl.getBillingReportToBeSent();
     }
 }
