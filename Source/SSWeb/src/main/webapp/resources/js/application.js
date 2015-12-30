@@ -9824,7 +9824,8 @@ function saveZillowEmailAddress() {
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
 		if(data && data == "success") {
-			loadSocialMediaUrlInSettingsPage();
+			showProfileLinkInEditProfilePage("zillow", "${ profile.socialMediaTokens.zillowToken.zillowScreenName}");
+            loadSocialMediaUrlInSettingsPage();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {
