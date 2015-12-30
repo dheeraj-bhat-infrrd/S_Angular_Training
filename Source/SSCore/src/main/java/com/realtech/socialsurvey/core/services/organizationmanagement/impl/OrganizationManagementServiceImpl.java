@@ -607,6 +607,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveySettings.setSadTextComplete( sadTextComplete );
         surveySettings.setAutoPostEnabled( true );
         surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+        surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
 
         surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
         surveySettings.setMax_number_of_survey_reminders( CommonConstants.DEFAULT_MAX_REMINDER_COUNT );
@@ -3946,6 +3947,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             SurveySettings surveySettings = new SurveySettings();
             surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             surveySettings.setAutoPostEnabled( true );
+            surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             organizationSettings.setSurvey_settings( surveySettings );
         }
 
@@ -3990,6 +3992,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             SurveySettings surveySettings = new SurveySettings();
             surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             surveySettings.setAutoPostEnabled( true );
+            surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             organizationSettings.setSurvey_settings( surveySettings );
         }
 
