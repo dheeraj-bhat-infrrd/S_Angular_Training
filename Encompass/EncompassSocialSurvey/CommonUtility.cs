@@ -34,6 +34,7 @@ namespace EncompassSocialSurvey
                 }
 
                 Logger.Info("Exiting the method CommonUtility.ConvertStringToDateTime()");
+               
                 return dt;
             }
             catch (Exception ex)
@@ -110,9 +111,9 @@ namespace EncompassSocialSurvey
         {
             try
             {
-                Logger.Debug("Sending mail to admin ");
-                Logger.Debug("Mail Subject is : " + subject);
-                Logger.Debug("Mail body is : " + body);
+                Logger.Info("Sending mail to admin ");
+                Logger.Info("Mail Subject is : " + subject);
+                Logger.Info("Mail body is : " + body);
 
                 var credentials = new NetworkCredential(EncompassSocialSurveyConfiguration.SendgridUsername, EncompassSocialSurveyConfiguration.SendgridPassword);
 
@@ -121,10 +122,11 @@ namespace EncompassSocialSurvey
                 myMessage.From = new MailAddress(EncompassSocialSurveyConfiguration.SendgridFromAddress, EncompassSocialSurveyConfiguration.SendgridName);
                 myMessage.Subject = subject;
                 myMessage.Text = body;
-
+                Logger.Info("Sending mail to admin at : " + EncompassSocialSurveyConfiguration.AdminEmailAddress);
+                Logger.Info("message is : " + myMessage.Text);
                 var transportWeb = new Web(credentials);
-                transportWeb.DeliverAsync(myMessage);
-
+                transportWeb.DeliverAsync(myMessage).Wait(); // wait for sending the mail.
+                Logger.Info("mail has been sent successfully to : " + EncompassSocialSurveyConfiguration.AdminEmailAddress);
 
             }
             catch (Exception ex)

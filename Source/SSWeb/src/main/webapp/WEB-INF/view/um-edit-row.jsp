@@ -32,7 +32,7 @@
 				    <c:when test="${accountType == 'Enterprise'}">
 				    <div class="v-edit-row clearfix">
 						<div class="float-left v-ed-lbl"><spring:message code="label.assignto.key"/></div>
-						<div id="assign-to-selector" class="float-left v-ed-txt pos-relative">
+						<div id="assign-to-selector" class="float-left v-ed-txt pos-relative" data-profile="individual">
 						<input id="assign-to-txt" data-assignto="office" class="v-ed-txt-item v-ed-txt-dd ignore-clear" value='<spring:message code="label.office.key"/>'>
 						<div id="assign-to-droplist" class="clearfix hide v-ed-dd-wrapper dd-droplist">
 								<div data-assign-to-option="office" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
@@ -49,7 +49,7 @@
 					<c:when test="${accountType == 'Company'}">
 					<div class="v-edit-row clearfix">
 						<div class="float-left v-ed-lbl"><spring:message code="label.assignto.key"/></div>
-						<div id="assign-to-selector" class="float-left v-ed-txt pos-relative">
+						<div id="assign-to-selector" class="float-left v-ed-txt pos-relative" data-profile="individual">
 						<input id="assign-to-txt" data-assignto="office" class="v-ed-txt-item v-ed-txt-dd ignore-clear" value='<spring:message code="label.office.key"/>'>
 						<div id="assign-to-droplist" class="clearfix hide v-ed-dd-wrapper dd-droplist">
 								<div data-assign-to-option="office" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>

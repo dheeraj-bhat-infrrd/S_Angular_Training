@@ -21,4 +21,9 @@ public interface AdminReports {
 	 * @throws NoRecordsFetchedException
 	 */
 	public List<Company> companyCreationReports(CompanyReportsSearch search) throws InvalidInputException, NoRecordsFetchedException;
+
+    /**
+     * Method to create an entry in the file upload table for billing report
+     */
+    public void createEntryInFileUploadForBillingReport();
 }

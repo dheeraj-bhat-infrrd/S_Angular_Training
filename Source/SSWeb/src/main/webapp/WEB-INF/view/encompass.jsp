@@ -28,8 +28,9 @@
 							</div>
 							<div
 								class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-fname en-icn-fname" ></div>
 								<input id="encompass-username" type="text"
-									class="um-item-row-txt um-item-row-txt-OR"
+									class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left"
 									placeholder="Username" name="encompass-username"
 									value="${encompassusername}">
 								<div id="encompass-username-error" class="hm-item-err-2"></div>
@@ -48,8 +49,9 @@
 							</div>
 							<div
 								class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-password en-icn-pswd" ></div>
 								<input id="encompass-password" type="password"
-									class="um-item-row-txt um-item-row-txt-OR"
+									class="um-item-row-txt um-item-row-txt-OR en-form-align-left"
 									placeholder="Password" name="encompass-password"
 									value="${encompasspassword}">
 								<div id="encompass-password-error" class="hm-item-err-2 hide"></div>
@@ -63,8 +65,9 @@
 							</div>
 							<div
 								class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-url en-icn" ></div>
 								<input id="encompass-url" type="text"
-									class="encompass-url-adj um-item-row-txt um-item-row-txt-OR"
+									class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left"
 									placeholder="URL" name="encompass-url" value="${encompassurl}">
 								<div id="encompass-url-error" class="hm-item-err-2"></div>
 							</div>
@@ -88,8 +91,9 @@
 							</div>
 							<div
 								class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-field-id en-icn" ></div>
 								<input id="encompass-fieldId" type="text"
-									class="um-item-row-txt um-item-row-txt-OR"
+									class="um-item-row-txt um-item-row-txt-OR en-form-align-left"
 									placeholder="fieldId" name="encompass-fieldId"
 									value="${encompassfieldid}">
 							</div>
