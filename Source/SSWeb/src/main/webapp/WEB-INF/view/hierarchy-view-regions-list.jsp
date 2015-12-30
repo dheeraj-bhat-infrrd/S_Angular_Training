@@ -16,15 +16,16 @@
 							test="${not empty region.address1}">${region.address1}</c:if>&nbsp;<c:if
 							test="${not empty region.address2}">${region.address2}</c:if></td>
            <td class="v-tbl-role"></td>
-           <td class="v-tbl-btns">
-               <div class="clearfix v-tbl-icn-wraper">
-              
+           <td class="v-tbl-btns v-tbl-btns-hr">
+               <div class="v-tbn-icn-dropdown hide"></div>
+				<div class="clearfix v-tbl-icn-wraper v-hr-tbl-icn-wraper">
 	               <div class="float-left v-tbl-top-spacer"></div>
-                   <div class="float-left v-tbl-icn v-icn-wid" title="<spring:message code="label.widget.key" />"
-							onclick="generateWidget($(this), ${region.regionId }, 'region');"></div> 
+                   <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-wid" 
+                   		data-iden="${region.regionId}" data-profile="region"
+                  	 	title="<spring:message code="label.widget.key" />">Widget</div> 
 	               <div class="float-left v-tbl-top-spacer"></div>  
-                   <div class="float-left v-tbl-icn v-icn-close region-del-icn" data-regionid="${region.regionId}"></div>
-                   <div class="float-left v-tbl-icn v-icn-edit region-edit-icn" clicked="false" data-regionid="${region.regionId}"></div>
+                   <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-close region-del-icn" data-regionid="${region.regionId}">Delete</div>
+                   <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-edit region-edit-icn" clicked="false" data-regionid="${region.regionId}">Edit</div>
                	   <div class="float-left v-tbl-top-spacer"></div>
                </div>
            </td>
@@ -46,15 +47,16 @@
 							test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if
 							test="${not empty branch.address2}">${branch.address2}</c:if></td>
            <td class="v-tbl-role"></td>
-           <td class="v-tbl-btns">
-                <div class="clearfix v-tbl-icn-wraper">
+           <td class="v-tbl-btns v-tbl-btns-hr">
+                <div class="v-tbn-icn-dropdown hide"></div>
+				<div class="clearfix v-tbl-icn-wraper v-hr-tbl-icn-wraper">
 					<div class="float-left v-tbl-top-spacer"></div>
-					<div class="float-left v-tbl-icn v-icn-wid"
-						title="<spring:message code="label.widget.key" />"
-						onclick="generateWidget($(this), ${branch.branchId }, 'branch');"></div>
+					<div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-wid" 
+						data-iden="${branch.branchId}" data-profile="branch"
+						title="<spring:message code="label.widget.key" />">Widget</div>
 					<div class="float-left v-tbl-top-spacer"></div>
-					<div class="float-left v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}"></div>
-                   <div class="float-left v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}"></div>
+					<div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}">Delete</div>
+                   <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}">Edit</div>
               <div class="float-left v-tbl-top-spacer"></div>
                </div>
            </td>
@@ -108,14 +110,12 @@
 					</c:when>
 				</c:choose>
 			</td>
-           	<td class="v-tbl-btns">
-               <div class="clearfix v-tbl-icn-wraper">
-               
-               
-               
+           	<td class="v-tbl-btns v-tbl-btns-hr">
+              	<div class="v-tbn-icn-dropdown hide"></div>
+				<div class="clearfix v-tbl-icn-wraper v-hr-tbl-icn-wraper">
                 <c:choose>
 						<c:when test="${not empty regstatustickclass}">
-							<div class="float-left v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
+							<div class="float-left v-tbl-icn-sm v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
 								title="<spring:message code="label.resendmail.key" />"></div>
 						</c:when>
 						<c:otherwise>
@@ -124,9 +124,9 @@
 					</c:choose>
 					<c:choose>
 					<c:when test="${compUser.isAgent}">
-					  <div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
-						title="<spring:message code="label.widget.key" />"
-						onclick="generateWidget($(this), ${compUser.userId }, 'individual');"></div> 
+					  <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-wid ${admincaneditclass}" 
+					  	   data-iden="${compUser.userId}" data-profile="individual"
+						   title="<spring:message code="label.widget.key" />">Widget</div> 
 					</c:when>
 						<c:otherwise>
 							<div class="float-left v-tbl-top-spacer"></div>
@@ -134,20 +134,15 @@
 					</c:choose>
 					<c:choose>
 						<c:when test="${compUser.status == 2}">
-							<div class="float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>
+							<div class="float-left v-tbl-icn v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>
 						</c:when>
 						<c:otherwise>
-							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
+							<div class=" float-left v-tbl-icn v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
 						</c:otherwise>
 					</c:choose>  
-              
-               
-              <!--  <div class="float-left v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div> -->
-               
-               
                    <c:choose>
 						<c:when test="${compUser.canEdit && user.userId != compUser.userId}">
-						   <div class="float-left v-tbl-icn v-icn-close user-del-icn" data-userid="${compUser.userId}"></div>
+						   <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-close user-del-icn" data-userid="${compUser.userId}">Delete</div>
 						</c:when>
 						<c:otherwise>
 							<div class="float-left v-tbl-icn-disabled v-icn-close"></div>
@@ -155,14 +150,14 @@
 				   </c:choose>
                    <c:choose>
 						<c:when test="${compUser.canEdit}">
-		                   <div class="float-left v-tbl-icn v-icn-edit user-edit-icn" clicked="false" data-userid="${compUser.userId}"></div>
+		                   <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-edit user-edit-icn" clicked="false" data-userid="${compUser.userId}">Edit</div>
 						</c:when>
 						<c:otherwise>
 		                    <div class="float-left v-tbl-icn-disabled v-icn-edit"></div>
 						</c:otherwise>
 				   </c:choose>
 				   <c:if test="${user.userId != compUser.userId}">
-				   		<div class="float-left v-tbl-icn v-icn-login user-login-icn" data-iden="${compUser.userId}" title="login as"></div>
+				   		<div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-login user-login-icn" data-iden="${compUser.userId}" title="login as">Login</div>
 				   </c:if>
 			   </div>
            </td>
@@ -175,9 +170,3 @@
        </tr>
 	</c:forEach>
 </c:if> 
-<script type="text/javascript">
-	$(document).ready(function() {
-		bindUserLoginEvent();
-		attachReInvitationClickEvent();
-	});
-</script>
