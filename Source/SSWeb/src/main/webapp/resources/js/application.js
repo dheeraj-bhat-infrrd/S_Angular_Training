@@ -1196,7 +1196,6 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 		return false;
 	}
 	searchColumn = e.options[e.selectedIndex].value;
-	
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue,
