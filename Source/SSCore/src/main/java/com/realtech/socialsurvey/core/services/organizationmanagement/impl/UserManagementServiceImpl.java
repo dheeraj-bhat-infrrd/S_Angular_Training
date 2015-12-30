@@ -2189,6 +2189,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             SurveySettings surveySettings = new SurveySettings();
             surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             surveySettings.setAutoPostEnabled( true );
+            surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             agentSettings.setSurvey_settings( surveySettings );
         }
 

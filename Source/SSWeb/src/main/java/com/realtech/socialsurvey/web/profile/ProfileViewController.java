@@ -227,6 +227,8 @@ public class ProfileViewController
             if ( companyProfile == null ) {
                 throw new NoRecordsFetchedException( "No settings found for company while fetching region profile" );
             }
+            // 	migrating the hideSectionsFromProfilePage value from company to region
+            regionProfile.setHideSectionsFromProfilePage(companyProfile.getHideSectionsFromProfilePage());
 
             try {
                 map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID, regionProfile.getIden() );
@@ -350,6 +352,8 @@ public class ProfileViewController
             }
 
             companyProfile = profileManagementService.getCompanyProfileByProfileName( companyProfileName );
+            // migrating the hideSectionsFromProfilePage value from company to branch
+            branchProfile.setHideSectionsFromProfilePage(companyProfile.getHideSectionsFromProfilePage());
 
             regionProfile = profileManagementService.getRegionProfileByBranch( branchProfile );
             try {
@@ -547,7 +551,8 @@ public class ProfileViewController
                 LOG.debug("Fetched zillow feed");*/
                 //set vertical name from the company
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
-
+                // migrating the hideSectionsFromProfilePage value from company to branch
+                individualProfile.setHideSectionsFromProfilePage(companyProfile.getHideSectionsFromProfilePage());
                 // aggregated social profile urls
                 /*                SocialMediaTokens agentTokens = profileManagementService.aggregateSocialProfiles( individualProfile,
                                     CommonConstants.AGENT_ID );
