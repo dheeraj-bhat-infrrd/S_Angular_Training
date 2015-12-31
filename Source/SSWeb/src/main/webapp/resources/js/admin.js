@@ -292,10 +292,18 @@ function downloadCompanyReport() {
 }
 
 function downloadBillingReport() {
-	callAjaxGET("./downloadbillingreport.do", function() {
-		$('#overlay-toast').html('The Billing Report will be mailed to you shortly');
+	var mailId = $("#dsh-mail-id").val();
+	if (emailRegex.test(mailId) || mailId == "") {
+		payload = { "mailid" : mailId };
+		callAjaxGetWithPayloadData("./downloadbillingreport.do", function() {
+			$('#overlay-toast').html(
+			'The Billing Report will be mailed to you shortly');
+			showToast();
+		}, payload, true);
+	} else {
+		$('#overlay-toast').html('Please enter a valid email address');
 		showToast();
-	}, true);
+	}
 }
 
 function showAbusiveReviews(startIndexCmp,batchSizeCmp) {

@@ -103,10 +103,10 @@ public class AdminReportsImpl implements AdminReports
      */
     @Override
     @Transactional
-    public void createEntryInFileUploadForBillingReport()
+    public void createEntryInFileUploadForBillingReport( String mailId )
     {
         LOG.info( "Method createEntryInFileUploadForBillingReport() started" );
-        //TODO: check if an entry already exists
+        //check if an entry already exists
         LOG.info( "Check if billing report entries exist" );
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
@@ -120,6 +120,11 @@ public class AdminReportsImpl implements AdminReports
             entity.setCompany( companyDao.findById( Company.class, CommonConstants.DEFAULT_COMPANY_ID ) );
             entity.setStatus( CommonConstants.STATUS_ACTIVE );
             entity.setUploadType( CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+            if ( mailId == null || mailId.isEmpty() ) {
+                entity.setFileName( "" );
+            } else {
+                entity.setFileName( mailId );
+            }
             entity.setFileName( "" );
             Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
             entity.setCreatedOn( currentTime );
@@ -131,6 +136,11 @@ public class AdminReportsImpl implements AdminReports
             LOG.debug( "Entry exists. Modifying it. ID : " + entity.getFileUploadId() );
             entity.setStatus( CommonConstants.STATUS_ACTIVE );
             entity.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            if ( mailId == null || mailId.isEmpty() ) {
+                entity.setFileName( "" );
+            } else {
+                entity.setFileName( mailId );
+            }
             fileUploadDao.update( entity );
         }
         LOG.info( "Method createEntryInFileUploadForBillingReport() finished" );
