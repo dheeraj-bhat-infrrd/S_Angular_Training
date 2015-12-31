@@ -1,12 +1,10 @@
 package com.realtech.socialsurvey.core.starter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,14 +12,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 
 
@@ -77,71 +79,244 @@ public class PrepareBillingReportTest
     }
 
 
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testGetRegionAddressForReportRowNull() throws InvalidInputException
+    @Test
+    public void testGetAddressFromAgent() throws InvalidInputException, NoRecordsFetchedException
     {
-        prepareBillingReport.getRegionAddress( null, "XY", new HashMap<Long, OrganizationUnitSettings>() );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testGetRegionAddressForCompanyStateEmpty() throws InvalidInputException
-    {
-        prepareBillingReport.getRegionAddress( new BillingReportData(), "", new HashMap<Long, OrganizationUnitSettings>() );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testGetRegionAddressForRegionsSettingsNull() throws InvalidInputException
-    {
-        prepareBillingReport.getRegionAddress( new BillingReportData(), "XY", null );
+        AgentSettings agentSettings = new AgentSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        agentSettings.setContact_details( contactDetails );
+        assertEquals( "test", prepareBillingReport.getAddress( agentSettings, new BillingReportData(), "CA", "RA", "BA" ) );
     }
 
 
     @Test
-    public void testGetRegionAddressForDefaultRegion() throws InvalidInputException
+    public void testGetAddressFromBranchForNonDefaultBranchAndBranchIdDifferent() throws InvalidInputException,
+        NoRecordsFetchedException
     {
+        OrganizationUnitSettings branchSettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        branchSettings.setContact_details( contactDetails );
         BillingReportData reportRow = new BillingReportData();
-        reportRow.setRegion( CommonConstants.DEFAULT_REGION_NAME );
-        assertEquals( "XY",
-            prepareBillingReport.getRegionAddress( reportRow, "XY", new HashMap<Long, OrganizationUnitSettings>() ) );
+        reportRow.setBranch( "TestBranch" );
+        reportRow.setBranchId( 1l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn( branchSettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", "RA", "BA" ) );
     }
 
 
     @Test
-    public void testGetRegionAddressForRegionSettingInMapForContactDetailsNull() throws InvalidInputException
+    public void testGetAddressFromBranchForNonDefaultBranchAndpreviousBranchAddressNull() throws InvalidInputException,
+        NoRecordsFetchedException
     {
+        OrganizationUnitSettings branchSettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        branchSettings.setContact_details( contactDetails );
         BillingReportData reportRow = new BillingReportData();
-        reportRow.setRegionId( 1l );
-        Map<Long, OrganizationUnitSettings> regionsSettings = new HashMap<Long, OrganizationUnitSettings>();
-        OrganizationUnitSettings regionSettings = new OrganizationUnitSettings();
-        regionSettings.setContact_details( new ContactDetailsSettings() );
-        regionsSettings.put( 1l, regionSettings );
-        reportRow.setRegion( "RegionX" );
-        assertEquals( "XY", prepareBillingReport.getRegionAddress( reportRow, "XY", regionsSettings ) );
+        reportRow.setBranch( "TestBranch" );
+        reportRow.setBranchId( 1l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn( branchSettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", "RA", null ) );
     }
 
 
     @Test
-    public void testGetRegionAddressForRegionSettingInMapForContactDetailsValid() throws InvalidInputException
+    public void testGetAddressFromBranchForNonDefaultBranch() throws InvalidInputException, NoRecordsFetchedException
     {
+        OrganizationUnitSettings branchSettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        branchSettings.setContact_details( contactDetails );
         BillingReportData reportRow = new BillingReportData();
-        reportRow.setRegionId( 1l );
-        Map<Long, OrganizationUnitSettings> regionsSettings = new HashMap<Long, OrganizationUnitSettings>();
+        reportRow.setBranch( "TestBranch" );
+        reportRow.setBranchId( 0l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn( branchSettings );
+        assertEquals( "BA", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", "RA", "BA" ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromRegionForNonDefaultBranchAndRegionAndRegionIdDifferent() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
         OrganizationUnitSettings regionSettings = new OrganizationUnitSettings();
         ContactDetailsSettings contactDetails = new ContactDetailsSettings();
-        contactDetails.setState( "TX" );
+        contactDetails.setAddress( "test" );
         regionSettings.setContact_details( contactDetails );
-        regionsSettings.put( 1l, regionSettings );
-        reportRow.setRegion( "RegionX" );
-        assertEquals( ", TX", prepareBillingReport.getRegionAddress( reportRow, "XY", regionsSettings ) );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( "TestBranch" );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( "TestRegion" );
+        reportRow.setRegionId( 1l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn(
+            new OrganizationUnitSettings() );
+        Mockito.when( organizationManagementService.getRegionSettings( Mockito.anyLong() ) ).thenReturn( regionSettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", "RA", null ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromRegionForDefaultBranchAndRegionAndRegionIdDifferent() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        OrganizationUnitSettings regionSettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        regionSettings.setContact_details( contactDetails );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( CommonConstants.DEFAULT_BRANCH_NAME );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( "TestRegion" );
+        reportRow.setRegionId( 1l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn(
+            new OrganizationUnitSettings() );
+        Mockito.when( organizationManagementService.getRegionSettings( Mockito.anyLong() ) ).thenReturn( regionSettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", "RA", null ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromRegionForNonDefaultBranchAndRegionAndRegionAddressNull() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        OrganizationUnitSettings regionSettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        regionSettings.setContact_details( contactDetails );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( "TestBranch" );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( "TestRegion" );
+        reportRow.setRegionId( 1l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn(
+            new OrganizationUnitSettings() );
+        Mockito.when( organizationManagementService.getRegionSettings( Mockito.anyLong() ) ).thenReturn( regionSettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", null, null ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromRegionForDefaultBranchAndRegionAndRegionAddressNull() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        OrganizationUnitSettings regionSettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        regionSettings.setContact_details( contactDetails );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( CommonConstants.DEFAULT_BRANCH_NAME );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( "TestRegion" );
+        reportRow.setRegionId( 1l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn(
+            new OrganizationUnitSettings() );
+        Mockito.when( organizationManagementService.getRegionSettings( Mockito.anyLong() ) ).thenReturn( regionSettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", null, null ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromRegionForDefaultBranchAndRegion() throws InvalidInputException, NoRecordsFetchedException
+    {
+        OrganizationUnitSettings regionSettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        regionSettings.setContact_details( contactDetails );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( CommonConstants.DEFAULT_BRANCH_NAME );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( "TestRegion" );
+        reportRow.setRegionId( 0l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn(
+            new OrganizationUnitSettings() );
+        Mockito.when( organizationManagementService.getRegionSettings( Mockito.anyLong() ) ).thenReturn( regionSettings );
+        assertEquals( "RA", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", "RA", null ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromCompanyForNonDefaultRegionAndCompanyIdDifferent() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        companySettings.setContact_details( contactDetails );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( CommonConstants.DEFAULT_BRANCH_NAME );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( "TestRegion" );
+        reportRow.setRegionId( 0l );
+        reportRow.setCompanyId( 1l );
+        Mockito.when( organizationManagementService.getBranchSettingsDefault( Mockito.anyLong() ) ).thenReturn(
+            new OrganizationUnitSettings() );
+        Mockito.when( organizationManagementService.getRegionSettings( Mockito.anyLong() ) ).thenReturn(
+            new OrganizationUnitSettings() );
+        Mockito.when( organizationManagementService.getCompanySettings( Mockito.anyLong() ) ).thenReturn( companySettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", null, null ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromCompanyForDefaultRegionAndCompanyIdDifferent() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        companySettings.setContact_details( contactDetails );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( CommonConstants.DEFAULT_BRANCH_NAME );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( CommonConstants.DEFAULT_REGION_NAME );
+        reportRow.setRegionId( 0l );
+        reportRow.setCompanyId( 1l );
+        Mockito.when( organizationManagementService.getCompanySettings( Mockito.anyLong() ) ).thenReturn( companySettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", null, null ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromCompanyForDefaultRegionAndCompanyAddrNull() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        companySettings.setContact_details( contactDetails );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( CommonConstants.DEFAULT_BRANCH_NAME );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( CommonConstants.DEFAULT_REGION_NAME );
+        reportRow.setRegionId( 0l );
+        reportRow.setCompanyId( 0l );
+        Mockito.when( organizationManagementService.getCompanySettings( Mockito.anyLong() ) ).thenReturn( companySettings );
+        assertEquals( "test", prepareBillingReport.getAddress( new AgentSettings(), reportRow, null, null, null ) );
+    }
+
+
+    @Test
+    public void testGetAddressFromCompany() throws InvalidInputException, NoRecordsFetchedException
+    {
+        OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        contactDetails.setAddress( "test" );
+        companySettings.setContact_details( contactDetails );
+        BillingReportData reportRow = new BillingReportData();
+        reportRow.setBranch( CommonConstants.DEFAULT_BRANCH_NAME );
+        reportRow.setBranchId( 0l );
+        reportRow.setRegion( CommonConstants.DEFAULT_REGION_NAME );
+        reportRow.setRegionId( 0l );
+        reportRow.setCompanyId( 0l );
+        Mockito.when( organizationManagementService.getCompanySettings( Mockito.anyLong() ) ).thenReturn( companySettings );
+        assertEquals( "CA", prepareBillingReport.getAddress( new AgentSettings(), reportRow, "CA", null, null ) );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetAddressFromContactDetailsForContactDetailsNull() throws InvalidInputException
+    public void testGetAddressFromContactDetails() throws InvalidInputException
     {
         prepareBillingReport.getAddressFromContactDetails( null );
     }

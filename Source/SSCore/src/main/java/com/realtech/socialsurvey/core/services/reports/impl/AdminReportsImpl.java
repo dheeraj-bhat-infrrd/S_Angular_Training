@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.core.services.reports.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +97,7 @@ public class AdminReportsImpl implements AdminReports
         return companyList;
     }
     
-    
+
     /**
      * Method to create an entry in the file upload table for billing report
      */
@@ -104,16 +106,33 @@ public class AdminReportsImpl implements AdminReports
     public void createEntryInFileUploadForBillingReport()
     {
         LOG.info( "Method createEntryInFileUploadForBillingReport() started" );
-        FileUpload entity = new FileUpload();
-        entity.setAdminUserId( CommonConstants.REALTECH_ADMIN_ID );
-        entity.setCompany( companyDao.findById( Company.class, CommonConstants.DEFAULT_COMPANY_ID ) );
-        entity.setStatus( CommonConstants.STATUS_ACTIVE );
-        entity.setUploadType( CommonConstants.FILE_UPLOAD_BILLING_REPORT );
-        entity.setFileName( "" );
-        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
-        entity.setCreatedOn( currentTime );
-        entity.setModifiedOn( currentTime );
-        fileUploadDao.save( entity );
+        //TODO: check if an entry already exists
+        LOG.info( "Check if billing report entries exist" );
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE );
+        List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue( FileUpload.class, queries );
+        if ( filesToBeUploaded == null || filesToBeUploaded.isEmpty() ) {
+            //Entry doesn't exist. Create one.
+            LOG.debug( "Entry does not exist. Creating one." );
+            FileUpload entity = new FileUpload();
+            entity.setAdminUserId( CommonConstants.REALTECH_ADMIN_ID );
+            entity.setCompany( companyDao.findById( Company.class, CommonConstants.DEFAULT_COMPANY_ID ) );
+            entity.setStatus( CommonConstants.STATUS_ACTIVE );
+            entity.setUploadType( CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+            entity.setFileName( "" );
+            Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+            entity.setCreatedOn( currentTime );
+            entity.setModifiedOn( currentTime );
+            fileUploadDao.save( entity );
+        } else {
+            //Entries exist. Change it to active.
+            FileUpload entity = filesToBeUploaded.get( 0 );
+            LOG.debug( "Entry exists. Modifying it. ID : " + entity.getFileUploadId() );
+            entity.setStatus( CommonConstants.STATUS_ACTIVE );
+            entity.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            fileUploadDao.update( entity );
+        }
         LOG.info( "Method createEntryInFileUploadForBillingReport() finished" );
     }
 }
