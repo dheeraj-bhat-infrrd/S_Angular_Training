@@ -27,6 +27,10 @@
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="dash-sub-head float-left">Billing Report</div>
 			<div id="dsh-billing-report-div" class="clearfix dash-sel-wrapper">
+				<div class="float-left dash-sel-lbl"><spring:message code="label.email.key" /></div>
+				<div class="dsh-inp-wrapper float-left">
+					<input id="dsh-mail-id" class="dash-sel-item" type="text" placeholder='<spring:message code="label.username.key"/>' >
+				</div>
 				<div class="dwnl-bnt-col float-right">
 					<div id="dsh-bill-rep-bnt" class="float-right dash-btn-dl-br">
 						<div class="dsh-br-dwnld-btn float-left cursor-pointer"

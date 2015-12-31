@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.reports;
 
 import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyReportsSearch;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -25,5 +26,5 @@ public interface AdminReports {
     /**
      * Method to create an entry in the file upload table for billing report
      */
-    public void createEntryInFileUploadForBillingReport();
+    public void createEntryInFileUploadForBillingReport( String mailId );
 }
