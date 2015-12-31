@@ -90,6 +90,7 @@ public class PrepareBillingReport implements Runnable
                 for ( FileUpload fileUpload : filesToBeUploaded ) {
                     try {
                         // update the status to be processing
+                        fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         fileUpload.setStatus( CommonConstants.STATUS_UNDER_PROCESSING );
                         csvUploadService.updateFileUploadRecord( fileUpload );
 
@@ -98,6 +99,7 @@ public class PrepareBillingReport implements Runnable
 
                         // update the status to be processed
                         fileUpload.setStatus( CommonConstants.STATUS_INACTIVE );
+                        fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         csvUploadService.updateFileUploadRecord( fileUpload );
                     } catch ( InvalidInputException e ) {
                         LOG.debug( "Error updating the status" );
