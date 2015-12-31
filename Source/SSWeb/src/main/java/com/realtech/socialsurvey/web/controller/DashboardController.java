@@ -2170,6 +2170,7 @@ public class DashboardController
         LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() finished." );
     }
     
+
     /**
      * Controller to generate and send billing report by mail
      * @param model
@@ -2191,7 +2192,10 @@ public class DashboardController
         } catch ( NoRecordsFetchedException e ) {
             //Request doesn't already exist. Create one.
             LOG.info( "There is no existing request for getting the billing report" );
-            adminReport.createEntryInFileUploadForBillingReport();
+
+            //Get value from Mail ID column
+            String mailId = request.getParameter( "mailid" );
+            adminReport.createEntryInFileUploadForBillingReport( mailId );
         }
         LOG.info( "Method to get billing report file getBillingReportFile() finished." );
     }

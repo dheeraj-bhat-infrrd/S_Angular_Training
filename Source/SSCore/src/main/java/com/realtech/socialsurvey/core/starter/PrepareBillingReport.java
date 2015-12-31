@@ -74,6 +74,8 @@ public class PrepareBillingReport implements Runnable
     private long previousCompanyId = 0l;
     private long previousRegionId = 0l;
     private long previousBranchId = 0l;
+    private String currentState = "";
+    private String recipientMailId = "";
 
 
     @Override
@@ -87,7 +89,11 @@ public class PrepareBillingReport implements Runnable
             previousBranchId = 0l;
             try {
                 List<FileUpload> filesToBeUploaded = dashboardService.getBillingReportToBeSent();
-                for ( FileUpload fileUpload : filesToBeUploaded ) {
+                if ( filesToBeUploaded != null && !( filesToBeUploaded.isEmpty() ) ) {
+                    FileUpload fileUpload = filesToBeUploaded.get( 0 );
+                    //FileName stores the recipient mail ID
+                    recipientMailId = fileUpload.getFileName();
+
                     try {
                         // update the status to be processing
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -151,6 +157,8 @@ public class PrepareBillingReport implements Runnable
 
                 // start populating the data
                 for ( BillingReportData reportRow : records ) {
+                    //Initialize current state for every user
+                    currentState = "";
                     // Populate Company Name in the sheet
                     billingReportToPopulate.add( reportRow.getCompany() );
                     // Populate Region name in the sheet
@@ -206,6 +214,10 @@ public class PrepareBillingReport implements Runnable
                     try {
                         billingReportToPopulate.add( getAddress( agentSettings, reportRow, previousCompanyAddress,
                             previousRegionAddress, previousBranchAddress ) );
+
+                        // Populate state in the sheet
+                        //DO NOT DELETE! THIS IS A REQUIREMENT.
+                        billingReportToPopulate.add( currentState );
                     } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                         LOG.error( "An error occured while fetching the address for the user. Reason : ", e );
                     }
@@ -227,6 +239,7 @@ public class PrepareBillingReport implements Runnable
         billingReportToPopulate.add( CommonConstants.HEADER_PUBLIC_PROFILE_URL );
         billingReportToPopulate.add( CommonConstants.HEADER_IS_AGENT );
         billingReportToPopulate.add( CommonConstants.HEADER_ADDRESS );
+        billingReportToPopulate.add( CommonConstants.HEADER_STATE );
 
         data.put( "1", billingReportToPopulate );
 
@@ -291,7 +304,13 @@ public class PrepareBillingReport implements Runnable
             if ( excelCreated ) {
                 Map<String, String> attachmentsDetails = new HashMap<String, String>();
                 attachmentsDetails.put( fileName + ".xls", filePath );
-                emailServices.sendBillingReportMail( adminName, "", adminEmailId, attachmentsDetails );
+                String mailId = null;
+                if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+                    mailId = adminEmailId;
+                } else {
+                    mailId = recipientMailId;
+                }
+                emailServices.sendBillingReportMail( adminName, "", mailId, attachmentsDetails );
             }
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught in sendCorruptDataFromCrmNotificationMail() while sending mail to company admin" );
@@ -434,6 +453,7 @@ public class PrepareBillingReport implements Runnable
         // Get State
         if ( contactDetails.getState() != null && !( contactDetails.getState().isEmpty() ) ) {
             fullAddress += ", " + contactDetails.getState();
+            currentState = contactDetails.getState();
         }
 
         // Get Zip-code
