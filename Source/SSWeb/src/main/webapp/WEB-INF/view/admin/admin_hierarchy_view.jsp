@@ -42,7 +42,7 @@
 			<div class="v-tbl-line"></div>
 			<!-- <div class="v-tbl-img"></div> -->
 			<div class="v-tbl-name">Name</div>
-			<div class="v-tbl-add">Email Address</div>
+			<div class="v-tbl-add">Address</div>
 			<div class="v-tbl-role">Role</div>
 			<div class="v-tbl-btns"></div>
 			<div class="v-tbl-spacer"></div>
