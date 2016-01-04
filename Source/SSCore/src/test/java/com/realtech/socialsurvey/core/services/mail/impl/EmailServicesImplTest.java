@@ -1,10 +1,13 @@
 package com.realtech.socialsurvey.core.services.mail.impl;
 
+import java.util.HashMap;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -1408,5 +1411,19 @@ public class EmailServicesImplTest
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendBillingReportMailForMailIdNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendBillingReportMail( "abc", "xyz", null, new HashMap<String, String>() );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendBillingReportMailForMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendBillingReportMail( "abc", "xyz", "", new HashMap<String, String>() );
     }
 }

@@ -4262,6 +4262,19 @@ img.prof-image {
 	text-transform: initial;
 }
 
+.dash-btn-dl-br {
+	color: #009FE0;
+	border-radius: 3px;
+	line-height: 32px;
+	margin-top: 2px;
+	border: 1px solid #009FE0;
+	height: 32px;
+	width: 160px;
+	text-align: center;
+	font-size: 13px;
+	text-transform: initial;
+}
+
 .dash-btn-dl-sd-admin {
 	float: right;
 	margin-right: 10px;
@@ -4300,6 +4313,11 @@ img.prof-image {
 	width: 45%;
 	padding-left: 5px;
 }
+
+.dsh-br-dwnld-btn {
+	padding-left: 14%;
+}
+
 .dsh-date-picker {
 	position: relative;
 	top: -2px;
