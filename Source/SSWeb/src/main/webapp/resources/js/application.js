@@ -1010,7 +1010,7 @@ function paintSurveyGraph() {
 function convertYearWeekKeyToDate(key) {
 	var year = parseInt(key.substr(0, 4));
 	var weekNumber = key.substr(4);
-	return getDateFromWeekAndYear(year, parseInt(weekNumber) + 1);
+	return getDateFromWeekAndYear(year, parseInt(weekNumber));
 }
 
 function convertYearMonthKeyToDate(key) {
@@ -1039,11 +1039,25 @@ function getKeysFromGraphFormat(format) {
 		if(parseInt(format) % 7 != 0) {
 			count += 1;
 		}
-		var key = firstDate.getFullYear().toString() + (firstDate.getWeek()).toString();
-		keys.push(key);
-		for (var i=1; i<count; i++){
+		/*var key = firstDate.getFullYear().toString() + (firstDate.getWeek()).toString();
+		keys.push(key);*/
+		for (var i=1; i<=count; i++){
 			var date = firstDate.add({days:7});
-			keys.push(date.getFullYear().toString() + (date.getWeek()).toString());
+			var week = date.getWeek();
+			if(week < 10 ) {
+				week = "0" + week.toString();
+				keys.push(date.getFullYear().toString() + week);
+			} else if(week > 52) {
+				if(date.getMonth() == 11) {
+					keys.push((date.getFullYear() + 1).toString() + '00');	
+				} else {
+					keys.push(date.getFullYear().toString() + '00');
+				}
+				
+			} else {
+				keys.push(date.getFullYear().toString() + week.toString());	
+			}
+			
 		}
 	}
 	return keys;
