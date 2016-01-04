@@ -1024,17 +1024,25 @@ function convertYearMonthKeyToDate(key) {
 }
 
 function getKeysFromGraphFormat(format) {
-	var firstDate = Date.today().add({days:-parseInt(format)});
+	var firstDate;
 	var keys = [];
 	if(format == '365') {
+		firstDate = Date.today().add({months:-11});
 		var key = firstDate.getFullYear().toString() + (firstDate.getMonth()+1).toString();
 		keys.push(key);
 		for (var i=1; i<12; i++){
-			var date = Date.today().add({days:-parseInt(format)}).addMonths(i);
-			keys.push(date.getFullYear().toString() + (date.getMonth()+1).toString());
+			var date = Date.today().add({months:-11}).addMonths(i);
+			var month = date.getMonth()+1;
+			if(month < 10) {
+				keys.push(date.getFullYear().toString() + ("0" + (date.getMonth()+1).toString()));	
+			} else {
+				keys.push(date.getFullYear().toString() + (date.getMonth()+1).toString());
+			}
+			
 		}
 		
 	} else {
+		firstDate = Date.today().add({days:-parseInt(format)});
 		var count = parseInt(parseInt(format) / 7);
 		if(parseInt(format) % 7 != 0) {
 			count += 1;
