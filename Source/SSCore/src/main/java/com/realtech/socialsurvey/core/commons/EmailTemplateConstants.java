@@ -123,4 +123,7 @@ public final class EmailTemplateConstants {
     
     public static final String SURVEY_COMPLAINT_HANDLER_MAIL_SUBJECT = "SurveyComplaintHandlerMailSubject.txt";
     public static final String SURVEY_COMPLAINT_HANDLER_MAIL_BODY = "SurveyComplaintHandlerMailBody.html";
+    
+    public static final String BILLING_REPORT_MAIL_SUBJECT = "BillingReportMailSubject.txt";
+    public static final String BILLING_REPORT_MAIL_BODY = "BillingReportMailBody.html";
 }
