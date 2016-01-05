@@ -34,7 +34,7 @@
 				<div class="dwnl-bnt-col float-right">
 					<div id="dsh-bill-rep-bnt" class="float-right dash-btn-dl-br">
 						<div class="dsh-br-dwnld-btn float-left cursor-pointer"
-							onclick="downloadBillingReport()">Download Report</div>
+							onclick="downloadBillingReport()">Generate Report</div>
 					</div>
 				</div>
 			</div>
