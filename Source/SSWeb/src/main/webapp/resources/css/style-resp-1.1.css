@@ -273,36 +273,56 @@
 		text-align: center;
 		width: 100%;
 	}
-	.popupUrl{
-	
-	font-size: 14px;
-	width: 350px;
-}
-.urlPopupButton{
-	width: 335px;
-	margin-left: 30px;
-}
-
-.profileForm {
-   
-    margin-left: 2%;
-}
+	.popupUrl {
+		font-size: 14px;
+		width: 350px;
+	}
+	.urlPopupButton {
+		width: 335px;
+		margin-left: 30px;
+	}
+	.profileForm {
+		margin-left: 2%;
+	}
 	.tweet-icn-sm {
-	height: 32px;
-	width: 32px;
-	margin-right:0px;
-}
-.sm-post-row {
-	padding-left: 0px;
-	
-}
-.sm-prof-name {
-	line-height: 30px;
-}
-.sm-custom-img{
-	width:40px;
-	height:40px;
-}
+		height: 32px;
+		width: 32px;
+		margin-right: 0px;
+	}
+	.sm-post-row {
+		padding-left: 0px;
+		width: 60%;
+		min-width: 250px;
+	}
+	.sm-prof-name {
+		line-height: 30px;
+	}
+	.sm-custom-img {
+		width: 40px;
+		height: 40px;
+	}
+	.sm-default-img {
+		width: 40px;
+		height: 40px;
+	}
+	.dash-sel-item-sm {
+		width: 270px;
+	}
+	.sm-prof-name {
+		margin-top: 15px;
+	}
+	.reg-prof-url {
+		line-height: 59px;
+		padding-left: 20px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		border-bottom: 1px solid #dcdcdc;
+		border-top: 1px solid #dcdcdc;
+	}
+	.position-align{
+	padding-left: 30px;
+	}
 }
 
 
@@ -612,4 +632,38 @@
 	.rpa-btn {
 		width: 130px;
 	}
+	.compl-input-cont{
+	width:250px;
+	}
+	.submit-comp-btn{
+	width: 245px;
+    margin-left: 27px;
+	}
+	.com-reg-or{
+	margin-top: 10px;
+	}
+	.compl-save-btn{
+	margin-top:0px;
+	}
+	.zillow-input-container,.zillow-example-cont{
+	font-size:12px;
+	}
+	.zillow-input-container,.zillow-example-cont{
+	width:100%;
+	}
+	.zillow-exm-profilename{
+	padding:3px;
+	}
+	input.zillow-input{
+	width:80px;
+	padding: 5px 0 5px 3px;
+	}
+	.position-align{
+	padding-left: 20px;
+	}
+	.help-save-small{
+	margin-left: 125px !important;
+	}
+	
+	
 }

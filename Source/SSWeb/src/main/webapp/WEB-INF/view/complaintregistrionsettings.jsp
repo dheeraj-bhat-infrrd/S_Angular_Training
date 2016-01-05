@@ -37,28 +37,28 @@
 					<div class="float-left compl-option-sel">
 						<input id="comp-enabled" type="checkbox" name="enabled" class="hide">
 						<div class="float-left">
-							<div id="compl-checkbox" class="bd-check-img float-right compl-checkbox bd-check-img-checked"></div>
+							<div id="compl-checkbox" class="bd-check-img float-right compl-checkbox bd-check-img-checked compl-check-height" ></div>
 						</div>
 						<div class="float-left compl-box-txt">
 							<spring:message code="label.complaintreg.capture.text" />
 						</div>
 					</div>
-					<div class="float-left compl-option-sel">
+					<div class="float-left compl-option-drop">
 						<input type="text" name="rating" id="comp-rating-post"
 							class="st-item-row-txt cursor-pointer dd-arrow-dn comp-rating-post"
 							autocomplete="off" value="${complaintRegSettings.rating}" readonly>
-						<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
+						<div class="st-dd-wrapper compl-rating-drop-wid hide" id="st-dd-wrapper-min-post" ></div>
 					</div>
 
 
 
 					<div class="float-left compl-option-sel clearfix">
-						<div class="float-left mood-text">
+						<div class="float-left mood-text com-reg-or">
 							<spring:message code="label.complaintreg.or.text" />
 						</div>
 						<div id="comp-mood-unpleasant"
-							class="float-left comp-sq-smile-icn-container compl-input-cont opacity-red"
-							data-mood="unpleasant">
+							class="float-left comp-sq-smile-icn-container compl-input-cont opacity-red com-reg-or"
+							data-mood="unpleasant" >
 							<div id="comp-mood-unpleasant-icn"
 								class="sq-smile-icn-text sq-smile-sad-text compl-sml-txt compl-sq-smile-sad-text-disabled">
 								<spring:message code="label.complaint.sad.text" />
@@ -85,7 +85,7 @@
 
 				</div>
 				<input type="hidden" id="comp-mood" name="mood"/> 
-				<div id="comp-reg-form-submit" class="bd-btn-save cursor-pointer compl-save-btn">Save</div>
+				<div id="comp-reg-form-submit" class="bd-btn-save cursor-pointer compl-save-btn submit-comp-btn">Save</div>
 			</form>
 		</div>
 	</div>
@@ -123,20 +123,19 @@
 				return;
 			$('#st-dd-wrapper-min-post').slideToggle(200);
 		});
-		$('.sq-smile-icn-container').off('click');
-		$('.sq-smile-icn-container').on('click', function() {
+		$('.comp-sq-smile-icn-container').off('click');
+		$('.comp-sq-smile-icn-container').on('click', function() {
 			if(!$('input[name="enabled"]').prop( "checked" ))
 				return;
 			var mood = $(this).attr("data-mood");
 			var currentMood = $('#comp-mood').val();
-			
 			//check for toggle state
 			
 			//set the mood
 			if($(this).hasClass('opacity-red')) {
 				$('#comp-mood').val(mood);
 				if(mood.toLowerCase() == "ok") {
-					$('.sq-smile-icn-container').removeClass('opacity-red');
+					$('.comp-sq-smile-icn-container').removeClass('opacity-red');
 					$('#comp-mood-ok-icn').removeClass('compl-sq-smile-sad-text-disabled');
 					$('#comp-mood-unpleasant-icn').removeClass('compl-sq-smile-sad-text-disabled');
 				} else if (mood.toLowerCase() == "unpleasant") {
@@ -147,12 +146,12 @@
 				$('#comp-mood').val('');
 				
 				if(mood.toLowerCase() == "ok") {
-					$('.sq-smile-icn-container').addClass('opacity-red');
+					$('.comp-sq-smile-icn-container').addClass('opacity-red');
 					$('#comp-mood-ok-icn').addClass('compl-sq-smile-sad-text-disabled');
 					$('#comp-mood-unpleasant-icn').addClass('compl-sq-smile-sad-text-disabled');
 				} else if (mood.toLowerCase() == "unpleasant") {
 					if(currentMood == "ok") {
-						$('.sq-smile-icn-container[data-mood="ok"]').addClass('opacity-red');
+						$('.comp-sq-smile-icn-container[data-mood="ok"]').addClass('opacity-red');
 						$('#comp-mood-ok-icn').addClass('compl-sq-smile-sad-text-disabled');
 						$('#comp-mood').val(mood);
 					} else if(currentMood == "unpleasant"){

@@ -1675,7 +1675,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood,
-        String rating ) throws InvalidInputException, UndeliveredEmailException
+        String rating, String surveyDetail ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1685,6 +1685,12 @@ public class EmailServicesImpl implements EmailServices
         if ( customerMailId == null || customerMailId.isEmpty() ) {
             LOG.error( "Customer email Id is empty or null " );
             throw new InvalidInputException( "Customer email Id is empty or null " );
+        }
+        
+        //SS-1435: Send survey details too. Check that it is not null.
+        if ( surveyDetail == null || surveyDetail.isEmpty() ) {
+            LOG.error( "surveyDetail parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "surveyDetail parameter is empty or null for sending survey completion mail " );
         }
 
         String[] mailIds = recipientMailId.split( "," );
@@ -1700,8 +1706,10 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_BODY );
+        
+        //SS-1435: Send survey details too.
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, customerName, customerMailId,
-            mood, rating ) );
+            mood, rating, surveyDetail ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -1785,6 +1793,37 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody, true, false );
         LOG.info( "Successfully forwarded customer reply mail from " + senderEmailAddress + " to : " + recipientMailId );
+    }
+    
+    
+    /**
+     * Method to send the billing report in a mail to the social survey admin
+     */
+    @Override
+    public void sendBillingReportMail( String firstName, String lastName, String recipientMailId,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendBillingReportMail() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending billing report mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending billing report mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setAttachmentDetail( attachmentsDetails );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.BILLING_REPORT_MAIL_SUBJECT;
+        String displayName = firstName + " " + lastName;
+        displayName.replaceAll( "null", "" );
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.BILLING_REPORT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+
+        LOG.info( "Method sendBillingReportMail() finished." );
     }
 }
 // JIRA: SS-7: By RM02: EOC

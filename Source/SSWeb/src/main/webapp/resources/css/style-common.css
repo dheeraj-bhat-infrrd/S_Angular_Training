@@ -306,6 +306,14 @@ a,a:hover,a:visited {
 	background: url('../csssprites/form_icons.png') no-repeat -99px 0px;
 	background-size: auto 26px;
 }
+.icn-url {
+	background: url('../images/url.png') no-repeat;
+	background-size: auto 20px;
+}
+.icn-field-id{
+	background: url('../images/field-id.png') no-repeat;
+	background-size: auto 20px;
+}
 
 .icn-confirm-password {
 	background: url('../csssprites/form_icons.png') no-repeat 0px 0px;
@@ -1792,7 +1800,7 @@ button.paypal.is-active {
 	min-width : 120px;
 	float: left;
 	margin-left: 15px;
-	margin-top: 3%;
+	margin-top: 25px;
 }
 
 .tweet-panel-item,.posts-panel-item {
@@ -4142,7 +4150,7 @@ img.prof-image {
 	border-radius: 3px;
 	padding-left: 5px;
 	outline: none;
-	min-width: 200px;
+	min-width: 215px;
 }
 
 
@@ -4254,6 +4262,19 @@ img.prof-image {
 	text-transform: initial;
 }
 
+.dash-btn-dl-br {
+	color: #009FE0;
+	border-radius: 3px;
+	line-height: 32px;
+	margin-top: 2px;
+	border: 1px solid #009FE0;
+	height: 32px;
+	width: 160px;
+	text-align: center;
+	font-size: 13px;
+	text-transform: initial;
+}
+
 .dash-btn-dl-sd-admin {
 	float: right;
 	margin-right: 10px;
@@ -4272,7 +4293,7 @@ img.prof-image {
 
 .sm-btn-dl-sd-admin{
 	
-	float: left;
+	float: right;
 	margin-right: 10px;
 	color: #009FE0;
 	border-radius: 3px;
@@ -4280,7 +4301,7 @@ img.prof-image {
 	border: 1px solid #009FE0;
 	height: 32px;
 	width: 25%;
-	min-width: 215px;
+	min-width: 240px;
 	max-width: 90%;
 	max-width: calc(100% - 20px);
 	text-align: center;
@@ -4292,6 +4313,11 @@ img.prof-image {
 	width: 45%;
 	padding-left: 5px;
 }
+
+.dsh-br-dwnld-btn {
+	padding-left: 14%;
+}
+
 .dsh-date-picker {
 	position: relative;
 	top: -2px;
@@ -5326,6 +5352,10 @@ tr.v-tbl-header {
 	border-top: 1px solid #dcdcdc;
 }
 
+td.v-tbl-btns {
+	position: relative;
+}
+
 .v-hr-tbl tr.v-tbl-header td {
 	font-weight: bold !important;
 }
@@ -5349,7 +5379,7 @@ tr.v-tbl-row {
 .v-line-rgn {
 	border-left: 3px solid #6296D9;
 	border-bottom: 1px solid #dcdcdc;
-	height: 100%;
+	height: 39px;
 	position: absolute;
 	top: -1px;
 	width: 100%;
@@ -5360,7 +5390,7 @@ tr.v-tbl-row {
 .v-line-brnch {
 	border-left: 3px solid #61A64B;
 	border-bottom: 1px solid #dcdcdc;
-	height: 100%;
+	height: 39px;
 	position: absolute;
 	top: -1px;
 	width: 100%;
@@ -5398,7 +5428,7 @@ td.td-region-edit,td.td-branch-edit,td.td-user-edit {
 .v-line-ind {
 	border-left: 3px solid #D7D7D7;
 	border-bottom: 1px solid #dcdcdc;
-	height: 100%;
+	height: 39px;
 	position: absolute;
 	top: -1px;
 	width: 100%;
@@ -6527,6 +6557,10 @@ tr.u-tbl-header td {
 
 .tweet-panel-item.bord-bot-dc.clearfix {
 	padding-top: 10px;
+}
+
+.tweet-panel-item.bord-bot-none {
+	border-bottom: none !important;
 }
 
 .sm-tweet-item {
@@ -7816,7 +7850,7 @@ label.url-change-input-label {
 }
 
 .contact-div {
-	margin-left: 220px;
+	margin-left: 30%;
     margin-bottom: 40px;
 }
 
@@ -7882,7 +7916,7 @@ label.url-change-input-label {
 }
 
 .compl-box-txt {
-	line-height: 50px;
+	line-height: 40px;
 }
 
 .compl-save-btn {
@@ -7899,6 +7933,10 @@ label.url-change-input-label {
 }
 
 .compl-option-sel {
+    margin: 0 10px;
+}
+
+.compl-option-drop{
     margin: 0 10px;
 }
 
@@ -7981,4 +8019,38 @@ label.url-change-input-label {
 
 .dsh-sel-dropdwn-cont {
 	max-height: 200px;
+}
+.date-wid-pick{
+	width:27%;
+}
+.search-panel-right-sm{
+	width: 70%;
+	margin-bottom: 20px;
+}
+.sm-date-picker-wid{
+	width:27% !important; 
+}
+.compl-check-height{
+	height:40px;
+}
+.compl-rating-drop-wid{
+	margin-left: 5px;
+}
+.social-auth-disabled {
+	cursor: auto !important; 
+}
+.v-hr-tbl-icn-wraper .v-tbl-icn {
+	font-size: 0;
+}
+.share-plus-height{
+	height:33px;
+}
+.en-icn {
+	margin-top: 12px !important;
+}
+.en-icn-pswd{
+	margin-top: 8px !important;
+}
+.en-icn-fname{
+	margin-top: 10px !important;
 }

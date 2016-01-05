@@ -291,6 +291,21 @@ function downloadCompanyReport() {
 			+ startDate + "&endDate=" + endDate;
 }
 
+function downloadBillingReport() {
+	var mailId = $("#dsh-mail-id").val();
+	if (emailRegex.test(mailId) || mailId == "") {
+		payload = { "mailid" : mailId };
+		callAjaxGetWithPayloadData("./downloadbillingreport.do", function() {
+			$('#overlay-toast').html(
+			'The Billing Report will be mailed to you shortly');
+			showToast();
+		}, payload, true);
+	} else {
+		$('#overlay-toast').html('Please enter a valid email address');
+		showToast();
+	}
+}
+
 function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 	if(startIndexCmp == 0) {
 		isAbuseReportRequestRunning = false;

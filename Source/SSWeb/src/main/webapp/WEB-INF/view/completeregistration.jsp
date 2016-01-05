@@ -80,7 +80,7 @@
 				<div class="reg_form_row clearfix">
 					<div class="float-left rfr_lbl"><spring:message code="label.profilepage.key" /></div>
 					<div class="float-left rfr_txt">
-						<div class="reg-prof-url"><a href="${profileUrl}" target="_blank">${profileUrl}</a></div>
+						<div class="reg-prof-url rfr_txt_fld"><a href="${profileUrl}" target="_blank">${profileUrl}</a></div>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">
@@ -113,126 +113,11 @@
 </div>
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script>
-var isFormValid;
 $(document).ready(function(){
-	isFormValid = false;
-
-	if ($('#message').val() != "") {
-		showError($('#message').val());
-	}
-
-	function submitCompleteRegistrationForm() {
-		if(validateCompleteRegistrationForm()){
-			$('#complete-registration-form').submit();
-		}
-	}
-	
-	$('#comp-reg-submit').click(function(e){
-		submitCompleteRegistrationForm();
-	});
-	
-	$('input').keypress(function(e){
-		// detect enter
-		if (e.which==13){
-			e.preventDefault();
-			submitCompleteRegistrationForm();
-		}
-	});
-	
-	$('#complete-reg-fname').blur(function(){
-		if (validateFirstName(this.id)) {
-			hideError();
-		}
-	});
-	
-	$('#complete-reg-lname').blur(function(){
-		if (validateLastName(this.id)) {
-			hideError();
-		}
-	});
-	
-	$('#complete-reg-user-id').blur(function() {
-		if (validateEmailId(this.id)) {
-			hideError();
-		}
-	});
-	
-	$('#complete-reg-pwd').blur(function() {
-		if (validatePassword(this.id)) {
-			hideError();
-		}
-	});
-	
-	$('#complete-reg-cnf-pwd').blur(function() {
-		if (validateConfirmPassword('complete-reg-pwd', this.id)) {
-			hideError();
-		}
-	});
-	
-	function validateCompleteRegistrationForm() {
-		var isFocussed = false;
-		isFormValid = true;
-		var isSmallScreen = false;
-		if($(window).width()<768){
-			isSmallScreen = true;
-		}
-		if(!validateFirstName('complete-reg-fname')){
-			isFormValid = false;
-			if(!isFocussed){
-				$('#complete-reg-fname').focus();
-				isFocussed=true;
-			}
-			if(isSmallScreen){
-				return isFormValid;
-			}
-		}
-		if(!validateLastName('complete-reg-lname')){
-			isFormValid = false;
-			if(!isFocussed){
-				$('#complete-reg-lname').focus();
-				isFocussed=true;
-			}
-			if(isSmallScreen){
-				return isFormValid;
-			}
-		}
-		if(!validateEmailId('complete-reg-user-id')){
-			isFormValid = false;
-			if(!isFocussed){
-				$('#complete-reg-user-id').focus();
-				isFocussed=true;
-			}
-			if(isSmallScreen){
-				return isFormValid;
-			}
-		}
-		if(!validatePassword('complete-reg-pwd')){
-			isFormValid = false;
-			if(!isFocussed){
-				$('#complete-reg-pwd').focus();
-				isFocussed=true;
-			}
-			if(isSmallScreen){
-				return isFormValid;
-			}
-		}
-		if(!validateConfirmPassword('complete-reg-pwd', 'complete-reg-cnf-pwd')){
-			isFormValid = false;
-			if(!isFocussed){
-				$('#complete-reg-cnf-pwd').focus();
-				isFocussed=true;
-			}
-			if(isSmallScreen){
-				return isFormValid;
-			}
-		}
-		return isFormValid;
-	}
+	initializeCompleteRegistrationPage();
 });
 </script>
-
 </body>
 </html>
