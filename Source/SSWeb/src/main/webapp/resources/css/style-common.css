@@ -6104,19 +6104,13 @@ tr.u-tbl-header td {
 	margin-right: 10px;
 }
 
-.srv-tbl-edit {
-	display: none;
+.srv-tbl-edit, .srv-tbl-rem {
 	cursor: pointer;
 	margin-left: 15px;
-	color: #145C7F;
 }
 
 .srv-tbl-rem {
-	display: none;
-	cursor: pointer;
-	margin-left: 15px;
 	margin-right: 10px;
-	color: #145C7F;
 }
 
 .bd-srv-pu {
@@ -6399,7 +6393,6 @@ tr.u-tbl-header td {
 
 .srv-tbl-move-up,.srv-tbl-move-dn {
 	cursor: pointer;
-	display: none;
 	width: 20px;
 	height: 50px;
 }
