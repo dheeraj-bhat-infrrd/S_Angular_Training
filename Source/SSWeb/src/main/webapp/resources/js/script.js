@@ -19,6 +19,8 @@ var pageInitialized = false;
 var currentPhoneRegEx; //Vary the phone regex according to masking
 var stateList; //usStateList
 var cityLookupList; //cityLookupList
+var phoneFormat = '(ddd) ddd-dddd'; //defualt phone format
+var selectedCountryRegEx = "";
 
 function buildMessageDiv(){
 	if($('.err-nw-wrapper').length == 0){
@@ -289,11 +291,11 @@ function validateFirstName(elementId){
 		if (nameRegex.test($('#'+elementId).val()) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter a valid first name');
+			showError('Please enter a valid first name');
 			return false;
 		}
 	} else {
-		showErrorMobileAndWeb('Please enter a valid first name');
+		showError('Please enter a valid first name');
 		return false;
 	}
 }
@@ -306,7 +308,7 @@ function validateLastName(elementId){
 		if ($('#'+elementId).val() == ""||lastNameRegEx.test($('#'+elementId).val()) == true) {
 			return true;
 		} else {
-			showErrorMobileAndWeb('Please enter a valid last name');
+			showError('Please enter a valid last name');
 			return false;
 		}
 	
@@ -1783,3 +1785,264 @@ function validateUserEmailId(elementId) {
 		}
 	}
 }
+
+//Functions for complete registration page
+function initializeCompleteRegistrationPage() {
+	
+	//show error message on page load
+	if ($('#message').val() != "") {
+		showError($('#message').val());
+	}
+
+	
+	$('#comp-reg-submit').click(function(e){
+		submitCompleteRegistrationForm();
+	});
+	
+	$('input').keypress(function(e){
+		// detect enter
+		if (e.which==13){
+			e.preventDefault();
+			submitCompleteRegistrationForm();
+		}
+	});
+	
+	$('#complete-reg-fname').blur(function(){
+		if (validateFirstName(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#complete-reg-lname').blur(function(){
+		if (validateLastName(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#complete-reg-user-id').blur(function() {
+		if (validateEmailId(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#complete-reg-pwd').blur(function() {
+		if (validatePassword(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#complete-reg-cnf-pwd').blur(function() {
+		if (validateConfirmPassword('complete-reg-pwd', this.id)) {
+			hideError();
+		}
+	});
+}
+
+function validateCompleteRegistrationForm() {
+	if(!validateFirstName('complete-reg-fname')){
+		$('#complete-reg-fname').focus();
+		return false;
+	}
+	if(!validateLastName('complete-reg-lname')){
+		$('#complete-reg-lname').focus();
+		return false;
+	}
+	if(!validateEmailId('complete-reg-user-id')){
+		$('#complete-reg-user-id').focus();
+		return false;
+	}
+	if(!validatePassword('complete-reg-pwd')){
+		$('#complete-reg-pwd').focus();
+		return false;
+	}
+	if(!validateConfirmPassword('complete-reg-pwd', 'complete-reg-cnf-pwd')){
+		$('#complete-reg-cnf-pwd').focus();
+		return false;
+	}
+	return true;
+}
+
+function submitCompleteRegistrationForm() {
+	if(validateCompleteRegistrationForm()){
+		$('#complete-registration-form').submit();
+	}
+}
+
+//Function for user registration page when a company is registered
+function submitRegistrationPageForm() {
+	if (validateRegistrationpageForm('reg-form')) {
+		$('#registration-form').submit();
+		showOverlay();
+	}
+}
+
+function validateRegistrationpageForm(id) {
+	// Validate form input elements
+	if (!validateFirstName('reg-fname')) {
+			$('#reg-fname').focus();
+		return false;
+	}
+	 if (!validateLastName('reg-lname')) {
+			$('#reg-lname').focus();
+		return false;
+	} 
+	if (!validateEmailId('reg-email')) {
+			$('#reg-email').focus();
+		return false;
+	}
+	if (!validatePassword('reg-pwd')) {
+			$('#reg-pwd').focus();
+		return false;
+	}
+	if (!validateConfirmPassword('reg-pwd', 'reg-conf-pwd')) {
+			$('#reg-conf-pwd').focus();
+		return false;
+	}
+	return true;
+}
+
+function initializeUserCompanyRegistrationPage() {
+	if ($('#message').val() != "") {
+		showError($('#message').val());
+	}
+	
+	$('#reg-submit').click(function(e) {
+		submitRegistrationPageForm();
+	});
+	
+	$('input').keypress(function(e){
+    	if (e.which==13){
+    		e.preventDefault();
+    		submitRegistrationPageForm();
+    	}
+	});
+
+
+	// Functions to trigger form validation of various input elements
+	$('#reg-fname').blur(function() {
+		if (validateFirstName(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#reg-lname').blur(function() {
+		if (validateLastName(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#reg-email').blur(function() {
+		if (validateEmailId(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#reg-pwd').blur(function() {
+		if (validatePassword(this.id)) {
+			hideError();
+		}
+	});
+	
+	$('#reg-conf-pwd').blur(function(){
+		if (validateConfirmPassword('reg-pwd', this.id)) {
+			hideError();
+		}
+	});
+}
+
+//Company registration variables
+var companyRegistration = {
+	isFormSubmitted : false, //is form submitted to avoid dbl click
+	logo : true, //logo set or not
+	logoSuccess : true, //logo upload successfully
+	submitForm : function() {
+		if (validateCompanyInformationForm('company-info-div')) {
+			companyRegistration.isFormSubmitted=true;
+			$('#company-info-form').submit();
+			
+		}
+	},
+	initializePage : function() {
+		var verticalVal = $('#select-vertical').attr('data-value');
+		if(verticalVal && verticalVal != ""){
+			$('#select-vertical').val(verticalVal);
+		}
+		
+		if ($('#message').val() != "") {
+			if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
+				showError($('#message').val());
+			} else {
+				showInfo($('#message').val());
+			}
+		}
+		
+		//Mask phone number
+		if($('#com-phone-format').val() || $('#com-phone-format').val() != ''){
+			phoneFormat = $('#com-phone-format').val();
+		}
+		
+		currentPhoneRegEx = phoneFormat; 
+		
+		$('#com-contactno').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+		$('#company-info-submit').click(function() {
+			if(!companyRegistration.logo){
+				$('#overlay-toast').html('Please upload files of type jpeg, png or jpg');
+				showToast();
+				return;
+			}
+			if(!companyRegistration.logoSuccess){
+				$('#overlay-toast').html('uploading logo please wait');
+				showToast();
+				return;
+			}
+			if(!companyRegistration.isFormSubmitted ){
+				companyRegistration.submitForm();
+			}
+			
+		});
+		
+		$('#icn-file').click(function(){
+			$('#com-logo').trigger('click');
+		});
+		
+		$('#com-logo').change(function(){
+			var fileAdd = $(this).val().split('\\');
+			$('#com-logo-decoy').val(fileAdd[fileAdd.length - 1]);
+		});
+		// Integrating autocomplete with country input text field
+		attachAutocompleteCountry('com-country', 'country-code', 'com-state', 'state-city-row', 'com-city', 'com-contactno');
+		
+		$('input').keypress(function(e){
+			// detect enter
+			if (e.which==13){
+				e.preventDefault();
+				companyRegistration.submitForm();
+			}
+		});
+
+		$("#com-logo").on("change", function() {
+			companyRegistration.logo=true;
+			if(!logoValidate("#com-logo")){
+				companyRegistration.logo =false;
+				return false;
+			}
+			companyRegistration.logoSuccess=false;
+			var formData = new FormData();
+			formData.append("logo", $('#com-logo').prop("files")[0]);
+			formData.append("logo_name", $('#com-logo').prop("files")[0].name);
+			callAjaxPOSTWithTextDataLogo("./uploadcompanylogo.do", companyRegistration.uploadImageSuccessCallback, true, formData);
+		});
+	},
+	uploadImageSuccessCallback : function(response) {
+		companyRegistration.logoSuccess=true;
+		var success = "Logo has been uploaded successfully";
+		if (success != response.trim()) {
+			$('#com-logo').val('');
+			$('#com-logo-decoy').val('');
+			showError(response);
+		} else {
+			showInfo(response);
+		}
+	}
+};
+

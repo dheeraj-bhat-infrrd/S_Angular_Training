@@ -196,20 +196,17 @@ function retrieveState() {
 /*
  * Click event to close survey popup
  */
-/*$(document).on('click',  function(e){
+$(document).on('click',  function(e){
 	if($('#overlay-send-survey').is(':visible')){
 		$('#overlay-send-survey').hide();
 		enableBodyScroll();
 	}
+	if($('#report-abuse-overlay' ).is(':visible')){
+		$('#report-abuse-overlay').hide();
+		enableBodyScroll();
+	}
 	
-		if($('#report-abuse-overlay' ).is(':visible')){
-			$('#report-abuse-overlay').hide();
-			enableBodyScroll();
-		}
-		if($('#overlay-main' ).is(':visible')){
-			$('#overlay-main').hide();
-			enableBodyScroll();
-		}
+		
 });
 
 $(document).on('keyup',  function(e){
@@ -222,14 +219,33 @@ $(document).on('keyup',  function(e){
 			$('#report-abuse-overlay').hide();
 			enableBodyScroll();
 		}
+		
+	}
+});
+
+/**if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
 		if($('#overlay-main' ).is(':visible')){
 			$('#overlay-main').hide();
 			enableBodyScroll();
 		}
-	}
-});*/
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
+*/
 
 $(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+
+$(document).on('click', '#report-abuse-pop-up', function(e){
 	e.stopPropagation();
 });
 
@@ -320,6 +336,7 @@ function retakeSurveyReminderMail(element) {
 }
 
 $(document).on('click', '.report-abuse-txt', function(e) {
+	disableBodyScroll();
 	e.stopPropagation();
 	var reviewElement = $(this).parent().parent().parent().parent();
 	var payload = {
@@ -518,12 +535,12 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
 	//get profile data for all the records , noOfDays = -1
-	showProfileDetails(newProfileName, 0, -1);
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
-	showSurveyStatistics(newProfileName, 0);
-	showSurveyStatisticsGraphically(newProfileName, 0);
+	showSurveyStatistics(newProfileName, newProfileValue);
+	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
 
 function showRegionAdminFlow(newProfileName, newProfileValue) {
@@ -563,7 +580,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
 	//get profile data for all the records , noOfDays = -1
-	showProfileDetails(newProfileName, 0, -1);
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
@@ -2253,7 +2270,7 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		if($("#hr-individual-tab").hasClass("bd-hdr-active"))
+		if($("#assign-to-selector").data("profile") == "individual")
 			hideAdminPrivilegesChk();
 		break;
 	case 'region':
@@ -2889,12 +2906,15 @@ function paintHierarchyViewBranches(data,regionId) {
 	$(".tr-region-edit").slideUp(200);
 	bindUserEditClicks();
 	bindBranchListClicks();
+	bindHierarchyEvents();
+	bindAppUserLoginEvent();
 }
 
 function bindBranchListClicks(){
 	$(".branch-edit-icn").unbind('click');
 	$(".branch-edit-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
 		if($(this).attr('clicked') == "false"){
 			showBranchEdit(branchId);
@@ -2907,7 +2927,7 @@ function bindBranchListClicks(){
 	});
 	$(".branch-row").unbind('click');
 	$(".branch-row").click(function(e){
-		e.stopPropagation();
+		//e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
@@ -2922,6 +2942,7 @@ function bindBranchListClicks(){
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
@@ -2929,17 +2950,18 @@ function bindBranchListClicks(){
 
 function fetchHierarchyViewList() {
 	var url = "./fetchhierarchyviewlist.do";
-	callAjaxGET(url, paintHierarchyViewList, true);
-}
-function paintHierarchyViewList(data) {
-	$("#hierarchy-list-header").siblings().remove();
-	$("#hierarchy-list-header").after(data);
-	bindRegionListClicks();
-    $('.v-tbl-icn').click(function(e){
-        e.stopPropagation();
-    });
-    bindBranchListClicks();
-    bindUserEditClicks();
+	callAjaxGET(url, function(data) {
+		$("#hierarchy-list-header").siblings().remove();
+		$("#hierarchy-list-header").after(data);
+		bindRegionListClicks();
+	    /*$('.v-tbl-icn').click(function(e){
+	        e.stopPropagation();
+	    });*/
+	    bindBranchListClicks();
+	    bindUserEditClicks();
+	    bindHierarchyEvents();
+	    bindAppUserLoginEvent();
+	}, true);
 }
 
 function bindRegionListClicks() {
@@ -2956,6 +2978,7 @@ function bindRegionListClicks() {
 	});
 	$(".region-edit-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
 			showRegionEdit(regionId);
@@ -2968,8 +2991,43 @@ function bindRegionListClicks() {
 	});
 	$(".region-del-icn").unbind('click');
 	$(".region-del-icn").click(function(e){
+		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
 		deleteRegionPopup(regionId);
+	});
+}
+
+function bindHierarchyEvents() {
+	$('.v-tbn-icn-dropdown').off('click');
+	$('.v-tbn-icn-dropdown').on('click', function(e) {
+		e.stopPropagation();
+		var element = $(this);
+		if(element.next('.v-hr-tbl-icn-wraper').is(':visible')) {
+			$(this).next('.v-hr-tbl-icn-wraper').hide();
+		} else {
+			$('.v-hr-tbl-icn-wraper').hide();
+			$(this).next('.v-hr-tbl-icn-wraper').show();
+		}
+	});
+	$('.v-icn-wid.v-tbl-icn-sm').off('click');
+	$('.v-icn-wid.v-tbl-icn-sm').on('click', function(e) {
+		e.stopPropagation();
+		var element = $(this);
+		generateWidget(element, element.data('iden'), element.data('profile'));
+	});
+	$('.v-icn-femail').off('click');
+	$('.v-icn-femail').on('click', function(e) {
+		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
+			return;
+		}
+
+		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
+	    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
 	});
 }
 
@@ -3045,12 +3103,15 @@ function paintUsersFromBranch(data,branchId,regionId) {
 	$("#tr-branch-"+branchId).slideDown(200);
 	$(".tr-branch-edit").slideUp(200);
 	bindUserEditClicks();
+	bindHierarchyEvents();
+	bindAppUserLoginEvent();
 }
 
 function bindUserEditClicks() {
 	$(".user-edit-icn").unbind('click');
 	$('.user-edit-icn').click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		if($(this).attr('clicked') == "false") {
 			// make an ajax call and fetch the details of the user
 			var userId = $(this).attr('data-userid');
@@ -3071,6 +3132,7 @@ function bindUserEditClicks() {
 	$(".user-del-icn").click(function(e){
 		e.stopPropagation();
 		var userId = $(this).attr("data-userid");
+		$('.v-hr-tbl-icn-wraper').hide();
 		confirmDeleteUser(userId);
 	});
 }
@@ -4494,17 +4556,6 @@ $(document).on('click', '.v-icn-fmail', function() {
     reinviteUser(firstName, lastName, emailId,'.v-icn-fmail');
 });
 
-$(document).on('click', '.v-icn-femail', function() {
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
-		return;
-	}
-
-	var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
-});
-
 /**
  * Method to send invite link
  */
@@ -5196,15 +5247,22 @@ function showFeedbackPage(mood) {
 			if( (Boolean(autoPost) == false)){
 				$('#shr-pst-cb').val('false');
 				$('#shr-post-chk-box').addClass('bd-check-img-checked');
+			} else {
+				$('#shr-pst-cb').val('true');
+				$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 			}
 		}
 		break;
 	case "OK":
 		question = neutralText;
+		$('#shr-pst-cb').val('false');//Update the agree to share checkbox false if mood is ok
+		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$("#ques-text-textarea").html(question);
 		break;
 	case "Unpleasant":
 		question = sadText;
+		$('#shr-pst-cb').val('false');//Update the agree to share checkbox false if mood is unpleasant
+		$('#shr-post-chk-box').addClass('bd-check-img-checked');
 		$("#ques-text-textarea").html(question);
 		break;
 	}
@@ -5308,7 +5366,7 @@ function showMasterQuestionPage(){
 			}
 			if(mood == 'Great') {
 				$('#social-post-links').show();
-			}
+			} 
 		}
 		
 		//call method to post the review and update the review count
@@ -7476,6 +7534,9 @@ function fetchPublicPostEditProfile(isNextBatch) {
 
 function paintPosts(posts) {
 	var divToPopulate = "";
+	var postsLength = posts.length;
+	var elementClass;
+	$('#prof-posts').children('.tweet-panel-item').removeClass('bord-bot-none');
 	$.each(posts, function(i, post) {
 		var iconClass = "";
 		var href="javascript:void(0)";
@@ -7501,7 +7562,13 @@ function paintPosts(posts) {
 		}
 		var hrefComplet='<a href='+href+' target="_blank">';
 		
-		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'		
+		elementClass = "tweet-panel-item bord-bot-dc clearfix";
+		
+		if(i >= postsLength - 1) {
+			elementClass += " bord-bot-none";
+		}
+		
+		divToPopulate += '<div class="'+elementClass+'">'		
 				+ hrefComplet
 				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
 				+"</a>"
@@ -7598,7 +7665,7 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 		openAuthPageDashboard('google', columnName, columnValue);
 	}
 	else if(task=='ZILLOW_PRF'){
-		openAuthPageDashboard('zillow', columnName, columnValue);
+		openAuthPageDashboardZillow('#dsh-btn3');
 	}
 	else if(task=='YELP_PRF'){
 		showMainContent('./showprofilepage.do');
@@ -7624,13 +7691,8 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 }
 
-// Update Disclaimer details
-$(document).on('click', '#disclaimer-text', function() {
-	$('#disclaimer-text').addClass('prof-name-edit');
-});
-
+//Update Disclaimer details
 $(document).on('blur', '#disclaimer-text', function() {
-	$('#disclaimer-text').removeClass('prof-name-edit');
 	
 	var disclaimer = $('#disclaimer-text').val().trim();
 	if (disclaimer == undefined || disclaimer == "") {
@@ -7715,7 +7777,8 @@ function userSwitchToCompAdmin() {
 	}, true);
 }
 
-function bindUserLoginEvent() {
+function bindAppUserLoginEvent() {
+	$('.user-login-icn').off('click');
 	$('.user-login-icn').on('click', function(e) {
 		e.stopImmediatePropagation();
 		var payload = {
@@ -8088,6 +8151,7 @@ function editProfileUrl(disableEle) {
 // Get all the required elements and show popup
 
 function generateWidget(clickedAttr , iden, profileLevel) {
+	$('.v-hr-tbl-icn-wraper').hide();
 	if($(clickedAttr).hasClass('v-tbl-icn-disabled')){
 		return;
 	}
@@ -8508,7 +8572,12 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 
 
 //Disconnect social media
-function disconnectSocialMedia(socialMedia) {
+function disconnectSocialMedia(socialMedia, isAutoLogin) {
+	if(isAutoLogin) {
+		$('#overlay-toast').html('Insufficient permission to disconnect from ' + socialMedia);
+		showToast();
+		return;
+	}
 	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
 		return;
 	}
@@ -9738,19 +9807,6 @@ function validateprofileUrlEditForm() {
 	});
 }
 
-function attachReInvitationClickEvent(){
-	$('.v-icn-femail').click( function() {
-		if ($(this).hasClass('v-tbl-icn-disabled')) {
-			return;
-		}
-	
-		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-	    reinviteUser(firstName, lastName, emailId);
-});
-}
-
 function initializeVerticalsMasterForProfilePage() {
 	if (verticalsMasterList == undefined) {
 		callAjaxGETWithTextData("/fetchverticalsmaster.do", function(data) {
@@ -9791,7 +9847,8 @@ function saveZillowEmailAddress() {
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
 		if(data && data == "success") {
-			loadSocialMediaUrlInSettingsPage();
+			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
+            loadSocialMediaUrlInSettingsPage();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {
@@ -9945,4 +10002,30 @@ function hideActiveUserLogoutOverlay() {
 	$('#overlay-cancel').html('');
 	
 	$('#overlay-cancel').unbind('click');
+}
+
+
+/**
+* Functions to confirm social authentication
+*/
+function confirmSocialAuth(socialNetwork, callBackFunction, link) {
+	
+	var message = "";
+	
+	if(link && link.trim() != "" ) {
+		message = "Are you sure you want to disconnect your previous connection to " + socialNetwork + " and connect again";
+	} else {
+		message = "Are you sure you want to connect to " + socialNetwork;
+	}
+	
+	$('#overlay-header').html("Confirm user Authentication");
+	$("#overlay-text").html(message);
+	$('#overlay-continue').html("Ok").click(function() {
+		if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
+			$('#overlay-main').hide();
+			callBackFunction();
+		}
+	});
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-main').show();
 }

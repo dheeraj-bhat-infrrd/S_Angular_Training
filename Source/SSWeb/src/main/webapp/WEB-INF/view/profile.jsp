@@ -589,7 +589,6 @@
     	profileJson = ${profileJson};
         var gaLabel;
         var gaName;
-        
         /**
 	    	If region profile name is mentioned, fetch the region profile 
     		since this would be a call to fetch region profile page 
@@ -620,6 +619,9 @@
        
         $(window).resize(adjustImage);
         
+      	//update google analytics
+    	updateGoogleTrackingId();
+        
     	// Google analytics for reviews
     	setTimeout(function() {
     		ga('send', {
@@ -629,10 +631,7 @@
         		'eventLabel': gaLabel,
         		'eventValue': gaName
         	});
-		}, 2000);
-    	
-    	//update google analytics
-    	updateGoogleTrackingId();
+		}, 5000);
     });
 </script>
 </body>

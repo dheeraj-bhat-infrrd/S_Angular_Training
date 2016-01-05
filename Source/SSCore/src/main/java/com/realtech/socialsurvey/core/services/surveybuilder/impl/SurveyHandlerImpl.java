@@ -853,7 +853,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
+            String mailSubject = restartSurvey.getMail_subject();
+            if ( mailSubject == null || mailSubject.isEmpty() ) {
+                mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
+            }
+
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -991,7 +995,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            String mailSubject = surveyCompletion.getMail_subject();
+            if ( mailSubject == null || mailSubject.isEmpty() ) {
+                mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            }
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1137,7 +1144,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
+            String mailSubject = surveyCompletionUnpleasant.getMail_subject();
+            if ( mailSubject == null || mailSubject.isEmpty() ) {
+                mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
+            }
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1276,7 +1286,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[Links\\]", links );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            String mailSubject = socialPostReminder.getMail_subject();
+            if ( mailSubject == null || mailSubject.isEmpty() ) {
+                mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            }
+
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1392,11 +1406,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             User user = null;
             if ( survey.getAgentEmailId() != null ) {
                 try {
-                    user = userManagementService.getUserByEmailAndCompany( survey.getCompanyId(), survey.getAgentEmailId() );
-                } catch ( NoRecordsFetchedException | InvalidInputException e ) {
+                    user = userManagementService.getActiveUserByEmailAndCompany( survey.getCompanyId(),
+                        survey.getAgentEmailId() );
+                } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                     LOG.error( "No user found in database for the email id: " + survey.getAgentEmailId() + " and company id : "
                         + survey.getCompanyId() );
                 }
+
                 if ( user != null ) {
                     // check if survey has already been sent to the email id
                     // check the pre-initiation and then the survey table
@@ -1424,22 +1440,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         survey.setAgentId( user.getUserId() );
                     }
                     surveyPreInitiationDao.update( survey );
-                    if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
-                        if ( user.getLoginPassword() != null ) {
-                            if ( user.getCreatedOn().after( survey.getEngagementClosedTime() ) ) {
-                                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                            }
-                        } else {
-                            LOG.debug( "Only a user invite has been sent so far, hence can't mark it as an old record for user "
-                                + user.getUserId() );
-                        }
-
-                        long surveyClosedTime = survey.getEngagementClosedTime().getTime();
-                        long currentTime = System.currentTimeMillis();
-                        if ( checkIfRecordHasExpired( surveyClosedTime, currentTime, validSurveyInterval ) ) {
-                            status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                        }
-                    }
                 }
 
             }
@@ -1706,18 +1706,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiationDao.save( surveyPreInitiation );
 
         LOG.debug( "Method preInitiateSurvey() finished." );
-    }
-
-
-    Boolean checkIfRecordHasExpired( long surveyClosedDate, long systemTime, int expirationDays )
-    {
-        long totalDaysInMillseconds = systemTime - surveyClosedDate;
-        int totalDays = (int) ( totalDaysInMillseconds / ( 1000 * 60 * 60 * 24 ) );
-        if ( totalDays >= expirationDays ) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
 

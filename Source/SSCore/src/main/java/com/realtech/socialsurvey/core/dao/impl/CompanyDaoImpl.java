@@ -2,9 +2,8 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -16,14 +15,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 @Component("company")
 public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements CompanyDao {
 	private static final Logger LOG = LoggerFactory.getLogger(CompanyDaoImpl.class);
+    private static final String activeUsersInCompany = "select subquery_Data.COMPANY_ID, C.COMPANY, subquery_Data.USER_ID, subquery_Data.FIRST_NAME,"
+        + "subquery_Data.LAST_NAME, subquery_Data.LOGIN_NAME,subquery_Data.REGION_ID,subquery_Data.BRANCH_ID,subquery_Data.REGION, "
+        + "subquery_Data.BRANCH, group_concat(distinct outer_up.PROFILES_MASTER_ID) as PROFILES_MASTER_ID From USER_PROFILE outer_up JOIN"
+        + " COMPANY C ON C.BILLING_MODE='I' JOIN "
+        + "(Select U.USER_ID as USER_ID,U.FIRST_NAME as FIRST_NAME,U.LAST_NAME as LAST_NAME, U.LOGIN_NAME as LOGIN_NAME, "
+        + "R.REGION_ID as REGION_ID, B.BRANCH_ID as BRANCH_ID, R.REGION as REGION, B.BRANCH as BRANCH, U.COMPANY_ID as COMPANY_ID "
+        + "FROM USERS U JOIN (select UP.USER_ID,UP.REGION_ID,UP.BRANCH_ID FROM USER_PROFILE UP "
+        + "where UP.STATUS IN (1,2) and UP.IS_PRIMARY=1 ) subquery_UP ON subquery_UP.USER_ID=U.USER_ID JOIN REGION R ON "
+        + "R.REGION_ID = subquery_UP.REGION_ID JOIN BRANCH B ON B.BRANCH_ID = subquery_UP.BRANCH_ID JOIN "
+        + "LICENSE_DETAILS L ON L.COMPANY_ID = U.COMPANY_ID where L.ACCOUNTS_MASTER_ID = 4 ) as  subquery_Data ON "
+        + "outer_up.USER_ID = subquery_Data.USER_ID where C.COMPANY_ID = subquery_Data.COMPANY_ID "
+        + "group by outer_up.USER_ID order by subquery_Data.COMPANY_ID, outer_up.REGION_ID, outer_up.BRANCH_ID";
 
 	@Autowired
 	SessionFactory sessionFactory;
@@ -80,73 +93,86 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<Object[]> getAllUsersAndAdminsUnderACompanyGroupedByBranches( long companyId ) throws InvalidInputException
+    public List<Object[]> getUserAdoptionData( long companyId ) throws InvalidInputException
     {
         if ( companyId <= 0 ) {
-            LOG.error( "Invalid company id passed in getAllUsersAndAdminsUnderACompanyGroupedByBranches" );
-            throw new InvalidInputException( "Invalid company id passed in getAllUsersAndAdminsUnderACompanyGroupedByBranches" );
+            LOG.error( "Invalid company id passed in getUserAdoptionData" );
+            throw new InvalidInputException( "Invalid company id passed in getUserAdoptionData" );
         }
 
-        LOG.info( "Method to get all users and admins under a company grouped by branches,getAllUsersAndAdminsUnderACompanyGroupedByBranches() started." );
+        LOG.info( "Method to get user adoption data for company id : " + companyId + ",getUserAdoptionData() started." );
 
         List<Integer> statuses = new ArrayList<Integer>();
         statuses.add( CommonConstants.STATUS_ACTIVE );
         statuses.add( CommonConstants.STATUS_NOT_VERIFIED );
 
-        String queryString = "SELECT B.BRANCH_ID, C.COMPANY, R.REGION, B.BRANCH, COUNT(DISTINCT U.USER_ID) FROM USERS U, BRANCH B, USER_PROFILE UP, REGION R, COMPANY C WHERE UP.USER_ID = U.USER_ID AND B.BRANCH_ID = UP.BRANCH_ID AND B.REGION_ID = R.REGION_ID AND C.COMPANY_ID = UP.COMPANY_ID AND U.STATUS IN (:statuses) AND UP.COMPANY_ID = :companyId GROUP BY B.BRANCH_ID";
-
+        String queryString = "SELECT C.COMPANY as Company,(CASE WHEN R.REGION = :defaultRegion THEN NULL ELSE R.REGION END) as Region,(CASE WHEN B.BRANCH = :defaultBranch THEN NULL ELSE B.BRANCH END) as Branch,COUNT(DISTINCT (CASE WHEN U.STATUS IN (:statuses) THEN U.USER_ID ELSE NULL END)) AS Invited,COUNT(DISTINCT (CASE WHEN U.STATUS IN (:status) THEN U.USER_ID ELSE NULL END)) AS Active,(CONCAT(ROUND(COUNT(DISTINCT (CASE WHEN U.STATUS IN (:status) THEN U.USER_ID ELSE NULL END)) / COUNT(DISTINCT (CASE WHEN U.STATUS IN (:statuses) THEN U.USER_ID ELSE NULL END)) * 100),'%')) as 'Adoption Rate' FROM USERS U, BRANCH B, USER_PROFILE UP, REGION R, COMPANY C WHERE UP.USER_ID = U.USER_ID AND B.BRANCH_ID = UP.BRANCH_ID AND B.REGION_ID = R.REGION_ID AND C.COMPANY_ID = UP.COMPANY_ID AND UP.COMPANY_ID = :companyId AND R.STATUS = :status AND B.STATUS = :status GROUP BY B.BRANCH_ID ORDER BY C.COMPANY, R.REGION, B.BRANCH";
+        // TODO: remove this log
+        LOG.info( queryString );
         Query query = getSession().createSQLQuery( queryString );
+        query.setParameter( "defaultRegion", CommonConstants.DEFAULT_REGION_NAME );
+        query.setParameter( "defaultBranch", CommonConstants.DEFAULT_BRANCH_NAME );
         query.setParameterList( "statuses", statuses );
         query.setParameter( "companyId", companyId );
-        LOG.info( "Querying database to fetch the users and admins under a company grouped by branches" );
+        query.setParameter( "status", CommonConstants.STATUS_ACTIVE );
+        LOG.info( "Querying database to fetch the user adoption data for company id : " + companyId );
         List<Object[]> rows = (List<Object[]>) query.list();
-        LOG.info( "Querying database to fetch the users and admins under a company grouped by branches done" );
-        LOG.info( "Method to get all users and admins under a company grouped by branches,getAllUsersAndAdminsUnderACompanyGroupedByBranches() finished." );
+        LOG.info( "Querying database to fetch the user adoption data for company id : " + companyId + " finished" );
+        LOG.info( "Method to get user adoption data for company id : " + companyId + ",getUserAdoptionData() finished." );
         return rows;
     }
-
-
+    
+    
+    /**
+     * Method to fetch all users in each company for billing report
+     * @param companyId
+     * @return
+     */
     @SuppressWarnings ( "unchecked")
     @Override
-    public Map<Long, Integer> getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( long companyId )
-        throws InvalidInputException
-    {
-        if ( companyId <= 0 ) {
-            LOG.error( "Invalid company id passed in getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches()" );
-            throw new InvalidInputException(
-                "Invalid company id passed in getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches()" );
+    public List<BillingReportData> getAllUsersInCompanysForBillingReport( int startIndex, int batchSize ){
+        LOG.info( "Method getAllUsersInCompanyForBillingReport started" );
+        Query query = getSession().createSQLQuery( activeUsersInCompany );
+        if ( startIndex > -1 ) {
+            query.setFirstResult( startIndex );
         }
-        LOG.info( "Method to get all active users and admins under a company grouped by branches,getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches() started." );
-        String queryString = "SELECT B.BRANCH_ID, COUNT(DISTINCT U.USER_ID) FROM USERS U, BRANCH B, USER_PROFILE UP, REGION R, COMPANY C WHERE UP.USER_ID = U.USER_ID AND B.BRANCH_ID = UP.BRANCH_ID AND B.REGION_ID = R.REGION_ID AND C.COMPANY_ID = UP.COMPANY_ID AND U.STATUS = :status AND UP.COMPANY_ID = :companyId GROUP BY B.BRANCH_ID";
-
-        Query query = getSession().createSQLQuery( queryString );
-        query.setParameter( "status", CommonConstants.STATUS_ACTIVE );
-        query.setParameter( "companyId", companyId );
-        LOG.info( "Querying database to fetch active users and admins under a company grouped by branches" );
+        if ( batchSize > -1 ) {
+            query.setMaxResults( batchSize );
+        }
+        LOG.debug( "QUERY : " + query.getQueryString() );
         List<Object[]> rows = (List<Object[]>) query.list();
-        LOG.info( "Querying database to fetch active users and admins under a company grouped by branches done" );
-
         if ( rows == null || rows.isEmpty() ) {
-            LOG.error( "Cound not find any active users for the company Id and status active" );
+            LOG.debug( "Cound not find any more users in company having billing mode Invoice and of type enterprise" );
             return null;
         }
-
-        LOG.info( "Parsing the branchids and user count returned by the query" );
-        Map<Long, Integer> branchIdUserCountMap = new LinkedHashMap<Long, Integer>();
+        
+        //Parse rows into BilllingReportData
+        List<BillingReportData> billingReportData = new ArrayList<BillingReportData>();
         for ( Object[] row : rows ) {
-            if ( row[0] != null && row[1] != null ) {
-                try {
-                    long branchId = Long.parseLong( String.valueOf( row[0] ) );
-                    int userCount = Integer.parseInt( String.valueOf( row[1] ) );
-                    branchIdUserCountMap.put( branchId, userCount );
-                } catch ( NumberFormatException nfe ) {
-                    // ignore and proceed
-                }
+            BillingReportData reportRow = new BillingReportData();
+            reportRow.setCompanyId( Long.parseLong( String.valueOf( row[0] ) ) );
+            reportRow.setCompany( String.valueOf( row[1] ) );
+            reportRow.setUserId( Long.parseLong( String.valueOf( row[2] ) ) );
+            reportRow.setFirstName( String.valueOf( row[3] ) );
+            reportRow.setLastName( String.valueOf( row[4] ) );
+            reportRow.setLoginName( String.valueOf( row[5] ) );
+            reportRow.setRegionId( Long.parseLong( String.valueOf( row[6] ) ) );
+            reportRow.setBranchId( Long.parseLong( String.valueOf( row[7] ) ) );
+            reportRow.setRegion( String.valueOf( row[8] ) );
+            reportRow.setBranch( String.valueOf( row[9] ) );
+            List<Long> profilesMasterIds = new ArrayList<Long>();
+            String[] profilesMastersStr = String.valueOf( row[10] ).split( "," );
+            for ( String pmId : profilesMastersStr ) {
+                long profilesMasterId = Long.parseLong( String.valueOf( pmId ) );
+                if ( !profilesMasterIds.contains( profilesMasterId ) )
+                    profilesMasterIds.add( profilesMasterId );
             }
+            reportRow.setProfilesMasterIds( profilesMasterIds );
+            
+            billingReportData.add( reportRow );
         }
-        LOG.info( "Parsing the branchids and user count returned by the query done" );
-        LOG.info( "Method to get all acitve users and admins under a company grouped by branches,getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches() finished." );
-        return branchIdUserCountMap;
+        LOG.info( "Method getAllUsersInCompanyForBillingReport finished" );
+        return billingReportData;
     }
 }
 // JIRA SS-42 By RM-05 EOC

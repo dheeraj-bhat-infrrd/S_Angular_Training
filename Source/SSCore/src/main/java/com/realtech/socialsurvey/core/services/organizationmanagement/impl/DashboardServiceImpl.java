@@ -22,7 +22,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
@@ -39,13 +38,17 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -57,6 +60,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 
@@ -88,13 +92,21 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+    private UserManagementService userManagementService;
 
     @Autowired
     private UserProfileDao userProfileDao;
 
     @Autowired
     private CompanyDao companyDao;
+    
+    @Autowired
+    private UserDao userDao;
 
+    @Autowired
+    private GenericDao<FileUpload, Long> fileUploadDao;
 
     @Transactional
     @Override
@@ -936,23 +948,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
         }
 
-        boolean activeUserFound = true;
-        // get all user and admin under a company data grouped by branches
-        List<Object[]> rows = companyDao.getAllUsersAndAdminsUnderACompanyGroupedByBranches( companyId );
-
-        // get all active user and admin under a company data grouped by branches
-        Map<Long, Integer> branchIdAccountUserCountMap = companyDao
-            .getAllActiveUsersAndAdminsUnderACompanyGroupedByBranches( companyId );
+        // get user adoption data
+        List<Object[]> rows = companyDao.getUserAdoptionData( companyId );
 
         // check whether report info are available
         if ( rows == null || rows.isEmpty() ) {
-            LOG.error( "No user and admin record found for the company id : " + companyId );
-            throw new NoRecordsFetchedException( "No user and admin record found for the company id : " + companyId );
-        }
-
-        if ( branchIdAccountUserCountMap == null || branchIdAccountUserCountMap.isEmpty() ) {
-            LOG.warn( "No active user and admin record found for the company id : " + companyId );
-            activeUserFound = false;
+            LOG.error( "No user adoption data found for the company id : " + companyId );
+            throw new NoRecordsFetchedException( "No user adoption data found for the company id : " + companyId );
         }
 
         // Blank workbook
@@ -967,24 +969,27 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         List<Object> userAdoptionReportToPopulate = new ArrayList<>();
 
         for ( Object[] row : rows ) {
-            userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
-            if ( row[2] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
+            // row 0 - company
+            // row 1 - region
+            // row 2 - branch
+            // row 3 - invited users
+            // row 4 - active users
+            // row 5 - adoption rate
+            userAdoptionReportToPopulate.add( String.valueOf( row[0] ) );
+            if ( row[1] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[1] ) ) )
+                userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
+            else
+                userAdoptionReportToPopulate.add( "" );
+            if ( row[2] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
                 userAdoptionReportToPopulate.add( String.valueOf( row[2] ) );
             else
                 userAdoptionReportToPopulate.add( "" );
-            if ( row[3] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[3] ) ) )
-                userAdoptionReportToPopulate.add( String.valueOf( row[3] ) );
-            else
-                userAdoptionReportToPopulate.add( "" );
-            long branchId = Long.parseLong( String.valueOf( row[0] ) );
-            Integer userCount = new Integer( String.valueOf( row[4] ) );
-            Integer activeUserCount = activeUserFound && branchIdAccountUserCountMap.get( branchId ) != null ? branchIdAccountUserCountMap
-                .get( branchId ) : 0;
-            Double adoptionRate = ( new Double( activeUserCount ) / new Double( userCount ) ) * 100;
+            Integer userCount = new Integer( String.valueOf( row[3] ) );
+            Integer activeUserCount = new Integer( String.valueOf( row[4] ) );
+            String adoptionRate = String.valueOf( row[5] ).replace( "\\.00", "" );
             userAdoptionReportToPopulate.add( userCount );
             userAdoptionReportToPopulate.add( activeUserCount );
-
-            userAdoptionReportToPopulate.add( adoptionRate );
+            userAdoptionReportToPopulate.add( adoptionRate != "null" ? adoptionRate : "0%" );
 
             data.put( ( ++counter ).toString(), userAdoptionReportToPopulate );
             userAdoptionReportToPopulate = new ArrayList<>();
@@ -994,7 +999,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_COMPANY );
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_REGION );
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_BRANCH );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_TOTAL_USERS );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_INVITED_USERS );
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_ACTIVE_USERS );
         userAdoptionReportToPopulate.add( CommonConstants.HEADER_ADOPTION_RATES );
 
@@ -1021,6 +1026,37 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             }
         }
         return workbook;
+    }
+    
+
+    /**
+     * Method to return records of billing report data based on start index and batch size
+     */
+    @Override
+    @Transactional
+    public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize )
+    {
+        LOG.info( "Method getBillingReportRecords started for startIndex : " + startIndex + " and batchSize : " + batchSize );
+        return companyDao.getAllUsersInCompanysForBillingReport( startIndex, batchSize );
+    }
+    
+    
+
+    /**
+     * Method to check if billing report entries exist
+     */
+    @Transactional
+    @Override
+    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException {
+        LOG.info("Check if billing report entries exist");
+        Map<String, Object> queries = new HashMap<>();
+        queries.put(CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT);
+        queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+        List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue(FileUpload.class, queries);
+        if (filesToBeUploaded == null || filesToBeUploaded.isEmpty()) {
+            throw new NoRecordsFetchedException("No billing report entries exist");
+        }
+        return filesToBeUploaded;
     }
 }
 // JIRA SS-137 BY RM05:EOC

@@ -1104,6 +1104,7 @@ span.wc-highlight {
   line-height: 40px;
   cursor: pointer;
   color: rgb(0, 159, 224);
+  border: none;
 }
 
 .ctnt-item-comment {
