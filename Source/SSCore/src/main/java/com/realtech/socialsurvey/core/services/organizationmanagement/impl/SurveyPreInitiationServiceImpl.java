@@ -2,11 +2,10 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
@@ -29,10 +29,10 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 
 	@Autowired
 	private UserProfileDao userProfileDao;
-
+	
 	@Autowired
 	private SurveyPreInitiationDao surveyPreInitiationDao;
-
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("afterPropertiesSet called for profile management service");
@@ -92,9 +92,13 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 	
 	@Transactional
 	@Override
-	public void deleteSurveyReminder(Set<Long> incompleteSurveyIds) {
+	public List<SurveyPreInitiation> deleteSurveyReminder(Set<Long> incompleteSurveyIds) {
 		LOG.debug("Method deleteSurveyReminder() called");
+		//Get all the surveys to be deleted
+		List<SurveyPreInitiation> surveys = surveyPreInitiationDao.fetchSurveysByIds( incompleteSurveyIds );
+		//Delete from MySQL
 		surveyPreInitiationDao.deleteSurveysWithIds(incompleteSurveyIds);
 		LOG.debug("Method deleteSurveyReminder() finished");
+		return surveys;
 	}
 }

@@ -1058,5 +1058,17 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         return filesToBeUploaded;
     }
+    
+    /**
+     * Method to delete surveys from mongo given the survey preinitiation details
+     * @param surveys
+     */
+    @Override
+    public void deleteSurveyDetailsByPreInitiation( List<SurveyPreInitiation> surveys )
+    {
+        LOG.info( "method deleteSurveyDetailsByPreInitiation() started." );
+        surveyDetailsDao.deleteSurveysBySurveyPreInitiation( surveys );
+        LOG.info( "method deleteSurveyDetailsByPreInitiation() finished." );
+    }
 }
 // JIRA SS-137 BY RM05:EOC
