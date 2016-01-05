@@ -38,13 +38,17 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -56,6 +60,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 
@@ -87,13 +92,21 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+    private UserManagementService userManagementService;
 
     @Autowired
     private UserProfileDao userProfileDao;
 
     @Autowired
     private CompanyDao companyDao;
+    
+    @Autowired
+    private UserDao userDao;
 
+    @Autowired
+    private GenericDao<FileUpload, Long> fileUploadDao;
 
     @Transactional
     @Override
@@ -1013,6 +1026,37 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             }
         }
         return workbook;
+    }
+    
+
+    /**
+     * Method to return records of billing report data based on start index and batch size
+     */
+    @Override
+    @Transactional
+    public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize )
+    {
+        LOG.info( "Method getBillingReportRecords started for startIndex : " + startIndex + " and batchSize : " + batchSize );
+        return companyDao.getAllUsersInCompanysForBillingReport( startIndex, batchSize );
+    }
+    
+    
+
+    /**
+     * Method to check if billing report entries exist
+     */
+    @Transactional
+    @Override
+    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException {
+        LOG.info("Check if billing report entries exist");
+        Map<String, Object> queries = new HashMap<>();
+        queries.put(CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT);
+        queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+        List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue(FileUpload.class, queries);
+        if (filesToBeUploaded == null || filesToBeUploaded.isEmpty()) {
+            throw new NoRecordsFetchedException("No billing report entries exist");
+        }
+        return filesToBeUploaded;
     }
 }
 // JIRA SS-137 BY RM05:EOC

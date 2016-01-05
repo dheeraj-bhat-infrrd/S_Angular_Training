@@ -133,7 +133,7 @@
 				<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
 					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
 				</c:if>
-				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
 					<div class="header-links-item" onclick="showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
@@ -148,6 +148,14 @@
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
 				<div class="header-links-item" onclick="showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></div>
 				<div class="header-links-item" onclick="showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></div>
+				<c:choose>
+					<c:when test="${ not empty realTechAdminId }">
+						<div class="header-links-item" onclick="userSwitchToAdmin();"><spring:message code="label.switch.key" /></div>
+					</c:when>
+					<c:when test="${ not empty companyAdminSwitchId || not empty regionAdminSwitchId || not empty branchAdminSwitchId}">
+						<div class="header-links-item" onclick="userSwitchToCompAdmin();"><spring:message code="label.switch.key" /></div>
+					</c:when>
+				</c:choose>
 				<a href="j_spring_security_logout"><span class="header-links-item" ><spring:message code="label.logout.key" />
 					</span>
 				</a>
