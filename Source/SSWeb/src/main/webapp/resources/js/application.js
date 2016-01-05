@@ -2270,8 +2270,8 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		//if($("#hr-individual-tab").hasClass("bd-hdr-active"))
-		hideAdminPrivilegesChk();
+		if($("#assign-to-selector").data("profile") == "individual")
+			hideAdminPrivilegesChk();
 		break;
 	case 'region':
 		$("#selected-region-txt").prop("disabled",false);
@@ -9852,7 +9852,8 @@ function saveZillowEmailAddress() {
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
 		if(data && data == "success") {
-			loadSocialMediaUrlInSettingsPage();
+			showProfileLinkInEditProfilePage("zillow", "${ profile.socialMediaTokens.zillowToken.zillowScreenName}");
+            loadSocialMediaUrlInSettingsPage();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {
