@@ -1420,6 +1420,7 @@ function loadActiveSurveyQuestions() {
 	var url = "./getactivesurveyquestions.do";
 	callAjaxGET(url, function(data) {
 		$('#bs-ques-wrapper').html(data);
+		bindEditSurveyEvents();
 		resizeAdjBuildSurvey();
 	}, true);
 }
@@ -1433,48 +1434,204 @@ function resizeAdjBuildSurvey(){
 	else {}
 }
 
-// On Hover
-$(document).on('click touchstart', '.bd-srv-tbl-row', function() {
-	if ($(window).width() < 768) {
-		if ($(this).find('.srv-tbl-rem').css('display') == 'none') {
-			$(this).find('.srv-tbl-rem').show();
-			$(this).find('.srv-tbl-edit').show();
-            $(this).find('.srv-tbl-move-up').show();
-            $(this).find('.srv-tbl-move-dn').show();
-		} else {
-			$(this).find('.srv-tbl-rem').hide();
-			$(this).find('.srv-tbl-edit').hide();
-            $(this).find('.srv-tbl-move-up').hide();
-            $(this).find('.srv-tbl-move-dn').hide();
+function bindEditSurveyEvents() {
+	// On Hover
+	$('.bd-srv-tbl-row').off('click');
+	$('.bd-srv-tbl-row').on('click', function() {
+		if (getWindowWidth() < 768) {
+			if (!$(this).find('.srv-tbl-btns').is(':visible')) {
+				$('.srv-tbl-btns').hide();
+				$(this).find('.srv-tbl-btns').show();
+			} else {
+				$(this).find('.srv-tbl-btns').hide();
+			}
+		} 
+	});
+	$('.bd-srv-tbl-row').off('touchStart');
+	$('.bd-srv-tbl-row').on('touchStart', function() {
+		$(this).trigger('click');
+	});
+	$('.bd-srv-tbl-row').off('mouseover');
+	$('.bd-srv-tbl-row').on('mouseover', function() {
+		if (getWindowWidth() > 768) {
+			$(this).addClass('bd-srv-tbl-row-hover');
+			$(this).find('.srv-tbl-btns').show();
 		}
-	} 
-});
+	});
+	$( '.bd-srv-tbl-row').off('mouseout');
+	$( '.bd-srv-tbl-row').on('mouseout', function() {
+		if (getWindowWidth() > 768) {
+			$(this).removeClass('bd-srv-tbl-row-hover');
+			$(this).find('.srv-tbl-btns').hide();
+		}
+	});
 
-$(document).on('mouseover', '.bd-srv-tbl-row', function() {
-	if ($(window).width() > 768) {
-		$(this).addClass('bd-srv-tbl-row-hover');
-		$(this).find('.srv-tbl-rem').show();
-		$(this).find('.srv-tbl-edit').show();
-        $(this).find('.srv-tbl-move-up').show();
-        $(this).find('.srv-tbl-move-dn').show();
-	}
-});
+	// Add Survey Question overlay
+	$('#btn-add-question').off('click');
+	$('#btn-add-question').on('click', function() {
+		$('#bd-srv-pu').show();
+		$(document).addClass('body-no-scroll');
+	});
+	// Question edit
+	$('.srv-tbl-edit').off('click');
+	$('.srv-tbl-edit').on('click', function(e) {
+		e.stopPropagation();
+		if($(this).parent().parent().next().hasClass('sb-edit-q-wrapper')) {
+			return;
+		}
+		var questionId = $(this).parent().parent().data('questionid');
+		var url = "./getsurveyquestion.do?questionId=" + questionId;
 
-$(document).on('mouseout', '.bd-srv-tbl-row', function() {
-	if ($(window).width() > 768) {
-		$(this).removeClass('bd-srv-tbl-row-hover');
-		$(this).find('.srv-tbl-rem').hide();
-		$(this).find('.srv-tbl-edit').hide();
-        $(this).find('.srv-tbl-move-up').hide();
-        $(this).find('.srv-tbl-move-dn').hide();
-	}
-});
+		callAjaxGET(url, function(response) {
+			$('.sb-edit-q-wrapper').remove();
+			$('.bd-q-pu-done-wrapper').remove();
+			$('.bd-srv-tbl-row-' + questionId).after(response);
+			revertQuestionOverlay();
+		}, true);
+	});
+	// Remove Question from survey
+	$('.srv-tbl-rem').off('click');
+	$('.srv-tbl-rem').on('click', function(e){
+		e.stopPropagation();
+		var questionId = $(this).parent().parent().data('questionid');
+		var url = "./removequestionfromsurvey.do?questionId=" + questionId;
+		
+		createPopupConfirm("Delete Question", "Do you want to delete the question ?", "Delete", "Cancel");
+		$('#overlay-continue').click(function(){
+			overlayRevert();
+			$('#overlay-continue').unbind('click');
 
-// Add Survey Question overlay
-$(document).on('click', '#btn-add-question', function() {
-	$('#bd-srv-pu').show();
-	$(document).addClass('body-no-scroll');
-});
+			callAjaxPOST(url, commonActiveSurveyCallback, true);
+		});
+		$('#overlay-cancel').click(function(){
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+			
+			//loadActiveSurveyQuestions();
+		});
+	});
+
+	// Reorder Question in survey
+	$('.srv-tbl-move-up').off('click');
+	$('.srv-tbl-move-up').on('click', function(e){
+		e.stopPropagation();
+		var formData = new FormData();
+		formData.append("questionId", $(this).parent().parent().data('questionid'));
+		formData.append("reorderType", "up");
+
+		callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
+	});
+	$('.srv-tbl-move-dn').off('click');
+	$('.srv-tbl-move-dn').on('click', function(e){
+		e.stopPropagation();
+		var formData = new FormData();
+		formData.append("questionId", $(this).parent().parent().data('questionid'));
+		formData.append("reorderType", "down");
+
+		callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
+	});
+	
+	//Save the changes
+	$('.bd-q-btn-done').off('click');
+	$('.bd-q-btn-done').on('click', function() {
+		var lastQuestion = currentQues - 1;
+		var count = 1;
+		var editedStatus = true;
+		while (count <= currentQues) {
+			if ($('#bs-question-' + count).attr('data-status') == 'edited') {
+				editedStatus = true;
+				break;
+			}
+			else {
+				editedStatus = false;
+			}
+			count++;
+		}
+		if (editedStatus == false) {
+			revertQuestionOverlay();
+			setTimeout(function() {
+				loadActiveSurveyQuestions();
+			}, 2000);
+			return;
+		}
+		
+		createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
+
+		$('#overlay-continue').off('click');
+		$('#overlay-continue').on('click', function(){
+			var count = 1;
+			while (count <= lastQuestion) {
+				// submit for adding question
+				if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'new'
+					&& $('#bs-question-' + count).attr('data-status') == 'edited') {
+					
+					if ($('#sb-question-txt-' + count).val() == '' || $('#sb-question-type-' + count).val() == '') {
+						$("#overlay-toast").html('Please finish adding the Question');
+						showToast();
+					} else {
+						var url = "./addquestiontosurvey.do?order=" + count;
+						$('#bs-question-' + count).attr('data-state', 'editable');
+						$('#bs-question-' + count).attr('data-status', 'new');
+						callAjaxFormSubmit(url, function(data) {
+							var map =  $.parseJSON(data);
+							$("#overlay-toast").html(map.message);
+							showToast();
+							
+							if (map.status == "success") {
+								$('#bs-question-' + count).attr('data-quesref', map.questionId);
+								revertQuestionOverlay();
+							} else {
+								$('#bs-question-' + count).attr('data-state', 'new');
+								$('#bs-question-' + count).attr('data-status', 'edited');
+							}
+						}, 'bs-question-' + count,'#overlay-continue');
+					}
+				}
+				// submit for modifying question
+				else if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'editable'
+					&& $('#bs-question-' + count).attr('data-status') == 'edited') {
+					
+					if ($('#sb-question-txt-' + count).val() == '' || $('#sb-question-type-' + count).val() == '') {
+						$("#overlay-toast").html('Please finish editing the Question');
+						showToast();
+					} else {
+						var questionId = $('#bs-question-' + count).attr('data-quesref');
+						var url = "./updatequestionfromsurvey.do?order=" + count + "&questionId=" + questionId;
+						callAjaxFormSubmit(url, function(data) {
+							var map =  $.parseJSON(data);
+							$("#overlay-toast").html(map.message);
+							showToast();
+							
+							if (map.status == "success") {
+								revertQuestionOverlay();
+								$('#bs-question-' + count).attr('data-status', 'new');
+							} else {
+								$('#bs-question-' + count).attr('data-status', 'edited');
+							}
+						}, 'bs-question-' + count,'#overlay-continue');
+					}
+				}
+				count ++;
+			}
+			
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+			setTimeout(function() {
+				loadActiveSurveyQuestions();
+			}, 2000);
+		});
+		$('#overlay-cancel').click(function(){
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+			
+			revertQuestionOverlay();
+			loadActiveSurveyQuestions();
+		});
+	});
+}
 
 function revertQuestionOverlay() {
 	var url = "./revertquestionoverlay.do";
@@ -1487,119 +1644,9 @@ function revertQuestionOverlay() {
 	currentQues = 1;
 }
 
-$(document).on('click', '.bd-q-btn-done', function() {
-	var lastQuestion = currentQues - 1;
-	var count = 1;
-	var editedStatus = true;
-	while (count <= currentQues) {
-		if ($('#bs-question-' + count).attr('data-status') == 'edited') {
-			editedStatus = true;
-			break;
-		}
-		else {
-			editedStatus = false;
-		}
-		count++;
-	}
-	if (editedStatus == false) {
-		revertQuestionOverlay();
-		setTimeout(function() {
-			loadActiveSurveyQuestions();
-		}, 2000);
-		return;
-	}
-	
-	createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
-
-	$('#overlay-continue').click(function(){
-		var count = 1;
-		while (count <= lastQuestion) {
-			// submit for adding question
-			if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'new'
-				&& $('#bs-question-' + count).attr('data-status') == 'edited') {
-				
-				if ($('#sb-question-txt-' + count).val() == '' || $('#sb-question-type-' + count).val() == '') {
-					$("#overlay-toast").html('Please finish adding the Question');
-					showToast();
-				} else {
-					var url = "./addquestiontosurvey.do?order=" + count;
-					$('#bs-question-' + count).attr('data-state', 'editable');
-					$('#bs-question-' + count).attr('data-status', 'new');
-					callAjaxFormSubmit(url, function(data) {
-						var map =  $.parseJSON(data);
-						$("#overlay-toast").html(map.message);
-						showToast();
-						
-						if (map.status == "success") {
-							$('#bs-question-' + count).attr('data-quesref', map.questionId);
-							revertQuestionOverlay();
-						} else {
-							$('#bs-question-' + count).attr('data-state', 'new');
-							$('#bs-question-' + count).attr('data-status', 'edited');
-						}
-					}, 'bs-question-' + count,'#overlay-continue');
-				}
-			}
-			// submit for modifying question
-			else if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'editable'
-				&& $('#bs-question-' + count).attr('data-status') == 'edited') {
-				
-				if ($('#sb-question-txt-' + count).val() == '' || $('#sb-question-type-' + count).val() == '') {
-					$("#overlay-toast").html('Please finish editing the Question');
-					showToast();
-				} else {
-					var questionId = $('#bs-question-' + count).attr('data-quesref');
-					var url = "./updatequestionfromsurvey.do?order=" + count + "&questionId=" + questionId;
-					callAjaxFormSubmit(url, function(data) {
-						var map =  $.parseJSON(data);
-						$("#overlay-toast").html(map.message);
-						showToast();
-						
-						if (map.status == "success") {
-							revertQuestionOverlay();
-							$('#bs-question-' + count).attr('data-status', 'new');
-						} else {
-							$('#bs-question-' + count).attr('data-status', 'edited');
-						}
-					}, 'bs-question-' + count,'#overlay-continue');
-				}
-			}
-			count ++;
-		}
-		
-		$('#overlay-continue').unbind('click');
-		$('#overlay-cancel').unbind('click');
-		overlayRevert();
-		setTimeout(function() {
-			loadActiveSurveyQuestions();
-		}, 2000);
-	});
-	$('#overlay-cancel').click(function(){
-		$('#overlay-continue').unbind('click');
-		$('#overlay-cancel').unbind('click');
-		overlayRevert();
-		
-		revertQuestionOverlay();
-		loadActiveSurveyQuestions();
-	});
-});
-
+//Clear the current edited question
 $(document).on('click', '.bd-q-pu-close', function() {
 	$(this).parent().parent().remove();
-});
-
-// Question edit
-$(document).on('click touchstart', '.srv-tbl-edit', function(e) {
-	e.stopPropagation();
-	var questionId = $(this).parent().parent().data('questionid');
-	var url = "./getsurveyquestion.do?questionId=" + questionId;
-
-	callAjaxGET(url, function(response) {
-		$('.sb-edit-q-wrapper').remove();
-		$('.bd-q-pu-done-wrapper').remove();
-		$('.bd-srv-tbl-row-' + questionId).after(response);
-		revertQuestionOverlay();
-	}, true);
 });
 
 $(document).on('input', '.bd-q-pu-txt-edit', function() {
@@ -1820,47 +1867,6 @@ $(document).on('click', '.bd-mcq-close', function(){
 
 	showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 	$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
-});
-
-// Remove Question from survey
-$(document).on('click', '.srv-tbl-rem', function(e){
-	e.stopPropagation();
-	var questionId = $(this).parent().parent().data('questionid');
-	var url = "./removequestionfromsurvey.do?questionId=" + questionId;
-	
-	createPopupConfirm("Delete Question", "Do you want to delete the question ?", "Delete", "Cancel");
-	$('#overlay-continue').click(function(){
-		overlayRevert();
-		$('#overlay-continue').unbind('click');
-
-		callAjaxPOST(url, commonActiveSurveyCallback, true);
-	});
-	$('#overlay-cancel').click(function(){
-		$('#overlay-continue').unbind('click');
-		$('#overlay-cancel').unbind('click');
-		overlayRevert();
-		
-		loadActiveSurveyQuestions();
-	});
-});
-
-// Reorder Question in survey
-$(document).on('click touchstart', '.srv-tbl-move-up', function(e){
-	e.stopPropagation();
-	var formData = new FormData();
-	formData.append("questionId", $(this).parent().parent().data('questionid'));
-	formData.append("reorderType", "up");
-
-	callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
-});
-
-$(document).on('click touchstart', '.srv-tbl-move-dn', function(e){
-	e.stopPropagation();
-	var formData = new FormData();
-	formData.append("questionId", $(this).parent().parent().data('questionid'));
-	formData.append("reorderType", "down");
-
-	callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
 });
 
 // Overlay Popup

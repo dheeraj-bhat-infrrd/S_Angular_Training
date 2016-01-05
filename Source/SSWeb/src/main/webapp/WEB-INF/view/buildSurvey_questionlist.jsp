@@ -34,7 +34,7 @@
 				</c:choose>
 				
 				<div class="float-left srv-tbl-txt ${questionicon}">${surveyQuestion.question}</div>
-				<div class="srv-tbl-btns clearfix float-right">
+				<div class="srv-tbl-btns clearfix float-right hide">
 					<c:choose>
 						<c:when test="${count == 1}">
 							<div class="float-left srv-tbl-move-dn"></div>
