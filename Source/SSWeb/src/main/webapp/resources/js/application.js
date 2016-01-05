@@ -1407,6 +1407,9 @@ $(document).click(function(){
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
 		$('#da-dd-wrapper-profiles').toggle();
 	}
+	if($('.v-tbl-icn-wraper').is(':visible')) {
+		$('.v-tbl-icn-wraper').hide();
+	}
 });
 
 //Populate Existing Survey Questions 
@@ -4165,6 +4168,7 @@ function paintUserListInUserManagement(startIndex) {
 			userStartIndex = startIndex;
 			updatePaginateButtons();
 			bindEditUserClick();
+			bindUMEvents();
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -4308,6 +4312,33 @@ function searchUsersByNameEmailLoginIdCallBack(data) {
 	$('#user-list').html(data);
 	updatePaginateButtons();
 	bindEditUserClick();
+	bindUMEvents();
+}
+
+function bindUMEvents() {
+	$('.v-tbn-icn-dropdown').off('click');
+	$('.v-tbn-icn-dropdown').on('click', function(e) {
+		e.stopPropagation();
+		if(!$(this).next('.v-um-tbl-icn-wraper').is(':visible')) {
+			$('.v-um-tbl-icn-wraper').hide();
+			$(this).next('.v-um-tbl-icn-wraper').show();
+		} else {
+			$(this).next('.v-um-tbl-icn-wraper').hide();
+		}
+	});
+	// resend verification mail
+	$('.v-icn-fmail').off('click');
+	$('.v-icn-fmail').on('click', function() {
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
+			return;
+		}
+		$('.v-um-tbl-icn-wraper').hide();
+		var $parentRowElemt = $(this).closest('.user-row');
+		var firstName = $parentRowElemt.find('.fetch-name').attr('data-first-name');
+	    var lastName = $parentRowElemt.find('.fetch-name').attr('data-last-name');
+	    var emailId = $parentRowElemt.find('.fetch-email').text();
+	    reinviteUser(firstName, lastName, emailId,'.v-icn-fmail');
+	});
 }
 
 function paginateUsersList() {
@@ -4554,18 +4585,6 @@ $(document).on('click', '.v-icn-rem-user', function() {
     confirmDeleteUser(userId, adminId);
 });
 
-// resend verification mail
-$(document).on('click', '.v-icn-fmail', function() {
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
-		return;
-	}
-
-	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
-    var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
-    var emailId = $(this).parent().find('.fetch-email').html();
-    reinviteUser(firstName, lastName, emailId,'.v-icn-fmail');
-});
-
 /**
  * Method to send invite link
  */
@@ -4634,6 +4653,7 @@ function updateUserProfile(profileId, profileStatus) {
 function bindEditUserClick(){
 	$('.edit-user').click(function(e){
 		e.stopPropagation();
+		$('.v-um-tbl-icn-wraper').hide();
 		if ($(this).hasClass('v-tbl-icn-disabled')) {
 			return;
 		}
@@ -4650,20 +4670,20 @@ function bindEditUserClick(){
             updateUserProfile(profileId, 1);
         });
 
-		if ($(this).parent().hasClass('u-tbl-row-sel')) {
-	        $(this).parent().removeClass('u-tbl-row-sel');
-	        $(this).parent().next('.user-assignment-edit-row').slideUp(200);
+		if ($(this).closest('.user-row').hasClass('u-tbl-row-sel')) {
+	        $(this).closest('.user-row').removeClass('u-tbl-row-sel');
+	        $(this).closest('.user-row').next('.user-assignment-edit-row').slideUp(200);
 	    } else {
 	        // make an ajax call and fetch the details of the user
-	        var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+	        var userId = $(this).closest('.user-row').find('.fetch-name').attr('data-user-id');
 			$(".user-assignment-edit-div").html("");
 			$(".user-row").removeClass('u-tbl-row-sel');
 			$(".user-assignment-edit-row").slideUp();
 
 			getUserAssignments(userId);
 
-	        $(this).parent().next('.user-assignment-edit-row').slideDown(200);
-	        $(this).parent().addClass('u-tbl-row-sel');
+	        $(this).closest('.user-row').next('.user-assignment-edit-row').slideDown(200);
+	        $(this).closest('.user-row').addClass('u-tbl-row-sel');
 	        
 			setTimeout(function() {
 				$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
