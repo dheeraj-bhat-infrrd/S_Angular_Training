@@ -9857,7 +9857,7 @@ function saveZillowEmailAddress() {
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
 		if(data && data == "success") {
-			showProfileLinkInEditProfilePage("zillow", "${ profile.socialMediaTokens.zillowToken.zillowScreenName}");
+			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
             loadSocialMediaUrlInSettingsPage();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
