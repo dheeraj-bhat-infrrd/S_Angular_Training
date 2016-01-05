@@ -627,7 +627,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue )
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue, boolean fetchAbusive )
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
@@ -684,6 +684,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
             }
 
+            //criteria for abusive reviews
+            if ( !fetchAbusive ) {
+                query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
+            }
 
             List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
@@ -905,7 +909,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( rows > -1 ) {
             query.limit( rows );
         }
-        
+
         query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
 
         /*if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) )

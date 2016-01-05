@@ -73,7 +73,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( DashboardServiceImpl.class );
-    
+
     //SS-1354: Using date format from CommonConstants
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
     private static Map<String, Integer> weightageColumns;
@@ -92,7 +92,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
-    
+
     @Autowired
     private UserManagementService userManagementService;
 
@@ -101,12 +101,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private CompanyDao companyDao;
-    
+
     @Autowired
     private UserDao userDao;
 
     @Autowired
     private GenericDao<FileUpload, Long> fileUploadDao;
+
 
     @Transactional
     @Override
@@ -232,7 +233,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
-        return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue );
+        return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue, false );
     }
 
 
@@ -246,7 +247,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( columnValue <= 0l ) {
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
-        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false, 0, 0 );
+        return surveyDetailsDao
+            .getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false, 0, 0 );
     }
 
 
@@ -495,7 +497,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        
+
         //SS-1354: Using date format from CommonConstants
         style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
@@ -574,7 +576,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        
+
         //SS-1354: Using date format from CommonConstants
         style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
@@ -686,14 +688,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        
+
         //SS-1354: Using date format from CommonConstants
         style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
 
         // Sorting SurveyResults
         Collections.sort( surveyDetails, new SurveyResultsComparator() );
-        
+
         //create rating format to format survey score
         DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
         ratingFormat.setMinimumFractionDigits( 1 );
@@ -737,7 +739,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 }
 
                 //add score
-                surveyDetailsToPopulate.add( ratingFormat.format( survey.getScore() ));
+                surveyDetailsToPopulate.add( ratingFormat.format( survey.getScore() ) );
                 for ( SurveyResponse response : survey.getSurveyResponse() ) {
                     surveyDetailsToPopulate.add( response.getAnswer() );
                 }
@@ -872,7 +874,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        
+
         //SS-1354: Using date format from CommonConstants
         style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
         Integer counter = 1;
@@ -1027,7 +1029,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         return workbook;
     }
-    
+
 
     /**
      * Method to return records of billing report data based on start index and batch size
@@ -1039,22 +1041,22 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         LOG.info( "Method getBillingReportRecords started for startIndex : " + startIndex + " and batchSize : " + batchSize );
         return companyDao.getAllUsersInCompanysForBillingReport( startIndex, batchSize );
     }
-    
-    
+
 
     /**
      * Method to check if billing report entries exist
      */
     @Transactional
     @Override
-    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException {
-        LOG.info("Check if billing report entries exist");
+    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException
+    {
+        LOG.info( "Check if billing report entries exist" );
         Map<String, Object> queries = new HashMap<>();
-        queries.put(CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT);
-        queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-        List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue(FileUpload.class, queries);
-        if (filesToBeUploaded == null || filesToBeUploaded.isEmpty()) {
-            throw new NoRecordsFetchedException("No billing report entries exist");
+        queries.put( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue( FileUpload.class, queries );
+        if ( filesToBeUploaded == null || filesToBeUploaded.isEmpty() ) {
+            throw new NoRecordsFetchedException( "No billing report entries exist" );
         }
         return filesToBeUploaded;
     }
