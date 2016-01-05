@@ -5476,6 +5476,13 @@ td.v-tbl-btns {
 	width: 23%;
 }
 
+td.v-tbl-btns.v-tbl-btns-um>.v-um-tbl-icn-wraper>div {
+    float: left;
+    width: 16.66666%;
+    height: 39px;
+    font-size: 0;
+}
+
 td.v-tbl-spacer {
 	width: 0%;
 }
@@ -5657,6 +5664,7 @@ tr.u-tbl-row td {
 .v-um-tbl {
 	width: 100%;
 	margin-bottom: 50px;
+    word-wrap: break-word;
 }
 
 tr.u-tbl-header td {
