@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -39,7 +37,6 @@ import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -2066,4 +2063,51 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         return surveyCountForEntities;
     }
+
+
+    /**
+     * Method to remove surveys from mongo by SurveyPreInitiation
+     * @param surveys
+     */
+    @Override
+    public void deleteSurveysBySurveyPreInitiation( List<SurveyPreInitiation> surveys )
+    {
+        LOG.info( "Method deleteSurveysBySurveyPreInitiation() to delete surveys started." );
+        if ( surveys == null || surveys.isEmpty() ) {
+            LOG.info( "No surveys present." );
+            return;
+        }
+        Map<Long, List<String>> surveysToDelete = new HashMap<Long, List<String>>();
+
+        for ( SurveyPreInitiation survey : surveys ) {
+            List<String> mailIds = null;
+            //Check if agentId exists in surveysToDelete
+            if ( surveysToDelete.containsKey( survey.getAgentId() ) ) {
+                //Get the current survey's agent ID
+                mailIds = surveysToDelete.get( survey.getAgentId() );
+            }
+            if ( mailIds == null ) {
+                mailIds = new ArrayList<String>();
+            }
+            mailIds.add( survey.getCustomerEmailId() );
+            surveysToDelete.put( survey.getAgentId(), mailIds );
+        }
+
+        //Ensure that the survey is editable
+        Criteria criteria = Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE );
+        //Add criterias for each of the agentId - customerEmailId pairs
+        List<Criteria> criterias = new ArrayList<Criteria>();
+        for ( Long agentId : surveysToDelete.keySet() ) {
+            Criteria criterion = Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId )
+                .and( CommonConstants.CUSTOMER_EMAIL_COLUMN ).in( surveysToDelete.get( agentId ) );
+            criterias.add( criterion );
+        }
+        Criteria surveyCriteria = new Criteria().orOperator( criterias.toArray( new Criteria[criterias.size()] ) );
+        Query query = new Query( new Criteria().andOperator( criteria, surveyCriteria ) );
+
+        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+
+        LOG.info( "Method deleteSurveysBySurveyPreInitiation() to delete surveys finished." );
+    }
+
 }
