@@ -47,7 +47,19 @@ public class SurveyDetails
     private SocialMediaPostDetails socialMediaPostDetails;
     private boolean underResolution;
     private boolean isAbuseRepByUser;
-    private SocialMediaPostErrors socialMediaPostErrors;
+    private SocialMediaPostResponseDetails socialMediaPostResponseDetails;
+
+    public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
+    {
+        return socialMediaPostResponseDetails;
+    }
+
+
+    public void setSocialMediaPostResponseDetails( SocialMediaPostResponseDetails socialMediaPostResponseDetails )
+    {
+        this.socialMediaPostResponseDetails = socialMediaPostResponseDetails;
+    }
+
 
     public String get_id()
     {
@@ -538,15 +550,4 @@ public class SurveyDetails
         this.isAbuseRepByUser = isAbuseRepByUser;
     }
 
-
-    public SocialMediaPostErrors getSocialMediaPostErrors()
-    {
-        return socialMediaPostErrors;
-    }
-
-
-    public void setSocialMediaPostErrors( SocialMediaPostErrors socialMediaPostErrors )
-    {
-        this.socialMediaPostErrors = socialMediaPostErrors;
-    }
 }
