@@ -61,10 +61,6 @@ var listOfBranchesForAdmin;
 var isUserManagementAuthorized = true;
 var isAddUser = true;
 
-//pagination variables for pro List page
-var rowSize = 10;
-var startIndex = 0;
-
 //Variables for editprofile page
 var editProfileForYelp = false;
 var editProfileForLicense = false;
@@ -205,6 +201,12 @@ $(document).on('click',  function(e){
 		$('#overlay-send-survey').hide();
 		enableBodyScroll();
 	}
+	if($('#report-abuse-overlay' ).is(':visible')){
+		$('#report-abuse-overlay').hide();
+		enableBodyScroll();
+	}
+	
+		
 });
 
 $(document).on('keyup',  function(e){
@@ -213,10 +215,37 @@ $(document).on('keyup',  function(e){
 			$('#overlay-send-survey').hide();
 			enableBodyScroll();
 		}
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		
 	}
 });
 
+/**if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
+*/
+
 $(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+
+$(document).on('click', '#report-abuse-pop-up', function(e){
 	e.stopPropagation();
 });
 
@@ -242,7 +271,7 @@ $(document).on('click', '.hr-dd-item', function(e) {
 });
 
 $(document).on('click', '.restart-survey-mail-txt', function(e) {
-	
+	e.stopPropagation();
 	confirmRetakeSurveyReminderMail(this);
 	
 	
@@ -307,6 +336,8 @@ function retakeSurveyReminderMail(element) {
 }
 
 $(document).on('click', '.report-abuse-txt', function(e) {
+	disableBodyScroll();
+	e.stopPropagation();
 	var reviewElement = $(this).parent().parent().parent().parent();
 	var payload = {
 		"customerEmail" : reviewElement.attr('data-customeremail'),
@@ -322,12 +353,16 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	// Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
 	$('.rpa-report-btn').off('click');
-	
+	//disableBodyScroll();
 	$('#report-abuse-overlay').show();
 	$('.rpa-cancel-btn').on('click', function() {
 		$('#report-abuse-overlay').hide();
-	});
+		enableBodyScroll();
+	}); 
+	
+	
 	$('.rpa-report-btn').on('click', function() {
+		
 		var reportText = $("#report-abuse-txtbox").val();
 		if (validateReportAbuseUserForm(reportText)) {
 			showOverlay();
@@ -336,6 +371,8 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 		}
 	});
 });
+
+
 
 function validateReportAbuseUserForm(reportText) {
 	//check if report text is empty
@@ -408,6 +445,87 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	
 	getIncompleteSurveyCount(colName, colValue);
 	fetchReviewsOnDashboard(false);
+	
+	bindAutosuggestForIndividualRegionBranchSearch('dsh-sel-item');
+	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
+}
+
+function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
+	//Bind keyup on search for region, branch, individual for dashboard
+	$('#'+elementId).on('keyup', function(e) {
+		var value = $(this).val();
+		var prevVal = $(this).attr('data-prev-val');
+		
+		if(value != prevVal){
+			$(this).attr('data-prev-val', value);
+			searchBranchRegionOrAgent(value, $(this).attr('data-search-target'));			
+		}
+		//Detect arrow key down
+		else if(e.which == 40) {
+			if($(this).next().is(':visible')) {
+				var parentElement = $(this).next();
+				var selectedElement = parentElement.find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0 && selectedElement.next('.dsh-res-display') && selectedElement.next('.dsh-res-display').length > 0) {
+					selectedElement.removeClass('dsh-res-hover');
+					selectedElement.next('.dsh-res-display').addClass('dsh-res-hover');
+					
+					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
+					//check if the top of current selected element is over the parents top
+					if((updatedSelectedElement.offset().top - parentElement.offset().top + updatedSelectedElement[0].clientHeight) > parentElement[0].clientHeight) {
+						var scrollTopPos = parentElement[0].scrollTop + updatedSelectedElement[0].clientHeight;
+						parentElement[0].scrollTop = scrollTopPos;
+					}
+				} else {
+					$(this).next().children('.dsh-res-display').removeClass('dsh-res-hover');
+					$(this).next().children('.dsh-res-display').first('.dsh-res-display').addClass('dsh-res-hover');
+					parentElement[0].scrollTop = 0;
+				}
+			}
+		}
+		//Detect arrow key up
+		else if(e.which == 38) {
+			if($(this).next().is(':visible')) {
+				var parentElement = $(this).next();
+				var selectedElement = parentElement.find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0 && selectedElement.prev('.dsh-res-display') && selectedElement.prev('.dsh-res-display').length > 0) {
+					selectedElement.removeClass('dsh-res-hover');
+					selectedElement.prev('.dsh-res-display').addClass('dsh-res-hover');
+					
+					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
+					//check if the top of current selected element is over the parents top
+					if((updatedSelectedElement.offset().top - parentElement.offset().top) < 0) {
+						var scrollTopPos = parentElement[0].scrollTop - updatedSelectedElement[0].clientHeight;
+						parentElement[0].scrollTop = scrollTopPos;
+					}
+				} else {
+					$(this).next().children('.dsh-res-display').removeClass('dsh-res-hover');
+					$(this).next().children('.dsh-res-display').last('.dsh-res-display').addClass('dsh-res-hover');
+					parentElement[0].scrollTop = parentElement[0].scrollHeight;
+				}
+			}
+		}
+		
+		//Detect enter key
+		else if(e.which == 13) {
+			if($(this).next().is(':visible')) {
+				var selectedElement = $(this).next().find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0) {
+					selectedElement.click();
+				}
+			}
+		}
+	});
+	
+	$('#'+elementId).on('blur', function(e) {
+		if($(this).next().is(':visible')) {
+			var selectedElement = $(this).next().find('.dsh-res-hover');
+			if(selectedElement && selectedElement.length > 0) {
+				selectedElement.click();
+			} else {
+				$(this).next().children('.dsh-res-display').first().click();
+			}
+		}
+	});
 }
 
 function showCompanyAdminFlow(newProfileName, newProfileValue) {
@@ -416,13 +534,13 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-
-	showProfileDetails(newProfileName, 0, 90);
+	//get profile data for all the records , noOfDays = -1
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
-	showSurveyStatistics(newProfileName, 0);
-	showSurveyStatisticsGraphically(newProfileName, 0);
+	showSurveyStatistics(newProfileName, newProfileValue);
+	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
 
 function showRegionAdminFlow(newProfileName, newProfileValue) {
@@ -431,8 +549,8 @@ function showRegionAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-
-	showProfileDetails(newProfileName, newProfileValue, 90);
+	//get profile data for all the records , noOfDays = -1
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -446,8 +564,8 @@ function showBranchAdminFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").show();
 	$("#dsh-grph-srch-survey-div").show();
-
-	showProfileDetails(newProfileName, newProfileValue, 90);
+	//get profile data for all the records , noOfDays = -1
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
@@ -461,8 +579,8 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
-
-	showProfileDetails(newProfileName, 0, 90);
+	//get profile data for all the records , noOfDays = -1
+	showProfileDetails(newProfileName, newProfileValue, -1);
 	bindSelectButtons();
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
@@ -610,24 +728,19 @@ function populateSurveyStatisticsList(columnName) {
 	$("#graph-sel-div").show();
 	
 	var options = "";
-	var optionsForGraph = "";
 	if ((columnName == "companyId") && (accountType == "ENTERPRISE" || accountType == "COMPANY")) {
 		options += "<option value=companyId>Company</option>";
-		optionsForGraph += "<option value=companyId>Company</option>";
 	}
 	if ((columnName == "companyId") && (accountType == "ENTERPRISE")) {
 		options += "<option value=regionName>Region</option>";
-		optionsForGraph += "<option value=regionName>Region</option>";
 	}
 	if (accountType == "ENTERPRISE" || accountType == "COMPANY") {
 		if (columnName == "companyId" || columnName == "regionId") {
-			options += "<option value=branchName>Branch</option>";
-			optionsForGraph += "<option value=branchName>Branch</option>";
+			options += "<option value=branchName>Office</option>";
 		}
 	}
 	if (columnName == "companyId" || columnName == "regionId" || columnName == "branchId") {
 		options += "<option value=displayName>Individual</option>";
-		optionsForGraph += "<option value=displayName>Individual</option>";
 	}
 	
 	$("#selection-list").html(options);
@@ -1003,8 +1116,21 @@ function paintSurveyGraph() {
 		}
 	};
 
+	removeAllPreviousGraphToolTip();
+	
 	var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 	chart.draw(data, options);
+}
+
+
+//Function to remove all previous tool tips popped up from charts
+function removeAllPreviousGraphToolTip() {
+	$('.footer-main-wrapper').nextAll("div").filter(
+			function() {
+				return $(this).css("display") == "none"
+						&& $(this).css("position") == "absolute"
+							&& $(this).children().css("font-family") == "Arial";
+			}).remove();
 }
 
 function convertYearWeekKeyToDate(key) {
@@ -1071,6 +1197,13 @@ function getKeysFromGraphFormat(format) {
 	return keys;
 }
 
+//Detect mousedown event to close to autocomplete list on outside click
+$(document).mousedown(function(event) {
+	if($('.dsh-res-display').is(':visible') && !$(event.target).hasClass('dsh-res-display')) {
+		$('.dsh-res-display').parent().hide();
+	}
+});
+
 //Being called from dashboard.jsp on key up event.
 function searchBranchRegionOrAgent(searchKeyword, flow) {
 	var e;
@@ -1095,16 +1228,33 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 	callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
 		if (flow == 'icons'){
 			$('#dsh-srch-res').addClass('dsh-sb-dd');
-			$('#dsh-srch-res').html(data);
+			$('#dsh-srch-res').html(data).show().perfectScrollbar();
+			$('#dsh-srch-res').perfectScrollbar('update');
+			if($('#dsh-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#dsh-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-srch-res').hide();
+			}
 		} else if (flow == 'graph'){
 			$('#dsh-grph-srch-res').addClass('dsh-sb-dd');
-			$('#dsh-grph-srch-res').html(data);
+			$('#dsh-grph-srch-res').html(data).show().perfectScrollbar();
+			$('#dsh-grph-srch-res').perfectScrollbar('update');
+			if($('#dsh-grph-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-grph-srch-res').hide();
+			}
 		} else if (flow == 'reports'){
 			$('#dsh-srch-report').addClass('dsh-sb-dd');
-			$('#dsh-srch-report').html(data);
+			$('#dsh-srch-report').html(data).show().perfectScrollbar();
+			$('#dsh-srch-report').perfectScrollbar('update');
+			if($('#dsh-srch-report').children('div.dsh-res-display').length <= 0) {
+				$('#dsh-srch-report').removeClass('dsh-sb-dd');
+				$('#dsh-srch-report').hide();
+			}
 		}
-		$('.dsh-res-display').click(function() {
-			
+		
+		$('.dsh-res-display').off('click');
+		$('.dsh-res-display').click(function(event) {
+			event.stopPropagation();
 			var value = $(this).data('attr');
 			if (searchColumn == "regionName") {
 				columnName = "regionId";
@@ -1118,15 +1268,21 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			
 			if (flow == 'icons'){
 			    $('#dsh-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-sel-item').val($(this).html());
+				$('#dsh-sel-item').val($(this).html()).attr('data-prev-val',"");
+				lastColNameForCount = columnName;
+				lastColValueForCount = value;
+				showSurveyStatistics(columnName, value);
 			}
 			else if (flow == 'graph') {
 				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
-				$('#dsh-grph-sel-item').val($(this).html());
+				$('#dsh-grph-sel-item').val($(this).html()).attr('data-prev-val',"");
+				lastColNameForGraph = columnName;
+				lastColValueForGraph = value;
+				showSurveyStatisticsGraphically(columnName, value);
 			}
 			else if (flow == 'reports'){
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
-				$('#admin-report-dwn').val($(this).html());
+				$('#admin-report-dwn').val($(this).html()).attr('data-prev-val',"");
 				$('#report-sel').attr('data-iden',columnName);
 				$('#report-sel').attr('data-idenVal',value);
 				if (searchColumn == "displayName") {
@@ -1136,20 +1292,17 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 					$('#dsh-admin-rep-bnt').show();
 					$('#dsh-ind-rep-bnt').hide();
 				}
-				
-			}
-			
-			if (flow == 'icons'){
-				lastColNameForCount = columnName;
-				lastColValueForCount = value;
-				showSurveyStatistics(columnName, value);
-			}
-			else if (flow == 'graph'){
-				lastColNameForGraph = columnName;
-				lastColValueForGraph = value;
-				showSurveyStatisticsGraphically(columnName, value);
 			}
 			$('.dsh-res-display').hide();
+		});
+		$('.dsh-res-display').off('mouseover');
+		$('.dsh-res-display').on('mouseover',function(){
+			$('.dsh-res-display').removeClass('dsh-res-hover');
+			$(this).addClass('dsh-res-hover');
+		});
+		$('.dsh-res-display').off('mouseout');
+		$('.dsh-res-display').on('mouseout',function(){
+			$(this).removeClass('dsh-res-hover');
 		});
 	}, payload, true);
 }
@@ -1191,26 +1344,6 @@ function sendSurveyReminderMail(surveyPreInitiationId, customerName,disableEle) 
 		}
 	});
 }
-
-/*function changeRatingPattern(rating, ratingParent) {
-	var counter = 0;
-	ratingParent.children().each(function() {
-		$(this).addClass("icn-no-star");
-		$(this).removeClass("icn-half-star");
-		$(this).removeClass("icn-full-star");
-
-		if (rating >= counter) {
-			if (rating - counter >= 1) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-full-star");
-			} else if (rating - counter == 0.5) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-half-star");
-			}
-		}
-		counter++;
-	});
-}*/
 
 function showDisplayPic() {
 	$.ajax({
@@ -1269,7 +1402,6 @@ function showSurveyRequestPage(){
 		$('#srv-req-pop').find('.survey-request-popup').html(data);
 		
 	},true);
-	//window.open('./redirecttosurveyrequestpage.do', '_self');
 }
 
 $(document).on('click','#dashboard-sel',function(e){
@@ -1281,7 +1413,6 @@ $(document).on('click','.da-dd-item',function(e){
 	showOverlay();
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
-	//$('#da-dd-wrapper-profiles').perfectScrollbar('update');
 	
 	attrName = $(this).attr('data-column-type');
 	attrVal = $(this).attr('data-column-value');
@@ -1338,10 +1469,7 @@ $(document).on('click touchstart', '.bd-srv-tbl-row', function() {
             $(this).find('.srv-tbl-move-up').hide();
             $(this).find('.srv-tbl-move-dn').hide();
 		}
-	} else {
-		// $(this).find('.srv-tbl-rem').hide();
-		// $(this).find('.srv-tbl-edit').hide();
-	}
+	} 
 });
 
 $(document).on('mouseover', '.bd-srv-tbl-row', function() {
@@ -2164,7 +2292,7 @@ function showSelectorsByAssignToOption(assignToOption) {
 	case 'company':
 		disableRegionSelector();
 		disableOfficeSelector();
-		if($("#hr-individual-tab").hasClass("bd-hdr-active"))
+		if($("#assign-to-selector").data("profile") == "individual")
 			hideAdminPrivilegesChk();
 		break;
 	case 'region':
@@ -2800,12 +2928,15 @@ function paintHierarchyViewBranches(data,regionId) {
 	$(".tr-region-edit").slideUp(200);
 	bindUserEditClicks();
 	bindBranchListClicks();
+	bindHierarchyEvents();
+	bindAppUserLoginEvent();
 }
 
 function bindBranchListClicks(){
 	$(".branch-edit-icn").unbind('click');
 	$(".branch-edit-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
 		if($(this).attr('clicked') == "false"){
 			showBranchEdit(branchId);
@@ -2818,7 +2949,7 @@ function bindBranchListClicks(){
 	});
 	$(".branch-row").unbind('click');
 	$(".branch-row").click(function(e){
-		e.stopPropagation();
+		//e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
@@ -2833,6 +2964,7 @@ function bindBranchListClicks(){
 	$(".branch-del-icn").unbind('click');
 	$(".branch-del-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var branchId = $(this).attr("data-branchid");
 		deleteBranchPopup(branchId);
 	});
@@ -2840,17 +2972,18 @@ function bindBranchListClicks(){
 
 function fetchHierarchyViewList() {
 	var url = "./fetchhierarchyviewlist.do";
-	callAjaxGET(url, paintHierarchyViewList, true);
-}
-function paintHierarchyViewList(data) {
-	$("#hierarchy-list-header").siblings().remove();
-	$("#hierarchy-list-header").after(data);
-	bindRegionListClicks();
-    $('.v-tbl-icn').click(function(e){
-        e.stopPropagation();
-    });
-    bindBranchListClicks();
-    bindUserEditClicks();
+	callAjaxGET(url, function(data) {
+		$("#hierarchy-list-header").siblings().remove();
+		$("#hierarchy-list-header").after(data);
+		bindRegionListClicks();
+	    /*$('.v-tbl-icn').click(function(e){
+	        e.stopPropagation();
+	    });*/
+	    bindBranchListClicks();
+	    bindUserEditClicks();
+	    bindHierarchyEvents();
+	    bindAppUserLoginEvent();
+	}, true);
 }
 
 function bindRegionListClicks() {
@@ -2867,6 +3000,7 @@ function bindRegionListClicks() {
 	});
 	$(".region-edit-icn").click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
 			showRegionEdit(regionId);
@@ -2879,8 +3013,43 @@ function bindRegionListClicks() {
 	});
 	$(".region-del-icn").unbind('click');
 	$(".region-del-icn").click(function(e){
+		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		var regionId = $(this).attr("data-regionid");
 		deleteRegionPopup(regionId);
+	});
+}
+
+function bindHierarchyEvents() {
+	$('.v-tbn-icn-dropdown').off('click');
+	$('.v-tbn-icn-dropdown').on('click', function(e) {
+		e.stopPropagation();
+		var element = $(this);
+		if(element.next('.v-hr-tbl-icn-wraper').is(':visible')) {
+			$(this).next('.v-hr-tbl-icn-wraper').hide();
+		} else {
+			$('.v-hr-tbl-icn-wraper').hide();
+			$(this).next('.v-hr-tbl-icn-wraper').show();
+		}
+	});
+	$('.v-icn-wid.v-tbl-icn-sm').off('click');
+	$('.v-icn-wid.v-tbl-icn-sm').on('click', function(e) {
+		e.stopPropagation();
+		var element = $(this);
+		generateWidget(element, element.data('iden'), element.data('profile'));
+	});
+	$('.v-icn-femail').off('click');
+	$('.v-icn-femail').on('click', function(e) {
+		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
+			return;
+		}
+
+		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
+	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
+	    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
 	});
 }
 
@@ -2956,12 +3125,15 @@ function paintUsersFromBranch(data,branchId,regionId) {
 	$("#tr-branch-"+branchId).slideDown(200);
 	$(".tr-branch-edit").slideUp(200);
 	bindUserEditClicks();
+	bindHierarchyEvents();
+	bindAppUserLoginEvent();
 }
 
 function bindUserEditClicks() {
 	$(".user-edit-icn").unbind('click');
 	$('.user-edit-icn').click(function(e){
 		e.stopPropagation();
+		$('.v-hr-tbl-icn-wraper').hide();
 		if($(this).attr('clicked') == "false") {
 			// make an ajax call and fetch the details of the user
 			var userId = $(this).attr('data-userid');
@@ -2982,6 +3154,7 @@ function bindUserEditClicks() {
 	$(".user-del-icn").click(function(e){
 		e.stopPropagation();
 		var userId = $(this).attr("data-userid");
+		$('.v-hr-tbl-icn-wraper').hide();
 		confirmDeleteUser(userId);
 	});
 }
@@ -4106,104 +4279,6 @@ function validateUserInviteDetails() {
 	return isFormValid;
 }
 
-// Function to validate email id in a form
-function validateUserEmailId(elementId) {
-	if ($(window).width() < 768) {
-		if ($('#' + elementId).val() != "") {
-			if (emailRegex.test($('#' + elementId).val()) == true) {
-				return true;
-			} else {
-				$('#overlay-toast').html('Please enter a valid email id.');
-				showToast();
-				return false;
-			}
-		} else {
-			$('#overlay-toast').html('Please enter email id.');
-			showToast();
-			return false;
-		}
-	} else {
-		if ($('#' + elementId).val() != "") {
-			if (emailRegex.test($('#' + elementId).val()) == true) {
-				$('#' + elementId).next('.input-error-2').hide();
-				return true;
-			} else {
-				$('#' + elementId).next('.input-error-2').html('Please enter a valid email id.');
-				$('#' + elementId).next('.input-error-2').show();
-				return false;
-			}
-		} else {
-			$('#' + elementId).next('.input-error-2').html('Please enter email id.');
-			$('#' + elementId).next('.input-error-2').show();
-			return false;
-		}
-	}
-}
-
-// Function to validate the first name
-function validateUserFirstName(elementId) {
-	if ($(window).width() < 768) {
-		if ($('#' + elementId).val() != "") {
-			if (nameRegex.test($('#' + elementId).val()) == true) {
-				return true;
-			} else {
-				$('#overlay-toast').html('Please enter a valid first name.');
-				showToast();
-				return false;
-			}
-		} else {
-			$('#overlay-toast').html('please enter first name.');
-			showToast();
-			return false;
-		}
-	} else {
-		if ($('#' + elementId).val() != "") {
-			if (nameRegex.test($('#' + elementId).val()) == true) {
-				$('#' + elementId).next('.input-error-2').hide();
-				return true;
-			} else {
-				$('#' + elementId).next('.input-error-2').html('Please enter a valid first name.');
-				$('#' + elementId).next('.input-error-2').show();
-				return false;
-			}
-		} else {
-			$('#' + elementId).next('.input-error-2').html('Please enter first name.');
-			$('#' + elementId).next('.input-error-2').show();
-			return false;
-		}
-	}
-}
-
-// Function to validate the last name
-function validateUserLastName(elementId) {
-	if ($(window).width() < 768) {
-		if ($('#' + elementId).val() != "") {
-			if (lastNameRegEx.test($('#' + elementId).val()) == true) {
-				return true;
-			} else {
-				$('#overlay-toast').html('Please enter a valid last name.');
-				showToast();
-				return false;
-			}
-		} else {
-			return true;
-		}
-	} else {
-		if ($('#' + elementId).val() != "") {
-			if (lastNameRegEx.test($('#' + elementId).val()) == true) {
-				$('#' + elementId).next('.input-error-2').hide();
-				return true;
-			} else {
-				$('#' + elementId).next('.input-error-2').html('Please enter a valid last name.');
-				$('#' + elementId).next('.input-error-2').show();
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
-}
-
 /**
  * Function to check if branch name entered is null or empty
  */
@@ -4503,17 +4578,6 @@ $(document).on('click', '.v-icn-fmail', function() {
     reinviteUser(firstName, lastName, emailId,'.v-icn-fmail');
 });
 
-$(document).on('click', '.v-icn-femail', function() {
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
-		return;
-	}
-
-	var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-    reinviteUser(firstName, lastName, emailId,'.v-icn-femail');
-});
-
 /**
  * Method to send invite link
  */
@@ -4724,10 +4788,6 @@ function authenticate(socialNetwork) {
 
 function authenticateZillow() {
 	openAuthPageZillow();
-	
-	/*payload = {
-		'socialNetwork' : socialNetwork
-	};*/
 }
 
 // update yelp profile url
@@ -4806,340 +4866,9 @@ function showProfileLink(source, profileUrl){
 	}
 }
 
-function adjustTextContainerWidthOnResize() {
-	var parentWidth = $('.ctnt-list-item').width();
-	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
-	var textContainerWidth = parentWidth - imgWidth - 35;
-	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
-}
-
-// Function to validate the first name pattern
-function validateProFirstNamePattern(elementId) {
-	if ($('#' + elementId).val() != "") {
-		if (firstNamePatternRegex.test($('#' + elementId).val().trim()) == true) {
-			return true;
-		} else {
-			$('#overlay-toast').html('Please enter a first name pattern.');
-			showToast();
-			return false;
-		}
-	} else {
-		$('#overlay-toast').html('Please enter a first name pattern.');
-		showToast();
-		return false;
-	}
-}
-
-// Function to validate the last name pattern
-function validateProLastNamePattern(elementId) {
-	if ($('#' + elementId).val() != "") {
-		if (lastNamePatternRegEx.test($('#' + elementId).val().trim()) == true) {
-			return true;
-		} else {
-			$('#overlay-toast').html('Please enter a valid last name pattern.');
-			showToast();
-			return false;
-		}
-	} else {
-		return false;
-	}
-}
-
-// Function to validate registration form
-function validateFindProForm() {
-	$("#serverSideerror").hide();
-	if (!validateProFirstNamePattern('find-pro-first-name') && !validateProLastNamePattern('find-pro-last-name')) {
-		$('#find-pro-first-name').focus();
-		return false;
-	}
-	return true;
-}
-
-function submitFindAProForm() {
-	if (validateFindProForm()) {
-		$('#find-pro-form').submit();
-		//showOverlay();
-	} else {
-		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
-			showError("Please enter either a valid First Name or Last Name to search for");
-	}
-}
-
-$('#find-pro-submit').click(function(e) {
-	e.preventDefault();
-	submitFindAProForm();
-});
-
-$('#find-pro-form input').keypress(function(e) {
-	// detect enter
-	if (e.which==13) {
-		e.preventDefault();
-		submitFindAProForm();
-	}
-});
-
-/**
- * Method to fetch users list based on the criteria i.e if profile level is specified,
- *  bring all users of that level else search based on first/last name
- * @param newIndex
- */
-function fetchUsers(newIndex) {
-	showOverlay();
-	var profileLevel = $("#fp-profile-level-fetch-info").data("profile-level");
-	var iden = $("#fp-profile-level-fetch-info").data("iden");
-	
-	if (profileLevel != undefined && profileLevel != "") {
-		fetchUsersByProfileLevel(iden, profileLevel, newIndex);
-	} else {
-		var formData = new FormData();
-		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
-		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
-		formData.append("find-pro-start-index", newIndex);
-		formData.append("find-pro-row-size", rowSize);
-		
-		if (!($('#find-pro-first-name').val() == "" && $('#find-pro-last-name').val() == ""))
-			callAjaxPOSTWithTextData("./findaproscroll.do", paginateUsersProList, true, formData);
-		else
-			hideOverlay();
-	}
-}
-
-function updatePaginationBtnsForProList() {
-	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
-	var total = parseInt($('#pro-paginate-btn').attr("data-total"));
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	
-	//update previous button
-	if(start == 0) {
-		$('#pro-prev').removeClass('paginate-button');
-	} else {
-		$('#pro-prev').addClass('paginate-button');
-	}
-	
-	//update next button
-	if(start + batch >= total) {
-		$('#pro-next').removeClass('paginate-button');
-	} else {
-		$('#pro-next').addClass('paginate-button');
-	}
-	
-	//update page no
-	var pageNo = 0;
-	if(start < total){
-		pageNo = start / batch + 1;	
-	} else {
-		pageNo = start / batch;
-	}
-	$('#sel-page-prolist').val(pageNo);
-}
-
-//Click events proList pagination buttons
-$(document).on('click', '#pro-next.paginate-button', function(e) {
-	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	
-	start += batch;
-	$('#pro-paginate-btn').attr("data-start", start);
-	fetchUsers(start);
-});
-
-$(document).on('click', '#pro-prev.paginate-button', function(e) {
-	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	
-	start -= batch;
-	$('#pro-paginate-btn').attr("data-start", start);
-	fetchUsers(start);
-});
-
-$(document).on('keypress', '#sel-page-prolist', function(e) {
-	//if the letter is not digit then don't type anything
-	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-		return false;
-	}
-	var totalPage = parseInt($('#pro-total-pages').text());
-	var prevPageNoVal = parseInt($('#sel-page-prolist').val());
-	if(prevPageNoVal == NaN) {
-		prevPageNoVal = 0;
-	}
-	var pageNo = prevPageNoVal + String.fromCharCode(e.which);
-	pageNo = parseInt(pageNo);
-	if(pageNo >= totalPage || pageNo <= 0) {
-		return false;
-	}
-});
-
-$(document).on('keyup', '#sel-page-prolist', function(e) {
-	if(e.which == 13) {
-		$(this).trigger('blur');	
-	}
-});
-
-$(document).on('blur', '#sel-page-prolist', function(e) {
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	var pageNoVal = parseInt($('#sel-page-prolist').val());
-	start = (pageNoVal - 1) * batch;
-	$('#pro-paginate-btn').attr("data-start", start);
-	fetchUsers(start);
-});
-
-function paginateUsersProList(response) {
-	var reponseJson = $.parseJSON(response);
-	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
-	var batch = parseInt($('#pro-paginate-btn').attr("data-batch"));
-	
-	// error message
-	if (reponseJson.errMessage) {
-		showError(reponseJson.errMessage);
-		$('#ctnt-list-wrapper').append("No Profiles found");
-	}
-	else {
-		if(start == 0) {
-			var usersSize = reponseJson.userFound;
-			if (usersSize > 0) {
-				$('#srch-num').text(usersSize);
-				$('#pro-paginate-btn').show().attr("data-total", usersSize);
-				var totalPage = 0;
-				if (usersSize % batch == 0) {
-					totalPage = parseInt(usersSize / batch);
-				} else {
-					totalPage = parseInt(usersSize / batch + 1);
-				}
-				
-				$('#pro-total-pages').text(totalPage);
-			} 
-			$('#srch-num-list').show();
-		}
-		paintProList(reponseJson.users);
-	}
-	updatePaginationBtnsForProList();
-	scrollToTop();
-	hideOverlay();
-}
-
-function paintProList(usersList) {
-	if (usersList != undefined) {
-		var usersSize = usersList.length;
-		/*if (usersSize > 0) {
-			$('#fp-users-size').val(usersSize);
-		}*/
-		
-		var usersHtml = "";
-		if (usersSize > 0) {
-			$.each(usersList, function(i, user) {
-				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
-				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '" data-profilename="' + user.profileUrl + '">';
-				
-				if (user.profileImageUrl != undefined && user.profileImageUrl.trim() != "") {
-					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
-				} else {
-					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
-				}
-				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">'
-					+ '<div class="ctnt-item-name user-display-name">' + user.displayName + '</div>';
-
-				if (user.title != undefined) {
-					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
-				}
-				if (user.location != undefined) {
-					usersHtml = usersHtml + '<div class="pro-addr-cont">' + user.location;
-	            	if (user.industry != undefined) {
-	            		usersHtml += " | " + user.industry;
-	            	}
-	            	usersHtml += "</div>";
-	            }
-				if (user.aboutMe != undefined) {
-					usersHtml = usersHtml + '<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
-				}
-				
-				var reviewCount = 0;
-				if (user.reviewCount) {
-					reviewCount  = user.reviewCount;
-				}
-				
-				var reviewScore = 0;
-				if (user.reviewScore) {
-					reviewScore  = user.reviewScore;
-				}
-				
-				usersHtml = usersHtml + '</div>';
-				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap clearfix">'
-					+ '<div class="float-left ctnt-review-score" data-score="' + reviewScore + '"></div>'
-					+ '<div class="float-left ctnt-review-count" user="' + user.userId + '">' + reviewCount + ' Review(s)</div>'
-				+ '</div>';
-				usersHtml = usersHtml + '</div>';
-			});
-			$('#ctnt-list-wrapper').html(usersHtml);
-			
-			$('.ctnt-review-score').each(function(){
-				changeRatingPattern($(this).attr("data-score"), $(this));
-				$(this).append(" - ");
-			});
-			
-			$(".ctnt-list-item").click(function(e){
-				var agentProfileName = $(this).attr("data-profilename");
-				// var url = window.location.origin + "/pages" + agentProfileName;
-				var url = getLocationOrigin() + "/pages" + agentProfileName;
-				window.open(url);
-			});
-		}
-	}
-}
-
-
-function fetchUsersByProfileLevel(iden, profileLevel, startIndex) {
-	if (iden == undefined) {
-		return;
-	}
-	var url = getLocationOrigin() + "/rest/profile/individuals/" + iden
-	+ "?profileLevel=" + profileLevel + "&start=" + startIndex;
-	callAjaxGET(url, fetchUsersByProfileLevelCallback, false);
-}
-
-function fetchUsersByProfileLevelCallback(data) {
-	var response = $.parseJSON(data);
-	if (response != undefined) {
-		paginateUsersProList(response.entity);
-	}
-}
-
 $(document).on('click', '.ctnt-review-btn', function(){
 	initSurveyReview($(this).attr('user'));
 });
-
-//Functions for survey question page
-$(document).on('click', '.sq-np-item-next', function() {
-});
-
-/*
- * Function to initiate survey. It hits controller to get list of all the
- * questions which are shown one after one to the customer.
- */
-function initSurvey(firstName, lastName, email, agentId, agentName, grecaptcharesponse) {
-	this.agentId = agentId;
-	this.agentName = agentName;
-	customerEmail = email;
-	/*var payload = {
-		"agentId" : agentId,
-		"firstName" : firstName,
-		"lastName" : lastName,
-		"customerEmail" : email,
-		"g-recaptcha-response" : grecaptcharesponse,
-		"relationship" : relationship
-	};*/
-	
-	
-	//$('input[relationship]').val(relationship);
-	$('input[g-recaptcha-response]').val(grecaptcharesponse);
-	
-	if($('#cust-agent-verify').hasClass('bd-check-img-checked')){
-		$('#overlay-toast').html("Verify that you have done business with the agent");
-		showToast();
-		return false;
-	}
-	
-	$('#survey-request-form').submit();
-}
 
 function initSurveyWithUrl(q) {
 	var success = false;
@@ -5147,7 +4876,6 @@ function initSurveyWithUrl(q) {
 		"q" : q
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "triggersurveywithurl",
 		url : getLocationOrigin() + surveyUrl + "triggersurveywithurl",
 		type : "GET",
 		cache : false,
@@ -5184,7 +4912,6 @@ function initSurveyWithUrl(q) {
 }
 
 function showPageNotFoundError(){
-	//window.location = window.location.origin + surveyUrl + "notfound";
 	window.location = getLocationOrigin() + surveyUrl + "notfound";
 }
 
@@ -5195,7 +4922,6 @@ function loadAgentPic(agentId){
 		"agentId" : agentId
 	};
 	$.ajax({
-		//url : window.location.origin + surveyUrl + "displaypiclocationofagent",
 		url : getLocationOrigin() + surveyUrl + "displaypiclocationofagent",
 		type : "GET",
 		dataType : "text",
@@ -5424,7 +5150,6 @@ function retakeSurveyRequest(){
 			"lastName" : lastName,
 			"agentName" : agentName
 	};
-	//callAjaxGetWithPayloadData(window.location.origin + surveyUrl + 'restartsurvey', '', payload, true);
 	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true);
 	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
 	showToast();
@@ -5661,32 +5386,6 @@ function showMasterQuestionPage(){
 			if(isAbusive == false){
 				onlyPostToSocialSurvey = false;
 			}
-			/*$('#social-post-lnk').show();
-			if((mood == 'Great') && (yelpEnabled || googleEnabled) && !(yelpEnabled && googleEnabled)){
-				$('.sq-btn-social-wrapper').css({
-					"float" : "none",
-					"width" : "100%"
-				});
-				$('.sq-btn-post-social').css({
-					"float" : "none"
-				});
-			}
-			if (yelpEnabled && (mood == 'Great')){
-				$('#ylp-btn').show();
-				//var yelpElement = document.getElementById('ylp-btn');
-				//shareOnYelp(agentId, window.location.origin+"/rest/survey/", yelpElement);
-			}
-			else {
-				$('#ylp-btn').parent().remove();
-			}
-			if (googleEnabled && (mood == 'Great')){
-				var googleElement = document.getElementById('ggl-btn');
-				shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/", googleElement);
-			}
-			else {
-				$('#ggl-btn').parent().remove();
-			}*/
-			
 			if(mood == 'Great') {
 				$('#social-post-links').show();
 			} 
@@ -5834,7 +5533,6 @@ function clearForm(){
 // Starting click events.
 
 // Code to be executed on click of stars of rating question.
-
 $('.sq-star').click(function() {
 	$(this).parent().find('.sq-star').removeClass('sq-full-star');
 	$(this).parent().find('.sq-star').removeClass('sq-full-star-click');
@@ -5876,7 +5574,6 @@ $('.sq-star').hover(function() {
 });
 
 // Code to be executed on click of next for all types of questions.
-
 $('.sq-np-item-next')
 		.click(
 				function() {
@@ -5968,7 +5665,6 @@ $('.sq-np-item-next')
 				});
 
 // Code to be executed on click of previous for star and smile questions.
-
 $('.sq-np-item-prev').click(function() {
 	$("#pst-srvy-div").hide();
 	if (qno == 0) {
@@ -6087,56 +5783,7 @@ $('#sq-sad-smile').click(function() {
 	$(this).removeClass('opacity-red');
 });
 
-$('#start-btn').click(function() {
-	firstName = $('#firstName').val().trim();
-	lastName = $('#lastName').val().trim();
-	var email = $('#email').val().trim();
-	var grecaptcharesponse = $('#g-recaptcha-response').val();
-	// var recaptcha_challenge_field = $('#recaptcha_challenge_field').val();
-	
-	if (!validateUserFirstName('firstName')) {
-		$('#overlay-toast').html('Please enter valid First Name!');
-		showToast();
-		return;
-	}
-	if (!validateUserEmailId('email')) {
-		$('#overlay-toast').html('Please enter valid Email Id!');
-		showToast();
-		return;
-	}
-	
-	var agentEmail = $('#prof-container').attr("data-agent-email");
-	if(agentEmail.toUpperCase() == email.toUpperCase()){
-		$('#overlay-toast').html('Agents can not take survey for themselves!');
-		showToast();
-		return;
-	}
-	
-	/*if (!validateUserEmailId('email')) {
-		$('#overlay-toast').html('Please enter valid Email Id!');
-		showToast();
-		return;
-	}*/
-	
-	
-	var agentId = $('#prof-container').attr("data-agentId");
-	var agentName = $('#prof-container').attr("data-agentName");
-	//var e = document.getElementById("cust-agnt-rel");
-	//var relationship = e.options[e.selectedIndex].value;
-	initSurvey(firstName, lastName, email, agentId, agentName,
-			grecaptcharesponse);
-	
-	// Google analytics for reviews
-	ga('send', {
-		'hitType': 'event',
-		'eventCategory': 'review',
-		'eventAction': 'click',
-		'eventLabel': 'Reviews',
-		'eventValue': agentId
-	});
-});
-
-$('input[type="range"]').rangeslider({
+/*$('input[type="range"]').rangeslider({
 	polyfill : false,
 
 	// Default CSS classes
@@ -6145,8 +5792,6 @@ $('input[type="range"]').rangeslider({
 	handleClass : 'rangeslider__handle',
 
 	onSlide : function(position, value) {
-		// $('div[quest-no="' + survQuesNo + '"]').find(
-		// '.sq-slider-val').html(value);
 		$('#range-slider-value').html(value);
 	},
 	// Callback function
@@ -6154,7 +5799,7 @@ $('input[type="range"]').rangeslider({
 		$('#range-slider-value').html(value);
 		storeCustomerAnswer(value);
 	},
-});
+});*/
 
 $('.sq-pts-red').click(function() {
 	$('.sq-pts-item-hover').removeClass('showHoverTab');
@@ -6197,22 +5842,18 @@ $('.sq-pts-dgreen').click(function() {
 });
 
 $('#ylp-btn').click(function(e) {
-	//e.stopImmediatePropagation();
 	updateSharedOn("yelp", agentId, customerEmail);
 });
 
 $('#ggl-btn').click(function(e) {
-	//e.stopImmediatePropagation();
 	updateSharedOn("google", agentId, customerEmail);
 });
 
 $('#zillow-btn').click(function(e) {
-	//e.stopImmediatePropagation();
 	updateSharedOn("zillow", agentId, customerEmail);
 });
 
 $('#lt-btn').click(function(e) {
-	//e.stopImmediatePropagation();
 	updateSharedOn("lendingtree", agentId, customerEmail);
 });
 
@@ -7915,6 +7556,9 @@ function fetchPublicPostEditProfile(isNextBatch) {
 
 function paintPosts(posts) {
 	var divToPopulate = "";
+	var postsLength = posts.length;
+	var elementClass;
+	$('#prof-posts').children('.tweet-panel-item').removeClass('bord-bot-none');
 	$.each(posts, function(i, post) {
 		var iconClass = "";
 		var href="javascript:void(0)";
@@ -7940,7 +7584,13 @@ function paintPosts(posts) {
 		}
 		var hrefComplet='<a href='+href+' target="_blank">';
 		
-		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'		
+		elementClass = "tweet-panel-item bord-bot-dc clearfix";
+		
+		if(i >= postsLength - 1) {
+			elementClass += " bord-bot-none";
+		}
+		
+		divToPopulate += '<div class="'+elementClass+'">'		
 				+ hrefComplet
 				+ '<div class="tweet-icn ' + iconClass + ' float-left"></div>'
 				+"</a>"
@@ -8037,7 +7687,7 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 		openAuthPageDashboard('google', columnName, columnValue);
 	}
 	else if(task=='ZILLOW_PRF'){
-		openAuthPageDashboard('zillow', columnName, columnValue);
+		openAuthPageDashboardZillow('#dsh-btn3');
 	}
 	else if(task=='YELP_PRF'){
 		showMainContent('./showprofilepage.do');
@@ -8063,13 +7713,8 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue){
 	}
 }
 
-// Update Disclaimer details
-$(document).on('click', '#disclaimer-text', function() {
-	$('#disclaimer-text').addClass('prof-name-edit');
-});
-
+//Update Disclaimer details
 $(document).on('blur', '#disclaimer-text', function() {
-	$('#disclaimer-text').removeClass('prof-name-edit');
 	
 	var disclaimer = $('#disclaimer-text').val().trim();
 	if (disclaimer == undefined || disclaimer == "") {
@@ -8126,6 +7771,9 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 		window.location.href = "/downloaddashboardincompletesurvey.do?columnName=" + colName + "&columnValue=" + colValue
 			+ "&startDate=" + startDate + "&endDate=" + endDate;
 		break;
+	case 5:
+		window.location.href = "/downloaduseradoptionreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		break;
 	default:
 		break;
 	}
@@ -8151,7 +7799,8 @@ function userSwitchToCompAdmin() {
 	}, true);
 }
 
-function bindUserLoginEvent() {
+function bindAppUserLoginEvent() {
+	$('.user-login-icn').off('click');
 	$('.user-login-icn').on('click', function(e) {
 		e.stopImmediatePropagation();
 		var payload = {
@@ -8424,8 +8073,12 @@ function bindDatePickerforSurveyDownload() {
 		autoclose: true
 	})
 	.on('changeDate', function(selected){
-        startDate = new Date(selected.date.valueOf());
-        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		if(selected.date == undefined) {
+			startDate = null; //reset start date
+		} else {
+			startDate = new Date(selected.date.valueOf());
+	        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));			
+		}
         $('#dsh-end-date').datepicker('setStartDate', startDate);
     });
 	
@@ -8438,8 +8091,12 @@ function bindDatePickerforSurveyDownload() {
 		autoclose: true
 	})
 	.on('changeDate', function(selected){
-        fromEndDate = new Date(selected.date.valueOf());
-        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));
+		if(selected.date == undefined) {
+			fromEndDate = null; //reset end date
+		} else {
+			fromEndDate = new Date(selected.date.valueOf());
+	        fromEndDate.setDate(fromEndDate.getDate(new Date(selected.date.valueOf())));			
+		}
         $('#dsh-start-date').datepicker('setEndDate', fromEndDate);
     });
 }
@@ -8516,6 +8173,7 @@ function editProfileUrl(disableEle) {
 // Get all the required elements and show popup
 
 function generateWidget(clickedAttr , iden, profileLevel) {
+	$('.v-hr-tbl-icn-wraper').hide();
 	if($(clickedAttr).hasClass('v-tbl-icn-disabled')){
 		return;
 	}
@@ -8936,7 +8594,12 @@ $(document).on( 'click', '#send-help-mail-button', function() {
 
 
 //Disconnect social media
-function disconnectSocialMedia(socialMedia) {
+function disconnectSocialMedia(socialMedia, isAutoLogin) {
+	if(isAutoLogin) {
+		$('#overlay-toast').html('Insufficient permission to disconnect from ' + socialMedia);
+		showToast();
+		return;
+	}
 	if($('div[data-social="'+socialMedia+'"]').text() == undefined || $('div[data-social="'+socialMedia+'"]').text() == ''){
 		return;
 	}
@@ -10089,8 +9752,6 @@ function attachAutocompleteUserListDropdown(){
 		minLength : 0,
 		select : function (event, ui) {
 			event.stopPropagation();
-			var element = event.target;
-			
 			$('#selected-user-txt').val(ui.item.value);
 			$('#selected-user-txt').attr('val', ui.item.value);
 			$('#selected-userid-hidden').val(ui.item.userId);
@@ -10168,19 +9829,6 @@ function validateprofileUrlEditForm() {
 	});
 }
 
-function attachReInvitationClickEvent(){
-	$('.v-icn-femail').click( function() {
-		if ($(this).hasClass('v-tbl-icn-disabled')) {
-			return;
-		}
-	
-		var firstName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-		var lastName = $(this).parent().parent().parent().find('.v-tbl-name').html();
-	    var emailId = $(this).parent().parent().parent().find('.v-tbl-add').html();
-	    reinviteUser(firstName, lastName, emailId);
-});
-}
-
 function initializeVerticalsMasterForProfilePage() {
 	if (verticalsMasterList == undefined) {
 		callAjaxGETWithTextData("/fetchverticalsmaster.do", function(data) {
@@ -10221,7 +9869,8 @@ function saveZillowEmailAddress() {
 	}
 	callAjaxFormSubmit("/zillowSaveInfo.do", function(data) {
 		if(data && data == "success") {
-			loadSocialMediaUrlInSettingsPage();
+			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
+            loadSocialMediaUrlInSettingsPage();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {
@@ -10348,4 +9997,57 @@ function bindIndividualSignupPathEvents() {
 			}, payload, false);
 		}
 	});
+}
+
+/**
+ * Functions for session info
+ */
+function showActiveUserLogoutOverlay() {
+	$('#overlay-header').html("Active User Detected");
+	$("#overlay-text").html("Please logout active user to proceed");
+	$('#overlay-continue').addClass("hide");
+	$('#overlay-cancel').html("Ok");
+	
+	$('#overlay-cancel').click(function(){
+		hideActiveUserLogoutOverlay();
+		landingFlow();
+	});
+
+	$('#overlay-main').show();
+}
+
+function hideActiveUserLogoutOverlay() {
+	$('#overlay-main').hide();
+	$("#overlay-header").html('');
+	$("#overlay-text").html('');
+	$('#overlay-continue').removeClass("hide");
+	$('#overlay-cancel').html('');
+	
+	$('#overlay-cancel').unbind('click');
+}
+
+
+/**
+* Functions to confirm social authentication
+*/
+function confirmSocialAuth(socialNetwork, callBackFunction, link) {
+	
+	var message = "";
+	
+	if(link && link.trim() != "" ) {
+		message = "Are you sure you want to disconnect your previous connection to " + socialNetwork + " and connect again";
+	} else {
+		message = "Are you sure you want to connect to " + socialNetwork;
+	}
+	
+	$('#overlay-header').html("Confirm user Authentication");
+	$("#overlay-text").html(message);
+	$('#overlay-continue').html("Ok").click(function() {
+		if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
+			$('#overlay-main').hide();
+			callBackFunction();
+		}
+	});
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-main').show();
 }

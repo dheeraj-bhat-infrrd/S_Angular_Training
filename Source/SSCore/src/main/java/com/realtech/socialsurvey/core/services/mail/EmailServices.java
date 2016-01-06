@@ -343,10 +343,11 @@ public interface EmailServices
      * @param companyName
      * @param survey
      * @param surveyLink
+     * @throws InvalidInputException 
      */
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl );
+        String surveyLink, String logoUrl ) throws InvalidInputException;
 
 
     void sendZillowCallExceededMailToAdmin( int count ) throws InvalidInputException, UndeliveredEmailException;
@@ -360,7 +361,8 @@ public interface EmailServices
         String agentEmail, String companyName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood, String rating )
+    //SS-1435: Send survey details too
+    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String mood, String rating, String surveyDetail )
         throws InvalidInputException, UndeliveredEmailException;
 
 
@@ -382,4 +384,8 @@ public interface EmailServices
 
     void sendReportBugMailToAdminForExceptionInBatch( String displayName, String batchName, String lastRunTime, String errorMsg, String exceptionStackTrace , String recipientMailId )
         throws InvalidInputException, UndeliveredEmailException;
+
+
+    void sendBillingReportMail( String firstName, String lastName, String recipientMailId,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
 }

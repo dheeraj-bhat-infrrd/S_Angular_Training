@@ -8,12 +8,15 @@ import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.BillingReportData;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
 // JIRA SS-137 BY RM05:BOC
@@ -75,5 +78,15 @@ public interface DashboardService
 
 
     public long getSocialPostsForPastNdaysWithHierarchy( String coumnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+
+
+    public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
+
+    /**
+     * Method to return records of billing report data based on start index and batch size
+     */
+    public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize );
+
+    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException;
 }
 // JIRA SS-137 BY RM05:EOC

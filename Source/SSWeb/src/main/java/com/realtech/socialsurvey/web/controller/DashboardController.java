@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,9 +17,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
@@ -30,12 +33,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -59,6 +64,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.reports.AdminReports;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
@@ -112,9 +118,12 @@ public class DashboardController
 
     @Autowired
     private EmailFormatHelper emailFormatHelper;
-    
+
     @Autowired
     BatchTrackerService batchTrackerService;
+    
+    @Autowired
+    private AdminReports adminReport;
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -131,6 +140,7 @@ public class DashboardController
     private final String EXCEL_FORMAT = "application/vnd.ms-excel";
     private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private final String EXCEL_FILE_EXTENSION = ".xlsx";
+
 
     /*
      * Method to initiate dashboard
@@ -182,7 +192,7 @@ public class DashboardController
                 profileName = user.getFirstName() + " " + user.getLastName();
             }
         }
-        
+
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "emailId", user.getEmailId() );
         model.addAttribute( "profileName", profileName );
@@ -266,59 +276,66 @@ public class DashboardController
                 realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
             }
 
-	        // calculating details for circles
-	        int numberOfDays = 30;
-	        try {
-	            if ( request.getParameter( "numberOfDays" ) != null ) {
-	                numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
-	            }
-	        } catch ( NumberFormatException e ) {
-	            LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
-	            throw e;
-	        }
-	
-	        if ( realtechAdmin ){
-	            columnName = null;
-	        }
-	        LOG.debug("Getting the survey score.");
-	        double surveyScore = (double) Math.round( dashboardService.getSurveyScore( columnName, columnValue, numberOfDays,
-	            realtechAdmin ) * 1000.0 ) / 1000.0;
-	        LOG.debug("Getting the sent surveys count.");
-	        int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
-	        LOG.debug("Getting the social posts count with hierarchy.");
-	        int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
-	            numberOfDays );
-	        int profileCompleteness = 0;
-	        if ( !realtechAdmin ){
-	        	LOG.debug("Getting profile completeness.");
-	            profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue, unitSettings );
-	        }
-	        model.addAttribute( "socialScore", surveyScore );
-	        if ( sentSurveyCount > 999 ){
-	        	int quotient = sentSurveyCount / 1000;
-	            model.addAttribute( "surveyCount", quotient+"K+" );
-	        }
-	        else{
-	            model.addAttribute( "surveyCount", sentSurveyCount );
-	        }
-	        if ( socialPostsCount > 999 ){
-	        	int quotient = socialPostsCount / 1000;
-	            model.addAttribute( "socialPosts", quotient+"K+" );
-	        }
-	        else{
-	            model.addAttribute( "socialPosts", socialPostsCount );
-	        }
-	
-	        model.addAttribute( "profileCompleteness", profileCompleteness );
-	        LOG.debug("Getting the badges.");
-	        model.addAttribute( "badges",
-	            dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
-	
-	        model.addAttribute( "columnName", columnName );
-	        model.addAttribute( "columnValue", columnValue );
-	
-	        LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
-	        return JspResolver.DASHBOARD_PROFILEDETAIL;
+            // calculating details for circles
+            int numberOfDays = -1;
+            try {
+                if ( request.getParameter( "numberOfDays" ) != null && !request.getParameter( "numberOfDays" ).isEmpty() ) {
+                    numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
+                }
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
+                throw e;
+            }
+
+            if ( realtechAdmin ) {
+                columnName = null;
+            }
+            LOG.debug( "Getting the survey score." );
+            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+            ratingFormat.setMinimumFractionDigits( 1 );
+            ratingFormat.setMaximumFractionDigits( 1 );
+            double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
+            try {
+                //get formatted survey score using rating format
+                surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
+            }
+            LOG.debug( "Getting the sent surveys count." );
+            int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
+            LOG.debug( "Getting the social posts count with hierarchy." );
+            int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
+                numberOfDays );
+            int profileCompleteness = 0;
+            if ( !realtechAdmin ) {
+                LOG.debug( "Getting profile completeness." );
+                profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue,
+                    unitSettings );
+            }
+            model.addAttribute( "socialScore", surveyScore );
+            if ( sentSurveyCount > 999 ) {
+                int quotient = sentSurveyCount / 1000;
+                model.addAttribute( "surveyCount", quotient + "K+" );
+            } else {
+                model.addAttribute( "surveyCount", sentSurveyCount );
+            }
+            if ( socialPostsCount > 999 ) {
+                int quotient = socialPostsCount / 1000;
+                model.addAttribute( "socialPosts", quotient + "K+" );
+            } else {
+                model.addAttribute( "socialPosts", socialPostsCount );
+            }
+
+            model.addAttribute( "profileCompleteness", profileCompleteness );
+            LOG.debug( "Getting the badges." );
+            model.addAttribute( "badges",
+                dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
+
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
+
+            LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
+            return JspResolver.DASHBOARD_PROFILEDETAIL;
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
@@ -363,14 +380,17 @@ public class DashboardController
             throw e;
         }
 
-        try{
-	        model.addAttribute( "allSurveySent", dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays ) );
-	        model.addAttribute( "completedSurvey", dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
-	        model.addAttribute( "clickedSurvey",
-	            dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-	        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue, numberOfDays ) );
-        }catch(InvalidInputException e){
-        	LOG.error("Error: "+e.getMessage(), e);
+        try {
+            model.addAttribute( "allSurveySent", dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "completedSurvey",
+                dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "clickedSurvey",
+                dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "socialPosts",
+                dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue, numberOfDays ) );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Error: " + e.getMessage(), e );
+
         }
 
         LOG.info( "Method to get count of all, completed and clicked surveys, getSurveyCount() finished" );
@@ -479,7 +499,8 @@ public class DashboardController
             }
 
             try {
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false, null, null, "date" );
+                surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
+                    null, null, "date" );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
@@ -999,9 +1020,9 @@ public class DashboardController
             String custFirstName = survey.getCustomerFirstName();
             String custLastName = survey.getCustomerLastName();
             if ( survey != null ) {
-//                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-//                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
-                  surveyLink =  surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
+                //                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+                //                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+                surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
             }
 
             try {
@@ -1167,8 +1188,8 @@ public class DashboardController
 
                     String surveyLink = "";
                     if ( survey != null ) {
-//                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
-//                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
+                        //                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
+                        //                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
                         surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
                     }
 
@@ -1220,8 +1241,7 @@ public class DashboardController
 
                     OrganizationUnitSettings companySettings = null;
                     try {
-                        companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                            .getCompanyId() );
+                        companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
                     } catch ( InvalidInputException e ) {
                         LOG.error( "InvalidInputException occured while trying to fetch company settings." );
                     }
@@ -1627,9 +1647,9 @@ public class DashboardController
         LOG.info( "Method getSocialMonitorFile() finished." );
     }
 
-  
+
     /*
-     * Method to download file containing incomplete surveys
+     * Method to download file agent ranking report
      */
     @RequestMapping ( value = "/downloadagentrankingreport")
     public void getAgentRankingFile( Model model, HttpServletRequest request, HttpServletResponse response )
@@ -2076,6 +2096,108 @@ public class DashboardController
         }
 
         return JspResolver.LINKEDIN_IMPORT_SOCIAL_LINKS;
+    }
+
+
+    /*
+     * Method to download file agent ranking report
+     */
+    @RequestMapping ( value = "/downloaduseradoptionreport")
+    public void getUserAdoptionReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() started." );
+        User user = sessionHelper.getCurrentUser();
+
+        //        if(user.isCompanyAdmin())
+        //            throw new UnsupportedOperationException("User is not authorized to perform this action");
+
+
+        try {
+            String columnName = request.getParameter( "columnName" );
+            if ( columnName == null || columnName.isEmpty() ) {
+                LOG.error( "Invalid value (null/empty) passed for column name." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for column name." );
+            }
+
+            long iden = 0;
+            String columnValue = request.getParameter( "columnValue" );
+            if ( columnValue != null && !columnValue.isEmpty() ) {
+                try {
+                    iden = Long.parseLong( columnValue );
+                } catch ( NumberFormatException e ) {
+                    LOG.error(
+                        "NumberFormatExcept;ion caught while parsing columnValue in getUserAdoptionReportFile(). Nested exception is ",
+                        e );
+                    throw e;
+                }
+            }
+
+            try {
+                Company company = organizationManagementService.getCompanyById( iden );
+                String profileLevel = getProfileLevel( columnName );
+                String fileName = "User_Adoption_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
+                    + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = dashboardService.downloadUserAdoptionReportData( iden );
+                response.setContentType( EXCEL_FORMAT );
+                String headerKey = CONTENT_DISPOSITION_HEADER;
+                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
+                response.setHeader( headerKey, headerValue );
+
+                // write into file
+                OutputStream responseStream = null;
+                try {
+                    responseStream = response.getOutputStream();
+                    workbook.write( responseStream );
+                } catch ( IOException e ) {
+                    LOG.error( "IOException caught in getUserAdoptionReportFile(). Nested exception is ", e );
+                } finally {
+                    try {
+                        responseStream.close();
+                    } catch ( IOException e ) {
+                        LOG.error( "IOException caught in getUserAdoptionReportFile(). Nested exception is ", e );
+                    }
+                }
+                response.flushBuffer();
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException caught in getUserAdoptionReportFile(). Nested exception is ", e );
+                throw e;
+            } catch ( IOException e ) {
+                LOG.error( "IOException caught in getUserAdoptionReportFile(). Nested exception is ", e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in getUserAdoptionReportFile(). Nested exception is ", e );
+        }
+        LOG.info( "Method to get user adoption report file getUserAdoptionReportFile() finished." );
+    }
+    
+
+    /**
+     * Controller to generate and send billing report by mail
+     * @param model
+     * @param request
+     * @param response
+     */
+    @RequestMapping ( value = "/downloadbillingreport")
+    public void getBillingReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get billing report file getBillingReportFile() started." );
+        User user = sessionHelper.getCurrentUser();
+        if ( !( user.isSuperAdmin() ) ) {
+            throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+        }
+        //Check if a request already exists
+        try {
+            dashboardService.getBillingReportToBeSent();
+            LOG.info( "A request already exists for getting the billing report" );
+        } catch ( NoRecordsFetchedException e ) {
+            //Request doesn't already exist. Create one.
+            LOG.info( "There is no existing request for getting the billing report" );
+
+            //Get value from Mail ID column
+            String mailId = request.getParameter( "mailid" );
+            adminReport.createEntryInFileUploadForBillingReport( mailId );
+        }
+        LOG.info( "Method to get billing report file getBillingReportFile() finished." );
     }
 }
 // JIRA SS-137 : by RM-05 : EOC
