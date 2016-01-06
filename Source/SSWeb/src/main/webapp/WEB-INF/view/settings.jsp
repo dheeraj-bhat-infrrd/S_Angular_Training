@@ -49,7 +49,8 @@
 					<div class="float-left st-score-txt"><spring:message code="label.scorepost.desc.key" /></div>
 					<form id="rating-settings-form">
 						<input type="hidden" name="ratingcategory" id="ratingcategory">
-						<div class="clearfix float-right st-score-rt">
+						<div class="clearfix float-right st-score-rt pos-relative">
+						<div id="config-setting-dash" class="hide" ></div>
 						<div class="float-left score-rt-post score-rt-post-OR score-rt-min">
 							<div class="st-score-rt-top"><spring:message code="label.scorepost.min.key" /></div>
 							<div class="st-score-rt-line2 clearfix">
@@ -84,7 +85,8 @@
 					<spring:message code="label.socialconnect.desc.key" />
 				</div>
 				<input type="hidden" name="ratingcategory" id="ratingcategory">
-				<div class="clearfix float-right col-lg-8 col-md-8 col-sm-8 col-xs-12">
+				<div class="clearfix float-right col-lg-8 col-md-8 col-sm-8 col-xs-12 pos-relative">
+				<div id="social-media-dash" class="hide" ></div>
 					<div id="social-media-token-cont" class="soc-nw-wrapper clearfix">
 						<%-- <jsp:include page="settings_socialauth.jsp"></jsp:include> --%>
 					</div>

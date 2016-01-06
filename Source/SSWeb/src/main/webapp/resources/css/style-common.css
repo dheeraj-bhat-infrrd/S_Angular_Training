@@ -545,7 +545,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	height: 100%;
 	z-index: 9999999;
 	background: url(../images/dashloader.gif) no-repeat center;
-	background-size: 50px 50px;
+	background-size: 40px 40px;
 	background-color: rgba(255, 255, 255, 0.7);
 	margin-left:-15px;
 }
@@ -555,10 +555,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	height: 100%;
 	z-index: 9999999;
 	background: url(../images/dashloader.gif) no-repeat center;
-	background-size: 50px 50px;
+	background-size: 40px 40px;
 	background-color: rgba(255, 255, 255, 0.7);
 }
-#hierarchy-ep{
+#hierarchy-ep,#config-setting-dash,#social-media-dash{
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -573,7 +573,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	height: 100%;
 	z-index: 9999999;
 	background: url(../images/dashloader.gif) no-repeat center;
-	background-size: 50px 50px;
+	background-size: 40px 40px;
 	background-color: rgba(255, 255, 255, 0.7);
 }
 

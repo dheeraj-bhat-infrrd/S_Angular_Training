@@ -1405,6 +1405,8 @@ $(document).on('click','.da-dd-item',function(e){
 		showDashOverlay('#latest-post-ep');
 		showDashOverlay('#review-ep');
 		showDashOverlay('#hierarchy-ep');
+		showDashOverlay('#config-setting-dash');
+		showDashOverlay('#social-media-dash');
 		var selectedTab = window.location.hash.split("#")[1];
 		showMainContent('./' + selectedTab + '.do');
 	});
