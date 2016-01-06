@@ -1420,7 +1420,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
         Update update = new Update();
         Date date = new Date();
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, date );
+        //        update.set( CommonConstants.MODIFIED_ON_COLUMN, date );
         update.set( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST, date );
         update.push( CommonConstants.REMINDERS_FOR_SOCIAL_POSTS, date );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
@@ -1430,7 +1430,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public List<SurveyDetails> getIncompleteSocialPostCustomersEmail( long companyId, int surveyReminderInterval,
-        int maxReminders, float autopostScore )
+        int maxReminders )
     {
         LOG.info( "Method to get list of customers who have not yet shared their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() started." );
         Date cutOffDate = getNdaysBackDate( surveyReminderInterval );
@@ -1440,7 +1440,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             new Criteria().orOperator( Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).lte( cutOffDate ),
                 Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ),
             Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
-            Criteria.where( CommonConstants.SCORE_COLUMN ).gte( autopostScore ),
             Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ),
             Criteria.where( CommonConstants.MOOD_COLUMN ).is( CommonConstants.SURVEY_MOOD_GREAT ) ) );
 
