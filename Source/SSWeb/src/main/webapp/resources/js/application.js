@@ -122,6 +122,7 @@ var defaultCountry = "United States";
  * @param url
  */
 function showMainContent(url) {
+	
 	closeMoblieScreenMenu();
 	saveState(url);
 	callAjaxGET(url, showMainContentCallBack, true);
@@ -134,6 +135,7 @@ function showMainContent(url) {
  */
 function showMainContentCallBack(data) {
 	$("#main-content").html(data);
+	hideDashOverlay('#logo-dash');
 	hideOverlay();
 }
 
@@ -1396,8 +1398,15 @@ $(document).on('click','.da-dd-item',function(e){
 	attrVal = $(this).attr('data-column-value');
 	
 	// update selected profile in session
+	
 	updateCurrentProfile($(this).attr('data-column-type'), $(this)
 			.attr('data-column-value'), function() {
+		showDashOverlay('#logo-dash');
+		showDashOverlay('#latest-post-ep');
+		showDashOverlay('#review-ep');
+		showDashOverlay('#hierarchy-ep');
+		showDashOverlay('#config-setting-dash');
+		showDashOverlay('#social-media-dash');
 		var selectedTab = window.location.hash.split("#")[1];
 		showMainContent('./' + selectedTab + '.do');
 	});
@@ -6415,12 +6424,10 @@ $(document).on('change', '#prof-logo', function() {
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
-
 	delay(function() {
-		callAjaxPOSTWithTextData("./updatelogo.do", function(data) {
+				callAjaxPOSTWithTextData("./updatelogo.do", function(data) {
 			$('#prof-message-header').html(data);
-			callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo,true);
-
+					callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo,true);
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
 		}, false, formData);
@@ -7214,6 +7221,7 @@ function fetchCompanyHierarchy(attrName, attrValue) {
 function paintHierarchy(data) {
 	$("#prof-hierarchy-container").html(data);
 	$("#prof-hierarchy-container").show();
+	hideDashOverlay('#hierarchy-ep');
 
 	/**
 	 * Click on region
@@ -7526,6 +7534,7 @@ function fetchPublicPostEditProfile(isNextBatch) {
 	
 	isAjaxRequestRunningEditProfile = true;
 	callAjaxGetWithPayloadData("./postsforuser.do", function(data) {
+		
 		isAjaxRequestRunningEditProfile = false;
 		if (data.errCode == undefined) {
 			if(data != "") {
