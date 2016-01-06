@@ -562,7 +562,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "started." );
         int reminderInterval = 0;
         int maxReminders = 0;
-        float autopostScore = 0;
         List<SurveyDetails> incompleteSocialPostCustomers = new ArrayList<>();
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
             companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -574,7 +573,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     && surveySettings.getSocial_post_reminder_interval_in_days() > 0 ) {
                     reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
                     maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
-                    autopostScore = surveySettings.getShow_survey_above_score();
                 }
             }
         }
@@ -585,7 +583,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             reminderInterval = socialPostReminderInterval;
         }
         incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail( companyId, reminderInterval,
-            maxReminders, autopostScore );
+            maxReminders );
         LOG.info( "finished." );
         return incompleteSocialPostCustomers;
     }
