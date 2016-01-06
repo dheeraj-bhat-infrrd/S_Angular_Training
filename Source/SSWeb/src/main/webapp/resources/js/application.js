@@ -113,6 +113,9 @@ var smScrollTop = 0;
 var defaultCountryCode = "US";
 var defaultCountry = "United States";
 
+var fb_app_id;
+var google_plus_app_id;
+
 /**
  * js functions for landing page
  */
@@ -4947,7 +4950,8 @@ function paintSurveyPage(jsonData) {
 	realtorEnabled = Boolean(jsonData.responseJSON.realtorEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
-	
+	fb_app_id = jsonData.responseJSON.fbAppId;
+	google_plus_app_id = jsonData.responseJSON.googlePlusAppId;
 	
 	//If social token availiable populate the links
 //	if (googleEnabled) {
@@ -4958,11 +4962,6 @@ function paintSurveyPage(jsonData) {
 //		$('#ggl-btn').remove();
 //	}
 
-	$('google-btn').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
-	$('linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&source=");
-	$('twitter-btn').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
-	$('fb-btn').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
-	
 	if (yelpEnabled) {
 		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
 	} else {
@@ -5369,9 +5368,9 @@ function showMasterQuestionPage(){
 			if(isAbusive == false){
 				onlyPostToSocialSurvey = false;
 			}
-			if(mood == 'Great') {
-				$('#social-post-links').show();
-			} 
+		}
+		if(mood == 'Great' && isAbusive == false) {
+			$('#social-post-links').show();
 		}
 		
 		//call method to post the review and update the review count
@@ -5381,10 +5380,18 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
-		$('#icn-fb-shr').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
-		$('#icn-google-shr').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
-		$('#icn-linkedin-shr').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&source=");
-		$('#icn-twitter-shr').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
+//		$('#icn-fb-shr').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
+//		$('#icn-google-shr').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
+//		$('#icn-linkedin-shr').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey&source=");
+//		$('#icn-twitter-shr').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
+		var fmt_rating = Number(rating).toFixed(1);
+		$('#linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+"&source=");
+		$('#twitter-btn').attr("href","https://twitter.com/intent/tweet?text="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&url='"+agentFullProfileLink+"'");
+		$('#fb-btn').attr("href","https://www.facebook.com/dialog/feed?app_id="+fb_app_id+"&link="+agentFullProfileLink+"'&description="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&redirect_uri=https://www.facebook.com");
+		$('#google-btn').attr("data-contenturl",agentFullProfileLink);
+		$('#google-btn').attr("data-clientid",google_plus_app_id);
+		$('#google-btn').attr("data-prefilltext",fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback);    
+		$('#google-btn').attr("data-calltoactionurl", agentFullProfileLink);
 		$('#content-head').html('Survey Completed');
 			if (mood == 'Great')
 				$('#content').html(happyTextComplete);

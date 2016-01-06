@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -149,6 +150,12 @@ public class SurveyManagementController
 
     @Autowired
     private EncryptionHelper encryptionHelper;
+
+    @Value ( "${FB_CLIENT_ID}")
+    private String facebookAppId;
+
+    @Value ( "${GOOGLE_API_KEY}")
+    private String googlePlusId;
 
 
     /*
@@ -1503,6 +1510,8 @@ public class SurveyManagementController
         Map<String, Object> surveyAndStage = new HashMap<>();
         List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId( agentId );
         boolean editable = false;
+        BranchSettings branchSettings = null;
+        OrganizationUnitSettings regionSettings = null;
         try {
             SurveyDetails survey = storeInitialSurveyDetails( agentId, customerEmail, firstName, lastName, reminderCount,
                 custRelationWithAgent, url, source );
@@ -1528,6 +1537,8 @@ public class SurveyManagementController
                 surveyAndStage.put( "customerFirstName", firstName );
                 surveyAndStage.put( "customerLastName", lastName );
             }
+            branchSettings = organizationManagementService.getBranchSettings( survey.getBranchId() );
+            regionSettings = organizationManagementService.getRegionSettings( survey.getRegionId() );
         } catch ( SolrException e ) {
             LOG.error( "SolrException caught in triggerSurvey(). Details are " + e );
             throw e;
@@ -1632,8 +1643,24 @@ public class SurveyManagementController
             if ( agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
                 surveyAndStage.put( "yelpEnabled", true );
                 surveyAndStage.put( "yelpLink", agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
-            } else
-                surveyAndStage.put( "yelpEnabled", false );
+            } else {
+                // Adding Yelp Url of the closest in hierarchy connected with Yelp.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
+                    surveyAndStage.put( "yelpEnabled", true );
+                    surveyAndStage.put( "yelpLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getYelpToken().getYelpPageLink() );
+                } else if ( regionSettings != null
+                    && regionSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
+                    surveyAndStage.put( "yelpEnabled", true );
+                    surveyAndStage.put( "yelpLink", regionSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
+                } else if ( companySettings != null
+                    && companySettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
+                    surveyAndStage.put( "yelpEnabled", true );
+                    surveyAndStage.put( "yelpLink", companySettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
+                } else
+                    surveyAndStage.put( "yelpEnabled", false );
+            }
         } catch ( NullPointerException e ) {
             surveyAndStage.put( "yelpEnabled", false );
         }
@@ -1654,8 +1681,27 @@ public class SurveyManagementController
             if ( agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
                 surveyAndStage.put( "zillowEnabled", true );
                 surveyAndStage.put( "zillowLink", agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
-            } else
-                surveyAndStage.put( "zillowEnabled", false );
+            } else {
+                // Adding Zillow Url of the closest in hierarchy connected with Zillow.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getZillowToken()
+                        .getZillowProfileLink() != null ) {
+                    surveyAndStage.put( "zillowEnabled", true );
+                    surveyAndStage.put( "zillowLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getZillowToken().getZillowProfileLink() );
+                } else if ( regionSettings != null
+                    && regionSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
+                    surveyAndStage.put( "zillowEnabled", true );
+                    surveyAndStage.put( "zillowLink", regionSettings.getSocialMediaTokens().getZillowToken()
+                        .getZillowProfileLink() );
+                } else if ( companySettings != null
+                    && companySettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
+                    surveyAndStage.put( "zillowEnabled", true );
+                    surveyAndStage.put( "zillowLink", companySettings.getSocialMediaTokens().getZillowToken()
+                        .getZillowProfileLink() );
+                } else
+                    surveyAndStage.put( "zillowEnabled", false );
+            }
         } catch ( NullPointerException e ) {
             surveyAndStage.put( "zillowEnabled", false );
         }
@@ -1666,8 +1712,27 @@ public class SurveyManagementController
                 surveyAndStage.put( "lendingtreeEnabled", true );
                 surveyAndStage.put( "lendingtreeLink", agentSettings.getSocialMediaTokens().getLendingTreeToken()
                     .getLendingTreeProfileLink() );
-            } else
-                surveyAndStage.put( "lendingtreeEnabled", false );
+            } else {
+             // Adding LendingTree Url of the closest in hierarchy connected with LendingTree.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getLendingTreeToken()
+                        .getLendingTreeProfileLink() != null ) {
+                    surveyAndStage.put( "lendingtreeEnabled", true );
+                    surveyAndStage.put( "lendingtreeLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getLendingTreeToken().getLendingTreeProfileLink() );
+                } else if ( regionSettings != null
+                    && regionSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
+                    surveyAndStage.put( "lendingtreeEnabled", true );
+                    surveyAndStage.put( "lendingtreeLink", regionSettings.getSocialMediaTokens().getLendingTreeToken()
+                        .getLendingTreeProfileLink() );
+                } else if ( companySettings != null
+                    && companySettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
+                    surveyAndStage.put( "lendingtreeEnabled", true );
+                    surveyAndStage.put( "lendingtreeLink", companySettings.getSocialMediaTokens().getLendingTreeToken()
+                        .getLendingTreeProfileLink() );
+                } else
+                    surveyAndStage.put( "lendingtreeEnabled", false );
+            }
         } catch ( NullPointerException e ) {
             surveyAndStage.put( "lendingtreeEnabled", false );
         }
@@ -1677,11 +1742,34 @@ public class SurveyManagementController
                 surveyAndStage.put( "realtorEnabled", true );
                 surveyAndStage.put( "realtorLink", agentSettings.getSocialMediaTokens().getRealtorToken()
                     .getRealtorProfileLink() );
-            } else
-                surveyAndStage.put( "realtorEnabled", false );
+            } else {
+             // Adding Realtor Url of the closest in hierarchy connected with Realtor.
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getRealtorToken()
+                        .getRealtorProfileLink() != null ) {
+                    surveyAndStage.put( "realtorEnabled", true );
+                    surveyAndStage.put( "realtorLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
+                        .getRealtorToken().getRealtorProfileLink() );
+                } else if ( regionSettings != null
+                    && regionSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
+                    surveyAndStage.put( "realtorEnabled", true );
+                    surveyAndStage.put( "realtorLink", regionSettings.getSocialMediaTokens().getRealtorToken()
+                        .getRealtorProfileLink() );
+                } else if ( companySettings != null
+                    && companySettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
+                    surveyAndStage.put( "realtorEnabled", true );
+                    surveyAndStage.put( "realtorLink", companySettings.getSocialMediaTokens().getRealtorToken()
+                        .getRealtorProfileLink() );
+                } else
+                    surveyAndStage.put( "realtorEnabled", false );
+            }
         } catch ( NullPointerException e ) {
             surveyAndStage.put( "realtorEnabled", false );
         }
+
+        // adding facebook and google plus api keys for customer share
+        surveyAndStage.put( "fbAppId", facebookAppId );
+        surveyAndStage.put( "googlePlusAppId", googlePlusId );
 
         surveyAndStage.put( "agentFullProfileLink", getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
             + agentSettings.getProfileUrl() );
