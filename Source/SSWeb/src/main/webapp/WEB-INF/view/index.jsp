@@ -47,7 +47,6 @@
 						<div class="float-left h-email-wrapper">
 							<div class="h-lbl">email address</div>
 							<div class="h-inp-wrapper">
-								<div class="m-inp-img m-inp-img-uname"></div>
 								<input type="email" class="h-inp" placeholder="Email Address" id="login-user-id" name="j_username">
 							</div>
 						</div>
@@ -57,7 +56,6 @@
 								<div class="float-right fgt-pwd"><span id="forgot-pwd" onclick ="openForgotPasswordPage();">Forgot Password?</span></div>
 							</div>
 							<div class="h-inp-wrapper">
-								<div class="m-inp-img m-inp-img-pwd"></div>
 								<input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password">
 							</div>
 						</div>
@@ -133,13 +131,10 @@
 						<div class="reg-txt-top1">Start Your Free Trial.</div>
 						<div class="reg-txt-top2">Sign up Now. It takes less than 2 minutes.</div>
 						<div class="clearfix reg-item reg-item-bord-top">
-							<div class="m-inp-img-fname m-inp-img"></div>
-							<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
 							<input id="reg-fname" name="firstName" class="reg-inp reg-inp-1 reg-inp-1-adj" value="${firstname}" placeholder="First Name">
 							<input id="reg-lname" name="lastName" class="reg-inp reg-inp-2" value="${lastname}" placeholder="Last Name">
 						</div>
 						<div class="clearfix reg-item">
-							<div class="m-inp-img-email m-inp-img"></div>
 							<input type="email" name="emailId" id="reg-email" class="reg-inp reg-inp-3" value="${emailid}" placeholder="Email">
 						</div>
 						<div class="clearfix reg-captcha-wrapper reg-item">
@@ -178,8 +173,6 @@
 				<form id="find-pro-form" method="GET" action="./findapro.do">
 					<div class="pro-right-wrapper clearfix float-left">
 						<div class="blue-ext-right"></div>
-						<div class="m-inp-img-fname m-inp-img"></div>
-						<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
 						<input id="find-pro-first-name" name="find-pro-first-name" class="pro-inp" placeholder="First Name">
 						<input id="find-pro-last-name" name="find-pro-last-name" class="pro-inp" placeholder="Last Name">
 						<input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Search">
@@ -202,7 +195,6 @@
 		</div>
 	</div>
  
-<script src='//www.google.com/recaptcha/api.js'></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
 	if (!window.jQuery) { document.write('<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js""><\/script>'); }
@@ -210,6 +202,7 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
 <script>
 $(document).ready(function(){
 	var captchaText=true;

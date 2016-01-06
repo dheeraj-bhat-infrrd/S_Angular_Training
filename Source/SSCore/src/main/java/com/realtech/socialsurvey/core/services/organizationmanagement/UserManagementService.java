@@ -472,5 +472,9 @@ public interface UserManagementService
 
 
     public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException;
+
+
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
+        NoRecordsFetchedException;
 }
 // JIRA SS-34 BY RM02 BOC

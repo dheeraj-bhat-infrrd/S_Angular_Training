@@ -412,8 +412,8 @@
 						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit" placeholder="<spring:message code="label.sspost.key"/>"></textarea>
 						<div id="prof-post-btn" class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
 					</div>
-					<div class="float-left panel-tweet-wrapper">
-						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
+					<div id="last-post" class="float-left panel-tweet-wrapper">
+						<div  class="main-con-header"><spring:message code="label.latestposts.key"/></div>
 						<div id="prof-posts" class="tweet-panel tweet-panel-left">
 							<!--  latest posts get populated here --> 
 						</div>
@@ -443,19 +443,8 @@
 <script>
 $(document).ready(function() {
 	
-	$('.va-dd-wrapper').perfectScrollbar({
-		suppressScrollX : true
-	});
-	$('.va-dd-wrapper').perfectScrollbar('update');
-	
-	hideOverlay();
 	$(document).attr("title", "Profile Settings");
-	
-	if ($("#da-dd-wrapper-profiles").children('.da-dd-item').length <= 1) {
-		$('#da-dd-wrapper').remove();
-	} else {
-		$('#da-dd-wrapper').show();
-	}
+	updateViewAsScroll();
 	
 	adjustImage();
 	$(window).resize(adjustImage);

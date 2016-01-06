@@ -159,27 +159,33 @@ public class DashboardController
             }
         }
 
+        String profileName = "";
         if ( !modelSet ) {
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = user.getCompany().getCompany();
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = solrSearchService.searchRegionById( entityId );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", entityType );
                 model.addAttribute( "columnValue", entityId );
                 model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
+                profileName = solrSearchService.searchBranchNameById( entityId );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 model.addAttribute( "columnName", CommonConstants.AGENT_ID_COLUMN );
                 model.addAttribute( "columnValue", entityId );
+                profileName = user.getFirstName() + " " + user.getLastName();
             }
         }
-
+        
         model.addAttribute( "userId", user.getUserId() );
         model.addAttribute( "emailId", user.getEmailId() );
+        model.addAttribute( "profileName", profileName );
 
         return JspResolver.DASHBOARD;
     }
@@ -334,9 +340,6 @@ public class DashboardController
         long columnValue = 0;
         User user = sessionHelper.getCurrentUser();
         boolean realtechAdmin = user.isSuperAdmin();
-        HttpSession session = request.getSession( false );
-        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         try {
             String columnValueStr = request.getParameter( "columnValue" );
@@ -365,7 +368,7 @@ public class DashboardController
 	        model.addAttribute( "completedSurvey", dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
 	        model.addAttribute( "clickedSurvey",
 	            dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
-	        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( entityType, entityId, numberOfDays ) );
+	        model.addAttribute( "socialPosts", dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue, numberOfDays ) );
         }catch(InvalidInputException e){
         	LOG.error("Error: "+e.getMessage(), e);
         }
@@ -569,9 +572,9 @@ public class DashboardController
 
             long id = 0;
             if ( columnName.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                return new Gson().toJson( user.getCompany().getCompany() );
+                return user.getCompany().getCompany();
             } else if ( columnName.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-                return new Gson().toJson( user.getFirstName() + " " + user.getLastName() );
+                return user.getFirstName() + " " + user.getLastName();
             } else {
                 String columnValue = request.getParameter( "columnValue" );
                 if ( columnValue != null && !columnValue.isEmpty() ) {
@@ -1060,7 +1063,8 @@ public class DashboardController
                 }
 
                 OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                //JIRA SS-1363 begin
+                /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                     logoUrl = companySettings.getLogoThumbnail();
                 } else if ( organizationUnit == OrganizationUnit.REGION ) {
                     OrganizationUnitSettings regionSettings = null;
@@ -1083,7 +1087,32 @@ public class DashboardController
                     }
                 } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                     logoUrl = agentSettings.getLogoThumbnail();
+                }*/
+                if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                    logoUrl = companySettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                    OrganizationUnitSettings regionSettings = null;
+                    try {
+                        regionSettings = organizationManagementService.getRegionSettings( regionId );
+                    } catch ( InvalidInputException e ) {
+                        e.printStackTrace();
+                    }
+                    if ( regionSettings != null )
+                        logoUrl = regionSettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                    OrganizationUnitSettings branchSettings = null;
+                    try {
+                        branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                    } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                        e.printStackTrace();
+                    }
+                    if ( branchSettings != null ) {
+                        logoUrl = branchSettings.getLogo();
+                    }
+                } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                    logoUrl = agentSettings.getLogo();
                 }
+                //JIRA SS-1363 end
 
                 emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
                     agentTitle, companyName, survey, surveyLink, logoUrl );
@@ -1198,7 +1227,8 @@ public class DashboardController
                     }
 
                     OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                    //JIRA SS-1363 begin
+                    /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
                         logoUrl = companySettings.getLogoThumbnail();
                     } else if ( organizationUnit == OrganizationUnit.REGION ) {
                         OrganizationUnitSettings regionSettings = null;
@@ -1221,7 +1251,32 @@ public class DashboardController
                         }
                     } else if ( organizationUnit == OrganizationUnit.AGENT ) {
                         logoUrl = agentSettings.getLogoThumbnail();
+                    }*/
+                    if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                        logoUrl = companySettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                        OrganizationUnitSettings regionSettings = null;
+                        try {
+                            regionSettings = organizationManagementService.getRegionSettings( regionId );
+                        } catch ( InvalidInputException e ) {
+                            e.printStackTrace();
+                        }
+                        if ( regionSettings != null )
+                            logoUrl = regionSettings.getLogo();
+                    } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                        OrganizationUnitSettings branchSettings = null;
+                        try {
+                            branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                            e.printStackTrace();
+                        }
+                        if ( branchSettings != null ) {
+                            logoUrl = branchSettings.getLogo();
+                        }
+                    } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                        logoUrl = agentSettings.getLogo();
                     }
+                    //JIRA SS-1363 end
 
                     emailServices.sendManualSurveyReminderMail( companySettings, user, agentName, agentEmailId, agentPhone,
                         agentTitle, companyName, survey, surveyLink, logoUrl );

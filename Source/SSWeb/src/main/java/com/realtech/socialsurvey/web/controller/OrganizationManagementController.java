@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
@@ -27,7 +30,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
@@ -49,6 +51,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -67,6 +70,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -301,10 +305,12 @@ public class OrganizationManagementController
             // JIRA SS-536: Added for manual registration via invitation
             if ( strIsDirectRegistration.equalsIgnoreCase( "false" ) ) {
                 companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE );
-                redirectAttributes.addFlashAttribute( "skippayment", "true" );
+                /*redirectAttributes.addFlashAttribute( "skippayment", "true" );*/
+                session.setAttribute("skippayment", "true");
             } else {
                 companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO );
-                redirectAttributes.addFlashAttribute( "skippayment", "false" );
+                /*redirectAttributes.addFlashAttribute( "skippayment", "false" );*/
+                session.setAttribute("skippayment", "false");
             }
 
             LOG.debug( "Calling services to add company details" );
@@ -495,7 +501,14 @@ public class OrganizationManagementController
             if ( settingsSetter.isSettingsValueSet( OrganizationUnit.COMPANY,
                 Long.parseLong( user.getCompany().getSettingsSetStatus() ), SettingsForApplication.LOGO ) ) {
                 LOG.debug( "Unlocking the logo" );
-                settingsLocker.lockSettingsValueForCompany( user.getCompany(), SettingsForApplication.LOGO, false );
+                try {
+                    if ( settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
+                        Long.parseLong( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.LOGO ) ) {
+                        settingsLocker.lockSettingsValueForCompany( user.getCompany(), SettingsForApplication.LOGO, false );
+                    }
+                } catch ( InvalidSettingsStateException e ) {
+                    LOG.error( "InvalidSettingsStateException occured. Reason :", e );
+                }
                 // update company
                 userManagementService.updateCompany( user.getCompany() );
             }
@@ -653,6 +666,7 @@ public class OrganizationManagementController
             }
             if ( surveySettings.getShow_survey_above_score() == 0f ) {
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 surveySettings.setAutoPostEnabled( true );
                 if(accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL){
                 	agentSettings.setSurvey_settings(surveySettings);
@@ -1203,6 +1217,7 @@ public class OrganizationManagementController
                 }
                 originalSurveySettings.setAutoPostEnabled( isAutopostEnabled );
                 originalSurveySettings.setShow_survey_above_score( (float) minPostRating );
+                originalSurveySettings.setAuto_post_score( (float) minPostRating );
 
                 LOG.info( "Updating Survey Settings Min score" );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL,
@@ -2336,6 +2351,7 @@ public class OrganizationManagementController
                 surveySettings.setSadTextComplete( sadTextComplete );
                 surveySettings.setAutoPostEnabled( true );
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
 
                 surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
                 unitSettings.setSurvey_settings( surveySettings );

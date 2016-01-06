@@ -36,6 +36,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
@@ -50,6 +51,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -60,7 +62,9 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -112,6 +116,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Autowired
     private ProfileManagementService profileManagementService;
 
+    @Autowired
+    private ZillowUpdateService zillowUpdateService;
+
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
@@ -152,6 +159,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Value ( "${CUSTOM_SOCIALNETWORK_POST_COMPANY_ID}")
     private String customisedSocialNetworkCompanyId;
 
+    @Autowired
+    private SocialPostDao socialPostDao;
 
     /**
      * Returns the Twitter request token for a particular URL
@@ -567,6 +576,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             }
             profileManagementService.updateProfileStages( profileStageList, unitSettings, collectionName );
         }
+        if ( socialMedia.equalsIgnoreCase( CommonConstants.ZILLOW_SOCIAL_SITE ) )
+            zillowUpdateService.updateZillowReviewCountAndAverage( collectionName, organizationUnitSettings.getIden(), 0, 0 );
 
         LOG.debug( "Method disconnectSocialNetwork() finished" );
 
@@ -621,19 +632,25 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
+    /*
+     * (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.social.SocialManagementService#postToSocialMedia(java.lang.String, java.lang.String, java.lang.String, java.lang.String, long, double, java.lang.String, java.lang.String, boolean, java.lang.String, boolean)
+     */
     @Override
     public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl ) throws NonFatalException
+        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl,
+        boolean onlyPostToSocialSurvey ) throws NonFatalException
     {
 
         LOG.info( "Method to post feedback of customer to various pages of social networking sites started." );
         boolean successfullyPosted = true;
+        
+        if(agentProfileLink == null || agentProfileLink.isEmpty()){
+            throw new InvalidInputException("Invalid parameter passed : passed input parameter agentProfileLink is null or empty");
+        }
+        
         try {
             String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
-
-            if ( isAbusive ) {
-                throw new InvalidInputException("Can't post an abusive survey");
-            }
 
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
             /*if ( rating % 1 == 0 ) {
@@ -690,35 +707,41 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 }
             }
 
-            // Facebook
-            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
-                + " for " + agentName + " on Social Survey - view at " + surveyHandler.getApplicationBaseUrl()
-                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-            facebookMessage += "\n Feedback : " + feedback;
-            try {
-                if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                    if ( !updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl, agent.getCompany()
-                        .getCompanyId() ) ) {
-                        if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
-                            agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+            //Social Survey
+            if ( !agentSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                agentSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
 
-                    }
-                }
-            } catch ( FacebookException e ) {
-                LOG.error(
-                    "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e );
-                reportBug( "Facebook", agentSettings.getContact_details().getName(), e );
+            if ( !companySocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                companySocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+
+            for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
+                List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
+                if ( !regionSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                    regionSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+                regionMediaPostDetails.setSharedOn( regionSocialList );
+
+
             }
-            if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+            for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
+                List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                if ( !branchSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                    branchSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+                branchMediaPostDetails.setSharedOn( branchSocialList );
+            }
 
+            //if onlyPostToSocialSurvey is false than only post on the social media otherwise just add social survey channel in social media post list
+            if ( !isAbusive && !onlyPostToSocialSurvey ) {
+                // Facebook
+                String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                    + " for " + agentName + " on Social Survey - view at " + surveyHandler.getApplicationBaseUrl()
+                    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                facebookMessage += "\n Feedback : " + feedback;
                 try {
-                    OrganizationUnitSettings companySetting = organizationManagementService
-                        .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
-                    if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
-                        if ( !updateStatusIntoFacebookPage( companySetting, facebookMessage, serverBaseUrl,
-                            companySetting.getIden() ) ) {
-                            if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
-                                companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
+                        if ( !updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl, agent.getCompany()
+                            .getCompanyId() ) ) {
+                            if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
 
                         }
                     }
@@ -726,19 +749,19 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     LOG.error(
                         "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                         e );
+                    reportBug( "Facebook", agentSettings.getContact_details().getName(), e );
                 }
+                if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
 
-                for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                     try {
-                        OrganizationUnitSettings setting = organizationManagementService
-                            .getRegionSettings( regionMediaPostDetails.getRegionId() );
-                        if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                            if ( !updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, agent.getCompany()
-                                .getCompanyId() ) ) {
-                                List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                if ( !regionSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
-                                    regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                                regionMediaPostDetails.setSharedOn( regionSocialList );
+                        OrganizationUnitSettings companySetting = organizationManagementService
+                            .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
+                        if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
+                            if ( !updateStatusIntoFacebookPage( companySetting, facebookMessage, serverBaseUrl,
+                                companySetting.getIden() ) ) {
+                                if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                    companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+
                             }
                         }
                     } catch ( FacebookException e ) {
@@ -746,172 +769,201 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                             e );
                     }
-                }
-                for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
-                    try {
-                        OrganizationUnitSettings setting = organizationManagementService
-                            .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                        if ( setting != null ) {
 
+                    for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails
+                        .getRegionMediaPostDetailsList() ) {
+                        try {
+                            OrganizationUnitSettings setting = organizationManagementService
+                                .getRegionSettings( regionMediaPostDetails.getRegionId() );
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                                 if ( !updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, agent.getCompany()
                                     .getCompanyId() ) ) {
-                                    List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
-                                        branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                                    branchMediaPostDetails.setSharedOn( branchSocialList );
+                                    List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
+                                    if ( !regionSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                        regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                                    regionMediaPostDetails.setSharedOn( regionSocialList );
                                 }
                             }
+                        } catch ( FacebookException e ) {
+                            LOG.error(
+                                "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
+                                e );
                         }
-                    } catch ( FacebookException e ) {
-                        LOG.error(
-                            "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
-                            e );
-                        reportBug( "Facebook", accountMasterName, e );
                     }
-                }
-            }
+                    for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
+                        .getBranchMediaPostDetailsList() ) {
+                        try {
+                            OrganizationUnitSettings setting = organizationManagementService
+                                .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
+                            if ( setting != null ) {
 
-            // LinkedIn
-            String linkedinMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
-                + " for " + agentName + " on SocialSurvey ";
-            String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                + agentProfileLink;
-            String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
-            if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                if ( !updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
-                    if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                        agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                }
-            }
-            if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
-                for ( OrganizationUnitSettings setting : companySettings ) {
-                    if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                        if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
-                            if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                                companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                                if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                                    if ( !updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, agent
+                                        .getCompany().getCompanyId() ) ) {
+                                        List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                                        if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
+                                            branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                                        branchMediaPostDetails.setSharedOn( branchSocialList );
+                                    }
+                                }
+                            }
+                        } catch ( FacebookException e ) {
+                            LOG.error(
+                                "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
+                                e );
+                            reportBug( "Facebook", accountMasterName, e );
                         }
                     }
                 }
-                for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
-                    OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
-                        .getRegionId() );
-                    if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                        if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
-                            List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                            if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                                regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                            regionMediaPostDetails.setSharedOn( regionSocialList );
-                        }
-                    }
-                }
-                for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
-                    OrganizationUnitSettings setting = organizationManagementService
-                        .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                    if ( setting != null ) {
 
+                // LinkedIn
+                String linkedinMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                    + " for " + agentName + " on SocialSurvey ";
+                String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                    + agentProfileLink;
+                String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
+                if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
+                    if ( !updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
+                        if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                            agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    }
+                }
+                if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+                    for ( OrganizationUnitSettings setting : companySettings ) {
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
-                                List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                                    branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                                branchMediaPostDetails.setSharedOn( branchSocialList );
+                                if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                    companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                             }
                         }
                     }
-                }
-            }
-
-            // Twitter
-            /*
-             * String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName
-             * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
-             * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-             */
-            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
-                customerDisplayName, agentName, "@SocialSurveyMe" )
-                + surveyHandler.getApplicationBaseUrl()
-                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-
-            try {
-                if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                    if ( !tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                        if ( !agentSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                            agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
-                    }
-                }
-            } catch ( TwitterException e ) {
-                LOG.error(
-                    "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e );
-                reportBug( "Twitter", agentSettings.getContact_details().getName(), e );
-            }
-            if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
-                for ( OrganizationUnitSettings setting : companySettings ) {
-                    try {
-                        if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                            if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
-                                if ( !companySocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                                    companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
-                            }
-                        }
-                    } catch ( TwitterException e ) {
-                        LOG.error(
-                            "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
-                            e );
-                    }
-                }
-                for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
-                    try {
+                    for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails
+                        .getRegionMediaPostDetailsList() ) {
                         OrganizationUnitSettings setting = organizationManagementService
                             .getRegionSettings( regionMediaPostDetails.getRegionId() );
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                            if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                            if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
                                 List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                if ( !regionSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                                    regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                    regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                                 regionMediaPostDetails.setSharedOn( regionSocialList );
                             }
                         }
-                    } catch ( TwitterException e ) {
-                        LOG.error(
-                            "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
-                            e );
                     }
-                }
-                for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
-                    try {
+                    for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
+                        .getBranchMediaPostDetailsList() ) {
                         OrganizationUnitSettings setting = organizationManagementService
                             .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
                         if ( setting != null ) {
 
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                                if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    if ( !branchSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                                        branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                    if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                                        branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                                     branchMediaPostDetails.setSharedOn( branchSocialList );
                                 }
                             }
                         }
-                    } catch ( TwitterException e ) {
-                        LOG.error(
-                            "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
-                            e );
-                        reportBug( "Twitter", accountMasterName, e );
+                    }
+                }
+
+                // Twitter
+                /*
+                 * String twitterMessage = rating + "-Star Survey Response from " + customerDisplayName
+                 * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
+                 * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                 */
+                String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
+                    customerDisplayName, agentName, "@SocialSurveyMe" )
+                    + surveyHandler.getApplicationBaseUrl()
+                    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+
+                try {
+                    if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
+                        if ( !tweet( agentSettings, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                            if ( !agentSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                        }
+                    }
+                } catch ( TwitterException e ) {
+                    LOG.error(
+                        "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
+                        e );
+                    reportBug( "Twitter", agentSettings.getContact_details().getName(), e );
+                }
+                if ( accountMasterId != CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+                    for ( OrganizationUnitSettings setting : companySettings ) {
+                        try {
+                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                                if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                                    if ( !companySocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                        companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                }
+                            }
+                        } catch ( TwitterException e ) {
+                            LOG.error(
+                                "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
+                                e );
+                        }
+                    }
+                    for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails
+                        .getRegionMediaPostDetailsList() ) {
+                        try {
+                            OrganizationUnitSettings setting = organizationManagementService
+                                .getRegionSettings( regionMediaPostDetails.getRegionId() );
+                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                                if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                                    List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
+                                    if ( !regionSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                        regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                    regionMediaPostDetails.setSharedOn( regionSocialList );
+                                }
+                            }
+                        } catch ( TwitterException e ) {
+                            LOG.error(
+                                "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
+                                e );
+                        }
+                    }
+                    for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
+                        .getBranchMediaPostDetailsList() ) {
+                        try {
+                            OrganizationUnitSettings setting = organizationManagementService
+                                .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
+                            if ( setting != null ) {
+
+                                if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                                    if ( !tweet( setting, twitterMessage, agent.getCompany().getCompanyId() ) ) {
+                                        List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                                        if ( !branchSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                                            branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                                        branchMediaPostDetails.setSharedOn( branchSocialList );
+                                    }
+                                }
+                            }
+                        } catch ( TwitterException e ) {
+                            LOG.error(
+                                "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
+                                e );
+                            reportBug( "Twitter", accountMasterName, e );
+                        }
                     }
                 }
             }
+
             socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( agentSocialList );
             socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( companySocialList );
             surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
             surveyHandler.updateSurveyDetails( surveyDetails );
+
 
         } catch ( NonFatalException e ) {
             LOG.error(
                 "Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
                 e );
             successfullyPosted = false;
-            throw new NonFatalException(e.getMessage());
+            throw new NonFatalException( e.getMessage() );
         }
         LOG.info( "Method to post feedback of customer to various pages of social networking sites finished." );
         return successfullyPosted;
@@ -937,5 +989,112 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( InvalidInputException iie ) {
             LOG.error( "error while sending report bug mail to admin ", iie );
         }
+    }
+    
+
+    /**
+     * Method to add entry to social connections history
+     * 
+     * @param entityType
+     * @param entityId
+     * @param mediaTokens
+     * @param socialMedia
+     * @param action
+     * @throws InvalidInputException
+     * @throws ProfileNotFoundException
+     */
+    @Override
+    public void updateSocialConnectionsHistory( String entityType, long entityId, SocialMediaTokens mediaTokens,
+        String socialMedia, String action ) throws InvalidInputException, ProfileNotFoundException
+    {
+        //Check if any of the parameters are null or empty
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entity type. EntityType : " + entityType );
+        }
+        
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "Invalid entity ID. Entity ID : " + entityId );
+        }
+        
+        if ( mediaTokens == null ) {
+            throw new InvalidInputException( "MediaTokens is null" );
+        }
+        
+        if ( action == null || action.isEmpty() ) {
+            throw new InvalidInputException( "action is invalid. Action : " + action );
+        }
+
+        if ( socialMedia == null || socialMedia.isEmpty() ) {
+            throw new InvalidInputException( "social media invalid. Social Media : " + socialMedia );
+        }
+        SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
+
+        //Check for the correct media token and set the appropriate link
+        switch ( socialMedia ) {
+            case CommonConstants.FACEBOOK_SOCIAL_SITE:
+                if ( ( mediaTokens.getFacebookToken() != null )
+                    && ( mediaTokens.getFacebookToken().getFacebookPageLink() != null )
+                    && !( mediaTokens.getFacebookToken().getFacebookPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getFacebookToken().getFacebookPageLink() );
+                break;
+
+            case CommonConstants.TWITTER_SOCIAL_SITE:
+                if ( ( mediaTokens.getTwitterToken() != null ) && ( mediaTokens.getTwitterToken().getTwitterPageLink() != null )
+                    && !( mediaTokens.getTwitterToken().getTwitterPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getTwitterToken().getTwitterPageLink() );
+                break;
+
+            case CommonConstants.GOOGLE_SOCIAL_SITE:
+                if ( ( mediaTokens.getGoogleToken() != null ) && ( mediaTokens.getGoogleToken().getProfileLink() != null )
+                    && !( mediaTokens.getGoogleToken().getProfileLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getGoogleToken().getProfileLink() );
+                break;
+
+            case CommonConstants.LINKEDIN_SOCIAL_SITE:
+                if ( ( mediaTokens.getLinkedInToken() != null )
+                    && ( mediaTokens.getLinkedInToken().getLinkedInPageLink() != null )
+                    && !( mediaTokens.getLinkedInToken().getLinkedInPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
+                break;
+
+            case CommonConstants.ZILLOW_SOCIAL_SITE:
+                if ( ( mediaTokens.getZillowToken() != null ) && ( mediaTokens.getZillowToken().getZillowProfileLink() != null )
+                    && !( mediaTokens.getZillowToken().getZillowProfileLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getZillowToken().getZillowProfileLink() );
+                break;
+
+            case CommonConstants.YELP_SOCIAL_SITE:
+                if ( ( mediaTokens.getYelpToken() != null ) && ( mediaTokens.getYelpToken().getYelpPageLink() != null )
+                    && !( mediaTokens.getYelpToken().getYelpPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getYelpToken().getYelpPageLink() );
+                break;
+
+            case CommonConstants.REALTOR_SOCIAL_SITE:
+                if ( ( mediaTokens.getRealtorToken() != null )
+                    && ( mediaTokens.getRealtorToken().getRealtorProfileLink() != null )
+                    && !( mediaTokens.getRealtorToken().getRealtorProfileLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getRealtorToken().getRealtorProfileLink() );
+                break;
+
+            case CommonConstants.LENDINGTREE_SOCIAL_SITE:
+                if ( ( mediaTokens.getLendingTreeToken() != null )
+                    && ( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null )
+                    && !( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
+                break;
+
+            default:
+                throw new InvalidInputException( "Invalid social media token entered" );
+        }
+        Map<String, Long> hierarchyList = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
+
+        socialUpdateAction.setAction( action );
+        socialUpdateAction.setAgentId( hierarchyList.get( CommonConstants.AGENT_ID ) );
+        socialUpdateAction.setBranchId( hierarchyList.get( CommonConstants.BRANCH_ID ) );
+        socialUpdateAction.setRegionId( hierarchyList.get( CommonConstants.REGION_ID ) );
+        socialUpdateAction.setCompanyId( hierarchyList.get( CommonConstants.COMPANY_ID ) );
+        socialUpdateAction.setSocialMediaSource( socialMedia );
+
+        socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
     }
 }

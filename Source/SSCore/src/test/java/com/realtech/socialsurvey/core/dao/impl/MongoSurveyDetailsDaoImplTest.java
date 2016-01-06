@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import java.sql.Timestamp;
-
+import java.util.ArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -9,19 +11,34 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Query;
+import com.mongodb.BasicDBObject;
+import com.realtech.socialsurvey.TestConstants;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 
 
 public class MongoSurveyDetailsDaoImplTest
 {
+    @Spy
     @InjectMocks
     private MongoSurveyDetailsDaoImpl mongoSurveyDetailsDaoImpl;
 
     @Mock
     private MongoTemplate mongoTemplate;
+
+    @Mock
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 
     @BeforeClass
@@ -107,5 +124,71 @@ public class MongoSurveyDetailsDaoImplTest
     public void getSocialPostsAggregationCountTestAggregateByEmpty() throws InvalidInputException
     {
         mongoSurveyDetailsDaoImpl.getSocialPostsAggregationCount( "test", 10l, new Timestamp( 0 ), new Timestamp( 0 ), "" );
+    }
+
+
+    @Test
+    public void testGetFeedBacksCountWithIncludeZillowReviewsAsTrueAndNotRecommendedTrue()
+    {
+        Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
+        long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( TestConstants.TEST_STRING, 2, 3.5, 3.5, false, true, true, 2 );
+        assertEquals( "FeedBack count does not match expected", 10, count );
+    }
+
+
+    @Test
+    public void testGetFeedBacksCountWithIncludeZillowReviewsAsTrueAndNotRecommendedFalse()
+    {
+        Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
+        long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 3.5, 3.5, false, false,
+            true, 2 );
+        assertEquals( "FeedBack count does not match expected", 12, count );
+    }
+
+
+    @Test
+    public void testGetFeedBacksCountWithIncludeZillowReviewsAsFalseAndNotRecommendedFalse()
+    {
+        Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
+        long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 3.5, 3.5, false, false,
+            false, 2 );
+        assertEquals( "FeedBack count does not match expected", 10, count );
+    }
+
+
+    @Test
+    public void testGetFeedBacksCountWithIncludeZillowReviewsAsFalseAndNotRecommendedTrue()
+    {
+        Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 2l );
+        long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 0, 3.0, false, true,
+            false, 2 );
+        assertEquals( "FeedBack count does not match expected", 2, count );
+    }
+
+
+    @Test
+    public void testGetRatingForPastNdaysWithIncludeZillowReviewsAsTrueWhenReviewCountIsZero()
+    {
+        Mockito.when(
+            mongoTemplate.aggregate( (TypedAggregation<SurveyDetails>) Mockito.any(), Mockito.anyString(),
+                Mockito.eq( SurveyDetails.class ) ) ).thenReturn(
+            new AggregationResults<SurveyDetails>( new ArrayList<SurveyDetails>(), new BasicDBObject() ) );
+        Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 0l );
+        double average = mongoSurveyDetailsDaoImpl.getRatingForPastNdays( CommonConstants.COMPANY_ID_COLUMN, 2, 90, false,
+            false, true, 10, 40 );
+        assertEquals( "Average does not match expected", 4, average, 0 );
+    }
+
+
+    @Test
+    public void testGetRatingForPastNdaysWithIncludeZillowReviewsAsTrueWhenResultsIsNull()
+    {
+        Mockito.when(
+            mongoTemplate.aggregate( (TypedAggregation<SurveyDetails>) Mockito.any(), Mockito.anyString(),
+                Mockito.eq( SurveyDetails.class ) ) ).thenReturn( null );
+        Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
+        double average = mongoSurveyDetailsDaoImpl.getRatingForPastNdays( CommonConstants.COMPANY_ID_COLUMN, 2, 90, false,
+            false, true, 10, 40 );
+        assertEquals( "Average does not match expected", 4, average, 0 );
     }
 }

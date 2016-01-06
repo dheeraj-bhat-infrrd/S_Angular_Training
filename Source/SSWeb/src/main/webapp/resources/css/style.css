@@ -7,14 +7,6 @@
 	height: 0;
 }
 
-.floatLeft {
-	float: left;
-}
-
-.floatRight {
-	float: right;
-}
-
 .formModalContainer {
 	width: 380px;
 	margin: 0 auto;
@@ -94,42 +86,6 @@
 .formInputField {
 	height: 48px;
 	margin: 0 auto 5px;
-}
-
-#firstName {
-	background: url(../images/first-name.png) no-repeat;
-	background-position: 14px center;
-	background-size: 20px;
-}
-
-#lastName {
-	background: url(../images/last-name.png) no-repeat;
-	background-position: 14px center;
-	background-size: 20px;
-}
-
-#emailId {
-	background: url(../images/iconEmailId.png) no-repeat;
-	background-position: 14px center;
-	background-size: 20px;
-}
-
-#userId {
-	background: url(../images/userName.png) no-repeat;
-	background-position: 14px center;
-	background-size: 20px;
-}
-
-#password {
-	background: url(../images/key.png) no-repeat;
-	background-position: 14px center;
-	background-size: 20px;
-}
-
-#confirmPassword {
-	background: url(../images/double-key.png) no-repeat;
-	background-position: 14px center;
-	background-size: 20px;
 }
 
 .formWrapper {
@@ -259,16 +215,11 @@
     width: 411px !important;
 }
 
-.account-type-height {
-/*    height: auto !important*/
-}
-
 .hm-content-right {
     border-left: 1px solid #dcdcdc;
 }
 
 .hm-left-item {
-/*    border-bottom: 1px solid #dcdcdc;*/
     padding: 0 45px 0 0;
 }
 
@@ -311,7 +262,6 @@
 }
 
 .rt-panel-slide{
-/*    right: 0;*/
      transform: translate3d(0,0,0);
     -webkit-transform: translate3d(0,0,0);
     -moz-transform: translate3d(0,0,0);
@@ -326,10 +276,6 @@
     box-shadow: none !important;
 }
 
-/* .body-no-scroll{
-    position: fixed;
-    top: 0;
-} */
 .st-score-txt {
     height: 110px;
     line-height: 26px;
@@ -371,9 +317,8 @@
 
 .lp-con-icn {
     height: 32px;
-    width: 36px;
-    margin-right: 10px;
-/*    background-size: 20px !important;*/
+    width: 26px;
+    margin: 0 15px 0 5px;
 }
 
 .update-card-details-txt{

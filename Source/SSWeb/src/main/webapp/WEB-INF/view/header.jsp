@@ -173,6 +173,9 @@
 					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
 				</div>
 				<div class="header-links-item" >
+					<a href="javascript:showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></a>
+				</div>
+				<div class="header-links-item" >
 					<a href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
 				</div>
 			</div>

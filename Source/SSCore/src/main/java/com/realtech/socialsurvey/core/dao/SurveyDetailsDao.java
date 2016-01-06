@@ -58,7 +58,7 @@ public interface SurveyDetailsDao
 
 
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin );
+        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, long zillowTotalReviewScore );
 
 
     public long getIncompleteSurveyCount( String columnName, long columnValue, int noOfDays );
@@ -75,7 +75,7 @@ public interface SurveyDetailsDao
 
 
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
-        boolean fetchAbusive, boolean notRecommended );
+        boolean fetchAbusive, boolean notRecommended, boolean includeZillow, long zillowReviewCount );
 
 
     public List<SurveyDetails> getIncompleteSurvey( String columnName, long columNValue, int start, int rows,
@@ -166,11 +166,11 @@ public interface SurveyDetailsDao
 
     void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName );
 
+    // Commented as Zillow surveys are not stored in database, SS-1276
+    // void removeZillowSurveysByEntity( String entityType, long entityId );
 
-    void removeZillowSurveysByEntity( String entityType, long entityId );
-
-
-    void removeExcessZillowSurveysByEntity( String entityType, long entityId );
+    // Commented as Zillow surveys are not stored in database, SS-1276
+    // void removeExcessZillowSurveysByEntity( String entityType, long entityId );
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows );

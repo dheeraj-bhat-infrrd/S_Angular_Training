@@ -17,7 +17,7 @@ namespace EncompassSocialSurvey
 {
     public class LoanUtility
     {
-        private static int DAYS_INTERVAL = 30; // should not get loans older than DAYS_INTERVAL from NOW
+        private static int DAYS_INTERVAL = EncompassSocialSurveyConfiguration.DefaultDaysIntervalToFetch; // should not get loans older than DAYS_INTERVAL from NOW
         private static DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurverConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
         // Populates the loan list with the contents of a folder
 
@@ -106,23 +106,24 @@ namespace EncompassSocialSurvey
                         forLoanVM_Borrower.CustomerFirstName = fieldValues[2];
                         forLoanVM_Borrower.CustomerLastName = fieldValues[3];
 
-
+                        string agentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
                         string emailId = fieldValues[4];
 
                         if (string.IsNullOrWhiteSpace(emailDomain))
                         {
 
                             forLoanVM_Borrower.CustomerEmailId = emailId;
-                            forLoanVM_Borrower.AgentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
+                            forLoanVM_Borrower.AgentEmailId = agentEmailId;
                         }
                         else
                         {
                             forLoanVM_Borrower.CustomerEmailId = replaceEmailAddress(emailId, emailDomain, emailPrefix);
-                            forLoanVM_Borrower.AgentEmailId = replaceEmailAddress((loanOfficer != null) ? loanOfficer.Email : "", emailDomain, emailPrefix);
+                            forLoanVM_Borrower.AgentEmailId = replaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
                         }
 
                         forLoanVM_Borrower.ReminderCounts = EncompassSocialSurverConstant.REMINDER_COUNT;
                         forLoanVM_Borrower.LastReminderTime = EncompassSocialSurverConstant.LAST_REMINDER_TIME;
+                        Logger.Debug("EngagementClosedTime for loan is : " + fieldValues[8]);
                         forLoanVM_Borrower.EngagementClosedTime = fieldValues[8];
                         forLoanVM_Borrower.Status = EncompassSocialSurverConstant.STATUS;
 
@@ -139,8 +140,7 @@ namespace EncompassSocialSurvey
 
                             forLoanVM_Co_Borrower.AgentId = (loanOfficer != null) ? loanOfficer.ID : "";
                             forLoanVM_Co_Borrower.AgentName = (loanOfficer != null) ? loanOfficer.FullName : "";
-                            forLoanVM_Co_Borrower.AgentEmailId = (loanOfficer != null) ? loanOfficer.Email : "";
-
+                            
                             forLoanVM_Co_Borrower.CustomerFirstName = fieldValues[5];
                             forLoanVM_Co_Borrower.CustomerLastName = fieldValues[6];
 
@@ -150,10 +150,12 @@ namespace EncompassSocialSurvey
                             {
 
                                 forLoanVM_Co_Borrower.CustomerEmailId = coborrowerEmailId;
+                                forLoanVM_Co_Borrower.AgentEmailId = agentEmailId;
                             }
                             else
                             {
                                 forLoanVM_Co_Borrower.CustomerEmailId = replaceEmailAddress(coborrowerEmailId, emailDomain, emailPrefix);
+                                forLoanVM_Co_Borrower.AgentEmailId = replaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
                             }
 
 

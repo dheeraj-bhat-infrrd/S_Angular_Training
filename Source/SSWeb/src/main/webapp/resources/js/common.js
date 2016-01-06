@@ -118,6 +118,46 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
 	});
 }
 
+function callAjaxPOSTWithTextDataLogo(url, callBackFunction, isAsync, formData) {
+
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+				url : url,
+				type : "POST",
+				dataType : "text",
+				timeout : 30000,
+				contentType : false,
+				processData : false,
+				cache : false,
+				data : formData,
+				async : isAsync,
+				success : callBackFunction,
+				complete : function() {
+					hideOverlay();
+				},
+				error : function(x, t, m) {
+					if (t === "timeout") {
+						logoSuccess=true;
+						showErrorMobileAndWeb(' please try uploading the logo again');
+						$('#overlay-toast').text("Please try uploading the logo again");
+						showToast();
+						
+					} else {
+						redirectErrorpage();
+					}
+				}
+
+			/*
+			 * function(e) { if(e.status == 504) {
+			 * redirectToLoginPageOnSessionTimeOut(e.status); return; }
+			 * redirectErrorpage(); }
+			 */
+			});
+}
+
+
 /**
  * Generic function to be used for making ajax get calls with datatype text and formdata
  * 
@@ -209,7 +249,7 @@ function callAjaxFormSubmit(url, callBackFunction, formId,disableEle) {
 		type : "POST",
 		data : payLoad,
 		success : callBackFunction,
-		complete: function(){
+		complete: function(data){
 			enable(disableEle);
 			
 			
@@ -300,6 +340,8 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
+			hideDashOverlay('#mid-dash');
+			hideDashOverlay('#top-dash');
 			enable(disableEle);
 		},
 		error : function(e) {
