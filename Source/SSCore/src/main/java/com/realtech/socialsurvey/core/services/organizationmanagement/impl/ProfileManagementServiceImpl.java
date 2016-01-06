@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Resource;
 import javax.servlet.UnavailableException;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -30,8 +32,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -46,6 +50,7 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
@@ -217,6 +222,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Autowired
     private ZillowUpdateService zillowUpdateService;
 
+    @Autowired
+    private ZillowHierarchyDao zillowHierarchyDao;
+
     @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
     String paramOrderTakeSurvey;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
@@ -332,7 +340,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private LockSettings lockSettingsTillRegion( OrganizationUnitSettings companySettings,
+    LockSettings lockSettingsTillRegion( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
         LOG.debug( "Method lockSettingsTillRegion() called from ProfileManagementService" );
@@ -353,7 +361,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private LockSettings lockSettingsTillBranch( OrganizationUnitSettings companySettings,
+    LockSettings lockSettingsTillBranch( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
         LOG.debug( "Method lockSettingsTillBranch() called from ProfileManagementService" );
@@ -379,7 +387,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private LockSettings aggregateLockSettings( LockSettings higherLock, LockSettings parentLock )
+    LockSettings aggregateLockSettings( LockSettings higherLock, LockSettings parentLock )
     {
         LOG.debug( "Method aggregateLockSettings() called from ProfileManagementService" );
 
@@ -509,7 +517,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings aggregateRegionProfile( OrganizationUnitSettings companySettings,
+    OrganizationUnitSettings aggregateRegionProfile( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
         LOG.debug( "Method aggregateRegionProfile() called from ProfileManagementService" );
@@ -531,7 +539,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings aggregateBranchProfile( OrganizationUnitSettings companySettings,
+    OrganizationUnitSettings aggregateBranchProfile( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
         LOG.debug( "Method aggregateBranchProfile() called from ProfileManagementService" );
@@ -558,7 +566,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings aggregateAgentProfile( OrganizationUnitSettings companySettings,
+    OrganizationUnitSettings aggregateAgentProfile( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSettings, OrganizationUnitSettings agentSettings )
         throws InvalidInputException
     {
@@ -598,7 +606,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings aggregateProfileData( OrganizationUnitSettings parentProfile,
+    OrganizationUnitSettings aggregateProfileData( OrganizationUnitSettings parentProfile,
         OrganizationUnitSettings userProfile, LockSettings userLock )
     {
         LOG.debug( "Method aggregateProfileData() called from ProfileManagementService" );
@@ -705,6 +713,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( logo == null || logo.isEmpty() ) {
             throw new InvalidInputException( "Logo passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
+        }
         LOG.info( "Updating logo" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             logo, companySettings, collection );*/
@@ -723,6 +737,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( image == null || image.isEmpty() ) {
             throw new InvalidInputException( "image passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
         }
         LOG.info( "Updating image" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -743,6 +763,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( vertical == null || vertical.isEmpty() ) {
             throw new InvalidInputException( "vertical passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
         }
         LOG.info( "Updating vertical" );
         if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
@@ -779,7 +805,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( associations == null ) {
             throw new InvalidInputException( "Association name passed can not be null" );
         }
-
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Adding associations" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, unitSettings,
@@ -796,7 +827,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( associations == null ) {
             throw new InvalidInputException( "Association name passed can not be null" );
         }
-
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
+        }
         LOG.info( "Adding associations" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION,
             associations, agentSettings );
@@ -813,6 +849,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( lockSettings == null ) {
             throw new InvalidInputException( "LockSettings passed can not be null" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Updating lock detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_LOCK_SETTINGS, lockSettings, unitSettings, collection );
@@ -828,6 +870,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( contactDetailsSettings == null ) {
             throw new InvalidInputException( "Contact details passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
         LOG.info( "Updating contact detail information" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -846,6 +894,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( contactDetailsSettings == null ) {
             throw new InvalidInputException( "Contact details passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
         }
         LOG.info( "Updating contact detail information" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings(
@@ -866,6 +920,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( achievements == null ) {
             throw new InvalidInputException( "Achievements passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Adding achievements" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS, achievements, unitSettings, collection );
@@ -881,6 +941,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( achievements == null ) {
             throw new InvalidInputException( "Achievements passed can not be null or empty" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
+        }
         LOG.info( "Adding achievements" );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS,
             achievements, agentSettings );
@@ -895,7 +961,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException
     {
         if ( authorisedIn == null ) {
-            throw new InvalidInputException( "Contact details passed can not be null" );
+            throw new InvalidInputException( "Authorised In list passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
 
         Licenses licenses = unitSettings.getLicenses();
@@ -917,7 +989,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException
     {
         if ( authorisedIn == null ) {
-            throw new InvalidInputException( "Contact details passed can not be null" );
+            throw new InvalidInputException( "Authorised In list passed can not be null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings passed can not be null" );
         }
 
         Licenses licenses = agentSettings.getLicenses();
@@ -942,6 +1020,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( mediaTokens == null ) {
             throw new InvalidInputException( "Media tokens passed was null" );
         }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
         LOG.info( "Updating the social media tokens in profile." );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens, unitSettings, collection );
@@ -956,6 +1040,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( disclaimer == null || disclaimer.isEmpty() ) {
             throw new InvalidInputException( "disclaimer passed can not be null or empty" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
         }
         LOG.info( "Updating disclaimer" );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -1386,7 +1476,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private SocialMediaTokens validateSocialMediaTokens( OrganizationUnitSettings unitSettings )
+    SocialMediaTokens validateSocialMediaTokens( OrganizationUnitSettings unitSettings )
     {
         SocialMediaTokens mediaTokens;
         if ( unitSettings.getSocialMediaTokens() == null ) {
@@ -1715,32 +1805,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public double getAverageRatings( long iden, String profileLevel, boolean aggregateAbusive ) throws InvalidInputException
     {
-        return getAverageRatings( iden, profileLevel, aggregateAbusive, false );
+        return getAverageRatings( iden, profileLevel, aggregateAbusive, false, 0, 0 );
     }
 
 
     @Override
-    public double getAverageRatings( long iden, String profileLevel, boolean aggregateAbusive, boolean includeZillow )
-        throws InvalidInputException
+    public double getAverageRatings( long iden, String profileLevel, boolean aggregateAbusive, boolean includeZillow, long zillowTotalScore, long zillowReviewCount) throws InvalidInputException
     {
         LOG.info( "Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel );
         if ( iden <= 0l ) {
             throw new InvalidInputException( "iden is invalid for getting average rating os a company" );
         }
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        long zillowReviewCount = 0;
-        long zillowReviewTotalScore = 0;
-        if ( includeZillow ) {
-            Map<String, Long> zillowReviewInfo = getZillowTotalScoreAndReviewCountForProfileLevel( idenColumnName, iden );
-            if ( zillowReviewInfo != null && !zillowReviewInfo.isEmpty()
-                && zillowReviewInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ) > 0
-                && zillowReviewInfo.get( CommonConstants.ZILLOW_TOTAL_SCORE ) > 0 ) {
-                zillowReviewCount = zillowReviewInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
-                zillowReviewTotalScore = zillowReviewInfo.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-            }
-        }
         double averageRating = surveyDetailsDao.getRatingForPastNdays( idenColumnName, iden, -1, aggregateAbusive, false,
-            includeZillow, zillowReviewCount, zillowReviewTotalScore );
+            includeZillow, zillowReviewCount, zillowTotalScore );
         LOG.info( "Method getAverageRatings executed successfully.Returning: " + averageRating );
         return averageRating;
     }
@@ -1753,7 +1831,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @return
      * @throws InvalidInputException
      */
-    private String getIdenColumnNameFromProfileLevel( String profileLevel ) throws InvalidInputException
+    String getIdenColumnNameFromProfileLevel( String profileLevel ) throws InvalidInputException
     {
         LOG.debug( "Getting iden column name for profile level:" + profileLevel );
         String idenColumnName = null;
@@ -1792,13 +1870,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
         boolean notRecommended ) throws InvalidInputException
     {
-        return getReviewsCount( iden, minScore, maxScore, profileLevel, fetchAbusive, notRecommended, false );
+        return getReviewsCount( iden, minScore, maxScore, profileLevel, fetchAbusive, notRecommended, false, 0 );
     }
 
 
     @Override
     public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
-        boolean notRecommended, boolean includeZillow ) throws InvalidInputException
+        boolean notRecommended, boolean includeZillow, long zillowReviewCount ) throws InvalidInputException
     {
         LOG.info( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
             + " profilelevel:" + profileLevel );
@@ -1806,14 +1884,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Iden is invalid for getting reviews count" );
         }
         long reviewsCount = 0;
-        long zillowReviewCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        if ( includeZillow ) {
-            Map<String, Long> zillowReviewInfo = getZillowTotalScoreAndReviewCountForProfileLevel( idenColumnName, iden );
-            if ( zillowReviewInfo != null && !zillowReviewInfo.isEmpty()
-                && zillowReviewInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN ) > 0 )
-                zillowReviewCount = zillowReviewInfo.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
-        }
         reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
             notRecommended, includeZillow, zillowReviewCount );
         LOG.info( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
@@ -2439,7 +2510,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private List<CompanyPositions> sortCompanyPositions( List<CompanyPositions> positions )
+    List<CompanyPositions> sortCompanyPositions( List<CompanyPositions> positions )
     {
         LOG.debug( "Sorting company positions" );
         if ( positions != null && positions.size() > 0 ) {
@@ -2449,7 +2520,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private Set<Long> getAgentIdsByProfileLevel( String profileLevel, long iden ) throws InvalidInputException
+    Set<Long> getAgentIdsByProfileLevel( String profileLevel, long iden ) throws InvalidInputException
     {
         if ( profileLevel == null || profileLevel.isEmpty() ) {
             throw new InvalidInputException( "profile level is null or empty while getting agents" );
@@ -2686,7 +2757,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateCrumbListWithCompanyName( List<BreadCrumb> breadCrumbList, Company company )
+    void updateCrumbListWithCompanyName( List<BreadCrumb> breadCrumbList, Company company )
         throws InvalidInputException
     {
         BreadCrumb breadCrumb = new BreadCrumb();
@@ -2697,7 +2768,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateCrumbListWithBranchName( List<BreadCrumb> breadCrumbList, Branch branch ) throws InvalidInputException,
+    void updateCrumbListWithBranchName( List<BreadCrumb> breadCrumbList, Branch branch ) throws InvalidInputException,
         NoRecordsFetchedException
     {
         if ( branch.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
@@ -2710,7 +2781,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateCrumbListWithRegionName( List<BreadCrumb> breadCrumbList, Region region ) throws InvalidInputException
+    void updateCrumbListWithRegionName( List<BreadCrumb> breadCrumbList, Region region ) throws InvalidInputException
     {
         if ( region.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
             BreadCrumb breadCrumb = new BreadCrumb();
@@ -2722,7 +2793,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private void updateCrumbListWithVerticalName( List<BreadCrumb> breadCrumbList, Company company )
+    void updateCrumbListWithVerticalName( List<BreadCrumb> breadCrumbList, Company company )
     {
         BreadCrumb breadCrumb = new BreadCrumb();
         breadCrumb.setBreadCrumbProfile( company.getVerticalsMaster().getVerticalName() );
@@ -2769,7 +2840,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Region region = regionDao.findById( Region.class, regionId );
         if ( region == null ) {
-            throw new InvalidInputException( "No region present for the specified companyId" );
+            throw new InvalidInputException( "No region present for the specified regionId" );
         }
         region.setRegion( regionName );
         region.setModifiedBy( String.valueOf( userId ) );
@@ -2788,7 +2859,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Branch branch = branchDao.findById( Branch.class, branchId );
         if ( branch == null ) {
-            throw new InvalidInputException( "No branch present for the specified companyId" );
+            throw new InvalidInputException( "No branch present for the specified branchId" );
         }
         branch.setBranch( branchName );
         branch.setModifiedBy( String.valueOf( userId ) );
@@ -2807,7 +2878,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         User user = userDao.findById( User.class, individualId );
         if ( user == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No user present for the specified individualId" );
         }
         String nameArray[] = null;
         if ( individualName != null && !individualName.equalsIgnoreCase( "" ) ) {
@@ -2821,13 +2892,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         user.setFirstName( nameArray[0] );
         String lastName = "";
         if ( nameArray.length > 1 ) {
-            for ( int i = 1; i < nameArray.length - 1; i++ ) {
+            for ( int i = 1; i <= nameArray.length - 1; i++ ) {
                 lastName += nameArray[i] + " ";
             }
         }
         if ( lastName != null && !lastName.equalsIgnoreCase( "" ) ) {
             lastName = lastName.trim();
             user.setLastName( lastName );
+        } else {
+            // Fix for SS-1442 : Last name is not updated to blank when updated agent name contains only first name
+            user.setLastName( "" );
         }
         user.setModifiedBy( String.valueOf( userId ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -2845,7 +2919,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Company company = companyDao.findById( Company.class, companyId );
         if ( company == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No company present for the specified companyId" );
         }
 
         User companyAdmin = null;
@@ -2900,7 +2974,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         User user = userDao.findById( User.class, userId );
         if ( user == null ) {
-            throw new InvalidInputException( "No user present for the specified companyId" );
+            throw new InvalidInputException( "No user present for the specified userId" );
         }
         user.setEmailId( emailId );
         user.setModifiedBy( String.valueOf( userId ) );
@@ -2955,7 +3029,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private static boolean isNumeric( String str )
+    static boolean isNumeric( String str )
     {
         try {
             Double.parseDouble( str );
@@ -3398,7 +3472,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile,
+    OrganizationUnitSettings setAggregateBasicData( OrganizationUnitSettings userProfile,
         OrganizationUnitSettings parentProfile )
     {
 
@@ -3418,7 +3492,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings setAggregateProfileData( OrganizationUnitSettings userProfile,
+    OrganizationUnitSettings setAggregateProfileData( OrganizationUnitSettings userProfile,
         OrganizationUnitSettings companyUnitSettings, OrganizationUnitSettings regionUnitSettings,
         OrganizationUnitSettings branchUnitSettings, OrganizationUnitSettings agentUnitSettings,
         Map<SettingsForApplication, OrganizationUnit> map, boolean isFetchRequiredDataFromHierarchy )
@@ -3872,141 +3946,140 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     //    }
 
 
-    private Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
+    Map<String, Object> convertJsonStringToMap( String jsonString ) throws JsonParseException, JsonMappingException,
         IOException
     {
         Map<String, Object> map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
         return map;
     }
 
-
-    //  Commented as Zillow surveys are not stored in database, SS-1276
-    //    @SuppressWarnings ( "unchecked")
-    //    private void fetchFeedFromZillow( OrganizationUnitSettings profile, String collectionName )
-    //    {
-    //        LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
-    //
-    //        if ( profile != null && profile.getSocialMediaTokens() != null ) {
-    //            LOG.debug( "Starting to fetch the feed." );
-    //
-    //            SocialMediaTokens token = profile.getSocialMediaTokens();
-    //            if ( token != null ) {
-    //                if ( token.getZillowToken() != null ) {
-    //                    ZillowIntegrationApi zillowIntegrationApi = zillowIntegrationApiBuilder.getZellowIntegrationApi();
-    //                    String responseString = null;
-    //                    ZillowToken zillowToken = token.getZillowToken();
-    //                    String zillowScreenName = zillowToken.getZillowScreenName();
-    //                    if ( zillowScreenName == null || zillowScreenName.isEmpty() ) {
-    //                        LOG.debug( "Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing" );
-    //                        // TODO: Convert to proper format from the old url format
-    //                    } else {
-    //                        Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
-    //                            zillowScreenName );
-    //                        if ( response != null ) {
-    //                            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-    //                        }
-    //                        if ( responseString != null ) {
-    //                            Map<String, Object> map = null;
-    //                            try {
-    //                                map = convertJsonStringToMap( responseString );
-    //                            } catch ( JsonParseException e ) {
-    //                                LOG.error( "Exception caught " + e.getMessage() );
-    //                            } catch ( JsonMappingException e ) {
-    //                                LOG.error( "Exception caught " + e.getMessage() );
-    //                            } catch ( IOException e ) {
-    //                                LOG.error( "Exception caught " + e.getMessage() );
-    //                            }
-    //
-    //                            if ( map != null ) {
-    //                                Map<String, Object> responseMap = new HashMap<String, Object>();
-    //                                Map<String, Object> resultMap = new HashMap<String, Object>();
-    //                                Map<String, Object> proReviews = new HashMap<String, Object>();
-    //                                Map<String, Object> messageMap = new HashMap<String, Object>();
-    //                                List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-    //                                responseMap = (HashMap<String, Object>) map.get( "response" );
-    //                                messageMap = (HashMap<String, Object>) map.get( "message" );
-    //                                String code = (String) messageMap.get( "code" );
-    //                                if ( !code.equalsIgnoreCase( "0" ) ) {
-    //                                    String errorMessage = (String) messageMap.get( "text" );
-    //                                    if ( errorMessage.contains( "You exceeded the maximum API requests per day." ) ) {
-    //                                        int count = socialManagementService.fetchZillowCallCount();
-    //                                        if ( count != 0 ) {
-    //                                            LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
-    //                                            try {
-    //                                                emailServices.sendZillowCallExceededMailToAdmin( count );
-    //                                                surveyDetailsDao.resetZillowCallCount();
-    //                                            } catch ( InvalidInputException e ) {
-    //                                                LOG.error(
-    //                                                    "Sending the mail to the admin failed due to invalid input. Reason : ", e );
-    //                                            } catch ( UndeliveredEmailException e ) {
-    //                                                LOG.error( "The email failed to get delivered. Reason : ", e );
-    //                                            }
-    //                                        }
-    //                                    }
-    //                                    LOG.error( "Error code : " + code + " Error description : " + errorMessage );
-    //                                } else {
-    //                                    surveyDetailsDao.updateZillowCallCount();
-    //                                }
-    //
-    //                                if ( responseMap != null ) {
-    //                                    resultMap = (HashMap<String, Object>) responseMap.get( "results" );
-    //                                    if ( resultMap != null ) {
-    //                                        proReviews = (HashMap<String, Object>) resultMap.get( "proReviews" );
-    //                                        if ( proReviews != null ) {
-    //                                            reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
-    //                                            if ( reviews != null ) {
-    //                                                for ( HashMap<String, Object> review : reviews ) {
-    //                                                    String sourceId = (String) review.get( "reviewURL" );
-    //                                                    SurveyDetails surveyDetails = surveyHandler
-    //                                                        .getSurveyDetailsBySourceIdAndMongoCollection( sourceId,
-    //                                                            profile.getIden(), collectionName );
-    //                                                    if ( surveyDetails == null ) {
-    //                                                        surveyDetails = new SurveyDetails();
-    //                                                        if ( collectionName
-    //                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-    //                                                            surveyDetails.setCompanyId( profile.getIden() );
-    //                                                        } else if ( collectionName
-    //                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-    //                                                            surveyDetails.setRegionId( profile.getIden() );
-    //                                                        } else if ( collectionName
-    //                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-    //                                                            surveyDetails.setBranchId( profile.getIden() );
-    //                                                        } else if ( collectionName
-    //                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-    //                                                            surveyDetails.setAgentId( profile.getIden() );
-    //                                                        }
-    //                                                        String createdDate = (String) review.get( "reviewDate" );
-    //                                                        surveyDetails.setCompleteProfileUrl( (String) review
-    //                                                            .get( "reviewerLink" ) );
-    //                                                        surveyDetails.setCustomerFirstName( (String) review.get( "reviewer" ) );
-    //                                                        surveyDetails.setReview( (String) review.get( "description" ) );
-    //                                                        surveyDetails.setEditable( false );
-    //                                                        surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
-    //                                                        surveyDetails
-    //                                                            .setScore( Double.valueOf( (String) review.get( "rating" ) ) );
-    //                                                        surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
-    //                                                        surveyDetails.setSourceId( sourceId );
-    //                                                        surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
-    //                                                        surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
-    //                                                        surveyDetails.setAgreedToShare( "true" );
-    //                                                        surveyDetails.setAbusive( false );
-    //                                                        surveyHandler.insertSurveyDetails( surveyDetails );
-    //                                                    }
-    //                                                }
-    //                                            }
-    //                                        }
-    //
-    //                                    }
-    //                                }
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        } else {
-    //            LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
-    //        }
-    //    }
+//  Commented as Zillow surveys are not stored in database, SS-1276
+//    @SuppressWarnings ( "unchecked")
+//    private void fetchFeedFromZillow( OrganizationUnitSettings profile, String collectionName )
+//    {
+//        LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
+//
+//        if ( profile != null && profile.getSocialMediaTokens() != null ) {
+//            LOG.debug( "Starting to fetch the feed." );
+//
+//            SocialMediaTokens token = profile.getSocialMediaTokens();
+//            if ( token != null ) {
+//                if ( token.getZillowToken() != null ) {
+//                    ZillowIntegrationApi zillowIntegrationApi = zillowIntegrationApiBuilder.getZellowIntegrationApi();
+//                    String responseString = null;
+//                    ZillowToken zillowToken = token.getZillowToken();
+//                    String zillowScreenName = zillowToken.getZillowScreenName();
+//                    if ( zillowScreenName == null || zillowScreenName.isEmpty() ) {
+//                        LOG.debug( "Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing" );
+//                        // TODO: Convert to proper format from the old url format
+//                    } else {
+//                        Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
+//                            zillowScreenName );
+//                        if ( response != null ) {
+//                            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+//                        }
+//                        if ( responseString != null ) {
+//                            Map<String, Object> map = null;
+//                            try {
+//                                map = convertJsonStringToMap( responseString );
+//                            } catch ( JsonParseException e ) {
+//                                LOG.error( "Exception caught " + e.getMessage() );
+//                            } catch ( JsonMappingException e ) {
+//                                LOG.error( "Exception caught " + e.getMessage() );
+//                            } catch ( IOException e ) {
+//                                LOG.error( "Exception caught " + e.getMessage() );
+//                            }
+//
+//                            if ( map != null ) {
+//                                Map<String, Object> responseMap = new HashMap<String, Object>();
+//                                Map<String, Object> resultMap = new HashMap<String, Object>();
+//                                Map<String, Object> proReviews = new HashMap<String, Object>();
+//                                Map<String, Object> messageMap = new HashMap<String, Object>();
+//                                List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
+//                                responseMap = (HashMap<String, Object>) map.get( "response" );
+//                                messageMap = (HashMap<String, Object>) map.get( "message" );
+//                                String code = (String) messageMap.get( "code" );
+//                                if ( !code.equalsIgnoreCase( "0" ) ) {
+//                                    String errorMessage = (String) messageMap.get( "text" );
+//                                    if ( errorMessage.contains( "You exceeded the maximum API requests per day." ) ) {
+//                                        int count = socialManagementService.fetchZillowCallCount();
+//                                        if ( count != 0 ) {
+//                                            LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
+//                                            try {
+//                                                emailServices.sendZillowCallExceededMailToAdmin( count );
+//                                                surveyDetailsDao.resetZillowCallCount();
+//                                            } catch ( InvalidInputException e ) {
+//                                                LOG.error(
+//                                                    "Sending the mail to the admin failed due to invalid input. Reason : ", e );
+//                                            } catch ( UndeliveredEmailException e ) {
+//                                                LOG.error( "The email failed to get delivered. Reason : ", e );
+//                                            }
+//                                        }
+//                                    }
+//                                    LOG.error( "Error code : " + code + " Error description : " + errorMessage );
+//                                } else {
+//                                    surveyDetailsDao.updateZillowCallCount();
+//                                }
+//
+//                                if ( responseMap != null ) {
+//                                    resultMap = (HashMap<String, Object>) responseMap.get( "results" );
+//                                    if ( resultMap != null ) {
+//                                        proReviews = (HashMap<String, Object>) resultMap.get( "proReviews" );
+//                                        if ( proReviews != null ) {
+//                                            reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
+//                                            if ( reviews != null ) {
+//                                                for ( HashMap<String, Object> review : reviews ) {
+//                                                    String sourceId = (String) review.get( "reviewURL" );
+//                                                    SurveyDetails surveyDetails = surveyHandler
+//                                                        .getSurveyDetailsBySourceIdAndMongoCollection( sourceId,
+//                                                            profile.getIden(), collectionName );
+//                                                    if ( surveyDetails == null ) {
+//                                                        surveyDetails = new SurveyDetails();
+//                                                        if ( collectionName
+//                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+//                                                            surveyDetails.setCompanyId( profile.getIden() );
+//                                                        } else if ( collectionName
+//                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+//                                                            surveyDetails.setRegionId( profile.getIden() );
+//                                                        } else if ( collectionName
+//                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+//                                                            surveyDetails.setBranchId( profile.getIden() );
+//                                                        } else if ( collectionName
+//                                                            .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+//                                                            surveyDetails.setAgentId( profile.getIden() );
+//                                                        }
+//                                                        String createdDate = (String) review.get( "reviewDate" );
+//                                                        surveyDetails.setCompleteProfileUrl( (String) review
+//                                                            .get( "reviewerLink" ) );
+//                                                        surveyDetails.setCustomerFirstName( (String) review.get( "reviewer" ) );
+//                                                        surveyDetails.setReview( (String) review.get( "description" ) );
+//                                                        surveyDetails.setEditable( false );
+//                                                        surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
+//                                                        surveyDetails
+//                                                            .setScore( Double.valueOf( (String) review.get( "rating" ) ) );
+//                                                        surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
+//                                                        surveyDetails.setSourceId( sourceId );
+//                                                        surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
+//                                                        surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
+//                                                        surveyDetails.setAgreedToShare( "true" );
+//                                                        surveyDetails.setAbusive( false );
+//                                                        surveyHandler.insertSurveyDetails( surveyDetails );
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } else {
+//            LOG.error( "No social media token present for " + collectionName + " with iden: " + profile.getIden() );
+//        }
+//    }
 
     @SuppressWarnings ( "unchecked")
     List<SurveyDetails> fetchZillowFeeds( OrganizationUnitSettings profile, String collectionName )
@@ -4015,7 +4088,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( profile == null )
             throw new InvalidInputException( "Profile setting passed cannot be null" );
         if ( collectionName == null || collectionName.isEmpty() ) {
-            throw new InvalidInputException( "Profile setting passed cannot be null" );
+            throw new InvalidInputException( "Collection name passed cannot be null or empty" );
         }
         LOG.debug( "Fetching social feed for " + collectionName + " with iden: " + profile.getIden() );
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
@@ -4056,8 +4129,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             } catch ( IOException e ) {
                                 LOG.error( "Exception caught " + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
-                                throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
-                                    + " zillow account " + zillowScreenName );
+                                    throw new UnavailableException( "Zillow reviews could not be fetched for "
+                                        + profile.getIden() + " zillow account " + zillowScreenName );
                             }
 
                             if ( map != null ) {
@@ -4303,7 +4376,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
+    boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
         long currentLockValue )
     {
         LOG.debug( "Inside method getLogoLockedByCompany " );
@@ -4317,6 +4390,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     void updateEmailIdInSolr( String emailId, long iden ) throws NonFatalException
     {
+        if ( iden <= 0 ) {
+            LOG.error( "Invalid iden passed in updateEmailIdInSolr");
+            throw new InvalidInputException( "Invalid iden passed in updateEmailIdInSolr" );
+        }
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id passed cannot be null or empty in updateEmailIdInSolr" );
+        }
         LOG.info( "Updating verified email id info into solr for user id : " + iden );
         Map<String, Object> editKeys = new HashMap<String, Object>();
         editKeys.put( CommonConstants.USER_LOGIN_NAME_SOLR, emailId );
@@ -4360,208 +4440,46 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    /**
-     * Method to get ids under a unit based on profile level
-     * @param profileLevel
-     * @param iden
-     * @return
-     * @throws InvalidInputException
-     * @throws ProfileNotFoundException
-     */
-    Map<String, Set<Long>> getIdsUnderAProfileLevel( String profileLevel, long iden ) throws InvalidInputException,
-        ProfileNotFoundException
+    @Override
+    @Transactional
+    public Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden )
     {
         if ( profileLevel == null || profileLevel.isEmpty() ) {
-            LOG.error( "profile level is null or empty while getting ids under a profile and id" );
+            LOG.error( "column name is null or empty while getting total review count and score for a column name and id" );
             return null;
         }
         if ( iden <= 0l ) {
-            LOG.error( "Invalid id passed while getting ids under a profile and id" );
+            LOG.error( "Invalid id passed while getting total review count and score for a column name and id" );
             return null;
         }
-        LOG.debug( "Getting ids under a profile level:" + profileLevel );
-        Map<String, Set<Long>> hierarchyIdsMap = new HashMap<String, Set<Long>>();
-        switch ( profileLevel ) {
-            case CommonConstants.COMPANY_ID_COLUMN:
-                hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
-                break;
-            case CommonConstants.REGION_ID_COLUMN:
-                hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet( Arrays
-                    .asList( new Long[] { iden } ) ) );
-                break;
-            case CommonConstants.BRANCH_ID_COLUMN:
-                hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
-                break;
-            default:
-                LOG.error( "Invalid profile level while getting ids under a profile level and id" );
+        try {
+            switch ( profileLevel ) {
+                case CommonConstants.PROFILE_LEVEL_COMPANY:
+                    return zillowHierarchyDao.getZillowReviewCountAndTotalScoreForAllUnderCompany( iden );
+                case CommonConstants.PROFILE_LEVEL_REGION:
+                    return zillowHierarchyDao.getZillowReviewCountAndTotalScoreForAllUnderRegion( iden );
+                case CommonConstants.PROFILE_LEVEL_BRANCH:
+                    return zillowHierarchyDao.getZillowReviewCountAndTotalScoreForAllUnderBranch( iden );
+                case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
+                    User user = userDao.findById( User.class, iden );
+                    long zillowReviewCount = 0;
+                    long zillowTotalScore = 0;
+                    if ( user != null ) {
+                        zillowReviewCount = user.getZillowReviewCount();
+                        zillowTotalScore = (long) ( user.getZillowAverageScore() * zillowReviewCount );
+                    }
+                    Map<String, Long> zillowTotalScoreAndAverageMap = new HashMap<String, Long>();
+                    zillowTotalScoreAndAverageMap.put( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN, zillowReviewCount );
+                    zillowTotalScoreAndAverageMap.put( CommonConstants.ZILLOW_TOTAL_SCORE, zillowTotalScore );
+                    return zillowTotalScoreAndAverageMap;
+                default:
+                    LOG.error( "Invalid profile level passed while getting ids under a profile level" );
+            }
+        } catch ( Exception e ) {
+            LOG.error( "Exception occurred while fetching zillow total score and average for profile level and id. Reason : ",
+                e );
         }
-        LOG.debug( "Returning ids:" + hierarchyIdsMap + " for profile level:" + profileLevel );
-        return hierarchyIdsMap;
-    }
-
-
-    /**
-     * Method to get ids under a unit based on profile level
-     * @param profileLevel
-     * @param iden
-     */
-    Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden )
-    {
-        if ( profileLevel == null || profileLevel.isEmpty() ) {
-            LOG.error( "profile level is null or empty while getting total review count and score for a profile level and id" );
-            return null;
-        }
-        if ( iden <= 0l ) {
-            LOG.error( "Invalid id passed while getting total review count and score for a profile level and id" );
-            return null;
-        }
-        Map<String, Long> totalAverageAndCountMap = new HashMap<String, Long>();
-        long reviewCount = 0;
-        long totalScore = 0;
-        //Map<String, Set<Long>> hierarchyIdsMap = getIdsUnderAProfileLevel( profileLevel, iden );
-        switch ( profileLevel ) {
-            case CommonConstants.COMPANY_ID_COLUMN:
-                OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( iden,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-                if ( companySettings != null && companySettings.getZillowReviewCount() > 0
-                    && companySettings.getZillowReviewAverage() > 0 ) {
-                    reviewCount += companySettings.getZillowReviewCount();
-                    totalScore += ( companySettings.getZillowReviewAverage() * companySettings.getZillowReviewCount() );
-                }
-                /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
-                    Set<Long> regionIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_REGION );
-                    if ( regionIds != null && !regionIds.isEmpty() ) {
-                        List<OrganizationUnitSettings> regionSetttingsList = organizationUnitSettingsDao
-                            .fetchOrganizationUnitSettingsForMultipleIds( regionIds,
-                                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-                        if ( regionSetttingsList != null && !regionSetttingsList.isEmpty() ) {
-                            for ( OrganizationUnitSettings regionSetttings : regionSetttingsList ) {
-                                if ( regionSetttings != null && regionSetttings.getZillowReviewCount() > 0
-                                    && regionSetttings.getZillowReviewAverage() > 0 ) {
-                                    reviewCount += regionSetttings.getZillowReviewCount();
-                                    totalScore += ( regionSetttings.getZillowReviewAverage() * regionSetttings
-                                        .getZillowReviewCount() );
-                                }
-                            }
-                        }
-                    }
-                    Set<Long> branchIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH );
-                    if ( branchIds != null && !branchIds.isEmpty() ) {
-                        List<OrganizationUnitSettings> branchSetttingsList = organizationUnitSettingsDao
-                            .fetchOrganizationUnitSettingsForMultipleIds( branchIds,
-                                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                        if ( branchSetttingsList != null && !branchSetttingsList.isEmpty() ) {
-                            for ( OrganizationUnitSettings branchSetttings : branchSetttingsList ) {
-                                if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
-                                    && branchSetttings.getZillowReviewAverage() > 0 ) {
-                                    reviewCount += branchSetttings.getZillowReviewCount();
-                                    totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings
-                                        .getZillowReviewCount() );
-                                }
-                            }
-                        }
-                    }
-                    Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
-                    if ( individualIds != null && !individualIds.isEmpty() ) {
-                        List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
-                            .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
-                        if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
-                            for ( AgentSettings agentSetttings : agentSetttingsList ) {
-                                if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
-                                    && agentSetttings.getZillowReviewAverage() > 0 ) {
-                                    reviewCount += agentSetttings.getZillowReviewCount();
-                                    totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
-                                        .getZillowReviewCount() );
-                                }
-                            }
-                        }
-                    }
-                }*/
-                break;
-            case CommonConstants.REGION_ID_COLUMN:
-                OrganizationUnitSettings regionSetttings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( iden,
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-                if ( regionSetttings != null && regionSetttings.getZillowReviewCount() > 0
-                    && regionSetttings.getZillowReviewAverage() > 0 ) {
-                    reviewCount += regionSetttings.getZillowReviewCount();
-                    totalScore += ( regionSetttings.getZillowReviewAverage() * regionSetttings.getZillowReviewCount() );
-                }
-                /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
-                    Set<Long> branchIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_BRANCH );
-                    if ( branchIds != null && !branchIds.isEmpty() ) {
-                        List<OrganizationUnitSettings> branchSetttingsList = organizationUnitSettingsDao
-                            .fetchOrganizationUnitSettingsForMultipleIds( branchIds,
-                                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                        if ( branchSetttingsList != null && !branchSetttingsList.isEmpty() ) {
-                            for ( OrganizationUnitSettings branchSetttings : branchSetttingsList ) {
-                                if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
-                                    && branchSetttings.getZillowReviewAverage() > 0 ) {
-                                    reviewCount += branchSetttings.getZillowReviewCount();
-                                    totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings
-                                        .getZillowReviewCount() );
-                                }
-                            }
-                        }
-                    }
-                    Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
-                    if ( individualIds != null && !individualIds.isEmpty() ) {
-                        List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
-                            .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
-                        if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
-                            for ( AgentSettings agentSetttings : agentSetttingsList ) {
-                                if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
-                                    && agentSetttings.getZillowReviewAverage() > 0 ) {
-                                    reviewCount += agentSetttings.getZillowReviewCount();
-                                    totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
-                                        .getZillowReviewCount() );
-                                }
-                            }
-                        }
-                    }
-                }*/
-                break;
-            case CommonConstants.BRANCH_ID_COLUMN:
-                OrganizationUnitSettings branchSetttings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( iden,
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-                if ( branchSetttings != null && branchSetttings.getZillowReviewCount() > 0
-                    && branchSetttings.getZillowReviewAverage() > 0 ) {
-                    reviewCount += branchSetttings.getZillowReviewCount();
-                    totalScore += ( branchSetttings.getZillowReviewAverage() * branchSetttings.getZillowReviewCount() );
-                }
-                /*if ( hierarchyIdsMap != null && !hierarchyIdsMap.isEmpty() ) {
-                    Set<Long> individualIds = hierarchyIdsMap.get( CommonConstants.PROFILE_TYPE_INDIVIDUAL );
-                    if ( individualIds != null && !individualIds.isEmpty() ) {
-                        List<AgentSettings> agentSetttingsList = organizationUnitSettingsDao
-                            .fetchMultipleAgentSettingsById( new ArrayList<Long>( individualIds ) );
-                        if ( agentSetttingsList != null && !agentSetttingsList.isEmpty() ) {
-                            for ( AgentSettings agentSetttings : agentSetttingsList ) {
-                                if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
-                                    && agentSetttings.getZillowReviewAverage() > 0 ) {
-                                    reviewCount += agentSetttings.getZillowReviewCount();
-                                    totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings
-                                        .getZillowReviewCount() );
-                                }
-                            }
-                        }
-                    }
-                }*/
-                break;
-            case CommonConstants.AGENT_ID_COLUMN:
-                AgentSettings agentSetttings = organizationUnitSettingsDao.fetchAgentSettingsById( iden );
-                if ( agentSetttings != null && agentSetttings.getZillowReviewCount() > 0
-                    && agentSetttings.getZillowReviewAverage() > 0 ) {
-                    reviewCount += agentSetttings.getZillowReviewCount();
-                    totalScore += ( agentSetttings.getZillowReviewAverage() * agentSetttings.getZillowReviewCount() );
-                }
-                break;
-            default:
-                LOG.error( "Invalid profile level while getting ids under a profile level" );
-        }
-
-        totalAverageAndCountMap.put( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN, reviewCount );
-        totalAverageAndCountMap.put( CommonConstants.ZILLOW_TOTAL_SCORE, totalScore );
-
-        return totalAverageAndCountMap;
+        return null;
     }
 
 

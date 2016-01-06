@@ -1,10 +1,13 @@
 package com.realtech.socialsurvey.core.services.mail.impl;
 
+import java.util.HashMap;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -1275,28 +1278,42 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( null, null, "test", null, null );
+        emailServicesImpl.sendComplaintHandleMail( null, null, "test", null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestRecipientMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "", null, "test", null, null );
+        emailServicesImpl.sendComplaintHandleMail( "", null, "test", null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestCustomerMailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "test", null, null, null, null );
+        emailServicesImpl.sendComplaintHandleMail( "test", null, null, null, null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendComplaintHandleMailTestCustomerMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendComplaintHandleMail( "test", null, "", null, null );
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "", null, null, "test" );
+    }
+    
+    //SS-1435: Test for survey details    
+    @Test ( expected = InvalidInputException.class)
+    public void sendComplaintHandleMailTestSurveyDetailNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", null, null, null );
+    }
+    
+    //SS-1435: Test for survey details
+    @Test ( expected = InvalidInputException.class)
+    public void sendComplaintHandleMailTestSurveyDetailEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendComplaintHandleMail( "test", null, "test", null, null, "" );
     }
 
 
@@ -1394,5 +1411,19 @@ public class EmailServicesImplTest
     {
         emailServicesImpl.forwardCustomerReplyMail( TestConstants.TEST_STRING, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendBillingReportMailForMailIdNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendBillingReportMail( "abc", "xyz", null, new HashMap<String, String>() );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testSendBillingReportMailForMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendBillingReportMail( "abc", "xyz", "", new HashMap<String, String>() );
     }
 }
