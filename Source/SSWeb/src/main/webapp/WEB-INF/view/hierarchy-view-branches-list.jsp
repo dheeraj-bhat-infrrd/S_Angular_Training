@@ -34,17 +34,20 @@
 			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-r${regionIdVal}-b${branch.branchId}">
 		    <td class="v-tbl-line"><div class="v-line-brnch"></div></td>
 		    <td class="v-tbl-name">${branch.branch}</td>
-		    <td class="v-tbl-add"></td>
+		    <td class="v-tbl-add"><c:if
+							test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if
+							test="${not empty branch.address2}">${branch.address2}</c:if></td>
 		    <td class="v-tbl-role"></td>
-		    <td class="v-tbl-btns">
-		        <div class="clearfix v-tbl-icn-wraper">
+		    <td class="v-tbl-btns v-tbl-btns-hr">
+		        <div class="v-tbn-icn-dropdown hide"></div>
+				<div class="clearfix v-tbl-icn-wraper v-hr-tbl-icn-wraper">
 					<div class="float-left v-tbl-top-spacer"></div>
-					<div class="float-left v-tbl-icn v-icn-wid"
+					<div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-wid"
 						title="<spring:message code="label.widget.key" />"
-						onclick="generateWidget($(this), ${branch.branchId }, 'branch');"></div>
+						data-iden="${branch.branchId}" data-profile="branch">Widget</div>
 					<div class="float-left v-tbl-top-spacer"></div>
-		            <div class="float-left v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}"></div>
-		            <div class="float-left v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}"></div>
+		            <div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-close branch-del-icn" data-branchid="${branch.branchId}">Delete</div>
+		            <div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}">Edit</div>
 		        </div>
 		    </td>
 		    <td class="v-tbl-spacer v-tbl-no-bd"></td>
@@ -72,10 +75,6 @@
 				<c:set value="4" var="currentprofilemasterid" />
 			</c:when>
 		</c:choose>
-		
-		
-		
-		
 		<!-- If status is 2, then user has not acted on invitation -->
 				<c:set var="regstatustickclass" value="" />
 				<c:set var="userstatustickclass" value="v-icn-verified" />
@@ -93,10 +92,6 @@
 						<c:set var="admincaneditclass" value="v-tbl-icn-disabled" />
 					</c:otherwise>
 				</c:choose>
-		
-		
-		
-		
 		<tr id="user-row-${regionUser.userId}" clicked="false" data-userid="${regionUser.userId}"
 			class="v-tbl-row v-tbl-row-sel edit-user v-tbl-row-ind sel-r${regionId}-u${regionUser.userId}">
            <td class="v-tbl-line">
@@ -131,25 +126,22 @@
 					</c:when>
 				</c:choose>
 			</td>
-           <td class="v-tbl-btns">
-               <div class="clearfix v-tbl-icn-wraper">
-               
-               
-               
+           <td class="v-tbl-btns v-tbl-btns-hr">
+               <div class="v-tbn-icn-dropdown hide"></div>
+				<div class="clearfix v-tbl-icn-wraper v-hr-tbl-icn-wraper">
                 <c:choose>
 						<c:when test="${not empty regstatustickclass}">
-							<div class="float-left v-tbl-icn  ${admincaneditclass} ${regstatustickclass}"
-								title="<spring:message code="label.resendmail.key" />"></div>
+							<div class="float-left v-tbl-icn v-tbl-icn-sm ${admincaneditclass} ${regstatustickclass}"
+								title="<spring:message code="label.resendmail.key" />">Resend</div>
 						</c:when>
 						<c:otherwise>
-							<div class="float-left v-tbl-icn  ${admincaneditclass}"></div>
+							<div class="float-left v-tbl-icn ${admincaneditclass}"></div>
 						</c:otherwise>
 					</c:choose>
 					 <c:choose>
 						<c:when test="${regionUser.isAgent}">
-							 <div class="float-left v-tbl-icn v-icn-wid ${admincaneditclass}"
-								title="<spring:message code="label.widget.key" />"
-								onclick="generateWidget($(this),${regionUser.userId }, 'individual');"></div>  
+							 <div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-wid ${admincaneditclass}" data-iden="${regionUser.userId}" data-profile="individual"
+								title="<spring:message code="label.widget.key" />">Widget</div>  
 						</c:when>
 						<c:otherwise>
 							<div class="float-left v-tbl-top-spacer"></div>
@@ -157,25 +149,15 @@
 					</c:choose>
 					<c:choose>
 						<c:when test="${regionUser.status == 2}">
-							<div class="float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>
+							<div class="float-left v-tbl-icn v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>
 						</c:when>
 						<c:otherwise>
-							<div class=" float-left v-tbl-icn  v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
+							<div class=" float-left v-tbl-icn v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
 						</c:otherwise>
 					</c:choose> 
-                
-               
-               
-               
-               
-               
-               
-               
-               
-              <!--   <div class="float-left  v-tbl-icn v-icn-femail" title="Resend Verification Mail"></div>  -->
                    <c:choose>
 						<c:when test="${regionUser.canEdit && user.userId != regionUser.userId}">
-						   <div class="float-left v-tbl-icn v-icn-close user-del-icn" data-userid="${regionUser.userId}"></div>
+						   <div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-close user-del-icn" data-userid="${regionUser.userId}">Delete</div>
 						</c:when>
 						<c:otherwise>
 							<div class="float-left v-tbl-icn-disabled v-icn-close"></div>
@@ -183,14 +165,14 @@
 				   </c:choose>
                    <c:choose>
 						<c:when test="${regionUser.canEdit}">
-		                   <div class="float-left v-tbl-icn v-icn-edit user-edit-icn" clicked="false" data-userid="${regionUser.userId}"></div>
+		                   <div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-edit user-edit-icn" clicked="false" data-userid="${regionUser.userId}">Edit</div>
 						</c:when>
 						<c:otherwise>
 		                    <div class="float-left v-tbl-icn-disabled v-icn-edit"></div>
 						</c:otherwise>
 				   </c:choose>
 				   <c:if test="${user.userId != regionUser.userId and sessionprofilemasterid < currentprofilemasterid}">
-				   		<div class="float-left v-tbl-icn v-icn-login user-login-icn" data-iden="${regionUser.userId}" title="login as"></div>
+				   		<div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-login user-login-icn" data-iden="${regionUser.userId}" title="login as">Login</div>
 				   </c:if>
 				</div>
            </td>
@@ -203,6 +185,3 @@
        </tr>
     </c:forEach>
 </c:if> 
-<script>
-	bindUserLoginEvent();
-</script>

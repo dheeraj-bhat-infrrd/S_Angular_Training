@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.UnavailableException;
+
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -619,16 +621,18 @@ public interface ProfileManagementService
         throws InvalidInputException, UnavailableException;
 
 
-    public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow )
-        throws InvalidInputException;
+    public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow, long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException;
 
 
     public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
-        boolean notRecommended, boolean includeZillow ) throws InvalidInputException;
+        boolean notRecommended, boolean includeZillow, long zillowReviewCount ) throws InvalidInputException;
 
 
     public List<AgentSettings> getIndividualsForCompany( long companyId ) throws InvalidInputException,
         NoRecordsFetchedException, ProfileNotFoundException;
+
+
+    public Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden );
 
 
 }

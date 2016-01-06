@@ -22,7 +22,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
-	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
@@ -96,88 +95,70 @@
 	</div>
 	
 	<div id="report-abuse-overlay" class="overlay-main hide">
+	<div id="report-abuse-pop-up">
     	<div class="overlay-disable-wrapper">
     		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
     		<div class="ol-content">
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
     		</div>
     		<div class="rpa-overlay-btn-cont clearfix">
-    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer">Report</div>
-    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer">Cancel</div>
+    			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer float-left"><spring:message code="label.report.key"/></div>
+    			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer float-right"><spring:message code="label.cancel.key"/></div>
     		</div>
     	</div>
+    </div>
     </div>
 	
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
-				<div class="header-links-item">
-					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
-				</div>
+				<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></div>
 				<c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></div>
 				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showbuildsurveypage.do');"><spring:message code="label.header.buildsurvey.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editsettings.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showcompanysettings.do');"><spring:message code="label.editsettings.key" /></div>
 				</c:if>
 				<c:if test="${highestrole == 1}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showcomplaintressettings.do')"><spring:message code="label.complaintregsettings.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showcomplaintressettings.do')"><spring:message code="label.complaintregsettings.key" /></div>
 				</c:if>
 				<!-- show apps for company admin other then free account -->
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showemailsettings.do')"><spring:message code="label.emailsettings.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showemailsettings.do')"><spring:message code="label.emailsettings.key" /></div>
 				</c:if>
 				<!-- show apps for company admin other then individual/free account -->
 				<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></a>
-					</div>
-				</c:if>
-				<c:if test="${highestrole == 1 && accountMasterId != 5}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showapps.do')"><spring:message code="label.appsettings.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></div>
+				</c:if>
+				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
+					<div class="header-links-item" onclick="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></div>
 				</c:if>
 				<c:if test="${accountMasterId < 4 }">	
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></div>
 				</c:if>
 				<c:if test="${ highestrole == 1 }">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></a>
-					</div>
+					<div class="header-links-item" onclick="showMainContent('./showsocialmonitortpage.do')"><spring:message code="label.socialmonitor.key" /></div>
 				</c:if>
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></a>
-				</div>
-				<div class="header-links-item" >
-					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
-				</div>
-				<div class="header-links-item" >
-					<a href="javascript:showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></a>
-				</div>
-				<div class="header-links-item" >
-					<a href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
-				</div>
+				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
+				<div class="header-links-item" onclick="showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></div>
+				<div class="header-links-item" onclick="showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></div>
+				<c:choose>
+					<c:when test="${ not empty realTechAdminId }">
+						<div class="header-links-item" onclick="userSwitchToAdmin();"><spring:message code="label.switch.key" /></div>
+					</c:when>
+					<c:when test="${ not empty companyAdminSwitchId || not empty regionAdminSwitchId || not empty branchAdminSwitchId}">
+						<div class="header-links-item" onclick="userSwitchToCompAdmin();"><spring:message code="label.switch.key" /></div>
+					</c:when>
+				</c:choose>
+				<a href="j_spring_security_logout"><span class="header-links-item" ><spring:message code="label.logout.key" />
+					</span>
+				</a>
 			</div>
 		</div>
 	</div>

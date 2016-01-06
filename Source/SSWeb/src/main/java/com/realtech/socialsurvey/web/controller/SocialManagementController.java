@@ -1418,7 +1418,9 @@ public class SocialManagementController
 
         String agentProfileLink = "";
         AgentSettings agentSettings;
+        String custDisplayName = null;
         try {
+            custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
             agentSettings = userManagementService.getUserSettings( agentId );
             if ( agentSettings != null && agentSettings.getProfileUrl() != null ) {
                 agentProfileLink = agentSettings.getProfileUrl();
@@ -1426,8 +1428,6 @@ public class SocialManagementController
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException caught in postToFacebook(). Nested exception is ", e );
         }
-        
-        String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 
         String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for "
             + agentName + " on Social Survey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
@@ -1559,8 +1559,10 @@ public class SocialManagementController
         ratingFormat.setMinimumFractionDigits( 1 );
         ratingFormat.setMaximumFractionDigits( 1 );
         String agentProfileLink = "";
+        String custDisplayName = null;
         AgentSettings agentSettings;
         try {
+            custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
             agentSettings = userManagementService.getUserSettings( agentId );
             if ( agentSettings != null && agentSettings.getProfileUrl() != null ) {
                 agentProfileLink = agentSettings.getProfileUrl();
@@ -1570,7 +1572,6 @@ public class SocialManagementController
         }
 
         User user = sessionHelper.getCurrentUser();
-        String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
         List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
         String message = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for " + agentName
             + " on SocialSurvey ";
@@ -1741,7 +1742,7 @@ public class SocialManagementController
     }
 
 
-    @SuppressWarnings ( "unchecked")
+    @SuppressWarnings ( { "unchecked", "unused" })
     @RequestMapping ( value = "/zillowSaveInfo")
     @ResponseBody
     public String saveZillowDetails( Model model, HttpServletRequest request )
@@ -1805,6 +1806,8 @@ public class SocialManagementController
 
             }
                 String jsonString = null;
+                int zillowReviewCount = 0;
+                double zillowTotalScore = 0;
                 if ( zillowScreenName.contains( "-" ) ) {
                     zillowScreenName = zillowScreenName.replace( "-", " " );
                 }
@@ -1832,18 +1835,18 @@ public class SocialManagementController
                     String code = (String) messageMap.get( "code" );
                     if ( !code.equalsIgnoreCase( "0" ) ) {
                         String errorMessage = (String) messageMap.get( "text" );
-                        
-                        if( errorMessage.contains("You exceeded the maximum API requests per day.") ){
-                        	int count = socialManagementService.fetchZillowCallCount();
-                        	if ( count != 0 ){
-	                        	LOG.debug("Zillow API call count exceeded limit. Sending mail to admin.");
-	                        	emailServices.sendZillowCallExceededMailToAdmin( count );
-	                        	socialManagementService.resetZillowCallCount();
-                        	}
+
+                        if ( errorMessage.contains( "You exceeded the maximum API requests per day." ) ) {
+                            int count = socialManagementService.fetchZillowCallCount();
+                            if ( count != 0 ) {
+                                LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
+                                emailServices.sendZillowCallExceededMailToAdmin( count );
+                                socialManagementService.resetZillowCallCount();
+                            }
                         }
                         throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
                     } else {
-                    	socialManagementService.updateZillowCallCount();
+                        socialManagementService.updateZillowCallCount();
                     }
 
                     if ( responseMap != null ) {
@@ -1853,51 +1856,21 @@ public class SocialManagementController
                             if ( proInfoMap != null ) {
                                 profileLink = (String) proInfoMap.get( "profileURL" );
                             }
-                            proReviews = (HashMap<String, Object>) resultMap.get("proReviews");
-							if (proReviews != null) {
-								reviews = (List<HashMap<String, Object>>) proReviews.get("review");
-								if (reviews != null) {
-//				                    Commented as Zillow surveys are not stored in database, SS-1276
-//									for (HashMap<String, Object> review : reviews) {
-//										String sourceId = (String) review.get("reviewURL");
-//										SurveyDetails surveyDetails = surveyHandler.getSurveyDetailsBySourceIdAndMongoCollection(
-//												sourceId, entityId, collectionName);
-//										if (surveyDetails == null) {
-//											surveyDetails = new SurveyDetails();
-//											if (collectionName
-//													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION)) {
-//												surveyDetails.setCompanyId(entityId);
-//											}
-//											else if (collectionName
-//													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION)) {
-//												surveyDetails.setRegionId(entityId);
-//											}
-//											else if (collectionName
-//													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION)) {
-//												surveyDetails.setBranchId(entityId);
-//											}
-//											else if (collectionName
-//													.equalsIgnoreCase(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
-//												surveyDetails.setAgentId(entityId);
-//											}
-//											String createdDate = (String) review.get("reviewDate");
-//											surveyDetails.setCompleteProfileUrl((String) review.get("reviewerLink"));
-//											surveyDetails.setCustomerFirstName((String) review.get("reviewer"));
-//											surveyDetails.setReview((String) review.get("description"));
-//											surveyDetails.setEditable(false);
-//											surveyDetails.setStage(CommonConstants.SURVEY_STAGE_COMPLETE);
-//											surveyDetails.setScore(Double.valueOf((String) review.get("rating")));
-//											surveyDetails.setSource(CommonConstants.SURVEY_SOURCE_ZILLOW);
-//											surveyDetails.setSourceId(sourceId);
-//											surveyDetails.setModifiedOn(profileManagementService.convertStringToDate(createdDate));
-//											surveyDetails.setCreatedOn(profileManagementService.convertStringToDate(createdDate));
-//											surveyDetails.setAgreedToShare("true");
-//											surveyDetails.setAbusive(false);
-//											surveyHandler.insertSurveyDetails(surveyDetails);
-//										}
-//									}
-								}
-							}
+                            proReviews = (HashMap<String, Object>) resultMap.get( "proReviews" );
+                            if ( proReviews != null ) {
+                                reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
+                                if ( reviews != null ) {
+                                    for ( HashMap<String, Object> review : reviews ) {
+                                        String rating = (String) review.get( "rating" );
+                                        if ( rating != null && !rating.isEmpty() ) {
+                                            if ( Double.valueOf( rating ) != Double.NaN ) {
+                                                zillowReviewCount++;
+                                                zillowTotalScore += Double.valueOf( rating );
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1918,6 +1891,15 @@ public class SocialManagementController
                     Company company = userManagementService.getCompanyById( companySettings.getIden() );
                     if(company != null){
                     	settingsSetter.setSettingsValueForCompany(company, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                    	//Set IS_ZILLOW_CONNECTED to true
+                    	company.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                        if ( zillowReviewCount == 0 ) {
+                            company.setZillowAverageScore( 0.0 );
+                            company.setZillowReviewCount( 0 );
+                        } else {
+                            company.setZillowAverageScore( 0.0 );
+                            company.setZillowReviewCount( 0 );
+                        }
                     	userManagementService.updateCompany( company );
                     }
                     for ( ProfileStage stage : companySettings.getProfileStages() ) {
@@ -1946,6 +1928,15 @@ public class SocialManagementController
                     Region region = userManagementService.getRegionById( regionSettings.getIden() );
                     if(region != null){
                     	settingsSetter.setSettingsValueForRegion(region, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                        //Set IS_ZILLOW_CONNECTED to true
+                        region.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                        if ( zillowReviewCount == 0 ) {
+                            region.setZillowAverageScore( 0.0 );
+                            region.setZillowReviewCount( 0 );
+                        } else {
+                            region.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
+                            region.setZillowReviewCount( zillowReviewCount );
+                        }
                     	userManagementService.updateRegion( region );
                     }
                     for ( ProfileStage stage : regionSettings.getProfileStages() ) {
@@ -1973,6 +1964,15 @@ public class SocialManagementController
                     Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                     if(branch != null){
                     	settingsSetter.setSettingsValueForBranch(branch, SettingsForApplication.ZILLOW, CommonConstants.SET_SETTINGS);
+                        //Set IS_ZILLOW_CONNECTED to true
+                        branch.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                        if ( zillowReviewCount == 0 ) {
+                            branch.setZillowAverageScore( 0.0 );
+                            branch.setZillowReviewCount( 0 );
+                        } else {
+                            branch.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
+                            branch.setZillowReviewCount( zillowReviewCount );
+                        }
                     	userManagementService.updateBranch( branch );
                     }
                     for ( ProfileStage stage : branchSettings.getProfileStages() ) {
@@ -1996,6 +1996,19 @@ public class SocialManagementController
                     mediaTokens = socialManagementService.checkOrAddZillowLastUpdated(mediaTokens);
                     mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                     agentSettings.setSocialMediaTokens( mediaTokens );
+                    User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
+                    if(agent != null){
+                        //Set IS_ZILLOW_CONNECTED to true
+                        agent.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
+                        if ( zillowReviewCount == 0 ) {
+                            agent.setZillowAverageScore( 0.0 );
+                            agent.setZillowReviewCount( 0 );
+                        } else {
+                            agent.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
+                            agent.setZillowReviewCount( zillowReviewCount );
+                        }
+                        userManagementService.updateUser( agent );
+                    }
                     for ( ProfileStage stage : agentSettings.getProfileStages() ) {
                         if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
                             stage.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -2104,6 +2117,7 @@ public class SocialManagementController
                 throw new InvalidInputException( "Social media can not be null or empty" );
             }
 
+            boolean isZillow = false;
             boolean unset = CommonConstants.UNSET_SETTINGS;
             SettingsForApplication settings;
             
@@ -2126,6 +2140,7 @@ public class SocialManagementController
     			
     		case CommonConstants.ZILLOW_SOCIAL_SITE:
     			settings = SettingsForApplication.ZILLOW;
+    			isZillow = true;
                 break;
 
     		default:
@@ -2144,6 +2159,12 @@ public class SocialManagementController
                 Company company = userManagementService.getCompanyById( entityId );
                 if(company != null){
                 	settingsSetter.setSettingsValueForCompany(company, settings, unset);
+                	//Set IS_ZILLOW_CONNECTED to false
+                	if ( isZillow ) {
+                        company.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                        company.setZillowAverageScore( 0.0 );
+                        company.setZillowReviewCount( 0 );
+                    }
                 	userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -2156,6 +2177,12 @@ public class SocialManagementController
                 Region region = userManagementService.getRegionById(entityId);
                 if(region != null){
                 	settingsSetter.setSettingsValueForRegion(region, settings, unset);
+//                    Set IS_ZILLOW_CONNECTED to false
+                    if ( isZillow ) {
+                        region.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                        region.setZillowAverageScore( 0.0 );
+                        region.setZillowReviewCount( 0 );
+                    }
                 	userManagementService.updateRegion( region );
                 }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -2168,6 +2195,12 @@ public class SocialManagementController
                 Branch branch = userManagementService.getBranchById(entityId);
                 if(branch != null){
                 	settingsSetter.setSettingsValueForBranch(branch, settings, unset);
+                    //Set IS_ZILLOW_CONNECTED to false
+                    if ( isZillow ) {
+                        branch.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                        branch.setZillowAverageScore( 0.0 );
+                        branch.setZillowReviewCount( 0 );
+                    }
                 	userManagementService.updateBranch( branch );
                 }
             }
@@ -2177,6 +2210,15 @@ public class SocialManagementController
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
+                //Set IS_ZILLOW_CONNECTED to false
+                if ( isZillow ) {
+                    User agent = userManagementService.getUserByUserId( unitSettings.getIden() );
+                    agent.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                    agent.setZillowAverageScore( 0.0 );
+                    agent.setZillowReviewCount( 0 );
+                    userManagementService.updateUser( agent );
+                }
+                
             }
             profileSettings.setSocialMediaTokens(unitSettings.getSocialMediaTokens());
             

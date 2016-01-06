@@ -5,10 +5,10 @@
 <c:set var="accountType" value="${user.company.licenseDetails[0].accountsMaster.accountName}" />
 <form id="edit-individual-form">
 	    <c:choose>
-		    <c:when test="${accountType == 'Enterprise'}">
+		    <c:when test="${accountType == 'Enterprise'}"> 
 	    	<div id="bd-assign-to" class="bd-hr-form-item clearfix">
     			<div class="float-left bd-frm-left"><spring:message code="label.assignto.key"/></div>
-    			<div id="assign-to-selector" class="float-left bd-frm-right pos-relative">
+    			<div id="assign-to-selector" class="float-left bd-frm-right pos-relative"  data-profile="individual">
 			        <input id="assign-to-txt" data-assignto="office" value='<spring:message code="label.office.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
 			        <div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 			        	<div data-assign-to-option="office" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
@@ -25,7 +25,7 @@
 	        <c:when test="${accountType == 'Company'}">
 	        <div id="bd-assign-to" class="bd-hr-form-item clearfix">
 	    		<div class="float-left bd-frm-left"><spring:message code="label.assignto.key"/></div>
-		    	<div id="assign-to-selector" class="float-left bd-frm-right pos-relative">
+		    	<div id="assign-to-selector" class="float-left bd-frm-right pos-relative" data-profile="individual">
 			    	<input id="assign-to-txt" data-assignto="office" value='<spring:message code="label.office.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
 		        	<div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 		        		<div data-assign-to-option="office" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
@@ -65,7 +65,7 @@
 	</div>
 	<div class="bd-hr-form-item clearfix">
 	    <div class="float-left bd-frm-left"></div>
-	    <div class="float-left bd-frm-right">
+	    <div class="float-left bd-frm-right manage-team-radio">
 	        <div class="bd-frm-rad-wrapper clearfix">
 				<input type="hidden" class="hide" name="userSelectionType">
 	            <div class="float-left bd-cust-rad-item clearfix">
