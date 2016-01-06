@@ -274,8 +274,8 @@
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
             	<c:choose>
-            		<c:when test="${not empty profile.logoThumbnail }">
-            			<div class="prof-user-logo" id="prof-company-logo" style="background: url(${profile.logoThumbnail}) no-repeat center; background-size: 100% auto;"></div>
+            		<c:when test="${not empty profile.logo }">
+            			<div class="prof-user-logo" id="prof-company-logo" style="background: url(${profile.logo}) no-repeat center; background-size: 100% auto;"></div>
             		</c:when>
             		<c:otherwise>
             			<div class="prof-user-logo" id="prof-company-logo"></div>
@@ -571,7 +571,6 @@
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
 </div>
-<script src='//www.google.com/recaptcha/api.js'></script>
 <script type="text/javascript" src="https://apis.google.com/js/client:plusone.js" async="async"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/date.js"></script>
@@ -582,6 +581,7 @@
 <script src="${initParam.resourcesPath}/resources/js/googlemaps.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
+<script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
     $(document).ready(function(){
     	if($('#social-token-container').children('.social-item-icon').length == 0) {
@@ -593,7 +593,6 @@
     	profileJson = ${profileJson};
         var gaLabel;
         var gaName;
-        
         /**
 	    	If region profile name is mentioned, fetch the region profile 
     		since this would be a call to fetch region profile page 

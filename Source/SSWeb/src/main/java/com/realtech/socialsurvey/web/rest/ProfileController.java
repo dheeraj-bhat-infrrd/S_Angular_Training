@@ -3,9 +3,14 @@ package com.realtech.socialsurvey.web.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
@@ -732,6 +737,8 @@ public class ProfileController
             try {
                 List<SurveyDetails> reviews = profileManagementService.getReviews( companyId, minScore, maxScore, start,
                     numRows, CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null, sortCriteria );
+                //This is added to get the agent's app ID and profile URL 
+                //DO NOT REMOVE!
                 profileManagementService.setAgentProfileUrlForReview( reviews );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
@@ -802,6 +809,7 @@ public class ProfileController
                     SurveySettings surveySettings = new SurveySettings();
                     surveySettings.setAutoPostEnabled( true );
                     surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile, surveySettings );
                     // update survey settings in the profile object
@@ -811,6 +819,7 @@ public class ProfileController
                     if ( regionProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         regionProfile.getSurvey_settings().setAutoPostEnabled( true );
                         regionProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                        regionProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                         organizationManagementService.updateScoreForSurvey(
                             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionProfile,
                             regionProfile.getSurvey_settings() );
@@ -822,6 +831,9 @@ public class ProfileController
 
                 List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, minScore, maxScore, start,
                     numRows, CommonConstants.PROFILE_LEVEL_REGION, false, null, null, sortCriteria );
+                //This is added to get the agent's app ID and profile URL 
+                //DO NOT REMOVE!
+                profileManagementService.setAgentProfileUrlForReview( reviews );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
                 response = Response.ok( json ).build();
@@ -1165,6 +1177,7 @@ public class ProfileController
                 if ( branchProfile.getSurvey_settings() == null ) {
                     SurveySettings surveySettings = new SurveySettings();
                     surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     surveySettings.setAutoPostEnabled( true );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile, surveySettings );
@@ -1176,6 +1189,7 @@ public class ProfileController
                     if ( branchProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                         branchProfile.getSurvey_settings().setAutoPostEnabled( true );
                         branchProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                        branchProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                         organizationManagementService.updateScoreForSurvey(
                             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchProfile,
                             branchProfile.getSurvey_settings() );
@@ -1186,6 +1200,9 @@ public class ProfileController
                 }
                 List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, minScore, maxScore, start,
                     numRows, CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, sortCriteria );
+                //This is added to get the agent's app ID and profile URL 
+                //DO NOT REMOVE!
+                profileManagementService.setAgentProfileUrlForReview( reviews );
                 String json = new Gson().toJson( reviews );
                 LOG.debug( "reviews json : " + json );
                 response = Response.ok( json ).build();
@@ -1346,6 +1363,7 @@ public class ProfileController
             if ( agentProfile.getSurvey_settings() != null ) {
                 if ( agentProfile.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                     agentProfile.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                    agentProfile.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                     agentProfile.getSurvey_settings().setAutoPostEnabled( true );
                     organizationManagementService.updateScoreForSurvey(
                         MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile,
@@ -1354,6 +1372,7 @@ public class ProfileController
             } else {
                 SurveySettings surveySettings = new SurveySettings();
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 surveySettings.setAutoPostEnabled( true );
                 organizationManagementService.updateScoreForSurvey(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentProfile, surveySettings );
@@ -1771,6 +1790,9 @@ public class ProfileController
     }
 
 
+    /**
+     * Method to fetch zillow reviews for a  profile type
+     * */
     @ResponseBody
     @RequestMapping ( value = "/{profileType}/{iden}/zillowreviews")
     public Response getZillowReviews( @PathVariable String profileType, @PathVariable long iden )
@@ -1785,12 +1807,17 @@ public class ProfileController
                 if ( companyProfile.getSocialMediaTokens() != null
                     && companyProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for company id: " + iden );
-                    profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( companyProfile,
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for company id: " + iden );
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "Could not fetch unit settings for company: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for company: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for company: " + iden, e );
+            } catch ( UnavailableException e ) {
+                LOG.error( "Could not fetch zillow reviews for company: " + iden, e );
+                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
             try {
@@ -1799,12 +1826,17 @@ public class ProfileController
                 if ( regionProfile.getSocialMediaTokens() != null
                     && regionProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for region id: " + iden );
-                    profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile,
+                        CommonConstants.REGION_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for region id: " + iden );
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "Could not fetch unit settings for region: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for region: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for region: " + iden, e );
+            } catch ( UnavailableException e ) {
+                LOG.error( "Could not fetch zillow reviews for region: " + iden, e );
+                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
             try {
@@ -1813,15 +1845,19 @@ public class ProfileController
                 if ( branchProfile.getSocialMediaTokens() != null
                     && branchProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for branch id: " + iden );
-                    profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile,
+                        CommonConstants.BRANCH_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for branch id: " + iden );
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "Could not fetch unit settings for branch: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for branch: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
             } catch ( NoRecordsFetchedException e ) {
-                LOG.error( "Could not fetch unit settings for branch: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for branch: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
+            } catch ( UnavailableException e ) {
+                LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
+                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_INDIVIDUAL ) ) {
             try {
@@ -1830,19 +1866,22 @@ public class ProfileController
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for agent id: " + iden );
-                    profileManagementService.updateZillowFeed( individualProfile, CommonConstants.AGENT_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( individualProfile,
+                        CommonConstants.AGENT_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for agent id: " + iden );
+                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok( json ).build();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "Could not fetch unit settings for agent: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for agent: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for agent: " + iden, e );
             } catch ( NoRecordsFetchedException e ) {
-                LOG.error( "Could not fetch unit settings for agent: " + iden, e );
-                throw new ProfileNotFoundException( "Could not fetch unit settings for agent: " + iden, e );
+                LOG.error( "Could not fetch zillow reviews for agent: " + iden, e );
+            } catch ( UnavailableException e ) {
+                LOG.error( "Could not fetch zillow reviews for agent: " + iden, e );
+                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         }
         LOG.info( "Fetched zillow reviews for profile type: " + profileType + " and id: " + iden );
-        response = Response.ok().build();
         return response;
     }
 
@@ -1937,5 +1976,38 @@ public class ProfileController
         }
         LOG.debug( "Resolved http status to " + httpStatus.getStatusCode() );
         return httpStatus;
+    }
+
+
+    /**
+     * Method to fetch all ids under a profile level connected to zillow
+     * */
+    @ResponseBody
+    @RequestMapping ( value = "/{profileType}/{iden}/fetchhierarchyconnectedtozillow")
+    public Response getIdsOfHeirarchyConnectedWithZillow( @PathVariable String profileType, @PathVariable long iden )
+    {/**
+         * Method to fetch all ids under a profile level connected to zillow
+         * */
+        Response response = null;
+        LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " connected with zillow" );
+        Map<String, Set<Long>> hierarchyIdsMap = new LinkedHashMap<String, Set<Long>>();
+        if ( profileType.equals( PROFILE_TYPE_COMPANY ) ) {
+            // get all region and branches, individuals under a region connected to zillow
+            hierarchyIdsMap = organizationManagementService.getAllIdsUnderCompanyConnectedToZillow( iden );
+        } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
+            // get all branches, individuals under a region connected to zillow
+            hierarchyIdsMap = organizationManagementService.getAllIdsUnderRegionsConnectedToZillow( new HashSet<Long>( Arrays
+                .asList( new Long[] { iden } ) ) );
+        } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
+            // get all individuals under branch connected with zillow
+            hierarchyIdsMap = organizationManagementService.getAllIdsUnderBranchConnectedToZillow( iden );
+        }
+        if ( !hierarchyIdsMap.isEmpty() ) {
+            String json = new Gson().toJson( hierarchyIdsMap );
+            response = Response.ok( json ).build();
+        }
+        LOG.info( "Getting ids of hierarchy under " + profileType + " and id: " + iden + " connected with zillow" );
+        return response;
+
     }
 }

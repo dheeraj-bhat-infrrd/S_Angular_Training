@@ -3,10 +3,8 @@ package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -16,18 +14,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -295,48 +294,51 @@ public class SurveyHandlerImplTest
     }
 
 
-    //Tests for deleteZillowSurveysByEntity
-    @Test ( expected = InvalidInputException.class)
-    public void deleteZillowSurveysByEntityTestEntityTypeNull() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteZillowSurveysByEntity( null, 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void deleteZillowSurveysByEntityTestEntityTypeEmpty() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteZillowSurveysByEntity( "", 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void deleteZillowSurveysByEntityTestInvalidId() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteZillowSurveysByEntity( CommonConstants.COMPANY_ID_COLUMN, -1 );
-    }
-
-
-    //Tests for deleteExcessZillowSurveysByEntity
-    @Test ( expected = InvalidInputException.class)
-    public void deleteExcessZillowSurveysByEntityTestEntityTypeNull() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( null, 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void deleteExcessZillowSurveysByEntityTestEntityTypeEmpty() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( "", 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void deleteExcessZillowSurveysByEntityTestInvalidId() throws InvalidInputException
-    {
-        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( CommonConstants.COMPANY_ID_COLUMN, -1 );
-    }
+    /**
+     * Commented as Zillow surveys are not stored in database, SS-1276
+     * */
+//      Tests for deleteZillowSurveysByEntity
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteZillowSurveysByEntityTestEntityTypeNull() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteZillowSurveysByEntity( null, 1 );
+//    }
+//
+//
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteZillowSurveysByEntityTestEntityTypeEmpty() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteZillowSurveysByEntity( "", 1 );
+//    }
+//
+//
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteZillowSurveysByEntityTestInvalidId() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteZillowSurveysByEntity( CommonConstants.COMPANY_ID_COLUMN, -1 );
+//    }
+//
+//
+//    Tests for deleteExcessZillowSurveysByEntity
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteExcessZillowSurveysByEntityTestEntityTypeNull() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( null, 1 );
+//    }
+//
+//
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteExcessZillowSurveysByEntityTestEntityTypeEmpty() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( "", 1 );
+//    }
+//
+//
+//    @Test ( expected = InvalidInputException.class)
+//    public void deleteExcessZillowSurveysByEntityTestInvalidId() throws InvalidInputException
+//    {
+//        surveyHandlerImpl.deleteExcessZillowSurveysByEntity( CommonConstants.COMPANY_ID_COLUMN, -1 );
+//    }
 
 
     //Tests for updateModifiedOnColumnForAgentHierachy
@@ -375,5 +377,88 @@ public class SurveyHandlerImplTest
     public void canPostOnSocialMediaTestCanPost()
     {
         surveyHandlerImpl.canPostOnSocialMedia( new OrganizationUnitSettings(), 5.0 );
+    }
+
+
+    //Tests for validateUnitsettingsForDotloop
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationNull()
+    {
+        assertEquals( "", 1, surveyHandlerImpl.validateUnitsettingsForDotloop( null, null ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdNotSame()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 2 );
+        assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdSameInvalidCollectionName()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 1 );
+        surveyPreInitiation.setCollectionName( "test" );
+        assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdSameRegionSettingsCollectionNoUserProfile()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 1 );
+        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdSameRegionSettingsCollectionValidUserProfile()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 1 );
+        List<UserProfile> profiles = new ArrayList<UserProfile>();
+        profiles.add( new UserProfile() );
+        user.setUserProfiles( profiles );
+        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        assertEquals( "", 3, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test
+    public void validateUnitsettingsForDotloopTestSurveyPreinitiationCompanyIdSameBranchSettingsCollectionValidUserProfile()
+    {
+        User user = new User();
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        user.setCompany( company );
+        surveyPreInitiation.setCompanyId( 1 );
+        List<UserProfile> profiles = new ArrayList<UserProfile>();
+        profiles.add( new UserProfile() );
+        user.setUserProfiles( profiles );
+        surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        assertEquals( "", 1, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
     }
 }

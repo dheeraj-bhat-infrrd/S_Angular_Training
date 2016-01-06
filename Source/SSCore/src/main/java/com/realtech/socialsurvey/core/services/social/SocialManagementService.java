@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -112,7 +113,23 @@ public interface SocialManagementService
 
 
     public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl ) throws NonFatalException;
+        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl,
+        boolean onlyPostToSocialSurvey ) throws NonFatalException;
+
+
+    /**
+     * Method to add entry to social connections history
+     *
+     * @param entityType
+     * @param entityId
+     * @param mediaTokens
+     * @param socialMedia
+     * @param action
+     * @throws InvalidInputException
+     * @throws ProfileNotFoundException
+     */
+    void updateSocialConnectionsHistory( String entityType, long entityId, SocialMediaTokens mediaTokens, String socialMedia,
+        String action ) throws InvalidInputException, ProfileNotFoundException;
 
 }
 // JIRA SS-34 BY RM02 BOC

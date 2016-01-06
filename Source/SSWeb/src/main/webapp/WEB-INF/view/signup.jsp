@@ -15,7 +15,6 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
-	<script src='//www.google.com/recaptcha/api.js'></script>
 </head>
 
 <body>
@@ -35,7 +34,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="hm-header-row-left text-center lgn-adj padding-10"><spring:message code="label.signuptostartsurvey.key"/></div>
+			<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.signuptostartsurvey.key"/></div>
 		</div>
 	</div>
 </div>
@@ -94,6 +93,7 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src='//www.google.com/recaptcha/api.js' async="async" defer="defer"></script>
 <script>
 $(document).ready(function(){
 

@@ -238,8 +238,8 @@ public class SurveyManagementController
                 }
             }
 
-            // Sending email to the customer telling about successful completion of survey.
             SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
+            // Sending email to the customer telling about successful completion of survey.
             try {
                 String customerName = emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                     survey.getCustomerLastName() );
@@ -553,9 +553,14 @@ public class SurveyManagementController
                 // fetching company logo
                 User user = userManagementService.getUserByUserId( agentId );
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-                if ( companySettings != null && companySettings.getLogoThumbnail() != null ) {
+                //JIRA SS-1363 begin
+                /*if ( companySettings != null && companySettings.getLogoThumbnail() != null ) {
                     surveyAndStage.put( "companyLogo", companySettings.getLogoThumbnail() );
+                }*/
+                if ( companySettings != null && companySettings.getLogo() != null ) {
+                    surveyAndStage.put( "companyLogo", companySettings.getLogo() );
                 }
+                //JIRA SS-1363 end
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in triggerSurveyWithUrl()." );
@@ -588,14 +593,17 @@ public class SurveyManagementController
             String feedback = request.getParameter( "feedback" );
             String isAbusiveStr = request.getParameter( "isAbusive" );
             String serverBaseUrl = requestUtils.getRequestServerName( request );
+            String onlyPostToSocialSurveyStr = request.getParameter( "onlyPostToSocialSurvey" );
 
             long agentId = 0;
             double rating = 0;
             boolean isAbusive = false;
+            boolean onlyPostToSocialSurvey = false;
             try {
                 agentId = Long.parseLong( agentIdStr );
                 rating = Double.parseDouble( ratingStr );
                 isAbusive = Boolean.parseBoolean( isAbusiveStr );
+                onlyPostToSocialSurvey = Boolean.parseBoolean( onlyPostToSocialSurveyStr );
             } catch ( NumberFormatException | NullPointerException e ) {
                 LOG.error(
                     "Number format/Null Pointer exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ",
@@ -603,8 +611,8 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
-            if(socialManagementService.postToSocialMedia( agentName, agentProfileLink, custFirstName, custLastName, agentId,
-                rating, customerEmail, feedback, isAbusive, serverBaseUrl )){
+            if ( socialManagementService.postToSocialMedia( agentName, agentProfileLink, custFirstName, custLastName, agentId,
+                rating, customerEmail, feedback, isAbusive, serverBaseUrl, onlyPostToSocialSurvey ) ) {
                 return "Successfully posted to all the places in hierarchy";
             }
 
@@ -616,13 +624,13 @@ public class SurveyManagementController
         }
         LOG.info( "Method to post feedback of customer to various pages of social networking sites finished." );
         return "Error while posting on social media";
-        
+
     }
 
 
     //@ResponseBody
     @RequestMapping ( value = "/posttofacebook", method = RequestMethod.GET)
-    public String postToFacebook(  Model model , HttpServletRequest request )
+    public String postToFacebook( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to facebook started." );
         try {
@@ -786,7 +794,7 @@ public class SurveyManagementController
 
 
     @RequestMapping ( value = "/posttotwitter", method = RequestMethod.GET)
-    public String postToTwitter( Model model , HttpServletRequest request )
+    public String postToTwitter( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to twitter started." );
         try {
@@ -943,7 +951,7 @@ public class SurveyManagementController
 
 
     @RequestMapping ( value = "/posttolinkedin", method = RequestMethod.GET)
-    public String postToLinkedin( Model model , HttpServletRequest request )
+    public String postToLinkedin( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to linkedin started." );
         try {
@@ -1244,8 +1252,8 @@ public class SurveyManagementController
 
             //update shared on
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
-            SocialMediaPostDetails socialMediaPostDetails = null;
-            if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+            SocialMediaPostDetails socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
+            if ( socialMediaPostDetails == null ) {
                 socialMediaPostDetails = new SocialMediaPostDetails();
 
             }
@@ -1318,8 +1326,8 @@ public class SurveyManagementController
 
                 //update shared on
                 SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, null, null );
-                SocialMediaPostDetails socialMediaPostDetails = null;
-                if ( surveyDetails.getSocialMediaPostDetails() == null ) {
+                SocialMediaPostDetails socialMediaPostDetails = surveyDetails.getSocialMediaPostDetails();
+                if ( socialMediaPostDetails == null ) {
                     socialMediaPostDetails = new SocialMediaPostDetails();
 
                 }
@@ -1523,52 +1531,98 @@ public class SurveyManagementController
             throw e;
         }
 
-        /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService.getUserByUserId(agentId));*/
+        //Used to set survey texts (which can be changed by the company admin)
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( userManagementService
+            .getUserByUserId( agentId ) );
         OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( agentId );
         if ( unitSettings.getSurvey_settings() == null ) {
             SurveySettings surveySettings = new SurveySettings();
             surveySettings.setAutoPostEnabled( true );
             surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+            surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             organizationManagementService.updateScoreForSurvey( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
                 unitSettings, surveySettings );
         } else {
             if ( unitSettings.getSurvey_settings().getShow_survey_above_score() <= 0 ) {
                 unitSettings.getSurvey_settings().setAutoPostEnabled( true );
                 unitSettings.getSurvey_settings().setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+                unitSettings.getSurvey_settings().setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 organizationManagementService.updateScoreForSurvey(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, unitSettings,
                     unitSettings.getSurvey_settings() );
             }
         }
-        SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-        surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
-        surveyAndStage.put( "neutralText", defaultSurveySettings.getNeutralText() );
-        surveyAndStage.put( "sadText", defaultSurveySettings.getSadText() );
-        surveyAndStage.put( "happyTextComplete", defaultSurveySettings.getHappyTextComplete() );
-        surveyAndStage.put( "neutralTextComplete", defaultSurveySettings.getNeutralTextComplete() );
-        surveyAndStage.put( "sadTextComplete", defaultSurveySettings.getSadTextComplete() );
+
+        //Flags to check if any particular text is not set in the companySettings
+        boolean isHappyTextSet = false, 
+            isNeutralTextSet = false, 
+            isSadTextSet = false,
+            isHappyTextCompleteSet = false, 
+            isNeutralTextCompleteSet = false, 
+            isSadTextCompleteSet = false;
 
         if ( unitSettings != null ) {
             SurveySettings surveySettings = unitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
-                if ( surveySettings.getHappyText() != null && !( surveySettings.getHappyText().isEmpty() ) )
-                    surveyAndStage.put( "happyText", surveySettings.getHappyText() );
-                if ( surveySettings.getNeutralText() != null && !( surveySettings.getNeutralText().isEmpty() ) )
-                    surveyAndStage.put( "neutralText", surveySettings.getNeutralText() );
-                if ( surveySettings.getSadText() != null && !surveySettings.getSadText().isEmpty() )
-                    surveyAndStage.put( "sadText", surveySettings.getSadText() );
-                if ( surveySettings.getHappyTextComplete() != null && !surveySettings.getHappyTextComplete().isEmpty() )
-                    surveyAndStage.put( "happyTextComplete", surveySettings.getHappyTextComplete() );
-                if ( surveySettings.getNeutralTextComplete() != null && !surveySettings.getNeutralTextComplete().isEmpty() )
-                    surveyAndStage.put( "neutralTextComplete", surveySettings.getNeutralTextComplete() );
-                if ( surveySettings.getSadTextComplete() != null && !surveySettings.getSadTextComplete().isEmpty() )
-                    surveyAndStage.put( "sadTextComplete", surveySettings.getSadTextComplete() );
-
+                //AutopostScore and autopostEnabled values, we get from the agent
                 surveyAndStage.put( "autopostScore", surveySettings.getShow_survey_above_score() );
                 surveyAndStage.put( "autopostEnabled", surveySettings.isAutoPostEnabled() );
             }
         }
-
+        if ( companySettings != null ) {
+            SurveySettings surveySettings = companySettings.getSurvey_settings();
+            if ( surveySettings != null ) {
+                if ( surveySettings.getHappyText() != null && !( surveySettings.getHappyText().isEmpty() ) ) {
+                    surveyAndStage.put( "happyText", surveySettings.getHappyText() );
+                    isHappyTextSet = true;
+                }
+                if ( surveySettings.getNeutralText() != null && !( surveySettings.getNeutralText().isEmpty() ) ) {
+                    surveyAndStage.put( "neutralText", surveySettings.getNeutralText() );
+                    isNeutralTextSet = true;
+                }
+                if ( surveySettings.getSadText() != null && !surveySettings.getSadText().isEmpty() ) {
+                    surveyAndStage.put( "sadText", surveySettings.getSadText() );
+                    isSadTextSet = true;
+                }
+                if ( surveySettings.getHappyTextComplete() != null && !surveySettings.getHappyTextComplete().isEmpty() ) {
+                    surveyAndStage.put( "happyTextComplete", surveySettings.getHappyTextComplete() );
+                    isHappyTextCompleteSet = true;
+                }
+                if ( surveySettings.getNeutralTextComplete() != null && !surveySettings.getNeutralTextComplete().isEmpty() ) {
+                    surveyAndStage.put( "neutralTextComplete", surveySettings.getNeutralTextComplete() );
+                    isNeutralTextCompleteSet = true;
+                }
+                if ( surveySettings.getSadTextComplete() != null && !surveySettings.getSadTextComplete().isEmpty() ) {
+                    surveyAndStage.put( "sadTextComplete", surveySettings.getSadTextComplete() );
+                    isSadTextCompleteSet = true;
+                }
+            }
+        }
+        
+        //If any of the texts are not set by the company, store default values for them.
+        if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet 
+            && isSadTextCompleteSet ) ) {
+            SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+            if ( !isHappyTextSet ) {
+                surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
+            }
+            if ( !isNeutralTextSet ) {
+                surveyAndStage.put( "neutralText", defaultSurveySettings.getNeutralText() );
+            }
+            if ( !isSadTextSet ) {
+                surveyAndStage.put( "sadText", defaultSurveySettings.getSadText() );
+            }
+            if ( !isHappyTextCompleteSet ) {
+                surveyAndStage.put( "happyTextComplete", defaultSurveySettings.getHappyTextComplete() );
+            }
+            if ( isNeutralTextCompleteSet ) {
+                surveyAndStage.put( "neutralTextComplete", defaultSurveySettings.getNeutralTextComplete() );
+            }
+            if ( isSadTextCompleteSet ) {
+                surveyAndStage.put( "sadTextComplete", defaultSurveySettings.getSadTextComplete() );
+            }
+        }
+        
         AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
 
         // Fetching Yelp Url

@@ -831,7 +831,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
             user.setReviewCount( reviewCount );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
-                CommonConstants.NO_LIMIT, false, false ) );
+                CommonConstants.NO_LIMIT, false, false, false, 0, 0 ) );
             users.add( user );
         }
         LOG.info( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );
@@ -2189,6 +2189,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             SurveySettings surveySettings = new SurveySettings();
             surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             surveySettings.setAutoPostEnabled( true );
+            surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
             agentSettings.setSurvey_settings( surveySettings );
         }
 
@@ -2803,7 +2804,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             e.printStackTrace();
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
             logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
@@ -2814,8 +2816,21 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             logoUrl = branchSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
             logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            logoUrl = branchSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
         }
-
+        //JIRA SS-1363 end
+        
         return logoUrl;
     }
 
@@ -3057,5 +3072,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         LOG.info( "Method to find users on the basis of user ids ended for user ids : " + userIds );
         return userList;
+    }
+    
+    
+    // Method to return active user with provided email and company
+    @Transactional
+    @Override
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
+        }
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null ) {
+            throw new NoRecordsFetchedException( "No company found with the id " + companyId );
+        }
+        User user = userDao.getActiveUserByEmailAndCompany( emailId, company );
+
+        LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
+        return user;
     }
 }

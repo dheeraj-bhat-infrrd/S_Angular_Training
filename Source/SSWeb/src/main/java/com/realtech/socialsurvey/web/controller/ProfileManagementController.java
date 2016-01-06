@@ -68,7 +68,6 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
@@ -251,6 +250,8 @@ public class ProfileManagementController
             OrganizationUnitSettings companyProfile = null;
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
+                //set setting detail by company Setting
+                setSettingSetByEntityInModel( model, companyProfile );
                 String json = new Gson().toJson( companyProfile );
                 model.addAttribute( "profileJson", json );
                 double averageRating = profileManagementService.getAverageRatings( companyId,
@@ -277,6 +278,8 @@ public class ProfileManagementController
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
+                //set setting detail by region Setting
+                setSettingSetByEntityInModel( model, regionProfile );
 
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
@@ -296,7 +299,7 @@ public class ProfileManagementController
 
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
-                    map );
+                    map , false);
 
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
@@ -335,6 +338,9 @@ public class ProfileManagementController
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
 
+                //set setting detail by branch Setting
+                setSettingSetByEntityInModel( model, branchProfile );
+
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID_COLUMN,
                         branchProfile.getIden() );
@@ -353,7 +359,7 @@ public class ProfileManagementController
                 }
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, null, map );
+                    branchProfile, null, map , false);
                 // aggregated disclaimer
                 String disclaimer = profileManagementService.aggregateDisclaimer( branchProfile, CommonConstants.BRANCH_ID );
                 branchProfile.setDisclaimer( disclaimer );
@@ -395,6 +401,9 @@ public class ProfileManagementController
                 branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
                 individualProfile = userManagementService.getAgentSettingsForUserProfiles( agentId );
 
+                //set setting detail by agent Setting
+                setSettingSetByEntityInModel( model, individualProfile );
+
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
                         individualProfile.getIden() );
@@ -417,7 +426,7 @@ public class ProfileManagementController
 
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, individualProfile, map );
+                    branchProfile, individualProfile, map , false);
                 individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
                 String disclaimer = profileManagementService.aggregateDisclaimer( individualProfile, CommonConstants.AGENT_ID );
                 individualProfile.setDisclaimer( disclaimer );
@@ -465,6 +474,53 @@ public class ProfileManagementController
 
         LOG.info( "Method showProfileEditPage() finished from ProfileManagementService" );
         return JspResolver.PROFILE_EDIT;
+    }
+
+
+    /**
+     * 
+     * @param model
+     * @param entitySetting
+     * @throws InvalidInputException 
+     */
+    private void setSettingSetByEntityInModel( Model model, OrganizationUnitSettings entitySetting )
+        throws InvalidInputException
+    {
+        LOG.debug( "method setSettingSetByEntityInModel() started " );
+        boolean isLogoSetByEntity;
+        boolean isContactNoSetByEntity;
+        boolean isWebAddressSetByEntity;
+
+        if ( entitySetting == null ) {
+            throw new InvalidInputException( "Passed entity setting is null" );
+        }
+
+        if ( entitySetting.getLogo() == null || entitySetting.getLogo().isEmpty() ) {
+            isLogoSetByEntity = false;
+        } else {
+            isLogoSetByEntity = true;
+        }
+
+        if ( entitySetting.getContact_details() != null && entitySetting.getContact_details().getWeb_addresses() != null
+            && entitySetting.getContact_details().getWeb_addresses().getWork() != null
+            && !entitySetting.getContact_details().getWeb_addresses().getWork().isEmpty() ) {
+            isWebAddressSetByEntity = true;
+        } else {
+            isWebAddressSetByEntity = false;
+        }
+
+        if ( entitySetting.getContact_details() != null && entitySetting.getContact_details().getContact_numbers() != null
+            && entitySetting.getContact_details().getContact_numbers().getWork() != null
+            && !entitySetting.getContact_details().getContact_numbers().getWork().isEmpty() ) {
+            isContactNoSetByEntity = true;
+        } else {
+            isContactNoSetByEntity = false;
+        }
+        model.addAttribute( "isLogoSetByEntity", isLogoSetByEntity );
+        model.addAttribute( "isWebAddressSetByEntity", isWebAddressSetByEntity );
+        model.addAttribute( "isContactNoSetByEntity", isContactNoSetByEntity );
+
+        LOG.debug( "method setSettingSetByEntityInModel() ended " );
     }
 
 
@@ -2803,11 +2859,6 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-        long branchId = 0;
-        long regionId = 0;
-        long companyId = 0;
-        long agentId = 0;
-
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
@@ -2828,17 +2879,6 @@ public class ProfileManagementController
             } catch ( IOException ioException ) {
                 throw new InvalidInputException( "Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR,
                     ioException );
-            }
-
-            try {
-                Map<String, Long> hierarchyDetails = profileManagementService
-                    .getHierarchyDetailsByEntity( entityType, entityId );
-                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
-            } catch ( ProfileNotFoundException e ) {
-                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2885,7 +2925,7 @@ public class ProfileManagementController
 
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.YELP, true );
                     userManagementService.updateRegion( region );
                 }
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -2938,19 +2978,8 @@ public class ProfileManagementController
             profileSettings.setSocialMediaTokens( socialMediaTokens );
 
             //Add action to social connection history
-            String action = "connected";
-            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
-            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getYelpToken() != null )
-                && ( socialMediaTokens.getYelpToken().getYelpPageLink() != null )
-                && !( socialMediaTokens.getYelpToken().getYelpPageLink().isEmpty() ) )
-                socialUpdateAction.setLink( socialMediaTokens.getYelpToken().getYelpPageLink() );
-            socialUpdateAction.setAction( action );
-            socialUpdateAction.setAgentId( agentId );
-            socialUpdateAction.setBranchId( branchId );
-            socialUpdateAction.setRegionId( regionId );
-            socialUpdateAction.setCompanyId( companyId );
-            socialUpdateAction.setSocialMediaSource( CommonConstants.YELP_SOCIAL_SITE );
-            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
+            socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
+                CommonConstants.YELP_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
 
             LOG.info( "YelpLinked in link updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
@@ -3256,10 +3285,6 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-        long branchId = 0;
-        long regionId = 0;
-        long companyId = 0;
-        long agentId = 0;
 
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
@@ -3269,17 +3294,6 @@ public class ProfileManagementController
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
-            }
-
-            try {
-                Map<String, Long> hierarchyDetails = profileManagementService
-                    .getHierarchyDetailsByEntity( entityType, entityId );
-                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
-            } catch ( ProfileNotFoundException e ) {
-                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
 
             String realtorLink = request.getParameter( "realtorLink" );
@@ -3361,21 +3375,9 @@ public class ProfileManagementController
             profileSettings.setSocialMediaTokens( socialMediaTokens );
 
             //Add action to social connection history
-            String action = "connected";
-            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
-            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getRealtorToken() != null )
-                && ( socialMediaTokens.getRealtorToken().getRealtorProfileLink() != null )
-                && !( socialMediaTokens.getRealtorToken().getRealtorProfileLink().isEmpty() ) )
-                socialUpdateAction.setLink( socialMediaTokens.getRealtorToken().getRealtorProfileLink() );
-            socialUpdateAction.setAction( action );
-            socialUpdateAction.setAgentId( agentId );
-            socialUpdateAction.setBranchId( branchId );
-            socialUpdateAction.setRegionId( regionId );
-            socialUpdateAction.setCompanyId( companyId );
-            socialUpdateAction.setSocialMediaSource( CommonConstants.REALTOR_SOCIAL_SITE );
-
-            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
-
+            socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
+                CommonConstants.REALTOR_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+            
             LOG.info( "realtor updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REALTOR_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -3417,10 +3419,6 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         SocialMediaTokens socialMediaTokens = null;
-        long branchId = 0;
-        long regionId = 0;
-        long companyId = 0;
-        long agentId = 0;
 
         try {
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
@@ -3430,17 +3428,6 @@ public class ProfileManagementController
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
-            }
-
-            try {
-                Map<String, Long> hierarchyDetails = profileManagementService
-                    .getHierarchyDetailsByEntity( entityType, entityId );
-                branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
-                regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
-                companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
-                agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
-            } catch ( ProfileNotFoundException e ) {
-                LOG.error( "Profile not found for user id : " + entityId + " of type : " + entityType, e );
             }
 
             String lendingTreeLink = request.getParameter( "lendingTreeLink" );
@@ -3521,23 +3508,11 @@ public class ProfileManagementController
             }
 
             profileSettings.setSocialMediaTokens( socialMediaTokens );
-
-            //Add action to social connection history
-            String action = "connected";
-            SocialUpdateAction socialUpdateAction = new SocialUpdateAction();
-            if ( ( socialMediaTokens != null ) && ( socialMediaTokens.getLendingTreeToken() != null )
-                && ( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink() != null )
-                && !( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink().isEmpty() ) )
-                socialUpdateAction.setLink( socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink() );
-            socialUpdateAction.setAction( action );
-            socialUpdateAction.setAgentId( agentId );
-            socialUpdateAction.setBranchId( branchId );
-            socialUpdateAction.setRegionId( regionId );
-            socialUpdateAction.setCompanyId( companyId );
-            socialUpdateAction.setSocialMediaSource( CommonConstants.LENDINGTREE_SOCIAL_SITE );
-
-            socialPostDao.addActionToSocialConnectionHistory( socialUpdateAction );
-
+            
+            //Update social connection history
+            socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
+                CommonConstants.LENDINGTREE_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+            
             LOG.info( "lendingTree updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -4758,6 +4733,10 @@ public class ProfileManagementController
             LOG.error( "InvalidInputException while verifying email. Reason : " + e.getMessage(), e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_VERIFICATION_URL,
                 DisplayMessageType.ERROR_MESSAGE ) );
+        } catch ( NonFatalException nfe ) {
+            LOG.error( "NonFatalException while updating verified email. Reason : " + nfe.getMessage(), nfe );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.EMAIL_ID_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Method to verify email finished" );
         return JspResolver.LOGIN;

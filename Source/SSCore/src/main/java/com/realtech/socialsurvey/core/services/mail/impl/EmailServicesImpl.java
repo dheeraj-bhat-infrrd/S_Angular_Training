@@ -1639,6 +1639,38 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Method sendReportBugMailToAdmin() finished." );
     }
     
+    @Override
+    public void sendReportBugMailToAdminForExceptionInBatch( String displayName, String batchName , String lastRunTime ,String errorMsg, String exceptionStackTrace , String recipientMailId )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendReportBugMailToAdminForExceptionInBatch() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sendReportBugMailToAdminForExceptionInBatch " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendReportBugMailToAdminForExceptionInBatch " );
+        }
+
+        LOG.info( "Saving EmailEntity with recipient mail id : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.REPORT_EXCEPTION_IN_BATCH_TO_ADMIN_SUBJECT;
+        
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName( subjectFileName );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( batchName ) );
+        
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.REPORT_EXCEPTION_IN_BATCH_TO_ADMIN_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, batchName , lastRunTime , errorMsg , exceptionStackTrace ) );
+
+        LOG.info( "Calling email sender to send mail" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false, false );
+
+        LOG.info( "Method sendReportBugMailToAdminForExceptionInBatch() finished." );
+    }
+    
 
     @Async
     @Override

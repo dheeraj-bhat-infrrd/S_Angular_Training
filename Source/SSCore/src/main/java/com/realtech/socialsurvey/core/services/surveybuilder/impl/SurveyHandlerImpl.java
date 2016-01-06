@@ -490,20 +490,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( organizationUnitSettings != null ) {
             SurveySettings surveySettings = organizationUnitSettings.getSurvey_settings();
             if ( surveySettings != null ) {
-                if ( !surveySettings.getIsSocialPostReminderDisabled() && surveySettings.getSocial_post_reminder_interval_in_days() > 0 ) {
-                    reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
-                    maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
+                if ( !surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0 ) {
+                    reminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
+                    maxReminders = surveySettings.getMax_number_of_survey_reminders();
                 }
             }
         }
 
         if ( maxReminders == 0 ) {
             LOG.debug( "No Reminder count found for company " + companyId + " hence setting default value" );
-            maxReminders = maxSocialpostReminders;
+            maxReminders = maxSurveyReminders;
         }
         if ( reminderInterval == 0 ) {
             LOG.debug( "No Reminder interval found for company " + companyId + " hence setting default value " );
-            reminderInterval = socialPostReminderInterval;
+            reminderInterval = surveyReminderInterval;
         }
 
         map.put( CommonConstants.SURVEY_REMINDER_COUNT, maxReminders );
@@ -606,7 +606,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void increaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException, InvalidInputException
+    public void increaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException,
+        InvalidInputException
     {
         LOG.info( "Method to increase survey count for agent started." );
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, 1 );
@@ -616,7 +617,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException, InvalidInputException
+    public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException,
+        InvalidInputException
     {
         LOG.info( "Method to decrease survey count for agent started." );
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, -1 );
@@ -693,7 +695,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             e.printStackTrace();
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
             logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
@@ -704,7 +707,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             logoUrl = branchSettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
             logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            logoUrl = branchSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
         }
+        //JIRA SS-1363 end
         sendInvitationMailByAgent( user, custFirstName, custLastName, custEmail, link, logoUrl );
         // else
         // sendInvitationMailByCustomer(user, custFirstName, custLastName, custEmail, link);
@@ -763,7 +779,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             e.printStackTrace();
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
             logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
@@ -782,7 +799,28 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
             logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
         }
+        //JIRA SS-1363 end
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
@@ -879,7 +917,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             e.printStackTrace();
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
             logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
@@ -898,7 +937,28 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
             logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
         }
+        //JIRA SS-1363 end
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
@@ -995,7 +1055,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             e.printStackTrace();
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
             logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
@@ -1014,7 +1075,28 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
             logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
         }
+        //JIRA SS-1363 end
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
@@ -1119,7 +1201,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             e.printStackTrace();
         }
         OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
             logoUrl = companySettings.getLogoThumbnail();
         } else if ( organizationUnit == OrganizationUnit.REGION ) {
@@ -1138,7 +1221,28 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         } else if ( organizationUnit == OrganizationUnit.AGENT ) {
             logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
         }
+        //JIRA SS-1363 end
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
@@ -1287,55 +1391,42 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
             User user = null;
             if ( survey.getAgentEmailId() != null ) {
-                List<User> userList = userDao.findByColumn( User.class, CommonConstants.AGENT_EMAIL_ID_COLUMN,
-                    survey.getAgentEmailId() );
-                if ( userList != null && !userList.isEmpty() ) {
-                    user = userList.get( 0 );
-                    if ( user != null ) {
-                        // check if survey has already been sent to the email id
-                        // check the pre-initiation and then the survey table
-                        HashMap<String, Object> queries = new HashMap<>();
-                        queries.put( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
-                        queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, survey.getCustomerEmailId() );
-                        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue(
-                            SurveyPreInitiation.class, queries );
-                        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
-                            LOG.warn( "Survey request already sent" );
-                            status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
-                            survey.setStatus( status );
-                        }
-                        // check the survey collection
-                        SurveyDetails surveyDetail = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( user.getUserId(),
-                            survey.getCustomerEmailId(), null, null );
-                        if ( surveyDetail != null ) {
-                            LOG.warn( "Survey request already sent and completed" );
-                            status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
-                            survey.setStatus( status );
-                        }
-
-                        LOG.debug( "Mapping the agent to this survey " );
-                        if ( survey.getAgentId() == 0 ) {
-                            survey.setAgentId( user.getUserId() );
-                        }
-                        surveyPreInitiationDao.update( survey );
-                        if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
-                            if ( user.getLoginPassword() != null ) {
-                                if ( user.getCreatedOn().after( survey.getEngagementClosedTime() ) ) {
-                                    status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                                }
-                            } else {
-                                LOG.debug( "Only a user invite has been sent so far, hence can't mark it as an old record for user "
-                                    + user.getUserId() );
-                            }
-
-                            long surveyClosedTime = survey.getEngagementClosedTime().getTime();
-                            long currentTime = System.currentTimeMillis();
-                            if ( checkIfRecordHasExpired( surveyClosedTime, currentTime, validSurveyInterval ) ) {
-                                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                            }
-                        }
-                    }
+                try {
+                    user = userManagementService.getActiveUserByEmailAndCompany( survey.getCompanyId(), survey.getAgentEmailId() );
+                } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+                    LOG.error( "No user found in database for the email id: " + survey.getAgentEmailId() + " and company id : "
+                        + survey.getCompanyId() );
                 }
+
+                if ( user != null ) {
+                    // check if survey has already been sent to the email id
+                    // check the pre-initiation and then the survey table
+                    HashMap<String, Object> queries = new HashMap<>();
+                    queries.put( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+                    queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, survey.getCustomerEmailId() );
+                    List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue(
+                        SurveyPreInitiation.class, queries );
+                    if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
+                        LOG.warn( "Survey request already sent" );
+                        status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
+                        survey.setStatus( status );
+                    }
+                    // check the survey collection
+                    SurveyDetails surveyDetail = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( user.getUserId(),
+                        survey.getCustomerEmailId(), null, null );
+                    if ( surveyDetail != null ) {
+                        LOG.warn( "Survey request already sent and completed" );
+                        status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
+                        survey.setStatus( status );
+                    }
+
+                    LOG.debug( "Mapping the agent to this survey " );
+                    if ( survey.getAgentId() == 0 ) {
+                        survey.setAgentId( user.getUserId() );
+                    }
+                    surveyPreInitiationDao.update( survey );
+                }
+
             }
             if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
                 LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
@@ -1392,7 +1483,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    private int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
+    int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
     {
         LOG.info( "Inside method validateUnitSettingsForDotloop " );
         int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
@@ -1529,7 +1620,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             emailServices.sendDefaultSurveyInvitationMail( custEmail, logoUrl,
                 emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
-                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress, user.getUserId() );
+                user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress,
+                user.getUserId() );
         }
         LOG.debug( "sendInvitationMailByAgent() finished." );
     }
@@ -1570,7 +1662,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         } else {
             emailServices.sendDefaultSurveyInvitationMailByCustomer( custEmail, custFirstName,
-                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), link, user.getEmailId(), user.getUserId() );
+                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), link, user.getEmailId(),
+                user.getUserId() );
         }
         LOG.debug( "sendInvitationMailByCustomer() finished." );
     }
@@ -1598,18 +1691,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiationDao.save( surveyPreInitiation );
 
         LOG.debug( "Method preInitiateSurvey() finished." );
-    }
-
-
-    private Boolean checkIfRecordHasExpired( long surveyClosedDate, long systemTime, int expirationDays )
-    {
-        long totalDaysInMillseconds = systemTime - surveyClosedDate;
-        int totalDays = (int) ( totalDaysInMillseconds / ( 1000 * 60 * 60 * 24 ) );
-        if ( totalDays >= expirationDays ) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
 
@@ -1697,36 +1778,37 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    @Override
-    @Transactional
-    public void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
-    {
-        LOG.info( "Method deleteZillowSurveysByEntity() started" );
-        if ( entityType == null || entityType.isEmpty() ) {
-            throw new InvalidInputException( "Entity Type is invalid" );
-        }
-        if ( entityId <= 0 ) {
-            throw new InvalidInputException( "Entity ID is invalid" );
-        }
-        surveyDetailsDao.removeZillowSurveysByEntity( entityType, entityId );
-        LOG.info( "Method deleteZillowSurveysByEntity() finished" );
-    }
+    //    Commented as Zillow surveys are not stored in database, SS-1276
+    //    @Override
+    //    @Transactional
+    //    public void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
+    //    {
+    //        LOG.info( "Method deleteZillowSurveysByEntity() started" );
+    //        if ( entityType == null || entityType.isEmpty() ) {
+    //            throw new InvalidInputException( "Entity Type is invalid" );
+    //        }
+    //        if ( entityId <= 0 ) {
+    //            throw new InvalidInputException( "Entity ID is invalid" );
+    //        }
+    //        surveyDetailsDao.removeZillowSurveysByEntity( entityType, entityId );
+    //        LOG.info( "Method deleteZillowSurveysByEntity() finished" );
+    //    }
 
-
-    @Override
-    @Transactional
-    public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
-    {
-        LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
-        if ( entityType == null || entityType.isEmpty() ) {
-            throw new InvalidInputException( "Entity Type is invalid" );
-        }
-        if ( entityId <= 0 ) {
-            throw new InvalidInputException( "Entity ID is invalid" );
-        }
-        surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
-        LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
-    }
+    //  Commented as Zillow surveys are not stored in database, SS-1276
+    //    @Override
+    //    @Transactional
+    //    public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
+    //    {
+    //        LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
+    //        if ( entityType == null || entityType.isEmpty() ) {
+    //            throw new InvalidInputException( "Entity Type is invalid" );
+    //        }
+    //        if ( entityId <= 0 ) {
+    //            throw new InvalidInputException( "Entity ID is invalid" );
+    //        }
+    //        surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
+    //        LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
+    //    }
 
 
     @Override
@@ -2121,8 +2203,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Method getSurveyDetails() to return survey details by surveyMongoId finished." );
         return surveyDetails;
     }
-    
-    
+
+
     @Override
     public void updateSurveyAsUnAbusive( String surveyId )
     {
@@ -2130,7 +2212,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetailsDao.updateSurveyAsUnAbusive( surveyId );
         LOG.info( "Method unMarkAbusiveSurvey() finished" );
     }
-    
+
+
     /**
      * Returns array of swear words. Its used only for testing. Not for development(non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler#getSwearList()
