@@ -215,7 +215,23 @@
 						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.LENDING_TREE.txt"/></a>
 						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.ZILLOW.txt"/></a>
 						<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.YELP.txt"/></a>
-						<a id="google-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.GOOGLE_PLUS.txt"/></a>
+						<%-- <a id="google-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.GOOGLE_PLUS.txt"/></a> --%>
+						<a id="google-btn"
+						  class="g-interactivepost sq-btn-continue sq-btn-post-social-btn"
+						  data-cookiepolicy="single_host_origin"
+						  data-calltoactionlabel="USE">
+                          <!-- <span class="icon">&nbsp;</span>
+                          <span class="label">share</span> -->
+                          <spring:message code="btn.label.GOOGLE_PLUS.txt"/>
+                      </a>
+                      <button id="google-btn"
+						  class="g-interactivepost sq-btn-continue sq-btn-post-social-btn"
+						  data-cookiepolicy="single_host_origin"
+						  data-calltoactionlabel="USE">
+                          <!-- <span class="icon">&nbsp;</span>
+                          <span class="label">share</span> -->
+                          <spring:message code="btn.label.GOOGLE_PLUS.txt"/>
+                      </button>
 						<a id="linkedin-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.LINKEDIN.txt"/></a>
 						<a id="twitter-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.TWITTER.txt"/></a>
 						<a id="fb-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.FACEBOOK.txt"/></a>
