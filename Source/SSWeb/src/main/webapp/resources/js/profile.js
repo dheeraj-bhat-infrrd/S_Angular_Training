@@ -742,6 +742,7 @@ function paintReviews(result){
 		if(reviewItem.customerLastName != undefined){
 			custName += ' ' + reviewItem.customerLastName;
 		}
+		custName = custName || "";
 		var custNameArray = custName.split(' ');
 		var custDispName = custNameArray[0];
 		if(custNameArray[1] != undefined && custNameArray[1].trim() != ""){
