@@ -67,7 +67,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                 CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER,
                 CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
 
-            populateSocialSites();
+            //populateSocialSites();
             // IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
             StringBuilder links = new StringBuilder();
             Set<String> socialPosts;
