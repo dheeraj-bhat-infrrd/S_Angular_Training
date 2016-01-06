@@ -41,7 +41,7 @@
 				</div>
 			</div>
 			<div class="ppl-content">${reviewItem.review}</div>
-			<div class="ppl-share-wrapper clearfix">
+			<div class="ppl-share-wrapper clearfix share-plus-height">
 				<div class="float-left blue-text ppl-share-shr-txt">
 					<spring:message code="label.share.key" />
 				</div>

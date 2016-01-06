@@ -65,10 +65,6 @@
 			<div class="sq-star sq-full-star hide"></div>
 		</div>
 	</div>
-	<div style="display: none">
-		<script
-			src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
-	</div>
 	<script>
 		$(document).ready(function() {
 			$("#req-cust-agnt-rel").html(paintListOptions());
@@ -122,9 +118,9 @@
 			function adjustMinHeight() {
 				var winH = $(window).height();
 				if ($(window).width() < 768) {
-					var minH = winH - 50 - 50 - 5 - 1;
+					minH = winH - 50 - 50 - 5 - 1;
 				} else {
-					var minH = winH - 80 - 78 - 78 - 1;
+					minH = winH - 80 - 78 - 78 - 1;
 				}
 				$('.min-height-container').css('min-height', minH + 'px');
 			}

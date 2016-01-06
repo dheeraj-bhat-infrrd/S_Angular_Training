@@ -273,36 +273,56 @@
 		text-align: center;
 		width: 100%;
 	}
-	.popupUrl{
-	
-	font-size: 14px;
-	width: 350px;
-}
-.urlPopupButton{
-	width: 335px;
-	margin-left: 30px;
-}
-
-.profileForm {
-   
-    margin-left: 2%;
-}
+	.popupUrl {
+		font-size: 14px;
+		width: 350px;
+	}
+	.urlPopupButton {
+		width: 335px;
+		margin-left: 30px;
+	}
+	.profileForm {
+		margin-left: 2%;
+	}
 	.tweet-icn-sm {
-	height: 32px;
-	width: 32px;
-	margin-right:0px;
-}
-.sm-post-row {
-	padding-left: 0px;
-	
-}
-.sm-prof-name {
-	line-height: 30px;
-}
-.sm-custom-img{
-	width:40px;
-	height:40px;
-}
+		height: 32px;
+		width: 32px;
+		margin-right: 0px;
+	}
+	.sm-post-row {
+		padding-left: 0px;
+		width: 60%;
+		min-width: 250px;
+	}
+	.sm-prof-name {
+		line-height: 30px;
+	}
+	.sm-custom-img {
+		width: 40px;
+		height: 40px;
+	}
+	.sm-default-img {
+		width: 40px;
+		height: 40px;
+	}
+	.dash-sel-item-sm {
+		width: 270px;
+	}
+	.sm-prof-name {
+		margin-top: 15px;
+	}
+	.reg-prof-url {
+		line-height: 59px;
+		padding-left: 20px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		border-bottom: 1px solid #dcdcdc;
+		border-top: 1px solid #dcdcdc;
+	}
+	.position-align{
+	padding-left: 30px;
+	}
 }
 
 
@@ -576,4 +596,74 @@
 	.wc-step2-body-row-hdr {
 	    font-size: 14px;
 	}
+	.bd-cust-rad-item-adj {
+		margin-left: 0px;
+		float: none;
+	}
+	.manage-team-radio {
+		width: 50%;
+	}
+	.compl-option-sel {
+		float: none;
+	}
+	.comp-email-input {
+		float: none;
+	}
+	/*Dashboard statistcs download*/
+	.dash-btn-dl-sd-admin {
+		height: auto;
+		min-height: 32px;
+	}
+	.dsh-date-picker {
+		width: 35%;
+		text-align: center;
+	}
+	.dash-download-sel-item {
+		width: 100%;
+		border-bottom: 1px solid #009FE0;
+	}
+	.dash-down-go-button {
+		width: 25%;
+		height: 32px;
+	}
+	.overlay-disable-wrapper {	
+		width: 100%;
+	}
+	.rpa-btn {
+		width: 130px;
+	}
+	.compl-input-cont{
+	width:250px;
+	}
+	.submit-comp-btn{
+	width: 245px;
+    margin-left: 27px;
+	}
+	.com-reg-or{
+	margin-top: 10px;
+	}
+	.compl-save-btn{
+	margin-top:0px;
+	}
+	.zillow-input-container,.zillow-example-cont{
+	font-size:12px;
+	}
+	.zillow-input-container,.zillow-example-cont{
+	width:100%;
+	}
+	.zillow-exm-profilename{
+	padding:3px;
+	}
+	input.zillow-input{
+	width:80px;
+	padding: 5px 0 5px 3px;
+	}
+	.position-align{
+	padding-left: 20px;
+	}
+	.help-save-small{
+	margin-left: 125px !important;
+	}
+	
+	
 }

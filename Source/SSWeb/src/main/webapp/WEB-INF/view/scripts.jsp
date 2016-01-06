@@ -16,10 +16,8 @@
 <script src="${initParam.resourcesPath}/resources/ckeditor/ckeditor.js"></script>
 <script src="${initParam.resourcesPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap-datepicker.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/rangeslider.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/progressbar.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/countrydata.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/zipcoderegex.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/application.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/timezones.js"></script>

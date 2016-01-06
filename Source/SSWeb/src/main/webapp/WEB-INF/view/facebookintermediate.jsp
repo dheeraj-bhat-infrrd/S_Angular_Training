@@ -116,10 +116,12 @@ $(document).ready(function() {
 			async : false,
 			complete :function(e){
 				enable(this);
+				parentWindow.loadSocialMediaUrlInSettingsPage();
 				checkIfFacebookSet = true;
 				setTimeout(function() {
 					window.close();
 				}, 3000);
+				
 			},
 			error : function(e) {
 				if(e.status == 504) {
