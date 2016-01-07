@@ -24,11 +24,11 @@ namespace EncompassSocialSurvey.DAL
         private const string SELECT_QUERY = @"SELECT spi.SURVEY_PRE_INITIATION_ID, spi.SURVEY_SOURCE_ID FROM SURVEY_PRE_INITIATION as  spi
                                         WHERE spi.SURVEY_SOURCE_ID = ?SURVEY_SOURCE_ID AND spi.CUSTOMER_EMAIL_ID = ?CUSTOMER_EMAIL_ID AND spi.CUSTOMER_FIRST_NAME = ?CUSTOMER_FIRST_NAME ;";
 
-        private const string CRM_BATCH_TRACKER_SELECT_QUERY = @"SELECT crmtrck.ID, crmtrck.SOURCE, crmtrck.COMPANY_ID, crmtrck.RECENT_RECORD_FETCHED_START_DATE, crmtrck.RECENT_RECORD_FETCHED_END_DATE, crmtrck.ERROR, crmtrck.CREATED_ON, crmtrck.MODIFIED_ON FROM CRM_BATCH_TRACKER as  crmtrck WHERE crmtrck.COMPANY_ID = ?COMPANY_ID AND crmtrck.SOURCE = ?SOURCE ;";
+        private const string CRM_BATCH_TRACKER_SELECT_QUERY = @"SELECT crmtrck.ID, crmtrck.SOURCE, crmtrck.COMPANY_ID, crmtrck.LAST_RUN_START_DATE, crmtrck.LAST_RUN_END_DATE, crmtrck.RECENT_RECORD_FETCHED_DATE, crmtrck.ERROR, crmtrck.CREATED_ON, crmtrck.MODIFIED_ON FROM CRM_BATCH_TRACKER as  crmtrck WHERE crmtrck.COMPANY_ID = ?COMPANY_ID AND crmtrck.SOURCE = ?SOURCE ;";
 
         private const string COMPANY_SELECT_QUERY = @"SELECT comp.COMPANY_ID, comp.COMPANY, comp.STATUS FROM COMPANY as  comp WHERE comp.COMPANY_ID = ?COMPANY_ID;";
 
-        private const string CRM_BATCH_TRACKER_UPDATE_QUERY = @"UPDATE CRM_BATCH_TRACKER SET RECENT_RECORD_FETCHED_START_DATE = ?RECENT_RECORD_FETCHED_START_DATE, RECENT_RECORD_FETCHED_END_DATE = ?RECENT_RECORD_FETCHED_END_DATE, ERROR = ?ERROR, MODIFIED_ON = ?MODIFIED_ON WHERE ID = ?ID";
+        private const string CRM_BATCH_TRACKER_UPDATE_QUERY = @"UPDATE CRM_BATCH_TRACKER SET LAST_RUN_START_DATE = ?LAST_RUN_START_DATE, LAST_RUN_END_DATE = ?LAST_RUN_END_DATE, RECENT_RECORD_FETCHED_DATE = ?RECENT_RECORD_FETCHED_DATE, ERROR = ?ERROR, MODIFIED_ON = ?MODIFIED_ON WHERE ID = ?ID";
 
         private const string CRM_BATCH_TRACKER_INSERT_QUERY = @"INSERT INTO CRM_BATCH_TRACKER(  
                                          
@@ -37,8 +37,9 @@ namespace EncompassSocialSurvey.DAL
                                         , BRANCH_ID
                                         , AGENT_ID
                                         , SOURCE
-                                        , RECENT_RECORD_FETCHED_START_DATE
-                                        , RECENT_RECORD_FETCHED_END_DATE
+                                        , LAST_RUN_START_DATE
+                                        , LAST_RUN_END_DATE
+                                        , RECENT_RECORD_FETCHED_DATE
                                         , ERROR
                                         , CREATED_ON
                                         , MODIFIED_ON
@@ -49,8 +50,9 @@ namespace EncompassSocialSurvey.DAL
                                         , ?BRANCH_ID
                                         , ?AGENT_ID
                                         , ?SOURCE
-                                        , ?RECENT_RECORD_FETCHED_START_DATE
-                                        , ?RECENT_RECORD_FETCHED_END_DATE
+                                        , ?LAST_RUN_START_DATE
+                                        , ?LAST_RUN_END_DATE
+                                        , ?RECENT_RECORD_FETCHED_DATE
                                         , ?ERROR
                                         , ?CREATED_ON
                                         , ?MODIFIED_ON
@@ -110,8 +112,9 @@ namespace EncompassSocialSurvey.DAL
                 // set the parameters
                 commandToUpdate.Parameters.Add("?ID", MySqlDbType.Int32).Value = entity.Id;
                 commandToUpdate.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = entity.ModifiedOn;
-                commandToUpdate.Parameters.Add("?RECENT_RECORD_FETCHED_START_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedStartDate;
-                commandToUpdate.Parameters.Add("?RECENT_RECORD_FETCHED_END_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedEndDate;
+                commandToUpdate.Parameters.Add("?LAST_RUN_START_DATE", MySqlDbType.DateTime).Value = entity.LastRunStartDate;
+                commandToUpdate.Parameters.Add("?LAST_RUN_END_DATE", MySqlDbType.DateTime).Value = entity.LastRunEndDate;
+                commandToUpdate.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
                 commandToUpdate.Parameters.Add("?ERROR", MySqlDbType.String).Value = entity.error;
                 commandToUpdate.ExecuteNonQuery();
             }
@@ -148,8 +151,9 @@ namespace EncompassSocialSurvey.DAL
                 commandToInsert.Parameters.Add("?REGION_ID", MySqlDbType.Int32).Value = DEFAULT_REGION_ID;
                 commandToInsert.Parameters.Add("?BRANCH_ID", MySqlDbType.Int32).Value = DEFAULT_BRANCH_ID;
                 commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.Int32).Value = DEFAULT_AGENT_ID;
-                commandToInsert.Parameters.Add("?RECENT_RECORD_FETCHED_START_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedStartDate;
-                commandToInsert.Parameters.Add("?RECENT_RECORD_FETCHED_END_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedEndDate;
+                commandToInsert.Parameters.Add("?LAST_RUN_START_DATE", MySqlDbType.DateTime).Value = entity.LastRunStartDate;
+                commandToInsert.Parameters.Add("?LAST_RUN_END_DATE", MySqlDbType.DateTime).Value = entity.LastRunEndDate;
+                commandToInsert.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
                 commandToInsert.Parameters.Add("?ERROR", MySqlDbType.DateTime).Value = entity.error;
 
                 commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = entity.CreatedOn;
@@ -281,8 +285,9 @@ namespace EncompassSocialSurvey.DAL
                     crmBatchTracker = new CRMBatchTrackerEntity();
                     crmBatchTracker.Id = dataReader.GetInt32("ID");
                     crmBatchTracker.CompanyId = companyId;
-                    crmBatchTracker.RecentRecordFetchedStartDate = dataReader.GetDateTime("RECENT_RECORD_FETCHED_START_DATE");
-                    crmBatchTracker.RecentRecordFetchedEndDate = dataReader.GetDateTime("RECENT_RECORD_FETCHED_END_DATE");
+                    crmBatchTracker.LastRunStartDate = dataReader.GetDateTime("LAST_RUN_START_DATE");
+                    crmBatchTracker.LastRunEndDate = dataReader.GetDateTime("LAST_RUN_END_DATE");
+                    crmBatchTracker.RecentRecordFetchedDate = dataReader.GetDateTime("RECENT_RECORD_FETCHED_DATE");
                     crmBatchTracker.Source = source;
                     crmBatchTracker.CreatedOn = dataReader.GetDateTime("CREATED_ON");
                     crmBatchTracker.ModifiedOn = dataReader.GetDateTime("MODIFIED_ON");

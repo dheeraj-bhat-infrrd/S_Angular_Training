@@ -14,7 +14,7 @@ public interface BatchTrackerService
     public long getLastRunEndTimeAndUpdateLastStartTimeByBatchType( String batchType , String batchName );
 
 
-    public Map<Long, Integer> getReviewCountForAgents( List<Long> agentIdList ) throws ParseException;
+    public Map<Long, Integer> getReviewCountForAgents( List<Long> agentIdList ) throws ParseException, InvalidInputException;
 
 
     public void updateLastRunEndTimeByBatchType( String batchType ) throws NoRecordsFetchedException, InvalidInputException;
