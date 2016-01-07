@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.services.batchTracker.impl;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -11,13 +14,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import static org.junit.Assert.assertEquals;
 
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.BatchTracker;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 
 public class BatchTrackerServiceImplTest
@@ -28,6 +34,12 @@ public class BatchTrackerServiceImplTest
     @Mock
     private GenericDao<BatchTracker, Long> batchTrackerDao;
 
+    @Mock
+    private SurveyDetailsDao surveyDetailsDao;
+    
+    
+    @Mock
+    UserManagementService userManagementService;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
@@ -183,5 +195,37 @@ public class BatchTrackerServiceImplTest
         InvalidInputException, UndeliveredEmailException
     {
         batchTrackerServiceImpl.sendMailToAdminRegardingBatchError( "test", 100l, null );
+    }
+
+
+    //Tests for GetReviewCountForAgents
+    @SuppressWarnings ( "unchecked")
+    @Test
+    public void testGetReviewCountForAgentsForZillowReviewsPresent() throws ParseException, InvalidInputException
+    {
+        Map<Long, Integer> mongoMap = new HashMap<Long, Integer>();
+        mongoMap.put( 1l, 10 );
+        Map<Long, Integer> zillowMap = new HashMap<Long, Integer>();
+        zillowMap.put( 1l, 5 );
+        Mockito.when( surveyDetailsDao.getSurveyCountForAgents( Mockito.anyList(), Mockito.anyBoolean() ) ).thenReturn(
+            mongoMap );
+        Mockito.when( userManagementService.getUserIdReviewCountMapFromUserIdList( Mockito.anyList() ) ).thenReturn( zillowMap );
+        assertEquals( (Integer) 15, batchTrackerServiceImpl.getReviewCountForAgents( new ArrayList<Long>() ).get( 1l ) );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Test
+    public void testGetReviewCountForAgentsForZillowReviewsAbsent() throws ParseException, InvalidInputException
+    {
+        Map<Long, Integer> mongoMap = new HashMap<Long, Integer>();
+        mongoMap.put( 1l, 10 );
+        Map<Long, Integer> zillowMap = new HashMap<Long, Integer>();
+        zillowMap.put( 1l, 5 );
+        Mockito.when( surveyDetailsDao.getSurveyCountForAgents( Mockito.anyList(), Mockito.anyBoolean() ) ).thenReturn(
+            mongoMap );
+        Mockito.when( userManagementService.getUserIdReviewCountMapFromUserIdList( Mockito.anyList() ) ).thenThrow(
+            InvalidInputException.class );
+        assertEquals( (Integer) 10, batchTrackerServiceImpl.getReviewCountForAgents( new ArrayList<Long>() ).get( 1l ) );
     }
 }
