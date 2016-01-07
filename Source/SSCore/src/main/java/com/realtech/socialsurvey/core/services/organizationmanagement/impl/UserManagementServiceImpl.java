@@ -824,9 +824,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         List<User> userList = userDao.getUsersForUserIds( userIds );
         Map<Long, Integer> userIdReviewCountMap = new HashMap<Long, Integer>();
+        Map<Long, Double> userIdReviewScoreMap = new HashMap<Long, Double>();
         for ( User user : userList ) {
             if ( user.getIsZillowConnected() == CommonConstants.YES ) {
                 userIdReviewCountMap.put( user.getUserId(), user.getZillowReviewCount() );
+                userIdReviewScoreMap.put( user.getUserId(), user.getZillowReviewCount() * user.getZillowAverageScore() );
             }
         }
 
@@ -851,8 +853,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
 
             user.setReviewCount( reviewCount );
-            user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
-                CommonConstants.NO_LIMIT, false, false, false, 0, 0 ) );
+            if ( userIdReviewScoreMap.get( agentSettings.getIden() ) != null
+                && userIdReviewScoreMap.get( agentSettings.getIden() ) > 0 ) {
+                user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
+                    CommonConstants.NO_LIMIT, false, false, true, userIdReviewCountMap.get( agentSettings.getIden() ),
+                    userIdReviewScoreMap.get( agentSettings.getIden() ) ) );
+            } else
+                user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
+                    CommonConstants.NO_LIMIT, false, false, false, 0, 0 ) );
             users.add( user );
         }
         LOG.info( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );
