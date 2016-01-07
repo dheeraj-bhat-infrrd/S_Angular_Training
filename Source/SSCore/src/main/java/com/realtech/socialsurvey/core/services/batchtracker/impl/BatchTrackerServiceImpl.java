@@ -22,6 +22,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 
 
@@ -38,6 +39,9 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
 
     @Autowired
     private SolrSearchService solrSearchService;
+    
+    @Autowired
+    private UserManagementService userManagementService;
 
     @Autowired
     private EmailServices emailServices;
@@ -207,10 +211,30 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
      */
     @Override
     @Transactional
-    public Map<Long, Integer> getReviewCountForAgents( List<Long> agentIdList ) throws ParseException
+    public Map<Long, Integer> getReviewCountForAgents( List<Long> agentIdList ) throws ParseException, InvalidInputException
     {
         LOG.debug( "method getReviewCountForAgents() started " );
+        //Get review count from mongodb
         Map<Long, Integer> agentsReviewCount = surveyDetailsDao.getSurveyCountForAgents( agentIdList, false );
+        boolean areZillowReviewsPresent = true;
+        Map<Long, Integer> agentsReviewCountFromZillow = null;
+        //Get zillow review count 
+        try {
+            agentsReviewCountFromZillow = userManagementService.getUserIdReviewCountMapFromUserIdList( agentIdList );
+        } catch ( InvalidInputException e ) {
+            LOG.info( "None of the users have zillow reviews" );
+            areZillowReviewsPresent = false;
+        }
+
+        //Add zillow review count to agentsReviewCount if present
+        if ( areZillowReviewsPresent ) {
+            for ( Long agentConnectedToZillow : agentsReviewCountFromZillow.keySet() ) {
+                int currentCount = agentsReviewCount.get( agentConnectedToZillow );
+                int zillowCount = agentsReviewCountFromZillow.get( agentConnectedToZillow );
+                int totalReviewCount = currentCount + zillowCount;
+                agentsReviewCount.put( agentConnectedToZillow, totalReviewCount );
+            }
+        }
         LOG.debug( "method getReviewCountForAgents() ended " );
         return agentsReviewCount;
     }

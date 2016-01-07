@@ -478,5 +478,14 @@ public interface UserManagementService
     
     public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
         NoRecordsFetchedException;
+
+
+    /**
+     *  Method to get a map of userId - review count given a list of userIds
+     * @param userIds
+     * @return 
+     * @throws InvalidInputException
+     */
+    public Map<Long, Integer> getUserIdReviewCountMapFromUserIdList( List<Long> userIds ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
