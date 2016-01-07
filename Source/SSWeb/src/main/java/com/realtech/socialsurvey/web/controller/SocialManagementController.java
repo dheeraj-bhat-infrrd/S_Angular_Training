@@ -1897,8 +1897,8 @@ public class SocialManagementController
                             company.setZillowAverageScore( 0.0 );
                             company.setZillowReviewCount( 0 );
                         } else {
-                            company.setZillowAverageScore( 0.0 );
-                            company.setZillowReviewCount( 0 );
+                            company.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
+                            company.setZillowReviewCount( zillowReviewCount );
                         }
                     	userManagementService.updateCompany( company );
                     }
