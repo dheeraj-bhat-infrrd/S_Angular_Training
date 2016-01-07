@@ -470,7 +470,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Override
     @SuppressWarnings ( "unchecked")
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, long zillowTotalReviewScore )
+        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, double zillowTotalReviewScore )
     {
         LOG.info( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName
             + " columnValue:" + columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive );
