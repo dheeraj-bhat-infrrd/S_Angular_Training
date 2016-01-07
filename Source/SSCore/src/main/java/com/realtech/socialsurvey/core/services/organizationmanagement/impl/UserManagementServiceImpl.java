@@ -3169,4 +3169,26 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
         return user;
     }
+
+
+    /**
+     *  Method to get a map of userId - review count given a list of userIds
+     * @param userIds
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public Map<Long, Integer> getUserIdReviewCountMapFromUserIdList( List<Long> userIds ) throws InvalidInputException
+    {
+
+        List<User> userList = userDao.getUsersForUserIds( userIds );
+        Map<Long, Integer> userIdReviewCountMap = new HashMap<Long, Integer>();
+        for ( User user : userList ) {
+            if ( user.getIsZillowConnected() == CommonConstants.YES ) {
+                userIdReviewCountMap.put( user.getUserId(), user.getZillowReviewCount() );
+            }
+        }
+        return userIdReviewCountMap;
+    }
 }

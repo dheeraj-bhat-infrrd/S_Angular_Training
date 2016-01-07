@@ -71,13 +71,13 @@ namespace EncompassSocialSurvey
                 DateTime lastRunTime = EncompassSocialSurverConstant.EPOCH_TIME;
                 crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
                 //update the recent record fetch start date or if crm batch tracker is null than insert new entry
-                insertOrUpdateLastRecordFetchedStartTime(crmBatchTracker, runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
+                insertOrUpdateLastRunStartTime(crmBatchTracker, runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
                 if (crmBatchTracker == null)
                 {
                     crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
                 }
-                lastRunTime = crmBatchTracker.RecentRecordFetchedEndDate;
-                 Logger.Info("Last Run time  " + lastRunTime);
+                lastRunTime = crmBatchTracker.RecentRecordFetchedDate;
+                 Logger.Info("Last Record Fetch time is " + lastRunTime);
                 Logger.Info("Company Id  " + runningCompanyId);
                 LoanIdentityList loanIdentityList = EncompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(lastRunTime, fieldIds[8]));
                 #region Load the list
@@ -196,10 +196,14 @@ namespace EncompassSocialSurvey
                     Logger.Debug("Notifying admin no records were fetched in this run ");
                     sendMailToAdminForNoRecordFetched(runningCompanyId);
                 }
+                else { 
+                    //update last record fetch time
+                updateRecentRecordFetchTimeInCrmBatchTracker(crmBatchTracker);
+                }
 
-                //update last record fetch end time
-                updateRecentRecordFetchEndTimeInCrmBatchTracker(crmBatchTracker);
-
+                
+            //update last run end date
+            updateLastRunEndTimeInCrmBatchTracker(crmBatchTracker);
 
             }
             catch (System.Exception ex)
@@ -240,18 +244,19 @@ namespace EncompassSocialSurvey
         }
 
 
-        private void insertOrUpdateLastRecordFetchedStartTime(CRMBatchTrackerEntity entity, long companyId, string source)
+        private void insertOrUpdateLastRunStartTime(CRMBatchTrackerEntity entity, long companyId, string source)
         {
              LoanService loanService = new LoanService();
-             Logger.Debug("Inside method insertOrUpdateLastRecordFetchedStartTime() ");
+             Logger.Debug("Inside method insertOrUpdateLastRunStartTime() ");
             if (entity == null)
             {
                 entity = new CRMBatchTrackerEntity();
                 entity.CompanyId = companyId;
                 entity.CreatedOn = DateTime.Now;
                 entity.ModifiedOn = DateTime.Now;
-                entity.RecentRecordFetchedStartDate = DateTime.Now;
-                entity.RecentRecordFetchedEndDate =  EncompassSocialSurverConstant.EPOCH_TIME;
+                entity.LastRunStartDate = DateTime.Now;
+                entity.LastRunEndDate =  EncompassSocialSurverConstant.EPOCH_TIME;
+                entity.RecentRecordFetchedDate = EncompassSocialSurverConstant.EPOCH_TIME;
                 entity.Source = source;
                 entity.error = null;
                 entity.description = null;
@@ -259,7 +264,7 @@ namespace EncompassSocialSurvey
             }
             else
             {
-                entity.RecentRecordFetchedStartDate = DateTime.Now;
+                entity.LastRunStartDate = DateTime.Now;
                 entity.ModifiedOn = DateTime.Now;
                 loanService.UpdateCrmbatchTracker(entity);
             }
@@ -270,7 +275,7 @@ namespace EncompassSocialSurvey
         private void updateErrorInCrmBatchTracker(CRMBatchTrackerEntity entity , String error)
         {
             LoanService loanService = new LoanService();
-            Logger.Debug("Inside method insertOrUpdateLastRecordFetchedStartTime() ");
+            Logger.Debug("Inside method updateErrorInCrmBatchTracker() ");
             if (entity != null)
             {
                 entity.error = error;
@@ -280,13 +285,27 @@ namespace EncompassSocialSurvey
 
         }
 
-        private void updateRecentRecordFetchEndTimeInCrmBatchTracker(CRMBatchTrackerEntity entity)
+        private void updateRecentRecordFetchTimeInCrmBatchTracker(CRMBatchTrackerEntity entity)
         {
             LoanService loanService = new LoanService();
-            Logger.Debug("Inside method updateRecentRecordFetchEndTimeInCrmBatchTracker() ");
+            Logger.Debug("Inside method updateRecentRecordFetchTimeInCrmBatchTracker() ");
             if (entity != null)
             {
-                entity.RecentRecordFetchedEndDate = lastFetchedTime;
+                entity.RecentRecordFetchedDate = lastFetchedTime;
+                entity.error = null;
+                entity.ModifiedOn = DateTime.Now;
+                loanService.UpdateCrmbatchTracker(entity);
+            }
+        }
+
+
+        private void updateLastRunEndTimeInCrmBatchTracker(CRMBatchTrackerEntity entity)
+        {
+            LoanService loanService = new LoanService();
+            Logger.Debug("Inside method updateLastRunEndTimeInCrmBatchTracker() ");
+            if (entity != null)
+            {
+                entity.LastRunEndDate = DateTime.Now;
                 entity.error = null;
                 entity.ModifiedOn = DateTime.Now;
                 loanService.UpdateCrmbatchTracker(entity);
