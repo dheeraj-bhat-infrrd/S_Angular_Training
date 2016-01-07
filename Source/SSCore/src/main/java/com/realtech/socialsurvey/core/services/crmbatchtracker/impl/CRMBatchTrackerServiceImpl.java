@@ -71,16 +71,16 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
                 crmBatchTracker.setAgentId( entityId );
             }
             crmBatchTracker.setSource( source );
-            crmBatchTracker.setRecentRecordFetchedEndDate( new Timestamp( CommonConstants.EPOCH_TIME_IN_MILLIS ) );
+            crmBatchTracker.setLastRunEndDate( new Timestamp( CommonConstants.EPOCH_TIME_IN_MILLIS ) );
             crmBatchTracker.setCreatedOn( new Timestamp( currentTime ) );
             lastEndTime = CommonConstants.EPOCH_TIME_IN_MILLIS;
         } else {
             crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
-            lastEndTime = crmBatchTracker.getRecentRecordFetchedEndDate().getTime();
+            lastEndTime = crmBatchTracker.getLastRunEndDate().getTime();
         }
 
 
-        crmBatchTracker.setRecentRecordFetchedStartDate( new Timestamp( currentTime ) );
+        crmBatchTracker.setLastRunStartDate( new Timestamp( currentTime ) );
         crmBatchTracker.setModifiedOn( new Timestamp( currentTime ) );
         crmBatchTrackerDao.saveOrUpdate( crmBatchTracker );
         LOG.debug( "method getLastRunEndTimeAndUpdateLastStartTimeByEntityTypeAndSourceType ended" );
@@ -148,7 +148,7 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
                 + entityId );
         }
         CrmBatchTracker crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
-        crmBatchTracker.setRecentRecordFetchedEndDate( new Timestamp( System.currentTimeMillis() ) );
+        crmBatchTracker.setLastRunEndDate( new Timestamp( System.currentTimeMillis() ) );
         crmBatchTracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         crmBatchTracker.setError( null );
         crmBatchTrackerDao.update( crmBatchTracker );
