@@ -2222,17 +2222,21 @@ public class SocialManagementController
                     agent.setZillowAverageScore( 0.0 );
                     agent.setZillowReviewCount( 0 );
                     userManagementService.updateUser( agent );
+                    long reviewCount = profileManagementService.getReviewsCount( agent.getUserId(), -1, -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false,
+                        false );
+                    solrSearchService
+                    .editUserInSolr( agent.getUserId(), CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
                 }
                 
             }
             profileSettings.setSocialMediaTokens(unitSettings.getSocialMediaTokens());
             
             //Remove zillow reviews on disconnect.
-            if(socialMedia.equals(CommonConstants.ZILLOW_SOCIAL_SITE)){
+//            if(socialMedia.equals(CommonConstants.ZILLOW_SOCIAL_SITE)){
                 // Commented as Zillow surveys are not stored in database, SS-1276
                 // LOG.debug("Deleting zillow feed for agent ID : " + entityId);
                 // surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
-            }
+//            }
             
             //Add action to social connection history
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
