@@ -38,8 +38,7 @@ function callAjaxGET(url, callBackFunction, isAsync,disableEle) {
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
-
-			/*$(document).data('requestRunning', false);
+						/*$(document).data('requestRunning', false);
 			*/
 			enable(disableEle);
 			
@@ -342,6 +341,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 			hideOverlay();
 			hideDashOverlay('#mid-dash');
 			hideDashOverlay('#top-dash');
+			hideDashOverlay('#latest-post-ep');
 			enable(disableEle);
 		},
 		error : function(e) {

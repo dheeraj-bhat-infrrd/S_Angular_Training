@@ -822,6 +822,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         }
 
+        //List<User> userList = userDao.getUsersForUserIds( userIds );
+        Map<Long, Integer> userIdReviewCountMap = getUserIdReviewCountMapFromUserIdList( userIds );
 
         for ( AgentSettings agentSettings : agentSettingsList ) {
             ProListUser user = new ProListUser();
@@ -838,6 +840,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             //JIRA SS-1104 search results not updated with correct number of reviews
             long reviewCount = profileManagementService.getReviewsCount( agentSettings.getIden(), 0, 5,
                 CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
+            if ( userIdReviewCountMap.get( agentSettings.getIden() ) != null
+                && userIdReviewCountMap.get( agentSettings.getIden() ) > 0 ) {
+                reviewCount += userIdReviewCountMap.get( agentSettings.getIden() );
+            }
+
             user.setReviewCount( reviewCount );
             user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
                 CommonConstants.NO_LIMIT, false, false, false, 0, 0 ) );
@@ -3148,5 +3155,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
         return user;
+    }
+    
+
+    /**
+     *  Method to get a map of userId - review count given a list of userIds
+     * @param userIds
+     * @return 
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public Map<Long, Integer> getUserIdReviewCountMapFromUserIdList( List<Long> userIds ) throws InvalidInputException
+    {
+        
+        List<User> userList = userDao.getUsersForUserIds( userIds );
+        Map<Long, Integer> userIdReviewCountMap = new HashMap<Long, Integer>();
+        for ( User user : userList ) {
+            if ( user.getIsZillowConnected() == CommonConstants.YES ) {
+                userIdReviewCountMap.put( user.getUserId(), user.getZillowReviewCount() );
+            }
+        }
+        return userIdReviewCountMap;
     }
 }
