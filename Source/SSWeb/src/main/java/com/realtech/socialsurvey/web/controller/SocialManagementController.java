@@ -2008,6 +2008,11 @@ public class SocialManagementController
                             agent.setZillowReviewCount( zillowReviewCount );
                         }
                         userManagementService.updateUser( agent );
+
+                        // updating solr review count for user
+                        long reviewCount = profileManagementService.getReviewsCount( agent.getUserId(), -1, -1,
+                            CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, true, zillowReviewCount );
+                        solrSearchService.editUserInSolr( agent.getUserId(), CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
                     }
                     for ( ProfileStage stage : agentSettings.getProfileStages() ) {
                         if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
