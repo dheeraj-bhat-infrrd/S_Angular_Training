@@ -34,7 +34,7 @@
 	        <td class="v-tbl-line"></td>
 	        <!-- <td class="v-tbl-img"> -->
 	        <td class="v-tbl-name"><spring:message code="label.name.key"/></td>
-	        <td class="v-tbl-add"><spring:message code="label.emailid.key"/></td>
+	        <td class="v-tbl-add"><spring:message code="label.address.key"/></td>
 	        <td class="v-tbl-role"><spring:message code="label.role.key"/></td>
 	        <td class="v-tbl-btns v-tbl-btns-hr"></td>
 	        <td class="v-tbl-spacer"></td>

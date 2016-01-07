@@ -37,9 +37,9 @@
 	<div class="dash-container container">
 		<div class="dash-stats-wrapper bord-bot-dc clearfix help">
 	
-			<div class="contact-div">
+			<div class="contact-div clearfix">
 				<h4>Contact us</h4>
-				<p>You may contact our support department at 1-888-701-4512.</p>
+				<p class="float-left">You may contact our support department&nbsp; </p><p class="float-left"> at 1-888-701-4512.</p>
 			</div>
 			
 			<form action="" method="post" class="contact-form" name=formSubmit  id="message-form"
@@ -86,7 +86,7 @@
 					<input type="file"  style="display:none" name="attachment" id="files"> 
 					<div class="bd-btn-save" id="icn-file-upload">Upload</div> -->
 					<div id="send-help-mail-button" style="margin: 0px auto; margin-top: 20px"
-						class="bd-btn-save cursor-pointer ">Send message</div>
+						class="bd-btn-save cursor-pointer help-save-small">Send message</div>
 				</div> 
 			</form>
 		</div>

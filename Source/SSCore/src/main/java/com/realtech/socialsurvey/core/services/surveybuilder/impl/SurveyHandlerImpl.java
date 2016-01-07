@@ -853,7 +853,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
+            String mailSubject = restartSurvey.getMail_subject();
+            if ( mailSubject == null || mailSubject.isEmpty() ) {
+                mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
+            }
+
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -991,7 +995,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            String mailSubject = surveyCompletion.getMail_subject();
+            if ( mailSubject == null || mailSubject.isEmpty() ) {
+                mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+            }
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1137,7 +1144,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
+            String mailSubject = surveyCompletionUnpleasant.getMail_subject();
+            if ( mailSubject == null || mailSubject.isEmpty() ) {
+                mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
+            }
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1276,7 +1286,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = mailBody.replaceAll( "\\[Links\\]", links );
             mailBody = mailBody.replaceAll( "null", "" );
 
-            String mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            String mailSubject = socialPostReminder.getMail_subject();
+            if ( mailSubject == null || mailSubject.isEmpty() ) {
+                mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+            }
+
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1392,7 +1406,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             User user = null;
             if ( survey.getAgentEmailId() != null ) {
                 try {
-                    user = userManagementService.getActiveUserByEmailAndCompany( survey.getCompanyId(), survey.getAgentEmailId() );
+                    user = userManagementService.getActiveUserByEmailAndCompany( survey.getCompanyId(),
+                        survey.getAgentEmailId() );
                 } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                     LOG.error( "No user found in database for the email id: " + survey.getAgentEmailId() + " and company id : "
                         + survey.getCompanyId() );

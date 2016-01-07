@@ -219,7 +219,7 @@ sources.forEach(function(source){
 		        	var modifiedTimes = db.SOCIAL_POST.aggregate(
 						[
 							{ 
-								$match : {$and : [ { companyId : e }, { source:source }, {postedBy : postOwner} ] }
+								$match : {$and : [ { companyId : e }, { regionId : -1 }, { branchId : -1 }, { agentId: -1 }, { source:source }, {postedBy : postOwner} ] }
 							},
 							{
 								$group:
