@@ -286,8 +286,7 @@ namespace EncompassSocialSurvey
             Logger.Debug("Inside method updateRecentRecordFetchEndTimeInCrmBatchTracker() ");
             if (entity != null)
             {
-                //entity.RecentRecordFetchedEndDate = lastFetchedTime;
-                entity.RecentRecordFetchedEndDate = DateTime.Now;
+                entity.RecentRecordFetchedEndDate = lastFetchedTime;
                 entity.error = null;
                 entity.ModifiedOn = DateTime.Now;
                 loanService.UpdateCrmbatchTracker(entity);
