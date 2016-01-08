@@ -58,7 +58,7 @@ public interface SurveyDetailsDao
 
 
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, long zillowTotalReviewScore );
+        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, double zillowTotalReviewScore );
 
 
     public long getIncompleteSurveyCount( String columnName, long columnValue, int noOfDays );

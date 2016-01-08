@@ -822,8 +822,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         }
 
-        //List<User> userList = userDao.getUsersForUserIds( userIds );
-        Map<Long, Integer> userIdReviewCountMap = getUserIdReviewCountMapFromUserIdList( userIds );
+        List<User> userList = userDao.getUsersForUserIds( userIds );
+        Map<Long, Integer> userIdReviewCountMap = new HashMap<Long, Integer>();
+        Map<Long, Double> userIdReviewScoreMap = new HashMap<Long, Double>();
+        for ( User user : userList ) {
+            if ( user.getIsZillowConnected() == CommonConstants.YES ) {
+                userIdReviewCountMap.put( user.getUserId(), user.getZillowReviewCount() );
+                userIdReviewScoreMap.put( user.getUserId(), user.getZillowReviewCount() * user.getZillowAverageScore() );
+            }
+        }
 
         for ( AgentSettings agentSettings : agentSettingsList ) {
             ProListUser user = new ProListUser();
@@ -846,8 +853,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
 
             user.setReviewCount( reviewCount );
-            user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
-                CommonConstants.NO_LIMIT, false, false, false, 0, 0 ) );
+            if ( userIdReviewScoreMap.get( agentSettings.getIden() ) != null
+                && userIdReviewScoreMap.get( agentSettings.getIden() ) > 0 ) {
+                user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
+                    CommonConstants.NO_LIMIT, false, false, true, userIdReviewCountMap.get( agentSettings.getIden() ),
+                    userIdReviewScoreMap.get( agentSettings.getIden() ) ) );
+            } else
+                user.setReviewScore( surveyDetailsDao.getRatingForPastNdays( CommonConstants.AGENT_ID, agentSettings.getIden(),
+                    CommonConstants.NO_LIMIT, false, false, false, 0, 0 ) );
             users.add( user );
         }
         LOG.info( "Method to find multiple users on the basis of list of user id finished for user ids " + userIds );
@@ -3156,19 +3169,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
         return user;
     }
-    
+
 
     /**
      *  Method to get a map of userId - review count given a list of userIds
      * @param userIds
-     * @return 
+     * @return
      * @throws InvalidInputException
      */
     @Override
     @Transactional
     public Map<Long, Integer> getUserIdReviewCountMapFromUserIdList( List<Long> userIds ) throws InvalidInputException
     {
-        
+
         List<User> userList = userDao.getUsersForUserIds( userIds );
         Map<Long, Integer> userIdReviewCountMap = new HashMap<Long, Integer>();
         for ( User user : userList ) {
