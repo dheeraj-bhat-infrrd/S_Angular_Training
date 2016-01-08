@@ -229,5 +229,8 @@ public interface SurveyDetailsDao
      * Method to remove surveys from mongo by SurveyPreInitiation
      * @param surveys
      */
-    void deleteSurveysBySurveyPreInitiation( List<SurveyPreInitiation> surveys );
+    public void deleteSurveysBySurveyPreInitiation( List<SurveyPreInitiation> surveys );
+
+
+    public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException;
 }
