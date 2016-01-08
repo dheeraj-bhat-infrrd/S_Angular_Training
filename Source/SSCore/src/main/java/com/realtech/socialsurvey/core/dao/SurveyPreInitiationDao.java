@@ -72,4 +72,11 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
      * @return
      */
     List<SurveyPreInitiation> fetchSurveysByIds( Set<Long> incompleteSurveyIds );
+
+    /**
+     * Method to delete SurveyPreInitiation records for a specific agent ID
+     * @param agentId
+     * @throws InvalidInputException
+     */
+    public void deletePreInitiatedSurveysForAgent( long agentId ) throws InvalidInputException;
 }

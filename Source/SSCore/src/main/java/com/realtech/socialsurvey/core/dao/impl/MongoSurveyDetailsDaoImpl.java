@@ -2095,7 +2095,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         //Ensure that the survey is editable
         Criteria criteria = Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE );
-        //Add criterias for each of the agentId - customerEmailId pairs
+        //Add criteria for each of the agentId - customerEmailId pairs
         List<Criteria> criterias = new ArrayList<Criteria>();
         for ( Long agentId : surveysToDelete.keySet() ) {
             Criteria criterion = Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId )
@@ -2110,4 +2110,25 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method deleteSurveysBySurveyPreInitiation() to delete surveys finished." );
     }
 
+
+    /**
+     * Method to delete incomplete surveys for a particular agent ID from Survey Details Collection
+     * @param agentId
+     * @throws InvalidInputException 
+     */
+    @Override
+    public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException
+    {
+        LOG.info( "Method to delete incomplete surveys for agent ID : " + agentId + " started." );
+        //Check if agentId is valid
+        if ( agentId <= 0l ) {
+            throw new InvalidInputException( "Invalid agent ID : " + agentId );
+        }
+        //Ensure that the survey is editable
+        Criteria criteria = Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE );
+        criteria.and( CommonConstants.AGENT_ID_COLUMN ).is( agentId );
+        Query query = new Query( criteria );
+        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method to delete incomplete surveys for agent ID : " + agentId + " finished." );
+    }
 }

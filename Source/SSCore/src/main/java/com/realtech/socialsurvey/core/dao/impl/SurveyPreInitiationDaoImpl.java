@@ -375,4 +375,24 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 		return aggregateResult;
 	}
+	
+	/**
+	 * Method to delete SurveyPreInitiation records for a specific agent ID
+	 * @param agentId
+	 * @throws InvalidInputException
+	 */
+	@Override
+    public void deletePreInitiatedSurveysForAgent( long agentId ) throws InvalidInputException
+    {
+        LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " started." );
+        //Check if the ID is valid
+        if ( agentId <= 0l ) {
+            throw new InvalidInputException( "Invalid agent ID : " + agentId );
+        }
+        String deleteQuery = "delete from SurveyPreInitiation where agentId = (:deletedAgentId)";
+        Query query = getSession().createQuery( deleteQuery );
+        query.setParameter( "deletedAgentId", agentId );
+        query.executeUpdate();
+        LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " finished." );
+    }
 }

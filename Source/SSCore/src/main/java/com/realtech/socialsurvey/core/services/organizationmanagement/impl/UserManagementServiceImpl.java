@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
@@ -175,6 +176,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private SocialManagementService socialManagementService;
+    
+    @Autowired
+    private SurveyPreInitiationDao surveyPreInitiationDao;
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -528,7 +532,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //Disconnect social connections(ensure that social connections history is updated)
         socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
-
+        
+        //Delete entries from SurveyPreInitiation table
+        surveyPreInitiationDao.deletePreInitiatedSurveysForAgent( userIdToRemove );
+        
+        //Delete entries from the Survey Details Collection
+        surveyDetailsDao.deleteIncompleteSurveysForAgent( userIdToRemove );
+        
         LOG.info( "Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished." );
     }
 
