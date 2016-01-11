@@ -131,15 +131,14 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
                     // updating solr review count for agent
                     long reviewCount = 0;
                     AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( iden );
-                    if ( agentSettings != null && agentSettings.getSurvey_settings() != null
-                        && agentSettings.getSurvey_settings().getAuto_post_score() > 0 ) {
-                        reviewCount = profileManagementService.getReviewsCount( iden, 0d, new Double( agentSettings
-                            .getSurvey_settings().getAuto_post_score() ).doubleValue(),
-                            CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, true, true, new Long( zillowReviewCount + "" )
+                    if ( agentSettings != null && agentSettings.getSurvey_settings() != null ) {
+                        reviewCount = profileManagementService.getReviewsCount( iden, -1, -1,
+                            CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, true, new Double( zillowReviewCount )
                                 .longValue() );
                     }
                     if ( reviewCount > 0 ) {
-                        solrSearchService.editUserInSolr( iden, CommonConstants.REVIEW_COUNT_SOLR, reviewCount + "" );
+                        solrSearchService
+                            .editUserInSolr( iden, CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
                     }
                     break;
                 default:
