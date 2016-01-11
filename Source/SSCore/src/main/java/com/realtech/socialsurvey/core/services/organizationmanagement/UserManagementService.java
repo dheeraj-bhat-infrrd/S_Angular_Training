@@ -483,7 +483,7 @@ public interface UserManagementService
     /**
      *  Method to get a map of userId - review count given a list of userIds
      * @param userIds
-     * @return 
+     * @return
      * @throws InvalidInputException
      */
     public Map<Long, Integer> getUserIdReviewCountMapFromUserIdList( List<Long> userIds ) throws InvalidInputException;
