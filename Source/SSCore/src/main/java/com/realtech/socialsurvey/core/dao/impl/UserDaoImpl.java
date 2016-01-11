@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 // JIRA SS-42 By RM-05 : BOC
@@ -190,6 +191,26 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
         }
         LOG.debug("Method getActiveUserByEmailAndCompany() successfull, active user with the emailId " + emailId);
         return users.get(CommonConstants.INITIAL_INDEX);
+    }
+
+
+    @Override
+    public List<User> getUsersForUserIds( List<Long> userIds ) throws InvalidInputException
+    {
+        if ( userIds == null || userIds.size() == 0 ) {
+            LOG.error( "User ids passed cannot be null or empty" );
+            throw new InvalidInputException( "User ids passed cannot be null or empty" );
+        }
+        Criteria criteria = getSession().createCriteria( User.class );
+        LOG.info( "Method getUsersForUserIds called to fetch users for user ids : " + userIds );
+        try {
+            criteria.add( Restrictions.in( CommonConstants.USER_ID, userIds ) );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForUserIds() ", hibernateException );
+        }
+        @SuppressWarnings ( "unchecked") List<User> users = criteria.list();
+        LOG.info( "Method getUsersForUserIds call ended to fetch users for user ids." );
+        return users;
     }
 }
 // JIRA SS-42 By RM-05 EOC
