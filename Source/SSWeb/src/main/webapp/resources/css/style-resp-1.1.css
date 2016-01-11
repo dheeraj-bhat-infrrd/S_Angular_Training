@@ -664,6 +664,15 @@
 	.help-save-small{
 	margin-left: 125px !important;
 	}
+	.bd-check-wrp{
+	width: 150px !important;
+	}
+	.bd-check-sm{
+	width: 75% !important;
+	}
+	.add-team-save{
+	margin-left: 0px !important;
+	}
 	
 	
 }
