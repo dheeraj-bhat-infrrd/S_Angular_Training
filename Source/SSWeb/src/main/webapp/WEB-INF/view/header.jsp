@@ -70,6 +70,7 @@
     <div id="message-header" class="hide"></div>
     
 	<div id="overlay-main" class="overlay-main hide">
+	<div id="overlay-pop-up">
 		<div class="overlay-disable-wrapper">
 			<div id="overlay-header" class="ol-header">
 				<!-- Populated by javascript -->
@@ -91,6 +92,7 @@
 					</div>
 				</div>
 			</div>
+		</div>
 		</div>
 	</div>
 	

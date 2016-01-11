@@ -207,6 +207,15 @@ $(document).on('click',  function(e){
 		$('#report-abuse-overlay').hide();
 		enableBodyScroll();
 	}
+	if($('#overlay-main' ).is(':visible')){
+		$('#overlay-main').hide();
+		enableBodyScroll();
+	}
+	if($('.overlay-payment' ).is(':visible')){
+		$('.overlay-payment').hide();
+		enableBodyScroll();
+	}
+	
 	
 		
 });
@@ -219,6 +228,14 @@ $(document).on('keyup',  function(e){
 		}
 		if($('#report-abuse-overlay' ).is(':visible')){
 			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
+		if($('.overlay-payment' ).is(':visible')){
+			$('.overlay-payment').hide();
 			enableBodyScroll();
 		}
 		
@@ -242,8 +259,13 @@ $(document).on('keyup',  function(e){
 			enableBodyScroll();
 		}
 */
-
+$(document).on('click', '#payment-data-container', function(e){
+	e.stopPropagation();
+});
 $(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+$(document).on('click', '#overlay-pop-up', function(e){
 	e.stopPropagation();
 });
 
@@ -654,7 +676,8 @@ function updateDashboardProfileEvents() {
     else circle4.animate(profileCompleted / 100);
     
     //update dashboard button events 
-    $('#pro-cmplt-stars').on('click', '#dsh-btn1', function() {
+    $('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
+    	e.stopPropagation();
 		if (colName == 'agentId') {
 			sendSurveyInvitation('#dsh-btn1');
 		} else if (accountType == "INDIVIDUAL") {
@@ -663,12 +686,14 @@ function updateDashboardProfileEvents() {
 			sendSurveyInvitationAdmin(colName, colValue,'#dsh-btn1');
 		}
 	});
-	$('#pro-cmplt-stars').on('click', '#dsh-btn2', function(){
+	$('#pro-cmplt-stars').on('click', '#dsh-btn2', function(e){
+		e.stopPropagation();		
 		var buttonId = 'dsh-btn2';
 		var task = $('#dsh-btn2').data('social');
 		dashboardButtonAction(buttonId, task, colName, colValue);
 	});
-	$('#pro-cmplt-stars').on('click', '#dsh-btn3', function(){
+	$('#pro-cmplt-stars').on('click', '#dsh-btn3', function(e){
+		e.stopPropagation();
 		var buttonId = 'dsh-btn3';
 		var task = $('#dsh-btn3').data('social');
 		dashboardButtonAction(buttonId, task, colName, colValue);
@@ -4596,7 +4621,8 @@ function saveUserAssignmentCallBack(data) {
 }
 
 // remove user profile
-$(document).on('click', '.v-icn-rem-userprofile', function() {
+$(document).on('click', '.v-icn-rem-userprofile', function(e) {
+	e.stopPropagation();
 	if ($(this).hasClass('v-tbl-icn-disabled')) {
 		return;
 	}
@@ -4607,7 +4633,7 @@ $(document).on('click', '.v-icn-rem-userprofile', function() {
 
 //remove user
 $(document).on('click', '.v-icn-rem-user', function() {
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
 		return;
 	}
 
@@ -9011,19 +9037,22 @@ $('body').on('click', '#st-settings-payment-off', function() {
 	showPaymentOptions();
 });
 
-$('body').on('click', '#st-delete-account', function() {
+$('body').on('click', '#st-delete-account', function(e) {
+	e.stopPropagation();
 	$('#other-account').val('true');
 	createPopupConfirm("Delete Account",
 		"This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
 	overlayDeleteAccount();
 });
 
-$('body').on('click', '#st-settings-account-on', function() {
+$('body').on('click', '#st-settings-account-on', function(e) {
+	e.stopPropagation();
 	$('#other-account').val('false');
 	createPopupConfirm("Enable Account", "Do you want to Continue?");
 	overlayAccount();
 });
-$('body').on('click', '#st-settings-account-off', function() {
+$('body').on('click', '#st-settings-account-off', function(e) {
+	e.stopPropagation();
 	$('#other-account').val('true');
 	createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
 	overlayAccount();
@@ -9555,6 +9584,7 @@ $(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
 
 
 $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
+	e.stopPropagation();
 	var surveyMongoId = $(this).attr('surveymongoid');
 	$('#overlay-main').show();
 	$('#overlay-continue').show();
