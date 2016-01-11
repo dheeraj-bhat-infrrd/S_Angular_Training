@@ -2079,4 +2079,72 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         return surveyCountForEntities;
     }
+
+
+    /**
+     * Method to remove surveys from mongo by SurveyPreInitiation
+     * @param surveys
+     */
+    @Override
+    public void deleteSurveysBySurveyPreInitiation( List<SurveyPreInitiation> surveys )
+    {
+        LOG.info( "Method deleteSurveysBySurveyPreInitiation() to delete surveys started." );
+        if ( surveys == null || surveys.isEmpty() ) {
+            LOG.info( "No surveys present." );
+            return;
+        }
+        Map<Long, List<String>> surveysToDelete = new HashMap<Long, List<String>>();
+
+        for ( SurveyPreInitiation survey : surveys ) {
+            List<String> mailIds = null;
+            //Check if agentId exists in surveysToDelete
+            if ( surveysToDelete.containsKey( survey.getAgentId() ) ) {
+                //Get the current survey's agent ID
+                mailIds = surveysToDelete.get( survey.getAgentId() );
+            }
+            if ( mailIds == null ) {
+                mailIds = new ArrayList<String>();
+            }
+            mailIds.add( survey.getCustomerEmailId() );
+            surveysToDelete.put( survey.getAgentId(), mailIds );
+        }
+
+        //Ensure that the survey is editable
+        Criteria criteria = Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE );
+        //Add criteria for each of the agentId - customerEmailId pairs
+        List<Criteria> criterias = new ArrayList<Criteria>();
+        for ( Long agentId : surveysToDelete.keySet() ) {
+            Criteria criterion = Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId )
+                .and( CommonConstants.CUSTOMER_EMAIL_COLUMN ).in( surveysToDelete.get( agentId ) );
+            criterias.add( criterion );
+        }
+        Criteria surveyCriteria = new Criteria().orOperator( criterias.toArray( new Criteria[criterias.size()] ) );
+        Query query = new Query( new Criteria().andOperator( criteria, surveyCriteria ) );
+
+        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+
+        LOG.info( "Method deleteSurveysBySurveyPreInitiation() to delete surveys finished." );
+    }
+
+
+    /**
+     * Method to delete incomplete surveys for a particular agent ID from Survey Details Collection
+     * @param agentId
+     * @throws InvalidInputException 
+     */
+    @Override
+    public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException
+    {
+        LOG.info( "Method to delete incomplete surveys for agent ID : " + agentId + " started." );
+        //Check if agentId is valid
+        if ( agentId <= 0l ) {
+            throw new InvalidInputException( "Invalid agent ID : " + agentId );
+        }
+        //Ensure that the survey is editable
+        Criteria criteria = Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE );
+        criteria.and( CommonConstants.AGENT_ID_COLUMN ).is( agentId );
+        Query query = new Query( criteria );
+        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method to delete incomplete surveys for agent ID : " + agentId + " finished." );
+    }
 }
