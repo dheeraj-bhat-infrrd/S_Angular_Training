@@ -23,11 +23,11 @@
 			</c:if>
 		</td>
 		<td class="v-tbl-ln-of text-center"><spring:message code="label.individual.key" /></td>
-		<td class="v-tbl-mail"></td>
+		<!-- <td class="v-tbl-mail"></td>
 		<td class="v-tbl-wid"></td>
 		<td class="v-tbl-online"></td>
 		<td class="v-tbl-rem"></td>
-		<td class="v-tbl-edit"></td>
+		<td class="v-tbl-edit"></td> -->
 		<td class="v-tbl-spacer"></td>
 	</tr>
 	<c:choose>
@@ -89,46 +89,51 @@
 					<td class="v-tbl-rgn-adm ${regionadmintickclass}"></td>
 					<td class="v-tbl-of-adm ${branchadmintickclass}"></td>
 					<td class="v-tbl-ln-of ${agenttickclass}"></td>
-					<c:choose>
-						<c:when test="${not empty regstatustickclass}">
-							<td class="v-tbl-mail ${admincaneditclass} ${regstatustickclass}"
-								title="<spring:message code="label.resendmail.key" />"></td>
-						</c:when>
-						<c:otherwise>
-							<td class="v-tbl-mail ${admincaneditclass}"></td>
-						</c:otherwise>
-					</c:choose>
-					<c:choose>
-						<c:when test="${userfromsearch.isAgent != null && userfromsearch.isAgent}">
-							<td class="v-tbl-wid v-icn-wid ${admincaneditclass}"
-								title="<spring:message code="label.widget.key" />"
-								onclick="generateWidget($(this),${ userfromsearch.userId }, 'individual');"></td>
-						</c:when>
-						<c:otherwise>
-							<td class="v-tbl-spacer" ></td>
-						</c:otherwise>
-					</c:choose>
-					<c:choose>
-						<c:when test="${userfromsearch.status == 2}">
-							<td class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></td>
-						</c:when>
-						<c:otherwise>
-							<td class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></td>
-						</c:otherwise>
-					</c:choose>
-					<td class="v-tbl-rem ${admincanremoveclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>
-					<td class="v-tbl-edit ${admincaneditclass} v-icn-edit-user edit-user" title="<spring:message code="label.edit.key" />"></td>
-					<c:choose>
-					 <c:when test="${user.userId != userfromsearch.userId}">
-				   		<td class="v-tbl-online v-tbl-icn v-icn-login user-login-icn" data-iden="${userfromsearch.userId}" title="login as"></td>
-				   </c:when>
-				   <c:otherwise>
-							<td class="v-tbl-spacer" ></td>
-						</c:otherwise>
-				   </c:choose>
+					<td class="v-tbl-btns v-tbl-btns-um">
+						<div class="v-tbn-icn-dropdown hide"></div>
+						<div class="clearfix v-tbl-icn-wraper v-um-tbl-icn-wraper">
+							<c:choose>
+								<c:when test="${not empty regstatustickclass}">
+									<div class="v-tbl-mail ${admincaneditclass} ${regstatustickclass} v-tbl-icn-sm"
+										title="<spring:message code="label.resendmail.key" />">Resend</div>
+								</c:when>
+								<c:otherwise>
+									<div class="v-tbl-mail ${admincaneditclass}"></div>
+								</c:otherwise>
+							</c:choose>
+							<c:choose>
+								<c:when test="${userfromsearch.isAgent != null && userfromsearch.isAgent}">
+									<div class="v-tbl-wid v-icn-wid ${admincaneditclass} v-tbl-icn-sm"
+										title="<spring:message code="label.widget.key" />"
+										onclick="generateWidget($(this),${ userfromsearch.userId }, 'individual');">Widget</div>
+								</c:when>
+								<c:otherwise>
+									<div class="v-tbl-spacer" ></div>
+								</c:otherwise>
+							</c:choose>
+							<c:choose>
+								<c:when test="${userfromsearch.status == 2}">
+									<div class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.notverified.key" />"></div>
+								</c:when>
+								<c:otherwise>
+									<div class="v-tbl-online v-tbl-icn ${userstatustickclass}" title="<spring:message code="label.verified.key" />"></div>
+								</c:otherwise>
+							</c:choose>
+							<div class="v-tbl-rem ${admincanremoveclass} v-icn-rem-user v-tbl-icn-sm" title="<spring:message code="label.remove.key" />">Delete</div>
+							<div class="v-tbl-edit ${admincaneditclass} v-icn-edit-user edit-user v-tbl-icn-sm" title="<spring:message code="label.edit.key" />">Edit</div>
+							<c:choose>
+							 <c:when test="${user.userId != userfromsearch.userId}">
+						   		<div class="v-tbl-online v-tbl-icn v-icn-login user-login-icn v-tbl-icn-sm" data-iden="${userfromsearch.userId}" title="login as">Login</div>
+						   </c:when>
+						   <c:otherwise>
+									<div class="v-tbl-spacer" ></div>
+								</c:otherwise>
+						   </c:choose>
+					   </div>
+				   </td>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="11">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="6">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>

@@ -1183,9 +1183,11 @@
 	}
 	.v-tbl-uname{
     	width: 30%;
+    	padding-right: 10px;
     }
     .v-tbl-email{	
     	width: 50%;
+    	padding-right: 10px;
     }
     .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item {
         margin-bottom: 1px;
@@ -1636,7 +1638,7 @@
 	.v-hr-tbl-icn-wraper div {
 		display: none;
 	}
-	
+	.v-um-tbl-icn-wraper .v-tbl-icn-sm,
 	.v-hr-tbl-icn-wraper .v-tbl-icn-sm {
 		display: block;
 		font-size: 14px;
@@ -1651,7 +1653,8 @@
 		line-height: 40px;
 		border-bottom: 1px solid #dcdcdc;
 	}
-	.v-tbl-icn-sm.v-icn-femail {
+	.v-tbl-icn-sm.v-icn-femail,
+	.v-tbl-icn-sm.v-icn-fmail {
 		background-size: 33px;
 	}
 	.v-tbn-icn-dropdown {
@@ -1666,6 +1669,28 @@
 	.v-line-rgn, .v-line-brnch, .v-line-ind {
 		height: 40px;
 	}
+	.v-um-tbl-icn-wraper {
+		display: none;
+	}
+	.v-tbl-icn-wraper.v-um-tbl-icn-wraper {
+		position: absolute;
+		width: 140px;
+		top: 33px;
+		right: 2px;
+		background: #fff;
+		z-index: 2;
+		border: 1px solid #dcdcdc;
+		border-bottom: none;
+	}
+	td.v-tbl-btns-um .v-tbl-spacer {
+		display: none;
+	}
+	td.v-tbl-btns.v-tbl-btns-um>.v-um-tbl-icn-wraper>div {
+	    width: 100%;
+	    max-width: 100%;
+	    font-size: 14px;
+	}
+
 }
 
 
@@ -2308,7 +2333,7 @@
     .review-for-text-sm-screen {
 		display: none;
 	}
-	.v-hr-tbl-icn-wraper {
+	.v-hr-tbl-icn-wraper, .v-um-tbl-icn-wraper {
 		display: block !important;
 	}
 }

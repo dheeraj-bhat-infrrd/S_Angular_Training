@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -39,7 +37,6 @@ import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -470,7 +467,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Override
     @SuppressWarnings ( "unchecked")
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, long zillowTotalReviewScore )
+        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, double zillowTotalReviewScore )
     {
         LOG.info( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName
             + " columnValue:" + columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive );
