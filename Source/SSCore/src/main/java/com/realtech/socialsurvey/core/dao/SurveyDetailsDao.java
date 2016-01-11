@@ -9,6 +9,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -222,4 +223,14 @@ public interface SurveyDetailsDao
 
 
     public SurveyDetails getSurveyBySurveyMongoId( String surveyMongoId );
+
+
+    /**
+     * Method to remove surveys from mongo by SurveyPreInitiation
+     * @param surveys
+     */
+    public void deleteSurveysBySurveyPreInitiation( List<SurveyPreInitiation> surveys );
+
+
+    public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException;
 }
