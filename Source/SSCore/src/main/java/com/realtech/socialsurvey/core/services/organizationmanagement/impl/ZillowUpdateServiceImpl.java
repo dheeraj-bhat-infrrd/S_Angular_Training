@@ -18,12 +18,14 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 
 
 @Component
@@ -47,6 +49,11 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private SolrSearchService solrSearchService;
 
     @Async
     @Override
@@ -120,6 +127,19 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
 
                     LOG.info( "Updating zillow average and review count for user id : " + iden );
                     userDao.update( user );
+
+                    // updating solr review count for agent
+                    long reviewCount = 0;
+                    AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( iden );
+                    if ( agentSettings != null && agentSettings.getSurvey_settings() != null ) {
+                        reviewCount = profileManagementService.getReviewsCount( iden, -1, -1,
+                            CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, true, new Double( zillowReviewCount )
+                                .longValue() );
+                    }
+                    if ( reviewCount > 0 ) {
+                        solrSearchService
+                            .editUserInSolr( iden, CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
+                    }
                     break;
                 default:
                     LOG.error( "Invalid collection name specified for updating zillow average and collection" );

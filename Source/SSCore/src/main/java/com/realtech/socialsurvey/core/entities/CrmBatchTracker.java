@@ -37,11 +37,14 @@ public class CrmBatchTracker implements Serializable
     @Column ( name = "SOURCE")
     private String source;
 
-    @Column ( name = "RECENT_RECORD_FETCHED_START_DATE")
-    private Timestamp recentRecordFetchedStartDate;
+    @Column ( name = "LAST_RUN_START_DATE")
+    private Timestamp lastRunStartDate;
     
-    @Column ( name = "RECENT_RECORD_FETCHED_END_DATE")
-    private Timestamp recentRecordFetchedEndDate;
+    @Column ( name = "LAST_RUN_END_DATE")
+    private Timestamp lastRunEndDate;
+    
+    @Column ( name = "RECENT_RECORD_FETCHED_DATE")
+    private Timestamp recentRecordFetchedDate;
     
     @Column ( name = "CREATED_ON")
     private Timestamp createdOn;
@@ -138,35 +141,35 @@ public class CrmBatchTracker implements Serializable
         this.source = source;
     }
 
-
-
-    public Timestamp getRecentRecordFetchedStartDate()
+    public Timestamp getLastRunStartDate()
     {
-        return recentRecordFetchedStartDate;
+        return lastRunStartDate;
     }
 
-
-
-    public void setRecentRecordFetchedStartDate( Timestamp recentRecordFetchedStartDate )
+    public void setLastRunStartDate( Timestamp lastRunStartDate )
     {
-        this.recentRecordFetchedStartDate = recentRecordFetchedStartDate;
+        this.lastRunStartDate = lastRunStartDate;
     }
 
-
-
-    public Timestamp getRecentRecordFetchedEndDate()
+    public Timestamp getLastRunEndDate()
     {
-        return recentRecordFetchedEndDate;
+        return lastRunEndDate;
     }
 
-
-
-    public void setRecentRecordFetchedEndDate( Timestamp recentRecordFetchedEndDate )
+    public void setLastRunEndDate( Timestamp lastRunEndDate )
     {
-        this.recentRecordFetchedEndDate = recentRecordFetchedEndDate;
+        this.lastRunEndDate = lastRunEndDate;
     }
 
+    public Timestamp getRecentRecordFetchedDate()
+    {
+        return recentRecordFetchedDate;
+    }
 
+    public void setRecentRecordFetchedDate( Timestamp recentRecordFetchedDate )
+    {
+        this.recentRecordFetchedDate = recentRecordFetchedDate;
+    }
 
     public Timestamp getCreatedOn()
     {
