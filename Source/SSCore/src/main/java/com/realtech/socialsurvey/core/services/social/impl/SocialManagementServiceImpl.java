@@ -517,7 +517,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param collectionName
      * @throws InvalidInputException
      */
-    private void removeSocialMediaTokens( OrganizationUnitSettings unitSettings, String collectionName )
+    void removeSocialMediaTokens( OrganizationUnitSettings unitSettings, String collectionName )
         throws InvalidInputException
     {
         LOG.info( "Method removeSocialMediaTokens started." );
