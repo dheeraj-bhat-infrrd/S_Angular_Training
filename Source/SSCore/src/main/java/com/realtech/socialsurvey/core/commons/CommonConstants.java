@@ -454,6 +454,8 @@ public interface CommonConstants
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
+    public static final String ENCOMPASS_DRY_RUN_STATE = "dryrun";
+    public static final String ENCOMPASS_PRODUCTION_STATE = "prod";
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
