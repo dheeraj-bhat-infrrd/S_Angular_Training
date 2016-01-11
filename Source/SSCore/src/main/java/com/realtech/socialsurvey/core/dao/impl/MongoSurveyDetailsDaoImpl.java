@@ -1858,6 +1858,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( surveyDetails.getCustomerEmail() ) );
         Update update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, surveyDetails.getSocialMediaPostDetails() );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN, surveyDetails.getSocialMediaPostResponseDetails() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );

@@ -645,6 +645,44 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
     
     
+    private RegionMediaPostResponseDetails getRMPRDFromRMPRDList(List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList , long regionId){
+        if(regionMediaPostResponseDetailsList == null || regionMediaPostResponseDetailsList.isEmpty()){
+            return null;
+        }
+        
+        for(RegionMediaPostResponseDetails regionMediaPostResponseDetails : regionMediaPostResponseDetailsList){
+            if(regionMediaPostResponseDetails.getRegionId() == regionId)
+                return regionMediaPostResponseDetails;
+        }
+        
+        return null;
+    }
+    
+    
+    private BranchMediaPostResponseDetails getBMPRDFromBMPRDList(List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList , long branchId){
+        if(branchMediaPostResponseDetailsList == null || branchMediaPostResponseDetailsList.isEmpty()){
+            return null;
+        }
+        
+        for(BranchMediaPostResponseDetails branchMediaPostResponseDetails : branchMediaPostResponseDetailsList){
+            if(branchMediaPostResponseDetails.getBranchId() == branchId)
+                return branchMediaPostResponseDetails;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * 
+     * @param facebookMessage
+     * @param rating
+     * @param serverBaseUrl
+     * @param accountMasterId
+     * @param socialMediaPostDetails
+     * @param socialMediaPostResponseDetails
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
     private void postToFacebookForHierarchy(String facebookMessage , double rating ,  String serverBaseUrl , int accountMasterId , SocialMediaPostDetails socialMediaPostDetails , 
         SocialMediaPostResponseDetails socialMediaPostResponseDetails 
              ) throws InvalidInputException, NoRecordsFetchedException
@@ -669,14 +707,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( !updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl, companyId ) ) {
                     if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                         agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    
+                    SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
+                    facebookPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
+                        .getFacebookAccessTokenToPost() );
+                    facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+                    facebookPostResponse.setResponseMessage( "Ok" );
+                    agentMediaPostResponseDetails.setFacebookPostResponse( facebookPostResponse );
 
                 }
-                SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                facebookPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
-                    .getFacebookAccessTokenToPost() );
-                facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                facebookPostResponse.setResponseMessage( "Ok" );
-                agentMediaPostResponseDetails.setFacebookPostResponse( facebookPostResponse );
             }
         } catch ( FacebookException e ) {
             LOG.error(
@@ -704,6 +743,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
                         if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                             companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                        
                         SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
                         facebookPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getFacebookToken()
                             .getFacebookAccessTokenToPost() );
@@ -721,7 +761,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 facebookPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getFacebookToken()
                     .getFacebookAccessTokenToPost() );
                 facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                facebookPostResponse.setResponseMessage( "Ok" );
+                facebookPostResponse.setResponseMessage( e.getMessage() );
                 companyMediaPostResponseDetails.setFacebookPostResponse( facebookPostResponse );
                 reportBug( "Facebook", companySetting.getContact_details().getName(), e );
             }
@@ -731,8 +771,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 .getRegionMediaPostDetailsList() ) {
                 OrganizationUnitSettings setting = organizationManagementService
                     .getRegionSettings( regionMediaPostDetails.getRegionId() );
-                RegionMediaPostResponseDetails regionMediaPostResponseDetails = regionMediaPostResponseDetailsList
-                    .get( 0 ); //TODO
+                RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList( regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
+                
                 try {
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, companyId ) ) {
@@ -757,7 +797,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
                         .getFacebookAccessTokenToPost() );
                     facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                    facebookPostResponse.setResponseMessage( "Ok" );
+                    facebookPostResponse.setResponseMessage( e.getMessage() );
                     regionMediaPostResponseDetails.setFacebookPostResponse( facebookPostResponse );
                     reportBug( "Facebook", setting.getContact_details().getName(), e );
                 }
@@ -768,8 +808,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 .getBranchMediaPostDetailsList() ) {
                 OrganizationUnitSettings setting = organizationManagementService
                     .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                BranchMediaPostResponseDetails branchMediaPostResponseDetails = branchMediaPostResponseDetailsList
-                    .get( 0 ); //TODO
+                BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList( branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
+                
                 if ( setting != null ) {
                     try {
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
@@ -796,7 +836,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
                             .getFacebookAccessTokenToPost() );
                         facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                        facebookPostResponse.setResponseMessage( "Ok" );
+                        facebookPostResponse.setResponseMessage( e.getMessage() );
                         branchMediaPostResponseDetails.setFacebookPostResponse( facebookPostResponse );
                         reportBug( "Facebook", setting.getContact_details().getName(), e );
                     }
@@ -832,8 +872,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                     
                     SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                    linkedinPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
-                        .getFacebookAccessTokenToPost() );
+                    linkedinPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
                     linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                     linkedinPostResponse.setResponseMessage( "Ok" );
                     agentMediaPostResponseDetails.setLinkedinPostResponse( linkedinPostResponse );
@@ -841,8 +880,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             }
         } catch ( Exception e ) {
             SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-            linkedinPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
-                .getFacebookAccessTokenToPost() );
+            linkedinPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
             linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
             linkedinPostResponse.setResponseMessage( e.getMessage() );
             agentMediaPostResponseDetails.setLinkedinPostResponse( linkedinPostResponse );
@@ -863,8 +901,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                         
                         SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                        linkedinPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getFacebookToken()
-                            .getFacebookAccessTokenToPost() );
+                        linkedinPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
                         linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                         linkedinPostResponse.setResponseMessage( "Ok" );
                         companyMediaPostResponseDetails.setLinkedinPostResponse( linkedinPostResponse );
@@ -873,8 +910,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             } catch ( Exception e ) {
 
                 SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                linkedinPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getFacebookToken()
-                    .getFacebookAccessTokenToPost() );
+                linkedinPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
                 linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                 linkedinPostResponse.setResponseMessage( e.getMessage() );
                 companyMediaPostResponseDetails.setLinkedinPostResponse( linkedinPostResponse );
@@ -886,8 +922,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                 OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
                     .getRegionId() );
-                RegionMediaPostResponseDetails regionMediaPostResponseDetails = regionMediaPostResponseDetailsList
-                    .get( 0 ); //TODO
+                RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList( regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
+                
                 try {
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
@@ -897,8 +933,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             regionMediaPostDetails.setSharedOn( regionSocialList );
                             
                             SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                            linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                                .getFacebookAccessTokenToPost() );
+                            linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
                             linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                             linkedinPostResponse.setResponseMessage( "Ok" );
                             regionMediaPostResponseDetails.setLinkedinPostResponse( linkedinPostResponse );
@@ -906,8 +941,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     }
                 } catch ( Exception e ) {
                     SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                    linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                        .getFacebookAccessTokenToPost() );
+                    linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
                     linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                     linkedinPostResponse.setResponseMessage( e.getMessage() );
                     regionMediaPostResponseDetails.setLinkedinPostResponse( linkedinPostResponse );
@@ -920,8 +954,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                 OrganizationUnitSettings setting = organizationManagementService
                     .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                BranchMediaPostResponseDetails branchMediaPostResponseDetails = branchMediaPostResponseDetailsList
-                    .get( 0 ); //TODO
+                BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList( branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
+                
                 try {
                     if ( setting != null ) {
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
@@ -932,8 +966,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                                 branchMediaPostDetails.setSharedOn( branchSocialList );
                                 
                                 SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                                linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                                    .getFacebookAccessTokenToPost() );
+                                linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
                                 linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                                 linkedinPostResponse.setResponseMessage( "Ok" );
                                 branchMediaPostResponseDetails.setLinkedinPostResponse( linkedinPostResponse );
@@ -942,8 +975,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     }
                 } catch ( Exception e ) {
                     SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                    linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                        .getFacebookAccessTokenToPost() );
+                    linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
                     linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                     linkedinPostResponse.setResponseMessage( e.getMessage() );
                     branchMediaPostResponseDetails.setLinkedinPostResponse( linkedinPostResponse );
@@ -957,7 +989,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
     
-    private void postToTweeterForHierarchy(String twitterMessage , double rating ,  String serverBaseUrl , int accountMasterId , SocialMediaPostDetails socialMediaPostDetails , 
+    private void postToTwitterForHierarchy(String twitterMessage , double rating ,  String serverBaseUrl , int accountMasterId , SocialMediaPostDetails socialMediaPostDetails , 
         SocialMediaPostResponseDetails socialMediaPostResponseDetails 
              ) throws InvalidInputException, NoRecordsFetchedException
     {
@@ -984,8 +1016,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                     
                     SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                    twitterPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
-                        .getFacebookAccessTokenToPost() );
+                    twitterPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
                     twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                     twitterPostResponse.setResponseMessage( "Ok" );
                     agentMediaPostResponseDetails.setTwitterPostResponse( twitterPostResponse );
@@ -994,8 +1025,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( TwitterException e ) {
             LOG.error( "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e );
             SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-            twitterPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
-                .getFacebookAccessTokenToPost() );
+            twitterPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
             twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
             twitterPostResponse.setResponseMessage( e.getMessage() );
             agentMediaPostResponseDetails.setTwitterPostResponse( twitterPostResponse );
@@ -1017,8 +1047,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
                         
                         SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                        twitterPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getFacebookToken()
-                            .getFacebookAccessTokenToPost() );
+                        twitterPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
                         twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                         twitterPostResponse.setResponseMessage( "Ok" );
                         companyMediaPostResponseDetails.setTwitterPostResponse( twitterPostResponse );
@@ -1029,8 +1058,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e );
                 
                 SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                twitterPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getFacebookToken()
-                    .getFacebookAccessTokenToPost() );
+                twitterPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
                 twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                 twitterPostResponse.setResponseMessage( e.getMessage() );
                 companyMediaPostResponseDetails.setTwitterPostResponse( twitterPostResponse );
@@ -1043,7 +1071,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                 OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
                     .getRegionId() );
-                RegionMediaPostResponseDetails regionMediaPostResponseDetails = regionMediaPostResponseDetailsList.get( 0 ); //TODO
+                RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList( regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
+                
                 try {
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !tweet( setting, twitterMessage, companyId ) ) {
@@ -1053,8 +1082,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             regionMediaPostDetails.setSharedOn( regionSocialList );
                             
                             SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                            twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                                .getFacebookAccessTokenToPost() );
+                            twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken());
                             twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                             twitterPostResponse.setResponseMessage( "Ok" );
                             regionMediaPostResponseDetails.setTwitterPostResponse( twitterPostResponse );
@@ -1066,8 +1094,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         e );
                     
                     SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                    twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                        .getFacebookAccessTokenToPost() );
+                    twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
                     twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                     twitterPostResponse.setResponseMessage( e.getMessage() );
                     regionMediaPostResponseDetails.setTwitterPostResponse( twitterPostResponse );
@@ -1081,7 +1108,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                 OrganizationUnitSettings setting = organizationManagementService
                     .getBranchSettingsDefault( branchMediaPostDetails.getBranchId() );
-                BranchMediaPostResponseDetails branchMediaPostResponseDetails = branchMediaPostResponseDetailsList.get( 0 ); //TODO
+                BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList( branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
+                
                 try {
                     if ( setting != null ) {
 
@@ -1093,8 +1121,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                                 branchMediaPostDetails.setSharedOn( branchSocialList );
                                 
                                 SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                                twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                                    .getFacebookAccessTokenToPost() );
+                                twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
                                 twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                                 twitterPostResponse.setResponseMessage( "Ok" );
                                 branchMediaPostResponseDetails.setTwitterPostResponse( twitterPostResponse );
@@ -1107,8 +1134,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         e );
                     
                     SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                    twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                        .getFacebookAccessTokenToPost() );
+                    twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken());
                     twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                     twitterPostResponse.setResponseMessage( e.getMessage() );
                     branchMediaPostResponseDetails.setTwitterPostResponse( twitterPostResponse );
@@ -1163,7 +1189,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             List<OrganizationUnitSettings> branchSettings = settingsMap
                 .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
-            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
@@ -1177,7 +1202,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 .getAgentMediaPostResponseDetails();
             if ( agentMediaPostResponseDetails == null ) {
                 agentMediaPostResponseDetails = new AgentMediaPostResponseDetails();
-                agentMediaPostResponseDetails.setAgentId( socialMediaPostResponseDetails.getAgentMediaPostResponseDetails()
+                agentMediaPostResponseDetails.setAgentId( socialMediaPostDetails.getAgentMediaPostDetails()
                     .getAgentId() );
             }
             CompanyMediaPostResponseDetails companyMediaPostResponseDetails = socialMediaPostResponseDetails
@@ -1218,7 +1243,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 BranchMediaPostResponseDetails branchMediaPostResponseDetails = new BranchMediaPostResponseDetails();
                 branchMediaPostResponseDetails.setBranchId( branchMediaPostDetails.getBranchId() );
                 branchMediaPostResponseDetails.setRegionId( branchMediaPostDetails.getRegionId() );
-                branchMediaPostResponseDetailsList.add( branchMediaPostResponseDetails );
+                if(getBMPRDFromBMPRDList( branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() ) == null){
+                    branchMediaPostResponseDetailsList.add( branchMediaPostResponseDetails );
+                }
             }
             for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                 if ( regionMediaPostDetails.getSharedOn() == null ) {
@@ -1227,9 +1254,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 //create RegionMediaPostResponseDetails 
                 RegionMediaPostResponseDetails regionMediaPostResponseDetails = new RegionMediaPostResponseDetails();
                 regionMediaPostResponseDetails.setRegionId( regionMediaPostDetails.getRegionId() );
-                regionMediaPostResponseDetailsList.add( regionMediaPostResponseDetails );
+                if(getRMPRDFromRMPRDList( regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() ) == null){
+                    regionMediaPostResponseDetailsList.add( regionMediaPostResponseDetails );
+                }
             }
 
+            socialMediaPostResponseDetails.setAgentMediaPostResponseDetails( agentMediaPostResponseDetails );
+            socialMediaPostResponseDetails.setCompanyMediaPostResponseDetails( companyMediaPostResponseDetails );
+            socialMediaPostResponseDetails.setBranchMediaPostResponseDetailsList( branchMediaPostResponseDetailsList );
+            socialMediaPostResponseDetails.setRegionMediaPostResponseDetailsList( regionMediaPostResponseDetailsList );
+            
             //Social Survey
             if ( !agentSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
                 agentSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
@@ -1279,7 +1313,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     + surveyHandler.getApplicationBaseUrl()
                     + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
-                postToTweeterForHierarchy( twitterMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
+                postToTwitterForHierarchy( twitterMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
                 
             }
