@@ -624,7 +624,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue )
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue, boolean fetchAbusive )
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
@@ -637,6 +637,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
 
         Query query = new Query();
+
+        //criteria for abusive reviews
+        if ( !fetchAbusive ) {
+            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
+        }
+
+
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+
+
         if ( columnName == null ) {
         } else {
             query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
@@ -680,7 +690,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             } else if ( startDate != null && endDate != null ) {
                 query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
             }
-
 
             List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
@@ -902,7 +911,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( rows > -1 ) {
             query.limit( rows );
         }
-        
+
         query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
 
         /*if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) )
@@ -1171,6 +1180,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             pipeline
                 .add( new BasicDBObject( "$match", new BasicDBObject( organizationUnitColumn, organizationUnitColumnValue ) ) );
         }
+        //match for non abusive reviews
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN, false ) ) );
+        // match the survey stage should be complete
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_CLICKED_COLUMN, true ) ) );
+
         // Commented as Zillow surveys are not stored in database, SS-1276
         // match non zillow survey
         // pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
@@ -1249,10 +1263,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             pipeline
                 .add( new BasicDBObject( "$match", new BasicDBObject( organizationUnitColumn, organizationUnitColumnValue ) ) );
         }
-        // match mood as great
-        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MOOD_COLUMN, "Great" ) ) );
-        // match agreed to share
-        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.AGREE_SHARE_COLUMN, "true" ) ) );
+
+        //match for non abusive reviews
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN, false ) ) );
+        // match the survey stage should be complete
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN,
+            CommonConstants.SURVEY_STAGE_COMPLETE ) ) );
         // match if social media post details exists
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN,
             new BasicDBObject( "$exists", true ) ) ) );
