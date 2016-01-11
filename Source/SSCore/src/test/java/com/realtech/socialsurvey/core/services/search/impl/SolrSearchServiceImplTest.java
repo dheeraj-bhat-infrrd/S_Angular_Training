@@ -670,4 +670,11 @@ public class SolrSearchServiceImplTest
     {
         solrSearchServiceImpl.removeSocialPostFromSolr( "" );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void updateRegionsForMultipleUsersTestRegionsMapIsNull() throws InvalidInputException, SolrException
+    {
+        solrSearchServiceImpl.updateRegionsForMultipleUsers( null );
+    }
 }

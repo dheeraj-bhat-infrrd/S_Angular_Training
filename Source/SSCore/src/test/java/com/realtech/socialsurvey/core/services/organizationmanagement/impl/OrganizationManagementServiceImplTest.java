@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,6 +33,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -109,6 +112,8 @@ public class OrganizationManagementServiceImplTest
     @Mock
     private UserManagementService userManagementService;
 
+    @Mock
+    private UserProfileDao userProfileDao;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {}
@@ -1745,6 +1750,7 @@ public class OrganizationManagementServiceImplTest
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Test ( expected = NoRecordsFetchedException.class)
     public void testupdateBranchWhenAssigneeUserIsNull() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UserAssignmentException
@@ -1755,6 +1761,15 @@ public class OrganizationManagementServiceImplTest
         Mockito.doReturn( new Region() ).when( organizationManagementServiceImpl )
             .getDefaultRegionForCompany( Mockito.any( Company.class ) );
         Mockito.when( regionDao.findById( Mockito.eq( Region.class ), Mockito.anyLong() ) ).thenReturn( new Region() );
+        Mockito.doNothing().when( userProfileDao ).updateRegionIdForParticularBranch( Mockito.anyLong(), Mockito.anyLong() );
+        Mockito.when( solrSearchService.findUsersInBranch( Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt() ) )
+            .thenReturn( null );
+        Mockito
+            .doReturn( null )
+            .when( organizationManagementServiceImpl )
+            .updateRegionIdForUsers( (SolrDocumentList) Matchers.any(), Matchers.anyLong(), Matchers.anyLong(),
+                Matchers.anyLong() );
+        Mockito.doNothing().when( solrSearchService ).updateRegionsForMultipleUsers( Mockito.anyMap() );
         Mockito.doNothing().when( branchDao ).update( Mockito.any( Branch.class ) );
         Mockito
             .doNothing()
@@ -2227,5 +2242,63 @@ public class OrganizationManagementServiceImplTest
         agent.setContact_details( contactDetails );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
         organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+    }
+
+
+    //Tests for UpdateRegionIdForUsers
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForUserListEmpty() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateRegionIdForUsers( null, 1l, 1l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersFornewRegionIdInvalid() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateRegionIdForUsers( new SolrDocumentList(), 0l, 1l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForoldRegionIdInvalid() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateRegionIdForUsers( new SolrDocumentList(), 1l, 0l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForcurBranchIdInvalid() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateRegionIdForUsers( new SolrDocumentList(), 1l, 1l, 0l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForBranchInvalid() throws InvalidInputException
+    {
+        SolrDocumentList userList = new SolrDocumentList();
+        SolrDocument user = new SolrDocument();
+        List<Long> branches = new ArrayList<Long>();
+        branches.add( 1l );
+        user.put( CommonConstants.BRANCHES_SOLR, branches );
+        userList.add( user );
+        Mockito.when( userManagementService.getBranchById( Mockito.anyLong() ) ).thenReturn( null );
+        organizationManagementServiceImpl.updateRegionIdForUsers( userList, 1l, 1l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForRegionInvalid() throws InvalidInputException
+    {
+        SolrDocumentList userList = new SolrDocumentList();
+        SolrDocument user = new SolrDocument();
+        List<Long> branches = new ArrayList<Long>();
+        branches.add( 1l );
+        user.put( CommonConstants.BRANCHES_SOLR, branches );
+        userList.add( user );
+        Mockito.when( userManagementService.getBranchById( Mockito.anyLong() ) ).thenReturn( new Branch() );
+        organizationManagementServiceImpl.updateRegionIdForUsers( userList, 1l, 1l, 1l );
     }
 }
