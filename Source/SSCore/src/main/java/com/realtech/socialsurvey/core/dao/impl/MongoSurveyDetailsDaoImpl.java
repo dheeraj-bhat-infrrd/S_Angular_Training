@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
@@ -1653,39 +1651,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 agentReportData.put( agentId, agentRankingReport );
             }
         }
-    }
-
-
-    // JIRA SS-137 and 158 : EOC
-
-    @Override
-    public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate )
-    {
-        String profileLevel = "";
-        if ( columnName.equals( CommonConstants.COMPANY_ID ) ) {
-            profileLevel = CommonConstants.PROFILE_LEVEL_COMPANY;
-        } else if ( columnName.equals( CommonConstants.REGION_ID ) ) {
-            profileLevel = CommonConstants.PROFILE_LEVEL_REGION;
-        } else if ( columnName.equals( CommonConstants.BRANCH_ID ) ) {
-            profileLevel = CommonConstants.PROFILE_LEVEL_BRANCH;
-        } else if ( columnName.equals( CommonConstants.AGENT_ID ) ) {
-            profileLevel = CommonConstants.PROFILE_LEVEL_INDIVIDUAL;
-        }
-
-        long noOfPreInitiatedSurveys = 0l;
-        try {
-            List<SurveyPreInitiation> preInitiations = surveyPreInitiationService.getIncompleteSurvey( columnValue, 0, 0, 0,
-                -1, profileLevel, startDate, endDate, false );
-            for ( SurveyPreInitiation initiation : preInitiations ) {
-                if ( initiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED ) {
-                    noOfPreInitiatedSurveys++;
-                }
-            }
-        } catch ( InvalidInputException e ) {
-            LOG.error(
-                "InvalidInputException caught in noOfPreInitiatedSurveys() while fetching reviews. Nested exception is ", e );
-        }
-        return noOfPreInitiatedSurveys;
     }
 
 
