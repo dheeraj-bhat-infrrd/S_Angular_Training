@@ -2499,6 +2499,53 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     /**
+     * Method to update regions for multiple users started
+     * @param regionsMap
+     * @throws InvalidInputException
+     * @throws SolrException 
+     */
+    @Override
+    public void updateRegionsForMultipleUsers( Map<Long, List<Long>> regionsMap ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method to regions for multiple users started." );
+        if ( regionsMap == null ) {
+            throw new InvalidInputException( "RegionsMap is null" );
+        }
+        //There's no update needed.
+        if ( regionsMap.isEmpty() ) {
+            return;
+        }
+
+        SolrServer solrServer = new HttpSolrServer( solrUserUrl );
+
+        List<SolrInputDocument> inputDocList = new ArrayList<SolrInputDocument>();
+        Map<String, List<Long>> editKeyValues;
+        SolrInputDocument inputDoc;
+
+        for ( Entry<Long, List<Long>> entry : regionsMap.entrySet() ) {
+            editKeyValues = new HashMap<String, List<Long>>();
+            editKeyValues.put( SOLR_EDIT_REPLACE, entry.getValue() );
+            // Adding fields to be updated
+            inputDoc = new SolrInputDocument();
+            inputDoc.setField( CommonConstants.USER_ID_SOLR, entry.getKey() );
+            inputDoc.setField( CommonConstants.REGIONS_SOLR, editKeyValues );
+            inputDocList.add( inputDoc );
+        }
+
+        try {
+            if ( inputDocList.size() > 0 ) {
+                solrServer.add( inputDocList );
+                solrServer.commit();
+            }
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while updating user to solr. Reason : " + e.getMessage(), e );
+        }
+        LOG.info( "Method to regions for multiple users finished." );
+    }
+
+
+    /**
      * Method to remove social post from solr
      * 
      * JIRA SS-1329
@@ -2524,5 +2571,39 @@ public class SolrSearchServiceImpl implements SolrSearchService
             throw new SolrException( "Exception while removing social post from solr. Reason : " + e.getMessage(), e );
         }
         LOG.info( "Method removeUserFromSolr() to remove social post {} from solr finished successfully.", postMongoId );
+    }
+
+
+    /**
+     * Method to find all the users in a branch
+     * @param branchId
+     * @return
+     * @throws SolrException
+     */
+    @Override
+    public SolrDocumentList findUsersInBranch( long branchId, int startIndex, int batchSize ) throws SolrException
+    {
+        LOG.info( "Method to find all users in branch " + branchId + " started." );
+        SolrDocumentList results;
+        QueryResponse response = null;
+        SolrServer solrServer = new HttpSolrServer( solrUserUrl );
+        SolrQuery query = new SolrQuery( CommonConstants.BRANCHES_SOLR + ":" + branchId );
+        if ( startIndex > -1 ) {
+            query.setStart( startIndex );
+        }
+        if ( batchSize > 0 ) {
+            query.setRows( batchSize );
+        }
+        LOG.info( "Running Solr query : " + query.getQuery() );
+        try {
+            response = solrServer.query( query );
+            results = response.getResults();
+        } catch ( SolrServerException e ) {
+            LOG.error( "SolrServerException while finding all the users in branch " + branchId );
+            throw new SolrException( "Exception while finding all the users in branchId " + branchId + ". Reason : "
+                + e.getMessage(), e );
+        }
+        LOG.info( "Method to find all users in branch " + branchId + " finished." );
+        return results;
     }
 }

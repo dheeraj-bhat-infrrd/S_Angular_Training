@@ -299,4 +299,25 @@ public class SocialManagementServiceImplTest
     {
         socialManagementServiceImpl.updateSettingsSetStatusByEntityType( "agentId", 0l, SettingsForApplication.FACEBOOK, false );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testRemoveSocialMediaTokensForInvalidUnitSettings() throws InvalidInputException
+    {
+        socialManagementServiceImpl.removeSocialMediaTokens( null, CommonConstants.AGENT_SETTINGS_COLLECTION );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testRemoveSocialMediaTokensForCollectionNull() throws InvalidInputException
+    {
+        socialManagementServiceImpl.removeSocialMediaTokens( new OrganizationUnitSettings(), null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testRemoveSocialMediaTokensForCollectionEmpty() throws InvalidInputException
+    {
+        socialManagementServiceImpl.removeSocialMediaTokens( new OrganizationUnitSettings(), "" );
+    }
 }
