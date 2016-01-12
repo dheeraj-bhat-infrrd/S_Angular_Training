@@ -16,6 +16,8 @@ import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -320,4 +322,43 @@ public class SocialManagementServiceImplTest
     {
         socialManagementServiceImpl.removeSocialMediaTokens( new OrganizationUnitSettings(), "" );
     }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testPostToTwitterForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails() );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testPostToTwitterForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testPostToLinkedInForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2" , "test3", 2, null, new SocialMediaPostResponseDetails() );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testPostToLinkedInForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2",  "test3" ,  2, new SocialMediaPostDetails() , null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testPostToFacebookForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails() );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testPostToFacebookForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null );
+    }
+    
 }
