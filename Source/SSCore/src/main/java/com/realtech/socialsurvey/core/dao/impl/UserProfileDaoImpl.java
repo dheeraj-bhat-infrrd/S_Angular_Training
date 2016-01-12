@@ -502,13 +502,13 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
 
     /**
-     * Method to update regionId for a particular branchId in user profiles
+     * Method to update regionId for a specific branchId in user profiles
      * @param branchId
      * @param regionId
      * @throws InvalidInputException 
      */
     @Override
-    public void updateRegionIdForParticularBranch( long branchId, long regionId ) throws InvalidInputException
+    public void updateRegionIdForBranch( long branchId, long regionId ) throws InvalidInputException
     {
         LOG.info( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE started." );
         //Check if regionId is invalid

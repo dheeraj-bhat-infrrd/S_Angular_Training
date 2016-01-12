@@ -4566,7 +4566,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 throw new NoRecordsFetchedException( "No region present for the required id in database while updating branch" );
             } else {
                 //Update user profiles here.
-                userProfileDao.updateRegionIdForParticularBranch( branchId, region.getRegionId() );
+                userProfileDao.updateRegionIdForBranch( branchId, region.getRegionId() );
 
                 //Get and update user
                 SolrDocumentList users = null;
