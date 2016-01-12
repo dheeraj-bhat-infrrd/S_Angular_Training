@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
@@ -63,4 +64,19 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 	 * @throws InvalidInputException
 	 */
 	public Map<Integer, Integer> getIncompletSurveyAggregationCount(long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate, Set<Long> agentIds, String aggregateBy) throws InvalidInputException;
+
+	/**
+     * Method to fetch preinitiated surveys by IDs
+     * 
+     * @param incompleteSurveyIds
+     * @return
+     */
+    List<SurveyPreInitiation> fetchSurveysByIds( Set<Long> incompleteSurveyIds );
+
+    /**
+     * Method to delete SurveyPreInitiation records for a specific agent ID
+     * @param agentId
+     * @throws InvalidInputException
+     */
+    public void deletePreInitiatedSurveysForAgent( long agentId ) throws InvalidInputException;
 }

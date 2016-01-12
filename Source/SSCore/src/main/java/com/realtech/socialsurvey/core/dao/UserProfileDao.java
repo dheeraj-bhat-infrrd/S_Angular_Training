@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
 /*
@@ -65,4 +66,13 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     public List<UserFromSearch> getUserFromSearchByUserIds( Set<Long> userIds );
+
+
+    /**
+     * Method to update regionId for a particular branchId in user profiles
+     * @param branchId
+     * @param regionId
+     * @throws InvalidInputException 
+     */
+    public void updateRegionIdForBranch( long branchId, long regionId ) throws InvalidInputException;
 }

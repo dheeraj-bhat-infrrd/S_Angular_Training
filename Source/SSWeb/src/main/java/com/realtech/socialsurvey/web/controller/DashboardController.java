@@ -710,7 +710,12 @@ public class DashboardController
                         + incompleteSurveyIdStr, e );
                 }
             }
-            surveyPreInitiationService.deleteSurveyReminder( incompleteSurveyIds );
+            //Remove records from Survey Pre Initiation table
+            List<SurveyPreInitiation> surveys = surveyPreInitiationService.deleteSurveyReminder( incompleteSurveyIds );
+            
+            //Remove records from Survey Details collection, if any
+            dashboardService.deleteSurveyDetailsByPreInitiation( surveys );
+            
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "Nonfatal exception occured in method cancelSurveyReminder, reason : " + nonFatalException.getMessage() );
             return CommonConstants.ERROR;
