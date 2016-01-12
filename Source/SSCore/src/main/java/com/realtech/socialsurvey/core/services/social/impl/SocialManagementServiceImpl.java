@@ -518,6 +518,27 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
+    /**
+     * Method to unset Social Media Tokens from a unit setting
+     * 
+     * @param unitSettings
+     * @param collectionName
+     * @throws InvalidInputException
+     */
+    void removeSocialMediaTokens( OrganizationUnitSettings unitSettings, String collectionName )
+        throws InvalidInputException
+    {
+        LOG.info( "Method removeSocialMediaTokens started." );
+        String keyToUpdate = CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY;
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Invalid unit settings" );
+        }
+        if ( collectionName == null || collectionName.isEmpty() ) {
+            throw new InvalidInputException( "collection name is empty" );
+        }
+        organizationUnitSettingsDao.removeKeyInOrganizationSettings( unitSettings, keyToUpdate, collectionName );
+    }
+
     @Override
     public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, OrganizationUnitSettings unitSettings,
         String collectionName ) throws InvalidInputException
@@ -1621,6 +1642,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
                     CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
             }
+            
+            //Finally unset SocialMediaTokens
+            removeSocialMediaTokens( unitSettings, collection );
+            
         } catch ( ProfileNotFoundException e ) {
             throw new InvalidInputException( "Profile not found for entityType : " + entityType + " and entityID : " + entityId );
         }
