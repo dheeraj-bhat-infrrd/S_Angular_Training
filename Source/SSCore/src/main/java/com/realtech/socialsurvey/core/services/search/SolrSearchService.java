@@ -350,5 +350,11 @@ public interface SolrSearchService
 
 
     void removeSocialPostFromSolr( String postMongoId ) throws SolrException, InvalidInputException;
+
+
+    public SolrDocumentList findUsersInBranch( long branchId, int startIndex, int batchSize ) throws SolrException;
+
+
+    void updateRegionsForMultipleUsers( Map<Long, List<Long>> regionsMap ) throws InvalidInputException, SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
