@@ -19,6 +19,7 @@
 <c:otherwise>
 </c:otherwise>
 </c:choose>
+<div id="payment-data-container">
     <div class="payment-details-wrapper">
     	<div id="acc-type-payment" class="acc-type-payment">
     	<div><div class="float-right popup-close-icn payment-close"></div></div>
@@ -94,7 +95,8 @@
 					</form>
 				</div>
         </div>
-    </div>  
+    </div> 
+    </div> 
     <c:if test="${ paymentChange == 1 || paidUpgrade == 1 }">
     		</div>
     	</div>
