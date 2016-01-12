@@ -1761,7 +1761,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.doReturn( new Region() ).when( organizationManagementServiceImpl )
             .getDefaultRegionForCompany( Mockito.any( Company.class ) );
         Mockito.when( regionDao.findById( Mockito.eq( Region.class ), Mockito.anyLong() ) ).thenReturn( new Region() );
-        Mockito.doNothing().when( userProfileDao ).updateRegionIdForParticularBranch( Mockito.anyLong(), Mockito.anyLong() );
+        Mockito.doNothing().when( userProfileDao ).updateRegionIdForBranch( Mockito.anyLong(), Mockito.anyLong() );
         Mockito.when( solrSearchService.findUsersInBranch( Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt() ) )
             .thenReturn( null );
         Mockito

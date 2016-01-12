@@ -42,13 +42,13 @@ public class UserProfileDaoImplTest
     @Test ( expected = InvalidInputException.class)
     public void testUpdateRegionIdForParticularBranchForInvalidRegionId() throws InvalidInputException
     {
-        userProfileDaoImpl.updateRegionIdForParticularBranch( 0l, 1l );
+        userProfileDaoImpl.updateRegionIdForBranch( 0l, 1l );
     }
     
     
     @Test ( expected = InvalidInputException.class)
     public void testUpdateRegionIdForParticularBranchForInvalidBranchId() throws InvalidInputException
     {
-        userProfileDaoImpl.updateRegionIdForParticularBranch( 1l, 0l );
+        userProfileDaoImpl.updateRegionIdForBranch( 1l, 0l );
     }
 }

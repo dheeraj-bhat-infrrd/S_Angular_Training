@@ -74,5 +74,5 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
      * @param regionId
      * @throws InvalidInputException 
      */
-    public void updateRegionIdForParticularBranch( long branchId, long regionId ) throws InvalidInputException;
+    public void updateRegionIdForBranch( long branchId, long regionId ) throws InvalidInputException;
 }
