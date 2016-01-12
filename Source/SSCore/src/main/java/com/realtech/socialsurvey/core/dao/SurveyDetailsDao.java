@@ -9,6 +9,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -158,9 +159,6 @@ public interface SurveyDetailsDao
         String colunmName, long columnValue, boolean fetchAbusive );
 
 
-    public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate );
-
-
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 
 
@@ -194,7 +192,7 @@ public interface SurveyDetailsDao
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
 
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId );
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId  , boolean fetchAbusive );
 
 
     public void updateSurveyAsUnderResolution( String surveyId );
@@ -222,4 +220,14 @@ public interface SurveyDetailsDao
 
 
     public SurveyDetails getSurveyBySurveyMongoId( String surveyMongoId );
+
+
+    /**
+     * Method to remove surveys from mongo by SurveyPreInitiation
+     * @param surveys
+     */
+    public void deleteSurveysBySurveyPreInitiation( List<SurveyPreInitiation> surveys );
+
+
+    public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException;
 }

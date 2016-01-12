@@ -4614,7 +4614,7 @@ $(document).on('click', '.v-icn-rem-user', function() {
 		return;
 	}
 
-	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+	var userId = $(this).closest('.user-row').find('.fetch-name').attr('data-user-id');
     var adminId = '${user.userId}';
     confirmDeleteUser(userId, adminId);
 });

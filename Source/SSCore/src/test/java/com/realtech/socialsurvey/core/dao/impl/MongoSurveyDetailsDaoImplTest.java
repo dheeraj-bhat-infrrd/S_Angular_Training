@@ -1,9 +1,10 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -15,17 +16,16 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Query;
+
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 
 
 public class MongoSurveyDetailsDaoImplTest
@@ -166,6 +166,7 @@ public class MongoSurveyDetailsDaoImplTest
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Test
     public void testGetRatingForPastNdaysWithIncludeZillowReviewsAsTrueWhenReviewCountIsZero()
     {
@@ -180,6 +181,7 @@ public class MongoSurveyDetailsDaoImplTest
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Test
     public void testGetRatingForPastNdaysWithIncludeZillowReviewsAsTrueWhenResultsIsNull()
     {
@@ -190,5 +192,12 @@ public class MongoSurveyDetailsDaoImplTest
         double average = mongoSurveyDetailsDaoImpl.getRatingForPastNdays( CommonConstants.COMPANY_ID_COLUMN, 2, 90, false,
             false, true, 10, 40 );
         assertEquals( "Average does not match expected", 4, average, 0 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDeleteIncompleteSurveysForAgent() throws InvalidInputException
+    {
+        mongoSurveyDetailsDaoImpl.deleteIncompleteSurveysForAgent( 0l );
     }
 }
