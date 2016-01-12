@@ -113,6 +113,7 @@
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
     <div id="report-abuse-overlay" class="overlay-main hide">
+     <div id="report-abuse-pop-up">
     	<div class="overlay-disable-wrapper">
     		<div id="overlay-header" class="ol-header"><spring:message code="label.publicprofile.reportabuse.title.key"/></div>
     		<div class="ol-content">
@@ -124,6 +125,7 @@
     			<div class="rpa-btn rpa-report-btn ol-btn cursor-pointer float-left"><spring:message code="label.report.key"/></div>
     			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer float-right"><spring:message code="label.cancel.key"/></div>
     		</div>
+    	</div>
     	</div>
     </div>
     <div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
