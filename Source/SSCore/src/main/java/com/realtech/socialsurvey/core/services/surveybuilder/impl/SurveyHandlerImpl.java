@@ -146,6 +146,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${SOCIAL_POST_REMINDER_INTERVAL}")
     private int socialPostReminderInterval;
 
+    @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
+    private int maxSocialPostReminderInterval;
+
     @Autowired
     private Utils utils;
 
@@ -582,6 +585,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( reminderInterval == 0 ) {
             reminderInterval = socialPostReminderInterval;
         }
+
+        if ( reminderInterval > maxSocialPostReminderInterval ) {
+            reminderInterval = maxSocialPostReminderInterval;
+        }
+
         incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail( companyId, reminderInterval,
             maxReminders );
         LOG.info( "finished." );

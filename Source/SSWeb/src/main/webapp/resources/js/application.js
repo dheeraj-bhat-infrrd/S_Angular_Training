@@ -5022,6 +5022,7 @@ function paintSurveyPage(jsonData) {
 //	} else {
 //		$('#ggl-btn').remove();
 //	}
+	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
 
 	if (yelpEnabled) {
 		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
@@ -5042,7 +5043,7 @@ function paintSurveyPage(jsonData) {
 	}
 	
 	if (realtorEnabled) {
-		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink));
+		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink)+"#reviews-section");
 	} else {
 		$('#realtor-btn').remove();
 	}
@@ -5441,18 +5442,11 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
-//		$('#icn-fb-shr').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
-//		$('#icn-google-shr').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
-//		$('#icn-linkedin-shr').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey&source=");
-//		$('#icn-twitter-shr').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
 		var fmt_rating = Number(rating).toFixed(1);
-		$('#linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+"&source=");
-		$('#twitter-btn').attr("href","https://twitter.com/intent/tweet?text="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&url='"+agentFullProfileLink+"'");
-		$('#fb-btn').attr("href","https://www.facebook.com/dialog/feed?app_id="+fb_app_id+"&link="+agentFullProfileLink+"'&description="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&redirect_uri=https://www.facebook.com");
-		$('#google-btn').attr("data-contenturl",agentFullProfileLink);
-		$('#google-btn').attr("data-clientid",google_plus_app_id);
-		$('#google-btn').attr("data-prefilltext",fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback);    
-		$('#google-btn').attr("data-calltoactionurl", agentFullProfileLink);
+		$('#linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&source=");
+		$('#twitter-btn').attr("href","https://twitter.com/intent/tweet?text="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + ".&url='"+agentFullProfileLink+"'");
+		$('#fb-btn').attr("href","https://www.facebook.com/dialog/feed?app_id="+fb_app_id+"&link="+agentFullProfileLink+"&description="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&redirect_uri=https://www.facebook.com");
+
 		$('#content-head').html('Survey Completed');
 			if (mood == 'Great')
 				$('#content').html(happyTextComplete);

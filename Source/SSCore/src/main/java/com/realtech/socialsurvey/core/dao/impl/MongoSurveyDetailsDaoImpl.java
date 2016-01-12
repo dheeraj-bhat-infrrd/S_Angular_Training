@@ -16,6 +16,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -72,6 +73,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+    @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
+    private int maxSocialPostReminderInterval;
 
 
     /*
@@ -1384,6 +1388,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     private Date getNdaysBackDate( int noOfDays )
     {
         Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.HOUR_OF_DAY, 0 );
+        calendar.add( Calendar.MINUTE, 0 );
+        calendar.add( Calendar.SECOND, 0 );
+        calendar.add( Calendar.MILLISECOND, 0 );
         calendar.add( Calendar.DATE, noOfDays * ( -1 ) );
         Date startDate = calendar.getTime();
         return startDate;
@@ -1417,7 +1425,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
         Update update = new Update();
         Date date = new Date();
-        //        update.set( CommonConstants.MODIFIED_ON_COLUMN, date );
         update.set( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST, date );
         update.push( CommonConstants.REMINDERS_FOR_SOCIAL_POSTS, date );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
@@ -1431,11 +1438,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         LOG.info( "Method to get list of customers who have not yet shared their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() started." );
         Date cutOffDate = getNdaysBackDate( surveyReminderInterval );
+        Date cutOffCompletionDate = getNdaysBackDate( maxSocialPostReminderInterval );
         Query query = new Query();
 
         query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
-            new Criteria().orOperator( Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).lte( cutOffDate ),
-                Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ),
+//            new Criteria().orOperator( Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).lte( cutOffDate ),
+//            Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ),
+            Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( cutOffCompletionDate ),
             Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
             Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ),
             Criteria.where( CommonConstants.MOOD_COLUMN ).is( CommonConstants.SURVEY_MOOD_GREAT ) ) );
