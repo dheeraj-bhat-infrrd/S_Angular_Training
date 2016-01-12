@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -17,6 +18,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
@@ -184,14 +186,31 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 	
 	@Override
 	public void deleteSurveysWithIds(Set<Long> incompleteSurveyIds) {
-		LOG.info("Method getIncompleteSurveysCount() started");
+		LOG.info("Method deleteSurveysWithIds() started");
+		//First get the list of surveys that will be deleted
 		String deleteQuery = "delete from SurveyPreInitiation where surveyPreIntitiationId in (:incompleteSurveyIds)";
 		Query query = getSession().createQuery(deleteQuery);
 		query.setParameterList("incompleteSurveyIds", incompleteSurveyIds);
 		query.executeUpdate();
 	}
 	
-	@Override
+	   /**
+     * Method to fetch preinitiated surveys by IDs
+     * 
+     * @param incompleteSurveyIds
+     * @return
+     */
+	@SuppressWarnings ( "unchecked")
+    @Override
+	public List<SurveyPreInitiation> fetchSurveysByIds(Set<Long> incompleteSurveyIds) {
+	    LOG.info( "Method fetchSurveysByIds() started" );
+	    Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+	    criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, incompleteSurveyIds ) );
+	    return criteria.list();
+	}
+	
+	@SuppressWarnings ( "unchecked")
+    @Override
 	public long getIncompleteSurveyCount(long companyId, long agentId, int status, Timestamp startDate, Timestamp endDate, Set<Long> agentIds){
 		LOG.info("getting incomplete survey count");
 		StringBuilder queryBuilder = new StringBuilder("SELECT COUNT(*) AS COUNT FROM SURVEY_PRE_INITIATION WHERE ");
@@ -356,4 +375,24 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 		return aggregateResult;
 	}
+	
+	/**
+	 * Method to delete SurveyPreInitiation records for a specific agent ID
+	 * @param agentId
+	 * @throws InvalidInputException
+	 */
+	@Override
+    public void deletePreInitiatedSurveysForAgent( long agentId ) throws InvalidInputException
+    {
+        LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " started." );
+        //Check if the ID is valid
+        if ( agentId <= 0l ) {
+            throw new InvalidInputException( "Invalid agent ID : " + agentId );
+        }
+        String deleteQuery = "delete from SurveyPreInitiation where agentId = (:deletedAgentId)";
+        Query query = getSession().createQuery( deleteQuery );
+        query.setParameter( "deletedAgentId", agentId );
+        query.executeUpdate();
+        LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " finished." );
+    }
 }

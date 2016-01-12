@@ -165,7 +165,7 @@ public interface CommonConstants
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
     public static final String BATCH_TYPE_COLUMN = "batchType";
     public static final String SOURCE_COLUMN = "source";
-    
+    public static final String SURVEY_PREINITIATION_ID_COLUMN = "surveyPreIntitiationId";
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";
 
@@ -237,6 +237,7 @@ public interface CommonConstants
     public static final String EDITABLE_SURVEY_COLUMN = "editable";
     public static final String AGREE_SHARE_COLUMN = "agreedToShare";
     public static final String SOCIAL_MEDIA_POST_DETAILS_COLUMN = "socialMediaPostDetails";
+    public static final String SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN = "socialMediaPostResponseDetails";
     public static final String SUBSCRIPTION_ID_SOURCE_BRAINTREE = "Braintree";
     public static final String SURVEY_ID_COLUMN = "surveyId";
     public static final String ABUSE_REPORTERS_COLUMN = "abuseReporters";

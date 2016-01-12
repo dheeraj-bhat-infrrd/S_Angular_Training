@@ -3,13 +3,12 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Criteria;
@@ -31,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
 @Component ( "userProfile")
@@ -500,4 +500,30 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         return userList;
     }
 
+
+    /**
+     * Method to update regionId for a specific branchId in user profiles
+     * @param branchId
+     * @param regionId
+     * @throws InvalidInputException 
+     */
+    @Override
+    public void updateRegionIdForBranch( long branchId, long regionId ) throws InvalidInputException
+    {
+        LOG.info( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE started." );
+        //Check if regionId is invalid
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "Invalid regionId : " + regionId );
+        }
+
+        if ( branchId <= 0l ) {
+            throw new InvalidInputException( "Invalid branchId : " + branchId );
+        }
+        String queryStr = "UPDATE USER_PROFILE SET REGION_ID = ? WHERE BRANCH_ID = ?";
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameter( 0, regionId );
+        query.setParameter( 1, branchId );
+        query.executeUpdate();
+        LOG.info( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE finished." );
+    }
  }

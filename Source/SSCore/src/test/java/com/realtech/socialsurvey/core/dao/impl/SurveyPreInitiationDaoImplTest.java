@@ -60,4 +60,10 @@ public class SurveyPreInitiationDaoImplTest
         surveyPreInitiationDaoImpl.getIncompletSurveyAggregationCount( 1, 10l, 1, new Timestamp( 0 ), new Timestamp( 0 ), null,
             "" );
     }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void deletePreInitiatedSurveysForAgentTestInvalidAgentId() throws InvalidInputException
+    {
+        surveyPreInitiationDaoImpl.deletePreInitiatedSurveysForAgent( 0l );
+    }
 }
