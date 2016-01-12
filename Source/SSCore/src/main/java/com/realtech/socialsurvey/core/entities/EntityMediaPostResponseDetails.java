@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
 /**
  * 
  * @author rohit
@@ -7,41 +9,41 @@ package com.realtech.socialsurvey.core.entities;
  */
 public class EntityMediaPostResponseDetails
 {
-    private SocialMediaPostResponse facebookPostResponse;
+    private List<SocialMediaPostResponse> facebookPostResponseList;
     
-    private SocialMediaPostResponse twitterPostResponse;
+    private List<SocialMediaPostResponse> twitterPostResponseList;
     
-    private SocialMediaPostResponse linkedinPostResponse;
+    private List<SocialMediaPostResponse> linkedinPostResponseList;
+
     
-
-    public SocialMediaPostResponse getFacebookPostResponse()
+    public List<SocialMediaPostResponse> getFacebookPostResponseList()
     {
-        return facebookPostResponse;
+        return facebookPostResponseList;
     }
 
-    public void setFacebookPostResponse( SocialMediaPostResponse facebookPostResponse )
+    public void setFacebookPostResponseList( List<SocialMediaPostResponse> facebookPostResponseList )
     {
-        this.facebookPostResponse = facebookPostResponse;
+        this.facebookPostResponseList = facebookPostResponseList;
     }
 
-    public SocialMediaPostResponse getTwitterPostResponse()
+    public List<SocialMediaPostResponse> getTwitterPostResponseList()
     {
-        return twitterPostResponse;
+        return twitterPostResponseList;
     }
 
-    public void setTwitterPostResponse( SocialMediaPostResponse twitterPostResponse )
+    public void setTwitterPostResponseList( List<SocialMediaPostResponse> twitterPostResponseList )
     {
-        this.twitterPostResponse = twitterPostResponse;
+        this.twitterPostResponseList = twitterPostResponseList;
     }
 
-    public SocialMediaPostResponse getLinkedinPostResponse()
+    public List<SocialMediaPostResponse> getLinkedinPostResponseList()
     {
-        return linkedinPostResponse;
+        return linkedinPostResponseList;
     }
 
-    public void setLinkedinPostResponse( SocialMediaPostResponse linkedinPostResponse )
+    public void setLinkedinPostResponseList( List<SocialMediaPostResponse> linkedinPostResponseList )
     {
-        this.linkedinPostResponse = linkedinPostResponse;
+        this.linkedinPostResponseList = linkedinPostResponseList;
     }
 
 }
