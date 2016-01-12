@@ -7397,6 +7397,17 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
     border-radius: 3px;
     cursor: pointer;
 }
+.enc-state-icon {
+    background-color: rgb(92, 199, 239);
+    color: #fff;
+    width:100px;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    margin-right: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
 
 .sq-btn-post-social-btn {
 	margin: 10px auto;

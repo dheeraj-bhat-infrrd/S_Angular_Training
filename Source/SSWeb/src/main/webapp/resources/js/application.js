@@ -10089,4 +10089,32 @@ function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 	});
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-main').show();
-}
+};
+$(document).on('click', '#en-dry-run', function() {
+	disableBodyScroll();
+	callAjaxGET("./dryrun.do", function(data) {
+		$('#overlay-text').html(data);
+		$('#overlay-continue').show();
+		$('#overlay-continue').html("Submit");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-header').html("Start DryRun")
+		$('#overlay-main').show();
+	}, true);
+	/*
+	 * callAjaxGET("./sendsurveyinvitation.do", function(data) {
+		$('#overlay-send-survey').html(data);
+		if ($("#welcome-popup-invite").length) {
+			$('#overlay-send-survey').removeClass("hide");
+			$('#overlay-send-survey').show();
+		}
+	}, true);
+	 * 
+	 * $('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Submit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Start DryRun");
+	$('#overlay-text').html("Are you sure you want to delete user ?");
+	$('#overlay-continue').attr("onclick", "");*/
+});
+

@@ -1730,6 +1730,13 @@ public class SocialManagementController
         LOG.info( "Method sendSurveyInvite() called from SocialManagementController" );
         return JspResolver.HEADER_SURVEY_INVITE;
     }
+    
+    @RequestMapping ( value = "/dryrun")
+    public String dryRun()
+    {
+        LOG.info( "Method dryrun called" );
+        return JspResolver.DRY_RUN;
+    }
 
 
     @RequestMapping ( value = "/sendsurveyinvitationadmin")
