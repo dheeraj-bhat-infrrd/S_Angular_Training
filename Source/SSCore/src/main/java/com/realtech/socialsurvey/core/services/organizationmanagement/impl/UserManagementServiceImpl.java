@@ -3201,4 +3201,30 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return userIdReviewCountMap;
     }
+
+    /**
+     * Method to search users in company by criteria
+     * @param queries
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    @Transactional
+    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Method searchUsersInCompanyByMultipleCriteria started." );
+
+        if ( queries == null || queries.isEmpty() ) {
+            throw new InvalidInputException( "The search criteria cannot be empty" );
+        }
+        List<User> users = userDao.findByKeyValueAscending( User.class, queries, CommonConstants.FIRST_NAME );
+
+        if ( users == null || users.isEmpty() ) {
+            throw new NoRecordsFetchedException( "No users found for the specified criteria" );
+        }
+        LOG.info( "Method searchUsersInCompanyByMultipleCriteria finished." );
+        return users;
+    }
 }
