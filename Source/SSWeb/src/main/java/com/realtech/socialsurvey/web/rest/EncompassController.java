@@ -46,7 +46,7 @@ public class EncompassController
         try {
             try {
                 List<OrganizationUnitSettings> companyList = organizationManagementService
-                    .getOrganizationUnitSettingsForCRMSource( CommonConstants.CRM_SOURCE_DOTLOOP,
+                    .getOrganizationUnitSettingsForCRMSource( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS,
                         CommonConstants.COMPANY_SETTINGS_COLLECTION );
 
                 List<EncompassCrmInfo> crmInfoList = new ArrayList<EncompassCrmInfo>();
