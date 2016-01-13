@@ -3201,4 +3201,33 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return userIdReviewCountMap;
     }
+
+
+    /**
+     * Method to get User Profile for user id where user is agent
+     * @throws InvalidInputException
+     * */
+    @Override
+    @Transactional
+    public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException
+    {
+        if ( userId == 0 ) {
+            LOG.error( "Invalid user id is passed in getAgentUserProfileForUserId" );
+            throw new InvalidInputException( "Invalid user id is passed in getAgentUserProfileForUserId" );
+        }
+        UserProfile agentUserProfile = null;
+        User user = userDao.findById( User.class, userId );
+        for ( UserProfile userProfile : user.getUserProfiles() ) {
+            if ( userProfile.getAgentId() == userId && userProfile.getIsPrimary() == CommonConstants.YES
+                && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                agentUserProfile = userProfile;
+                break;
+            }
+            if ( userProfile.getAgentId() == userId
+                && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                agentUserProfile = userProfile;
+            }
+        }
+        return agentUserProfile;
+    }
 }

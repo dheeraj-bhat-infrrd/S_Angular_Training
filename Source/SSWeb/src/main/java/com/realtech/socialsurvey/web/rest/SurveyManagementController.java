@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -1531,14 +1532,19 @@ public class SurveyManagementController
                         }
                     }
                 }
+                branchSettings = organizationManagementService.getBranchSettings( survey.getBranchId() );
+                regionSettings = organizationManagementService.getRegionSettings( survey.getRegionId() );
             } else {
                 surveyAndStage.put( "agentName", solrSearchService.getUserDisplayNameById( agentId ) );
                 surveyAndStage.put( "customerEmail", customerEmail );
                 surveyAndStage.put( "customerFirstName", firstName );
                 surveyAndStage.put( "customerLastName", lastName );
+                UserProfile userProfile = userManagementService.getAgentUserProfileForUserId( agentId );
+                if( userProfile != null){
+                    branchSettings = organizationManagementService.getBranchSettings( userProfile.getBranchId() );
+                    regionSettings = organizationManagementService.getRegionSettings( userProfile.getRegionId() );
+                }
             }
-            branchSettings = organizationManagementService.getBranchSettings( survey.getBranchId() );
-            regionSettings = organizationManagementService.getRegionSettings( survey.getRegionId() );
         } catch ( SolrException e ) {
             LOG.error( "SolrException caught in triggerSurvey(). Details are " + e );
             throw e;
