@@ -4128,7 +4128,9 @@ public class ProfileManagementController
                 for ( SolrDocument solrDocument : results ) {
                     userIds.add( (Long) solrDocument.getFieldValue( "userId" ) );
                 }
-                users = userManagementService.getMultipleUsersByUserId( userIds );
+                //Check if userIds are not empty
+                if(!userIds.isEmpty())
+                    users = userManagementService.getMultipleUsersByUserId( userIds );
 
                 userList.setUsers( users );
                 userList.setUserFound( results.getNumFound() );
