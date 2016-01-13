@@ -1539,10 +1539,14 @@ public class SurveyManagementController
                 surveyAndStage.put( "customerEmail", customerEmail );
                 surveyAndStage.put( "customerFirstName", firstName );
                 surveyAndStage.put( "customerLastName", lastName );
-                UserProfile userProfile = userManagementService.getAgentUserProfileForUserId( agentId );
-                if( userProfile != null){
-                    branchSettings = organizationManagementService.getBranchSettings( userProfile.getBranchId() );
-                    regionSettings = organizationManagementService.getRegionSettings( userProfile.getRegionId() );
+                try {
+                    UserProfile userProfile = userManagementService.getAgentUserProfileForUserId( agentId );
+                    if ( userProfile != null ) {
+                        branchSettings = organizationManagementService.getBranchSettings( userProfile.getBranchId() );
+                        regionSettings = organizationManagementService.getRegionSettings( userProfile.getRegionId() );
+                    }
+                } catch ( Exception e ) {
+                    LOG.error( "Exception occurred while fetching user profile for agent id " + agentId + ".Reason :", e );
                 }
             }
         } catch ( SolrException e ) {

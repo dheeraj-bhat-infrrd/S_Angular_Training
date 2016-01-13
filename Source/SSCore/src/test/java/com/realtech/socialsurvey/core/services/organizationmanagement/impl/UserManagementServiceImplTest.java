@@ -866,4 +866,19 @@ public class UserManagementServiceImplTest
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
         userManagementServiceImpl.getActiveUserByEmailAndCompany( 1l, "test" );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentUserProfileForUserIdWithInvalidUserId() throws InvalidInputException
+    {
+        userManagementServiceImpl.getAgentUserProfileForUserId( 0 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentUserProfileForUserIdWhenUserDoesNotExist() throws InvalidInputException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.getAgentUserProfileForUserId( 2 );
+    }
 }

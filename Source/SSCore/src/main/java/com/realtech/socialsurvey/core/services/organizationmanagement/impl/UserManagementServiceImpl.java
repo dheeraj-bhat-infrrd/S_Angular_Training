@@ -3217,6 +3217,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         UserProfile agentUserProfile = null;
         User user = userDao.findById( User.class, userId );
+        if ( user == null ) {
+            LOG.error( "User does not exist for user id : " + userId );
+            throw new InvalidInputException( "User does not exist for user id : " + userId );
+        }
         for ( UserProfile userProfile : user.getUserProfiles() ) {
             if ( userProfile.getAgentId() == userId && userProfile.getIsPrimary() == CommonConstants.YES
                 && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
