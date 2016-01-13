@@ -5886,25 +5886,8 @@ $('.sq-pts-dgreen').click(function() {
 	$("#next-scale").removeClass("btn-com-disabled");
 });
 
-$('#ylp-btn').click(function(e) {
-	updateSharedOn("yelp", agentId, customerEmail);
-});
-
 $('#ggl-btn').click(function(e) {
 	updateSharedOn("google", agentId, customerEmail);
-});
-
-$('#zillow-btn').click(function(e) {
-	updateSharedOn("zillow", agentId, customerEmail);
-});
-
-$('#lt-btn').click(function(e) {
-	updateSharedOn("lendingtree", agentId, customerEmail);
-});
-
-$('#realtor-btn').click(function(e) {
-	//e.stopImmediatePropagation();
-	updateSharedOn("realtor", agentId, customerEmail);
 });
 
 $('#shr-post-chk-box').click(function(){

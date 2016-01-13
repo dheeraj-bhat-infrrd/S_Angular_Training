@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -2245,6 +2246,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Returning swear list" );
         String[] swearList = new Gson().fromJson( SWEAR_WORDS, String[].class );
         return swearList;
+    }
+
+
+    @Override
+    public double getFormattedSurveyScore( double surveyScore )
+    {
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
+        try {
+            //get formatted survey score using rating format
+            surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
+        } catch ( NumberFormatException e ) {
+            LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
+        }
+        return surveyScore;
     }
 }
 // JIRA SS-119 by RM-05:EOC

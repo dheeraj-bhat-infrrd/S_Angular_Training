@@ -929,10 +929,10 @@ public interface CommonConstants
 
     // Social Post Connection Buttons
     public static final String REALTOR_LABEL = "REALTOR.COM";
-    public static final String LENDING_TREE_LABEL = "LENDING_TREE";
+    public static final String LENDING_TREE_LABEL = "LENDING TREE";
     public static final String ZILLOW_LABEL = "ZILLOW";
     public static final String YELP_LABEL = "YELP!";
-    public static final String GOOGLE_PLUS_LABEL = "=GOOGLE+";
+    public static final String GOOGLE_PLUS_LABEL = "GOOGLE+";
     public static final String LINKEDIN_LABEL = "LINKEDIN";
     public static final String TWITTER_LABEL = "TWITTER";
     public static final String FACEBOOK_LABEL = "FACEBOOK";

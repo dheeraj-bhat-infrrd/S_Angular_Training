@@ -75,7 +75,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
     private int maxSocialPostReminderInterval;
 
-
     /*
      * Method to fetch survey details on the basis of agentId and customer email.
      */
@@ -1451,13 +1450,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         int maxReminders )
     {
         LOG.info( "Method to get list of customers who have not yet shared their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() started." );
-        Date cutOffDate = getNdaysBackDate( surveyReminderInterval );
         Date cutOffCompletionDate = getNdaysBackDate( maxSocialPostReminderInterval );
         Query query = new Query();
 
-        query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
-//            new Criteria().orOperator( Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).lte( cutOffDate ),
-//            Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ),
+        query.addCriteria( new Criteria().andOperator(
+            Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
             Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( cutOffCompletionDate ),
             Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
             Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ),

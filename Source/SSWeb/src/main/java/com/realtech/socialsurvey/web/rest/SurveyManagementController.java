@@ -1640,21 +1640,27 @@ public class SurveyManagementController
 
         // Fetching Yelp Url
         try {
-            if ( agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getYelpToken() != null
+                && agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
                 surveyAndStage.put( "yelpEnabled", true );
                 surveyAndStage.put( "yelpLink", agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
             } else {
                 // Adding Yelp Url of the closest in hierarchy connected with Yelp.
-                if ( branchSettings != null
+                if ( branchSettings != null && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
                     surveyAndStage.put( "yelpEnabled", true );
                     surveyAndStage.put( "yelpLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
                         .getYelpToken().getYelpPageLink() );
-                } else if ( regionSettings != null
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getYelpToken() != null
                     && regionSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
                     surveyAndStage.put( "yelpEnabled", true );
                     surveyAndStage.put( "yelpLink", regionSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
-                } else if ( companySettings != null
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getYelpToken() != null
                     && companySettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
                     surveyAndStage.put( "yelpEnabled", true );
                     surveyAndStage.put( "yelpLink", companySettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
@@ -1678,23 +1684,30 @@ public class SurveyManagementController
 
         // Fetching Zillow Url
         try {
-            if ( agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getZillowToken() != null
+                && agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
                 surveyAndStage.put( "zillowEnabled", true );
                 surveyAndStage.put( "zillowLink", agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
             } else {
                 // Adding Zillow Url of the closest in hierarchy connected with Zillow.
                 if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getZillowToken() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getZillowToken()
                         .getZillowProfileLink() != null ) {
                     surveyAndStage.put( "zillowEnabled", true );
                     surveyAndStage.put( "zillowLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
                         .getZillowToken().getZillowProfileLink() );
-                } else if ( regionSettings != null
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getZillowToken() != null
                     && regionSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
                     surveyAndStage.put( "zillowEnabled", true );
                     surveyAndStage.put( "zillowLink", regionSettings.getSocialMediaTokens().getZillowToken()
                         .getZillowProfileLink() );
-                } else if ( companySettings != null
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getZillowToken() != null
                     && companySettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
                     surveyAndStage.put( "zillowEnabled", true );
                     surveyAndStage.put( "zillowLink", companySettings.getSocialMediaTokens().getZillowToken()
@@ -1708,24 +1721,31 @@ public class SurveyManagementController
 
         // Fetching LendingTree Url
         try {
-            if ( agentSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getLendingTreeToken() != null
+                && agentSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
                 surveyAndStage.put( "lendingtreeEnabled", true );
                 surveyAndStage.put( "lendingtreeLink", agentSettings.getSocialMediaTokens().getLendingTreeToken()
                     .getLendingTreeProfileLink() );
             } else {
-             // Adding LendingTree Url of the closest in hierarchy connected with LendingTree.
+                // Adding LendingTree Url of the closest in hierarchy connected with LendingTree.
                 if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getLendingTreeToken() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getLendingTreeToken()
                         .getLendingTreeProfileLink() != null ) {
                     surveyAndStage.put( "lendingtreeEnabled", true );
                     surveyAndStage.put( "lendingtreeLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
                         .getLendingTreeToken().getLendingTreeProfileLink() );
-                } else if ( regionSettings != null
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getLendingTreeToken() != null
                     && regionSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
                     surveyAndStage.put( "lendingtreeEnabled", true );
                     surveyAndStage.put( "lendingtreeLink", regionSettings.getSocialMediaTokens().getLendingTreeToken()
                         .getLendingTreeProfileLink() );
-                } else if ( companySettings != null
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getLendingTreeToken() != null
                     && companySettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() != null ) {
                     surveyAndStage.put( "lendingtreeEnabled", true );
                     surveyAndStage.put( "lendingtreeLink", companySettings.getSocialMediaTokens().getLendingTreeToken()
@@ -1738,24 +1758,31 @@ public class SurveyManagementController
         }
 
         try {
-            if ( agentSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
+            if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                && agentSettings.getSocialMediaTokens().getRealtorToken() != null
+                && agentSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
                 surveyAndStage.put( "realtorEnabled", true );
                 surveyAndStage.put( "realtorLink", agentSettings.getSocialMediaTokens().getRealtorToken()
                     .getRealtorProfileLink() );
             } else {
-             // Adding Realtor Url of the closest in hierarchy connected with Realtor.
+                // Adding Realtor Url of the closest in hierarchy connected with Realtor.
                 if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
+                    && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getRealtorToken() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getRealtorToken()
                         .getRealtorProfileLink() != null ) {
                     surveyAndStage.put( "realtorEnabled", true );
                     surveyAndStage.put( "realtorLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
                         .getRealtorToken().getRealtorProfileLink() );
-                } else if ( regionSettings != null
+                } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+                    && regionSettings.getSocialMediaTokens().getRealtorToken() != null
                     && regionSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
                     surveyAndStage.put( "realtorEnabled", true );
                     surveyAndStage.put( "realtorLink", regionSettings.getSocialMediaTokens().getRealtorToken()
                         .getRealtorProfileLink() );
-                } else if ( companySettings != null
+                } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                    && companySettings.getSocialMediaTokens().getRealtorToken() != null
                     && companySettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() != null ) {
                     surveyAndStage.put( "realtorEnabled", true );
                     surveyAndStage.put( "realtorLink", companySettings.getSocialMediaTokens().getRealtorToken()
