@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

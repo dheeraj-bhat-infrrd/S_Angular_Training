@@ -211,14 +211,14 @@
 						<i><span id="content" class="sq-ques-txt"></span></i>
 					</div>
 					<div id="social-post-links" class="share-social-link-cont hide">
-						<a id="realtor-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.REALTOR_COM.txt"/></a>
-						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.LENDING_TREE.txt"/></a>
-						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.ZILLOW.txt"/></a>
-						<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.YELP.txt"/></a>
-						<a id="google-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.GOOGLE_PLUS.txt"/></a>
-						<a id="linkedin-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.LINKEDIN.txt"/></a>
-						<a id="twitter-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.TWITTER.txt"/></a>
-						<a id="fb-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.FACEBOOK.txt"/></a>
+						<a id="realtor-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.realtor_com.txt"/></a>
+						<a id="lt-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.lending_tree.txt"/></a>
+						<a id="zillow-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.zillow.txt"/></a>
+						<a id="ylp-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.yelp.txt"/></a>
+						<a id="google-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.google_plus.txt"/></a>
+						<a id="linkedin-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.linkedin.txt"/></a>
+						<a id="twitter-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.twitter.txt"/></a>
+						<a id="fb-btn" target="_blank" class="sq-btn-continue sq-btn-post-social-btn"><spring:message code="btn.label.facebook.txt"/></a>
 					</div>
 				</div>
 		</div>
