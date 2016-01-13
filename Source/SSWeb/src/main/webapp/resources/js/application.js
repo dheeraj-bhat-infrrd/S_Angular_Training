@@ -10090,16 +10090,7 @@ function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-main').show();
 };
-$(document).on('click', '#en-dry-run', function() {
-	disableBodyScroll();
-	callAjaxGET("./dryrun.do", function(data) {
-		$('#overlay-text').html(data);
-		$('#overlay-continue').show();
-		$('#overlay-continue').html("Submit");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Start DryRun")
-		$('#overlay-main').show();
-	}, true);
+
 	/*
 	 * callAjaxGET("./sendsurveyinvitation.do", function(data) {
 		$('#overlay-send-survey').html(data);
@@ -10116,5 +10107,34 @@ $(document).on('click', '#en-dry-run', function() {
 	$('#overlay-header').html("Start DryRun");
 	$('#overlay-text').html("Are you sure you want to delete user ?");
 	$('#overlay-continue').attr("onclick", "");*/
+
+
+$(document).on('click','#en-dry-save',function(){
+    if($('#en-dry-save').css('display')!='none'){
+    $('#en-dry-enable').show().siblings('div').hide();
+    }
+    $('#en-generate-report').show();
 });
 
+    
+$(document).on('click','#en-dry-enable',function(){
+    if($('#en-dry-enable').css('display')!='none'){
+    $('#en-disconnect').show().siblings('div').hide();
+    }
+});
+$(document).on('click','#en-disconnect',function(){
+    if($('#en-disconnect').css('display')!='none'){
+    $('#en-dry-save').show().siblings('div').hide();
+    }
+});
+
+/*$(document).on('click', '#en-dry-run', function() {
+	disableBodyScroll();
+	callAjaxGET("./dryrun.do", function(data) {
+		$('#overlay-text').html(data);
+		$('#overlay-continue').show();
+		$('#overlay-continue').html("Submit");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-header').html("Start DryRun")
+		$('#overlay-main').show();
+	}, true);*/

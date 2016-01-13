@@ -99,9 +99,18 @@
 							</div>
 						</div>
 					</div>
-					<div>
 					<div id="en-production" class="float-left enc-state-icon cursor-pointer" style="margin-left: 126px;">Test Connection</div>
-					<div id="en-dry-run" class="float-left enc-state-icon cursor-pointer" >Save</div>
+					<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" style="margin-left: 126px;">Generate Report</div>
+					<div>
+
+						<div id="en-dry-save"
+							class="float-left enc-state-icon cursor-pointer">Save</div>
+						<div id="en-dry-enable"
+							class="float-left enc-state-icon cursor-pointer hide"
+							style="display: none;">Enable</div>
+						<div id="en-disconnect"
+							class="float-left enc-state-icon cursor-pointer hide"
+							style="display: none;">Disconnect</div>
 					</div>
 				</form>
 			</div>
