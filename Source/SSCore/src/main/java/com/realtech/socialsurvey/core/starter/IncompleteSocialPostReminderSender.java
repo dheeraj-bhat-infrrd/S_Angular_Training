@@ -1,11 +1,9 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -23,8 +21,6 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.generator.URLGenerator;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
@@ -49,7 +45,9 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
     public static final Logger LOG = LoggerFactory.getLogger( IncompleteSocialPostReminderSender.class );
 
-    private static final String STYLE_ATTR = "align=\"center\"style=\"display:block; width: 200px; height: 47px; line-height: 47px; margin: 25px auto 15px auto;text-decoration:none;background: #009FE3; border-bottom: 2px solid #077faf; color: #fff; text-align: center; border-radius: 3px; font-size: 20px;border: 0;\"";
+    private static final String STYLE_ATTR = "align=\"center\"style=\"display:block; width: 150px; height: 40px; line-height: 40px; margin: 10px auto 10px auto;text-decoration:none;background: #009FE3; border-bottom: 2px solid #077faf; color: #fff; text-align: center; border-radius: 3px; font-size: 15px;border: 0;\"";
+
+    private String fbAppId;
 
 
     @Override
@@ -200,6 +198,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         socialManagementService = (SocialManagementService) jobMap.get( "socialManagementService" );
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
+        fbAppId = (String) jobMap.get( "fbAppId" );
 
     }
 
@@ -210,7 +209,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         long agentId = survey.getAgentId();
         OrganizationUnitSettings agentSettings = userManagementService.getUserSettings( agentId );
         Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
-            .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            .getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( agentId );
         List<OrganizationUnitSettings> companySettings = settingsMap
             .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         List<OrganizationUnitSettings> regionSettings = settingsMap
@@ -334,8 +333,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         OrganizationUnitSettings organizationUnitSettings ) throws InvalidInputException
     {
         LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() started." );
-        Map<String, String> params = new HashMap<>();
-        String fmt_Rating = String.format( "#.#", survey.getScore() );
+        double fmt_Rating = surveyHandler.getFormattedSurveyScore( survey.getScore() );
         String url = "";
         String customerDisplayName = new EmailFormatHelper().getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
             survey.getCustomerLastName() );
@@ -368,7 +366,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                     + organizationUnitSettings.getCompleteProfileUrl();
                 break;
             case CommonConstants.FACEBOOK_LABEL:
-                url += "https://www.facebook.com/dialog/feed?" + survey.getFaceBookShareUrl() + "&link="
+                url += "https://www.facebook.com/dialog/feed?app_id=" + fbAppId + "&link="
                     + organizationUnitSettings.getCompleteProfileUrl() + "&description=" + fmt_Rating + "-star response from "
                     + customerDisplayName + " for " + survey.getAgentName() + " at SocialSurvey - " + survey.getReview()
                     + ".&redirect_uri=https://www.facebook.com";

@@ -73,6 +73,7 @@
 				<entry key="socialManagementService" value-ref="socialManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="fbAppId" value="${FB_CLIENT_ID}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -94,6 +95,7 @@
 				<entry key="applicationBaseUrl" value="${APPLICATION_BASE_URL}" />
 				<entry key="applicationLogoUrl" value="${APPLICATION_LOGO_URL}" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="urlService" value-ref="urlService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -494,7 +496,7 @@
 			<list>
 				<ref bean="sitemapjobdetail" />
 				<ref bean="emailreaderjobdetail" />
-				<!-- <ref bean="incompletesocialpostjobdetail" /> -->
+				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<ref bean="socialfeedingesterjobdetail" />
@@ -517,7 +519,7 @@
 			<list>
 				<ref bean="sitemapgeneratorcron" />
 				<ref bean="emailreadercron" />
-				<!-- <ref bean="incompletesocialpostcron" /> -->
+				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<ref bean="socialfeedingestercron" />
@@ -573,6 +575,8 @@
 	<bean id="crmBatchTrackerService"
 		class="com.realtech.socialsurvey.core.services.crmbatchtracker.impl.CRMBatchTrackerServiceImpl" />
 		
+	<bean id="urlService"
+		class="com.realtech.socialsurvey.core.services.generator.impl.UrlServiceImpl" />
 
 	<!-- Update subscription dependencies -->
 	<bean id="reviseSubscription"

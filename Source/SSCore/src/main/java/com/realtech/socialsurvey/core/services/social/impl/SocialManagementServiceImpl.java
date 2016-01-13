@@ -481,6 +481,74 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
+    /**
+     * Method to get Company, all Region and Branch Settings for an agent
+     * */
+    @Override
+    @Transactional
+    public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( long agentId )
+        throws InvalidInputException
+    {
+        LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started." );
+        User user = userDao.findById( User.class, agentId );
+        Map<String, List<OrganizationUnitSettings>> map = new HashMap<String, List<OrganizationUnitSettings>>();
+        List<OrganizationUnitSettings> companySettings = new ArrayList<>();
+        List<OrganizationUnitSettings> branchSettings = new ArrayList<>();
+        List<OrganizationUnitSettings> regionSettings = new ArrayList<>();
+        Set<Long> branchIds = new HashSet<>();
+        Set<Long> regionIds = new HashSet<>();
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.USER_COLUMN, user );
+        queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+            userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+        List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+        for ( UserProfile userProfile : userProfiles ) {
+            long branchId = userProfile.getBranchId();
+            if ( branchId > 0 ) {
+                Branch branch = userManagementService.getBranchById( branchId );
+                if ( branch != null ) {
+                    if ( branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                        LOG.debug( "This agent belongs to branch id : " + userProfile.getBranchId() );
+                        branchIds.add( userProfile.getBranchId() );
+                    }
+                }
+            }
+            long regionId = userProfile.getRegionId();
+            if ( regionId > 0 ) {
+                Region region = userManagementService.getRegionById( regionId );
+                if ( region != null ) {
+                    if ( region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                        LOG.info( "This agent belongs to region id : " + regionId );
+                        regionIds.add( regionId );
+                    }
+                }
+            }
+        }
+
+        for ( Long branchId : branchIds ) {
+            branchSettings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branchId,
+                CommonConstants.BRANCH_SETTINGS_COLLECTION ) );
+        }
+
+        for ( Long regionId : regionIds ) {
+            regionSettings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
+                CommonConstants.REGION_SETTINGS_COLLECTION ) );
+        }
+
+
+        companySettings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( user.getCompany().getCompanyId(),
+            CommonConstants.COMPANY_SETTINGS_COLLECTION ) );
+
+
+        map.put( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
+        map.put( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
+        map.put( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
+        LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished." );
+
+        return map;
+    }
+
+
     /*
      * Method to get settings of branches, regions and company current user is admin of.
      */
