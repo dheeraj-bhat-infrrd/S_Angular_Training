@@ -936,4 +936,8 @@ public interface CommonConstants
     public static final String LINKEDIN_LABEL = "LINKEDIN";
     public static final String TWITTER_LABEL = "TWITTER";
     public static final String FACEBOOK_LABEL = "FACEBOOK";
+    
+    // Status in mongo for active and inactive records
+    public static final String STATUS_ACTIVE_MONGO = "A";
+    public static final String STATUS_DELETED_MONGO = "D";
 }
