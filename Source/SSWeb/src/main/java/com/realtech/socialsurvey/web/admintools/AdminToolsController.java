@@ -40,13 +40,21 @@ public class AdminToolsController
     private UserManagementService userManagementService;
 
 
+    /**
+     * Controller that returns all the users in a company that match a certain criteria
+     * @param companyId
+     * @param emailId
+     * @param firstName
+     * @param lastName
+     * @return
+     */
     @ResponseBody
     @RequestMapping ( value = "/{companyId}")
     public Response searchUsersInCompany( @PathVariable long companyId, @QueryParam ( value = "emailId") String emailId,
         @QueryParam ( value = "firstName") String firstName, @QueryParam ( value = "lastName") String lastName )
     {
         LOG.info( "Method searchUsersInCompany started for companyId : " + companyId + " emailId : " + emailId
-            + " firstName : " + firstName + " lastName : " + lastName + " started." );
+            + " firstName : " + firstName + " lastName : " + lastName );
         Response response = null;
         try {
             try {
@@ -95,11 +103,27 @@ public class AdminToolsController
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
         }
-        LOG.info( "Method searchUsersInCompany started for companyId : " + companyId + " emailId : " + emailId
-            + " firstName : " + firstName + " lastName : " + lastName + " finished." );
+        LOG.info( "Method searchUsersInCompany finished for companyId : " + companyId + " emailId : " + emailId
+            + " firstName : " + firstName + " lastName : " + lastName );
         return response;
     }
 
+    @ResponseBody
+    @RequestMapping ( value = "/restoreUser/{userId}" )
+    public Response restoreUser( @PathVariable long userId ){
+        LOG.info( "Method restoreUser started for userId : " + userId );
+        Response response = null;
+        //TODO : restore the user
+        /*
+         * 1. Check if any user has loginId = user's emailId.
+         * 2. Set status = 1, set loginId = emailId
+         * 3. Set the status of all user profiles for that user as 1
+         * 4. Add user to Solr
+         * 5. Restore the original profileName and url of user if it's still available
+         */
+        LOG.info( "Method restoreUser finished for userId : " + userId );
+        return response;
+    }
 
     /**
      * Method to get the error response object from base rest exception
