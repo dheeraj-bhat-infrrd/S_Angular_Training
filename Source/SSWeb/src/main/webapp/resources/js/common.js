@@ -610,6 +610,7 @@ function openForgotPasswordPage(){
 
 // Dashboard popup click functions
 function openAuthPage(socialNetwork, isAutoLogin, element) {
+	event.stopPropagation();
 	if(isAutoLogin) {
 		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
 		showToast();

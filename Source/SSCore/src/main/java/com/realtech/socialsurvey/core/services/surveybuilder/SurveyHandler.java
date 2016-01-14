@@ -268,4 +268,7 @@ public interface SurveyHandler
 
 
     public SurveyDetails getSurveyDetails( String surveyMongoId );
+
+
+    public double getFormattedSurveyScore( double surveyScore );
 }

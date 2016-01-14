@@ -26,6 +26,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -51,6 +52,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
     private String applicationBaseUrl;
     private String applicationLogoUrl;
     private BatchTrackerService batchTrackerService;
+    private UrlService urlService;
 
 
     @Override
@@ -177,6 +179,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         applicationBaseUrl = (String) jobMap.get( "applicationBaseUrl" );
         applicationLogoUrl = (String) jobMap.get( "applicationLogoUrl" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
+        urlService = (UrlService) jobMap.get( "urlService" );
     }
 
 
@@ -478,6 +481,13 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                     "\\[Name\\]",
                     emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
                         survey.getCustomerLastName() ) );
+            LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+            try {
+                surveyLink = urlService.shortenUrl( surveyLink );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
+            }
+            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
             mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
             mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
             mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );

@@ -498,5 +498,8 @@ public interface UserManagementService
      */
     public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries ) throws InvalidInputException,
         NoRecordsFetchedException;
+
+
+    public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
