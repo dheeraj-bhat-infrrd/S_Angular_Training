@@ -108,22 +108,39 @@ public class AdminToolsController
         return response;
     }
 
+
+    /**
+     * Method to restore a deleted user
+     * 1. Check if any user has loginId = user's emailId.
+     * 2. Set status = 1, set loginId = emailId
+     * 3. Set the status of all user profiles for that user as 1
+     * 4. Add user to Solr
+     * 6. In mongo, change Status:D to Status:A
+     */
     @ResponseBody
-    @RequestMapping ( value = "/restoreUser/{userId}" )
-    public Response restoreUser( @PathVariable long userId ){
+    @RequestMapping ( value = "/restoreUser/{userId}")
+    public Response restoreUser( @PathVariable long userId )
+    {
         LOG.info( "Method restoreUser started for userId : " + userId );
         Response response = null;
-        //TODO : restore the user
-        /*
-         * 1. Check if any user has loginId = user's emailId.
-         * 2. Set status = 1, set loginId = emailId
-         * 3. Set the status of all user profiles for that user as 1
-         * 4. Add user to Solr
-         * 5. Restore the original profileName and url of user if it's still available
-         */
+        try {
+            try {
+                userManagementService.restoreDeletedUser( userId );
+                response = Response.ok( "UserId " + userId + " was successfully restored." ).build();
+            } catch ( Exception e ) {
+                LOG.error( "Exception occured while restoring user having userId : " + userId + ". Reason : "
+                    + e.getStackTrace() );
+                throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
+                    CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while restoring the user" ), e.getMessage() );
+            }
+        } catch ( BaseRestException e ) {
+            response = getErrorResponse( e );
+        }
+
         LOG.info( "Method restoreUser finished for userId : " + userId );
         return response;
     }
+
 
     /**
      * Method to get the error response object from base rest exception
