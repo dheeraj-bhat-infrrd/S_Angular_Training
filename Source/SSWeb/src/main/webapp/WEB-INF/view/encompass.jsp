@@ -99,9 +99,7 @@
 							</div>
 						</div>
 					</div>
-					<div id="en-production" class="float-left enc-state-icon cursor-pointer" style="margin-left: 126px;">Test Connection</div>
-					<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" style="margin-left: 126px;">Generate Report</div>
-					<div>
+					<div style="margin-left:160px;">
 
 						<div id="en-dry-save"
 							class="float-left enc-state-icon cursor-pointer">Save</div>
@@ -112,6 +110,9 @@
 							class="float-left enc-state-icon cursor-pointer hide"
 							style="display: none;">Disconnect</div>
 					</div>
+					<div id="en-test-connection" class="float-left enc-state-icon cursor-pointer" >Test Connection</div>
+					<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" >Generate Report</div>
+					
 				</form>
 			</div>
 		</div>

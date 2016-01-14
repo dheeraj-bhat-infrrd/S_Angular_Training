@@ -16,11 +16,6 @@
             </div>
             <div class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.duration.key" /></div>
-					<select id="survey-count-days" class="float-left dash-sel-item">
-						<option value="30"><spring:message code="label.duration.one.key" /></option>
-						<option value="60"><spring:message code="label.duration.two.key" /></option>
-						<option value="90" selected><spring:message code="label.duration.three.key" /></option>
-						<option value="365"><spring:message code="label.duration.four.key" /></option>
-					</select>
+					<input id="encompass-no-of days" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="No Of Days" name="encompass-username" value="">
 				</div>
         </div>

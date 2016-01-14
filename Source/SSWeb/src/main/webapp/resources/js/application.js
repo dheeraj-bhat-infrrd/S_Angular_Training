@@ -10121,6 +10121,7 @@ $(document).on('click','#en-dry-enable',function(){
     if($('#en-dry-enable').css('display')!='none'){
     $('#en-disconnect').show().siblings('div').hide();
     }
+    $('#en-generate-report').hide();
 });
 $(document).on('click','#en-disconnect',function(){
     if($('#en-disconnect').css('display')!='none'){
@@ -10128,13 +10129,27 @@ $(document).on('click','#en-disconnect',function(){
     }
 });
 
-/*$(document).on('click', '#en-dry-run', function() {
+$(document).on('click', '#en-generate-report', function() {
 	disableBodyScroll();
 	callAjaxGET("./dryrun.do", function(data) {
 		$('#overlay-text').html(data);
 		$('#overlay-continue').show();
 		$('#overlay-continue').html("Submit");
 		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Start DryRun")
+		$('#overlay-header').html("Start DryRun");
 		$('#overlay-main').show();
-	}, true);*/
+	}, true);
+});
+
+$('body').on('click', '#en-test-connection', function() {
+	if (validateEncompassInput('encompass-form-div')) {
+		testEncompassConnection("encompass-form");
+	}
+});
+
+function testEncompassConnection(formid) {
+	if (validateEncompassInput(formid)) {
+		var url = "./testcredentials.do";
+		callAjaxFormSubmit(url, testEncompassConnectionCallBack, formid);
+	}
+}
