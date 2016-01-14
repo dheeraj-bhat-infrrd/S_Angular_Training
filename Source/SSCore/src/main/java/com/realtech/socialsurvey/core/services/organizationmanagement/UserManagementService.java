@@ -487,5 +487,8 @@ public interface UserManagementService
      * @throws InvalidInputException
      */
     public Map<Long, Integer> getUserIdReviewCountMapFromUserIdList( List<Long> userIds ) throws InvalidInputException;
+
+
+    public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
