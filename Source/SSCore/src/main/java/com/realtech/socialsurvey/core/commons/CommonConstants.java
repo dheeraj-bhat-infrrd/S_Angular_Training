@@ -456,6 +456,9 @@ public interface CommonConstants
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
     public static final String ENCOMPASS_DRY_RUN_STATE = "dryrun";
     public static final String ENCOMPASS_PRODUCTION_STATE = "prod";
+    public static final String ENCOMPASS_CLIENT_URL_COLUMN = "clientUrl";
+    public static final String ENCOMPASS_USERNAME_COLUMN = "userName";
+    public static final String ENCOMPASS_PASSWORD_COLUMN = "password";
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
