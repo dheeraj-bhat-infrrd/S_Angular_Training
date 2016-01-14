@@ -5528,7 +5528,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException
+    public void updateProfileUrlAndStatusForDeletedEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
         
@@ -5596,7 +5596,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         String newProfileUrl = subUrl + "/" + newProfileName;
         if ( newProfileUrl.equals( existingProfileUrl ) ) {
             LOG.debug( "There is no need to update profile url." );
-
         } else {
             //Update profileUrl in Mongo
             organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -5605,6 +5604,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, newProfileName, unitSettings, collectionName );
             
         }
+        // update the isActive status to false
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_STATUS, CommonConstants.STATUS_DELETED_MONGO, unitSettings, collectionName);
+        
         LOG.info( "Finished updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
     }
 
