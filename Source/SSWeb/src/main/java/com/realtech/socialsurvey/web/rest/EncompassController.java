@@ -1,17 +1,25 @@
 package com.realtech.socialsurvey.web.rest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -36,7 +44,14 @@ public class EncompassController
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
+    @Value ( "${ENCOMPASS_APP_URL}")
+    private String encompassTestUrl;
 
+
+    /**
+     * Controller to get a list of companies conencted to encompass and their credentials 
+     * @return
+     */
     @ResponseBody
     @RequestMapping ( value = "/getcompanycredentials")
     public Response getCompanyCredentials()
@@ -69,6 +84,61 @@ public class EncompassController
             response = getErrorResponse( e );
         }
         LOG.info( "Method to get the encompass credentials for all companies finished." );
+        return response;
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/testcredentials")
+    public Response testCompanyCredentials( @QueryParam ( value = "username") String username,
+        @QueryParam ( value = "password") String password, @QueryParam ( value = "url") String url )
+    {
+        LOG.info( "Method to test encompass credentials started for username : " + username + " password : " + password
+            + " url : " + url + " started." );
+        Response response = null;
+        try {
+            try {
+                if ( username == null || username.isEmpty() ) {
+                    throw new InvalidInputException( "Username cannot be empty" );
+                }
+
+                if ( password == null || password.isEmpty() ) {
+                    throw new InvalidInputException( "Password cannot be empty" );
+                }
+
+                if ( url == null || url.isEmpty() ) {
+                    throw new InvalidInputException( "URL cannot be empty" );
+                }
+
+                String jsonString = "{ \"ClientUrl\" : \"" + url + "\", \"UserName\" : \"" + username + "\", \"Password\" : \""
+                    + password + "\" }";
+                LOG.info( "JSON Request object : " + jsonString );
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType( MediaType.APPLICATION_JSON );
+                headers.setAccept( Arrays.asList( MediaType.APPLICATION_JSON ) );
+
+                RestTemplate restTemplate = new RestTemplate();
+
+                //Make request to the encompass application and get the response
+                ResponseEntity<String> restResponse = restTemplate.postForEntity( encompassTestUrl, jsonString, String.class );
+                String responseBody = restResponse.getBody();
+                response = Response.ok( responseBody ).build();
+
+            } catch ( ResourceAccessException e ) {
+                LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
+                throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
+                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ),
+                    "Unable to connect to encompass server at the moment" );
+            } catch ( Exception e ) {
+                throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
+                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage() );
+            }
+        } catch ( BaseRestException e ) {
+            response = getErrorResponse( e );
+        }
+
+        LOG.info( "Method to test encompass credentials started for username : " + username + " password : " + password
+            + " url : " + url + " finished." );
         return response;
     }
 
