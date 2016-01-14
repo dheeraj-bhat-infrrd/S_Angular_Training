@@ -215,6 +215,10 @@ $(document).on('click',  function(e){
 		$('.overlay-payment').hide();
 		enableBodyScroll();
 	}
+	if($('#overlay-incomplete-survey' ).is(':visible')){
+		$('#overlay-incomplete-survey').hide();
+		enableBodyScroll();
+	}
 	
 	
 		
@@ -238,6 +242,11 @@ $(document).on('keyup',  function(e){
 			$('.overlay-payment').hide();
 			enableBodyScroll();
 		}
+		if($('#overlay-incomplete-survey' ).is(':visible')){
+			$('#overlay-incomplete-survey').hide();
+			enableBodyScroll();
+		}
+		
 		
 	}
 });
@@ -272,6 +281,10 @@ $(document).on('click', '#overlay-pop-up', function(e){
 $(document).on('click', '#report-abuse-pop-up', function(e){
 	e.stopPropagation();
 });
+$(document).on('click', '#incomplete-survey-popup', function(e){
+	e.stopPropagation();
+});
+
 
 
 $(document).on('click', '.icn-plus-open', function() {
@@ -8004,6 +8017,7 @@ $(document).on('change', '#sel-page', function(e) {
 });
 
 function showIncompleteSurveyListPopup() {
+	event.stopPropagation()
 	$('#icn-sur-popup-cont').attr("data-start", 0);
 	$("#overlay-incomplete-survey").show();
 	paintIncompleteSurveyListPopupResults(0);		
