@@ -501,5 +501,11 @@ public interface UserManagementService
 
 
     public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
+
+
+    public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException;
+
+
+    public void restoreDeletedUser( long userId ) throws InvalidInputException, SolrException;
 }
 // JIRA SS-34 BY RM02 BOC

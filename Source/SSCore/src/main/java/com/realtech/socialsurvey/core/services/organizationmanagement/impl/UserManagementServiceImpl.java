@@ -544,6 +544,64 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     /*
+     * Method to deactivate an existing user.
+     */
+    @Transactional
+    @Override
+    public void restoreDeletedUser( long userId ) throws InvalidInputException, SolrException
+    {
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "User id is invalid in restoreDeletedUser" );
+        }
+
+        LOG.info( "Method to activate user " + userId + " called." );
+
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "Invalid userId" );
+        }
+        User user = getUserByUserId( userId );
+        //Check if any user has emailId = user's emailId.
+        List<User> usersWithSameEmail = getUsersByEmailId( user.getEmailId() );
+        if ( usersWithSameEmail != null && !( usersWithSameEmail.isEmpty() ) ) {
+            for ( User userWithSameEmail : usersWithSameEmail ) {
+                if ( user.getUserId() != userWithSameEmail.getUserId() ) {
+                    throw new InvalidInputException( "Another User exists with the same Email ID. UserId : "
+                        + userWithSameEmail.getUserId() );
+                }
+            }
+        }
+
+        //Start restoring the user
+        //Set status = 1 and loginId = emailId
+        user.setStatus( CommonConstants.STATUS_ACTIVE );
+        user.setLoginName( user.getEmailId() );
+        updateUser( user );
+
+        //Set the status of all user profiles for that user as 1
+        userProfileDao.activateAllUserProfilesForUser( user );
+
+        //Remove entry from RemovedUser table
+
+        List<RemovedUser> entriesToDelete = removedUserDao.findByColumn( RemovedUser.class, CommonConstants.USER_COLUMN, user );
+        if ( entriesToDelete != null && !( entriesToDelete.isEmpty() ) ) {
+            for ( RemovedUser removedUser : entriesToDelete ) {
+                removedUserDao.delete( removedUser );
+            }
+        }
+
+        //Set status to active in mongo
+        AgentSettings agentSettings = getUserSettings( userId );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE_MONGO, agentSettings );
+
+        //Add user to Solr
+        solrSearchService.addUserToSolr( user );
+
+        LOG.info( "Method to reactivate user " + user.getFirstName() + " finished." );
+    }
+    
+    
+    /*
      * Method to get user with login name of a company
      */
     @Transactional
@@ -569,6 +627,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         return users.get( CommonConstants.INITIAL_INDEX );
     }
 
+    /**
+     * Method to get a list of users having the same email ID
+     * @param emailId
+     * @return
+     * @throws InvalidInputException
+     */
+    @Transactional
+    @Override
+    public List<User> getUsersByEmailId(String emailId) throws InvalidInputException{
+        LOG.info( "Method getUsersByEmailId started for emailId : " + emailId );
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email ID is empty" );
+        }
+        List<User> users = userDao.findByColumn( User.class, CommonConstants.EMAIL_ID, emailId );
+        
+        LOG.info( "Method getUsersByEmailId finished for emailId : " + emailId );
+        return users;
+    }
 
     // Method to return user with provided email and company
     @Transactional
