@@ -861,10 +861,18 @@ $(document).on('click',  function(e){
 		$('#report-abuse-overlay').hide();
 		enableBodyScroll();
 	}
-	
-	
-	
 		
+});
+
+$(document).on('keyup',  function(e){
+	if (e.keyCode == 27){
+		
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+	
+	}
 });
 
 function validateReportAbuseForm(reportText, cusName, cusEmail) {

@@ -35,7 +35,7 @@
 	</div>
 	<div id="overlay-incomplete-survey"
 		class="overlay-login overlay-main hide">
-		<div class="welcome-popup-wrapper">
+		<div id="incomplete-survey-popup" class="welcome-popup-wrapper">
 			<div class="welcome-popup-hdr-wrapper clearfix">
 				<div class="float-left wc-hdr-txt">
 					<spring:message code="label.header.incompletesurvey.key" />
@@ -70,8 +70,7 @@
     <div id="message-header" class="hide"></div>
     
 	<div id="overlay-main" class="overlay-main hide">
-	<div id="overlay-pop-up">
-		<div class="overlay-disable-wrapper">
+		<div id="overlay-pop-up" class="overlay-disable-wrapper">
 			<div id="overlay-header" class="ol-header">
 				<!-- Populated by javascript -->
 			</div>
@@ -93,12 +92,10 @@
 				</div>
 			</div>
 		</div>
-		</div>
 	</div>
 	
 	<div id="report-abuse-overlay" class="overlay-main hide">
-	<div id="report-abuse-pop-up">
-    	<div class="overlay-disable-wrapper">
+    	<div id="report-abuse-pop-up" class="overlay-disable-wrapper">
     		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>
     		<div class="ol-content">
     			<textarea id="report-abuse-txtbox" class="report-abuse-txtbox" placeholder="Type here on why do you want to report the review...."></textarea>
@@ -108,7 +105,6 @@
     			<div class="rpa-btn rpa-cancel-btn ol-btn cursor-pointer float-right"><spring:message code="label.cancel.key"/></div>
     		</div>
     	</div>
-    </div>
     </div>
 	
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
