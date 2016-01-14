@@ -560,6 +560,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "Invalid userId" );
         }
         User user = getUserByUserId( userId );
+        if ( user == null ) {
+            throw new InvalidInputException( "No user having userId : " + userId + " exists." );
+        }
+        if ( user.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+            throw new InvalidInputException( "User with userId : " + userId + " already exists." );
+        }
         //Check if any user has emailId = user's emailId.
         List<User> usersWithSameEmail = getUsersByEmailId( user.getEmailId() );
         if ( usersWithSameEmail != null && !( usersWithSameEmail.isEmpty() ) ) {
