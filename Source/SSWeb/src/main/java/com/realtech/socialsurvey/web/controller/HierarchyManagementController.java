@@ -279,7 +279,7 @@ public class HierarchyManagementController {
 				LOG.debug("Successfully executed service to deactivate region");
                 
                 //update profile name and url
-                organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.REGION_ID_COLUMN, regionId );
+                organizationManagementService.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.REGION_ID_COLUMN, regionId );
                 //remove social media connections
                 socialManagementService.disconnectAllSocialConnections( CommonConstants.REGION_ID_COLUMN, regionId );
 			}
@@ -370,7 +370,7 @@ public class HierarchyManagementController {
 				LOG.debug("Successfully executed service to deactivate branch");
 				
 				//update profile name and url
-				organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.BRANCH_ID_COLUMN, branchId );
+				organizationManagementService.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.BRANCH_ID_COLUMN, branchId );
 				//remove social media connections
 				socialManagementService.disconnectAllSocialConnections( CommonConstants.BRANCH_ID_COLUMN, branchId );
 			}

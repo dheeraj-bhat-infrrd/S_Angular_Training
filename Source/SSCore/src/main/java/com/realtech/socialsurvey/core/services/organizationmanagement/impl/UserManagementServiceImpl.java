@@ -528,7 +528,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
 
         //update profile url in mongo if needed
-        organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
+        organizationManagementService.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
 
         //Disconnect social connections(ensure that social connections history is updated)
         socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );

@@ -48,6 +48,9 @@ public class OrganizationUnitSettings {
 	private boolean isLogoImageProcessed;
 	private String[] hideSectionsFromProfilePage;
 
+	// status of the record, A for active and D for deleted
+	private String status;
+
 	public String getId() {
 		return id;
 	}
@@ -326,6 +329,14 @@ public class OrganizationUnitSettings {
 
 	public void setHideSectionsFromProfilePage(String[] hideSectionsFromProfilePage) {
 		this.hideSectionsFromProfilePage = hideSectionsFromProfilePage;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	@Override

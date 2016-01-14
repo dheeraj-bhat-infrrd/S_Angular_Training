@@ -86,6 +86,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_REALTOR_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.realtorToken";
 	public static final String KEY_CONTACT_NAME = "contact_details.name";
 	public static final String KEY_POSTIONS = "positions";
+	public static final String KEY_STATUS = "status";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 	
@@ -303,6 +304,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		// Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
 		Query query = new Query();
 		query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
+		// query records which are not deleted
+		query.addCriteria(Criteria.where(KEY_STATUS).ne(CommonConstants.STATUS_DELETED_MONGO));
 		query.fields().include(KEY_PROFILE_URL).include(KEY_MODIFIED_ON).exclude("_id");
 		query.with(new Sort(Sort.Direction.DESC,KEY_MODIFIED_ON));
 		if (skipCount > 0) {
