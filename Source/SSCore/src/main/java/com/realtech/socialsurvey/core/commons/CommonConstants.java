@@ -589,6 +589,8 @@ public interface CommonConstants
     public static final int ERROR_CODE_REGION_POSTS_FETCH_FAILURE = 138;
     public static final int ERROR_CODE_BRANCH_POSTS_FETCH_PRECONDITION_FAILURE = 139;
     public static final int ERROR_CODE_BRANCH_POSTS_FETCH_FAILURE = 140;
+    public static final int ERROR_CODE_ENCOMPASS_COMPANY_FETCH_FAILURE = 141;
+    public static final int ERROR_CODE_ENCOMPASS_NO_COMPANIES_CONNECTED = 142;
 
     /**
      * Service codes
@@ -626,7 +628,8 @@ public interface CommonConstants
     public static final int SERVICE_CODE_COMPANY_POSTS = 124;
     public static final int SERVICE_CODE_BRANCH_POSTS = 125;
     public static final int SERVICE_CODE_REGION_POSTS = 126;
-
+    public static final int SERVICE_CODE_COMPANY_CRM_INFO = 127;
+    
     /*
      * Mongo column and collection constants
      */
