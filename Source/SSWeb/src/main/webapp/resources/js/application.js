@@ -113,6 +113,9 @@ var smScrollTop = 0;
 var defaultCountryCode = "US";
 var defaultCountry = "United States";
 
+var fb_app_id;
+var google_plus_app_id;
+
 /**
  * js functions for landing page
  */
@@ -5008,17 +5011,19 @@ function paintSurveyPage(jsonData) {
 	realtorEnabled = Boolean(jsonData.responseJSON.realtorEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
-	
+	fb_app_id = jsonData.responseJSON.fbAppId;
+	google_plus_app_id = jsonData.responseJSON.googlePlusAppId;
 	
 	//If social token availiable populate the links
-	if (googleEnabled) {
-		var googleElement = document.getElementById('ggl-btn');
-		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
-		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
-	} else {
-		$('#ggl-btn').remove();
-	}
-	
+//	if (googleEnabled) {
+//		var googleElement = document.getElementById('ggl-btn');
+//		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+//		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
+//	} else {
+//		$('#ggl-btn').remove();
+//	}
+	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
+
 	if (yelpEnabled) {
 		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
 	} else {
@@ -5038,7 +5043,7 @@ function paintSurveyPage(jsonData) {
 	}
 	
 	if (realtorEnabled) {
-		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink));
+		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink)+"#reviews-section");
 	} else {
 		$('#realtor-btn').remove();
 	}
@@ -5425,9 +5430,9 @@ function showMasterQuestionPage(){
 			if(isAbusive == false){
 				onlyPostToSocialSurvey = false;
 			}
-			if(mood == 'Great') {
-				$('#social-post-links').show();
-			} 
+		}
+		if(mood == 'Great' && isAbusive == false) {
+			$('#social-post-links').show();
 		}
 		
 		//call method to post the review and update the review count
@@ -5437,10 +5442,11 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
-		$('#icn-fb-shr').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
-		$('#icn-google-shr').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
-		$('#icn-linkedin-shr').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&source=");
-		$('#icn-twitter-shr').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
+		var fmt_rating = Number(rating).toFixed(1);
+		$('#linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&source=");
+		$('#twitter-btn').attr("href","https://twitter.com/intent/tweet?text="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + ".&url='"+agentFullProfileLink+"'");
+		$('#fb-btn').attr("href","https://www.facebook.com/dialog/feed?app_id="+fb_app_id+"&link="+agentFullProfileLink+"&description="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&redirect_uri=https://www.facebook.com");
+
 		$('#content-head').html('Survey Completed');
 			if (mood == 'Great')
 				$('#content').html(happyTextComplete);
@@ -5880,25 +5886,8 @@ $('.sq-pts-dgreen').click(function() {
 	$("#next-scale").removeClass("btn-com-disabled");
 });
 
-$('#ylp-btn').click(function(e) {
-	updateSharedOn("yelp", agentId, customerEmail);
-});
-
 $('#ggl-btn').click(function(e) {
 	updateSharedOn("google", agentId, customerEmail);
-});
-
-$('#zillow-btn').click(function(e) {
-	updateSharedOn("zillow", agentId, customerEmail);
-});
-
-$('#lt-btn').click(function(e) {
-	updateSharedOn("lendingtree", agentId, customerEmail);
-});
-
-$('#realtor-btn').click(function(e) {
-	//e.stopImmediatePropagation();
-	updateSharedOn("realtor", agentId, customerEmail);
 });
 
 $('#shr-post-chk-box').click(function(){

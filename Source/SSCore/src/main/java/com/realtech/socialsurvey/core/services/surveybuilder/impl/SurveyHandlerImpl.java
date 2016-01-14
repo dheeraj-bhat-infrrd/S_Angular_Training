@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -145,6 +146,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Value ( "${SOCIAL_POST_REMINDER_INTERVAL}")
     private int socialPostReminderInterval;
+
+    @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
+    private int maxSocialPostReminderInterval;
 
     @Autowired
     private Utils utils;
@@ -562,7 +566,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "started." );
         int reminderInterval = 0;
         int maxReminders = 0;
-        float autopostScore = 0;
         List<SurveyDetails> incompleteSocialPostCustomers = new ArrayList<>();
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
             companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -574,7 +577,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     && surveySettings.getSocial_post_reminder_interval_in_days() > 0 ) {
                     reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
                     maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
-                    autopostScore = surveySettings.getShow_survey_above_score();
                 }
             }
         }
@@ -584,8 +586,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( reminderInterval == 0 ) {
             reminderInterval = socialPostReminderInterval;
         }
+
+        if ( reminderInterval > maxSocialPostReminderInterval ) {
+            reminderInterval = maxSocialPostReminderInterval;
+        }
+
         incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail( companyId, reminderInterval,
-            maxReminders, autopostScore );
+            maxReminders );
         LOG.info( "finished." );
         return incompleteSocialPostCustomers;
     }
@@ -2239,6 +2246,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Returning swear list" );
         String[] swearList = new Gson().fromJson( SWEAR_WORDS, String[].class );
         return swearList;
+    }
+
+
+    @Override
+    public double getFormattedSurveyScore( double surveyScore )
+    {
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
+        try {
+            //get formatted survey score using rating format
+            surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
+        } catch ( NumberFormatException e ) {
+            LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
+        }
+        return surveyScore;
     }
 }
 // JIRA SS-119 by RM-05:EOC
