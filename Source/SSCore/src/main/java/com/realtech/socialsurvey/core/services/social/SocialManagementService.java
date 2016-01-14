@@ -157,5 +157,9 @@ public interface SocialManagementService
         SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails )
         throws InvalidInputException, NoRecordsFetchedException;
 
+
+    public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( long agentId )
+        throws InvalidInputException;
+
 }
 // JIRA SS-34 BY RM02 BOC
