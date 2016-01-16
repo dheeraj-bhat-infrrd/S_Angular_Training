@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.web.rest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -12,16 +14,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -31,7 +36,6 @@ import com.realtech.socialsurvey.core.exception.InputValidationException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 
 
@@ -96,6 +100,7 @@ public class EncompassController
         LOG.info( "Method to test encompass credentials started for username : " + username + " password : " + password
             + " url : " + url + " started." );
         Response response = null;
+        boolean status = false;
         try {
             try {
                 if ( username == null || username.isEmpty() ) {
@@ -110,21 +115,35 @@ public class EncompassController
                     throw new InvalidInputException( "URL cannot be empty" );
                 }
 
-                String jsonString = "{ \"ClientUrl\" : \"" + url + "\", \"UserName\" : \"" + username + "\", \"Password\" : \""
-                    + password + "\" }";
+                Map<String, String> jsonMap = new HashMap<String, String>();
+                jsonMap.put( CommonConstants.ENCOMPASS_CLIENT_URL_COLUMN, url );
+                jsonMap.put( CommonConstants.ENCOMPASS_USERNAME_COLUMN, username );
+                jsonMap.put( CommonConstants.ENCOMPASS_PASSWORD_COLUMN, password );
+                String jsonString = new Gson().toJson( jsonMap );
                 LOG.info( "JSON Request object : " + jsonString );
+
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType( MediaType.APPLICATION_JSON );
                 headers.setAccept( Arrays.asList( MediaType.APPLICATION_JSON ) );
 
+                HttpEntity<String> requestEntity = new HttpEntity<String>( jsonString, headers );
+
                 RestTemplate restTemplate = new RestTemplate();
-
+                restTemplate.getMessageConverters().add( new FormHttpMessageConverter() );
+                restTemplate.getMessageConverters().add( new MappingJackson2HttpMessageConverter() );
                 //Make request to the encompass application and get the response
-                ResponseEntity<String> restResponse = restTemplate.postForEntity( encompassTestUrl, jsonString, String.class );
-                String responseBody = restResponse.getBody();
-                response = Response.ok( responseBody ).build();
+                String responseBody = restTemplate.postForObject( encompassTestUrl, requestEntity, String.class );
+                Map<String, String> responseMap = new Gson().fromJson( responseBody,
+                    new TypeToken<Map<String, String>>() {}.getType() );
+                if ( Boolean.parseBoolean( responseMap.get( CommonConstants.STATUS_COLUMN ) ) ) {
+                    status = true;
+                }
+                Map<String, Object> resultMap = new HashMap<String, Object>();
+                resultMap.put( CommonConstants.STATUS_COLUMN, status );
+                resultMap.put( CommonConstants.MESSAGE, responseMap.get( CommonConstants.MESSAGE ) );
+                response = Response.ok( new Gson().toJson( resultMap ) ).build();
 
-            } catch ( ResourceAccessException e ) {
+            } catch ( HttpServerErrorException e ) {
                 LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ),
@@ -153,8 +172,11 @@ public class EncompassController
     {
         LOG.debug( "Resolve Error Response" );
         Status httpStatus = resolveHttpStatus( ex );
-        RestErrorResponse errorResponse = ex.transformException( httpStatus.getStatusCode() );
-        Response response = Response.status( httpStatus ).entity( new Gson().toJson( errorResponse ) ).build();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        resultMap.put( CommonConstants.STATUS_COLUMN, false );
+        resultMap.put( CommonConstants.MESSAGE, ex.getDebugMessage() );
+        Response response = Response.status( httpStatus ).entity( new Gson().toJson( resultMap ) ).build();
+        
         return response;
     }
 
