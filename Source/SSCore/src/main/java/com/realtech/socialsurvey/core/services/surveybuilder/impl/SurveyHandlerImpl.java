@@ -635,15 +635,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void updateSharedOn( String socialSite, long agentId, String customerEmail )
-    {
-        LOG.info( "Method to update sharedOn in SurveyDetails collection, updateSharedOn() started." );
-        surveyDetailsDao.updateSharedOn( socialSite, agentId, customerEmail );
-        LOG.info( "Method to update sharedOn in SurveyDetails collection, updateSharedOn() finished." );
-    }
-
-
-    @Override
     public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable )
     {
         LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
