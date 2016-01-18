@@ -9,6 +9,7 @@ public class EncompassCrmInfo extends CRMInfo {
 	private String state;
 	private int numberOfDays;
 	private String emailAddressForReport;
+	private boolean generateReport;
 
 	public String getCrm_username() {
 		return crm_username;
@@ -64,6 +65,14 @@ public class EncompassCrmInfo extends CRMInfo {
 
 	public void setEmailAddressForReport(String emailAddressForReport) {
 		this.emailAddressForReport = emailAddressForReport;
+	}
+
+	public boolean isGenerateReport() {
+		return generateReport;
+	}
+
+	public void setGenerateReport(boolean generateReport) {
+		this.generateReport = generateReport;
 	}
 
 	@Override
