@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -14,6 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -206,4 +209,17 @@ public class Utils
         return ( new java.sql.Timestamp( cal.getTimeInMillis() ) );
     }
 
+
+    public String urlEncodeText( String text )
+    {
+        LOG.debug( "Encoding of text started." );
+        try {
+            text = URLEncoder.encode( text, "UTF-8" );
+            System.out.println( "Encoded text : " + text );
+        } catch ( UnsupportedEncodingException e ) {
+            LOG.warn( "Error occurred while url encoding params. Reason : ", e );
+        }
+        LOG.debug( "Encoding of text ended." );
+        return text;
+    }
 }
