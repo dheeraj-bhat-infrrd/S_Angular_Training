@@ -72,6 +72,17 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+	<!-- admin tools -->
+	<servlet>
+		<servlet-name>admintools</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/admintools-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
 	<servlet-mapping>
 		<servlet-name>sswebapp</servlet-name>
 		<url-pattern>*.do</url-pattern>
@@ -82,6 +93,11 @@
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>admintools</servlet-name>
+		<url-pattern>/admintools/*</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>profile</servlet-name>
 		<url-pattern>/pages/*</url-pattern>
