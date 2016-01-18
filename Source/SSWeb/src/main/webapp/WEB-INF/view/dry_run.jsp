@@ -11,11 +11,11 @@
             </div>
             <div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
                 <div class="rfr_icn icn-fname en-icn-fname"></div>
-                <input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="EmailID" name="encompass-username" value="${encompassusername}">
+                <input id="encompass-report-email" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="EmailID" name="encompass-username" value="${encompassusername}">
                 <div id="encompass-username-error" class="hm-item-err-2"></div>
             </div>
             <div class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.duration.key" /></div>
-					<input id="encompass-no-of days" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="No Of Days" name="encompass-username" value="">
+					<input id="encompass-no-of-days" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="No Of Days" name="encompass-username" value="">
 				</div>
         </div>

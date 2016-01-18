@@ -3437,13 +3437,13 @@ function saveEncompassDetailsCallBack(response) {
 	showToast();
 }
 
-function testEncompassConnection(formid) {
+/*function testEncompassConnection(formid) {
 	if (validateEncompassInput(formid)) {
 		var url = "./testencompassconnection.do";
 		callAjaxFormSubmit(url, testEncompassConnectionCallBack, formid);
 	}
 }
-
+*/
 function testEncompassConnectionCallBack(response) {
 	$("#overlay-toast").html(response);
 	showToast();
@@ -10141,15 +10141,28 @@ $(document).on('click', '#en-generate-report', function() {
 	}, true);
 });
 
-$('body').on('click', '#en-test-connection', function() {
-	if (validateEncompassInput('encompass-form-div')) {
+function encompassCretentials(){
+	var username=document.getElementById('encompass-username').value;
+	var password=document.getElementById('encompass-password').value;
+	var url=document.getElementById('encompass-url').value;
+	var payload = {
+			"username" : username,
+			"password":password,
+			"url":url
+		};
+	callAjaxGetWithPayloadData(getLocationOrigin()+"/rest/encompass/testcredentials.do",
+			testEncompassConnectionCallBack, payload,true);
+
+};
+/*$('body').on('click', '#en-test-connection', function() {
+	
 		testEncompassConnection("encompass-form");
-	}
+	
 });
 
 function testEncompassConnection(formid) {
-	if (validateEncompassInput(formid)) {
+	
 		var url = "./testcredentials.do";
 		callAjaxFormSubmit(url, testEncompassConnectionCallBack, formid);
-	}
-}
+	
+}*/

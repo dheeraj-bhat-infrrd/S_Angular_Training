@@ -110,7 +110,7 @@
 							class="float-left enc-state-icon cursor-pointer hide"
 							style="display: none;">Disconnect</div>
 					</div>
-					<div id="en-test-connection" class="float-left enc-state-icon cursor-pointer" >Test Connection</div>
+					<div id="en-test-connection" class="float-left enc-state-icon cursor-pointer" onclick="encompassCretentials();">Test Connection</div>
 					<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" >Generate Report</div>
 					
 				</form>
