@@ -37,19 +37,24 @@ import com.realtech.socialsurvey.core.commons.AgentRankingReportComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.SurveyResultsComparator;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.BillingReportData;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -60,6 +65,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
@@ -108,6 +114,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Autowired
     private GenericDao<FileUpload, Long> fileUploadDao;
 
+    @Autowired
+    private RegionDao regionDao;
+
+    @Autowired
+    private BranchDao branchDao;
 
     @Transactional
     @Override
@@ -1071,6 +1082,119 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         LOG.info( "method deleteSurveyDetailsByPreInitiation() started." );
         surveyDetailsDao.deleteSurveysBySurveyPreInitiation( surveys );
         LOG.info( "method deleteSurveyDetailsByPreInitiation() finished." );
+    }
+
+
+    /**
+     * Method to create excel file for company hierarchy report.
+     */
+    @Override
+    @Transactional
+    public XSSFWorkbook downloadCompanyHierarchyReportData( long companyId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
+        }
+
+        try {
+            // get region ids under company
+            List<Region> regions = organizationManagementService.getRegionsForCompany( companyId );
+
+            // get branch ids under company
+            List<Branch> branches = organizationManagementService.getBranchesUnderCompany( companyId );
+
+            if ( regions != null && regions.size() > 0 ) {
+                List<Long> regionIds = new ArrayList<Long>();
+                for ( Region region : regions ) {
+                    regionIds.add( region.getRegionId() );
+                }
+                branches.addAll( organizationManagementService.getBranchesByRegionIds( new HashSet<Long>( regionIds ) ) );
+            }
+            // get branch ids under region ids as collected from earlier
+
+            // get branch settings for the above branch ids
+
+            // get user ids under company
+            // get user ids under region ids as collected earlier
+            // get user ids under branch ids as collected earlier
+            // get user information for the above user ids
+
+        } catch ( ProfileNotFoundException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        Integer counter = 1;
+
+        // This data needs to be written (List<Object>)
+        Map<String, List<Object>> data = new TreeMap<>();
+        List<Object> userAdoptionReportToPopulate = new ArrayList<>();
+        List<Object[]> rows = new ArrayList<>();
+        for ( Object[] row : rows ) {
+            // row 0 - company
+            // row 1 - region
+            // row 2 - branch
+            // row 3 - invited users
+            // row 4 - active users
+            // row 5 - adoption rate
+            userAdoptionReportToPopulate.add( String.valueOf( row[0] ) );
+            if ( row[1] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[1] ) ) )
+                userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
+            else
+                userAdoptionReportToPopulate.add( "" );
+            if ( row[2] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
+                userAdoptionReportToPopulate.add( String.valueOf( row[2] ) );
+            else
+                userAdoptionReportToPopulate.add( "" );
+            Integer userCount = new Integer( String.valueOf( row[3] ) );
+            Integer activeUserCount = new Integer( String.valueOf( row[4] ) );
+            String adoptionRate = String.valueOf( row[5] ).replace( "\\.00", "" );
+            userAdoptionReportToPopulate.add( userCount );
+            userAdoptionReportToPopulate.add( activeUserCount );
+            userAdoptionReportToPopulate.add( adoptionRate != "null" ? adoptionRate : "0%" );
+
+            data.put( ( ++counter ).toString(), userAdoptionReportToPopulate );
+            userAdoptionReportToPopulate = new ArrayList<>();
+        }
+
+        // Setting up headers
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_COMPANY );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_REGION );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_BRANCH );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_INVITED_USERS );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ACTIVE_USERS );
+        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ADOPTION_RATES );
+
+        data.put( "1", userAdoptionReportToPopulate );
+
+        // Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        DecimalFormat decimalFormat = new DecimalFormat( "#0" );
+        decimalFormat.setRoundingMode( RoundingMode.DOWN );
+
+        int rownum = 0;
+        for ( String key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String )
+                    cell.setCellValue( (String) obj );
+                else if ( obj instanceof Integer )
+                    cell.setCellValue( (Integer) obj );
+                else if ( obj instanceof Double )
+                    cell.setCellValue( decimalFormat.format( obj ) );
+            }
+        }
+        return workbook;
     }
 }
 // JIRA SS-137 BY RM05:EOC
