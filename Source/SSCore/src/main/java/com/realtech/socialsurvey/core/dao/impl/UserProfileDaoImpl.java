@@ -62,6 +62,28 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         LOG.info( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
 
     }
+    
+    
+    
+    /*
+     * Method to activate all the user profiles for a given user.
+     */
+
+    @Override
+    public void activateAllUserProfilesForUser( User userToBeActivated )
+    {
+
+        LOG.info( "Method activateUserProfileByUser called to deactivate user : " + userToBeActivated.getFirstName() );
+        Query query = getSession().getNamedQuery( "UserProfile.updateProfileByUser" );
+        // Setting status for user profile as inactive.
+        query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
+        query.setParameter( 1, String.valueOf( CommonConstants.REALTECH_ADMIN_ID ) );
+        query.setParameter( 2, new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( 3, userToBeActivated );
+        query.executeUpdate();
+        LOG.info( "Method activateUserProfileByUser called to deactivate user : " + userToBeActivated.getFirstName() );
+
+    }
 
 
     /*

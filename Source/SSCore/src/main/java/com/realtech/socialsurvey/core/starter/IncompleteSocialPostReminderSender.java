@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -41,6 +42,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
     private SocialManagementService socialManagementService;
 
     private BatchTrackerService batchTrackerService;
+
+    private Utils utils;
 
     public static final Logger LOG = LoggerFactory.getLogger( IncompleteSocialPostReminderSender.class );
 
@@ -198,7 +201,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
         fbAppId = (String) jobMap.get( "fbAppId" );
-
+        utils = (Utils) jobMap.get( "utils" );
     }
 
 
@@ -336,6 +339,9 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         String url = "";
         String customerDisplayName = new EmailFormatHelper().getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
             survey.getCustomerLastName() );
+        String reviewText = fmt_Rating + "-star response from " + customerDisplayName + " for " + survey.getAgentName()
+            + " at SocialSurvey - " + survey.getReview();
+        reviewText = utils.urlEncodeText( reviewText );
         switch ( socialSite ) {
             case CommonConstants.REALTOR_LABEL:
                 url = organizationUnitSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink()
@@ -355,19 +361,15 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                 break;
             case CommonConstants.LINKEDIN_LABEL:
                 url += "https://www.linkedin.com/shareArticle?mini=true&url="
-                    + organizationUnitSettings.getCompleteProfileUrl() + "&title=&summary=" + fmt_Rating
-                    + "-star response from " + customerDisplayName + " for " + survey.getAgentName() + " at SocialSurvey - "
-                    + survey.getReview() + "&source=";
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&title=&summary=" + reviewText + "&source=";
                 break;
             case CommonConstants.TWITTER_LABEL:
-                url += "https://twitter.com/intent/tweet?text=" + fmt_Rating + "-star response from " + survey.getAgentName()
-                    + " for " + survey.getAgentName() + " at SocialSurvey - " + survey.getReview() + ".&url="
+                url += "https://twitter.com/intent/tweet?text=" + reviewText + ".&url="
                     + organizationUnitSettings.getCompleteProfileUrl();
                 break;
             case CommonConstants.FACEBOOK_LABEL:
                 url += "https://www.facebook.com/dialog/feed?app_id=" + fbAppId + "&link="
-                    + organizationUnitSettings.getCompleteProfileUrl() + "&description=" + fmt_Rating + "-star response from "
-                    + customerDisplayName + " for " + survey.getAgentName() + " at SocialSurvey - " + survey.getReview()
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&description=" + reviewText
                     + ".&redirect_uri=https://www.facebook.com";
                 break;
         }
