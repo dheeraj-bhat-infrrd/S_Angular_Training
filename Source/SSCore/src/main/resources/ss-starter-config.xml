@@ -73,6 +73,7 @@
 				<entry key="socialManagementService" value-ref="socialManagementService" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="utils" value-ref="utils" />
 				<entry key="fbAppId" value="${FB_CLIENT_ID}" />
 			</map>
 		</property>
