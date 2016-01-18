@@ -53,20 +53,23 @@ public class EncompassController
 
 
     /**
-     * Controller to get a list of companies conencted to encompass and their credentials 
+     * Controller to get a list of companies connected to encompass and their credentials 
      * @return
      */
     @ResponseBody
     @RequestMapping ( value = "/getcompanycredentials")
-    public Response getCompanyCredentials()
+    public Response getCompanyCredentials( @QueryParam ( value = "state") String state )
     {
         Response response = null;
         LOG.info( "Method to get the encompass credentials for all companies started." );
         try {
             try {
+                if ( state == null || state.isEmpty() ) {
+                    throw new InvalidInputException( "The state parameter is empty" );
+                }
+                
                 List<OrganizationUnitSettings> companyList = organizationManagementService
-                    .getOrganizationUnitSettingsForCRMSource( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS,
-                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    .getCompanyListForEncompass( state );
 
                 List<EncompassCrmInfo> crmInfoList = new ArrayList<EncompassCrmInfo>();
                 for ( OrganizationUnitSettings company : companyList ) {
@@ -92,6 +95,13 @@ public class EncompassController
     }
 
 
+    /**
+     * Controller to make a call to the encompass application and test the credentials
+     * @param username
+     * @param password
+     * @param url
+     * @return
+     */
     @ResponseBody
     @RequestMapping ( value = "/testcredentials")
     public String testCompanyCredentials( @QueryParam ( value = "username") String username,
