@@ -1478,21 +1478,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public void updateSharedOn( String socialSite, long agentId, String customerEmail )
-    {
-        LOG.info( "updateSharedOn() started." );
-        Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
-        Update update = new Update();
-        update.addToSet( CommonConstants.SHARED_ON_COLUMN, socialSite );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
-        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        LOG.info( "updateSharedOn() finished." );
-    }
-
-
-    @Override
     public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable )
     {
         LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
