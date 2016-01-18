@@ -171,12 +171,12 @@
 
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-							<div id="icn-fb" class="float-left social-item-icon icn-fb ${socialDisabled}" data-source="facebook" data-link="${fbLink}" onclick="openAuthPage('facebook', ${isAutoLogin}, this);" title="Facebook"></div>
-							<div id="icn-twit" class="float-left social-item-icon icn-twit ${socialDisabled}" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage('twitter', ${isAutoLogin}, this);" title="Twitter"></div>
-							<div id="icn-lin" class="float-left social-item-icon icn-lin ${socialDisabled}" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage('linkedin', ${isAutoLogin}, this);" title="LinkedIn"></div>
-                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus ${socialDisabled}" data-source="google" data-link="${googleLink}" onclick="openAuthPage('google', ${isAutoLogin}, this);" title="Google+"></div>
+							<div id="icn-fb" class="float-left social-item-icon icn-fb ${socialDisabled}" data-source="facebook" data-link="${fbLink}" onclick="openAuthPage(event,'facebook', ${isAutoLogin}, this);" title="Facebook"></div>
+							<div id="icn-twit" class="float-left social-item-icon icn-twit ${socialDisabled}" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage(event,'twitter', ${isAutoLogin}, this);" title="Twitter"></div>
+							<div id="icn-lin" class="float-left social-item-icon icn-lin ${socialDisabled}" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage(event,'linkedin', ${isAutoLogin}, this);" title="LinkedIn"></div>
+                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus ${socialDisabled}" data-source="google" data-link="${googleLink}" onclick="openAuthPage(event,'google', ${isAutoLogin}, this);" title="Google+"></div>
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-source="yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
-							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow('.icn-zillow');"></div>
+							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow(event,'.icn-zillow');"></div>
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-source="lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
 							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-source="realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
