@@ -51,7 +51,6 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -718,7 +717,6 @@ public class OrganizationManagementController
         String message;
 
         try {
-            testEncompassConnection( model, request );
 
             // Encrypting the password
             String plainPassword = request.getParameter( "encompass-password" );
@@ -730,6 +728,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setCrm_fieldId( request.getParameter( "encompass-fieldId" ) );
             encompassCrmInfo.setCrm_password( cipherPassword );
             encompassCrmInfo.setUrl( request.getParameter( "encompass-url" ) );
+            encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
             encompassCrmInfo.setConnection_successful( true );
 
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
@@ -752,8 +751,112 @@ public class OrganizationManagementController
 
 
     /**
+     * Method to enable an encompass connection
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/enableencompassdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String enableEncompassConnection( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating encompass details to 'Enabled'" );
+        User user = sessionHelper.getCurrentUser();
+        String message;
+
+        try {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            encompassCrmInfo.setState( CommonConstants.ENCOMPASS_PRODUCTION_STATE );
+            encompassCrmInfo.setNumberOfDays( 0 );
+            encompassCrmInfo.setEmailAddressForReport( null );
+            encompassCrmInfo.setGenerateReport( false );
+            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while saving encompass detials. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
+    
+    
+    
+    /**
+     * Method to disable an encompass connection
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/disableencompassdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String disableEncompassConnection( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating encompass details to 'Disabled'" );
+        User user = sessionHelper.getCurrentUser();
+        String message;
+
+        try {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
+            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while disabling encompass. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
+    
+    
+    /**
+     * Method to enable report generation for encompass
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/enableencompassreportgeneration", method = RequestMethod.POST)
+    @ResponseBody
+    public String enableEncompassReportGeneration( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Enabling report generation for encompass details" );
+        User user = sessionHelper.getCurrentUser();
+        String message;
+        try {
+            String numOfDaysStr = request.getParameter( "encompass-no-of-days" );
+            int numOfDays = Integer.parseInt( numOfDaysStr );
+            String emailIdForReport = request.getParameter( "encompass-report-email" );
+            if ( emailIdForReport == null || emailIdForReport.isEmpty() ) {
+                throw new InvalidInputException( "" );
+            }
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            encompassCrmInfo.setNumberOfDays( numOfDays );
+            encompassCrmInfo.setEmailAddressForReport( emailIdForReport );
+            encompassCrmInfo.setGenerateReport( true );
+            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while enabling report generation for encompass. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
+
+
+    /**
      * Method to test encompass details / CRM info
-     * 
+     * NO LONGER USED
      * @param model
      * @param request
      * @return
@@ -785,7 +888,7 @@ public class OrganizationManagementController
 
     /**
      * Method to validate encompass details / CRM info
-     * 
+     * NO LONGER USED
      * @param request
      * @return
      */
@@ -1237,6 +1340,7 @@ public class OrganizationManagementController
     }
 
 
+    @SuppressWarnings ( "unused")
     private LockSettings updateLockSettings( LockSettings parentLock, LockSettings lockSettings, boolean status )
     {
         if ( !parentLock.getIsLogoLocked() ) {
