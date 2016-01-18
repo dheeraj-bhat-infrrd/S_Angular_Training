@@ -1609,7 +1609,8 @@ function bindEditSurveyEvents() {
 	
 	//Save the changes
 	$('.bd-q-btn-done').off('click');
-	$('.bd-q-btn-done').on('click', function() {
+	$('.bd-q-btn-done').on('click', function(e) {
+		e.stopPropagation();
 		var lastQuestion = currentQues - 1;
 		var count = 1;
 		var editedStatus = true;
@@ -8005,8 +8006,8 @@ $(document).on('change', '#sel-page', function(e) {
 	}, 100);
 });
 
-function showIncompleteSurveyListPopup() {
-	event.stopPropagation()
+function showIncompleteSurveyListPopup(event) {
+	event.stopPropagation();
 	$('#icn-sur-popup-cont').attr("data-start", 0);
 	$("#overlay-incomplete-survey").show();
 	paintIncompleteSurveyListPopupResults(0);		
