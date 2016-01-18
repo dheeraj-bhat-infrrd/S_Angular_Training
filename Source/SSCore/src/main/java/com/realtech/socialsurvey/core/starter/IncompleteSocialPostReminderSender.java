@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.starter;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -336,6 +338,9 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         String url = "";
         String customerDisplayName = new EmailFormatHelper().getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
             survey.getCustomerLastName() );
+        String reviewText = fmt_Rating + "-star response from " + customerDisplayName + " for " + survey.getAgentName()
+            + " at SocialSurvey - " + survey.getReview();
+        reviewText = urlEncodeText( reviewText );
         switch ( socialSite ) {
             case CommonConstants.REALTOR_LABEL:
                 url = organizationUnitSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink()
@@ -355,28 +360,34 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                 break;
             case CommonConstants.LINKEDIN_LABEL:
                 url += "https://www.linkedin.com/shareArticle?mini=true&url="
-                    + organizationUnitSettings.getCompleteProfileUrl() + "&title=&summary=" + fmt_Rating
-                    + "-star response from " + customerDisplayName + " for " + survey.getAgentName() + " at SocialSurvey - "
-                    + survey.getReview() + "&source=";
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&title=&summary=" + reviewText + "&source=";
                 break;
             case CommonConstants.TWITTER_LABEL:
-                url += "https://twitter.com/intent/tweet?text=" + fmt_Rating + "-star response from " + survey.getAgentName()
-                    + " for " + survey.getAgentName() + " at SocialSurvey - " + survey.getReview() + ".&url="
+                url += "https://twitter.com/intent/tweet?text=" + reviewText + ".&url="
                     + organizationUnitSettings.getCompleteProfileUrl();
                 break;
             case CommonConstants.FACEBOOK_LABEL:
                 url += "https://www.facebook.com/dialog/feed?app_id=" + fbAppId + "&link="
-                    + organizationUnitSettings.getCompleteProfileUrl() + "&description=" + fmt_Rating + "-star response from "
-                    + customerDisplayName + " for " + survey.getAgentName() + " at SocialSurvey - " + survey.getReview()
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&description=" + reviewText
                     + ".&redirect_uri=https://www.facebook.com";
                 break;
         }
 
         LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() ended." );
-        LOG.debug( "Encoding of URL started." );
-        url = url.replaceAll( " ", "%20" );
-        LOG.debug( "Encoding of URL ended. Encoded URL : " + url );
-        LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() ended." );
         return url;
+    }
+
+
+    String urlEncodeText( String params )
+    {
+        LOG.debug( "Encoding of URL params started." );
+        try {
+            params = URLEncoder.encode( params, "UTF-8" );
+            System.out.println( "Encoded URL params : " + params );
+        } catch ( UnsupportedEncodingException e ) {
+            LOG.warn( "Error occurred while url encoding params. Reason : ", e );
+        }
+        LOG.debug( "Encoding of URL params ended." );
+        return params;
     }
 }
