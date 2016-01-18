@@ -94,13 +94,14 @@ public class EncompassController
 
     @ResponseBody
     @RequestMapping ( value = "/testcredentials")
-    public Response testCompanyCredentials( @QueryParam ( value = "username") String username,
+    public String testCompanyCredentials( @QueryParam ( value = "username") String username,
         @QueryParam ( value = "password") String password, @QueryParam ( value = "url") String url )
     {
         LOG.info( "Method to test encompass credentials started for username : " + username + " password : " + password
             + " url : " + url + " started." );
         Response response = null;
         boolean status = false;
+
         try {
             try {
                 if ( username == null || username.isEmpty() ) {
@@ -142,7 +143,6 @@ public class EncompassController
                 resultMap.put( CommonConstants.STATUS_COLUMN, status );
                 resultMap.put( CommonConstants.MESSAGE, responseMap.get( CommonConstants.MESSAGE ) );
                 response = Response.ok( new Gson().toJson( resultMap ) ).build();
-
             } catch ( HttpServerErrorException e ) {
                 LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
@@ -158,7 +158,7 @@ public class EncompassController
 
         LOG.info( "Method to test encompass credentials started for username : " + username + " password : " + password
             + " url : " + url + " finished." );
-        return response;
+        return response.getEntity().toString();
     }
 
 
@@ -176,7 +176,7 @@ public class EncompassController
         resultMap.put( CommonConstants.STATUS_COLUMN, false );
         resultMap.put( CommonConstants.MESSAGE, ex.getDebugMessage() );
         Response response = Response.status( httpStatus ).entity( new Gson().toJson( resultMap ) ).build();
-        
+
         return response;
     }
 
