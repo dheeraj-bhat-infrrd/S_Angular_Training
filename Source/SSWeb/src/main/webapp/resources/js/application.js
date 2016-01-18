@@ -10154,15 +10154,3 @@ function encompassCretentials(){
 			testEncompassConnectionCallBack, payload,true);
 
 };
-/*$('body').on('click', '#en-test-connection', function() {
-	
-		testEncompassConnection("encompass-form");
-	
-});
-
-function testEncompassConnection(formid) {
-	
-		var url = "./testcredentials.do";
-		callAjaxFormSubmit(url, testEncompassConnectionCallBack, formid);
-	
-}*/
