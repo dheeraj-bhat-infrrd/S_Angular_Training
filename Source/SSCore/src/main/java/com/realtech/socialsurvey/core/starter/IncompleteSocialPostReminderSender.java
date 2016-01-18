@@ -373,6 +373,10 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         }
 
         LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() ended." );
+        LOG.debug( "Encoding of URL started." );
+        url = url.replaceAll( " ", "%20" );
+        LOG.debug( "Encoding of URL ended. Encoded URL : " + url );
+        LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() ended." );
         return url;
     }
 }
