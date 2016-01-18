@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -43,6 +42,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
     private SocialManagementService socialManagementService;
 
     private BatchTrackerService batchTrackerService;
+
+    private Utils utils;
 
     public static final Logger LOG = LoggerFactory.getLogger( IncompleteSocialPostReminderSender.class );
 
@@ -200,7 +201,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
         fbAppId = (String) jobMap.get( "fbAppId" );
-
+        utils = (Utils) jobMap.get( "utils" );
     }
 
 
@@ -340,7 +341,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
             survey.getCustomerLastName() );
         String reviewText = fmt_Rating + "-star response from " + customerDisplayName + " for " + survey.getAgentName()
             + " at SocialSurvey - " + survey.getReview();
-        reviewText = urlEncodeText( reviewText );
+        reviewText = utils.urlEncodeText( reviewText );
         switch ( socialSite ) {
             case CommonConstants.REALTOR_LABEL:
                 url = organizationUnitSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink()
@@ -375,19 +376,5 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
         LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() ended." );
         return url;
-    }
-
-
-    String urlEncodeText( String params )
-    {
-        LOG.debug( "Encoding of URL params started." );
-        try {
-            params = URLEncoder.encode( params, "UTF-8" );
-            System.out.println( "Encoded URL params : " + params );
-        } catch ( UnsupportedEncodingException e ) {
-            LOG.warn( "Error occurred while url encoding params. Reason : ", e );
-        }
-        LOG.debug( "Encoding of URL params ended." );
-        return params;
     }
 }
