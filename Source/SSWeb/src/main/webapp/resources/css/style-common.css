@@ -6779,12 +6779,68 @@ tr.u-tbl-header td {
 	width: 28px;
 }
 
-.social-item-icon {
-	background-position-y: 3px;
+.social-item-icon.icn-fb {
+    background-position: 0 3px;
 }
 
-.icn-social-add {
-    background-position-y: -38px;
+.social-item-icon.icn-twit {
+    background-position: -350px 3px;
+}
+
+.social-item-icon.icn-lin {
+    background-position: -150px 3px;
+}
+
+.social-item-icon.icn-gplus {
+    background-position: -50px 3px;
+}
+
+.social-item-icon.icn-yelp {
+    background-position: -300px 3px;
+}
+
+.social-item-icon.icn-zillow {
+    background-position: -250px 3px;
+}
+
+.social-item-icon.icn-lendingtree {
+    background-position: -100px 3px;
+}
+
+.social-item-icon.icn-realtor {
+    background-position: -200px 3px;
+}
+
+.icn-social-add.icn-fb {
+    background-position: 0 -38px;
+}
+
+.icn-social-add.icn-twit {
+    background-position: -350px -38px;
+}
+
+.icn-social-add.icn-lin {
+    background-position: -150px -38px;
+}
+
+.icn-social-add.icn-gplus {
+    background-position: -50px -38px;
+}
+
+.icn-social-add.icn-yelp {
+    background-position: -300px -38px;
+}
+
+.icn-social-add.icn-zillow {
+    background-position: -250px -38px;
+}
+
+.icn-social-add.icn-lendingtree {
+    background-position: -100px -38px;
+}
+
+.icn-social-add.icn-realtor {
+    background-position: -200px -38px;
 }
 
 .lp-input-cont {
