@@ -609,7 +609,7 @@ function openForgotPasswordPage(){
 }
 
 // Dashboard popup click functions
-function openAuthPage(socialNetwork, isAutoLogin, element) {
+function openAuthPage(event,socialNetwork, isAutoLogin, element) {
 	event.stopPropagation();
 	if(isAutoLogin) {
 		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
@@ -623,7 +623,8 @@ function openAuthPage(socialNetwork, isAutoLogin, element) {
 		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
 	}, dataLink);
 }
-function openAuthPageZillow(disableEle) {
+function openAuthPageZillow(event,disableEle) {
+	event.stopPropagation();
 	callAjaxGET("/socialauth.do?social=zillow", function(data) {
 		createZillowProfileUrlPopup( data);
 	}, true,disableEle);

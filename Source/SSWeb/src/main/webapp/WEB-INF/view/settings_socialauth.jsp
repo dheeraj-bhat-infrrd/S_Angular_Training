@@ -88,7 +88,7 @@
 	</c:choose>
 	<div
 		class="float-left soc-nw-icns cursor-pointer icn-wide-zillow soc-nw-adj"
-		onclick="openAuthPageZillow('.icn-wide-zillow');"></div>
+		onclick="openAuthPageZillow(event,'.icn-wide-zillow');"></div>
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
 		data-social='zillow'>${zillowLink}</div>
 </div>
