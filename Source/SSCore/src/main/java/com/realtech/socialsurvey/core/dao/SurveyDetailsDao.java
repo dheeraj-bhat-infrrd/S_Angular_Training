@@ -142,9 +142,6 @@ public interface SurveyDetailsDao
         int maxReminders );
 
 
-    public void updateSharedOn( String socialSite, long agentId, String customerEmail );
-
-
     public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable );
 
 
