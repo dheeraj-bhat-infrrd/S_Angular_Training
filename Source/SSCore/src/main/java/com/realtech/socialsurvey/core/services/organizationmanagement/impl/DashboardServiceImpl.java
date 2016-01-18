@@ -52,6 +52,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -1071,7 +1072,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         return filesToBeUploaded;
     }
-    
+
+
     /**
      * Method to delete surveys from mongo given the survey preinitiation details
      * @param surveys
@@ -1096,34 +1098,34 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
         }
-
+        List<Region> regionList = new ArrayList<Region>();
+        List<Branch> branchList = new ArrayList<Branch>();
+        Company company = companyDao.findById( Company.class, companyId );
         try {
-            // get region ids under company
-            List<Region> regions = organizationManagementService.getRegionsForCompany( companyId );
+            // get regions under company
+            regionList = organizationManagementService.getRegionsForCompany( companyId );
 
-            // get branch ids under company
-            List<Branch> branches = organizationManagementService.getBranchesUnderCompany( companyId );
-
-            if ( regions != null && regions.size() > 0 ) {
-                List<Long> regionIds = new ArrayList<Long>();
-                for ( Region region : regions ) {
-                    regionIds.add( region.getRegionId() );
-                }
-                branches.addAll( organizationManagementService.getBranchesByRegionIds( new HashSet<Long>( regionIds ) ) );
-            }
-            // get branch ids under region ids as collected from earlier
-
-            // get branch settings for the above branch ids
-
-            // get user ids under company
-            // get user ids under region ids as collected earlier
-            // get user ids under branch ids as collected earlier
-            // get user information for the above user ids
-
+            // get branches under company
+            branchList = organizationManagementService.getBranchesUnderCompany( companyId );
         } catch ( ProfileNotFoundException e ) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        // get branches under regions
+        if ( regionList != null && regionList.size() > 0 ) {
+            List<Long> regionIds = new ArrayList<Long>();
+            for ( Region region : regionList ) {
+                regionIds.add( region.getRegionId() );
+            }
+            List<Branch> branchesUnderRegionList = organizationManagementService.getBranchesByRegionIds( new HashSet<Long>(
+                regionIds ) );
+            if ( branchesUnderRegionList != null && branchesUnderRegionList.size() > 0 ) {
+                branchList.addAll( branchesUnderRegionList );
+            }
+        }
+
+        // get users under company
+        List<User> userList = userDao.getUsersForCompany( company );
 
 
         // Blank workbook
@@ -1135,8 +1137,22 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
         // This data needs to be written (List<Object>)
         Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> userAdoptionReportToPopulate = new ArrayList<>();
+        List<Object> userReportToPopulate = new ArrayList<>();
+        List<Object> branchesReportToPopulate = new ArrayList<>();
+        List<Object> regionsReportToPopulate = new ArrayList<>();
+        List<Object> companyHierarchyReportToPopulate = new ArrayList<>();
+
+        // loop on users to generate users sheet
+        if ( userList != null && userList.size() > 0 ) {
+
+        }
+        // loop on branches to generate branches sheet - Sheet name Offices
+        // loop on region to generate region sheet
+
+
         List<Object[]> rows = new ArrayList<>();
+
+
         for ( Object[] row : rows ) {
             // row 0 - company
             // row 1 - region
@@ -1144,35 +1160,35 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             // row 3 - invited users
             // row 4 - active users
             // row 5 - adoption rate
-            userAdoptionReportToPopulate.add( String.valueOf( row[0] ) );
+            companyHierarchyReportToPopulate.add( String.valueOf( row[0] ) );
             if ( row[1] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[1] ) ) )
-                userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
+                companyHierarchyReportToPopulate.add( String.valueOf( row[1] ) );
             else
-                userAdoptionReportToPopulate.add( "" );
+                companyHierarchyReportToPopulate.add( "" );
             if ( row[2] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
-                userAdoptionReportToPopulate.add( String.valueOf( row[2] ) );
+                companyHierarchyReportToPopulate.add( String.valueOf( row[2] ) );
             else
-                userAdoptionReportToPopulate.add( "" );
+                companyHierarchyReportToPopulate.add( "" );
             Integer userCount = new Integer( String.valueOf( row[3] ) );
             Integer activeUserCount = new Integer( String.valueOf( row[4] ) );
             String adoptionRate = String.valueOf( row[5] ).replace( "\\.00", "" );
-            userAdoptionReportToPopulate.add( userCount );
-            userAdoptionReportToPopulate.add( activeUserCount );
-            userAdoptionReportToPopulate.add( adoptionRate != "null" ? adoptionRate : "0%" );
+            companyHierarchyReportToPopulate.add( userCount );
+            companyHierarchyReportToPopulate.add( activeUserCount );
+            companyHierarchyReportToPopulate.add( adoptionRate != "null" ? adoptionRate : "0%" );
 
-            data.put( ( ++counter ).toString(), userAdoptionReportToPopulate );
-            userAdoptionReportToPopulate = new ArrayList<>();
+            data.put( ( ++counter ).toString(), companyHierarchyReportToPopulate );
+            companyHierarchyReportToPopulate = new ArrayList<>();
         }
 
         // Setting up headers
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_COMPANY );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_REGION );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_BRANCH );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_INVITED_USERS );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ACTIVE_USERS );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ADOPTION_RATES );
+        companyHierarchyReportToPopulate.add( CommonConstants.HEADER_COMPANY );
+        companyHierarchyReportToPopulate.add( CommonConstants.HEADER_REGION );
+        companyHierarchyReportToPopulate.add( CommonConstants.HEADER_BRANCH );
+        companyHierarchyReportToPopulate.add( CommonConstants.HEADER_INVITED_USERS );
+        companyHierarchyReportToPopulate.add( CommonConstants.HEADER_ACTIVE_USERS );
+        companyHierarchyReportToPopulate.add( CommonConstants.HEADER_ADOPTION_RATES );
 
-        data.put( "1", userAdoptionReportToPopulate );
+        data.put( "1", companyHierarchyReportToPopulate );
 
         // Iterate over data and write to sheet
         Set<String> keyset = data.keySet();
