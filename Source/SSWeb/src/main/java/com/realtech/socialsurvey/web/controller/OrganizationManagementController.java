@@ -1358,7 +1358,14 @@ public class OrganizationManagementController
                 int reminderInterval = Integer.parseInt( request.getParameter( "post-reminder-interval" ) );
                 if ( reminderInterval == 0 ) {
                     LOG.warn( "Reminder Interval is 0." );
-                    throw new InvalidInputException( "Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR );
+                    throw new InvalidInputException( "Reminder Interval is 0.",
+                        DisplayMessageConstants.INVALID_SOCIAL_POST_REMINDER_ERROR );
+                }
+
+                if ( reminderInterval > 4 ) {
+                    LOG.warn( "Reminder Interval is greater than 4." );
+                    throw new InvalidInputException( "Reminder Interval is greater than 4.",
+                        DisplayMessageConstants.INVALID_SOCIAL_POST_REMINDER_ERROR );
                 }
 
                 originalSurveySettings = companySettings.getSurvey_settings();
@@ -1400,7 +1407,7 @@ public class OrganizationManagementController
     
     
     /**
-     * Method to update Survey Reminder Settings
+     * Method to update Social Post Reminder Settings
      * 
      * @param model
      * @param request

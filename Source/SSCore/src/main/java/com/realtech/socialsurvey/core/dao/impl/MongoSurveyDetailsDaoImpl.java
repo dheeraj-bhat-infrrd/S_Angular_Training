@@ -1398,13 +1398,22 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
+    private Date getNdaysBackDateForIncompleteSocialPostSurveys( int noOfDays )
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set( Calendar.HOUR_OF_DAY, 0 );
+        calendar.set( Calendar.MINUTE, 0 );
+        calendar.set( Calendar.SECOND, 0 );
+        calendar.set( Calendar.MILLISECOND, 0 );
+        calendar.add( Calendar.DATE, noOfDays * ( -1 ) );
+        Date startDate = calendar.getTime();
+        return startDate;
+    }
+
+
     private Date getNdaysBackDate( int noOfDays )
     {
         Calendar calendar = Calendar.getInstance();
-        calendar.add( Calendar.HOUR_OF_DAY, 0 );
-        calendar.add( Calendar.MINUTE, 0 );
-        calendar.add( Calendar.SECOND, 0 );
-        calendar.add( Calendar.MILLISECOND, 0 );
         calendar.add( Calendar.DATE, noOfDays * ( -1 ) );
         Date startDate = calendar.getTime();
         return startDate;
@@ -1450,29 +1459,22 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         int maxReminders )
     {
         LOG.info( "Method to get list of customers who have not yet shared their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() started." );
-        Date cutOffCompletionDate = getNdaysBackDate( maxSocialPostReminderInterval );
+        Date cutOffCompletionDate = getNdaysBackDateForIncompleteSocialPostSurveys( maxSocialPostReminderInterval );
+        Date cutOffDate = getNdaysBackDateForIncompleteSocialPostSurveys( surveyReminderInterval );
         Query query = new Query();
 
         query.addCriteria( new Criteria().andOperator(
             Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
-            Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( cutOffCompletionDate ),
+            Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( cutOffCompletionDate ).lt( cutOffDate ),
+            Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ),
             Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
             Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ),
             Criteria.where( CommonConstants.MOOD_COLUMN ).is( CommonConstants.SURVEY_MOOD_GREAT ) ) );
 
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
-        ListIterator<SurveyDetails> surveyIterator = surveys.listIterator();
-        SurveyDetails surveyDetail;
-        while ( surveyIterator.hasNext() ) {
-            surveyDetail = surveyIterator.next();
-            if ( surveyDetail.getRemindersForSocialPosts() != null
-                && surveyDetail.getRemindersForSocialPosts().size() >= maxReminders ) {
-                surveyIterator.remove();
-            }
-        }
         LOG.info( "Method to get list of customers who have not yet completed their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() finished." );
         return surveys;
-    }
+    }   
 
 
     @Override
