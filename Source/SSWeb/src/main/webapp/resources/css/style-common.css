@@ -1054,8 +1054,14 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	float: left;
 	line-height: 40px;
 }
+.encompass-item-row-left {
+	float: left;
+	line-height: 40px;
+	width: 120px;
+    font-size: 13px;
+}
 
-.um-item-row-txt {
+.um-item-row-txt,.encompass-item-row-txt{
 	width: 300px;
 	height: 40px;
 	padding: 0 10px;
