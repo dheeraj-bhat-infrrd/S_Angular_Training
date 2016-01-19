@@ -774,7 +774,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setGenerateReport( false );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while saving encompass detials. Reason : " + e.getMessage(), e );
@@ -806,7 +806,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while disabling encompass. Reason : " + e.getMessage(), e );
@@ -844,7 +844,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setGenerateReport( true );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_GENERATE_REPORT_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while enabling report generation for encompass. Reason : " + e.getMessage(), e );
