@@ -223,4 +223,5 @@ public final class DisplayMessageConstants
     public static final String INVALID_SURVEY_JSON = "INVALID_SURVEY_JSON";
     public static final String INVALID_AUTHORIZATION_HEADER = "INVALID_AUTHORIZATION_HEADER";
     
+    public static final String INVALID_SOCIAL_POST_REMINDER_ERROR = "INVALID_SOCIAL_POST_REMINDER_ERROR";
 }
