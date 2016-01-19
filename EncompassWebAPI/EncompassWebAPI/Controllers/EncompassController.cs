@@ -18,21 +18,21 @@ namespace EncompassWebAPI.Controllers
                 encompassCredentials = new EncompassCredentials();
                 encompassCredentials.status = false;
                 encompassCredentials.message = "Passed parameter is null or empty";
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, encompassCredentials);
+                return Request.CreateResponse(HttpStatusCode.OK, encompassCredentials);
             }
             //check if null or empty userName is passed
             if (null == encompassCredentials.userName || encompassCredentials.userName == "")
             {
                 encompassCredentials.status = false;
                 encompassCredentials.message = "Passed parameter userName is null or empty";
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, encompassCredentials);
+                return Request.CreateResponse(HttpStatusCode.OK, encompassCredentials);
             }
             //check if null or empty passwod is passed
             if (null == encompassCredentials.password || encompassCredentials.password == "")
             {
                 encompassCredentials.status = false;
                 encompassCredentials.message = "Passed parameter password is null or empty";
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, encompassCredentials);
+                return Request.CreateResponse(HttpStatusCode.OK, encompassCredentials);
             }
             
             //create session object
@@ -59,7 +59,7 @@ namespace EncompassWebAPI.Controllers
             {
                 encompassCredentials.status = false;
                 encompassCredentials.message = "Connection Unsuccessful. Reason : " + ex.Message;
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, encompassCredentials);
+                return Request.CreateResponse(HttpStatusCode.OK, encompassCredentials);
             }
             finally
             {
