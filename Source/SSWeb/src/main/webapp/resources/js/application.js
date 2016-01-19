@@ -3425,17 +3425,38 @@ function resendVerificationMail(){
  * Functions for settings page
  */
 // Encompass
-function saveEncompassDetails(formid) {
+/*function saveEncompassDetails(formid) {
 	if (validateEncompassInput(formid)) {
 		var url = "./saveencompassdetails.do";
 		callAjaxFormSubmit(url, saveEncompassDetailsCallBack, formid);
 	}
-}
+}*/
 
 function saveEncompassDetailsCallBack(response) {
-	$("#overlay-toast").html(response);
-	showToast();
+	
+	var map =  $.parseJSON(response);
+	if (map.status == true) {
+		if($('#en-dry-save').css('display')!='none'){
+		    $('#en-dry-enable').show().siblings('div').hide();
+		    }
+		    $('#en-generate-report').show();
+		callAjaxPOST("/saveencompassdetails.do",
+				testConnectionSaveCallBack,true);		
+	} else {
+		showError(map.message);
+	}
+	/*$("#overlay-toast").html(response);
+	showToast();*/
+	
 }
+function testConnectionSaveCallBack(response){
+	var map = response;
+	if (map== "Successfully set encompass details") {
+		showInfo(map);	
+	} else {
+		showError(map);
+	}
+};
 
 /*function testEncompassConnection(formid) {
 	if (validateEncompassInput(formid)) {
@@ -3445,8 +3466,13 @@ function saveEncompassDetailsCallBack(response) {
 }
 */
 function testEncompassConnectionCallBack(response) {
-	$("#overlay-toast").html(response);
-	showToast();
+	var map =  $.parseJSON(response);
+	if (map.status == true) {
+		showInfo(map.message);
+	} else {
+		showError(map.message);
+	}
+	
 }
 
 var isEncompassValid;
@@ -10110,24 +10136,61 @@ function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 
 
 $(document).on('click','#en-dry-save',function(){
-    if($('#en-dry-save').css('display')!='none'){
-    $('#en-dry-enable').show().siblings('div').hide();
-    }
-    $('#en-generate-report').show();
+ 
+    var username=document.getElementById('encompass-username').value;
+	var password=document.getElementById('encompass-password').value;
+	var url=document.getElementById('encompass-url').value;
+	var payload = {
+			"username" : username,
+			"password":password,
+			"url":url
+		};
+    callAjaxGetWithPayloadData(getLocationOrigin()+"/rest/encompass/testcredentials.do",
+    		saveEncompassDetailsCallBack, payload,true);
 });
 
     
 $(document).on('click','#en-dry-enable',function(){
-    if($('#en-dry-enable').css('display')!='none'){
+   /* if($('#en-dry-enable').css('display')!='none'){
     $('#en-disconnect').show().siblings('div').hide();
     }
-    $('#en-generate-report').hide();
+    $('#en-generate-report').hide();*/
+    callAjaxPOST("/enableencompassdetails.do",
+			testEnableCompassCallBack,true);	
+    
 });
+function testEnableCompassCallBack(response){
+	var map = response;
+	if (map== "Successfully set encompass details") {
+		showInfo(map);	
+		if($('#en-dry-enable').css('display')!='none'){
+		    $('#en-disconnect').show().siblings('div').hide();
+		    }
+		    $('#en-generate-report').hide();
+	} else {
+		showError(map);
+	}	
+	
+};
+
 $(document).on('click','#en-disconnect',function(){
     if($('#en-disconnect').css('display')!='none'){
     $('#en-dry-save').show().siblings('div').hide();
     }
+    callAjaxPOST("/disableencompassdetails.do",
+			testDisconnectCompassCallBack,true);
+    
 });
+
+function testDisconnectCompassCallBack(response){
+	var map = response;
+	if (map== "Successfully set encompass details") {
+		showInfo(map);	
+	} else {
+		showError(map);
+	}	
+	
+};
 
 $(document).on('click', '#en-generate-report', function() {
 	disableBodyScroll();
@@ -10138,8 +10201,23 @@ $(document).on('click', '#en-generate-report', function() {
 		$('#overlay-cancel').html("Cancel");
 		$('#overlay-header').html("Start DryRun");
 		$('#overlay-main').show();
+		$('#overlay-continue').off();
+		$('#overlay-continue').click(function(){
+			 callAjaxPOST("/enableencompassreportgeneration.do",
+					 testGenerateReportCallBack,true);
+		});
 	}, true);
 });
+
+function testGenerateReportCallBack(response){
+	var map = response;
+	if (map== "Successfully set encompass details") {
+		showInfo(map);	
+	} else {
+		showError(map);
+	}	
+	
+};
 
 function encompassCretentials(){
 	var username=document.getElementById('encompass-username').value;

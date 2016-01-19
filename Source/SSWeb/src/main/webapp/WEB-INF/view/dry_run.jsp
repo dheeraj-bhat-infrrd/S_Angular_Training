@@ -5,13 +5,12 @@
             <div class="um-item-row-left text-right">
                 EmailID
             </div>
-            <div class="clearfix float-right st-username-icons">
+           <!--  <div class="clearfix float-right st-username-icons">
                 <div class="um-item-row-icon margin-left-0"></div>
                 <div class="um-item-row-icon margin-left-0"></div>
-            </div>
+            </div> -->
             <div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
-                <div class="rfr_icn icn-fname en-icn-fname"></div>
-                <input id="encompass-report-email" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="EmailID" name="encompass-username" value="${encompassusername}">
+                <input id="encompass-report-email" type="text" class="um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="EmailID" name="encompass-username" >
                 <div id="encompass-username-error" class="hm-item-err-2"></div>
             </div>
             <div class="clearfix dash-sel-wrapper">
