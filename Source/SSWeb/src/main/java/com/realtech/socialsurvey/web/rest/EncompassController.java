@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.CompanyEncompassInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
@@ -58,40 +59,35 @@ public class EncompassController
      */
     @ResponseBody
     @RequestMapping ( value = "/getcompanycredentials")
-    public Response getCompanyCredentials( @QueryParam ( value = "state") String state )
+    public List<CompanyEncompassInfo> getCompanyCredentials( @QueryParam ( value = "state") String state )
     {
-        Response response = null;
+        List<CompanyEncompassInfo> crmInfoList = new ArrayList<CompanyEncompassInfo>();
         LOG.info( "Method to get the encompass credentials for all companies started." );
         try {
-            try {
-                if ( state == null || state.isEmpty() ) {
-                    throw new InvalidInputException( "The state parameter is empty" );
-                }
-                
-                List<OrganizationUnitSettings> companyList = organizationManagementService
-                    .getCompanyListForEncompass( state );
-
-                List<EncompassCrmInfo> crmInfoList = new ArrayList<EncompassCrmInfo>();
-                for ( OrganizationUnitSettings company : companyList ) {
-                    crmInfoList.add( (EncompassCrmInfo) company.getCrm_info() );
-                }
-                String json = new Gson().toJson( crmInfoList );
-                LOG.debug( "crmInfoList json : " + json );
-                response = Response.ok( json ).build();
-
-            } catch ( InvalidInputException e ) {
-                LOG.error( "An exception occured while fetching the list of companies connected to encompass. Reason : " + e );
-                throw new InternalServerException( new EncompassErrorCode(
-                    CommonConstants.ERROR_CODE_ENCOMPASS_COMPANY_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_CRM_INFO,
-                    "Error occured while fetching companies connected to encompass" ), e.getMessage() );
-            } catch ( NoRecordsFetchedException e ) {
-                LOG.info( "No company connected to encompass found!" );
+            if ( state == null || state.isEmpty() ) {
+                throw new InvalidInputException( "The state parameter is empty" );
             }
-        } catch ( BaseRestException e ) {
-            response = getErrorResponse( e );
+
+            List<OrganizationUnitSettings> companyList = organizationManagementService.getCompanyListForEncompass( state );
+
+
+            for ( OrganizationUnitSettings company : companyList ) {
+                CompanyEncompassInfo companyEncompassInfo = new CompanyEncompassInfo();
+                companyEncompassInfo.setCompanyName( company.getProfileName() );
+                companyEncompassInfo.setEncompassCrmInfo( (EncompassCrmInfo) company.getCrm_info() );
+                crmInfoList.add( companyEncompassInfo );
+            }
+
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.info( "No company connected to encompass found!" );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "An exception occured while fetching the list of companies connected to encompass. Reason : " + e );
+            throw new InternalServerException( new EncompassErrorCode(
+                CommonConstants.ERROR_CODE_ENCOMPASS_COMPANY_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_CRM_INFO,
+                "Error occured while fetching companies connected to encompass" ), e.getMessage() );
         }
         LOG.info( "Method to get the encompass credentials for all companies finished." );
-        return response;
+        return crmInfoList;
     }
 
 
