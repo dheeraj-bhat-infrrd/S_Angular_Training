@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -123,6 +125,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private GenericDao<UsercountModificationNotification, Long> userCountModificationDao;
 
+    @Autowired
+    private BatchTrackerService batchTrackerService;
+    
     @Autowired
     private Utils utils;
 
@@ -595,13 +600,45 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
 
-        //Set status to active in mongo
+        //Update Agent settings
         AgentSettings agentSettings = getUserSettings( userId );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN,
-            CommonConstants.STATUS_ACTIVE_MONGO, agentSettings );
+        
 
+        //Update profileName and profileUrl if possible
+        String profileNameForUpdate = null;
+        String profileName = agentSettings.getProfileName();
+        String newProfileName = user.getFirstName().toLowerCase() + "-" + user.getLastName().toLowerCase();
+        user.setProfileName( profileName );
+        user.setProfileUrl( "/" + profileName );
+        if ( !profileName.equals( newProfileName ) ) {
+            OrganizationUnitSettings agentWithProfile = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(
+                newProfileName, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            if ( agentWithProfile == null ) {
+                profileNameForUpdate = newProfileName;
+                user.setProfileName( newProfileName );
+                user.setProfileUrl( "/" + newProfileName );
+            }
+        }
+        
+        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings );
+        
         //Add user to Solr
         solrSearchService.addUserToSolr( user );
+
+        //Update review count for user
+        List<Long> userIdList = new ArrayList<Long>();
+        userIdList.add( userId );
+
+        Map<Long, Integer> agentsReviewCount;
+        try {
+            agentsReviewCount = batchTrackerService.getReviewCountForAgents( userIdList );
+        } catch ( ParseException e ) {
+            LOG.error( "Error while parsing the data fetched from mongo for survey count", e );
+            throw new InvalidInputException( "Error while parsing the data fetched from mongo for survey count. Reason :"
+                + e.getMessage() );
+        }
+        if ( agentsReviewCount != null && !agentsReviewCount.isEmpty() )
+            solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
 
         LOG.info( "Method to reactivate user " + user.getFirstName() + " finished." );
     }

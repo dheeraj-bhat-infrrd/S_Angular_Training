@@ -665,4 +665,38 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.info( "Updated thumbnail image details" );
     }
+    
+
+    /**
+     * Method to set the status as active, reset the profileName, and update the modifiedOn for agent.
+     * @param newProfileName
+     * @param agentSettings
+     * @throws InvalidInputException
+     */
+    @Override
+    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings )
+        throws InvalidInputException
+    {
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "AgentSettings cannot be null" );
+        }
+        LOG.info( "Method updateAgentSettingsForUserRestoration started for agentId : " + agentSettings.getIden() );
+
+        //Set status to active in mongo
+        Query query = new Query();
+        Update update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( agentSettings.getIden() ) );
+        update.set( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO );
+
+        //If newProfileName is present, then update profileName and profileUrl in mongo
+        if ( newProfileName != null && !( newProfileName.isEmpty() ) ) {
+            update.set( CommonConstants.PROFILE_NAME_COLUMN, newProfileName );
+            update.set( CommonConstants.PROFILE_URL_SOLR, "/" + newProfileName );
+        }
+
+        //Update the modifiedOn column in mongo
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+
+        mongoTemplate.updateFirst( query, update, AGENT_SETTINGS_COLLECTION );
+    }
 }
