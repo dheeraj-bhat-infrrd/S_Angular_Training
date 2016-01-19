@@ -62,7 +62,13 @@ function callAjaxGET(url, callBackFunction, isAsync,disableEle) {
  * @param callBackFunction
  * @param isAsync
  */
-function callAjaxPOST(url, callBackFunction, isAsync) {
+function callAjaxPOST(url, callBackFunction, isAsync,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -72,6 +78,12 @@ function callAjaxPOST(url, callBackFunction, isAsync) {
 		dataType : "html",
 		async : isAsync,
 		success : callBackFunction,
+		complete: function(){
+			
+			enable(disableEle);
+		
+		},
+
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);

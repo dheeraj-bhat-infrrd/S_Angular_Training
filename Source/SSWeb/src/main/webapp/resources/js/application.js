@@ -3436,10 +3436,7 @@ function saveEncompassDetailsCallBack(response) {
 	
 	var map =  $.parseJSON(response);
 	if (map.status == true) {
-		if($('#en-dry-save').css('display')!='none'){
-		    $('#en-dry-enable').show().siblings('div').hide();
-		    }
-		    $('#en-generate-report').show();
+		
 		callAjaxPOST("/saveencompassdetails.do",
 				testConnectionSaveCallBack,true);		
 	} else {
@@ -3452,6 +3449,10 @@ function saveEncompassDetailsCallBack(response) {
 function testConnectionSaveCallBack(response){
 	var map = response;
 	if (map== "Successfully set encompass details") {
+		if($('#en-dry-save').css('display')!='none'){
+		    $('#en-dry-enable').show().siblings('div').hide();
+		    }
+		    $('#en-generate-report').show();
 		showInfo(map);	
 	} else {
 		showError(map);
@@ -10136,6 +10137,7 @@ function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 
 
 $(document).on('click','#en-dry-save',function(){
+	
  
     var username=document.getElementById('encompass-username').value;
 	var password=document.getElementById('encompass-password').value;
@@ -10146,14 +10148,14 @@ $(document).on('click','#en-dry-save',function(){
 			"url":url
 		};
     callAjaxGetWithPayloadData(getLocationOrigin()+"/rest/encompass/testcredentials.do",
-    		saveEncompassDetailsCallBack, payload,true);
+    		saveEncompassDetailsCallBack, payload,true,'#en-dry-save');
 });
 
     
 $(document).on('click','#en-dry-enable',function(){
   
     callAjaxPOST("/enableencompassdetails.do",
-			testEnableCompassCallBack,true);	
+			testEnableCompassCallBack,true,'#en-dry-enable');	
     
 });
 function testEnableCompassCallBack(response){
@@ -10171,17 +10173,18 @@ function testEnableCompassCallBack(response){
 };
 
 $(document).on('click','#en-disconnect',function(){
-    if($('#en-disconnect').css('display')!='none'){
-    $('#en-dry-save').show().siblings('div').hide();
-    }
+   
     callAjaxPOST("/disableencompassdetails.do",
-			testDisconnectCompassCallBack,true);
+			testDisconnectCompassCallBack,true,'#en-disconnect');
     
 });
 
 function testDisconnectCompassCallBack(response){
 	var map = response;
 	if (map== "Successfully disabled encompass connection") {
+		 if($('#en-disconnect').css('display')!='none'){
+			    $('#en-dry-save').show().siblings('div').hide();
+			    }
 		showInfo(map);	
 	} else {
 		showError(map);
@@ -10196,7 +10199,7 @@ $(document).on('click', '#en-generate-report', function() {
 		$('#overlay-continue').show();
 		$('#overlay-continue').html("Submit");
 		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Start DryRun");
+		$('#overlay-header').html("Send Report");
 		$('#overlay-main').show();
 		$('#overlay-continue').off();
 		$('#overlay-continue').click(function(){
@@ -10207,7 +10210,7 @@ $(document).on('click', '#en-generate-report', function() {
 			        "encompassReportEmail":encompassReportEmail
 			};
 			 callAjaxPostWithPayloadData("/enableencompassreportgeneration.do",
-					 testGenerateReportCallBack, payload,true);
+					 testGenerateReportCallBack, payload,true,'#en-generate-report');
 		});
 	}, true);
 });
@@ -10233,6 +10236,6 @@ function encompassCretentials(){
 			"url":url
 		};
 	callAjaxGetWithPayloadData(getLocationOrigin()+"/rest/encompass/testcredentials.do",
-			testEncompassConnectionCallBack, payload,true);
+			testEncompassConnectionCallBack, payload,true,'#en-test-connection');
 
 };
