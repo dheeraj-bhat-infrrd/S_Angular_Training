@@ -218,4 +218,8 @@ public interface OrganizationUnitSettingsDao
 
     void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
+
+
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException,
+        NoRecordsFetchedException;
 }
