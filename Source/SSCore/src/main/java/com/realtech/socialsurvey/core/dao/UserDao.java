@@ -30,6 +30,8 @@ public interface UserDao extends GenericDao<User, Long> {
 
     public List<User> getUsersForUserIds( List<Long> userIds ) throws InvalidInputException;
 
+    public List<User> getUsersForCompany( Company company, int start, int batch );
+
 	// JIRA SS-76 by RM-06 : EOC
 
 }

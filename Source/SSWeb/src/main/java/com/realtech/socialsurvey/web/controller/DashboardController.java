@@ -2238,7 +2238,7 @@ public class DashboardController
                 String profileLevel = getProfileLevel( columnName );
                 String fileName = "Company_Hierarchy_Report-" + profileLevel + "-" + user.getFirstName() + "_"
                     + user.getLastName() + "-" + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadUserAdoptionReportData( iden );
+                XSSFWorkbook workbook = dashboardService.downloadCompanyHierarchyReportData( iden );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
                 String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
