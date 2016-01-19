@@ -10203,13 +10203,20 @@ $(document).on('click', '#en-generate-report', function() {
 		$('#overlay-main').show();
 		$('#overlay-continue').off();
 		$('#overlay-continue').click(function(){
-			 callAjaxPOST("/enableencompassreportgeneration.do",
-					 testGenerateReportCallBack,true);
+			var encompassNoOfdays = document.getElementById('encompass-no-of-days').value;	
+			var encompassReportEmail= document.getElementById('encompass-report-email').value;
+			var payload ={
+					"encompassNoOfdays":encompassNoOfdays,
+			        "encompassReportEmail":encompassReportEmail
+			};
+			 callAjaxPostWithPayloadData("/enableencompassreportgeneration.do",
+					 testGenerateReportCallBack, payload,true);
 		});
 	}, true);
 });
 
 function testGenerateReportCallBack(response){
+	$('#overlay-cancel').click();
 	var map = response;
 	if (map== "Successfully set encompass details") {
 		showInfo(map);	

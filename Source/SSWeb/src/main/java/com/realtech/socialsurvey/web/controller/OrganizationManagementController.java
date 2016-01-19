@@ -830,9 +830,9 @@ public class OrganizationManagementController
         User user = sessionHelper.getCurrentUser();
         String message;
         try {
-            String numOfDaysStr = request.getParameter( "encompass-no-of-days" );
+            String numOfDaysStr = request.getParameter( "encompassNoOfdays" );
             int numOfDays = Integer.parseInt( numOfDaysStr );
-            String emailIdForReport = request.getParameter( "encompass-report-email" );
+            String emailIdForReport = request.getParameter( "encompassReportEmail" );
             if ( emailIdForReport == null || emailIdForReport.isEmpty() ) {
                 throw new InvalidInputException( "" );
             }
