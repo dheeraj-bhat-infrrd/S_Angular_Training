@@ -1054,8 +1054,14 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	float: left;
 	line-height: 40px;
 }
+.encompass-item-row-left {
+	float: left;
+	line-height: 40px;
+	width: 120px;
+    font-size: 13px;
+}
 
-.um-item-row-txt {
+.um-item-row-txt,.encompass-item-row-txt{
 	width: 300px;
 	height: 40px;
 	padding: 0 10px;
@@ -7394,6 +7400,17 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
     height: 25px;
     line-height: 25px;
     margin: 75px 0 0 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.enc-state-icon {
+    background-color: rgb(92, 199, 239);
+    color: #fff;
+    width:110px;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    margin-right: 5px;
     border-radius: 3px;
     cursor: pointer;
 }

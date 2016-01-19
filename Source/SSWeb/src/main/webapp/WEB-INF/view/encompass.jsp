@@ -71,12 +71,12 @@
 									placeholder="URL" name="encompass-url" value="${encompassurl}">
 								<div id="encompass-url-error" class="hm-item-err-2"></div>
 							</div>
-							<div class="clearfix float-left st-url-icons">
+							<!-- <div class="clearfix float-left st-url-icons">
 								<div id="encompass-testconnection"
 									class="encompass-testconnection-adj um-item-row-icon icn-spanner margin-left-0 cursor-pointer"></div>
 								<div id="encompass-save"
 									class="um-item-row-icon icn-blue-tick margin-left-0 cursor-pointer"></div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 					<div
@@ -99,6 +99,20 @@
 							</div>
 						</div>
 					</div>
+					<div style="margin-left:160px;">
+
+						<div id="en-dry-save"
+							class="float-left enc-state-icon cursor-pointer">Save</div>
+						<div id="en-dry-enable"
+							class="float-left enc-state-icon cursor-pointer hide"
+							style="display: none;">Enable</div>
+						<div id="en-disconnect"
+							class="float-left enc-state-icon cursor-pointer hide"
+							style="display: none;">Disconnect</div>
+					</div>
+					<div id="en-test-connection" class="float-left enc-state-icon cursor-pointer" onclick="encompassCretentials();">Test Connection</div>
+					<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" >Generate Report</div>
+					
 				</form>
 			</div>
 		</div>
