@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
