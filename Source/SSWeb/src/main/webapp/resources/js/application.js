@@ -10151,17 +10151,14 @@ $(document).on('click','#en-dry-save',function(){
 
     
 $(document).on('click','#en-dry-enable',function(){
-   /* if($('#en-dry-enable').css('display')!='none'){
-    $('#en-disconnect').show().siblings('div').hide();
-    }
-    $('#en-generate-report').hide();*/
+  
     callAjaxPOST("/enableencompassdetails.do",
 			testEnableCompassCallBack,true);	
     
 });
 function testEnableCompassCallBack(response){
 	var map = response;
-	if (map== "Successfully set encompass details") {
+	if (map== "Successfully enabled encompass connection") {
 		showInfo(map);	
 		if($('#en-dry-enable').css('display')!='none'){
 		    $('#en-disconnect').show().siblings('div').hide();
@@ -10184,7 +10181,7 @@ $(document).on('click','#en-disconnect',function(){
 
 function testDisconnectCompassCallBack(response){
 	var map = response;
-	if (map== "Successfully set encompass details") {
+	if (map== "Successfully disabled encompass connection") {
 		showInfo(map);	
 	} else {
 		showError(map);
@@ -10218,7 +10215,7 @@ $(document).on('click', '#en-generate-report', function() {
 function testGenerateReportCallBack(response){
 	$('#overlay-cancel').click();
 	var map = response;
-	if (map== "Successfully set encompass details") {
+	if (map== "Successfully enabled encompass report generation ") {
 		showInfo(map);	
 	} else {
 		showError(map);
