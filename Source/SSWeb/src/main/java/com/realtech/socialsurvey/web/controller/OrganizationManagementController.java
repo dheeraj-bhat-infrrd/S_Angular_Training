@@ -831,10 +831,13 @@ public class OrganizationManagementController
         String message;
         try {
             String numOfDaysStr = request.getParameter( "encompass-no-of-days" );
+            if ( numOfDaysStr == null || numOfDaysStr.isEmpty() ) {
+                throw new InvalidInputException( "Number of days cannot be empty" );
+            }
             int numOfDays = Integer.parseInt( numOfDaysStr );
             String emailIdForReport = request.getParameter( "encompass-report-email" );
             if ( emailIdForReport == null || emailIdForReport.isEmpty() ) {
-                throw new InvalidInputException( "" );
+                throw new InvalidInputException( "emailId cannot be empty" );
             }
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
                 .getCompanyId() );
@@ -848,7 +851,7 @@ public class OrganizationManagementController
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while enabling report generation for encompass. Reason : " + e.getMessage(), e );
-            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = e.getMessage();
         }
         return message;
     }
