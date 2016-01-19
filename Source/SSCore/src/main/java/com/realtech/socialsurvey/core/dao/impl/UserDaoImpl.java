@@ -219,8 +219,10 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
      */
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<User> getUsersForCompany( Company company, int start, int batch )
+    public List<User> getUsersForCompany( Company company, int start, int batch ) throws InvalidInputException
     {
+        if ( company == null )
+            throw new InvalidInputException( "Company passed in getBranchesForCompany() cannot be null" );
         LOG.info( "Method getUsersForCompany called to fetch list of users of company : " + company.getCompany() );
         Criteria criteria = getSession().createCriteria( User.class );
         try {

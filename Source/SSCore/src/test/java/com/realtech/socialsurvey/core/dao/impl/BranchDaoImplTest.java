@@ -43,4 +43,10 @@ public class BranchDaoImplTest
     public void testGetBranchForBranchIdsWithEmptyRegionIds() throws InvalidInputException{
         branchDaoImpl.getBranchForBranchIds( new HashSet<Long>() );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchesForCompanyWithInvalidCompanyId() throws InvalidInputException{
+        branchDaoImpl.getBranchesForCompany( 0, 0, 0, 50 );
+    }
 }

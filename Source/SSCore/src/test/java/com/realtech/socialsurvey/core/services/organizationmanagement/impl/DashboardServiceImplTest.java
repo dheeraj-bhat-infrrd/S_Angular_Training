@@ -412,4 +412,12 @@ public class DashboardServiceImplTest
         Mockito.when( fileUploadDao.findByKeyValue( Mockito.eq( FileUpload.class ), Mockito.anyMap() ) ).thenReturn( null );
         dashboardServiceImpl.getBillingReportToBeSent();
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadCompanyHierarchyReportDataWithInvalidCompanyId() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        dashboardServiceImpl.downloadCompanyHierarchyReportData( 0 );
+    }
 }
