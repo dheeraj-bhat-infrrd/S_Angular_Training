@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpServerErrorException;
@@ -165,6 +166,46 @@ public class EncompassController
         LOG.info( "Method to test encompass credentials started for username : " + username + " password : " + password
             + " url : " + url + " finished." );
         return response.getEntity().toString();
+    }
+
+
+    /**
+     * Method to set the generateReport field to false in EncompassCrmInfo
+     * @param companyId
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/disablereportgeneration/{companyId}")
+    public boolean disableEncompassReportGeneration( @PathVariable long companyId )
+    {
+        LOG.info( "Method to disable report generation for companyId : " + companyId + " started." );
+        boolean success = true;
+        try {
+            if ( companyId <= 0l ) {
+                throw new InvalidInputException( "Invalid companyId : " + companyId );
+            }
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            if ( companySettings == null ) {
+                throw new InvalidInputException( "Company Settings was not found for companyId : " + companyId );
+            }
+
+            if ( companySettings.getCrm_info() == null || companySettings.getCrm_info().getCrm_source() == null
+                || companySettings.getCrm_info().getCrm_source().isEmpty()
+                || !( companySettings.getCrm_info().getCrm_source().equals( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) ) {
+                throw new InvalidInputException( "No Encompass CRM Info was found for the company : " + companyId );
+            }
+
+            EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            encompassCrmInfo.setGenerateReport( false );
+            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+
+        } catch ( Exception e ) {
+            LOG.error( "An exception occured while disabling report generation for companyId : " + companyId, e );
+            success = false;
+        }
+        LOG.info( "Method to disable report generation for companyId : " + companyId + " finished." );
+        return success;
     }
 
 
