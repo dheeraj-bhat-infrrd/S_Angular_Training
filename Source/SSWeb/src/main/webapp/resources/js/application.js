@@ -2374,10 +2374,6 @@ function showSelectorsByAssignToOption(assignToOption) {
 }
 
 function showAdminPrivilegesChk(){
-	//check if assign to is company or multiple users is selected 
-	if(($('#assign-to-txt').attr('data-assignto') == 'company' && $("#assign-to-selector").data("profile") == "individual") || $('div.bd-cust-rad-img-checked.bd-cust-rad-img').attr('data-type') == 'multiple') {
-		return; //do not show checkbox if assign to is company or multiple user assignment
-	}
 	$("#admin-privilege-div").show();
 	if(!$('.bd-check-img').hasClass('bd-check-img-checked') ){
 		$('.bd-check-img').next("#is-admin-chk").val("true");
