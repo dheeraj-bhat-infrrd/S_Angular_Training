@@ -58,7 +58,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding" >
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.url.key" />
@@ -80,7 +80,7 @@
 						</div>
 					</div>
 					<div
-						class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
+						class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden" style="margin-bottom:30px;">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.fieldId.key" />
@@ -99,7 +99,8 @@
 							</div>
 						</div>
 					</div>
-					<div style="margin-left:160px;">
+					<div class="encompass-btn" >
+					<div>
 
 						<div id="en-dry-save"
 							class="float-left enc-state-icon cursor-pointer">Save</div>
@@ -112,7 +113,7 @@
 					</div>
 					<div id="en-test-connection" class="float-left enc-state-icon cursor-pointer" onclick="encompassCretentials();">Test Connection</div>
 					<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" >Generate Report</div>
-					
+					</div>
 				</form>
 			</div>
 		</div>
