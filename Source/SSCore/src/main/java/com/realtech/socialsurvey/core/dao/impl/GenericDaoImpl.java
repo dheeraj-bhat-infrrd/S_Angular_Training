@@ -223,9 +223,9 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
     @Override
     @SuppressWarnings ( "unchecked")
     @Transactional
-    public List<T> findByCriteria( Criterion... criterion )
+    public List<T> findByCriteria( Class<T> dataClass, Criterion... criterion )
     {
-        Criteria crit = getSession().createCriteria( getPersistentClass() );
+        Criteria crit = getSession().createCriteria( dataClass );
         try {
             for ( Criterion c : criterion ) {
                 crit.add( c );
