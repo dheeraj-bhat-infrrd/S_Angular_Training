@@ -829,7 +829,28 @@ public class SolrSearchServiceImpl implements SolrSearchService
             .addField( CommonConstants.IS_BRANCH_ADMIN_SOLR, ( user.isBranchAdmin() ? user.isBranchAdmin() : isBranchAdmin ) );
         document
             .addField( CommonConstants.IS_REGION_ADMIN_SOLR, ( user.isRegionAdmin() ? user.isRegionAdmin() : isRegionAdmin ) );
-        document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
+        try {
+            AgentSettings agentSettings = userManagementService.getUserSettings( user.getUserId() );
+            //Set profileImageUrl fields if present
+            if ( agentSettings.getProfileImageUrl() != null && !( agentSettings.getProfileImageUrl().isEmpty() ) ) {
+                document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                document.addField( CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl() );
+                if ( agentSettings.getProfileImageUrlThumbnail() != null
+                    && !( agentSettings.getProfileImageUrlThumbnail().isEmpty() ) ) {
+                    document.addField( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN,
+                        agentSettings.getProfileImageUrlThumbnail() );
+                } else {
+                    document.addField( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, agentSettings.getProfileImageUrl() );
+                }
+
+            } else {
+                document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.info( "No agentSettings found for userId :" + user.getUserId() );
+            document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
+        }
+
         return document;
     }
 

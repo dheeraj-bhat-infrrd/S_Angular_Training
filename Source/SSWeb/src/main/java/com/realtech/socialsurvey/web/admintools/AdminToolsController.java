@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -29,6 +30,9 @@ import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 
 
 @Controller
@@ -39,10 +43,19 @@ public class AdminToolsController
     @Autowired
     private UserManagementService userManagementService;
 
+    @Autowired
+    private MessageUtils messageUtils;
+
+    @Autowired
+    private EncryptionHelper encryptionHelper;
+
+    @Autowired
+    private SurveyHandler surveyHandler;
+
 
     /**
      * Controller that returns all the users in a company that match a certain criteria
-     * @param companyId
+     * @param companyId, HttpServletRequest request
      * @param emailId
      * @param firstName
      * @param lastName
@@ -51,13 +64,16 @@ public class AdminToolsController
     @ResponseBody
     @RequestMapping ( value = "/{companyId}")
     public Response searchUsersInCompany( @PathVariable long companyId, @QueryParam ( value = "emailId") String emailId,
-        @QueryParam ( value = "firstName") String firstName, @QueryParam ( value = "lastName") String lastName )
+        @QueryParam ( value = "firstName") String firstName, @QueryParam ( value = "lastName") String lastName,
+        HttpServletRequest request )
     {
         LOG.info( "Method searchUsersInCompany started for companyId : " + companyId + " emailId : " + emailId
             + " firstName : " + firstName + " lastName : " + lastName );
         Response response = null;
         try {
             try {
+                String authorizationHeader = request.getHeader( "Authorization" );
+                validateAuthHeader( authorizationHeader );
                 if ( companyId <= 0l ) {
                     throw new InvalidInputException( "Invalid comapnyId : " + companyId );
                 }
@@ -119,12 +135,14 @@ public class AdminToolsController
      */
     @ResponseBody
     @RequestMapping ( value = "/restoreUser/{userId}")
-    public Response restoreUser( @PathVariable long userId )
+    public Response restoreUser( @PathVariable long userId, HttpServletRequest request )
     {
         LOG.info( "Method restoreUser started for userId : " + userId );
         Response response = null;
         try {
             try {
+                String authorizationHeader = request.getHeader( "Authorization" );
+                validateAuthHeader( authorizationHeader );
                 userManagementService.restoreDeletedUser( userId );
                 response = Response.ok( "UserId " + userId + " was successfully restored." ).build();
             } catch ( Exception e ) {
@@ -175,5 +193,31 @@ public class AdminToolsController
         }
         LOG.debug( "Resolved http status to " + httpStatus.getStatusCode() );
         return httpStatus;
+    }
+
+
+    private void validateAuthHeader( String authorizationHeader ) throws InvalidInputException
+    {
+        Map<String, String> params = new HashMap<String, String>();
+        if ( authorizationHeader == null || authorizationHeader.isEmpty() ) {
+            throw new InvalidInputException( "Authorization failure" );
+        }
+
+        LOG.debug( "Validating authroization header " );
+        try {
+            String plainText = encryptionHelper.decryptAES( authorizationHeader, "" );
+            String keyValuePairs[] = plainText.split( "&" );
+
+            for ( int counter = 0; counter < keyValuePairs.length; counter += 1 ) {
+                String[] keyValuePair = keyValuePairs[counter].split( "=" );
+                params.put( keyValuePair[0], keyValuePair[1] );
+            }
+        } catch ( InvalidInputException e ) {
+            throw new InvalidInputException( "Authorization failure" );
+        }
+
+        if ( !surveyHandler.validateDecryptedApiParams( params ) ) {
+            throw new InvalidInputException( "Authorization failure" );
+        }
     }
 }

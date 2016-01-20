@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -12,7 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import com.realtech.socialsurvey.TestConstants;
+
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -175,5 +176,13 @@ public class MongoOrganizationUnitSettingsDaoImplTest
     public void updateImageForOrganizationUnitSettingTestImageTypeInvalid() throws InvalidInputException
     {
         mongoOrganizationUnitSettingDaoImpl.updateImageForOrganizationUnitSetting( 1, "test", "test", "test", false, false );
+    }
+
+
+    //Tests for updateAgentSettingsForUserRestoration
+
+    public void updateAgentSettingsForUserRestorationTestAgentSettingsNull() throws InvalidInputException
+    {
+        mongoOrganizationUnitSettingDaoImpl.updateAgentSettingsForUserRestoration( null, null );
     }
 }
