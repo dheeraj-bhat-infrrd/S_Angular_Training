@@ -47,4 +47,11 @@ public class UserDaoImplTest
     {
         userDaoImpl.getUsersForUserIds( new ArrayList<Long>() );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUsersForCompanyWithNullCompany() throws InvalidInputException
+    {
+        userDaoImpl.getUsersForCompany( null, 0, 50 );
+    }
 }

@@ -7842,6 +7842,9 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	case 5:
 		window.location.href = "/downloaduseradoptionreport.do?columnName=" + colName + "&columnValue=" + colValue;
 		break;
+	case 6:
+		window.location.href = "/downloadcompanyhierarchyreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		break;
 	default:
 		break;
 	}
