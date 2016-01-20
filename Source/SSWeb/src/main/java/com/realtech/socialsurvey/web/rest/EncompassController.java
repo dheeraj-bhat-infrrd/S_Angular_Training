@@ -138,8 +138,8 @@ public class EncompassController
 
                 HttpEntity<String> requestEntity = new HttpEntity<String>( jsonString, headers );
                 HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-                requestFactory.setReadTimeout( 20 * 1000 );
-                requestFactory.setConnectTimeout( 20 * 1000 );
+                requestFactory.setReadTimeout( 30 * 1000 );
+                requestFactory.setConnectTimeout( 30 * 1000 );
                 RestTemplate restTemplate = new RestTemplate( requestFactory );
                 restTemplate.getMessageConverters().add( new FormHttpMessageConverter() );
                 restTemplate.getMessageConverters().add( new MappingJackson2HttpMessageConverter() );
