@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
@@ -135,8 +137,10 @@ public class EncompassController
                 headers.setAccept( Arrays.asList( MediaType.APPLICATION_JSON ) );
 
                 HttpEntity<String> requestEntity = new HttpEntity<String>( jsonString, headers );
-
-                RestTemplate restTemplate = new RestTemplate();
+                HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+                requestFactory.setReadTimeout( 30 * 1000 );
+                requestFactory.setConnectTimeout( 30 * 1000 );
+                RestTemplate restTemplate = new RestTemplate( requestFactory );
                 restTemplate.getMessageConverters().add( new FormHttpMessageConverter() );
                 restTemplate.getMessageConverters().add( new MappingJackson2HttpMessageConverter() );
                 //Make request to the encompass application and get the response
@@ -150,6 +154,11 @@ public class EncompassController
                 resultMap.put( CommonConstants.STATUS_COLUMN, status );
                 resultMap.put( CommonConstants.MESSAGE, responseMap.get( CommonConstants.MESSAGE ) );
                 response = Response.ok( new Gson().toJson( resultMap ) ).build();
+            } catch ( ResourceAccessException e ) {
+                LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
+                throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
+                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ),
+                    "Unable to connect to encompass server at the moment" );
             } catch ( HttpServerErrorException e ) {
                 LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
