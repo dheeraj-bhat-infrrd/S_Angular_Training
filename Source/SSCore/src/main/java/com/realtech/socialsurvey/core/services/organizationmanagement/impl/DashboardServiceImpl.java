@@ -25,6 +25,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.slf4j.Logger;
@@ -1064,15 +1066,17 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     /**
      * Method to check if billing report entries exist
      */
-    @Transactional
     @Override
+    @Transactional
     public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException
     {
         LOG.info( "Check if billing report entries exist" );
-        Map<String, Object> queries = new HashMap<>();
-        queries.put( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
-        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-        List<FileUpload> filesToBeUploaded = fileUploadDao.findByKeyValue( FileUpload.class, queries );
+        Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+        List<Integer> statusList = new ArrayList<Integer>();
+        statusList.add( CommonConstants.STATUS_ACTIVE );
+        statusList.add( CommonConstants.STATUS_UNDER_PROCESSING );
+        Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN, statusList );
+        List<FileUpload> filesToBeUploaded = fileUploadDao.findByCriteria( FileUpload.class, fileUploadTypeCriteria, statusCriteria );
         if ( filesToBeUploaded == null || filesToBeUploaded.isEmpty() ) {
             throw new NoRecordsFetchedException( "No billing report entries exist" );
         }
