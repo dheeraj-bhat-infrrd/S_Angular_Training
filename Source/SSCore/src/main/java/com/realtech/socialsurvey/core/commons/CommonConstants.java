@@ -940,4 +940,50 @@ public interface CommonConstants
     // Status in mongo for active and inactive records
     public static final String STATUS_ACTIVE_MONGO = "A";
     public static final String STATUS_DELETED_MONGO = "D";
+
+    // Company Hierarchy Report Headers
+    public static final String CHR_YES = "Yes";
+    public static final String CHR_NO = "No";
+    public static final String CHR_USERS_USER_ID = "User ID";
+    public static final String CHR_USERS_FIRST_NAME = "First Name";
+    public static final String CHR_USERS_LAST_NAME = "Last Name";
+    public static final String CHR_USERS_TITLE = "Title";
+    public static final String CHR_USERS_OFFICE_ASSIGNMENTS = "Office Assignment(s)";
+    public static final String CHR_USERS_REGION_ASSIGNMENTS = "Region Assignment(s)";
+    public static final String CHR_USERS_PUBLIC_PROFILE = "Public Profile";
+    public static final String CHR_USERS_OFFICE_ADMIN_PRIVILEGE = "Office Admin Privilege(s)";
+    public static final String CHR_USERS_REGION_ADMIN_PRIVILEGE = "Region Admin Privilege";
+    public static final String CHR_USERS_EMAIL = "Email";
+    public static final String CHR_USERS_PHONE = "Phone";
+    public static final String CHR_USERS_WEBSITE = "Website";
+    public static final String CHR_USERS_LICENSE = "License(s)";
+    public static final String CHR_USERS_LEGAL_DISCLAIMER = "Legal Disclaimer";
+    public static final String CHR_USERS_PHOTO = "Photo";
+    public static final String CHR_USERS_ABOUT_ME_DESCRIPTION = "About Me Description";
+    public static final String CHR_USERS_USER_ID_DESC = "Unique ID used for record updates.";
+    public static final String CHR_USERS_TITLE_DESC = "Title to be displayed.";
+    public static final String CHR_USERS_OFFICE_ASSIGNMENTS_DESC = "List each Office ID from the Offices sheet.";
+    public static final String CHR_USERS_REGION_ASSIGNMENTS_DESC = "List each Region ID from the Region sheet.";
+    public static final String CHR_USERS_PUBLIC_PROFILE_DESC = "Yes, if they should have a webpage and be surveyable.";
+    public static final String CHR_USERS_OFFICE_ADMIN_PRIVILEGE_DESC = "Yes, if they should have access to manage Office Account";
+    public static final String CHR_USERS_REGION_ADMIN_PRIVILEGE_DESC = "Yes, if they should have access to manage Region Account";
+    public static final String CHR_USERS_EMAIL_DESC = "Email address to send registration request.";
+    public static final String CHR_USERS_PHONE_DESC = "Phone number to be publicly displayed.";
+    public static final String CHR_USERS_WEBSITE_DESC = "Link to website to be publicly displayed.";
+    public static final String CHR_USERS_LICENSE_DESC = "List of licenses to be displayed publicly.";
+    public static final String CHR_USERS_LEGAL_DISCLAIMER_DESC = "Plain text legal disclaimer to be displayed on footer of all pages.";
+    public static final String CHR_USERS_PHOTO_DESC = "URL of Agents Photo";
+    public static final String CHR_USERS_ABOUT_ME_DESCRIPTION_DESC = "A few paragraphs about the user displayed publicly.";
+    public static final String CHR_BRANCH_BRANCH_ID = "Office ID";
+    public static final String CHR_BRANCH_BRANCH_NAME = "Office Name";
+    public static final String CHR_REGION_REGION_ID = "Region ID";
+    public static final String CHR_REGION_REGION_NAME = "Region Name";
+    public static final String CHR_ADDRESS_1 = "Address 1";
+    public static final String CHR_ADDRESS_2 = "Address 2";
+    public static final String CHR_CITY = "City";
+    public static final String CHR_STATE = "State";
+    public static final String CHR_ZIP = "Zip";
+    public static final String CHR_ID_DESC = "Unique ID used for assignment.";
+    public static final String CHR_BRANCH_REGION_ID_DESC = "Region ID from the Region sheet.";
+    public static final String CHR_REGION_REGION_NAME_DESC = "Name to be displayed.";
 }

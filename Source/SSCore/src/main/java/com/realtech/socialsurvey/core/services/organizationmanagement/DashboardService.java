@@ -94,5 +94,7 @@ public interface DashboardService
      * @param surveys
      */
     void deleteSurveyDetailsByPreInitiation( List<SurveyPreInitiation> surveys );
+
+    public XSSFWorkbook downloadCompanyHierarchyReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
 }
 // JIRA SS-137 BY RM05:EOC

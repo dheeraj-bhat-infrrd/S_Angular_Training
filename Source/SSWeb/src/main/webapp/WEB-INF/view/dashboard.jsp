@@ -142,6 +142,7 @@
 							<option value=4 data-report="incomplete-survey"><spring:message code="label.incompletesurveydata.key" /></option>
 							<c:if test="${profilemasterid == 1 || accounttype == 'COMPANY' }">
 								<option value=5 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option>
+								<option value=6 data-report="company-hierarchy"><spring:message code="label.downloadcompanyhierarchydata.key" /></option>
 							</c:if>
 						</select>
 						<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
