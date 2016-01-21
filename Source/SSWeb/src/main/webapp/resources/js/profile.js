@@ -100,7 +100,7 @@ function validateContactUsForm() {
 		$('#lp-input-message').focus();
 		return false;
 	}
-	return false;
+	return true;
 } 
 
 $(document).on('click touchstart', '.icn-person', function() {
@@ -195,7 +195,7 @@ function showMessage(data){
 		var recaptchaframe = $('.g-recaptcha iframe');
         var recaptchaSoure = recaptchaframe[0].src;
         recaptchaframe[0].src = '';
-        setInterval(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
+        setTimeout(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
 	}
 	else{
 		showErrorMobileAndWeb(jsonData["message"]);
