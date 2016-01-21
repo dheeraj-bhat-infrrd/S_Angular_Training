@@ -714,39 +714,73 @@ public class OrganizationManagementController
         LOG.info( "Saving encompass details" );
         User user = sessionHelper.getCurrentUser();
         request.setAttribute( "saveencompassdetails", "true" );
+        
+        String encompassUsername = request.getParameter( "encompass-username" );
+        String encompassPassword = request.getParameter( "encompass-password" );
+        String encompassUrl = request.getParameter( "encompass-url" );
+        String encompassFieldId = request.getParameter( "encompass-fieldId" );
+        String state = request.getParameter( "encompass-state" );
+        Map<String, Object> responseMap = new HashMap<String, Object>();
         String message;
+        boolean status = true;
 
         try {
+            
+            if(encompassUsername == null || encompassUsername.isEmpty()){
+                throw new InvalidInputException( "User name can not be empty" );
+            }
+            if(encompassPassword == null || encompassPassword.isEmpty()){
+                throw new InvalidInputException( "Password can not be empty" );  
+            }
+            if(encompassUrl == null || encompassUrl.isEmpty()){
+                throw new InvalidInputException( "Url can not be empty" );
+            }
+            if(encompassFieldId == null || encompassFieldId.isEmpty()){
+                throw new InvalidInputException( "Field Id can not be empty" );
+            }
+            if ( state == null || state.isEmpty() || state.equals( CommonConstants.ENCOMPASS_DRY_RUN_STATE ) ){
+                state = CommonConstants.ENCOMPASS_DRY_RUN_STATE;
+            } else {
+                state = CommonConstants.ENCOMPASS_PRODUCTION_STATE;                
+            }
 
-            // Encrypting the password
-            String plainPassword = request.getParameter( "encompass-password" );
-            String cipherPassword = plainPassword;
-
-            EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
-            encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
-            encompassCrmInfo.setCrm_username( request.getParameter( "encompass-username" ) );
-            encompassCrmInfo.setCrm_fieldId( request.getParameter( "encompass-fieldId" ) );
-            encompassCrmInfo.setCrm_password( cipherPassword );
-            encompassCrmInfo.setUrl( request.getParameter( "encompass-url" ) );
-            encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
-            encompassCrmInfo.setConnection_successful( true );
+            // TODO : Encrypting the password
+            String cipherPassword = encompassPassword;
 
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
                 .getCompanyId() );
-            encompassCrmInfo.setCompanyId( companySettings.getIden() );
+            EncompassCrmInfo encompassCrmInfo;
+            if ( companySettings.getCrm_info() != null && companySettings.getCrm_info().getCrm_source().equals( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
+                encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            } else {
+                encompassCrmInfo = new EncompassCrmInfo();
+                encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
+                encompassCrmInfo.setState( state );
+                encompassCrmInfo.setConnection_successful( true );
+                encompassCrmInfo.setCompanyId( companySettings.getIden() );
+            }
+            encompassCrmInfo.setCrm_username( encompassUsername );
+            encompassCrmInfo.setCrm_fieldId( encompassFieldId );
+            encompassCrmInfo.setCrm_password( cipherPassword );
+            encompassCrmInfo.setUrl( encompassUrl );
+            
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
 
             // set the updated settings value in session with plain password
-            encompassCrmInfo.setCrm_password( plainPassword );
+            encompassCrmInfo.setCrm_password( cipherPassword );
             companySettings.setCrm_info( encompassCrmInfo );
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+            status = false;
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
-        return message;
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        String response = new Gson().toJson( responseMap );
+        return response;
     }
 
 

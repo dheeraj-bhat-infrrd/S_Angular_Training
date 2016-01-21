@@ -3425,20 +3425,18 @@ function resendVerificationMail(){
  * Functions for settings page
  */
 // Encompass
-/*function saveEncompassDetails(formid) {
+function saveEncompassDetails(formid) {
 	if (validateEncompassInput(formid)) {
 		var url = "./saveencompassdetails.do";
-		callAjaxFormSubmit(url, saveEncompassDetailsCallBack, formid);
+		callAjaxFormSubmit(url, testConnectionSaveCallBack, formid);
 	}
-}*/
+}
 
 function saveEncompassDetailsCallBack(response) {
 	
-	var map =  $.parseJSON(response);
+	var map = $.parseJSON(response);
 	if (map.status == true) {
-		
-		callAjaxPOST("/saveencompassdetails.do",
-				testConnectionSaveCallBack,true);		
+		saveEncompassDetails("encompass-form");	
 	} else {
 		showError(map.message);
 	}
@@ -3447,15 +3445,18 @@ function saveEncompassDetailsCallBack(response) {
 	
 }
 function testConnectionSaveCallBack(response){
-	var map = response;
-	if (map== "Successfully set encompass details") {
-		if($('#en-dry-save').css('display')!='none'){
-		    $('#en-dry-enable').show().siblings('div').hide();
-		    }
-		    $('#en-generate-report').show();
-		showInfo(map);	
+	var map = $.parseJSON(response);
+	if (map.status == true) {
+		//If state = prod/ state = dryrun, don't make any changes
+		//else state = dryrun
+		var state = $("#encompass-state").val();
+		if (state != 'dryrun' && state != 'prod') {
+			$("#encompass-state").val('dryrun');
+			showEncompassButtons();
+		}
+		showInfo(map.message);	
 	} else {
-		showError(map);
+		showError(map.message);
 	}
 };
 
@@ -10138,7 +10139,38 @@ function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 
 $(document).on('click','#en-dry-save',function(){
 	
- 
+	if (validateEncompassInput('encompass-form-div')) {
+		var state = $("#encompass-state").val();
+		var warn = true;
+		if (state == null || state == undefined || state == '' || state == 'dryrun') {
+			warn = false;
+		}
+		if(warn){
+			confirmEncompassEdit();
+		} else {
+			initiateEncompassSaveConnection();
+		}
+	}
+});
+
+function confirmEncompassEdit() {
+	
+	
+	$('#overlay-header').html("Confirm Edit");
+	$('#overlay-text').html("This action can affect the way we fetch your encompass records");
+	$('#overlay-continue').html("Edit");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
+	$('#overlay-continue').click(function(){
+		initiateEncompassSaveConnection();
+		$('#overlay-main').hide();
+	});
+	
+	$('#overlay-main').show();
+	disableBodyScroll();
+}
+
+function initiateEncompassSaveConnection(){
     var username=document.getElementById('encompass-username').value;
 	var password=document.getElementById('encompass-password').value;
 	var url=document.getElementById('encompass-url').value;
@@ -10149,8 +10181,7 @@ $(document).on('click','#en-dry-save',function(){
 		};
     callAjaxGetWithPayloadData(getLocationOrigin()+"/rest/encompass/testcredentials.do",
     		saveEncompassDetailsCallBack, payload,true,'#en-dry-save');
-});
-
+}
     
 $(document).on('click','#en-dry-enable',function(){
   
@@ -10161,17 +10192,30 @@ $(document).on('click','#en-dry-enable',function(){
 function testEnableCompassCallBack(response){
 	var map = response;
 	if (map== "Successfully enabled encompass connection") {
-		showInfo(map);	
-		if($('#en-dry-enable').css('display')!='none'){
-		    $('#en-disconnect').show().siblings('div').hide();
-		    }
-		    $('#en-generate-report').hide();
+		showInfo(map);
+		$("#encompass-state").val('prod');
+		showEncompassButtons();
 	} else {
 		showError(map);
 	}	
 	
 };
-
+function showEncompassButtons(){
+	var state = $("#encompass-state").val();
+	if (state == 'dryrun') {
+		$('#en-dry-enable').show();
+		$('#en-generate-report').show();
+		$('#en-disconnect').hide();
+	} else if (state == 'prod') {
+		$('#en-disconnect').show();
+		$('#en-dry-enable').hide();
+		$('#en-generate-report').hide();
+	} else {
+		$('#en-disconnect').hide();
+		$('#en-dry-enable').hide();
+		$('#en-generate-report').hide();
+	}
+}
 $(document).on('click','#en-disconnect',function(){
    
     callAjaxPOST("/disableencompassdetails.do",
@@ -10182,9 +10226,8 @@ $(document).on('click','#en-disconnect',function(){
 function testDisconnectCompassCallBack(response){
 	var map = response;
 	if (map== "Successfully disabled encompass connection") {
-		 if($('#en-disconnect').css('display')!='none'){
-			    $('#en-dry-save').show().siblings('div').hide();
-			    }
+		$("#encompass-state").val('dryrun');
+		showEncompassButtons();
 		showInfo(map);	
 	} else {
 		showError(map);
