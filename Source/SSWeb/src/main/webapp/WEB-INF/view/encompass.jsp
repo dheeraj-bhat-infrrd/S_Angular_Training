@@ -15,8 +15,10 @@
 					<c:set var="encompassurl" value="${appSettings.crm_info.url}" />
 					<c:set var="encompassfieldid"
 						value="${appSettings.crm_info.crm_fieldId}" />
+					<c:set var="encompassstate" value="${ appSettings.crm_info.state }" />
 				</c:if>
 				<form id="encompass-form">
+					<input id="encompass-state" type="hidden" value="${ encompassstate }" />
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
@@ -101,7 +103,6 @@
 					</div>
 					<div class="encompass-btn" >
 					<div>
-
 						<div id="en-dry-save"
 							class="float-left enc-state-icon cursor-pointer">Save</div>
 						<div id="en-dry-enable"
@@ -119,3 +120,8 @@
 		</div>
 	</div>
 </div>
+<script>
+		$(document).ready(function() {
+			showEncompassButtons();
+		});
+</script>

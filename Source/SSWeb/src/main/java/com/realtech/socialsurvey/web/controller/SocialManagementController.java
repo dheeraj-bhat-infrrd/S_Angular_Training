@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
@@ -1731,10 +1732,41 @@ public class SocialManagementController
         return JspResolver.HEADER_SURVEY_INVITE;
     }
     
+
+    /**
+     * Method to get the generate report pop up for dry run
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
     @RequestMapping ( value = "/dryrun")
-    public String dryRun()
+    public String dryRun( Model model )
     {
-        LOG.info( "Method dryrun called" );
+        LOG.info( "Method to display the generate report popup for dry run started" );
+        User user = sessionHelper.getCurrentUser();
+        String emailId = "";
+        String noOfDays = "";
+        try {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+            if ( companySettings.getCrm_info() != null
+                && companySettings.getCrm_info().getCrm_source().equals( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
+                EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+                if ( encompassCrmInfo.getEmailAddressForReport() != null
+                    && !( encompassCrmInfo.getEmailAddressForReport().isEmpty() ) ) {
+                    emailId = encompassCrmInfo.getEmailAddressForReport();
+                }
+                if ( encompassCrmInfo.getNumberOfDays() > 0 ) {
+                    noOfDays = String.valueOf( encompassCrmInfo.getNumberOfDays() );
+                }
+            }
+            model.addAttribute( "emailId", emailId );
+            model.addAttribute( "NumberOfDays", noOfDays );
+        } catch ( Exception e ) {
+            LOG.error( "An exception occured while fetching the generate report pop up. Reason :", e );
+            return CommonConstants.ERROR;
+        }
+        LOG.info( "Method to display the generate report popup for dry run finished" );
         return JspResolver.DRY_RUN;
     }
 
