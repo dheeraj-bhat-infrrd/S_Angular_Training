@@ -1288,6 +1288,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             if ( mailSubject == null || mailSubject.isEmpty() ) {
                 mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
             }
+            // replace arguments
+            mailSubject = mailSubject.replaceAll("\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
+            mailSubject = mailSubject.replaceAll("\\[AgentName\\]", agentName);
 
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
