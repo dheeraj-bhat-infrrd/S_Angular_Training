@@ -14,7 +14,7 @@ namespace EncompassSocialSurvey
     {
         public static DateTime ConvertStringToDateTime(string inputDate)
         {
-            Logger.Info("Entering the method CommonUtility.ConvertStringToDateTime()");
+            Logger.Info("Entering the method CommonUtility.ConvertStringToDateTime() for date : " + inputDate);
             try
             {
                 // "11/30/2015 01:54 PM"
@@ -32,7 +32,7 @@ namespace EncompassSocialSurvey
                 {
                     dt = DateTime.ParseExact(inputDate, dateFormat, CultureInfo.InvariantCulture);
                 }
-
+                Logger.Debug("Formatted the input date string " + inputDate + " to date : " + dt.ToString());
                 Logger.Info("Exiting the method CommonUtility.ConvertStringToDateTime()");
                
                 return dt;
@@ -132,6 +132,44 @@ namespace EncompassSocialSurvey
             catch (Exception ex)
             {
                 Logger.Error("Caught an exception: CommonUtility.sendMailToAdmin(): ", ex);
+            }
+
+        }
+
+
+        public static void SendMailToEmailAdresses(string subject, string body , string[] emailAddresses , string attachmentPath)
+        {
+            try
+            {
+                Logger.Info("Sending mail to email address : emailAddresses ");
+                Logger.Info("Mail Subject is : " + subject);
+                Logger.Info("Mail body is : " + body);
+
+                var credentials = new NetworkCredential(EncompassSocialSurveyConfiguration.SendgridUsername, EncompassSocialSurveyConfiguration.SendgridPassword);
+
+                SendGridMessage myMessage = new SendGridMessage();
+                myMessage.AddTo(emailAddresses);
+                myMessage.From = new MailAddress(EncompassSocialSurveyConfiguration.SendgridFromAddress, EncompassSocialSurveyConfiguration.SendgridName);
+                myMessage.Subject = subject;
+                myMessage.Text = body;
+
+                if (attachmentPath != null && !attachmentPath.Equals(""))
+                {
+                    String[] attachmentList = new string[] { attachmentPath };
+                    myMessage.Attachments = attachmentList;
+                }
+                
+                Logger.Info("Sending mail to : " + emailAddresses);
+                Logger.Info("message is : " + myMessage.Text);
+                var transportWeb = new Web(credentials);
+                transportWeb.DeliverAsync(myMessage).Wait(); // wait for sending the mail.
+                Logger.Info("mail has been sent successfully to : " + emailAddresses);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: CommonUtility.SendMailToEmailAdresses(): ", ex);
+                throw ex;
             }
 
         }

@@ -1,12 +1,17 @@
 ﻿
+using Newtonsoft.Json;
+using System.Runtime.Serialization;
 namespace EncompassSocialSurvey.Entity
 {
+    [DataContract]
     public class CompanyCredential
     {
-        public long CompanyId { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public string EncompassUrl { get; set; }
-        public string fieldId { get; set; }
+        [DataMember(Name = "companyName")]
+        public string CompanyName { get; set; }
+
+        [DataMember(Name = "encompassCrmInfo")]
+        public EncompassCredential EncompassCredential { get; set; }
+
     }
+
 }
