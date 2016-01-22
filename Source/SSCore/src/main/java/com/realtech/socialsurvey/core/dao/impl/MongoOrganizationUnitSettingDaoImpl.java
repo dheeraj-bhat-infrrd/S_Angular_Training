@@ -537,6 +537,45 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
 
     /**
+     * Method to get a list of companies connected to encompass for a specific encompass info state
+     * @param state
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Getting Company list for encompass where state : " + state );
+        if ( state == null || state.isEmpty() ) {
+            LOG.info( "state is not present to fetch encompass info list." );
+            throw new InvalidInputException( "state is not present to fetch encompass info list." );
+        }
+        List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_CRM_INFO ).exists( true ).and( KEY_CRM_INFO_SOURCE )
+            .is( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) );
+        if ( state.equals( CommonConstants.ENCOMPASS_DRY_RUN_STATE ) ) {
+            query.addCriteria( Criteria.where( KEY_CRM_INFO + "." + CommonConstants.STATE ).is( state )
+                .and( KEY_CRM_INFO + "." + CommonConstants.ENCOMPASS_GENERATE_REPORT_COLUMN ).is( true ) );
+        } else if ( state.equals( CommonConstants.ENCOMPASS_PRODUCTION_STATE ) ) {
+            query.addCriteria( Criteria.where( KEY_CRM_INFO + "." + CommonConstants.STATE ).is( state ) );
+        } else {
+            throw new InvalidInputException( "Invalid encompass crm info state : " + state );
+        }
+        organizationUnitsSettingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        if ( organizationUnitsSettingsList == null || organizationUnitsSettingsList.isEmpty() ) {
+            LOG.info( "No records found for state : " + state );
+            throw new NoRecordsFetchedException( "No records found for state : " + state );
+        }
+        LOG.info( "Successfully found company settings for encompass where state : " + state );
+        return organizationUnitsSettingsList;
+    }
+
+
+    /**
      * Method to fetch profile image urls for an entity list
      * 
      * @param entityType

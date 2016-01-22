@@ -53,19 +53,22 @@ namespace EncompassSocialSurvey.MongoDAL
                     if (null != ssCompInfo.crm_info)
                         Logger.Info("Not to include: crm_info.crm_source : " + ssCompInfo.crm_info.crm_source);
 
-                    if (ssCompInfo.crm_info != null && ssCompInfo.crm_info.crm_source == EncompassSocialSurverConstant.COMPANY_CREDENTIALS_CRM_SOURCE)
+                    if (ssCompInfo.crm_info != null && ssCompInfo.crm_info.crm_source == EncompassSocialSurveyConstant.COMPANY_CREDENTIALS_CRM_SOURCE)
                     {
                         CompanyCredential forCompCredential = new CompanyCredential();
 
                         // TODO: Raushan check with Nishit
-                        forCompCredential.CompanyId = ssCompInfo.crm_info.companyId;
+                        forCompCredential.EncompassCredential.CompanyId = ssCompInfo.crm_info.companyId;
 
                         //
-                        forCompCredential.EncompassUrl = ssCompInfo.crm_info.url;
-                        forCompCredential.UserName = ssCompInfo.crm_info.crm_username;
-                        forCompCredential.Password = ssCompInfo.crm_info.crm_password;
-                        forCompCredential.fieldId = ssCompInfo.crm_info.crm_fieldId;
-                        //
+                        forCompCredential.EncompassCredential.EncompassUrl = ssCompInfo.crm_info.url;
+                        forCompCredential.EncompassCredential.UserName = ssCompInfo.crm_info.crm_username;
+                        forCompCredential.EncompassCredential.Password = ssCompInfo.crm_info.crm_password;
+                        forCompCredential.EncompassCredential.fieldId = ssCompInfo.crm_info.crm_fieldId;
+
+                        forCompCredential.EncompassCredential.numberOfDays = ssCompInfo.crm_info.numberOfDays;
+                        forCompCredential.EncompassCredential.emailAddressForReport = ssCompInfo.crm_info.emailAddressForReport;
+                        
                         returnValue.Add(forCompCredential);
                     }
                 }

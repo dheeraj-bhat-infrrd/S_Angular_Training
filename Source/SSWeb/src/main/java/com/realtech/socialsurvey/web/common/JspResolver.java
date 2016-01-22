@@ -138,6 +138,9 @@ public interface JspResolver {
 	public static final String ADMIN_BRANCH_HIERARCHY = "admin/admin_branch_hierarchy";
 	public static final String ADMIN_COMPANY_NOT_REGISTERED = "admin/company_not_registered";
 	
+	//config settngs
+	public static final String DRY_RUN = "dry_run";
+	
 	// Widget
 	public static final String WIDGET_PAGE = "widget/widget";
 	public static final String WIDGET_CODE_PAGE = "widget/widgetcodepage";
