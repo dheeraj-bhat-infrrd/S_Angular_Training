@@ -96,8 +96,9 @@
 								<div class="rfr_icn icn-field-id en-icn" ></div>
 								<input id="encompass-fieldId" type="text"
 									class="um-item-row-txt um-item-row-txt-OR en-form-align-left"
-									placeholder="fieldId" name="encompass-fieldId"
+									placeholder="Trigger fieldId" name="encompass-fieldId"
 									value="${encompassfieldid}">
+									<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
 					</div>
