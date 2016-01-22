@@ -2254,5 +2254,97 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         return surveyScore;
     }
+
+
+    /**
+     * Method to move surveys belonging to one user to another user
+     * @param fromUserId
+     * @param toUserId
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     * */
+    @Override
+    @Transactional
+    public void moveSurveysToAnotherUser( long fromUserId, long toUserId ) throws InvalidInputException,
+        NoRecordsFetchedException, SolrException
+    {
+        if ( fromUserId <= 0 ) {
+            LOG.error( "Invalid from user id passed as parameter" );
+            throw new InvalidInputException( "Invalid from user id passed as parameter" );
+        }
+        if ( toUserId <= 0 ) {
+            LOG.error( "Invalid to user id passed as parameter" );
+            throw new InvalidInputException( "Invalid to user id passed as parameter" );
+        }
+        LOG.info( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call started" );
+        List<Long> userIds = new ArrayList<Long>();
+        userIds.add( fromUserId );
+        userIds.add( toUserId );
+        LOG.info( "Fetching from and to user information" );
+        List<User> userList = null;
+        try {
+            userList = userDao.getUsersForUserIds( userIds );
+        } catch ( Exception e ) {
+            throw new NoRecordsFetchedException( "Error occurred while fetching information for users" );
+        }
+        if ( userList == null || userList.size() != 2 )
+            throw new NoRecordsFetchedException( "Either from user or to user or both could not be found" );
+        LOG.info( "Fetched from and to user information" );
+        User fromUser = userList.get( 0 ).getUserId() == fromUserId ? userList.get( 0 ) : userList.get( 1 );
+        User toUser = userList.get( 1 ).getUserId() == toUserId ? userList.get( 1 ) : userList.get( 0 );
+
+        // check if both user belong to same company
+        UserProfile fromUserProfile = getUserProfileWhereAgentForUser( fromUser );
+        UserProfile toUserProfile = getUserProfileWhereAgentForUser( toUser );
+        LOG.info( "Validating whether both from and to user are agents" );
+        // check if from user id is an agent
+        if ( fromUserProfile == null )
+            throw new NoRecordsFetchedException( "From user id : " + fromUser.getUserId() + " is not an agent" );
+        // check if to user id is an agent
+        if ( toUserProfile == null )
+            throw new NoRecordsFetchedException( "To user id : " + toUser.getUserId() + " is not an agent" );
+        LOG.info( "Validating whether both from and to user belong to same company" );
+        if ( fromUser.getCompany().getCompanyId() != toUser.getCompany().getCompanyId()
+            || fromUserProfile.getCompany().getCompanyId() != toUserProfile.getCompany().getCompanyId() )
+            throw new UnsupportedOperationException( "From user : " + fromUser.getUserId() + " and to user id : "
+                + toUser.getUserId() + " do not belong to same company" );
+
+        // replace agent id Survey Pre Initiation
+        LOG.info( "Moving all incomplete surveys of user : " + fromUserId + " to user : " + toUserId );
+        surveyPreInitiationDao.updateAgentInfoOfPreInitiatedSurveys( fromUserId, toUser );
+        // replace agent id in Surveys
+        LOG.info( "Moving all started & completed surveys of user : " + fromUserId + " to user : " + toUserId );
+        surveyDetailsDao.updateAgentInfoInSurveys( fromUserId, toUser, toUserProfile );
+        // update to user solr review count
+        LOG.info( "Updating review count of user : " + toUserId );
+        solrSearchService.updateReviewCountOfUserInSolr( toUser );
+        if ( fromUser.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+            // update from user solr review count
+            LOG.info( "Updating review count of user : " + fromUserId );
+            solrSearchService.updateReviewCountOfUserInSolr( fromUser );
+        }
+        LOG.info( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call ended" );
+    }
+
+
+    UserProfile getUserProfileWhereAgentForUser( User user )
+    {
+        LOG.info( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser started" );
+        UserProfile agentUserProfile = null;
+        if ( user.getUserProfiles() != null ) {
+            for ( UserProfile userProfile : user.getUserProfiles() ) {
+                if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE
+                    && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                    agentUserProfile = userProfile;
+                    if ( userProfile.getIsPrimary() == CommonConstants.YES ) {
+                        break;
+                    }
+                }
+            }
+        }
+        LOG.info( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser ended" );
+        return agentUserProfile;
+    }
 }
 // JIRA SS-119 by RM-05:EOC

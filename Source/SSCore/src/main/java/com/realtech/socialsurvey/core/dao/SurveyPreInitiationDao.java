@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -79,4 +80,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
      * @throws InvalidInputException
      */
     public void deletePreInitiatedSurveysForAgent( long agentId ) throws InvalidInputException;
+
+
+    public void updateAgentInfoOfPreInitiatedSurveys( long fromUserId, User toUser ) throws InvalidInputException;
 }

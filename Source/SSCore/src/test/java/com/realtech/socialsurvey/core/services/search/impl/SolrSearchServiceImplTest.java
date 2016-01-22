@@ -677,4 +677,11 @@ public class SolrSearchServiceImplTest
     {
         solrSearchServiceImpl.updateRegionsForMultipleUsers( null );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateReviewCountOfUserInSolrWithNullUser() throws InvalidInputException, SolrException
+    {
+        solrSearchServiceImpl.updateReviewCountOfUserInSolr( null );
+    }
 }
