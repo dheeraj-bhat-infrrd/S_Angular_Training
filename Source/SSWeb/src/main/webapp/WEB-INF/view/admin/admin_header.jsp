@@ -33,7 +33,7 @@
     <div id="message-header" class="hide"></div>
     
 	<div id="overlay-main" class="overlay-main hide">
-		<div class="overlay-disable-wrapper">
+		<div id="overlay-pop-up" class="overlay-disable-wrapper">
 			<div id="overlay-header" class="ol-header">
 				<!-- Populated by javascript -->
 			</div>
