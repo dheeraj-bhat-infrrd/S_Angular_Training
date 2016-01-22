@@ -160,9 +160,13 @@ public class AdminToolsController
     }
 
 
+    /**
+     * Method to move surveys from one user id to another user
+     * sample url : /users/movesurveys?from_user={fromUserId}&to_user={toUserId}
+     * */
     @ResponseBody
-    @RequestMapping(value="/movesurveys/{fromUserId}/{toUserId}")
-    public Response moveSurveysToAnotherUser(@PathVariable long fromUserId, @PathVariable long toUserId, HttpServletRequest request){
+    @RequestMapping(value="/users/movesurveys")
+    public Response moveSurveysToAnotherUser(@QueryParam( value = "from_user") long fromUserId, @QueryParam( value = "to_user") long toUserId, HttpServletRequest request){
         LOG.info( "Method to move surveys from user id : " + fromUserId + " to user id : " + toUserId + " started.");
         Response response = null;
         try {
