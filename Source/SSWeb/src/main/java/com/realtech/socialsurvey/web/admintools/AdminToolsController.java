@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 
@@ -165,37 +166,51 @@ public class AdminToolsController
      * sample url : /users/movesurveys?from_user={fromUserId}&to_user={toUserId}
      * */
     @ResponseBody
-    @RequestMapping(value="/users/movesurveys")
-    public Response moveSurveysToAnotherUser(@QueryParam( value = "from_user") long fromUserId, @QueryParam( value = "to_user") long toUserId, HttpServletRequest request){
-        LOG.info( "Method to move surveys from user id : " + fromUserId + " to user id : " + toUserId + " started.");
+    @RequestMapping ( value = "/users/movesurveys")
+    public Response moveSurveysToAnotherUser( HttpServletRequest request )
+    {
+
         Response response = null;
+        long fromUserId = 0;
+        long toUserId = 0;
+        String from_user_id = request.getParameter( "from_user" );
+        String to_user_id = request.getParameter( "to_user" );
         try {
             try {
+                if ( from_user_id == null || from_user_id.isEmpty() ) {
+                    throw new InvalidInputException( "Invalid from user id passed as parameter" );
+                }
+                if ( to_user_id == null || to_user_id.isEmpty() ) {
+                    throw new InvalidInputException( "Invalid to user id passed as parameter" );
+                }
+                LOG.info( "Method to move surveys from user id : " + from_user_id + " to user id : " + to_user_id + " started." );
                 LOG.info( "Checking for authorization to perform survey move operation" );
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
                 LOG.info( "Authorization confirmed to perform survey move operation" );
-                if( fromUserId <= 0)
-                    throw new InvalidInputException("Invalid from user id passed as parameter");
-                if( toUserId <= 0)
-                    throw new InvalidInputException("Invalid to user id passed as parameter");
+                fromUserId = Long.valueOf( from_user_id ).longValue();
+                toUserId = Long.valueOf( to_user_id ).longValue();
+                if ( fromUserId <= 0 )
+                    throw new InvalidInputException( "Invalid from user id passed as parameter" );
+                if ( toUserId <= 0 )
+                    throw new InvalidInputException( "Invalid to user id passed as parameter" );
                 LOG.info( "Moving surveys from one user to another operation started" );
-                surveyHandler.moveSurveysToAnotherUser(fromUserId, toUserId);
+                surveyHandler.moveSurveysToAnotherUser( fromUserId, toUserId );
                 LOG.info( "Moving surveys from one user to another operation finished" );
-                response = Response.ok( "Surveys from user id : " + fromUserId + " has been successfully moved to user id : " + toUserId ).build();
+                response = Response.ok(
+                    "Surveys from user id : " + from_user_id + " has been successfully moved to user id : " + to_user_id )
+                    .build();
             } catch ( Exception e ) {
-                LOG.error( "Error occurred while moving surveys from user id : " + fromUserId + " to user id : " + toUserId  + ", Reason : ", e );
+                LOG.error( "Error occurred while moving surveys from user id : " + from_user_id + " to user id : " + to_user_id
+                    + ", Reason : ", e );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys from user id : " + fromUserId + " to user id : " + toUserId  ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys from user id : " + from_user_id
+                        + " to user id : " + to_user_id ), e.getMessage() );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
         }
-        
-        if(fromUserId <= 0 ){
-            LOG.error( "" );
-        }
-        LOG.info( "Method to move surveys from user id : " + fromUserId + " to user id : " + toUserId + " started.");
+        LOG.info( "Method to move surveys from user id : " + from_user_id + " to user id : " + to_user_id + " ended." );
         return response;
     }
     
