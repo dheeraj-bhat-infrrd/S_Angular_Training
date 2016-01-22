@@ -1629,11 +1629,11 @@
 	.v-hr-tbl-icn-wraper {
 		display: none;
 		position: absolute;
-		right: 2px;
-		top: 33px;
 		border: 1px solid #dcdcdc;
 		border-bottom: none;
 		z-index: 9;
+		margin-left: -15px;
+    	margin-top: 33px
 	}
 	.v-hr-tbl-icn-wraper div {
 		display: none;
@@ -1667,7 +1667,7 @@
 		cursor: pointer;
 	}
 	.v-line-rgn, .v-line-brnch, .v-line-ind {
-		height: 40px;
+		height: 42px;
 	}
 	.v-um-tbl-icn-wraper {
 		display: none;

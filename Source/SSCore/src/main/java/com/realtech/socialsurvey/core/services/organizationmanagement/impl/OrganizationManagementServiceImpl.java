@@ -30,6 +30,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -275,6 +277,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private ZillowHierarchyDao zillowHierarchyDao;
 
+    @Value ( "${BATCH_SIZE}")
+    private int pageSize;
+    
     /**
      * This method adds a new company and updates the same for current user and all its user
      * profiles.
@@ -523,6 +528,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param organizationalDetails
      * @throws InvalidInputException
      */
+    @SuppressWarnings ( "unused")
     void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
         throws InvalidInputException
     {
@@ -3867,7 +3873,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param userProfiles
      * @return
      */
-    @SuppressWarnings ( "unused")
     boolean isRegionViewAllowed( List<UserProfile> userProfiles )
     {
         // TODO implement this
@@ -3881,7 +3886,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param userProfiles
      * @return
      */
-    @SuppressWarnings ( "unused")
     boolean isBranchViewAllowed( List<UserProfile> userProfiles )
     {
         // TODO implement this
@@ -4518,8 +4522,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException,
+        NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, List<User>> userMap = new HashMap<String, List<User>>();
@@ -4560,6 +4564,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             if ( region == null ) {
                 throw new NoRecordsFetchedException( "No region present for the required id in database while updating branch" );
+            } else {
+                //Update user profiles here.
+                userProfileDao.updateRegionIdForBranch( branchId, region.getRegionId() );
+
+                //Get and update user
+                SolrDocumentList users = null;
+                int pageNo = 1;
+                do {
+                    users = solrSearchService.findUsersInBranch( branchId, pageSize * ( pageNo - 1 ), pageSize );
+                    Map<Long, List<Long>> userRegionsMap = updateRegionIdForUsers( users, region.getRegionId(), branch.getRegion().getRegionId(),
+                        branchId );
+                    solrSearchService.updateRegionsForMultipleUsers( userRegionsMap );
+                    pageNo ++;
+                } while ( !( users == null || users.isEmpty() ) );
+
             }
             branch.setRegion( region );
         }
@@ -5521,7 +5540,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException
+    public void updateProfileUrlAndStatusForDeletedEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
         
@@ -5589,7 +5608,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         String newProfileUrl = subUrl + "/" + newProfileName;
         if ( newProfileUrl.equals( existingProfileUrl ) ) {
             LOG.debug( "There is no need to update profile url." );
-
         } else {
             //Update profileUrl in Mongo
             organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -5598,6 +5616,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, newProfileName, unitSettings, collectionName );
             
         }
+        // update the isActive status to false
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_STATUS, CommonConstants.STATUS_DELETED_MONGO, unitSettings, collectionName);
+        
         LOG.info( "Finished updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
     }
 
@@ -5996,6 +6017,101 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 throw new InvalidInputException(
                     "Invalid profile type passed in getAllUsersUnderProfileTypeConnectedToZillow" );
         }
+    }
+    
+
+    
+    /**
+     * Method to get update map for updating regionId for user in solr on moving branch from one region to another
+     * @param userList
+     * @param regionId
+     * @return 
+     * @throws InvalidInputException
+     */
+    @SuppressWarnings ( "unchecked")
+    Map<Long, List<Long>> updateRegionIdForUsers( SolrDocumentList userList, long newRegionId, long oldRegionId, long curBranchId )
+        throws InvalidInputException
+    {
+        LOG.info( "Method to update regions for users in solr started for newRegionId = " + newRegionId + " oldRegionId = "
+            + oldRegionId + " current branch Id = " + curBranchId + " started." );
+        if ( userList == null ) {
+            throw new InvalidInputException( "userList is null" );
+        }
+
+        if ( newRegionId <= 0l ) {
+            throw new InvalidInputException( "newRegionId = " + newRegionId + " is invalid." );
+        }
+
+        if ( oldRegionId <= 0l ) {
+            throw new InvalidInputException( "oldRegionId = " + oldRegionId + " is invalid." );
+        }
+
+        if ( curBranchId <= 0l ) {
+            throw new InvalidInputException( "curBranchId = " + curBranchId + " is invalid." );
+        }
+
+        Map<Long, List<Long>> userRegionsMap = new HashMap<Long, List<Long>>();
+        //Iterate through each user
+        for ( SolrDocument user : userList ) {
+            boolean append = false;
+            //Get branches for current user
+            List<Long> branches = (List<Long>) user.get( CommonConstants.BRANCHES_SOLR );
+            /*
+             * For every branch in branches except for current branchId, see if they have regionId = oldRegionId
+             * If the above check is true, then add the newRegionId to the regions list. Otherwise, replace the oldRegionId
+             * with the new one in the regions list
+             * If the new region Id is already present, remove/keep oldRegionId based on the above check
+             */
+            for ( Long branchId : branches ) {
+                //Get branch data from id
+                Branch branch = userManagementService.getBranchById( branchId );
+                if ( branch == null ) {
+                    throw new InvalidInputException( "No branch found for branchId : " + branchId );
+                }
+                if ( branch.getRegion() == null ) {
+                    throw new InvalidInputException( "No region found for branchId : " + branchId );
+                }
+                long currentRegionId = branch.getRegion().getRegionId();
+                /*
+                 * If the current regionId is the same as the old one and the branchId is different,
+                 * then keep the regionId and append the new one started       
+                 * else replace the oldRegionId with the new one
+                 */
+                if ( currentRegionId == oldRegionId && branchId != curBranchId ) {
+                    append = true;
+                    break;
+                }
+            }
+            //Get list of regions for user
+            List<Long> regions = (List<Long>) user.get( CommonConstants.REGIONS_SOLR );
+            if ( regions == null ) {
+                regions = new ArrayList<Long>();
+                append = true;
+            }
+            if ( regions.contains( newRegionId ) ) {
+                if ( append ) {
+                    //No changes to be made. Don't store in map. Go to next user.
+                    continue;
+                } else {
+                    //Remove old region id
+                    regions.remove( oldRegionId );
+                }
+            } else {
+                if ( append ) {
+                    regions.add( newRegionId );
+                } else {
+                    //Remove old region id
+                    regions.remove( oldRegionId );
+                    //Add new region Id
+                    regions.add( newRegionId );
+                }
+            }
+            //Store details in map for update
+            userRegionsMap.put( (Long) user.get( CommonConstants.USER_ID_SOLR ), regions );
+        }
+        LOG.info( "Method to update regions for users in solr started for newRegionId = " + newRegionId + " oldRegionId = "
+            + oldRegionId + " current branch Id = " + curBranchId + " finished." );
+        return userRegionsMap;
     }
 }
 // JIRA: SS-27: By RM05: EOC

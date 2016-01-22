@@ -113,7 +113,7 @@
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
     <div id="report-abuse-overlay" class="overlay-main hide">
-    	<div class="overlay-disable-wrapper">
+    	<div id="report-abuse-pop-up" class="overlay-disable-wrapper">
     		<div id="overlay-header" class="ol-header"><spring:message code="label.publicprofile.reportabuse.title.key"/></div>
     		<div class="ol-content">
     			<input type="text" id="report-abuse-cus-name" class="report-abuse-input" placeholder="Name">

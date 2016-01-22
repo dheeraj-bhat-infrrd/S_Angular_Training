@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,6 +33,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -109,6 +112,8 @@ public class OrganizationManagementServiceImplTest
     @Mock
     private UserManagementService userManagementService;
 
+    @Mock
+    private UserProfileDao userProfileDao;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {}
@@ -1745,6 +1750,7 @@ public class OrganizationManagementServiceImplTest
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Test ( expected = NoRecordsFetchedException.class)
     public void testupdateBranchWhenAssigneeUserIsNull() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UserAssignmentException
@@ -1755,6 +1761,15 @@ public class OrganizationManagementServiceImplTest
         Mockito.doReturn( new Region() ).when( organizationManagementServiceImpl )
             .getDefaultRegionForCompany( Mockito.any( Company.class ) );
         Mockito.when( regionDao.findById( Mockito.eq( Region.class ), Mockito.anyLong() ) ).thenReturn( new Region() );
+        Mockito.doNothing().when( userProfileDao ).updateRegionIdForBranch( Mockito.anyLong(), Mockito.anyLong() );
+        Mockito.when( solrSearchService.findUsersInBranch( Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt() ) )
+            .thenReturn( null );
+        Mockito
+            .doReturn( null )
+            .when( organizationManagementServiceImpl )
+            .updateRegionIdForUsers( (SolrDocumentList) Matchers.any(), Matchers.anyLong(), Matchers.anyLong(),
+                Matchers.anyLong() );
+        Mockito.doNothing().when( solrSearchService ).updateRegionsForMultipleUsers( Mockito.anyMap() );
         Mockito.doNothing().when( branchDao ).update( Mockito.any( Branch.class ) );
         Mockito
             .doNothing()
@@ -1954,28 +1969,28 @@ public class OrganizationManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testUpdateProfileUrlForDeletedEntityWithNullEntityType() throws InvalidInputException
     {
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( null, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( null, 1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testUpdateProfileUrlForDeletedEntityWithEmptyEntityType() throws InvalidInputException
     {
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( TestConstants.TEST_EMPTY_STRING, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( TestConstants.TEST_EMPTY_STRING, 1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testUpdateProfileUrlForDeletedEntityWithInvalidEntityType() throws InvalidInputException
     {
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( TestConstants.TEST_STRING, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( TestConstants.TEST_STRING, 1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testUpdateProfileUrlForDeletedEntityWithInvalidEntityId() throws InvalidInputException
     {
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( TestConstants.TEST_STRING, 0 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( TestConstants.TEST_STRING, 0 );
     }
 
 
@@ -1983,7 +1998,7 @@ public class OrganizationManagementServiceImplTest
     public void testUpdateProfileUrlForDeletedEntityWhenUnitSettingsIsNull() throws InvalidInputException
     {
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( null );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
     }
 
 
@@ -1991,7 +2006,7 @@ public class OrganizationManagementServiceImplTest
     public void testUpdateProfileUrlForDeletedEntityWhenContactDetailsIsNull() throws InvalidInputException
     {
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( new AgentSettings() );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
     }
 
 
@@ -2001,7 +2016,7 @@ public class OrganizationManagementServiceImplTest
         AgentSettings agentSettings = new AgentSettings();
         agentSettings.setContact_details( new ContactDetailsSettings() );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agentSettings );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
     }
 
 
@@ -2013,7 +2028,7 @@ public class OrganizationManagementServiceImplTest
         AgentSettings agentSettings = new AgentSettings();
         agentSettings.setContact_details( contactDetailsSettings );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agentSettings );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
     }
 
 
@@ -2025,7 +2040,7 @@ public class OrganizationManagementServiceImplTest
         AgentSettings agentSettings = new AgentSettings();
         agentSettings.setContact_details( contactDetailsSettings );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agentSettings );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
     }
 
 
@@ -2038,7 +2053,7 @@ public class OrganizationManagementServiceImplTest
         agentSettings.setContact_details( contactDetailsSettings );
         agentSettings.setProfileUrl( TestConstants.TEST_EMPTY_STRING );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agentSettings );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, 1 );
     }
 
 
@@ -2124,21 +2139,21 @@ public class OrganizationManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testUpdateProfileUrlForDeletedEntityTypeNull() throws InvalidInputException
     {
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( null, 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( null, 1l );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testUpdateProfileUrlForDeletedEntityTypeEmpty() throws InvalidInputException
     {
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "", 1l );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testUpdateProfileUrlForDeletedEntityIdInvalid() throws InvalidInputException
     {
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 0l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "agentId", 0l );
     }
 
 
@@ -2146,7 +2161,7 @@ public class OrganizationManagementServiceImplTest
     public void testUpdateProfileUrlForDeletedEntityUserSettingNull() throws InvalidInputException
     {
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( null );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "agentId", 1l );
     }
 
 
@@ -2154,7 +2169,7 @@ public class OrganizationManagementServiceImplTest
     public void testUpdateProfileUrlForDeletedEntityBranchSettingNull() throws InvalidInputException, NoRecordsFetchedException
     {
         Mockito.doReturn( null ).when( organizationManagementServiceImpl ).getBranchSettingsDefault( Matchers.anyLong() );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "branchId", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "branchId", 1l );
     }
 
 
@@ -2162,7 +2177,7 @@ public class OrganizationManagementServiceImplTest
     public void testUpdateProfileUrlForDeletedEntityRegionSettingNull() throws InvalidInputException
     {
         Mockito.doReturn( null ).when( organizationManagementServiceImpl ).getRegionSettings( Matchers.anyLong() );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "regionId", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "regionId", 1l );
     }
 
 
@@ -2170,7 +2185,7 @@ public class OrganizationManagementServiceImplTest
     public void testUpdateProfileUrlForDeletedEntityInvalidEntityType() throws InvalidInputException
     {
         Mockito.doReturn( null ).when( organizationManagementServiceImpl ).getRegionSettings( Matchers.anyLong() );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "test", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "test", 1l );
     }
 
 
@@ -2179,7 +2194,7 @@ public class OrganizationManagementServiceImplTest
     {
         AgentSettings agent = new AgentSettings();
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "agentId", 1l );
     }
 
 
@@ -2189,7 +2204,7 @@ public class OrganizationManagementServiceImplTest
         AgentSettings agent = new AgentSettings();
         agent.setContact_details( new ContactDetailsSettings() );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "agentId", 1l );
     }
 
 
@@ -2201,7 +2216,7 @@ public class OrganizationManagementServiceImplTest
         contactDetails.setName( "" );
         agent.setContact_details( contactDetails );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "agentId", 1l );
     }
 
 
@@ -2213,7 +2228,7 @@ public class OrganizationManagementServiceImplTest
         contactDetails.setName( "test" );
         agent.setContact_details( contactDetails );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "agentId", 1l );
     }
 
 
@@ -2226,6 +2241,64 @@ public class OrganizationManagementServiceImplTest
         agent.setProfileUrl( "" );
         agent.setContact_details( contactDetails );
         Mockito.when( userManagementService.getUserSettings( Mockito.anyLong() ) ).thenReturn( agent );
-        organizationManagementServiceImpl.updateProfileUrlForDeletedEntity( "agentId", 1l );
+        organizationManagementServiceImpl.updateProfileUrlAndStatusForDeletedEntity( "agentId", 1l );
+    }
+
+
+    //Tests for UpdateRegionIdForUsers
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForUserListEmpty() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateRegionIdForUsers( null, 1l, 1l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersFornewRegionIdInvalid() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateRegionIdForUsers( new SolrDocumentList(), 0l, 1l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForoldRegionIdInvalid() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateRegionIdForUsers( new SolrDocumentList(), 1l, 0l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForcurBranchIdInvalid() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateRegionIdForUsers( new SolrDocumentList(), 1l, 1l, 0l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForBranchInvalid() throws InvalidInputException
+    {
+        SolrDocumentList userList = new SolrDocumentList();
+        SolrDocument user = new SolrDocument();
+        List<Long> branches = new ArrayList<Long>();
+        branches.add( 1l );
+        user.put( CommonConstants.BRANCHES_SOLR, branches );
+        userList.add( user );
+        Mockito.when( userManagementService.getBranchById( Mockito.anyLong() ) ).thenReturn( null );
+        organizationManagementServiceImpl.updateRegionIdForUsers( userList, 1l, 1l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateRegionIdForUsersForRegionInvalid() throws InvalidInputException
+    {
+        SolrDocumentList userList = new SolrDocumentList();
+        SolrDocument user = new SolrDocument();
+        List<Long> branches = new ArrayList<Long>();
+        branches.add( 1l );
+        user.put( CommonConstants.BRANCHES_SOLR, branches );
+        userList.add( user );
+        Mockito.when( userManagementService.getBranchById( Mockito.anyLong() ) ).thenReturn( new Branch() );
+        organizationManagementServiceImpl.updateRegionIdForUsers( userList, 1l, 1l, 1l );
     }
 }
