@@ -177,26 +177,31 @@ public interface OrganizationUnitSettingsDao
 
 
     public List<OrganizationUnitSettings> getCompanyListByVerticalName( String verticalName );
-    
+
+
     public List<OrganizationUnitSettings> getCompanyList();
 
-    public List<OrganizationUnitSettings> getCompanyListByKey(String searchKey);
-    
+
+    public List<OrganizationUnitSettings> getCompanyListByKey( String searchKey );
+
+
     public OrganizationUnitSettings fetchOrganizationUnitSettingsByUniqueIdentifier( String uniqueIdentifier,
         String collectionName );
 
 
-	public List<OrganizationUnitSettings> getCompanyListByIds(Set<Long> companyIds);
-	
-	/**
-	 * Gets a list of organisation unit settings with give crm info details from a given collection
-	 * @param source
-	 * @param collectionName
-	 * @return
-	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException
-	 */
-	public List<OrganizationUnitSettings> getOrganizationUnitListWithCRMSource(String source, String collectionName) throws InvalidInputException, NoRecordsFetchedException;
+    public List<OrganizationUnitSettings> getCompanyListByIds( Set<Long> companyIds );
+
+
+    /**
+     * Gets a list of organisation unit settings with give crm info details from a given collection
+     * @param source
+     * @param collectionName
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    public List<OrganizationUnitSettings> getOrganizationUnitListWithCRMSource( String source, String collectionName )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     void updateKeyOrganizationUnitSettingsByInCriteria( String keyToUpdate, Object updatedRecord, String criteriaKey,
@@ -205,7 +210,8 @@ public interface OrganizationUnitSettingsDao
 
     List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
         throws InvalidInputException;
-    
+
+
     /**
      * Gets a collection of unprocessed images
      * @param collectionName
@@ -213,7 +219,8 @@ public interface OrganizationUnitSettingsDao
      * @return
      * @throws InvalidInputException
      */
-    public Map<Long, String> getCollectionListOfUnprocessedImages(String collectionName, String imageType) throws InvalidInputException;
+    public Map<Long, String> getCollectionListOfUnprocessedImages( String collectionName, String imageType )
+        throws InvalidInputException;
 
 
     void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
@@ -222,4 +229,8 @@ public interface OrganizationUnitSettingsDao
 
     public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException,
         NoRecordsFetchedException;
+
+
+    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings )
+        throws InvalidInputException;
 }

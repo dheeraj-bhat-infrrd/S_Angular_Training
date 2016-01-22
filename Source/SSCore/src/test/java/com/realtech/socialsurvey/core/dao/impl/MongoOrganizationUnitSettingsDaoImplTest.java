@@ -198,4 +198,10 @@ public class MongoOrganizationUnitSettingsDaoImplTest
     {
         mongoOrganizationUnitSettingDaoImpl.getCompanyListForEncompass( "test" );
     }
+    //Tests for updateAgentSettingsForUserRestoration
+
+    public void updateAgentSettingsForUserRestorationTestAgentSettingsNull() throws InvalidInputException
+    {
+        mongoOrganizationUnitSettingDaoImpl.updateAgentSettingsForUserRestoration( null, null );
+    }
 }

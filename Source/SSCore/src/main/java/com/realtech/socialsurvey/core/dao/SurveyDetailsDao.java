@@ -139,10 +139,7 @@ public interface SurveyDetailsDao
 
 
     public List<SurveyDetails> getIncompleteSocialPostCustomersEmail( long companyId, int surveyReminderInterval,
-        int maxReminders, float autopostScore );
-
-
-    public void updateSharedOn( String socialSite, long agentId, String customerEmail );
+        int maxReminders );
 
 
     public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable );

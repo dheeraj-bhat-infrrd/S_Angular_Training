@@ -113,6 +113,9 @@ var smScrollTop = 0;
 var defaultCountryCode = "US";
 var defaultCountry = "United States";
 
+var fb_app_id;
+var google_plus_app_id;
+
 /**
  * js functions for landing page
  */
@@ -207,6 +210,19 @@ $(document).on('click',  function(e){
 		$('#report-abuse-overlay').hide();
 		enableBodyScroll();
 	}
+	if($('#overlay-main' ).is(':visible')){
+		$('#overlay-main').hide();
+		enableBodyScroll();
+	}
+	if($('.overlay-payment' ).is(':visible')){
+		$('.overlay-payment').hide();
+		enableBodyScroll();
+	}
+	if($('#overlay-incomplete-survey' ).is(':visible')){
+		$('#overlay-incomplete-survey').hide();
+		enableBodyScroll();
+	}
+	
 	
 		
 });
@@ -221,6 +237,19 @@ $(document).on('keyup',  function(e){
 			$('#report-abuse-overlay').hide();
 			enableBodyScroll();
 		}
+		if($('#overlay-main' ).is(':visible')){
+			$('#overlay-main').hide();
+			enableBodyScroll();
+		}
+		if($('.overlay-payment' ).is(':visible')){
+			$('.overlay-payment').hide();
+			enableBodyScroll();
+		}
+		if($('#overlay-incomplete-survey' ).is(':visible')){
+			$('#overlay-incomplete-survey').hide();
+			enableBodyScroll();
+		}
+		
 		
 	}
 });
@@ -242,14 +271,23 @@ $(document).on('keyup',  function(e){
 			enableBodyScroll();
 		}
 */
-
+$(document).on('click', '#payment-data-container', function(e){
+	e.stopPropagation();
+});
 $(document).on('click', '#welcome-popup-invite', function(e){
+	e.stopPropagation();
+});
+$(document).on('click', '#overlay-pop-up', function(e){
 	e.stopPropagation();
 });
 
 $(document).on('click', '#report-abuse-pop-up', function(e){
 	e.stopPropagation();
 });
+$(document).on('click', '#incomplete-survey-popup', function(e){
+	e.stopPropagation();
+});
+
 
 
 $(document).on('click', '.icn-plus-open', function() {
@@ -654,7 +692,8 @@ function updateDashboardProfileEvents() {
     else circle4.animate(profileCompleted / 100);
     
     //update dashboard button events 
-    $('#pro-cmplt-stars').on('click', '#dsh-btn1', function() {
+    $('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
+    	e.stopPropagation();
 		if (colName == 'agentId') {
 			sendSurveyInvitation('#dsh-btn1');
 		} else if (accountType == "INDIVIDUAL") {
@@ -663,12 +702,14 @@ function updateDashboardProfileEvents() {
 			sendSurveyInvitationAdmin(colName, colValue,'#dsh-btn1');
 		}
 	});
-	$('#pro-cmplt-stars').on('click', '#dsh-btn2', function(){
+	$('#pro-cmplt-stars').on('click', '#dsh-btn2', function(e){
+		e.stopPropagation();		
 		var buttonId = 'dsh-btn2';
 		var task = $('#dsh-btn2').data('social');
 		dashboardButtonAction(buttonId, task, colName, colValue);
 	});
-	$('#pro-cmplt-stars').on('click', '#dsh-btn3', function(){
+	$('#pro-cmplt-stars').on('click', '#dsh-btn3', function(e){
+		e.stopPropagation();
 		var buttonId = 'dsh-btn3';
 		var task = $('#dsh-btn3').data('social');
 		dashboardButtonAction(buttonId, task, colName, colValue);
@@ -1568,7 +1609,8 @@ function bindEditSurveyEvents() {
 	
 	//Save the changes
 	$('.bd-q-btn-done').off('click');
-	$('.bd-q-btn-done').on('click', function() {
+	$('.bd-q-btn-done').on('click', function(e) {
+		e.stopPropagation();
 		var lastQuestion = currentQues - 1;
 		var count = 1;
 		var editedStatus = true;
@@ -2332,10 +2374,6 @@ function showSelectorsByAssignToOption(assignToOption) {
 }
 
 function showAdminPrivilegesChk(){
-	//check if assign to is company or multiple users is selected 
-	if(($('#assign-to-txt').attr('data-assignto') == 'company' && $("#assign-to-selector").data("profile") == "individual") || $('div.bd-cust-rad-img-checked.bd-cust-rad-img').attr('data-type') == 'multiple') {
-		return; //do not show checkbox if assign to is company or multiple user assignment
-	}
 	$("#admin-privilege-div").show();
 	if(!$('.bd-check-img').hasClass('bd-check-img-checked') ){
 		$('.bd-check-img').next("#is-admin-chk").val("true");
@@ -4624,7 +4662,8 @@ function saveUserAssignmentCallBack(data) {
 }
 
 // remove user profile
-$(document).on('click', '.v-icn-rem-userprofile', function() {
+$(document).on('click', '.v-icn-rem-userprofile', function(e) {
+	e.stopPropagation();
 	if ($(this).hasClass('v-tbl-icn-disabled')) {
 		return;
 	}
@@ -4635,7 +4674,7 @@ $(document).on('click', '.v-icn-rem-userprofile', function() {
 
 //remove user
 $(document).on('click', '.v-icn-rem-user', function() {
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
 		return;
 	}
 
@@ -5036,17 +5075,19 @@ function paintSurveyPage(jsonData) {
 	realtorEnabled = Boolean(jsonData.responseJSON.realtorEnabled);
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
-	
+	fb_app_id = jsonData.responseJSON.fbAppId;
+	google_plus_app_id = jsonData.responseJSON.googlePlusAppId;
 	
 	//If social token availiable populate the links
-	if (googleEnabled) {
-		var googleElement = document.getElementById('ggl-btn');
-		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
-		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
-	} else {
-		$('#ggl-btn').remove();
-	}
-	
+//	if (googleEnabled) {
+//		var googleElement = document.getElementById('ggl-btn');
+//		//shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
+//		shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
+//	} else {
+//		$('#ggl-btn').remove();
+//	}
+	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
+
 	if (yelpEnabled) {
 		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
 	} else {
@@ -5066,7 +5107,7 @@ function paintSurveyPage(jsonData) {
 	}
 	
 	if (realtorEnabled) {
-		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink));
+		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink)+"#reviews-section");
 	} else {
 		$('#realtor-btn').remove();
 	}
@@ -5453,9 +5494,9 @@ function showMasterQuestionPage(){
 			if(isAbusive == false){
 				onlyPostToSocialSurvey = false;
 			}
-			if(mood == 'Great') {
-				$('#social-post-links').show();
-			} 
+		}
+		if(mood == 'Great' && isAbusive == false) {
+			$('#social-post-links').show();
 		}
 		
 		//call method to post the review and update the review count
@@ -5465,10 +5506,11 @@ function showMasterQuestionPage(){
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
-		$('#icn-fb-shr').attr("href","https://www.facebook.com/sharer/sharer.php?u="+agentFullProfileLink);
-		$('#icn-google-shr').attr("href","https://plus.google.com/share?url="+agentFullProfileLink);
-		$('#icn-linkedin-shr').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + "&source=");
-		$('#icn-twitter-shr').attr("href","https://twitter.com/home?status="+agentFullProfileLink);
+		var fmt_rating = Number(rating).toFixed(1);
+		$('#linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&source=");
+		$('#twitter-btn').attr("href","https://twitter.com/intent/tweet?text="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + ".&url='"+agentFullProfileLink+"'");
+		$('#fb-btn').attr("href","https://www.facebook.com/dialog/feed?app_id="+fb_app_id+"&link="+agentFullProfileLink+"&description="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&redirect_uri=https://www.facebook.com");
+
 		$('#content-head').html('Survey Completed');
 			if (mood == 'Great')
 				$('#content').html(happyTextComplete);
@@ -5908,25 +5950,8 @@ $('.sq-pts-dgreen').click(function() {
 	$("#next-scale").removeClass("btn-com-disabled");
 });
 
-$('#ylp-btn').click(function(e) {
-	updateSharedOn("yelp", agentId, customerEmail);
-});
-
 $('#ggl-btn').click(function(e) {
 	updateSharedOn("google", agentId, customerEmail);
-});
-
-$('#zillow-btn').click(function(e) {
-	updateSharedOn("zillow", agentId, customerEmail);
-});
-
-$('#lt-btn').click(function(e) {
-	updateSharedOn("lendingtree", agentId, customerEmail);
-});
-
-$('#realtor-btn').click(function(e) {
-	//e.stopImmediatePropagation();
-	updateSharedOn("realtor", agentId, customerEmail);
 });
 
 $('#shr-post-chk-box').click(function(){
@@ -7841,6 +7866,9 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	case 5:
 		window.location.href = "/downloaduseradoptionreport.do?columnName=" + colName + "&columnValue=" + colValue;
 		break;
+	case 6:
+		window.location.href = "/downloadcompanyhierarchyreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		break;
 	default:
 		break;
 	}
@@ -8005,7 +8033,8 @@ $(document).on('change', '#sel-page', function(e) {
 	}, 100);
 });
 
-function showIncompleteSurveyListPopup() {
+function showIncompleteSurveyListPopup(event) {
+	event.stopPropagation();
 	$('#icn-sur-popup-cont').attr("data-start", 0);
 	$("#overlay-incomplete-survey").show();
 	paintIncompleteSurveyListPopupResults(0);		
@@ -9039,19 +9068,22 @@ $('body').on('click', '#st-settings-payment-off', function() {
 	showPaymentOptions();
 });
 
-$('body').on('click', '#st-delete-account', function() {
+$('body').on('click', '#st-delete-account', function(e) {
+	e.stopPropagation();
 	$('#other-account').val('true');
 	createPopupConfirm("Delete Account",
 		"This action cannot be undone.<br/>All user setting will be permanently deleted and your subscription will terminate permanently immediately.");
 	overlayDeleteAccount();
 });
 
-$('body').on('click', '#st-settings-account-on', function() {
+$('body').on('click', '#st-settings-account-on', function(e) {
+	e.stopPropagation();
 	$('#other-account').val('false');
 	createPopupConfirm("Enable Account", "Do you want to Continue?");
 	overlayAccount();
 });
-$('body').on('click', '#st-settings-account-off', function() {
+$('body').on('click', '#st-settings-account-off', function(e) {
+	e.stopPropagation();
 	$('#other-account').val('true');
 	createPopupConfirm("Disable Account", "You will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
 	overlayAccount();
@@ -9583,6 +9615,7 @@ $(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
 
 
 $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
+	e.stopPropagation();
 	var surveyMongoId = $(this).attr('surveymongoid');
 	$('#overlay-main').show();
 	$('#overlay-continue').show();

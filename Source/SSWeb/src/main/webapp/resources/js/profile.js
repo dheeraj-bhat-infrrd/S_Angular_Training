@@ -100,7 +100,7 @@ function validateContactUsForm() {
 		$('#lp-input-message').focus();
 		return false;
 	}
-	return false;
+	return true;
 } 
 
 $(document).on('click touchstart', '.icn-person', function() {
@@ -195,7 +195,7 @@ function showMessage(data){
 		var recaptchaframe = $('.g-recaptcha iframe');
         var recaptchaSoure = recaptchaframe[0].src;
         recaptchaframe[0].src = '';
-        setInterval(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
+        setTimeout(function () { recaptchaframe[0].src = recaptchaSoure; }, 500);
 	}
 	else{
 		showErrorMobileAndWeb(jsonData["message"]);
@@ -811,9 +811,13 @@ $(document).on('click','.review-more-button',function(){
 	$(this).parent().find('.review-complete-txt').show();
 	$(this).hide();
 });
+$(document).on('click', '#report-abuse-pop-up', function(e){
+	e.stopPropagation();
+});
 
 // Report abuse click event.
 $(document).on('click', '.prof-report-abuse-txt', function(e) {
+	e.stopPropagation();
 	var reviewElement = $(this).parent().parent().parent();
 	var payload = {
 		"customerEmail" : reviewElement.attr('data-customeremail'),
@@ -849,6 +853,26 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 			confirmReportAbuse(payload);
 		}
 	});
+});
+
+$(document).on('click',  function(e){
+	
+	if($('#report-abuse-overlay' ).is(':visible')){
+		$('#report-abuse-overlay').hide();
+		enableBodyScroll();
+	}
+		
+});
+
+$(document).on('keyup',  function(e){
+	if (e.keyCode == 27){
+		
+		if($('#report-abuse-overlay' ).is(':visible')){
+			$('#report-abuse-overlay').hide();
+			enableBodyScroll();
+		}
+	
+	}
 });
 
 function validateReportAbuseForm(reportText, cusName, cusEmail) {

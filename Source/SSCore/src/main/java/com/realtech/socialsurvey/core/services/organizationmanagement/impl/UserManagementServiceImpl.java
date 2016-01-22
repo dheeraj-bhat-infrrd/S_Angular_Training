@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -123,6 +125,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private GenericDao<UsercountModificationNotification, Long> userCountModificationDao;
 
+    @Autowired
+    private BatchTrackerService batchTrackerService;
+    
     @Autowired
     private Utils utils;
 
@@ -528,7 +533,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
 
         //update profile url in mongo if needed
-        organizationManagementService.updateProfileUrlForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
+        organizationManagementService.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
 
         //Disconnect social connections(ensure that social connections history is updated)
         socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
@@ -543,6 +548,102 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    /*
+     * Method to deactivate an existing user.
+     */
+    @Transactional
+    @Override
+    public void restoreDeletedUser( long userId ) throws InvalidInputException, SolrException
+    {
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "User id is invalid in restoreDeletedUser" );
+        }
+
+        LOG.info( "Method to activate user " + userId + " called." );
+
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "Invalid userId" );
+        }
+        User user = getUserByUserId( userId );
+        if ( user == null ) {
+            throw new InvalidInputException( "No user having userId : " + userId + " exists." );
+        }
+        if ( user.getStatus() != CommonConstants.STATUS_INACTIVE ) {
+            throw new InvalidInputException( "User with userId : " + userId + " already exists." );
+        }
+        //Check if any user has emailId = user's emailId.
+        List<User> usersWithSameEmail = getUsersByEmailId( user.getEmailId() );
+        if ( usersWithSameEmail != null && !( usersWithSameEmail.isEmpty() ) ) {
+            for ( User userWithSameEmail : usersWithSameEmail ) {
+                if ( user.getUserId() != userWithSameEmail.getUserId() ) {
+                    throw new InvalidInputException( "Another User exists with the same Email ID. UserId : "
+                        + userWithSameEmail.getUserId() );
+                }
+            }
+        }
+
+        //Start restoring the user
+        //Set status = 1 and loginId = emailId
+        user.setStatus( CommonConstants.STATUS_ACTIVE );
+        user.setLoginName( user.getEmailId() );
+        updateUser( user );
+
+        //Set the status of all user profiles for that user as 1
+        userProfileDao.activateAllUserProfilesForUser( user );
+
+        //Remove entry from RemovedUser table
+
+        List<RemovedUser> entriesToDelete = removedUserDao.findByColumn( RemovedUser.class, CommonConstants.USER_COLUMN, user );
+        if ( entriesToDelete != null && !( entriesToDelete.isEmpty() ) ) {
+            for ( RemovedUser removedUser : entriesToDelete ) {
+                removedUserDao.delete( removedUser );
+            }
+        }
+
+        //Update Agent settings
+        AgentSettings agentSettings = getUserSettings( userId );
+        
+
+        //Update profileName and profileUrl if possible
+        String profileNameForUpdate = null;
+        String profileName = agentSettings.getProfileName();
+        String newProfileName = user.getFirstName().toLowerCase() + "-" + user.getLastName().toLowerCase();
+        user.setProfileName( profileName );
+        user.setProfileUrl( "/" + profileName );
+        if ( !profileName.equals( newProfileName ) ) {
+            OrganizationUnitSettings agentWithProfile = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(
+                newProfileName, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            if ( agentWithProfile == null ) {
+                profileNameForUpdate = newProfileName;
+                user.setProfileName( newProfileName );
+                user.setProfileUrl( "/" + newProfileName );
+            }
+        }
+        
+        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings );
+        
+        //Add user to Solr
+        solrSearchService.addUserToSolr( user );
+
+        //Update review count for user
+        List<Long> userIdList = new ArrayList<Long>();
+        userIdList.add( userId );
+
+        Map<Long, Integer> agentsReviewCount;
+        try {
+            agentsReviewCount = batchTrackerService.getReviewCountForAgents( userIdList );
+        } catch ( ParseException e ) {
+            LOG.error( "Error while parsing the data fetched from mongo for survey count", e );
+            throw new InvalidInputException( "Error while parsing the data fetched from mongo for survey count. Reason :"
+                + e.getMessage() );
+        }
+        if ( agentsReviewCount != null && !agentsReviewCount.isEmpty() )
+            solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
+
+        LOG.info( "Method to reactivate user " + user.getFirstName() + " finished." );
+    }
+    
+    
     /*
      * Method to get user with login name of a company
      */
@@ -569,6 +670,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         return users.get( CommonConstants.INITIAL_INDEX );
     }
 
+    /**
+     * Method to get a list of users having the same email ID
+     * @param emailId
+     * @return
+     * @throws InvalidInputException
+     */
+    @Transactional
+    @Override
+    public List<User> getUsersByEmailId(String emailId) throws InvalidInputException{
+        LOG.info( "Method getUsersByEmailId started for emailId : " + emailId );
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email ID is empty" );
+        }
+        List<User> users = userDao.findByColumn( User.class, CommonConstants.EMAIL_ID, emailId );
+        
+        LOG.info( "Method getUsersByEmailId finished for emailId : " + emailId );
+        return users;
+    }
 
     // Method to return user with provided email and company
     @Transactional
@@ -3200,5 +3319,65 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
         return userIdReviewCountMap;
+    }
+
+
+    /**
+     * Method to search users in company by criteria
+     * @param queries
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    @Transactional
+    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Method searchUsersInCompanyByMultipleCriteria started." );
+
+        if ( queries == null || queries.isEmpty() ) {
+            throw new InvalidInputException( "The search criteria cannot be empty" );
+        }
+        List<User> users = userDao.findByKeyValueAscending( User.class, queries, CommonConstants.FIRST_NAME );
+
+        if ( users == null || users.isEmpty() ) {
+            throw new NoRecordsFetchedException( "No users found for the specified criteria" );
+        }
+        LOG.info( "Method searchUsersInCompanyByMultipleCriteria finished." );
+        return users;
+    }
+
+
+    /**
+     * Method to get User Profile for user id where user is agent
+     * @throws InvalidInputException
+     * */
+    @Override
+    @Transactional
+    public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException
+    {
+        if ( userId == 0 ) {
+            LOG.error( "Invalid user id is passed in getAgentUserProfileForUserId" );
+            throw new InvalidInputException( "Invalid user id is passed in getAgentUserProfileForUserId" );
+        }
+        UserProfile agentUserProfile = null;
+        User user = userDao.findById( User.class, userId );
+        if ( user == null ) {
+            LOG.error( "User does not exist for user id : " + userId );
+            throw new InvalidInputException( "User does not exist for user id : " + userId );
+        }
+        for ( UserProfile userProfile : user.getUserProfiles() ) {
+            if ( userProfile.getAgentId() == userId && userProfile.getIsPrimary() == CommonConstants.YES
+                && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                agentUserProfile = userProfile;
+                break;
+            }
+            if ( userProfile.getAgentId() == userId
+                && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                agentUserProfile = userProfile;
+            }
+        }
+        return agentUserProfile;
     }
 }
