@@ -15,8 +15,10 @@
 					<c:set var="encompassurl" value="${appSettings.crm_info.url}" />
 					<c:set var="encompassfieldid"
 						value="${appSettings.crm_info.crm_fieldId}" />
+					<c:set var="encompassstate" value="${ appSettings.crm_info.state }" />
 				</c:if>
 				<form id="encompass-form">
+					<input id="encompass-state" type="hidden" value="${ encompassstate }" />
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
@@ -58,7 +60,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding" >
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.url.key" />
@@ -71,16 +73,16 @@
 									placeholder="URL" name="encompass-url" value="${encompassurl}">
 								<div id="encompass-url-error" class="hm-item-err-2"></div>
 							</div>
-							<div class="clearfix float-left st-url-icons">
+							<!-- <div class="clearfix float-left st-url-icons">
 								<div id="encompass-testconnection"
 									class="encompass-testconnection-adj um-item-row-icon icn-spanner margin-left-0 cursor-pointer"></div>
 								<div id="encompass-save"
 									class="um-item-row-icon icn-blue-tick margin-left-0 cursor-pointer"></div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 					<div
-						class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
+						class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden" style="margin-bottom:30px;">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left text-right">
 								<spring:message code="label.crm.fieldId.key" />
@@ -94,13 +96,33 @@
 								<div class="rfr_icn icn-field-id en-icn" ></div>
 								<input id="encompass-fieldId" type="text"
 									class="um-item-row-txt um-item-row-txt-OR en-form-align-left"
-									placeholder="fieldId" name="encompass-fieldId"
+									placeholder="Trigger fieldId" name="encompass-fieldId"
 									value="${encompassfieldid}">
+									<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
 							</div>
 						</div>
+					</div>
+					<div class="encompass-btn" >
+					<div>
+						<div id="en-dry-save"
+							class="float-left enc-state-icon cursor-pointer">Save</div>
+						<div id="en-dry-enable"
+							class="float-left enc-state-icon cursor-pointer hide"
+							style="display: none;">Enable</div>
+						<div id="en-disconnect"
+							class="float-left enc-state-icon cursor-pointer hide"
+							style="display: none;">Disconnect</div>
+					</div>
+					<div id="en-test-connection" class="float-left enc-state-icon cursor-pointer" onclick="encompassCretentials();">Test Connection</div>
+					<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" >Generate Report</div>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
 </div>
+<script>
+		$(document).ready(function() {
+			showEncompassButtons();
+		});
+</script>

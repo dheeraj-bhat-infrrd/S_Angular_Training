@@ -1054,9 +1054,26 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	float: left;
 	line-height: 40px;
 }
+.encompass-item-row-left {
+	float: left;
+	line-height: 40px;
+	width: 20%;
+    font-size: 13px;
+}
 
-.um-item-row-txt {
+.um-item-row-txt{
 	width: 300px;
+	height: 40px;
+	padding: 0 10px;
+	border-radius: 3px;
+	outline: none;
+	box-shadow: none;
+	border: 1px solid #dcdcdc;
+	margin-left: 30px;
+	font-size: 12px;
+}
+.encompass-item-row-txt{
+	width: 100%;
 	height: 40px;
 	padding: 0 10px;
 	border-radius: 3px;
@@ -7457,6 +7474,17 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
     border-radius: 3px;
     cursor: pointer;
 }
+.enc-state-icon {
+    background-color: rgb(92, 199, 239);
+    color: #fff;
+    width:110px;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    margin-right: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
 
 .sq-btn-post-social-btn {
 	margin: 10px auto;
@@ -8153,6 +8181,7 @@ label.url-change-input-label {
 .en-icn-fname{
 	margin-top: 10px !important;
 }
+
 .line-height-25{
 	line-height: 25px !important;
 }

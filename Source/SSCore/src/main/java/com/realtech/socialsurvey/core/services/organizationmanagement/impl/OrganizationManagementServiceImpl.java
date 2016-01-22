@@ -5405,6 +5405,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Override
+    @Transactional
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Getting list of encompass crm info for state : " + state );
+        List<OrganizationUnitSettings> organizationUnitSettingsList = null;
+        organizationUnitSettingsList = organizationUnitSettingsDao.getCompanyListForEncompass( state );
+        LOG.info( "Returning company settings list with provided crm list" );
+        return organizationUnitSettingsList;
+    }
+
     /**
      * Method to fetch profile image url for a list of entities
      * 

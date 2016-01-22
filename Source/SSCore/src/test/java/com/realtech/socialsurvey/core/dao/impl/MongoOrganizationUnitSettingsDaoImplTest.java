@@ -179,6 +179,25 @@ public class MongoOrganizationUnitSettingsDaoImplTest
     }
 
 
+    @Test ( expected = InvalidInputException.class)
+    public void getCompanyListForEncompassTestStateNull() throws InvalidInputException, NoRecordsFetchedException
+    {
+        mongoOrganizationUnitSettingDaoImpl.getCompanyListForEncompass( null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void getCompanyListForEncompassTestStateEmpty() throws InvalidInputException, NoRecordsFetchedException
+    {
+        mongoOrganizationUnitSettingDaoImpl.getCompanyListForEncompass( "" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void getCompanyListForEncompassTestStateInvalid() throws InvalidInputException, NoRecordsFetchedException
+    {
+        mongoOrganizationUnitSettingDaoImpl.getCompanyListForEncompass( "test" );
+    }
     //Tests for updateAgentSettingsForUserRestoration
 
     public void updateAgentSettingsForUserRestorationTestAgentSettingsNull() throws InvalidInputException

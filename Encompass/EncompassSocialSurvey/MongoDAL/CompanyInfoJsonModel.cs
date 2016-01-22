@@ -36,6 +36,8 @@ namespace EncompassSocialSurvey.MongoDAL
         public string url { get; set; }
         public string crm_source { get; set; }
         public bool connection_successful { get; set; }
+        public int numberOfDays { get; set; }
+        public string emailAddressForReport { get; set; }
     }
 
     public class LockSettings

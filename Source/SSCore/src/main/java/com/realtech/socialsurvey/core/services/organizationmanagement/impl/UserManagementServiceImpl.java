@@ -583,8 +583,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         //Start restoring the user
-        //Set status = 1 and loginId = emailId
-        user.setStatus( CommonConstants.STATUS_ACTIVE );
+        //Set status = 1 if password field is present, 2 otherwise, and loginId = emailId
+        if ( user.getPassword() == null || user.getPassword().isEmpty() ) {
+            user.setStatus( CommonConstants.STATUS_NOT_VERIFIED );
+        } else {
+            user.setStatus( CommonConstants.STATUS_ACTIVE );
+        }
         user.setLoginName( user.getEmailId() );
         updateUser( user );
 

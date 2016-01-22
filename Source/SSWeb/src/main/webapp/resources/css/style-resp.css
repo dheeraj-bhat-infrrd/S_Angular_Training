@@ -1690,6 +1690,14 @@
 	    max-width: 100%;
 	    font-size: 14px;
 	}
+	.enc-state-icon {
+		clear: both;
+		width: 100%;
+		margin-top: 10px;
+		padding: 20px;
+		line-height: 5px;
+	}
+
 }
 
 
@@ -2046,6 +2054,9 @@
 	font-size: 13px;
 	text-transform: initial;
 	}
+	.encompass-btn{
+	margin-left: 180px;
+   }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -2209,7 +2220,13 @@
 	#top-dash{
 	min-height:480px;
 	}
-	
+	.en-botttom-padding{
+	margin-bottom:30px;
+	}
+	.encompass-btn{
+	width:700px;
+	margin-left: 30%;
+   }
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
@@ -2229,6 +2246,13 @@
 	#top-dash{
 	min-height:480px;
 	}
+	.en-botttom-padding{
+	margin-bottom:30px;
+	}
+	.encompass-btn{
+	width:700px;
+	margin-left: 30%;
+   }
     
 }
 
