@@ -1228,4 +1228,7 @@ public interface OrganizationManagementService
     public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index,
         int batch_size ) throws InvalidInputException;
 
+
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException, NoRecordsFetchedException;
+
 }

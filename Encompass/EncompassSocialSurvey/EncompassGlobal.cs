@@ -25,13 +25,13 @@ namespace EncompassSocialSurvey
             try
             {
                 // if user name or password field is empty return
-                if (string.IsNullOrWhiteSpace(companyCredential.UserName)) return;
-                if (string.IsNullOrWhiteSpace(companyCredential.Password)) return;
+                if (string.IsNullOrWhiteSpace(companyCredential.EncompassCredential.UserName)) return;
+                if (string.IsNullOrWhiteSpace(companyCredential.EncompassCredential.Password)) return;
 
                 // now set the user name  password
-                EncompassGlobal.EncompassUserName = companyCredential.UserName;
-                EncompassGlobal.EncompassPassword = companyCredential.Password;
-                EncompassGlobal.EncompassUrl = companyCredential.EncompassUrl;
+                EncompassGlobal.EncompassUserName = companyCredential.EncompassCredential.UserName;
+                EncompassGlobal.EncompassPassword = companyCredential.EncompassCredential.Password;
+                EncompassGlobal.EncompassUrl = companyCredential.EncompassCredential.EncompassUrl;
 
                 // Start the session
                 EllieMae.Encompass.Client.Session s = new EllieMae.Encompass.Client.Session();
@@ -39,10 +39,10 @@ namespace EncompassSocialSurvey
 
 
                 // 
-                if (companyCredential.EncompassUrl == "")
-                    s.StartOffline(companyCredential.UserName, companyCredential.Password);
+                if (companyCredential.EncompassCredential.EncompassUrl == "")
+                    s.StartOffline(companyCredential.EncompassCredential.UserName, companyCredential.EncompassCredential.Password);
                 else
-                    s.Start(companyCredential.EncompassUrl, companyCredential.UserName, companyCredential.Password);
+                    s.Start(companyCredential.EncompassCredential.EncompassUrl, companyCredential.EncompassCredential.UserName, companyCredential.EncompassCredential.Password);
 
                 // set the static object
                 EncompassGlobal.EncompassLoginSession = s;
@@ -51,7 +51,7 @@ namespace EncompassSocialSurvey
             {
                 Logger.Error("Caught an exception: EncompassGlobal.GetUserLoginSesssion(): ", ex);
                 String Subject = "Error while connecting to encompass";
-                String BodyText = "An error has been occurred while connecting to encompass for company with id : " + companyCredential.CompanyId + " on " + DateTime.Now + ".";
+                String BodyText = "An error has been occurred while connecting to encompass for company : " + companyCredential .CompanyName + " with id : " + companyCredential.EncompassCredential.CompanyId + " on " + DateTime.Now + ".";
                 BodyText += ex.Message;
                 CommonUtility.SendMailToAdmin(Subject, BodyText);
                 throw ex;

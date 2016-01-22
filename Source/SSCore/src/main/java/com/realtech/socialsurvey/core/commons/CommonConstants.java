@@ -455,6 +455,12 @@ public interface CommonConstants
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
+    public static final String ENCOMPASS_DRY_RUN_STATE = "dryrun";
+    public static final String ENCOMPASS_PRODUCTION_STATE = "prod";
+    public static final String ENCOMPASS_CLIENT_URL_COLUMN = "clientUrl";
+    public static final String ENCOMPASS_USERNAME_COLUMN = "userName";
+    public static final String ENCOMPASS_PASSWORD_COLUMN = "password";
+    public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -588,6 +594,8 @@ public interface CommonConstants
     public static final int ERROR_CODE_REGION_POSTS_FETCH_FAILURE = 138;
     public static final int ERROR_CODE_BRANCH_POSTS_FETCH_PRECONDITION_FAILURE = 139;
     public static final int ERROR_CODE_BRANCH_POSTS_FETCH_FAILURE = 140;
+    public static final int ERROR_CODE_ENCOMPASS_COMPANY_FETCH_FAILURE = 141;
+    public static final int ERROR_CODE_ENCOMPASS_NO_COMPANIES_CONNECTED = 142;
 
     /**
      * Service codes
@@ -625,6 +633,7 @@ public interface CommonConstants
     public static final int SERVICE_CODE_COMPANY_POSTS = 124;
     public static final int SERVICE_CODE_BRANCH_POSTS = 125;
     public static final int SERVICE_CODE_REGION_POSTS = 126;
+    public static final int SERVICE_CODE_COMPANY_CRM_INFO = 127;
 
     /*
      * Mongo column and collection constants
