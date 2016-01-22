@@ -66,4 +66,18 @@ public class SurveyPreInitiationDaoImplTest
     {
         surveyPreInitiationDaoImpl.deletePreInitiatedSurveysForAgent( 0l );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateAgentInfoOfPreInitiatedSurveysWithInvalidFromUserId() throws InvalidInputException
+    {
+        surveyPreInitiationDaoImpl.updateAgentInfoOfPreInitiatedSurveys( 0l, null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateAgentInfoOfPreInitiatedSurveysWithNullToUser() throws InvalidInputException
+    {
+        surveyPreInitiationDaoImpl.updateAgentInfoOfPreInitiatedSurveys( 1l, null );
+    }
 }

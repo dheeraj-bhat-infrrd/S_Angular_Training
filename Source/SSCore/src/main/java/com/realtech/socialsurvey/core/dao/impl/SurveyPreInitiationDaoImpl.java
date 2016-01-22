@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -394,5 +395,35 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         query.setParameter( "deletedAgentId", agentId );
         query.executeUpdate();
         LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " finished." );
+    }
+
+
+    /**
+     * Method to update agent info when survey moved from one user to another
+     * @throws InvalidInputException
+     * */
+    @Override
+    public void updateAgentInfoOfPreInitiatedSurveys( long fromUserId, User toUser ) throws InvalidInputException
+    {
+
+        if ( fromUserId <= 0l ) {
+            throw new InvalidInputException( "Invalid from agent id : " + fromUserId );
+        }
+
+        if ( toUser == null ) {
+            throw new InvalidInputException( "To agent passed cannot be null" );
+        }
+        LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
+            + " started." );
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, AGENT_COLLECTION_ID=? WHERE AGENT_ID = ?";
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameter( 0, toUser.getUserId() );
+        query.setParameter( 1, toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
+        query.setParameter( 2, toUser.getEmailId() );
+        query.setParameter( 3, toUser.getUserId() );
+        query.setParameter( 4, fromUserId );
+        query.executeUpdate();
+        LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
+            + " ended." );
     }
 }

@@ -268,4 +268,7 @@ public interface SurveyHandler
 
 
     public double getFormattedSurveyScore( double surveyScore );
+
+
+    public void moveSurveysToAnotherUser( long fromUserId, long toUserId ) throws InvalidInputException, NoRecordsFetchedException, SolrException;
 }

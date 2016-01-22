@@ -25,6 +25,8 @@ import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -199,5 +201,26 @@ public class MongoSurveyDetailsDaoImplTest
     public void testDeleteIncompleteSurveysForAgent() throws InvalidInputException
     {
         mongoSurveyDetailsDaoImpl.deleteIncompleteSurveysForAgent( 0l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentInfoInSurveysWithInvalidAgentId() throws InvalidInputException
+    {
+        mongoSurveyDetailsDaoImpl.updateAgentInfoInSurveys( 0l, new User(), new UserProfile() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentInfoInSurveysWithNullToUser() throws InvalidInputException
+    {
+        mongoSurveyDetailsDaoImpl.updateAgentInfoInSurveys( 1l, null, new UserProfile() );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testUpdateAgentInfoInSurveysWithNullUserProfile() throws InvalidInputException
+    {
+        mongoSurveyDetailsDaoImpl.updateAgentInfoInSurveys( 1l, new User(), null );
     }
 }

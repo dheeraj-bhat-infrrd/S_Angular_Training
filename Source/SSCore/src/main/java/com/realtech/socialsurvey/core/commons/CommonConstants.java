@@ -213,6 +213,7 @@ public interface CommonConstants
      * Mongo entities and column name constants
      */
     public static final String AGENT_ID_COLUMN = "agentId";
+    public static final String AGENT_NAME_COLUMN = "agentName";
     public static final String AGENT_EMAIL_ID_COLUMN = "emailId";
     public static final String SURVEY_AGENT_EMAIL_ID_COLUMN = "agentEmailId";
     public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";

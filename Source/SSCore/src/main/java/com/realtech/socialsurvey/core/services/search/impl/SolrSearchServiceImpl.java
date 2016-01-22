@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -88,6 +89,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
 
     /**
@@ -2626,5 +2630,33 @@ public class SolrSearchServiceImpl implements SolrSearchService
         }
         LOG.info( "Method to find all users in branch " + branchId + " finished." );
         return results;
+    }
+
+
+    /**
+     * Method to update review count of user in solr
+     * @throws InvalidInputException
+     * @throws SolrException
+     * */
+    @Override
+    public void updateReviewCountOfUserInSolr( User user ) throws InvalidInputException, SolrException
+    {
+        if ( user == null )
+            throw new InvalidInputException( "User passed cannot be null in updateReviewCountOfUserInSolr()" );
+        LOG.info( "Method to update solr review count for user : " + user.getUserId()
+            + ", updateReviewCountOfUserInSolr() started" );
+        LOG.info( "Fetching review count of user from mongo for user id : " + user.getUserId() );
+        long reviewCount = profileManagementService.getReviewsCount( user.getUserId(), -1, -1,
+            CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
+        LOG.info( "Fetched review count of user from mongo for user id : " + user.getUserId() );
+        if ( user.getIsZillowConnected() == CommonConstants.STATUS_ACTIVE && user.getZillowReviewCount() > 0 ) {
+            LOG.info( "Adding zillow review count to review count as user is connected to zillow" );
+            reviewCount += user.getZillowReviewCount();
+        }
+        LOG.info( "Updating review count of user in solr for user id : " + user.getUserId() );
+        editUserInSolr( user.getUserId(), CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
+        LOG.info( "Updated review count of user in solr for user id : " + user.getUserId() );
+        LOG.info( "Method to update solr review count for user : " + user.getUserId()
+            + ", updateReviewCountOfUserInSolr() ended" );
     }
 }
