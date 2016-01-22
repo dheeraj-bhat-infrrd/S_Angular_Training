@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
@@ -41,6 +43,8 @@ import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 
@@ -2104,5 +2108,35 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query( criteria );
         mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method to delete incomplete surveys for agent ID : " + agentId + " finished." );
+    }
+
+
+    /**
+     * Method to update agent info when surveys moved from one user to another
+     * @throws InvalidInputException
+     * */
+    @Override
+    public void updateAgentInfoInSurveys( long fromUserId, User toUser, UserProfile toUserProfile )
+        throws InvalidInputException
+    {
+        if ( fromUserId <= 0l )
+            throw new InvalidInputException( "Invalid fromUserId passed in updateAgentIdOfSurveys()" );
+        if ( toUser == null )
+            throw new InvalidInputException( "toUser passed cannot be null in updateAgentIdOfSurveys()" );
+        if ( toUserProfile == null )
+            throw new InvalidInputException( "toUser's user profile passed cannot be null in updateAgentIdOfSurveys()" );
+
+        LOG.info( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        Update update = new Update();
+        update.set( CommonConstants.AGENT_ID_COLUMN, toUser.getUserId() );
+        update.set( CommonConstants.AGENT_NAME_COLUMN, toUser.getFirstName()
+            + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
+        update.set( CommonConstants.REGION_ID_COLUMN, toUserProfile.getRegionId() );
+        update.set( CommonConstants.BRANCH_ID_COLUMN, toUserProfile.getBranchId() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user finished." );
+
     }
 }

@@ -356,5 +356,8 @@ public interface SolrSearchService
 
 
     void updateRegionsForMultipleUsers( Map<Long, List<Long>> regionsMap ) throws InvalidInputException, SolrException;
+
+
+    public void updateReviewCountOfUserInSolr( User user ) throws InvalidInputException, SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

@@ -11,6 +11,8 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -227,4 +229,7 @@ public interface SurveyDetailsDao
 
 
     public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException;
+
+
+    public void updateAgentInfoInSurveys( long fromUserId, User toUser, UserProfile toUserProfile ) throws InvalidInputException;
 }

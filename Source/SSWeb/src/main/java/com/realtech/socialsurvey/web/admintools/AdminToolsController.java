@@ -160,6 +160,42 @@ public class AdminToolsController
     }
 
 
+    @ResponseBody
+    @RequestMapping(value="/movesurveys/{fromUserId}/{toUserId}")
+    public Response moveSurveysToAnotherUser(@PathVariable long fromUserId, @PathVariable long toUserId, HttpServletRequest request){
+        LOG.info( "Method to move surveys from user id : " + fromUserId + " to user id : " + toUserId + " started.");
+        Response response = null;
+        try {
+            try {
+                LOG.info( "Checking for authorization to perform survey move operation" );
+                String authorizationHeader = request.getHeader( "Authorization" );
+                validateAuthHeader( authorizationHeader );
+                LOG.info( "Authorization confirmed to perform survey move operation" );
+                if( fromUserId <= 0)
+                    throw new InvalidInputException("Invalid from user id passed as parameter");
+                if( toUserId <= 0)
+                    throw new InvalidInputException("Invalid to user id passed as parameter");
+                LOG.info( "Moving surveys from one user to another operation started" );
+                surveyHandler.moveSurveysToAnotherUser(fromUserId, toUserId);
+                LOG.info( "Moving surveys from one user to another operation finished" );
+                response = Response.ok( "Surveys from user id : " + fromUserId + " has been successfully moved to user id : " + toUserId ).build();
+            } catch ( Exception e ) {
+                LOG.error( "Error occurred while moving surveys from user id : " + fromUserId + " to user id : " + toUserId  + ", Reason : ", e );
+                throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
+                    CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys from user id : " + fromUserId + " to user id : " + toUserId  ), e.getMessage() );
+            }
+        } catch ( BaseRestException e ) {
+            response = getErrorResponse( e );
+        }
+        
+        if(fromUserId <= 0 ){
+            LOG.error( "" );
+        }
+        LOG.info( "Method to move surveys from user id : " + fromUserId + " to user id : " + toUserId + " started.");
+        return response;
+    }
+    
+    
     /**
      * Method to get the error response object from base rest exception
      * 
