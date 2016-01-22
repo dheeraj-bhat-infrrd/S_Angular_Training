@@ -167,29 +167,21 @@ public class AdminToolsController
      * */
     @ResponseBody
     @RequestMapping ( value = "/users/movesurveys")
-    public Response moveSurveysToAnotherUser( HttpServletRequest request )
+    public Response moveSurveysToAnotherUser( @QueryParam ( value = "from_user") long from_user,
+        @QueryParam ( value = "to_user") long to_user, HttpServletRequest request )
     {
-
         Response response = null;
         long fromUserId = 0;
         long toUserId = 0;
-        String from_user_id = request.getParameter( "from_user" );
-        String to_user_id = request.getParameter( "to_user" );
         try {
             try {
-                if ( from_user_id == null || from_user_id.isEmpty() ) {
-                    throw new InvalidInputException( "Invalid from user id passed as parameter" );
-                }
-                if ( to_user_id == null || to_user_id.isEmpty() ) {
-                    throw new InvalidInputException( "Invalid to user id passed as parameter" );
-                }
-                LOG.info( "Method to move surveys from user id : " + from_user_id + " to user id : " + to_user_id + " started." );
+                LOG.info( "Method to move surveys from user id : " + from_user + " to user id : " + to_user + " started." );
                 LOG.info( "Checking for authorization to perform survey move operation" );
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
                 LOG.info( "Authorization confirmed to perform survey move operation" );
-                fromUserId = Long.valueOf( from_user_id ).longValue();
-                toUserId = Long.valueOf( to_user_id ).longValue();
+                fromUserId = Long.valueOf( from_user ).longValue();
+                toUserId = Long.valueOf( to_user ).longValue();
                 if ( fromUserId <= 0 )
                     throw new InvalidInputException( "Invalid from user id passed as parameter" );
                 if ( toUserId <= 0 )
@@ -198,19 +190,19 @@ public class AdminToolsController
                 surveyHandler.moveSurveysToAnotherUser( fromUserId, toUserId );
                 LOG.info( "Moving surveys from one user to another operation finished" );
                 response = Response.ok(
-                    "Surveys from user id : " + from_user_id + " has been successfully moved to user id : " + to_user_id )
+                    "Surveys from user id : " + from_user + " has been successfully moved to user id : " + to_user )
                     .build();
             } catch ( Exception e ) {
-                LOG.error( "Error occurred while moving surveys from user id : " + from_user_id + " to user id : " + to_user_id
+                LOG.error( "Error occurred while moving surveys from user id : " + from_user + " to user id : " + to_user
                     + ", Reason : ", e );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys from user id : " + from_user_id
-                        + " to user id : " + to_user_id ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys from user id : " + from_user
+                        + " to user id : " + to_user ), e.getMessage() );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
         }
-        LOG.info( "Method to move surveys from user id : " + from_user_id + " to user id : " + to_user_id + " ended." );
+        LOG.info( "Method to move surveys from user id : " + from_user + " to user id : " + to_user + " ended." );
         return response;
     }
     
