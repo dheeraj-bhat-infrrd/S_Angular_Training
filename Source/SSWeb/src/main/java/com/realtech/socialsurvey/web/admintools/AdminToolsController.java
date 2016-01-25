@@ -164,7 +164,7 @@ public class AdminToolsController
      * sample url : /users/movesurveys?from_user={fromUserId}&to_user={toUserId}
      * */
     @ResponseBody
-    @RequestMapping ( value = "/users/movesurveys")
+    @RequestMapping ( value = "/user/movesurveys")
     public Response moveSurveysToAnotherUser( @QueryParam ( value = "from_user") long from_user,
         @QueryParam ( value = "to_user") long to_user, HttpServletRequest request )
     {
