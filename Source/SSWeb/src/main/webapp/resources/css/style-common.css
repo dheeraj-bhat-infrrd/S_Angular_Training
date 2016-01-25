@@ -3042,7 +3042,7 @@ margin-top:10px;
 	margin-bottom: 20px;
 }
 
-.sq-btn-continue {
+.sq-btn-continue,.sq-btn-continue-survey {
 	border-radius: 3px;
 	color: #fff;
 	cursor: pointer;
@@ -3054,7 +3054,7 @@ margin-top:10px;
 	margin: 0px 0px 0px 165px;
 }
 
-.sq-btn-continue:hover {
+.sq-btn-continue,.sq-btn-continue-survey:hover {
 	background-color: #7AB400;
 }
 
@@ -3955,7 +3955,7 @@ img.prof-image {
 	width: 184px !important;
 }
 
-.reg-cap-nw-adj .sq-btn-continue {
+.reg-cap-nw-adj .sq-btn-continue{
 	position: relative;
 	left: 30px;
 	margin-top: 25px;
@@ -7490,6 +7490,7 @@ a.sq-btn-post-social:hover, a.sq-btn-post-social:visited {
 .sq-btn-post-social-btn {
 	margin: 10px auto;
 	display: block;
+	margin-left:5px;
 }
 .sq-btn-post-social-btn:hover, .sq-btn-post-social-btn:visited {
 	color: #fff !important;
@@ -8185,4 +8186,10 @@ label.url-change-input-label {
 
 .line-height-25{
 	line-height: 25px !important;
+}
+.share-social-link-cont{
+	width: 312px;
+    margin-left: 40%;
+    height: 250px;
+    margin: auto;
 }

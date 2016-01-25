@@ -5534,6 +5534,7 @@ function showMasterQuestionPage(){
 		}
 		if(mood == 'Great' && isAbusive == false) {
 			$('#social-post-links').show();
+			
 		}
 		
 		//call method to post the review and update the review count
