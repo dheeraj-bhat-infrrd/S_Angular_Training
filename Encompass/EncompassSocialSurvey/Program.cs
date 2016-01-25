@@ -54,7 +54,7 @@ namespace EncompassSocialSurvey
 
                 if (loanSerivce.isCompanyActive(forCompCredential.EncompassCredential.CompanyId))
                 {
-                    Logger.Debug("Starting loan processing for company: "
+                    Logger.Debug("Starting loan processing for company: " + forCompCredential.CompanyName + " " 
                         + " companyId: " + forCompCredential.EncompassCredential.CompanyId
                         + " : companyUserName : " + forCompCredential.EncompassCredential.UserName
                         + " : companyURL : " + forCompCredential.EncompassCredential.EncompassUrl);
@@ -83,13 +83,12 @@ namespace EncompassSocialSurvey
 
                             var loansVM = _loanUtility.PopulateLoanList(forCompCredential.EncompassCredential.CompanyId, fieldId, isProductionRun, forCompCredential.EncompassCredential.numberOfDays, emailDomain, emailPrefix);
 
-                            if (null == loansVM) continue;
-                            if (loansVM.Count <= 0) continue;
-
                             if (isProductionRun)
                             {
                                 try
                                 {
+                                    if (null == loansVM) continue;
+                                    if (loansVM.Count <= 0) continue;
                                     Logger.Debug("Saving loans for company : " + forCompCredential.CompanyName + " id : "  + forCompCredential.EncompassCredential.CompanyId);
                                     // process for insert
                                     loanSerivce.InsertLoans(loansVM);
@@ -106,6 +105,7 @@ namespace EncompassSocialSurvey
                             {
                                 try
                                 {
+
                                     Logger.Debug("Generating report for company : " + forCompCredential.CompanyName);
                                     //generate report and send it
                                     var createdFilePath = loanSerivce.createExcelSpreadSheetForLoanlist(loansVM, forCompCredential.CompanyName);
