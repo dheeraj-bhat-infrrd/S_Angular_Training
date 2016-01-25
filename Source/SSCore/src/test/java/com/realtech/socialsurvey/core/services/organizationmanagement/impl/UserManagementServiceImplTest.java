@@ -956,7 +956,7 @@ public class UserManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testRestoreDeletedUserForInvalidUserId() throws InvalidInputException, SolrException
     {
-        userManagementServiceImpl.restoreDeletedUser( 0l );
+        userManagementServiceImpl.restoreDeletedUser( 0l, false );
     }
 
 
@@ -964,7 +964,7 @@ public class UserManagementServiceImplTest
     public void testRestoreDeletedUserForUserDoesntExist() throws InvalidInputException, SolrException
     {
         Mockito.doReturn( null ).when( userManagementServiceImpl ).getUserByUserId( Matchers.anyLong() );
-        userManagementServiceImpl.restoreDeletedUser( 50l );
+        userManagementServiceImpl.restoreDeletedUser( 50l, false );
     }
 
 
@@ -974,7 +974,7 @@ public class UserManagementServiceImplTest
         User user = new User();
         user.setStatus( CommonConstants.STATUS_ACTIVE );
         Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByUserId( Matchers.anyLong() );
-        userManagementServiceImpl.restoreDeletedUser( 50l );
+        userManagementServiceImpl.restoreDeletedUser( 50l, false );
     }
 
 
@@ -995,7 +995,7 @@ public class UserManagementServiceImplTest
         user2.setEmailId( email );
         userList.add( user2 );
         Mockito.doReturn( userList ).when( userManagementServiceImpl ).getUsersByEmailId( email );
-        userManagementServiceImpl.restoreDeletedUser( 50l );
+        userManagementServiceImpl.restoreDeletedUser( 50l, false );
     }
 
 
