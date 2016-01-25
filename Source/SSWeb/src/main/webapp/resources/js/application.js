@@ -3498,13 +3498,7 @@ function testConnectionSaveCallBack(response){
 	}
 };
 
-/*function testEncompassConnection(formid) {
-	if (validateEncompassInput(formid)) {
-		var url = "./testencompassconnection.do";
-		callAjaxFormSubmit(url, testEncompassConnectionCallBack, formid);
-	}
-}
-*/
+
 function testEncompassConnectionCallBack(response) {
 	var map =  $.parseJSON(response);
 	if (map.status == true) {
@@ -3541,13 +3535,10 @@ function validateEncompassInput(elementId) {
 			isFocussed=true;
 		}
 	}
-	if(!validateFieldID('encompass-fieldId')){
-		isEncompassValid = false;
-		if(!isFocussed){
-			$('encompass-fieldId').focus();
-			isFocussed=true;
-		}
+	if($('#encompass-fieldId').val()==""){
+		$('#encompass-fieldId').val('1997');
 	}
+	
 	return isEncompassValid;
 }
 //Check for encompass input fields for testConnection (except fieldid)
@@ -3592,16 +3583,7 @@ function validateDotloopInput() {
 }
 
 //app settings event binding
-$('body').on('click', '#encompass-save', function() {
-	if (validateEncompassInput('encompass-form-div')) {
-		saveEncompassDetails("encompass-form");
-	}
-});
-$('body').on('click', '#encompass-testconnection', function() {
-	if (validateEncompassInput('encompass-form-div')) {
-		testEncompassConnection("encompass-form");
-	}
-});
+
 $('body').on('click',function(){
 	$('.crm-settings-dropdown-cont').slideUp(200);
 });
@@ -10222,6 +10204,7 @@ $(document).on('click','#en-dry-save',function(e){
 			initiateEncompassSaveConnection(false);
 		}
 	}
+	
 });
 
 function confirmEncompassEdit() {
