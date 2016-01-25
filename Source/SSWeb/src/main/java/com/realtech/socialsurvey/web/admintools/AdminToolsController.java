@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.SearchedUser;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.exception.AdminToolsErrorCode;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
@@ -57,18 +57,18 @@ public class AdminToolsController
     /**
      * Controller that returns all the users in a company that match a certain criteria
      * @param companyId, HttpServletRequest request
-     * @param emailId
+     * @param emailAddress
      * @param firstName
      * @param lastName
      * @return
      */
     @ResponseBody
-    @RequestMapping ( value = "/{companyId}")
-    public Response searchUsersInCompany( @PathVariable long companyId, @QueryParam ( value = "emailId") String emailId,
-        @QueryParam ( value = "firstName") String firstName, @QueryParam ( value = "lastName") String lastName,
-        HttpServletRequest request )
+    @RequestMapping ( value = "/user/search")
+    public Response searchUsersInCompany( @QueryParam ( value = "companyId") long companyId,
+        @QueryParam ( value = "emailAddress") String emailAddress, @QueryParam ( value = "firstName") String firstName,
+        @QueryParam ( value = "lastName") String lastName, HttpServletRequest request )
     {
-        LOG.info( "Method searchUsersInCompany started for companyId : " + companyId + " emailId : " + emailId
+        LOG.info( "Method searchUsersInCompany started for companyId : " + companyId + " emailId : " + emailAddress
             + " firstName : " + firstName + " lastName : " + lastName );
         Response response = null;
         try {
@@ -81,8 +81,8 @@ public class AdminToolsController
                 Map<String, Object> queries = new HashMap<String, Object>();
                 Company company = userManagementService.getCompanyById( companyId );
                 queries.put( CommonConstants.COMPANY, company );
-                if ( !( emailId == null || emailId.isEmpty() ) ) {
-                    queries.put( CommonConstants.EMAIL_ID, emailId );
+                if ( !( emailAddress == null || emailAddress.isEmpty() ) ) {
+                    queries.put( CommonConstants.EMAIL_ID, emailAddress );
                 }
                 if ( !( firstName == null || firstName.isEmpty() ) ) {
                     queries.put( CommonConstants.FIRST_NAME, firstName );
@@ -95,16 +95,14 @@ public class AdminToolsController
                 }
 
                 List<User> users = userManagementService.searchUsersInCompanyByMultipleCriteria( queries );
-                List<UserFromSearch> usersList = new ArrayList<UserFromSearch>();
+                List<SearchedUser> usersList = new ArrayList<SearchedUser>();
                 for ( User user : users ) {
-                    UserFromSearch searchedUser = new UserFromSearch();
+                    SearchedUser searchedUser = new SearchedUser();
                     searchedUser.setUserId( user.getUserId() );
-                    searchedUser.setCompanyId( companyId );
                     searchedUser.setFirstName( user.getFirstName() );
                     searchedUser.setLastName( user.getLastName() );
-                    searchedUser.setLoginName( user.getLoginName() );
-                    searchedUser.setEmailId( user.getEmailId() );
                     searchedUser.setStatus( user.getStatus() );
+                    searchedUser.setEmailAddress( emailAddress );
                     usersList.add( searchedUser );
                 }
                 String json = new Gson().toJson( usersList );
@@ -120,7 +118,7 @@ public class AdminToolsController
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
         }
-        LOG.info( "Method searchUsersInCompany finished for companyId : " + companyId + " emailId : " + emailId
+        LOG.info( "Method searchUsersInCompany finished for companyId : " + companyId + " emailId : " + emailAddress
             + " firstName : " + firstName + " lastName : " + lastName );
         return response;
     }
@@ -135,7 +133,7 @@ public class AdminToolsController
      * 6. In mongo, change Status:D to Status:A
      */
     @ResponseBody
-    @RequestMapping ( value = "/restoreUser/{userId}")
+    @RequestMapping ( value = "/user/restore/{userId}")
     public Response restoreUser( @PathVariable long userId, HttpServletRequest request )
     {
         LOG.info( "Method restoreUser started for userId : " + userId );
