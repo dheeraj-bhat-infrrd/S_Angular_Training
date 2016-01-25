@@ -549,11 +549,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     /*
-     * Method to deactivate an existing user.
+     * Method to reactivate a deleted user.
      */
     @Transactional
     @Override
-    public void restoreDeletedUser( long userId ) throws InvalidInputException, SolrException
+    public void restoreDeletedUser( long userId, boolean restoreSocial ) throws InvalidInputException, SolrException
     {
         if ( userId <= 0l ) {
             throw new InvalidInputException( "User id is invalid in restoreDeletedUser" );
@@ -584,7 +584,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //Start restoring the user
         //Set status = 1 if password field is present, 2 otherwise, and loginId = emailId
-        if ( user.getPassword() == null || user.getPassword().isEmpty() ) {
+        if ( user.getLoginPassword() == null || user.getLoginPassword().isEmpty() ) {
             user.setStatus( CommonConstants.STATUS_NOT_VERIFIED );
         } else {
             user.setStatus( CommonConstants.STATUS_ACTIVE );
@@ -624,7 +624,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
         
-        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings );
+        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings, restoreSocial );
         
         //Add user to Solr
         solrSearchService.addUserToSolr( user );

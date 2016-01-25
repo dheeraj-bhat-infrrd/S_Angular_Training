@@ -415,13 +415,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " started." );
-        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, AGENT_COLLECTION_ID=? WHERE AGENT_ID = ?";
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=? WHERE AGENT_ID = ?";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, toUser.getUserId() );
         query.setParameter( 1, toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
         query.setParameter( 2, toUser.getEmailId() );
-        query.setParameter( 3, toUser.getUserId() );
-        query.setParameter( 4, fromUserId );
+        query.setParameter( 3, fromUserId );
         query.executeUpdate();
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " ended." );

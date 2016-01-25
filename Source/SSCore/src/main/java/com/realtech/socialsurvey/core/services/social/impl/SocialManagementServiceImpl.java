@@ -1809,6 +1809,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
 
         mediaTokens = unitSettings.getSocialMediaTokens();
+        //Make a backup of the mediaTokens
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            CommonConstants.DELETED_SOCIAL_MEDIA_TOKENS_COLUMN, mediaTokens, unitSettings, collection );
+        
         try {
             if ( mediaTokens.getFacebookToken() != null ) {
                 String socialMedia = CommonConstants.FACEBOOK_SOCIAL_SITE;

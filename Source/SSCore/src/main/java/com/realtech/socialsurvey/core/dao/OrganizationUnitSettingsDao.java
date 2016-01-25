@@ -231,6 +231,6 @@ public interface OrganizationUnitSettingsDao
         NoRecordsFetchedException;
 
 
-    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings )
+    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings, boolean restoreSocial  )
         throws InvalidInputException;
 }

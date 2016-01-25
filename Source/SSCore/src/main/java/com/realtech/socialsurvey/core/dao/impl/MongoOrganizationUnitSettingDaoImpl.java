@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
@@ -713,7 +714,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      * @throws InvalidInputException
      */
     @Override
-    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings )
+    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings, boolean restoreSocial )
         throws InvalidInputException
     {
         if ( agentSettings == null ) {
@@ -732,7 +733,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             update.set( CommonConstants.PROFILE_NAME_COLUMN, newProfileName );
             update.set( CommonConstants.PROFILE_URL_SOLR, "/" + newProfileName );
         }
-
+        
+        //Restore social media tokens if requested
+        if ( restoreSocial ) {
+            if ( agentSettings.getDeletedSocialTokens() != null ) {
+                SocialMediaTokens mediaTokens = agentSettings.getDeletedSocialTokens();
+                update.set( KEY_SOCIAL_MEDIA_TOKENS, mediaTokens );
+                update.unset( CommonConstants.DELETED_SOCIAL_MEDIA_TOKENS_COLUMN );
+            }
+        }
         //Update the modifiedOn column in mongo
         update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
 

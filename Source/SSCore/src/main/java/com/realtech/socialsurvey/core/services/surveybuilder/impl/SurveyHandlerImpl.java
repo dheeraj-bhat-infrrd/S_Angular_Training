@@ -2298,18 +2298,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         User toUser = userList.get( 1 ).getUserId() == toUserId ? userList.get( 1 ) : userList.get( 0 );
 
         // check if both user belong to same company
-        UserProfile fromUserProfile = getUserProfileWhereAgentForUser( fromUser );
+        //UserProfile fromUserProfile = getUserProfileWhereAgentForUser( fromUser );
         UserProfile toUserProfile = getUserProfileWhereAgentForUser( toUser );
         LOG.info( "Validating whether both from and to user are agents" );
-        // check if from user id is an agent
-        if ( fromUserProfile == null )
-            throw new NoRecordsFetchedException( "From user id : " + fromUser.getUserId() + " is not an agent" );
         // check if to user id is an agent
         if ( toUserProfile == null )
             throw new NoRecordsFetchedException( "To user id : " + toUser.getUserId() + " is not an agent" );
         LOG.info( "Validating whether both from and to user belong to same company" );
-        if ( fromUser.getCompany().getCompanyId() != toUser.getCompany().getCompanyId()
-            || fromUserProfile.getCompany().getCompanyId() != toUserProfile.getCompany().getCompanyId() )
+        if ( fromUser.getCompany().getCompanyId() != toUser.getCompany().getCompanyId() )
             throw new UnsupportedOperationException( "From user : " + fromUser.getUserId() + " and to user id : "
                 + toUser.getUserId() + " do not belong to same company" );
 

@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +15,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.SearchedUser;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.exception.AdminToolsErrorCode;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
@@ -56,18 +53,18 @@ public class AdminToolsController
     /**
      * Controller that returns all the users in a company that match a certain criteria
      * @param companyId, HttpServletRequest request
-     * @param emailId
+     * @param emailAddress
      * @param firstName
      * @param lastName
      * @return
      */
     @ResponseBody
-    @RequestMapping ( value = "/{companyId}")
-    public Response searchUsersInCompany( @PathVariable long companyId, @QueryParam ( value = "emailId") String emailId,
-        @QueryParam ( value = "firstName") String firstName, @QueryParam ( value = "lastName") String lastName,
-        HttpServletRequest request )
+    @RequestMapping ( value = "/user/search")
+    public Response searchUsersInCompany( @QueryParam ( value = "companyId") long companyId,
+        @QueryParam ( value = "emailAddress") String emailAddress, @QueryParam ( value = "firstName") String firstName,
+        @QueryParam ( value = "lastName") String lastName, HttpServletRequest request )
     {
-        LOG.info( "Method searchUsersInCompany started for companyId : " + companyId + " emailId : " + emailId
+        LOG.info( "Method searchUsersInCompany started for companyId : " + companyId + " emailId : " + emailAddress
             + " firstName : " + firstName + " lastName : " + lastName );
         Response response = null;
         try {
@@ -80,8 +77,8 @@ public class AdminToolsController
                 Map<String, Object> queries = new HashMap<String, Object>();
                 Company company = userManagementService.getCompanyById( companyId );
                 queries.put( CommonConstants.COMPANY, company );
-                if ( !( emailId == null || emailId.isEmpty() ) ) {
-                    queries.put( CommonConstants.EMAIL_ID, emailId );
+                if ( !( emailAddress == null || emailAddress.isEmpty() ) ) {
+                    queries.put( CommonConstants.EMAIL_ID, emailAddress );
                 }
                 if ( !( firstName == null || firstName.isEmpty() ) ) {
                     queries.put( CommonConstants.FIRST_NAME, firstName );
@@ -94,16 +91,14 @@ public class AdminToolsController
                 }
 
                 List<User> users = userManagementService.searchUsersInCompanyByMultipleCriteria( queries );
-                List<UserFromSearch> usersList = new ArrayList<UserFromSearch>();
+                List<SearchedUser> usersList = new ArrayList<SearchedUser>();
                 for ( User user : users ) {
-                    UserFromSearch searchedUser = new UserFromSearch();
+                    SearchedUser searchedUser = new SearchedUser();
                     searchedUser.setUserId( user.getUserId() );
-                    searchedUser.setCompanyId( companyId );
                     searchedUser.setFirstName( user.getFirstName() );
                     searchedUser.setLastName( user.getLastName() );
-                    searchedUser.setLoginName( user.getLoginName() );
-                    searchedUser.setEmailId( user.getEmailId() );
                     searchedUser.setStatus( user.getStatus() );
+                    searchedUser.setEmailAddress( emailAddress );
                     usersList.add( searchedUser );
                 }
                 String json = new Gson().toJson( usersList );
@@ -119,7 +114,7 @@ public class AdminToolsController
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
         }
-        LOG.info( "Method searchUsersInCompany finished for companyId : " + companyId + " emailId : " + emailId
+        LOG.info( "Method searchUsersInCompany finished for companyId : " + companyId + " emailId : " + emailAddress
             + " firstName : " + firstName + " lastName : " + lastName );
         return response;
     }
@@ -134,8 +129,8 @@ public class AdminToolsController
      * 6. In mongo, change Status:D to Status:A
      */
     @ResponseBody
-    @RequestMapping ( value = "/restoreUser/{userId}")
-    public Response restoreUser( @PathVariable long userId, HttpServletRequest request )
+    @RequestMapping ( value = "/user/restore/{userId}")
+    public Response restoreUser( @PathVariable long userId, @QueryParam ( value = "fullRestore") boolean fullRestore, HttpServletRequest request )
     {
         LOG.info( "Method restoreUser started for userId : " + userId );
         Response response = null;
@@ -143,7 +138,7 @@ public class AdminToolsController
             try {
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
-                userManagementService.restoreDeletedUser( userId );
+                userManagementService.restoreDeletedUser( userId, fullRestore );
                 response = Response.ok( "UserId " + userId + " was successfully restored." ).build();
             } catch ( Exception e ) {
                 LOG.error( "Exception occured while restoring user having userId : " + userId + ". Reason : "
@@ -160,38 +155,48 @@ public class AdminToolsController
     }
 
 
+    /**
+     * Method to move surveys from one user id to another user
+     * sample url : /users/movesurveys?from_user={fromUserId}&to_user={toUserId}
+     * */
     @ResponseBody
-    @RequestMapping(value="/movesurveys/{fromUserId}/{toUserId}")
-    public Response moveSurveysToAnotherUser(@PathVariable long fromUserId, @PathVariable long toUserId, HttpServletRequest request){
-        LOG.info( "Method to move surveys from user id : " + fromUserId + " to user id : " + toUserId + " started.");
+    @RequestMapping ( value = "/user/movesurveys")
+    public Response moveSurveysToAnotherUser( @QueryParam ( value = "from_user") long from_user,
+        @QueryParam ( value = "to_user") long to_user, HttpServletRequest request )
+    {
         Response response = null;
+        long fromUserId = 0;
+        long toUserId = 0;
         try {
             try {
+                LOG.info( "Method to move surveys from user id : " + from_user + " to user id : " + to_user + " started." );
                 LOG.info( "Checking for authorization to perform survey move operation" );
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
                 LOG.info( "Authorization confirmed to perform survey move operation" );
-                if( fromUserId <= 0)
-                    throw new InvalidInputException("Invalid from user id passed as parameter");
-                if( toUserId <= 0)
-                    throw new InvalidInputException("Invalid to user id passed as parameter");
+                fromUserId = Long.valueOf( from_user ).longValue();
+                toUserId = Long.valueOf( to_user ).longValue();
+                if ( fromUserId <= 0 )
+                    throw new InvalidInputException( "Invalid from user id passed as parameter" );
+                if ( toUserId <= 0 )
+                    throw new InvalidInputException( "Invalid to user id passed as parameter" );
                 LOG.info( "Moving surveys from one user to another operation started" );
-                surveyHandler.moveSurveysToAnotherUser(fromUserId, toUserId);
+                surveyHandler.moveSurveysToAnotherUser( fromUserId, toUserId );
                 LOG.info( "Moving surveys from one user to another operation finished" );
-                response = Response.ok( "Surveys from user id : " + fromUserId + " has been successfully moved to user id : " + toUserId ).build();
+                response = Response.ok(
+                    "Surveys from user id : " + from_user + " has been successfully moved to user id : " + to_user )
+                    .build();
             } catch ( Exception e ) {
-                LOG.error( "Error occurred while moving surveys from user id : " + fromUserId + " to user id : " + toUserId  + ", Reason : ", e );
+                LOG.error( "Error occurred while moving surveys from user id : " + from_user + " to user id : " + to_user
+                    + ", Reason : ", e );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys from user id : " + fromUserId + " to user id : " + toUserId  ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys from user id : " + from_user
+                        + " to user id : " + to_user ), e.getMessage() );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
         }
-        
-        if(fromUserId <= 0 ){
-            LOG.error( "" );
-        }
-        LOG.info( "Method to move surveys from user id : " + fromUserId + " to user id : " + toUserId + " started.");
+        LOG.info( "Method to move surveys from user id : " + from_user + " to user id : " + to_user + " ended." );
         return response;
     }
     

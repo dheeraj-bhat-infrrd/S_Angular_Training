@@ -51,7 +51,7 @@ namespace EncompassSocialSurvey
 
         public List<LoanViewModel> PopulateLoanList(long runningCompanyId, string fieldid, Boolean isProductionRun , int noOfDaysToFetch ,  string emailDomain, string emailPrefix)
         {
-            Logger.Info("Entering the method LoanUtility.LopopulateLoanList() ");
+            Logger.Info("Entering the method LoanUtility.PopulateLoanList() ");
 
             List<LoanViewModel> returnLoansViewModel = null;
             CRMBatchTrackerEntity crmBatchTracker = null;
@@ -105,6 +105,15 @@ namespace EncompassSocialSurvey
                         LoanViewModel forLoanVM_Borrower = new LoanViewModel();
 
                         forLoanVM_Borrower.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
+                        Logger.Debug("EngagementClosedTime for loan is : " + fieldValues[8]);
+                        //check if engagement closed time is greater than current time
+                        DateTime engagementClosedTime = Convert.ToDateTime(fieldValues[8]);
+                        int result = DateTime.Compare(engagementClosedTime, DateTime.Now);
+                        if (result > 0)
+                        {
+                            Logger.Debug("Engagement cloed time " + fieldValues[8] + " is greater than current date so skipping the record");
+                            continue;
+                        }
 
                         // remove the flower bracket from GUID
                         forLoanVM_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
@@ -134,7 +143,6 @@ namespace EncompassSocialSurvey
 
                         forLoanVM_Borrower.ReminderCounts = EncompassSocialSurveyConstant.REMINDER_COUNT;
                         forLoanVM_Borrower.LastReminderTime = EncompassSocialSurveyConstant.LAST_REMINDER_TIME;
-                        Logger.Debug("EngagementClosedTime for loan is : " + fieldValues[8]);
                         forLoanVM_Borrower.EngagementClosedTime = fieldValues[8];
                         forLoanVM_Borrower.Status = EncompassSocialSurveyConstant.STATUS;
 

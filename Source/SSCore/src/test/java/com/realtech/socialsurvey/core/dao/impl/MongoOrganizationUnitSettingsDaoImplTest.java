@@ -202,6 +202,6 @@ public class MongoOrganizationUnitSettingsDaoImplTest
 
     public void updateAgentSettingsForUserRestorationTestAgentSettingsNull() throws InvalidInputException
     {
-        mongoOrganizationUnitSettingDaoImpl.updateAgentSettingsForUserRestoration( null, null );
+        mongoOrganizationUnitSettingDaoImpl.updateAgentSettingsForUserRestoration( null, null, false );
     }
 }
