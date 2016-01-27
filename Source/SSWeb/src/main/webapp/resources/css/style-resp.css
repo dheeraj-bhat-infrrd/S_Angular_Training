@@ -1969,6 +1969,14 @@
     .lp-input-cont,.lp-button,.prof-captcha-cont{
     	width: 210px;
     }
+    .profile-captcha{
+    transform: scale(0.69); 
+     -webkit-transform: scale(0.69); 
+     transform-origin: 0 0; 
+     -webkit-transform-origin: 0 0; 
+    -moz-transform: scale(0.69);
+    -webkit-transform-origin:0 0;
+    }
     .lp-input{
     	width: 168px;
     }
@@ -2233,6 +2241,14 @@
 	width:700px;
 	margin-left: 30%;
    }
+    .profile-captcha{
+    transform: scale(0.888); 
+     -webkit-transform: scale(0.888); 
+     transform-origin: 0 0; 
+     -webkit-transform-origin: 0 0; 
+    -moz-transform: scale(0.888);
+    -webkit-transform-origin:0 0;
+    }
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
