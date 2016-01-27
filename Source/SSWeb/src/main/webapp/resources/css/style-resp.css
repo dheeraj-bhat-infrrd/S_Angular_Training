@@ -1400,10 +1400,13 @@
     td.v-tbl-img {
 	    width: 11%;
 	}
-    td.v-tbl-name{
-    	width: 36%;
-    }
-    td.v-tbl-add{
+	td.v-tbl-name {
+		width: 36%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	td.v-tbl-add{
     	display: none;
     }
     td.v-tbl-role{
