@@ -563,28 +563,7 @@ function validateEncompassPassword(elementId) {
 		}
 	}
 }
-//function to validate a fieldId in form
-function validateFieldID(elementId) {
-	if($(window).width()<768){
-		if ($('#'+elementId).val() != "") {
-			$('#'+elementId).next('.hm-item-err-2').hide();
-			return true;
-		}else{
-			$('#overlay-toast').html('Please enter fieldId');
-			showToast();
-			return false;
-		}
-	}else{
-		if ($('#'+elementId).val() != "") {
-			$('#'+elementId).next('.hm-item-err-2').hide();
-			return true;
-		}else{
-			$('#'+elementId).next('.hm-item-err-2').html('Please enter fieldId');
-			$('#'+elementId).next('.hm-item-err-2').show();
-			return false;
-		}
-	}
-}
+
 
 
 //Function to validate the url
