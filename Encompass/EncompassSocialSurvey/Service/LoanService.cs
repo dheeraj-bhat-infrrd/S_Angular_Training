@@ -135,6 +135,34 @@ namespace EncompassSocialSurvey.Service
         }
 
 
+        public String createLoanListCSV(List<LoanViewModel> loansVM, String companyName)
+        {
+            Logger.Info("Entering the method LoanService.createLoanListCSV for company : " + companyName);
+            try
+            {
+                String fileName = companyName + "_" + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".csv";
+                String filePath = EncompassSocialSurveyConfiguration.TempFolderPath + Path.DirectorySeparatorChar + fileName;
+                // Write header
+                var csv = new System.Text.StringBuilder();
+                var newLine = string.Format("{0},{1},{2},{3},{4},{5}", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time");
+                csv.AppendLine(newLine);
+                if (null != loansVM)
+                {
+                    foreach (var loanVM in loansVM)
+                    {
+                        newLine = null;
+                        newLine = string.Format("{0},{1},{2},{3},{4},{5}", loanVM.CustomerFirstName, loanVM.CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime);
+                        csv.AppendLine(newLine);
+                    }
+                }
+                File.WriteAllText(filePath, csv.ToString());
+                return filePath;
+            }
+            catch (Exception e) {
+                Logger.Error("Error while generating excel sheet for company " + companyName + " Message : " + e.Message);
+                throw e;
+            }
+        }
         public String createExcelSpreadSheetForLoanlist(List<LoanViewModel> loansVM , String companyName)
         {
             Logger.Info("Entering the method LoanService.createExcelSpreadSheetForLoanlist for company : " + companyName);

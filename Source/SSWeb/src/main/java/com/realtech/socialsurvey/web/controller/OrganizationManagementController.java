@@ -736,7 +736,8 @@ public class OrganizationManagementController
                 throw new InvalidInputException( "Url can not be empty" );
             }
             if(encompassFieldId == null || encompassFieldId.isEmpty()){
-                throw new InvalidInputException( "Field Id can not be empty" );
+                LOG.info( "Field Id is empty" );
+                encompassFieldId = CommonConstants.ENCOMPASS_DEFAULT_FEILD_ID;
             }
             if ( state == null || state.isEmpty() || state.equals( CommonConstants.ENCOMPASS_DRY_RUN_STATE ) ){
                 state = CommonConstants.ENCOMPASS_DRY_RUN_STATE;

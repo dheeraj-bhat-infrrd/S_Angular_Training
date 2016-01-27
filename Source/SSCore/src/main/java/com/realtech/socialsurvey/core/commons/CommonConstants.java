@@ -463,6 +463,8 @@ public interface CommonConstants
     public static final String ENCOMPASS_USERNAME_COLUMN = "userName";
     public static final String ENCOMPASS_PASSWORD_COLUMN = "password";
     public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
+    public static final String ENCOMPASS_DEFAULT_FEILD_ID = "1997";
+    
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";

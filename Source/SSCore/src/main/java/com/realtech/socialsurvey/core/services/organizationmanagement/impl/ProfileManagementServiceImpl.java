@@ -4135,9 +4135,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             try {
                                 map = convertJsonStringToMap( responseString );
                                 if ( checkMapForError( map ) ) {
-                                    reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName,
-                                        new Exception( (String) map.get( ZILLOW_JSON_TEXT_KEY ) ) );
-                                    return new ArrayList<SurveyDetails>();
+                                    reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, new Exception(
+                                        (String) map.get( ZILLOW_JSON_TEXT_KEY ) ) );
+                                    // return new ArrayList<SurveyDetails>();
                                 }
                             } catch ( JsonParseException e ) {
                                 LOG.error( "Exception caught " + e.getMessage() );
@@ -4165,21 +4165,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 responseMap = (HashMap<String, Object>) map.get( "response" );
                                 messageMap = (HashMap<String, Object>) map.get( "message" );
                                 String code = (String) messageMap.get( "code" );
-                                if ( !code.equalsIgnoreCase( "0" ) ) {
+                                if ( code.equalsIgnoreCase( "7" ) ) {
                                     String errorMessage = (String) messageMap.get( "text" );
-                                    if ( errorMessage.contains( "You exceeded the maximum API requests per day." ) ) {
-                                        int count = socialManagementService.fetchZillowCallCount();
-                                        if ( count != 0 ) {
-                                            LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
-                                            try {
-                                                emailServices.sendZillowCallExceededMailToAdmin( count );
-                                                surveyDetailsDao.resetZillowCallCount();
-                                            } catch ( InvalidInputException e ) {
-                                                LOG.error(
-                                                    "Sending the mail to the admin failed due to invalid input. Reason : ", e );
-                                            } catch ( UndeliveredEmailException e ) {
-                                                LOG.error( "The email failed to get delivered. Reason : ", e );
-                                            }
+                                    int count = socialManagementService.fetchZillowCallCount();
+                                    if ( count != 0 ) {
+                                        LOG.debug( "Zillow API call count exceeded limit. Sending mail to admin." );
+                                        try {
+                                            emailServices.sendZillowCallExceededMailToAdmin( count );
+                                            surveyDetailsDao.resetZillowCallCount();
+                                        } catch ( InvalidInputException e ) {
+                                            LOG.error( "Sending the mail to the admin failed due to invalid input. Reason : ",
+                                                e );
+                                        } catch ( UndeliveredEmailException e ) {
+                                            LOG.error( "The email failed to get delivered. Reason : ", e );
                                         }
                                     }
                                     LOG.error( "Error code : " + code + " Error description : " + errorMessage );
@@ -4538,8 +4536,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     {
         if ( map != null && map.containsKey( ZILLOW_JSON_CODE_KEY ) ) {
             int code = Integer.parseInt( ( String.valueOf( map.get( ZILLOW_JSON_CODE_KEY ) ) ) );
-            if ( code > 0 && map.containsKey( ZILLOW_JSON_TEXT_KEY )
-                && map.get( ZILLOW_JSON_TEXT_KEY ) != null
+            if ( code > 0 && map.containsKey( ZILLOW_JSON_TEXT_KEY ) && map.get( ZILLOW_JSON_TEXT_KEY ) != null
                 && ( (String) map.get( ZILLOW_JSON_TEXT_KEY ) ).startsWith( ZILLOW_JSON_ERROR_TEXT_PREFIX ) ) {
                 return true;
             }

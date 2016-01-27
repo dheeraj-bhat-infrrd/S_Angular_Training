@@ -31,23 +31,31 @@ namespace EncompassSocialSurvey
             return fieldIds;
         }
 
-        private DateFieldCriterion createCriteria(DateTime lastFetchedTime, string field)
+        private QueryCriterion createCriteria(DateTime lastFetchedTime, string field)
         {
-            DateFieldCriterion dateCriteria = new DateFieldCriterion();
-            dateCriteria.FieldName = "Fields." + field;
+            DateFieldCriterion upperLimitCriteria = new DateFieldCriterion();
+            upperLimitCriteria.FieldName = "Fields." + field;
+            upperLimitCriteria.Value = DateTime.Now;
+            upperLimitCriteria.MatchType = OrdinalFieldMatchType.LessThanOrEquals;
+
+            DateFieldCriterion lowerLimitCriteria = new DateFieldCriterion();
+            lowerLimitCriteria.FieldName = "Fields." + field;
+
             int result = DateTime.Compare(lastFetchedTime, EncompassSocialSurveyConstant.EPOCH_TIME);
             if (result != 0)
             {
-                dateCriteria.Value = lastFetchedTime;
+                //Create and return a criteria to return the loans processed between Now and three days back.
+                lowerLimitCriteria.Value = DateTime.Now.AddDays(-1 * EncompassSocialSurveyConstant.DAYS_BEFORE);
             }
             else
             {
-                dateCriteria.Value = DateTime.Now.AddDays(-1 * DAYS_INTERVAL);
+                //If the loans are being fetched for the first time, get loans data for the past N days.
+                lowerLimitCriteria.Value = DateTime.Now.AddDays(-1 * DAYS_INTERVAL);
             }
-            dateCriteria.MatchType = OrdinalFieldMatchType.GreaterThanOrEquals;
-            return dateCriteria;
-
+            lowerLimitCriteria.MatchType = OrdinalFieldMatchType.GreaterThanOrEquals;
+            return upperLimitCriteria.And(lowerLimitCriteria);
         }
+
 
         public List<LoanViewModel> PopulateLoanList(long runningCompanyId, string fieldid, Boolean isProductionRun , int noOfDaysToFetch ,  string emailDomain, string emailPrefix)
         {
@@ -85,9 +93,12 @@ namespace EncompassSocialSurvey
                     lastRunTime = DateTime.Now.AddDays(-1 * noOfDaysToFetch);
                 }
                 
-                 Logger.Info("Last Record Fetch time is " + lastRunTime);
+                Logger.Info("Last Record Fetch time is " + lastRunTime);
                 Logger.Info("Company Id  " + runningCompanyId);
+
+                //fieldIds[8] is the loan closed date
                 LoanIdentityList loanIdentityList = EncompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(lastRunTime, fieldIds[8]));
+
                 #region Load the list
 
                 foreach (LoanIdentity id in loanIdentityList)
