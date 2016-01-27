@@ -47,7 +47,7 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
     public static final Logger LOG = LoggerFactory.getLogger( IncompleteSocialPostReminderSender.class );
 
-    private static final String STYLE_ATTR = "align=\"center\"style=\"display:block; width: 150px; height: 40px; line-height: 40px; margin: 10px auto 10px auto;text-decoration:none;background: #009FE3; border-bottom: 2px solid #077faf; color: #fff; text-align: center; border-radius: 3px; font-size: 15px;border: 0;\"";
+    private static final String STYLE_ATTR = "align=\"center\"style=\"display:block; width: 150px; height: 40px; line-height: 40px;float: left; margin: 5px ;text-decoration:none;background: #009FE3; border-bottom: 2px solid #077faf; color: #fff; text-align: center; border-radius: 3px; font-size: 15px;border: 0;\"";
 
     private String fbAppId;
 
@@ -65,7 +65,6 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                 CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
 
             StringBuilder links = new StringBuilder();
-            AgentSettings agentSettings = null;
             User user = null;
             for ( Company company : organizationManagementService.getAllCompanies() ) {
                 List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys( company
@@ -82,13 +81,13 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
                     links = new StringBuilder();
                     try {
-                        agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
                         user = userManagementService.getUserByUserId( survey.getAgentId() );
                     } catch ( InvalidInputException e ) {
                         LOG.error( "InvalidInputException occured while fetch agent settings/ user details for user id "
                             + survey.getAgentId() + ". Nested exception is ", e );
                         continue;
                     }
+                    links.append("<div style=\"width: 320px;margin: auto;clear:both;\">");
                     if ( socialSitesWithSettings.get( CommonConstants.REALTOR_LABEL ) != null ) {
                         links.append( "<a " + STYLE_ATTR + " href="
                             + socialSitesWithSettings.get( CommonConstants.REALTOR_LABEL ) + ">"
@@ -128,36 +127,10 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                             + socialSitesWithSettings.get( CommonConstants.FACEBOOK_LABEL ) + ">"
                             + CommonConstants.FACEBOOK_LABEL + "</a>" );
                     }
-
+                    links.append("</div>");
                     // Send email to complete social post for survey to each customer.
                     if ( !links.toString().isEmpty() ) {
                         try {
-                            String title = "";
-                            String phoneNo = "";
-                            String companyName = "";
-                            if ( agentSettings != null && agentSettings.getContact_details() != null ) {
-                                if ( agentSettings.getContact_details().getTitle() != null ) {
-                                    title = agentSettings.getContact_details().getTitle();
-                                }
-                                if ( agentSettings.getContact_details().getContact_numbers() != null
-                                    && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
-                                    phoneNo = agentSettings.getContact_details().getContact_numbers().getWork();
-                                }
-                                if ( company.getCompany() != null ) {
-                                    companyName = company.getCompany();
-                                }
-                            }
-
-                            String logoUrl = null;
-                            try {
-                                logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser( survey
-                                    .getAgentId() );
-                            } catch ( NoRecordsFetchedException e ) {
-                                LOG.error( "Error while fatching logo for user with id : " + survey.getAgentId(), e );
-                            } catch ( ProfileNotFoundException e ) {
-                                LOG.error( "Error while fatching logo for user with id : " + survey.getAgentId(), e );
-                            }
-
                             surveyHandler.sendSocialPostReminderMail( survey.getCustomerEmail(), survey.getCustomerFirstName(),
                                 survey.getCustomerLastName(), user, links.toString() );
                             surveyHandler.updateReminderCountForSocialPosts( survey.getAgentId(), survey.getCustomerEmail() );
