@@ -108,7 +108,7 @@ namespace EncompassSocialSurvey
 
                                     Logger.Debug("Generating report for company : " + forCompCredential.CompanyName);
                                     //generate report and send it
-                                    var createdFilePath = loanSerivce.createExcelSpreadSheetForLoanlist(loansVM, forCompCredential.CompanyName);
+                                    var createdFilePath = loanSerivce.createLoanListCSV(loansVM, forCompCredential.CompanyName);
                                     loanSerivce.sendLoanReportToEmailAddresses(createdFilePath, forCompCredential.EncompassCredential.emailAddressForReport, forCompCredential.EncompassCredential.numberOfDays);
                                     //disable generate report for company
                                     Logger.Debug("Disabling generate report for company " + forCompCredential.CompanyName);
