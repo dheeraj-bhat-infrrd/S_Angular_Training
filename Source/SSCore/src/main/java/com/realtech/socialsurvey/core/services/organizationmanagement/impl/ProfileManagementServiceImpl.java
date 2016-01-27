@@ -129,6 +129,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     private static final Logger LOG = LoggerFactory.getLogger( ProfileManagementServiceImpl.class );
 
+    // Zillow JSON response map key
+    public static final String ZILLOW_JSON_CODE_KEY = "code";
+    public static final String ZILLOW_JSON_TEXT_KEY = "text";
+
+    // Zillow JSON response map error text prefix
+    public static final String ZILLOW_JSON_ERROR_TEXT_PREFIX = "Error";
+
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
@@ -4127,6 +4134,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             Map<String, Object> map = null;
                             try {
                                 map = convertJsonStringToMap( responseString );
+                                if ( checkMapForError( map ) ) {
+                                    reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName,
+                                        new Exception( (String) map.get( ZILLOW_JSON_TEXT_KEY ) ) );
+                                    return new ArrayList<SurveyDetails>();
+                                }
                             } catch ( JsonParseException e ) {
                                 LOG.error( "Exception caught " + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
@@ -4519,5 +4531,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         } catch ( InvalidInputException iie ) {
             LOG.error( "error while sending report bug mail to admin ", iie );
         }
+    }
+
+
+    boolean checkMapForError( Map<String, Object> map )
+    {
+        if ( map != null && map.containsKey( ZILLOW_JSON_CODE_KEY ) ) {
+            int code = Integer.parseInt( ( String.valueOf( map.get( ZILLOW_JSON_CODE_KEY ) ) ) );
+            if ( code > 0 && map.containsKey( ZILLOW_JSON_TEXT_KEY )
+                && map.get( ZILLOW_JSON_TEXT_KEY ) != null
+                && ( (String) map.get( ZILLOW_JSON_TEXT_KEY ) ).startsWith( ZILLOW_JSON_ERROR_TEXT_PREFIX ) ) {
+                return true;
+            }
+        }
+        return false;
     }
 }
