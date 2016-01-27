@@ -3535,9 +3535,7 @@ function validateEncompassInput(elementId) {
 			isFocussed=true;
 		}
 	}
-	if($('#encompass-fieldId').val()==""){
-		$('#encompass-fieldId').val('1997');
-	}
+	
 	
 	return isEncompassValid;
 }
