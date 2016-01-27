@@ -5501,6 +5501,9 @@ td.v-tbl-img {
 
 td.v-tbl-name {
 	width: 20%;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 td.v-tbl-add {
@@ -7563,6 +7566,9 @@ div.v-tbl-img {
 
 div.v-tbl-name {
 	width: 26%;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 div.v-tbl-add {
