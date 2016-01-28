@@ -1062,11 +1062,11 @@ public class OrganizationManagementController
                 }
 
                 mailBody = request.getParameter( "survey-completion-unpleasant-mailcontent" );
-                if ( mailBody == null || mailBody.isEmpty() ) {
-                    LOG.warn( "Survey Completion Unpleasant mail body is blank." );
-                    throw new InvalidInputException( "Survey completion Unpleasant mail body is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+//                if ( mailBody == null || mailBody.isEmpty() ) {
+//                    LOG.warn( "Survey Completion Unpleasant mail body is blank." );
+//                    throw new InvalidInputException( "Survey completion Unpleasant mail body is blank.",
+//                        DisplayMessageConstants.GENERAL_ERROR );
+//                }
 
                 updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
                     mailSubject, mailBody, CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY );
