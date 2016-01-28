@@ -104,10 +104,14 @@ namespace EncompassSocialSurvey
                         crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
                     }
                     lastRunTime = crmBatchTracker.RecentRecordFetchedDate;
-                    int result = DateTime.Compare(lastFetchedTime, EncompassSocialSurveyConstant.EPOCH_TIME);
+                    int result = DateTime.Compare(lastRunTime, EncompassSocialSurveyConstant.EPOCH_TIME);
                     if (result != 0)
                     {
-                        noOfDays = EncompassSocialSurveyConstant.DAYS_BEFORE;
+                        int days = (DateTime.Now - lastRunTime).Days;
+                        if (days > EncompassSocialSurveyConstant.DAYS_BEFORE)
+                            noOfDays = days;
+                        else
+                            noOfDays = EncompassSocialSurveyConstant.DAYS_BEFORE;
                     }
                     else
                     {
