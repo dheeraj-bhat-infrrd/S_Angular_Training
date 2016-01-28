@@ -1,11 +1,8 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -14,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -23,26 +21,21 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.generator.URLGenerator;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 
 public class IncompleteSocialPostReminderSender extends QuartzJobBean
 {
 
-    private URLGenerator urlGenerator;
-
     private UserManagementService userManagementService;
 
     private SurveyHandler surveyHandler;
-
-    private EmailServices emailServices;
 
     private OrganizationManagementService organizationManagementService;
 
@@ -50,9 +43,13 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
     private BatchTrackerService batchTrackerService;
 
+    private Utils utils;
+
     public static final Logger LOG = LoggerFactory.getLogger( IncompleteSocialPostReminderSender.class );
 
-    private static List<String> socialSites = new ArrayList<>();
+    private static final String STYLE_ATTR = "align=\"center\"style=\"display:block; width: 150px; height: 40px; line-height: 40px;float: left; margin: 5px ;text-decoration:none;background: #009FE3; border-bottom: 2px solid #077faf; color: #fff; text-align: center; border-radius: 3px; font-size: 15px;border: 0;\"";
+
+    private String fbAppId;
 
 
     @Override
@@ -61,83 +58,79 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
         try {
             LOG.info( "Executing IncompleteSocialPostReminderSender" );
             initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-            
+
             //update last run start time
             batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
                 CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER,
                 CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
 
-            populateSocialSites();
-            // IncompleteSocialPostReminderSender sender = new IncompleteSocialPostReminderSender();
             StringBuilder links = new StringBuilder();
-            Set<String> socialPosts;
-            AgentSettings agentSettings = null;
             User user = null;
             for ( Company company : organizationManagementService.getAllCompanies() ) {
                 List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys( company
                     .getCompanyId() );
                 for ( SurveyDetails survey : incompleteSocialPostCustomers ) {
-                    // To fetch settings of Agent and admins in the hierarchy
-                    Set<String> socialSitesWithSettings = new HashSet<>();
+                    // To fetch settings of agents/closest in the hierarchy
+                    Map<String, String> socialSitesWithSettings = new HashMap<>();
                     try {
-                        socialSitesWithSettings = getSocialSitesWithSettingsConfigured( survey.getAgentId() );
+                        socialSitesWithSettings = getSocialSitesWithSettingsConfigured( survey );
                     } catch ( InvalidInputException e ) {
                         LOG.error( "InvalidInputException caught in executeInternal() for SocialpostReminderMail" );
                         continue;
                     }
 
-                    if ( survey.getSocialMediaPostDetails() != null
-                        && survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
-                        && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null ) {
-                        socialPosts = new HashSet<String>( survey.getSocialMediaPostDetails().getAgentMediaPostDetails()
-                            .getSharedOn() );
-                    } else {
-                        socialPosts = new HashSet<>();
-                    }
-
                     links = new StringBuilder();
-                    for ( String site : getRemainingSites( socialPosts, socialSitesWithSettings ) ) {
-                        try {
-                            links.append( "<br/>For " ).append( site ).append( " : " )
-                                .append( "<a href=" + generateQueryParams( survey, site ) + ">Click here</a>" );
-                            agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
-                            user = userManagementService.getUserByUserId( survey.getAgentId() );
-
-                        } catch ( InvalidInputException e ) {
-                            LOG.error( "InvalidInputException occured while generating URL for " + site
-                                + ". Nested exception is ", e );
-                            continue;
-                        }
+                    try {
+                        user = userManagementService.getUserByUserId( survey.getAgentId() );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "InvalidInputException occured while fetch agent settings/ user details for user id "
+                            + survey.getAgentId() + ". Nested exception is ", e );
+                        continue;
                     }
+                    links.append("<div style=\"width: 320px;margin: auto;clear:both;\">");
+                    if ( socialSitesWithSettings.get( CommonConstants.REALTOR_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.REALTOR_LABEL ) + ">"
+                            + CommonConstants.REALTOR_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.LENDING_TREE_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.LENDING_TREE_LABEL ) + ">"
+                            + CommonConstants.LENDING_TREE_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.ZILLOW_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.ZILLOW_LABEL ) + ">" + CommonConstants.ZILLOW_LABEL
+                            + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.YELP_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.YELP_LABEL )
+                            + ">" + CommonConstants.YELP_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL ) + ">"
+                            + CommonConstants.GOOGLE_PLUS_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.LINKEDIN_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.LINKEDIN_LABEL ) + ">"
+                            + CommonConstants.LINKEDIN_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.TWITTER_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.TWITTER_LABEL ) + ">"
+                            + CommonConstants.TWITTER_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.FACEBOOK_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.FACEBOOK_LABEL ) + ">"
+                            + CommonConstants.FACEBOOK_LABEL + "</a>" );
+                    }
+                    links.append("</div>");
                     // Send email to complete social post for survey to each customer.
                     if ( !links.toString().isEmpty() ) {
                         try {
-                            String title = "";
-                            String phoneNo = "";
-                            String companyName = "";
-                            if ( agentSettings != null && agentSettings.getContact_details() != null ) {
-                                if ( agentSettings.getContact_details().getTitle() != null ) {
-                                    title = agentSettings.getContact_details().getTitle();
-                                }
-                                if ( agentSettings.getContact_details().getContact_numbers() != null
-                                    && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
-                                    phoneNo = agentSettings.getContact_details().getContact_numbers().getWork();
-                                }
-                                if ( company.getCompany() != null ) {
-                                    companyName = company.getCompany();
-                                }
-                            }
-
-                            String logoUrl = null;
-                            try {
-                                logoUrl = userManagementService.fetchAppropriateLogoUrlFromHierarchyForUser( survey
-                                    .getAgentId() );
-                            } catch ( NoRecordsFetchedException e ) {
-                                LOG.error( "Error while fatching logo for user with id : " + survey.getAgentId(), e );
-                            } catch ( ProfileNotFoundException e ) {
-                                LOG.error( "Error while fatching logo for user with id : " + survey.getAgentId(), e );
-                            }
-
                             surveyHandler.sendSocialPostReminderMail( survey.getCustomerEmail(), survey.getCustomerFirstName(),
                                 survey.getCustomerLastName(), user, links.toString() );
                             surveyHandler.updateReminderCountForSocialPosts( survey.getAgentId(), survey.getCustomerEmail() );
@@ -152,7 +145,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
             }
 
             //Update last build time in batch tracker table
-            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
+            batchTrackerService
+                .updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
 
         } catch ( Exception e ) {
             LOG.error( "Error in IncompleteSocialPostReminderSender", e );
@@ -161,8 +155,8 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
                 batchTrackerService.updateErrorForBatchTrackerByBatchType(
                     CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER, e.getMessage() );
                 //send report bug mail to admin
-                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER,
-                    System.currentTimeMillis(), e );
+                batchTrackerService.sendMailToAdminRegardingBatchError(
+                    CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER, System.currentTimeMillis(), e );
             } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
                 LOG.error( "Error while updating error message in IncompleteSocialPostReminderSender " );
             } catch ( UndeliveredEmailException e1 ) {
@@ -174,157 +168,186 @@ public class IncompleteSocialPostReminderSender extends QuartzJobBean
 
     private void initializeDependencies( JobDataMap jobMap )
     {
-        urlGenerator = (URLGenerator) jobMap.get( "urlGenerator" );
         surveyHandler = (SurveyHandler) jobMap.get( "surveyHandler" );
-        emailServices = (EmailServices) jobMap.get( "emailServices" );
         userManagementService = (UserManagementService) jobMap.get( "userManagementService" );
         socialManagementService = (SocialManagementService) jobMap.get( "socialManagementService" );
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
-
+        fbAppId = (String) jobMap.get( "fbAppId" );
+        utils = (Utils) jobMap.get( "utils" );
     }
 
 
-    private static void populateSocialSites()
-    {
-        socialSites.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-        socialSites.add( CommonConstants.TWITTER_SOCIAL_SITE );
-        socialSites.add( CommonConstants.YELP_SOCIAL_SITE );
-        socialSites.add( CommonConstants.GOOGLE_SOCIAL_SITE );
-        socialSites.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-    }
-
-
-    private String generateQueryParams( SurveyDetails survey, String socialSite ) throws InvalidInputException
-    {
-        LOG.debug( "Method to generate URL parameters for Facebook, generateUrlParamsForFacebook() started." );
-        Map<String, String> params = new HashMap<>();
-        String subUrl = "rest/survey/";
-        switch ( socialSite ) {
-            case "facebook":
-                subUrl += "posttofacebook";
-                break;
-            case "twitter":
-                subUrl += "posttotwitter";
-                break;
-            case "linkedin":
-                subUrl += "posttolinkedin";
-                break;
-            case "yelp":
-                subUrl += "posttoyelp";
-                break;
-            case "google":
-                subUrl += "posttogoogleplus";
-                break;
-        }
-
-        AgentSettings agentSettings = userManagementService.getUserSettings( survey.getAgentId() );
-        params.put( "agentName", survey.getAgentName() );
-        params.put( "agentProfileLink", agentSettings.getProfileUrl() );
-        params.put( "firstName", survey.getCustomerFirstName() );
-        params.put( "lastName", survey.getCustomerLastName() );
-        params.put( "agentId", survey.getAgentId() + "" );
-        params.put( "rating", survey.getScore() + "" );
-        params.put( "customerEmail", survey.getCustomerEmail() );
-        params.put( "feedback", survey.getReview() );
-        LOG.debug( "Method to generate URL parameters for Facebook, generateUrlParamsForFacebook() finished." );
-        String url = urlGenerator.generateUrl( params, surveyHandler.getApplicationBaseUrl() + subUrl );
-        return url;
-    }
-
-
-    private static Set<String> getRemainingSites( Set<String> sharedOn, Set<String> socialSitesWithSettings )
-    {
-        Set<String> allElems = new HashSet<String>( socialSites );
-        allElems.removeAll( sharedOn );
-        allElems.retainAll( socialSitesWithSettings );
-        return allElems;
-    }
-
-
-    private Set<String> getSocialSitesWithSettingsConfigured( long agentId ) throws InvalidInputException
+    private Map<String, String> getSocialSitesWithSettingsConfigured( SurveyDetails survey ) throws InvalidInputException
     {
         LOG.debug( "Method to get settings of agent and admins in the hierarchy getSocialSitesWithSettingsConfigured() started." );
+        long agentId = survey.getAgentId();
         OrganizationUnitSettings agentSettings = userManagementService.getUserSettings( agentId );
         Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
-            .getSettingsForBranchesAndRegionsInHierarchy( agentId );
+            .getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( agentId );
         List<OrganizationUnitSettings> companySettings = settingsMap
             .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         List<OrganizationUnitSettings> regionSettings = settingsMap
             .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
         List<OrganizationUnitSettings> branchSettings = settingsMap
             .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-        List<OrganizationUnitSettings> settings = new ArrayList<OrganizationUnitSettings>();
-        Set<String> socialSitesWithSettings = new HashSet<>();
+        Map<String, String> socialSiteUrlMap = new HashMap<String, String>();
 
-        // Enabling Google+ and Yelp only if agent has configured it.
+        // Enabling Zillow, Realtor, Lending tree and Yelp from agent settings
         if ( agentSettings != null ) {
-            settings.add( agentSettings );
             if ( agentSettings.getSocialMediaTokens() != null ) {
-                if ( agentSettings.getSocialMediaTokens().getGoogleToken() != null ) {
-                    socialSitesWithSettings.add( "google" );
+                if ( agentSettings.getSocialMediaTokens().getRealtorToken() != null ) {
+                    socialSiteUrlMap.put( CommonConstants.REALTOR_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.REALTOR_LABEL, agentSettings ) );
+                }
+                if ( agentSettings.getSocialMediaTokens().getLendingTreeToken() != null ) {
+                    socialSiteUrlMap.put( CommonConstants.LENDING_TREE_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.LENDING_TREE_LABEL, agentSettings ) );
+                }
+                if ( agentSettings.getSocialMediaTokens().getZillowToken() != null ) {
+                    socialSiteUrlMap.put( CommonConstants.ZILLOW_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.ZILLOW_LABEL, agentSettings ) );
                 }
                 if ( agentSettings.getSocialMediaTokens().getYelpToken() != null ) {
-                    socialSitesWithSettings.add( "yelp" );
+                    socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, agentSettings ) );
                 }
             }
         }
 
-        // Enabling Facebook / Linkedin / Twitter if agent or anybody in the hierarchy has
+        // Enabling Zillow, Realtor, Lending tree and Yelp if anyone closest in hierarchy to agent has
         // configured in settings.
-        for ( OrganizationUnitSettings setting : companySettings ) {
+        for ( OrganizationUnitSettings setting : branchSettings ) {
             if ( setting.getSocialMediaTokens() != null ) {
-                if ( setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null ) {
-                    socialSitesWithSettings.add( "facebook" );
+                if ( setting.getSocialMediaTokens().getRealtorToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.REALTOR_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.REALTOR_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.REALTOR_LABEL, setting ) );
                 }
-                if ( setting.getSocialMediaTokens().getTwitterToken() != null ) {
-                    socialSitesWithSettings.add( "twitter" );
+                if ( setting.getSocialMediaTokens().getLendingTreeToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.LENDING_TREE_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.LENDING_TREE_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.LENDING_TREE_LABEL, setting ) );
                 }
-                if ( setting.getSocialMediaTokens().getLinkedInToken() != null ) {
-                    socialSitesWithSettings.add( "linkedin" );
+                if ( setting.getSocialMediaTokens().getZillowToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.ZILLOW_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.ZILLOW_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.ZILLOW_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getYelpToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.YELP_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
                 }
             }
         }
         for ( OrganizationUnitSettings setting : regionSettings ) {
             if ( setting.getSocialMediaTokens() != null ) {
-                if ( setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null ) {
-                    socialSitesWithSettings.add( "facebook" );
+                if ( setting.getSocialMediaTokens().getRealtorToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.REALTOR_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.REALTOR_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.REALTOR_LABEL, setting ) );
                 }
-                if ( setting.getSocialMediaTokens().getTwitterToken() != null ) {
-                    socialSitesWithSettings.add( "twitter" );
+                if ( setting.getSocialMediaTokens().getLendingTreeToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.LENDING_TREE_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.LENDING_TREE_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.LENDING_TREE_LABEL, setting ) );
                 }
-                if ( setting.getSocialMediaTokens().getLinkedInToken() != null ) {
-                    socialSitesWithSettings.add( "linkedin" );
+                if ( setting.getSocialMediaTokens().getZillowToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.ZILLOW_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.ZILLOW_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.ZILLOW_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getYelpToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.YELP_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
                 }
             }
         }
-        for ( OrganizationUnitSettings setting : branchSettings ) {
+        for ( OrganizationUnitSettings setting : companySettings ) {
             if ( setting.getSocialMediaTokens() != null ) {
-                if ( setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null ) {
-                    socialSitesWithSettings.add( "facebook" );
+                if ( setting.getSocialMediaTokens().getRealtorToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.REALTOR_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.REALTOR_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.REALTOR_LABEL, setting ) );
                 }
-                if ( setting.getSocialMediaTokens().getTwitterToken() != null ) {
-                    socialSitesWithSettings.add( "twitter" );
+                if ( setting.getSocialMediaTokens().getLendingTreeToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.LENDING_TREE_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.LENDING_TREE_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.LENDING_TREE_LABEL, setting ) );
                 }
-                if ( setting.getSocialMediaTokens().getLinkedInToken() != null ) {
-                    socialSitesWithSettings.add( "linkedin" );
+                if ( setting.getSocialMediaTokens().getZillowToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.ZILLOW_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.ZILLOW_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.ZILLOW_LABEL, setting ) );
                 }
-            }
-        }
-        for ( OrganizationUnitSettings setting : settings ) {
-            if ( setting.getSocialMediaTokens() != null ) {
-                if ( setting.getSocialMediaTokens() != null && setting.getSocialMediaTokens().getFacebookToken() != null ) {
-                    socialSitesWithSettings.add( "facebook" );
-                }
-                if ( setting.getSocialMediaTokens().getTwitterToken() != null ) {
-                    socialSitesWithSettings.add( "twitter" );
-                }
-                if ( setting.getSocialMediaTokens().getLinkedInToken() != null ) {
-                    socialSitesWithSettings.add( "linkedin" );
+                if ( setting.getSocialMediaTokens().getYelpToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.YELP_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
                 }
             }
         }
+
+        // build social site url's like Google Plus, LinkedIn, Twitter and Facebook
+        socialSiteUrlMap.put( CommonConstants.GOOGLE_PLUS_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_PLUS_LABEL, agentSettings ) );
+        socialSiteUrlMap.put( CommonConstants.LINKEDIN_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.LINKEDIN_LABEL, agentSettings ) );
+        socialSiteUrlMap.put( CommonConstants.TWITTER_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.TWITTER_LABEL, agentSettings ) );
+        socialSiteUrlMap.put( CommonConstants.FACEBOOK_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.FACEBOOK_LABEL, agentSettings ) );
         LOG.debug( "Method getSocialSitesWithSettingsConfigured() finished" );
-        return socialSitesWithSettings;
+        return socialSiteUrlMap;
+    }
+
+
+    private String generateSocialSiteUrl( SurveyDetails survey, String socialSite,
+        OrganizationUnitSettings organizationUnitSettings ) throws InvalidInputException
+    {
+        LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() started." );
+        double fmt_Rating = surveyHandler.getFormattedSurveyScore( survey.getScore() );
+        String url = "";
+        String customerDisplayName = new EmailFormatHelper().getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+            survey.getCustomerLastName() );
+        String reviewText = fmt_Rating + "-star response from " + customerDisplayName + " for " + survey.getAgentName()
+            + " at SocialSurvey - " + survey.getReview();
+        reviewText = utils.urlEncodeText( reviewText );
+        switch ( socialSite ) {
+            case CommonConstants.REALTOR_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink()
+                    + "#reviews-section";
+                break;
+            case CommonConstants.LENDING_TREE_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink();
+                break;
+            case CommonConstants.ZILLOW_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink();
+                break;
+            case CommonConstants.YELP_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
+                break;
+            case CommonConstants.GOOGLE_PLUS_LABEL:
+                url = "https://plus.google.com/share?url=" + organizationUnitSettings.getCompleteProfileUrl();
+                break;
+            case CommonConstants.LINKEDIN_LABEL:
+                url += "https://www.linkedin.com/shareArticle?mini=true&url="
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&title=&summary=" + reviewText + "&source=";
+                break;
+            case CommonConstants.TWITTER_LABEL:
+                url += "https://twitter.com/intent/tweet?text=" + reviewText + ".&url="
+                    + organizationUnitSettings.getCompleteProfileUrl();
+                break;
+            case CommonConstants.FACEBOOK_LABEL:
+                url += "https://www.facebook.com/dialog/feed?app_id=" + fbAppId + "&link="
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&description=" + reviewText
+                    + ".&redirect_uri=https://www.facebook.com";
+                break;
+        }
+
+        LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() ended." );
+        return url;
     }
 }

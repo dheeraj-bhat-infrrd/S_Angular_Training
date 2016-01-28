@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
@@ -88,6 +87,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_REALTOR_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.realtorToken";
 	public static final String KEY_CONTACT_NAME = "contact_details.name";
 	public static final String KEY_POSTIONS = "positions";
+	public static final String KEY_STATUS = "status";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 	
@@ -305,6 +305,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		// Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
 		Query query = new Query();
 		query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
+		// query records which are not deleted
+		query.addCriteria(Criteria.where(KEY_STATUS).ne(CommonConstants.STATUS_DELETED_MONGO));
 		query.fields().include(KEY_PROFILE_URL).include(KEY_MODIFIED_ON).exclude("_id");
 		query.with(new Sort(Sort.Direction.DESC,KEY_MODIFIED_ON));
 		if (skipCount > 0) {
@@ -536,6 +538,45 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
 
     /**
+     * Method to get a list of companies connected to encompass for a specific encompass info state
+     * @param state
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Getting Company list for encompass where state : " + state );
+        if ( state == null || state.isEmpty() ) {
+            LOG.info( "state is not present to fetch encompass info list." );
+            throw new InvalidInputException( "state is not present to fetch encompass info list." );
+        }
+        List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_CRM_INFO ).exists( true ).and( KEY_CRM_INFO_SOURCE )
+            .is( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) );
+        if ( state.equals( CommonConstants.ENCOMPASS_DRY_RUN_STATE ) ) {
+            query.addCriteria( Criteria.where( KEY_CRM_INFO + "." + CommonConstants.STATE ).is( state )
+                .and( KEY_CRM_INFO + "." + CommonConstants.ENCOMPASS_GENERATE_REPORT_COLUMN ).is( true ) );
+        } else if ( state.equals( CommonConstants.ENCOMPASS_PRODUCTION_STATE ) ) {
+            query.addCriteria( Criteria.where( KEY_CRM_INFO + "." + CommonConstants.STATE ).is( state ) );
+        } else {
+            throw new InvalidInputException( "Invalid encompass crm info state : " + state );
+        }
+        organizationUnitsSettingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        if ( organizationUnitsSettingsList == null || organizationUnitsSettingsList.isEmpty() ) {
+            LOG.info( "No records found for state : " + state );
+            throw new NoRecordsFetchedException( "No records found for state : " + state );
+        }
+        LOG.info( "Successfully found company settings for encompass where state : " + state );
+        return organizationUnitsSettingsList;
+    }
+
+
+    /**
      * Method to fetch profile image urls for an entity list
      * 
      * @param entityType
@@ -663,5 +704,47 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.info( "Updated thumbnail image details" );
+    }
+    
+
+    /**
+     * Method to set the status as active, reset the profileName, and update the modifiedOn for agent.
+     * @param newProfileName
+     * @param agentSettings
+     * @throws InvalidInputException
+     */
+    @Override
+    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings, boolean restoreSocial )
+        throws InvalidInputException
+    {
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "AgentSettings cannot be null" );
+        }
+        LOG.info( "Method updateAgentSettingsForUserRestoration started for agentId : " + agentSettings.getIden() );
+
+        //Set status to active in mongo
+        Query query = new Query();
+        Update update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( agentSettings.getIden() ) );
+        update.set( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO );
+
+        //If newProfileName is present, then update profileName and profileUrl in mongo
+        if ( newProfileName != null && !( newProfileName.isEmpty() ) ) {
+            update.set( CommonConstants.PROFILE_NAME_COLUMN, newProfileName );
+            update.set( CommonConstants.PROFILE_URL_SOLR, "/" + newProfileName );
+        }
+        
+        //Restore social media tokens if requested
+        if ( restoreSocial ) {
+            if ( agentSettings.getDeletedSocialTokens() != null ) {
+                SocialMediaTokens mediaTokens = agentSettings.getDeletedSocialTokens();
+                update.set( KEY_SOCIAL_MEDIA_TOKENS, mediaTokens );
+                update.unset( CommonConstants.DELETED_SOCIAL_MEDIA_TOKENS_COLUMN );
+            }
+        }
+        //Update the modifiedOn column in mongo
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+
+        mongoTemplate.updateFirst( query, update, AGENT_SETTINGS_COLLECTION );
     }
 }

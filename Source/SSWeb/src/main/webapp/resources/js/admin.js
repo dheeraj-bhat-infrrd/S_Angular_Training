@@ -336,7 +336,8 @@ function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 	}, payload, true);
 }
 
-$(document).on('click', '.unmark-abusive-icn', function() {
+$(document).on('click', '.unmark-abusive-icn', function(e) {
+	e.stopPropagation();
 	var surveyMongoId = $(this).parent().parent().attr('data-iden');
 	confirmUnmarkAbusiveReview(surveyMongoId);
 });

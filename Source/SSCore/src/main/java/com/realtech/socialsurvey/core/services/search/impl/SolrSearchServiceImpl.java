@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -88,6 +89,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
 
     /**
@@ -829,7 +833,28 @@ public class SolrSearchServiceImpl implements SolrSearchService
             .addField( CommonConstants.IS_BRANCH_ADMIN_SOLR, ( user.isBranchAdmin() ? user.isBranchAdmin() : isBranchAdmin ) );
         document
             .addField( CommonConstants.IS_REGION_ADMIN_SOLR, ( user.isRegionAdmin() ? user.isRegionAdmin() : isRegionAdmin ) );
-        document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
+        try {
+            AgentSettings agentSettings = userManagementService.getUserSettings( user.getUserId() );
+            //Set profileImageUrl fields if present
+            if ( agentSettings.getProfileImageUrl() != null && !( agentSettings.getProfileImageUrl().isEmpty() ) ) {
+                document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                document.addField( CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl() );
+                if ( agentSettings.getProfileImageUrlThumbnail() != null
+                    && !( agentSettings.getProfileImageUrlThumbnail().isEmpty() ) ) {
+                    document.addField( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN,
+                        agentSettings.getProfileImageUrlThumbnail() );
+                } else {
+                    document.addField( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, agentSettings.getProfileImageUrl() );
+                }
+
+            } else {
+                document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.info( "No agentSettings found for userId :" + user.getUserId() );
+            document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
+        }
+
         return document;
     }
 
@@ -2499,6 +2524,53 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
 
     /**
+     * Method to update regions for multiple users started
+     * @param regionsMap
+     * @throws InvalidInputException
+     * @throws SolrException 
+     */
+    @Override
+    public void updateRegionsForMultipleUsers( Map<Long, List<Long>> regionsMap ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method to regions for multiple users started." );
+        if ( regionsMap == null ) {
+            throw new InvalidInputException( "RegionsMap is null" );
+        }
+        //There's no update needed.
+        if ( regionsMap.isEmpty() ) {
+            return;
+        }
+
+        SolrServer solrServer = new HttpSolrServer( solrUserUrl );
+
+        List<SolrInputDocument> inputDocList = new ArrayList<SolrInputDocument>();
+        Map<String, List<Long>> editKeyValues;
+        SolrInputDocument inputDoc;
+
+        for ( Entry<Long, List<Long>> entry : regionsMap.entrySet() ) {
+            editKeyValues = new HashMap<String, List<Long>>();
+            editKeyValues.put( SOLR_EDIT_REPLACE, entry.getValue() );
+            // Adding fields to be updated
+            inputDoc = new SolrInputDocument();
+            inputDoc.setField( CommonConstants.USER_ID_SOLR, entry.getKey() );
+            inputDoc.setField( CommonConstants.REGIONS_SOLR, editKeyValues );
+            inputDocList.add( inputDoc );
+        }
+
+        try {
+            if ( inputDocList.size() > 0 ) {
+                solrServer.add( inputDocList );
+                solrServer.commit();
+            }
+        } catch ( SolrServerException | IOException e ) {
+            LOG.error( "Exception while editing user in solr. Reason : " + e.getMessage(), e );
+            throw new SolrException( "Exception while updating user to solr. Reason : " + e.getMessage(), e );
+        }
+        LOG.info( "Method to regions for multiple users finished." );
+    }
+
+
+    /**
      * Method to remove social post from solr
      * 
      * JIRA SS-1329
@@ -2524,5 +2596,67 @@ public class SolrSearchServiceImpl implements SolrSearchService
             throw new SolrException( "Exception while removing social post from solr. Reason : " + e.getMessage(), e );
         }
         LOG.info( "Method removeUserFromSolr() to remove social post {} from solr finished successfully.", postMongoId );
+    }
+
+
+    /**
+     * Method to find all the users in a branch
+     * @param branchId
+     * @return
+     * @throws SolrException
+     */
+    @Override
+    public SolrDocumentList findUsersInBranch( long branchId, int startIndex, int batchSize ) throws SolrException
+    {
+        LOG.info( "Method to find all users in branch " + branchId + " started." );
+        SolrDocumentList results;
+        QueryResponse response = null;
+        SolrServer solrServer = new HttpSolrServer( solrUserUrl );
+        SolrQuery query = new SolrQuery( CommonConstants.BRANCHES_SOLR + ":" + branchId );
+        if ( startIndex > -1 ) {
+            query.setStart( startIndex );
+        }
+        if ( batchSize > 0 ) {
+            query.setRows( batchSize );
+        }
+        LOG.info( "Running Solr query : " + query.getQuery() );
+        try {
+            response = solrServer.query( query );
+            results = response.getResults();
+        } catch ( SolrServerException e ) {
+            LOG.error( "SolrServerException while finding all the users in branch " + branchId );
+            throw new SolrException( "Exception while finding all the users in branchId " + branchId + ". Reason : "
+                + e.getMessage(), e );
+        }
+        LOG.info( "Method to find all users in branch " + branchId + " finished." );
+        return results;
+    }
+
+
+    /**
+     * Method to update review count of user in solr
+     * @throws InvalidInputException
+     * @throws SolrException
+     * */
+    @Override
+    public void updateReviewCountOfUserInSolr( User user ) throws InvalidInputException, SolrException
+    {
+        if ( user == null )
+            throw new InvalidInputException( "User passed cannot be null in updateReviewCountOfUserInSolr()" );
+        LOG.info( "Method to update solr review count for user : " + user.getUserId()
+            + ", updateReviewCountOfUserInSolr() started" );
+        LOG.info( "Fetching review count of user from mongo for user id : " + user.getUserId() );
+        long reviewCount = profileManagementService.getReviewsCount( user.getUserId(), -1, -1,
+            CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
+        LOG.info( "Fetched review count of user from mongo for user id : " + user.getUserId() );
+        if ( user.getIsZillowConnected() == CommonConstants.STATUS_ACTIVE && user.getZillowReviewCount() > 0 ) {
+            LOG.info( "Adding zillow review count to review count as user is connected to zillow" );
+            reviewCount += user.getZillowReviewCount();
+        }
+        LOG.info( "Updating review count of user in solr for user id : " + user.getUserId() );
+        editUserInSolr( user.getUserId(), CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
+        LOG.info( "Updated review count of user in solr for user id : " + user.getUserId() );
+        LOG.info( "Method to update solr review count for user : " + user.getUserId()
+            + ", updateReviewCountOfUserInSolr() ended" );
     }
 }

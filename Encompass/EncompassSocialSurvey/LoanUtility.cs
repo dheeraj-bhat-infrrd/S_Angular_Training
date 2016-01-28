@@ -18,7 +18,7 @@ namespace EncompassSocialSurvey
     public class LoanUtility
     {
         private static int DAYS_INTERVAL = EncompassSocialSurveyConfiguration.DefaultDaysIntervalToFetch; // should not get loans older than DAYS_INTERVAL from NOW
-        private static DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurverConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
+        private static DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurveyConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
         // Populates the loan list with the contents of a folder
 
         private StringList appendInitialFieldIdList(StringList fieldIds, string fieldId)
@@ -31,27 +31,35 @@ namespace EncompassSocialSurvey
             return fieldIds;
         }
 
-        private DateFieldCriterion createCriteria(DateTime lastFetchedTime, string field)
+        private QueryCriterion createCriteria(DateTime lastFetchedTime, string field)
         {
-            DateFieldCriterion dateCriteria = new DateFieldCriterion();
-            dateCriteria.FieldName = "Fields." + field;
-            int result = DateTime.Compare(lastFetchedTime, EncompassSocialSurverConstant.EPOCH_TIME);
+            DateFieldCriterion upperLimitCriteria = new DateFieldCriterion();
+            upperLimitCriteria.FieldName = "Fields." + field;
+            upperLimitCriteria.Value = DateTime.Now;
+            upperLimitCriteria.MatchType = OrdinalFieldMatchType.LessThanOrEquals;
+
+            DateFieldCriterion lowerLimitCriteria = new DateFieldCriterion();
+            lowerLimitCriteria.FieldName = "Fields." + field;
+
+            int result = DateTime.Compare(lastFetchedTime, EncompassSocialSurveyConstant.EPOCH_TIME);
             if (result != 0)
             {
-                dateCriteria.Value = lastFetchedTime;
+                //Create and return a criteria to return the loans processed between Now and three days back.
+                lowerLimitCriteria.Value = DateTime.Now.AddDays(-1 * EncompassSocialSurveyConstant.DAYS_BEFORE);
             }
             else
             {
-                dateCriteria.Value = DateTime.Now.AddDays(-1 * DAYS_INTERVAL);
+                //If the loans are being fetched for the first time, get loans data for the past N days.
+                lowerLimitCriteria.Value = DateTime.Now.AddDays(-1 * DAYS_INTERVAL);
             }
-            dateCriteria.MatchType = OrdinalFieldMatchType.GreaterThanOrEquals;
-            return dateCriteria;
-
+            lowerLimitCriteria.MatchType = OrdinalFieldMatchType.GreaterThanOrEquals;
+            return upperLimitCriteria.And(lowerLimitCriteria);
         }
 
-        public List<LoanViewModel> LopulateLoanList(long runningCompanyId, string fieldid, string emailDomain, string emailPrefix)
+
+        public List<LoanViewModel> PopulateLoanList(long runningCompanyId, string fieldid, Boolean isProductionRun , int noOfDaysToFetch ,  string emailDomain, string emailPrefix)
         {
-            Logger.Info("Entering the method LoanUtility.LopopulateLoanList() ");
+            Logger.Info("Entering the method LoanUtility.PopulateLoanList() ");
 
             List<LoanViewModel> returnLoansViewModel = null;
             CRMBatchTrackerEntity crmBatchTracker = null;
@@ -61,25 +69,36 @@ namespace EncompassSocialSurvey
 
                 #region Popualted FieldIds // list of ids to get the details from loan
 
-                StringList fieldIds = EncompassSocialSurverConstant.initialFieldList();
+                StringList fieldIds = EncompassSocialSurveyConstant.initialFieldList();
                 fieldIds = appendInitialFieldIdList(fieldIds, fieldid);
 
                 #endregion
 
                 LoanService loanService = new LoanService();
 
-                DateTime lastRunTime = EncompassSocialSurverConstant.EPOCH_TIME;
-                crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
-                //update the recent record fetch start date or if crm batch tracker is null than insert new entry
-                insertOrUpdateLastRunStartTime(crmBatchTracker, runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
-                if (crmBatchTracker == null)
+                DateTime lastRunTime = EncompassSocialSurveyConstant.EPOCH_TIME;
+                if (isProductionRun)
                 {
-                    crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurverConstant.SURVEY_SOURCE);
+                    crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
+                    //update the recent record fetch start date or if crm batch tracker is null than insert new entry
+                    insertOrUpdateLastRunStartTime(crmBatchTracker, runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
+                    if (crmBatchTracker == null)
+                    {
+                        crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
+                    }
+                    lastRunTime = crmBatchTracker.RecentRecordFetchedDate;
                 }
-                lastRunTime = crmBatchTracker.RecentRecordFetchedDate;
-                 Logger.Info("Last Record Fetch time is " + lastRunTime);
+                else 
+                {
+                    lastRunTime = DateTime.Now.AddDays(-1 * noOfDaysToFetch);
+                }
+                
+                Logger.Info("Last Record Fetch time is " + lastRunTime);
                 Logger.Info("Company Id  " + runningCompanyId);
+
+                //fieldIds[8] is the loan closed date
                 LoanIdentityList loanIdentityList = EncompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(lastRunTime, fieldIds[8]));
+
                 #region Load the list
 
                 foreach (LoanIdentity id in loanIdentityList)
@@ -96,7 +115,16 @@ namespace EncompassSocialSurvey
 
                         LoanViewModel forLoanVM_Borrower = new LoanViewModel();
 
-                        forLoanVM_Borrower.SurveySource = EncompassSocialSurverConstant.SURVEY_SOURCE;
+                        forLoanVM_Borrower.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
+                        Logger.Debug("EngagementClosedTime for loan is : " + fieldValues[8]);
+                        //check if engagement closed time is greater than current time
+                        DateTime engagementClosedTime = Convert.ToDateTime(fieldValues[8]);
+                        int result = DateTime.Compare(engagementClosedTime, DateTime.Now);
+                        if (result > 0)
+                        {
+                            Logger.Debug("Engagement cloed time " + fieldValues[8] + " is greater than current date so skipping the record");
+                            continue;
+                        }
 
                         // remove the flower bracket from GUID
                         forLoanVM_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
@@ -124,11 +152,10 @@ namespace EncompassSocialSurvey
                             forLoanVM_Borrower.AgentEmailId = replaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
                         }
 
-                        forLoanVM_Borrower.ReminderCounts = EncompassSocialSurverConstant.REMINDER_COUNT;
-                        forLoanVM_Borrower.LastReminderTime = EncompassSocialSurverConstant.LAST_REMINDER_TIME;
-                        Logger.Debug("EngagementClosedTime for loan is : " + fieldValues[8]);
+                        forLoanVM_Borrower.ReminderCounts = EncompassSocialSurveyConstant.REMINDER_COUNT;
+                        forLoanVM_Borrower.LastReminderTime = EncompassSocialSurveyConstant.LAST_REMINDER_TIME;
                         forLoanVM_Borrower.EngagementClosedTime = fieldValues[8];
-                        forLoanVM_Borrower.Status = EncompassSocialSurverConstant.STATUS;
+                        forLoanVM_Borrower.Status = EncompassSocialSurveyConstant.STATUS;
 
                         returnLoansViewModel.Add(forLoanVM_Borrower);
 
@@ -136,7 +163,7 @@ namespace EncompassSocialSurvey
                         {
                             Logger.Debug("Found CoBorrower , fetching the required details");
                             LoanViewModel forLoanVM_Co_Borrower = new LoanViewModel();
-                            forLoanVM_Co_Borrower.SurveySource = EncompassSocialSurverConstant.SURVEY_SOURCE;
+                            forLoanVM_Co_Borrower.SurveySource = EncompassSocialSurveyConstant.SURVEY_SOURCE;
                             forLoanVM_Co_Borrower.SurveySourceId = id.Guid.ToString().Replace("{", "").Replace("}", "");
                             forLoanVM_Co_Borrower.CompanyId = runningCompanyId;
 
@@ -163,10 +190,10 @@ namespace EncompassSocialSurvey
 
 
 
-                            forLoanVM_Co_Borrower.ReminderCounts = EncompassSocialSurverConstant.REMINDER_COUNT;
-                            forLoanVM_Co_Borrower.LastReminderTime = EncompassSocialSurverConstant.LAST_REMINDER_TIME;
+                            forLoanVM_Co_Borrower.ReminderCounts = EncompassSocialSurveyConstant.REMINDER_COUNT;
+                            forLoanVM_Co_Borrower.LastReminderTime = EncompassSocialSurveyConstant.LAST_REMINDER_TIME;
                             forLoanVM_Co_Borrower.EngagementClosedTime = fieldValues[8];
-                            forLoanVM_Co_Borrower.Status = EncompassSocialSurverConstant.STATUS;
+                            forLoanVM_Co_Borrower.Status = EncompassSocialSurveyConstant.STATUS;
 
                             returnLoansViewModel.Add(forLoanVM_Co_Borrower);
                         }
@@ -176,9 +203,13 @@ namespace EncompassSocialSurvey
                             Logger.Debug("Closing the loan ");
                             runningLoan.Close();
                         }
-                        Logger.Debug("Updating last fetched time");
-                        updateLastFetchedTime(fieldValues[8]);
 
+                        if (isProductionRun) 
+                        {
+                            Logger.Debug("Updating last fetched time");
+                            updateLastFetchedTime(fieldValues[8]);
+                        }
+                        
                     }
                     catch (System.Exception ex)
                     {
@@ -189,36 +220,44 @@ namespace EncompassSocialSurvey
 
                 #endregion // Load the list
 
-
-                Logger.Debug("Updating crm batch tracker");
-                if (returnLoansViewModel.Count <= 0)
+                if (isProductionRun)
                 {
-                    Logger.Debug("Notifying admin no records were fetched in this run ");
-                    sendMailToAdminForNoRecordFetched(runningCompanyId);
-                }
-                else { 
-                    //update last record fetch time
-                updateRecentRecordFetchTimeInCrmBatchTracker(crmBatchTracker);
-                }
+                    Logger.Debug("Updating crm batch tracker");
+                    if (returnLoansViewModel.Count <= 0)
+                    {
+                        Logger.Debug("Notifying admin no records were fetched in this run ");
+                        sendMailToAdminForNoRecordFetched(runningCompanyId);
+                    }
+                    else
+                    {
+                        //update last record fetch time if new records has been fetched
+                        updateRecentRecordFetchTimeInCrmBatchTracker(crmBatchTracker);
+                    }
 
-                
-            //update last run end date
-            updateLastRunEndTimeInCrmBatchTracker(crmBatchTracker);
+
+                    //update last run end date
+                    updateLastRunEndTimeInCrmBatchTracker(crmBatchTracker);
+                }
+            
 
             }
             catch (System.Exception ex)
             {
                 Logger.Error("Caught an exception: LoanUtility.LopopulateLoanList(): ", ex);
                 String Subject = "Error while fetching data from encompass";
-                String BodyText = "<br> Error while fetchign data from encompass for company with id : " + runningCompanyId + " on " + DateTime.Now + "<br>";
+                String BodyText = "Error while fetchign data from encompass for company with id : " + runningCompanyId + " on " + DateTime.Now + " \n ";
                 BodyText += ex.Message;
                 CommonUtility.SendMailToAdmin(Subject, BodyText);
-                //update error in crm batch tracker
-                updateErrorInCrmBatchTracker(crmBatchTracker, ex.Message);
+                if (isProductionRun)
+                {
+                    //update error in crm batch tracker
+                    updateErrorInCrmBatchTracker(crmBatchTracker, ex.Message);
+                }
+                
                 throw;
             }
 
-            Logger.Info("Exiting the method LoanUtility.LopopulateLoanList()");
+            Logger.Info("Exiting the method LoanUtility.PopopulateLoanList()");
             return returnLoansViewModel;
         }
 
@@ -255,8 +294,8 @@ namespace EncompassSocialSurvey
                 entity.CreatedOn = DateTime.Now;
                 entity.ModifiedOn = DateTime.Now;
                 entity.LastRunStartDate = DateTime.Now;
-                entity.LastRunEndDate =  EncompassSocialSurverConstant.EPOCH_TIME;
-                entity.RecentRecordFetchedDate = EncompassSocialSurverConstant.EPOCH_TIME;
+                entity.LastRunEndDate =  EncompassSocialSurveyConstant.EPOCH_TIME;
+                entity.RecentRecordFetchedDate = EncompassSocialSurveyConstant.EPOCH_TIME;
                 entity.Source = source;
                 entity.error = null;
                 entity.description = null;

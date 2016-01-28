@@ -142,6 +142,7 @@
 							<option value=4 data-report="incomplete-survey"><spring:message code="label.incompletesurveydata.key" /></option>
 							<c:if test="${profilemasterid == 1 || accounttype == 'COMPANY' }">
 								<option value=5 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option>
+								<option value=6 data-report="company-hierarchy"><spring:message code="label.downloadcompanyhierarchydata.key" /></option>
 							</c:if>
 						</select>
 						<input id="dsh-start-date" class="dsh-date-picker" placeholder="<spring:message code="label.startdate.key" />">
@@ -160,7 +161,7 @@
 				<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
 					<div class="dash-lp-header clearfix" id="incomplete-survey-header">
 						<div class="float-left"><spring:message code="label.incompletesurveys.key" /></div>
-						<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup()">View All</div>
+						<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup(event)">View All</div>
 					</div>
 					<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix" data-total="0">
 						<!-- Populated with dashboard_incompletesurveys.jsp -->

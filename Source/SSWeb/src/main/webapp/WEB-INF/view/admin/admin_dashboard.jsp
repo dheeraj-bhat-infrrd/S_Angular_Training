@@ -14,25 +14,25 @@
 	<div class="dash-container container">
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="dash-sub-head float-left">Company Report</div>
-			<div class="dwnl-bnt-col float-right">
-				<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd">
+			<div class="dwnl-bnt-col float-right clear-both-sm">
+				<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd btn-wid-sm">
 					<div class="dsh-dwnld-btn float-left cursor-pointer" onclick="downloadCompanyReport()">Download Report</div>
 					<input id="comp-start-date" data-date-type="startDate"
-						class="dsh-date-picker" placeholder="Start Date"> <span>-</span>
+						class="dsh-date-picker picker-sm" placeholder="Start Date"> <span>-</span>
 					<input id="comp-end-date" data-date-type="endDate"
-						class="dsh-date-picker" placeholder="End Date">
+						class="dsh-date-picker picker-sm" placeholder="End Date">
 				</div>
 			</div>
 		</div>
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="dash-sub-head float-left">Billing Report</div>
-			<div id="dsh-billing-report-div" class="clearfix dash-sel-wrapper">
+			<div id="dsh-billing-report-div" class="clearfix ">
 				<div class="float-left dash-sel-lbl"><spring:message code="label.email.key" /></div>
-				<div class="dsh-inp-wrapper float-left">
+				<div class="dsh-inp-wrapper float-left" style="margin-bottom: 10px;">
 					<input id="dsh-mail-id" class="dash-sel-item" type="text" placeholder='<spring:message code="label.username.key"/>' >
 				</div>
-				<div class="dwnl-bnt-col float-right">
-					<div id="dsh-bill-rep-bnt" class="float-right dash-btn-dl-br">
+				<div class="dwnl-bnt-col float-right clear-both-sm">
+					<div id="dsh-bill-rep-bnt" class="float-right dash-btn-dl-br float-none">
 						<div class="dsh-br-dwnld-btn float-left cursor-pointer"
 							onclick="downloadBillingReport()">Generate Report</div>
 					</div>

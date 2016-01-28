@@ -100,10 +100,10 @@
 		<div class="bd-hr-form-item clearfix" id="admin-privilege-div">
 		    <div class="float-left bd-frm-left"></div>
 		    <div class="float-left bd-frm-right">
-		        <div class="bd-frm-check-wrapper clearfix">
+		        <div class="bd-frm-check-wrapper clearfix bd-check-wrp">
 		            <div class="float-left bd-check-img bd-check-img-checked"></div>
 		            <input type="hidden" name="isAdmin" value="false" id="is-admin-chk" class="ignore-clear">
-		            <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
+		            <div class="float-left bd-check-txt bd-check-sm"><spring:message code="label.grantadminprivileges.key"/></div>
 		        </div>
 		    </div>
 		</div>
@@ -111,7 +111,7 @@
 	<div class="bd-hr-form-item clearfix">
 	    <div class="float-left bd-frm-left"></div>
 	    <div class="float-left bd-frm-right">
-	        <div class="bd-btn-save cursor-pointer" id="btn-individual-save"><spring:message code="label.save.key"/></div>
+	        <div class="bd-btn-save  cursor-pointer add-team-save" id="btn-individual-save"><spring:message code="label.save.key"/></div>
 	    </div>
 	</div>
 </form>

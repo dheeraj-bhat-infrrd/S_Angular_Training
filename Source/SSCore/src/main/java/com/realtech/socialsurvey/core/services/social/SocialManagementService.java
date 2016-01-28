@@ -9,6 +9,8 @@ import twitter4j.auth.RequestToken;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -139,6 +141,25 @@ public interface SocialManagementService
      * @throws InvalidInputException 
      */
     void disconnectAllSocialConnections( String entityType, long entityId ) throws InvalidInputException;
+
+
+    void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
+        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+
+    void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,
+        String linkedinMessageFeedback, int accountMasterId, SocialMediaPostDetails socialMediaPostDetails,
+        SocialMediaPostResponseDetails socialMediaPostResponseDetails ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    void postToTwitterForHierarchy( String twitterMessage, double rating, String serverBaseUrl, int accountMasterId,
+        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( long agentId )
+        throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC

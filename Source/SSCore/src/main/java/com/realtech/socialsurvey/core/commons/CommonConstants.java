@@ -165,7 +165,7 @@ public interface CommonConstants
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
     public static final String BATCH_TYPE_COLUMN = "batchType";
     public static final String SOURCE_COLUMN = "source";
-    
+    public static final String SURVEY_PREINITIATION_ID_COLUMN = "surveyPreIntitiationId";
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";
 
@@ -213,6 +213,7 @@ public interface CommonConstants
      * Mongo entities and column name constants
      */
     public static final String AGENT_ID_COLUMN = "agentId";
+    public static final String AGENT_NAME_COLUMN = "agentName";
     public static final String AGENT_EMAIL_ID_COLUMN = "emailId";
     public static final String SURVEY_AGENT_EMAIL_ID_COLUMN = "agentEmailId";
     public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
@@ -237,6 +238,7 @@ public interface CommonConstants
     public static final String EDITABLE_SURVEY_COLUMN = "editable";
     public static final String AGREE_SHARE_COLUMN = "agreedToShare";
     public static final String SOCIAL_MEDIA_POST_DETAILS_COLUMN = "socialMediaPostDetails";
+    public static final String SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN = "socialMediaPostResponseDetails";
     public static final String SUBSCRIPTION_ID_SOURCE_BRAINTREE = "Braintree";
     public static final String SURVEY_ID_COLUMN = "surveyId";
     public static final String ABUSE_REPORTERS_COLUMN = "abuseReporters";
@@ -251,6 +253,7 @@ public interface CommonConstants
     public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN ="isProfileImageProcessed";
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN ="isLogoImageProcessed";
     public static final String IS_UNMARKED_ABUSIVE_COLUMN ="isUnmarkedAbusive";
+    public static final String DELETED_SOCIAL_MEDIA_TOKENS_COLUMN = "deletedSocialTokens";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -454,6 +457,14 @@ public interface CommonConstants
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
     public static final String SURVEY_SOURCE_FILE_UPLOAD = "upload";
+    public static final String ENCOMPASS_DRY_RUN_STATE = "dryrun";
+    public static final String ENCOMPASS_PRODUCTION_STATE = "prod";
+    public static final String ENCOMPASS_CLIENT_URL_COLUMN = "clientUrl";
+    public static final String ENCOMPASS_USERNAME_COLUMN = "userName";
+    public static final String ENCOMPASS_PASSWORD_COLUMN = "password";
+    public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
+    public static final String ENCOMPASS_DEFAULT_FEILD_ID = "1997";
+    
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -587,6 +598,8 @@ public interface CommonConstants
     public static final int ERROR_CODE_REGION_POSTS_FETCH_FAILURE = 138;
     public static final int ERROR_CODE_BRANCH_POSTS_FETCH_PRECONDITION_FAILURE = 139;
     public static final int ERROR_CODE_BRANCH_POSTS_FETCH_FAILURE = 140;
+    public static final int ERROR_CODE_ENCOMPASS_COMPANY_FETCH_FAILURE = 141;
+    public static final int ERROR_CODE_ENCOMPASS_NO_COMPANIES_CONNECTED = 142;
 
     /**
      * Service codes
@@ -624,6 +637,7 @@ public interface CommonConstants
     public static final int SERVICE_CODE_COMPANY_POSTS = 124;
     public static final int SERVICE_CODE_BRANCH_POSTS = 125;
     public static final int SERVICE_CODE_REGION_POSTS = 126;
+    public static final int SERVICE_CODE_COMPANY_CRM_INFO = 127;
 
     /*
      * Mongo column and collection constants
@@ -925,4 +939,64 @@ public interface CommonConstants
     // sections that can be hidden from public profile page
     public static final String HIDE_RECENT_POSTS = "recent_posts";
     public static final String HIDE_SOCIAL_REVIEW = "social_reviews";
+
+    // Social Post Connection Buttons
+    public static final String REALTOR_LABEL = "REALTOR.COM";
+    public static final String LENDING_TREE_LABEL = "LENDING TREE";
+    public static final String ZILLOW_LABEL = "ZILLOW";
+    public static final String YELP_LABEL = "YELP!";
+    public static final String GOOGLE_PLUS_LABEL = "GOOGLE+";
+    public static final String LINKEDIN_LABEL = "LINKEDIN";
+    public static final String TWITTER_LABEL = "TWITTER";
+    public static final String FACEBOOK_LABEL = "FACEBOOK";
+    
+    // Status in mongo for active and inactive records
+    public static final String STATUS_ACTIVE_MONGO = "A";
+    public static final String STATUS_DELETED_MONGO = "D";
+
+    // Company Hierarchy Report Headers
+    public static final String CHR_YES = "Yes";
+    public static final String CHR_NO = "No";
+    public static final String CHR_USERS_USER_ID = "User ID";
+    public static final String CHR_USERS_FIRST_NAME = "First Name";
+    public static final String CHR_USERS_LAST_NAME = "Last Name";
+    public static final String CHR_USERS_TITLE = "Title";
+    public static final String CHR_USERS_OFFICE_ASSIGNMENTS = "Office Assignment(s)";
+    public static final String CHR_USERS_REGION_ASSIGNMENTS = "Region Assignment(s)";
+    public static final String CHR_USERS_PUBLIC_PROFILE = "Public Profile";
+    public static final String CHR_USERS_OFFICE_ADMIN_PRIVILEGE = "Office Admin Privilege(s)";
+    public static final String CHR_USERS_REGION_ADMIN_PRIVILEGE = "Region Admin Privilege";
+    public static final String CHR_USERS_EMAIL = "Email";
+    public static final String CHR_USERS_PHONE = "Phone";
+    public static final String CHR_USERS_WEBSITE = "Website";
+    public static final String CHR_USERS_LICENSE = "License(s)";
+    public static final String CHR_USERS_LEGAL_DISCLAIMER = "Legal Disclaimer";
+    public static final String CHR_USERS_PHOTO = "Photo";
+    public static final String CHR_USERS_ABOUT_ME_DESCRIPTION = "About Me Description";
+    public static final String CHR_USERS_USER_ID_DESC = "Unique ID used for record updates.";
+    public static final String CHR_USERS_TITLE_DESC = "Title to be displayed.";
+    public static final String CHR_USERS_OFFICE_ASSIGNMENTS_DESC = "List each Office ID from the Offices sheet.";
+    public static final String CHR_USERS_REGION_ASSIGNMENTS_DESC = "List each Region ID from the Region sheet.";
+    public static final String CHR_USERS_PUBLIC_PROFILE_DESC = "Yes, if they should have a webpage and be surveyable.";
+    public static final String CHR_USERS_OFFICE_ADMIN_PRIVILEGE_DESC = "Yes, if they should have access to manage Office Account";
+    public static final String CHR_USERS_REGION_ADMIN_PRIVILEGE_DESC = "Yes, if they should have access to manage Region Account";
+    public static final String CHR_USERS_EMAIL_DESC = "Email address to send registration request.";
+    public static final String CHR_USERS_PHONE_DESC = "Phone number to be publicly displayed.";
+    public static final String CHR_USERS_WEBSITE_DESC = "Link to website to be publicly displayed.";
+    public static final String CHR_USERS_LICENSE_DESC = "List of licenses to be displayed publicly.";
+    public static final String CHR_USERS_LEGAL_DISCLAIMER_DESC = "Plain text legal disclaimer to be displayed on footer of all pages.";
+    public static final String CHR_USERS_PHOTO_DESC = "URL of Agents Photo";
+    public static final String CHR_USERS_ABOUT_ME_DESCRIPTION_DESC = "A few paragraphs about the user displayed publicly.";
+    public static final String CHR_BRANCH_BRANCH_ID = "Office ID";
+    public static final String CHR_BRANCH_BRANCH_NAME = "Office Name";
+    public static final String CHR_REGION_REGION_ID = "Region ID";
+    public static final String CHR_REGION_REGION_NAME = "Region Name";
+    public static final String CHR_ADDRESS_1 = "Address 1";
+    public static final String CHR_ADDRESS_2 = "Address 2";
+    public static final String CHR_CITY = "City";
+    public static final String CHR_STATE = "State";
+    public static final String CHR_ZIP = "Zip";
+    public static final String CHR_ID_DESC = "Unique ID used for assignment.";
+    public static final String CHR_BRANCH_REGION_ID_DESC = "Region ID from the Region sheet.";
+    public static final String CHR_REGION_REGION_NAME_DESC = "Name to be displayed.";
 }

@@ -487,5 +487,25 @@ public interface UserManagementService
      * @throws InvalidInputException
      */
     public Map<Long, Integer> getUserIdReviewCountMapFromUserIdList( List<Long> userIds ) throws InvalidInputException;
+
+
+    /**
+     * Method to search users in company by criteria
+     * @param queries
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries ) throws InvalidInputException,
+        NoRecordsFetchedException;
+
+
+    public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
+
+
+    public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException;
+
+
+    public void restoreDeletedUser( long userId, boolean restoreSocial  ) throws InvalidInputException, SolrException;
 }
 // JIRA SS-34 BY RM02 BOC

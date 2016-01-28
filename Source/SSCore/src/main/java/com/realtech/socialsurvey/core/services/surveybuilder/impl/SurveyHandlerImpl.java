@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -145,6 +146,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Value ( "${SOCIAL_POST_REMINDER_INTERVAL}")
     private int socialPostReminderInterval;
+
+    @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
+    private int maxSocialPostReminderInterval;
 
     @Autowired
     private Utils utils;
@@ -562,7 +566,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "started." );
         int reminderInterval = 0;
         int maxReminders = 0;
-        float autopostScore = 0;
         List<SurveyDetails> incompleteSocialPostCustomers = new ArrayList<>();
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
             companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -574,7 +577,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     && surveySettings.getSocial_post_reminder_interval_in_days() > 0 ) {
                     reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
                     maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
-                    autopostScore = surveySettings.getShow_survey_above_score();
                 }
             }
         }
@@ -584,8 +586,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( reminderInterval == 0 ) {
             reminderInterval = socialPostReminderInterval;
         }
+
+        if ( reminderInterval > maxSocialPostReminderInterval ) {
+            reminderInterval = maxSocialPostReminderInterval;
+        }
+
         incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail( companyId, reminderInterval,
-            maxReminders, autopostScore );
+            maxReminders );
         LOG.info( "finished." );
         return incompleteSocialPostCustomers;
     }
@@ -624,15 +631,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         organizationUnitSettingsDao.updateCompletedSurveyCountForAgent( agentId, -1 );
         solrSearchService.updateCompletedSurveyCountForUserInSolr( agentId, -1 );
         LOG.info( "Method to decrease survey count for agent finished." );
-    }
-
-
-    @Override
-    public void updateSharedOn( String socialSite, long agentId, String customerEmail )
-    {
-        LOG.info( "Method to update sharedOn in SurveyDetails collection, updateSharedOn() started." );
-        surveyDetailsDao.updateSharedOn( socialSite, agentId, customerEmail );
-        LOG.info( "Method to update sharedOn in SurveyDetails collection, updateSharedOn() finished." );
     }
 
 
@@ -2242,6 +2240,110 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Returning swear list" );
         String[] swearList = new Gson().fromJson( SWEAR_WORDS, String[].class );
         return swearList;
+    }
+
+
+    @Override
+    public double getFormattedSurveyScore( double surveyScore )
+    {
+        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
+        ratingFormat.setMinimumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 1 );
+        try {
+            //get formatted survey score using rating format
+            surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
+        } catch ( NumberFormatException e ) {
+            LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
+        }
+        return surveyScore;
+    }
+
+
+    /**
+     * Method to move surveys belonging to one user to another user
+     * @param fromUserId
+     * @param toUserId
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     * */
+    @Override
+    @Transactional
+    public void moveSurveysToAnotherUser( long fromUserId, long toUserId ) throws InvalidInputException,
+        NoRecordsFetchedException, SolrException
+    {
+        if ( fromUserId <= 0 ) {
+            LOG.error( "Invalid from user id passed as parameter" );
+            throw new InvalidInputException( "Invalid from user id passed as parameter" );
+        }
+        if ( toUserId <= 0 ) {
+            LOG.error( "Invalid to user id passed as parameter" );
+            throw new InvalidInputException( "Invalid to user id passed as parameter" );
+        }
+        LOG.info( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call started" );
+        List<Long> userIds = new ArrayList<Long>();
+        userIds.add( fromUserId );
+        userIds.add( toUserId );
+        LOG.info( "Fetching from and to user information" );
+        List<User> userList = null;
+        try {
+            userList = userDao.getUsersForUserIds( userIds );
+        } catch ( Exception e ) {
+            throw new NoRecordsFetchedException( "Error occurred while fetching information for users" );
+        }
+        if ( userList == null || userList.size() != 2 )
+            throw new NoRecordsFetchedException( "Either from user or to user or both could not be found" );
+        LOG.info( "Fetched from and to user information" );
+        User fromUser = userList.get( 0 ).getUserId() == fromUserId ? userList.get( 0 ) : userList.get( 1 );
+        User toUser = userList.get( 1 ).getUserId() == toUserId ? userList.get( 1 ) : userList.get( 0 );
+
+        // check if both user belong to same company
+        //UserProfile fromUserProfile = getUserProfileWhereAgentForUser( fromUser );
+        UserProfile toUserProfile = getUserProfileWhereAgentForUser( toUser );
+        LOG.info( "Validating whether both from and to user are agents" );
+        // check if to user id is an agent
+        if ( toUserProfile == null )
+            throw new NoRecordsFetchedException( "To user id : " + toUser.getUserId() + " is not an agent" );
+        LOG.info( "Validating whether both from and to user belong to same company" );
+        if ( fromUser.getCompany().getCompanyId() != toUser.getCompany().getCompanyId() )
+            throw new UnsupportedOperationException( "From user : " + fromUser.getUserId() + " and to user id : "
+                + toUser.getUserId() + " do not belong to same company" );
+
+        // replace agent id Survey Pre Initiation
+        LOG.info( "Moving all incomplete surveys of user : " + fromUserId + " to user : " + toUserId );
+        surveyPreInitiationDao.updateAgentInfoOfPreInitiatedSurveys( fromUserId, toUser );
+        // replace agent id in Surveys
+        LOG.info( "Moving all started & completed surveys of user : " + fromUserId + " to user : " + toUserId );
+        surveyDetailsDao.updateAgentInfoInSurveys( fromUserId, toUser, toUserProfile );
+        // update to user solr review count
+        LOG.info( "Updating review count of user : " + toUserId );
+        solrSearchService.updateReviewCountOfUserInSolr( toUser );
+        if ( fromUser.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+            // update from user solr review count
+            LOG.info( "Updating review count of user : " + fromUserId );
+            solrSearchService.updateReviewCountOfUserInSolr( fromUser );
+        }
+        LOG.info( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call ended" );
+    }
+
+
+    UserProfile getUserProfileWhereAgentForUser( User user )
+    {
+        LOG.info( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser started" );
+        UserProfile agentUserProfile = null;
+        if ( user.getUserProfiles() != null ) {
+            for ( UserProfile userProfile : user.getUserProfiles() ) {
+                if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE
+                    && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                    agentUserProfile = userProfile;
+                    if ( userProfile.getIsPrimary() == CommonConstants.YES ) {
+                        break;
+                    }
+                }
+            }
+        }
+        LOG.info( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser ended" );
+        return agentUserProfile;
     }
 }
 // JIRA SS-119 by RM-05:EOC
