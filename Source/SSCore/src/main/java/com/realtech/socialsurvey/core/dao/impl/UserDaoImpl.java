@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 // JIRA SS-42 By RM-05 : BOC
@@ -190,6 +191,59 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
         }
         LOG.debug("Method getActiveUserByEmailAndCompany() successfull, active user with the emailId " + emailId);
         return users.get(CommonConstants.INITIAL_INDEX);
+    }
+
+
+    @Override
+    public List<User> getUsersForUserIds( List<Long> userIds ) throws InvalidInputException
+    {
+        if ( userIds == null || userIds.size() == 0 ) {
+            LOG.error( "User ids passed cannot be null or empty" );
+            throw new InvalidInputException( "User ids passed cannot be null or empty" );
+        }
+        Criteria criteria = getSession().createCriteria( User.class );
+        LOG.info( "Method getUsersForUserIds called to fetch users for user ids : " + userIds );
+        try {
+            criteria.add( Restrictions.in( CommonConstants.USER_ID, userIds ) );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForUserIds() ", hibernateException );
+        }
+        @SuppressWarnings ( "unchecked") List<User> users = criteria.list();
+        LOG.info( "Method getUsersForUserIds call ended to fetch users for user ids." );
+        return users;
+    }
+
+
+    /*
+     * Method to get list of active and unauthorized users belonging to a company with settings batch wise.
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<User> getUsersForCompany( Company company, int start, int batch ) throws InvalidInputException
+    {
+        if ( company == null )
+            throw new InvalidInputException( "Company passed in getBranchesForCompany() cannot be null" );
+        LOG.info( "Method getUsersForCompany called to fetch list of users of company : " + company.getCompany() );
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY, company ) );
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+            criteria.add( criterion );
+            criteria.addOrder( Order.asc( "firstName" ) );
+            criteria.addOrder( Order.asc( "lastName" ) );
+            if ( start > 0 )
+                criteria.setFirstResult( start );
+            if ( batch > 0 )
+                criteria.setFetchSize( batch );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
+        }
+        LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
+        return (List<User>) criteria.list();
     }
 }
 // JIRA SS-42 By RM-05 EOC

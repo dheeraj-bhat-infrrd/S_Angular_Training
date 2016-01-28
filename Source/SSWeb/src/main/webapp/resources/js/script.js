@@ -564,6 +564,8 @@ function validateEncompassPassword(elementId) {
 	}
 }
 
+
+
 //Function to validate the url
 function validateURL(elementId){
 	if($(window).width()<768){

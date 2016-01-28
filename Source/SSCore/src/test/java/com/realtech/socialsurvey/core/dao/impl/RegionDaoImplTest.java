@@ -46,7 +46,7 @@ public class RegionDaoImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetRegionIdsForCompanyIdWithInvalidCompanyId() throws InvalidInputException{
-        regionDaoImpl.getRegionIdsForCompanyId( 0 );
+    public void testGetRegionsForCompanyWithInvalidCompanyId() throws InvalidInputException{
+        regionDaoImpl.getRegionsForCompany( 0, 1, 50 );
     }
 }

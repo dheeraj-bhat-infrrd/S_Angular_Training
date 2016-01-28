@@ -38,8 +38,7 @@ function callAjaxGET(url, callBackFunction, isAsync,disableEle) {
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();
-
-			/*$(document).data('requestRunning', false);
+						/*$(document).data('requestRunning', false);
 			*/
 			enable(disableEle);
 			
@@ -63,7 +62,13 @@ function callAjaxGET(url, callBackFunction, isAsync,disableEle) {
  * @param callBackFunction
  * @param isAsync
  */
-function callAjaxPOST(url, callBackFunction, isAsync) {
+function callAjaxPOST(url, callBackFunction, isAsync,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
@@ -73,6 +78,12 @@ function callAjaxPOST(url, callBackFunction, isAsync) {
 		dataType : "html",
 		async : isAsync,
 		success : callBackFunction,
+		complete: function(){
+			
+			enable(disableEle);
+		
+		},
+
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -342,6 +353,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 			hideOverlay();
 			hideDashOverlay('#mid-dash');
 			hideDashOverlay('#top-dash');
+			hideDashOverlay('#latest-post-ep');
 			enable(disableEle);
 		},
 		error : function(e) {
@@ -609,7 +621,8 @@ function openForgotPasswordPage(){
 }
 
 // Dashboard popup click functions
-function openAuthPage(socialNetwork, isAutoLogin, element) {
+function openAuthPage(event,socialNetwork, isAutoLogin, element) {
+	event.stopPropagation();
 	if(isAutoLogin) {
 		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
 		showToast();
@@ -622,7 +635,8 @@ function openAuthPage(socialNetwork, isAutoLogin, element) {
 		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
 	}, dataLink);
 }
-function openAuthPageZillow(disableEle) {
+function openAuthPageZillow(event,disableEle) {
+	event.stopPropagation();
 	callAjaxGET("/socialauth.do?social=zillow", function(data) {
 		createZillowProfileUrlPopup( data);
 	}, true,disableEle);

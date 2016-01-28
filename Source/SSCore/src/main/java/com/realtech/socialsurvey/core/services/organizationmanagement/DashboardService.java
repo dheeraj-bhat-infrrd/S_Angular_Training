@@ -88,5 +88,13 @@ public interface DashboardService
     public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize );
 
     public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException;
+
+    /**
+     * Method to delete surveys from mongo given the survey preinitiation details
+     * @param surveys
+     */
+    void deleteSurveyDetailsByPreInitiation( List<SurveyPreInitiation> surveys );
+
+    public XSSFWorkbook downloadCompanyHierarchyReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
 }
 // JIRA SS-137 BY RM05:EOC

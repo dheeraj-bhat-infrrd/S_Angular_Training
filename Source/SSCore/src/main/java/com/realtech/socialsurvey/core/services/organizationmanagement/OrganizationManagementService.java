@@ -1198,7 +1198,7 @@ public interface OrganizationManagementService
      * @param entityId
      * @throws InvalidInputException
      */
-    void updateProfileUrlForDeletedEntity( String entityType, long entityId ) throws InvalidInputException;
+    void updateProfileUrlAndStatusForDeletedEntity( String entityType, long entityId ) throws InvalidInputException;
 
 //    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
 
@@ -1227,5 +1227,8 @@ public interface OrganizationManagementService
 
     public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index,
         int batch_size ) throws InvalidInputException;
+
+
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException, NoRecordsFetchedException;
 
 }

@@ -104,9 +104,6 @@ public interface SurveyHandler
     public void decreaseSurveyCountForAgent( long agentId ) throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 
-    public void updateSharedOn( String socialSite, long agentId, String customerEmail );
-
-
     public String getGoogleShareUri();
 
 
@@ -268,4 +265,10 @@ public interface SurveyHandler
 
 
     public SurveyDetails getSurveyDetails( String surveyMongoId );
+
+
+    public double getFormattedSurveyScore( double surveyScore );
+
+
+    public void moveSurveysToAnotherUser( long fromUserId, long toUserId ) throws InvalidInputException, NoRecordsFetchedException, SolrException;
 }

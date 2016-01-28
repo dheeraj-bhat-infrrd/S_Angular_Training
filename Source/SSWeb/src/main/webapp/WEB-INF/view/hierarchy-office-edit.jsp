@@ -124,7 +124,7 @@
     </div>
 </div>
 <div id="bd-single" class="bd-hr-form-item clearfix">
-    <div class="float-left bd-frm-left"><spring:message code="label.chooseuserforoffice.key"/></div>
+    <div class="float-left bd-frm-left line-height-25"><spring:message code="label.chooseuserforoffice.key"/></div>
     <div class="float-left bd-frm-right pos-relative">
         <input autocomplete="off" id="selected-user-txt" name="selectedUserEmail" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img" placeholder='<spring:message code="label.userselector.placeholder.key"/>'/>
         <input type="hidden" name="selectedUserId" id="selected-userid-hidden">
@@ -136,10 +136,10 @@
 <div class="bd-hr-form-item clearfix" id="admin-privilege-div">
     <div class="float-left bd-frm-left"></div>
     <div class="float-left bd-frm-right">
-        <div class="bd-frm-check-wrapper clearfix">
+        <div class="bd-frm-check-wrapper clearfix bd-check-wrp">
             <div class="float-left bd-check-img bd-check-img-checked"></div>
             <input type="hidden" name="isAdmin" value="false" id="is-admin-chk" class="ignore-clear">
-            <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
+            <div class="float-left bd-check-txt bd-check-sm"><spring:message code="label.grantadminprivileges.key"/></div>
         </div>
     </div>
 </div>
@@ -152,7 +152,7 @@
 	     	 <div id="btn-office-update" data-branchid = "${branchUnitSettings.iden}" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
 	     </c:when>
 	     <c:otherwise>
-	      	 <div id="btn-office-save" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
+	      	 <div id="btn-office-save" class="bd-btn-save cursor-pointer add-team-save"><spring:message code="label.save.key"/></div>
 	     </c:otherwise>
      </c:choose>
     </div>

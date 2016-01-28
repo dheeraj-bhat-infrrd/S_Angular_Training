@@ -122,8 +122,9 @@
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<input id="prof-all-lock" type="hidden" value="locked">
-	<div>
-        <div class="container">
+	<div >
+        <div class="container pos-relative" >
+         <div id="logo-dash" class="hide" > </div>
 		<div class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
@@ -137,6 +138,7 @@
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
+				
 					<jsp:include page="profile_profilelogo.jsp"></jsp:include>
 				</div>
 				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer" onclick="showEditAddressPopup();">
@@ -169,12 +171,12 @@
 
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-							<div id="icn-fb" class="float-left social-item-icon icn-fb ${socialDisabled}" data-source="facebook" data-link="${fbLink}" onclick="openAuthPage('facebook', ${isAutoLogin}, this);" title="Facebook"></div>
-							<div id="icn-twit" class="float-left social-item-icon icn-twit ${socialDisabled}" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage('twitter', ${isAutoLogin}, this);" title="Twitter"></div>
-							<div id="icn-lin" class="float-left social-item-icon icn-lin ${socialDisabled}" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage('linkedin', ${isAutoLogin}, this);" title="LinkedIn"></div>
-                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus ${socialDisabled}" data-source="google" data-link="${googleLink}" onclick="openAuthPage('google', ${isAutoLogin}, this);" title="Google+"></div>
+							<div id="icn-fb" class="float-left social-item-icon icn-fb ${socialDisabled}" data-source="facebook" data-link="${fbLink}" onclick="openAuthPage(event,'facebook', ${isAutoLogin}, this);" title="Facebook"></div>
+							<div id="icn-twit" class="float-left social-item-icon icn-twit ${socialDisabled}" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage(event,'twitter', ${isAutoLogin}, this);" title="Twitter"></div>
+							<div id="icn-lin" class="float-left social-item-icon icn-lin ${socialDisabled}" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage(event,'linkedin', ${isAutoLogin}, this);" title="LinkedIn"></div>
+                            <div id="icn-gplus" class="float-left social-item-icon icn-gplus ${socialDisabled}" data-source="google" data-link="${googleLink}" onclick="openAuthPage(event,'google', ${isAutoLogin}, this);" title="Google+"></div>
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-source="yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
-							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow('.icn-zillow');"></div>
+							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow(event,'.icn-zillow');"></div>
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-source="lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
 							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-source="realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide"
@@ -404,8 +406,12 @@
 									<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
 								</c:when>
 							</c:choose>
+							<div class="pos-relative">
+							<div id="hierarchy-ep" class="hide" > </div>
 							<div id="prof-hierarchy-container" class="hide">
+							 
 								<!-- hierarchy structure comes here  -->
+							</div>
 							</div>
    						</div>
 					</c:when>
@@ -422,18 +428,20 @@
 						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit" placeholder="<spring:message code="label.sspost.key"/>"></textarea>
 						<div id="prof-post-btn" class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
 					</div>
-					<div id="last-post" class="float-left panel-tweet-wrapper">
+					<div id="last-post" class="float-left panel-tweet-wrapper pos-relative">
 						<div  class="main-con-header"><spring:message code="label.latestposts.key"/></div>
+						<div id="latest-post-ep" class="hide" > </div>
 						<div id="prof-posts" class="tweet-panel tweet-panel-left">
 							<!--  latest posts get populated here --> 
 						</div>
 					</div>
 				</div>
 
-				<div id="reviews-container" class="people-say-wrapper rt-content-main">
+				<div id="reviews-container" class="people-say-wrapper rt-content-main pos-relative">
 					<div class="main-con-header">
 						<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>${contactdetail.name}
 					</div>
+					 <div id="review-ep" class="hide" > </div>
 					<div id="prof-review-item" class="prof-reviews">
 						<!--  reviews get populated here -->
 					</div>

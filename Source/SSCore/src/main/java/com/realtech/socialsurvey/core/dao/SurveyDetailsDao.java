@@ -9,7 +9,10 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -58,7 +61,7 @@ public interface SurveyDetailsDao
 
 
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, long zillowTotalReviewScore );
+        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, double zillowTotalReviewScore );
 
 
     public long getIncompleteSurveyCount( String columnName, long columnValue, int noOfDays );
@@ -138,10 +141,7 @@ public interface SurveyDetailsDao
 
 
     public List<SurveyDetails> getIncompleteSocialPostCustomersEmail( long companyId, int surveyReminderInterval,
-        int maxReminders, float autopostScore );
-
-
-    public void updateSharedOn( String socialSite, long agentId, String customerEmail );
+        int maxReminders );
 
 
     public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable );
@@ -156,9 +156,6 @@ public interface SurveyDetailsDao
 
     public void getCompletedSurveysCount( Date startDate, Date endDate, Map<Long, AgentRankingReport> agentReportData,
         String colunmName, long columnValue, boolean fetchAbusive );
-
-
-    public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate );
 
 
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
@@ -194,7 +191,7 @@ public interface SurveyDetailsDao
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
 
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId );
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId  , boolean fetchAbusive );
 
 
     public void updateSurveyAsUnderResolution( String surveyId );
@@ -222,4 +219,17 @@ public interface SurveyDetailsDao
 
 
     public SurveyDetails getSurveyBySurveyMongoId( String surveyMongoId );
+
+
+    /**
+     * Method to remove surveys from mongo by SurveyPreInitiation
+     * @param surveys
+     */
+    public void deleteSurveysBySurveyPreInitiation( List<SurveyPreInitiation> surveys );
+
+
+    public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException;
+
+
+    public void updateAgentInfoInSurveys( long fromUserId, User toUser, UserProfile toUserProfile ) throws InvalidInputException;
 }

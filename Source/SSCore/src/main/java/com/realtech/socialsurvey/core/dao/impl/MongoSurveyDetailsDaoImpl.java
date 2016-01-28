@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -18,6 +16,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -39,12 +38,13 @@ import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 
@@ -76,6 +76,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
+    @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
+    private int maxSocialPostReminderInterval;
 
     /*
      * Method to fetch survey details on the basis of agentId and customer email.
@@ -470,7 +472,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Override
     @SuppressWarnings ( "unchecked")
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
-        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, long zillowTotalReviewScore )
+        boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, double zillowTotalReviewScore )
     {
         LOG.info( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName
             + " columnValue:" + columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive );
@@ -627,7 +629,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue )
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue, boolean fetchAbusive )
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
@@ -640,6 +642,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
 
         Query query = new Query();
+
+        //criteria for abusive reviews
+        if ( !fetchAbusive ) {
+            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
+        }
+
+
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+
+
         if ( columnName == null ) {
         } else {
             query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).ne( null ) );
@@ -683,7 +695,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             } else if ( startDate != null && endDate != null ) {
                 query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
             }
-
 
             List<SurveyDetails> surveyDetails = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
@@ -905,7 +916,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( rows > -1 ) {
             query.limit( rows );
         }
-        
+
         query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
 
         /*if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) )
@@ -1174,6 +1185,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             pipeline
                 .add( new BasicDBObject( "$match", new BasicDBObject( organizationUnitColumn, organizationUnitColumnValue ) ) );
         }
+        //match for non abusive reviews
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN, false ) ) );
+        // match the survey stage should be complete
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_CLICKED_COLUMN, true ) ) );
+
         // Commented as Zillow surveys are not stored in database, SS-1276
         // match non zillow survey
         // pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
@@ -1252,10 +1268,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             pipeline
                 .add( new BasicDBObject( "$match", new BasicDBObject( organizationUnitColumn, organizationUnitColumnValue ) ) );
         }
-        // match mood as great
-        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MOOD_COLUMN, "Great" ) ) );
-        // match agreed to share
-        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.AGREE_SHARE_COLUMN, "true" ) ) );
+
+        //match for non abusive reviews
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN, false ) ) );
+        // match the survey stage should be complete
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN,
+            CommonConstants.SURVEY_STAGE_COMPLETE ) ) );
         // match if social media post details exists
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN,
             new BasicDBObject( "$exists", true ) ) ) );
@@ -1384,6 +1402,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
+    private Date getNdaysBackDateForIncompleteSocialPostSurveys( int noOfDays )
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set( Calendar.HOUR_OF_DAY, 0 );
+        calendar.set( Calendar.MINUTE, 0 );
+        calendar.set( Calendar.SECOND, 0 );
+        calendar.set( Calendar.MILLISECOND, 0 );
+        calendar.add( Calendar.DATE, noOfDays * ( -1 ) );
+        Date startDate = calendar.getTime();
+        return startDate;
+    }
+
+
     private Date getNdaysBackDate( int noOfDays )
     {
         Calendar calendar = Calendar.getInstance();
@@ -1420,7 +1451,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
         Update update = new Update();
         Date date = new Date();
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, date );
         update.set( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST, date );
         update.push( CommonConstants.REMINDERS_FOR_SOCIAL_POSTS, date );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
@@ -1430,48 +1460,25 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public List<SurveyDetails> getIncompleteSocialPostCustomersEmail( long companyId, int surveyReminderInterval,
-        int maxReminders, float autopostScore )
+        int maxReminders )
     {
         LOG.info( "Method to get list of customers who have not yet shared their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() started." );
-        Date cutOffDate = getNdaysBackDate( surveyReminderInterval );
+        Date cutOffCompletionDate = getNdaysBackDateForIncompleteSocialPostSurveys( maxSocialPostReminderInterval );
+        Date cutOffDate = getNdaysBackDateForIncompleteSocialPostSurveys( surveyReminderInterval );
         Query query = new Query();
 
-        query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
-            new Criteria().orOperator( Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).lte( cutOffDate ),
-                Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ) ),
+        query.addCriteria( new Criteria().andOperator(
+            Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
+            Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( cutOffCompletionDate ).lt( cutOffDate ),
+            Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ),
             Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
-            Criteria.where( CommonConstants.SCORE_COLUMN ).gte( autopostScore ),
             Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ),
             Criteria.where( CommonConstants.MOOD_COLUMN ).is( CommonConstants.SURVEY_MOOD_GREAT ) ) );
 
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
-        ListIterator<SurveyDetails> surveyIterator = surveys.listIterator();
-        SurveyDetails surveyDetail;
-        while ( surveyIterator.hasNext() ) {
-            surveyDetail = surveyIterator.next();
-            if ( surveyDetail.getRemindersForSocialPosts() != null
-                && surveyDetail.getRemindersForSocialPosts().size() >= maxReminders ) {
-                surveyIterator.remove();
-            }
-        }
         LOG.info( "Method to get list of customers who have not yet completed their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() finished." );
         return surveys;
-    }
-
-
-    @Override
-    public void updateSharedOn( String socialSite, long agentId, String customerEmail )
-    {
-        LOG.info( "updateSharedOn() started." );
-        Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
-        Update update = new Update();
-        update.addToSet( CommonConstants.SHARED_ON_COLUMN, socialSite );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
-        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        LOG.info( "updateSharedOn() finished." );
-    }
+    }   
 
 
     @Override
@@ -1640,39 +1647,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 agentReportData.put( agentId, agentRankingReport );
             }
         }
-    }
-
-
-    // JIRA SS-137 and 158 : EOC
-
-    @Override
-    public long noOfPreInitiatedSurveys( String columnName, long columnValue, Date startDate, Date endDate )
-    {
-        String profileLevel = "";
-        if ( columnName.equals( CommonConstants.COMPANY_ID ) ) {
-            profileLevel = CommonConstants.PROFILE_LEVEL_COMPANY;
-        } else if ( columnName.equals( CommonConstants.REGION_ID ) ) {
-            profileLevel = CommonConstants.PROFILE_LEVEL_REGION;
-        } else if ( columnName.equals( CommonConstants.BRANCH_ID ) ) {
-            profileLevel = CommonConstants.PROFILE_LEVEL_BRANCH;
-        } else if ( columnName.equals( CommonConstants.AGENT_ID ) ) {
-            profileLevel = CommonConstants.PROFILE_LEVEL_INDIVIDUAL;
-        }
-
-        long noOfPreInitiatedSurveys = 0l;
-        try {
-            List<SurveyPreInitiation> preInitiations = surveyPreInitiationService.getIncompleteSurvey( columnValue, 0, 0, 0,
-                -1, profileLevel, startDate, endDate, false );
-            for ( SurveyPreInitiation initiation : preInitiations ) {
-                if ( initiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED ) {
-                    noOfPreInitiatedSurveys++;
-                }
-            }
-        } catch ( InvalidInputException e ) {
-            LOG.error(
-                "InvalidInputException caught in noOfPreInitiatedSurveys() while fetching reviews. Nested exception is ", e );
-        }
-        return noOfPreInitiatedSurveys;
     }
 
 
@@ -1861,6 +1835,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( surveyDetails.getCustomerEmail() ) );
         Update update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, surveyDetails.getSocialMediaPostDetails() );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN, surveyDetails.getSocialMediaPostResponseDetails() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
@@ -2065,5 +2040,103 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
 
         return surveyCountForEntities;
+    }
+
+
+    /**
+     * Method to remove surveys from mongo by SurveyPreInitiation
+     * @param surveys
+     */
+    @Override
+    public void deleteSurveysBySurveyPreInitiation( List<SurveyPreInitiation> surveys )
+    {
+        LOG.info( "Method deleteSurveysBySurveyPreInitiation() to delete surveys started." );
+        if ( surveys == null || surveys.isEmpty() ) {
+            LOG.info( "No surveys present." );
+            return;
+        }
+        Map<Long, List<String>> surveysToDelete = new HashMap<Long, List<String>>();
+
+        for ( SurveyPreInitiation survey : surveys ) {
+            List<String> mailIds = null;
+            //Check if agentId exists in surveysToDelete
+            if ( surveysToDelete.containsKey( survey.getAgentId() ) ) {
+                //Get the current survey's agent ID
+                mailIds = surveysToDelete.get( survey.getAgentId() );
+            }
+            if ( mailIds == null ) {
+                mailIds = new ArrayList<String>();
+            }
+            mailIds.add( survey.getCustomerEmailId() );
+            surveysToDelete.put( survey.getAgentId(), mailIds );
+        }
+
+        //Ensure that the survey is editable
+        Criteria criteria = Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE );
+        //Add criteria for each of the agentId - customerEmailId pairs
+        List<Criteria> criterias = new ArrayList<Criteria>();
+        for ( Long agentId : surveysToDelete.keySet() ) {
+            Criteria criterion = Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId )
+                .and( CommonConstants.CUSTOMER_EMAIL_COLUMN ).in( surveysToDelete.get( agentId ) );
+            criterias.add( criterion );
+        }
+        Criteria surveyCriteria = new Criteria().orOperator( criterias.toArray( new Criteria[criterias.size()] ) );
+        Query query = new Query( new Criteria().andOperator( criteria, surveyCriteria ) );
+
+        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+
+        LOG.info( "Method deleteSurveysBySurveyPreInitiation() to delete surveys finished." );
+    }
+
+
+    /**
+     * Method to delete incomplete surveys for a particular agent ID from Survey Details Collection
+     * @param agentId
+     * @throws InvalidInputException 
+     */
+    @Override
+    public void deleteIncompleteSurveysForAgent( long agentId ) throws InvalidInputException
+    {
+        LOG.info( "Method to delete incomplete surveys for agent ID : " + agentId + " started." );
+        //Check if agentId is valid
+        if ( agentId <= 0l ) {
+            throw new InvalidInputException( "Invalid agent ID : " + agentId );
+        }
+        //Ensure that the survey is editable
+        Criteria criteria = Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE );
+        criteria.and( CommonConstants.AGENT_ID_COLUMN ).is( agentId );
+        Query query = new Query( criteria );
+        mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method to delete incomplete surveys for agent ID : " + agentId + " finished." );
+    }
+
+
+    /**
+     * Method to update agent info when surveys moved from one user to another
+     * @throws InvalidInputException
+     * */
+    @Override
+    public void updateAgentInfoInSurveys( long fromUserId, User toUser, UserProfile toUserProfile )
+        throws InvalidInputException
+    {
+        if ( fromUserId <= 0l )
+            throw new InvalidInputException( "Invalid fromUserId passed in updateAgentIdOfSurveys()" );
+        if ( toUser == null )
+            throw new InvalidInputException( "toUser passed cannot be null in updateAgentIdOfSurveys()" );
+        if ( toUserProfile == null )
+            throw new InvalidInputException( "toUser's user profile passed cannot be null in updateAgentIdOfSurveys()" );
+
+        LOG.info( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        Update update = new Update();
+        update.set( CommonConstants.AGENT_ID_COLUMN, toUser.getUserId() );
+        update.set( CommonConstants.AGENT_NAME_COLUMN, toUser.getFirstName()
+            + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
+        update.set( CommonConstants.REGION_ID_COLUMN, toUserProfile.getRegionId() );
+        update.set( CommonConstants.BRANCH_ID_COLUMN, toUserProfile.getBranchId() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user finished." );
+
     }
 }

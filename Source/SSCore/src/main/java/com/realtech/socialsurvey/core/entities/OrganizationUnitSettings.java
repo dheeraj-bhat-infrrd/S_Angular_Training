@@ -47,6 +47,10 @@ public class OrganizationUnitSettings {
 	private boolean isProfileImageProcessed;
 	private boolean isLogoImageProcessed;
 	private String[] hideSectionsFromProfilePage;
+	private SocialMediaTokens deletedSocialTokens;
+
+	// status of the record, A for active and D for deleted
+	private String status;
 
 	public String getId() {
 		return id;
@@ -328,7 +332,31 @@ public class OrganizationUnitSettings {
 		this.hideSectionsFromProfilePage = hideSectionsFromProfilePage;
 	}
 
-	@Override
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	/**
+     * @return the deletedSocialTokens
+     */
+    public SocialMediaTokens getDeletedSocialTokens()
+    {
+        return deletedSocialTokens;
+    }
+
+    /**
+     * @param deletedSocialTokens the deletedSocialTokens to set
+     */
+    public void setDeletedSocialTokens( SocialMediaTokens deletedSocialTokens )
+    {
+        this.deletedSocialTokens = deletedSocialTokens;
+    }
+
+    @Override
 	public String toString() {
 		return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion + ", profileName="
 				+ profileName + ", profileUrl=" + profileUrl + ", profileImageUrl=" + profileImageUrl + ", logo=" + logo + ", isLocationEnabled="

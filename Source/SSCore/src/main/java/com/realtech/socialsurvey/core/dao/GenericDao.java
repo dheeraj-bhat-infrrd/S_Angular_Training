@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import org.hibernate.criterion.Criterion;
 
 // JIRA: SS-8: By RM05: BOC
@@ -30,7 +31,7 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public void clear();
 
-	public List<T> findByCriteria(Criterion... criterion);
+	public List<T> findByCriteria(Class<T> dataClass,Criterion... criterion);
 
 	public T findById(Class<T> table, ID id);
 

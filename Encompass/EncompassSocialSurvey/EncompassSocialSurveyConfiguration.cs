@@ -14,7 +14,7 @@ namespace EncompassSocialSurvey
         {
             get
             {
-                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SENDGRID_USERNAME];
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SENDGRID_USERNAME];
             }
         }
 
@@ -24,7 +24,7 @@ namespace EncompassSocialSurvey
         {
             get
             {
-                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SENDGRID_PASSWORD];
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SENDGRID_PASSWORD];
             }
         }
 
@@ -34,7 +34,7 @@ namespace EncompassSocialSurvey
         {
             get
             {
-                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.ADMIN_EMAIL_ADDRESS];
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.ADMIN_EMAIL_ADDRESS];
             }
         }
 
@@ -44,7 +44,7 @@ namespace EncompassSocialSurvey
         {
             get
             {
-                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SENDGRID_FROM_ADDRESS];
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SENDGRID_FROM_ADDRESS];
             }
         }
 
@@ -54,7 +54,7 @@ namespace EncompassSocialSurvey
         {
             get
             {
-                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.SENDGRID_FROM_NAME];
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SENDGRID_FROM_NAME];
             }
         }
 
@@ -63,10 +63,34 @@ namespace EncompassSocialSurvey
         {
             get
             {
-                return Int32.Parse(System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurverConstant.DEFAULT_DAYS_INTERVAL]);
+                return Int32.Parse(System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.DEFAULT_DAYS_INTERVAL]);
             }
         }
 
 
+        public static string TempFolderPath
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.TEMP_FOLDER_PATH];
+            }
+        }
+
+        public static string fetchCompanyCredentialsURL
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.FETCH_COMPANY_CREDENTIALS_URL];
+            }
+        }
+
+        public static string disableGenerateReportUrl
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.DISABLE_GENERATE_REPORT_URL];
+            }
+        }
+        
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 /*
@@ -26,6 +27,10 @@ public interface UserDao extends GenericDao<User, Long> {
 	public void deleteUsersByCompanyId(long companyId);
 
     User getActiveUserByEmailAndCompany( String emailId, Company company ) throws NoRecordsFetchedException;
+
+    public List<User> getUsersForUserIds( List<Long> userIds ) throws InvalidInputException;
+
+    public List<User> getUsersForCompany( Company company, int start, int batch ) throws InvalidInputException;
 
 	// JIRA SS-76 by RM-06 : EOC
 

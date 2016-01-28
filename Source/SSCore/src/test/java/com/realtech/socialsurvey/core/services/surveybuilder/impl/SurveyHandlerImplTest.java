@@ -3,8 +3,11 @@ package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,6 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -23,6 +29,7 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -44,6 +51,7 @@ import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 public class SurveyHandlerImplTest
 {
+    @Spy
     @InjectMocks
     private SurveyHandlerImpl surveyHandlerImpl;
 
@@ -460,5 +468,69 @@ public class SurveyHandlerImplTest
         user.setUserProfiles( profiles );
         surveyPreInitiation.setCollectionName( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
         assertEquals( "", 1, surveyHandlerImpl.validateUnitsettingsForDotloop( user, surveyPreInitiation ) );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testMoveSurveysToAnotherUserWithInvalidFromUserId() throws InvalidInputException, NoRecordsFetchedException,
+        SolrException
+    {
+        surveyHandlerImpl.moveSurveysToAnotherUser( 0l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testMoveSurveysToAnotherUserWithInvalidToUserId() throws InvalidInputException, NoRecordsFetchedException,
+        SolrException
+    {
+        surveyHandlerImpl.moveSurveysToAnotherUser( 1l, 0l );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testMoveSurveysToAnotherUserWhenUserListIsNull() throws InvalidInputException, NoRecordsFetchedException,
+        SolrException
+    {
+        Mockito.when( userDao.getUsersForUserIds( Mockito.anyListOf( Long.class ) ) ).thenReturn( null );
+        surveyHandlerImpl.moveSurveysToAnotherUser( 1l, 1l );
+    }
+
+
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testMoveSurveysToAnotherUserWhenUserListIsEmpty() throws InvalidInputException, NoRecordsFetchedException,
+        SolrException
+    {
+        Mockito.when( userDao.getUsersForUserIds( Mockito.anyListOf( Long.class ) ) ).thenReturn( new ArrayList<User>() );
+        surveyHandlerImpl.moveSurveysToAnotherUser( 1l, 1l );
+    }
+
+
+    @Test ( expected = UnsupportedOperationException.class)
+    public void testMoveSurveysToAnotherUserWhenFromUserAndToUserDoNotBelongToSameCompany() throws InvalidInputException,
+        NoRecordsFetchedException, SolrException
+    {
+        Company fromUserCompany = new Company();
+        fromUserCompany.setCompanyId( 1 );
+        Company toUserCompany = new Company();
+        toUserCompany.setCompanyId( 2 );
+
+        ProfilesMaster profilesMaster = new ProfilesMaster();
+        profilesMaster.setProfileId( 4 );
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompany( fromUserCompany );
+        userProfile.setStatus( CommonConstants.STATUS_ACTIVE );
+        userProfile.setProfilesMaster( profilesMaster );
+        
+        User fromUser = new User();
+        fromUser.setCompany( fromUserCompany );
+        fromUser.setUserProfiles( Arrays.asList( new UserProfile[] { userProfile } ) );
+        User toUser = new User();
+        toUser.setCompany( toUserCompany );
+        toUser.setUserProfiles( Arrays.asList( new UserProfile[] { userProfile } ) );
+
+        Mockito.doReturn( new UserProfile() ).when( surveyHandlerImpl ).getUserProfileWhereAgentForUser( fromUser );
+        Mockito.when( userDao.getUsersForUserIds( Mockito.anyListOf( Long.class ) ) ).thenReturn(
+            Arrays.asList( new User[] { fromUser, toUser } ) );
+        surveyHandlerImpl.moveSurveysToAnotherUser( 1l, 1l );
     }
 }

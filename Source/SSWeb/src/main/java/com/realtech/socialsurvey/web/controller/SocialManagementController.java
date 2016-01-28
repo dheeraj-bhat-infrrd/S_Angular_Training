@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
@@ -1730,6 +1731,44 @@ public class SocialManagementController
         LOG.info( "Method sendSurveyInvite() called from SocialManagementController" );
         return JspResolver.HEADER_SURVEY_INVITE;
     }
+    
+
+    /**
+     * Method to get the generate report pop up for dry run
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/dryrun")
+    public String dryRun( Model model )
+    {
+        LOG.info( "Method to display the generate report popup for dry run started" );
+        User user = sessionHelper.getCurrentUser();
+        String emailId = "";
+        String noOfDays = "";
+        try {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+            if ( companySettings.getCrm_info() != null
+                && companySettings.getCrm_info().getCrm_source().equals( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
+                EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+                if ( encompassCrmInfo.getEmailAddressForReport() != null
+                    && !( encompassCrmInfo.getEmailAddressForReport().isEmpty() ) ) {
+                    emailId = encompassCrmInfo.getEmailAddressForReport();
+                }
+                if ( encompassCrmInfo.getNumberOfDays() > 0 ) {
+                    noOfDays = String.valueOf( encompassCrmInfo.getNumberOfDays() );
+                }
+            }
+            model.addAttribute( "emailId", emailId );
+            model.addAttribute( "NumberOfDays", noOfDays );
+        } catch ( Exception e ) {
+            LOG.error( "An exception occured while fetching the generate report pop up. Reason :", e );
+            return CommonConstants.ERROR;
+        }
+        LOG.info( "Method to display the generate report popup for dry run finished" );
+        return JspResolver.DRY_RUN;
+    }
 
 
     @RequestMapping ( value = "/sendsurveyinvitationadmin")
@@ -1897,8 +1936,8 @@ public class SocialManagementController
                             company.setZillowAverageScore( 0.0 );
                             company.setZillowReviewCount( 0 );
                         } else {
-                            company.setZillowAverageScore( 0.0 );
-                            company.setZillowReviewCount( 0 );
+                            company.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
+                            company.setZillowReviewCount( zillowReviewCount );
                         }
                     	userManagementService.updateCompany( company );
                     }
@@ -2008,6 +2047,11 @@ public class SocialManagementController
                             agent.setZillowReviewCount( zillowReviewCount );
                         }
                         userManagementService.updateUser( agent );
+
+                        // updating solr review count for user
+                        long reviewCount = profileManagementService.getReviewsCount( agent.getUserId(), -1, -1,
+                            CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, true, zillowReviewCount );
+                        solrSearchService.editUserInSolr( agent.getUserId(), CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
                     }
                     for ( ProfileStage stage : agentSettings.getProfileStages() ) {
                         if ( stage.getProfileStageKey().equalsIgnoreCase( "ZILLOW_PRF" ) ) {
@@ -2217,17 +2261,21 @@ public class SocialManagementController
                     agent.setZillowAverageScore( 0.0 );
                     agent.setZillowReviewCount( 0 );
                     userManagementService.updateUser( agent );
+                    long reviewCount = profileManagementService.getReviewsCount( agent.getUserId(), -1, -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false,
+                        false );
+                    solrSearchService
+                    .editUserInSolr( agent.getUserId(), CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
                 }
                 
             }
             profileSettings.setSocialMediaTokens(unitSettings.getSocialMediaTokens());
             
             //Remove zillow reviews on disconnect.
-            if(socialMedia.equals(CommonConstants.ZILLOW_SOCIAL_SITE)){
+//            if(socialMedia.equals(CommonConstants.ZILLOW_SOCIAL_SITE)){
                 // Commented as Zillow surveys are not stored in database, SS-1276
                 // LOG.debug("Deleting zillow feed for agent ID : " + entityId);
                 // surveyHandler.deleteZillowSurveysByEntity(entityType, entityId);
-            }
+//            }
             
             //Add action to social connection history
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,

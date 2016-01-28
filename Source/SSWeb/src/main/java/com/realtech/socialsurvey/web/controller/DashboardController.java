@@ -710,7 +710,12 @@ public class DashboardController
                         + incompleteSurveyIdStr, e );
                 }
             }
-            surveyPreInitiationService.deleteSurveyReminder( incompleteSurveyIds );
+            //Remove records from Survey Pre Initiation table
+            List<SurveyPreInitiation> surveys = surveyPreInitiationService.deleteSurveyReminder( incompleteSurveyIds );
+            
+            //Remove records from Survey Details collection, if any
+            dashboardService.deleteSurveyDetailsByPreInitiation( surveys );
+            
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "Nonfatal exception occured in method cancelSurveyReminder, reason : " + nonFatalException.getMessage() );
             return CommonConstants.ERROR;
@@ -2126,7 +2131,7 @@ public class DashboardController
                     iden = Long.parseLong( columnValue );
                 } catch ( NumberFormatException e ) {
                     LOG.error(
-                        "NumberFormatExcept;ion caught while parsing columnValue in getUserAdoptionReportFile(). Nested exception is ",
+                        "NumberFormatException caught while parsing columnValue in getUserAdoptionReportFile(). Nested exception is ",
                         e );
                     throw e;
                 }
@@ -2198,6 +2203,72 @@ public class DashboardController
             adminReport.createEntryInFileUploadForBillingReport( mailId );
         }
         LOG.info( "Method to get billing report file getBillingReportFile() finished." );
+    }
+
+
+    /**
+     * Method to download hierarchy report for a company
+     * */
+    @RequestMapping ( value = "/downloadcompanyhierarchyreport")
+    public void getCompanyHierarchyReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method to get company hierarchy report file, getCompanyHierarchyReportFile() started." );
+        User user = sessionHelper.getCurrentUser();
+
+        try {
+            String columnName = request.getParameter( "columnName" );
+            if ( columnName == null || columnName.isEmpty() ) {
+                LOG.error( "Invalid value (null/empty) passed for column name." );
+                throw new InvalidInputException( "Invalid value (null/empty) passed for column name." );
+            }
+
+            long iden = 0;
+            String columnValue = request.getParameter( "columnValue" );
+            if ( columnValue != null && !columnValue.isEmpty() ) {
+                try {
+                    iden = Long.parseLong( columnValue );
+                } catch ( NumberFormatException e ) {
+                    LOG.error(
+                        "NumberFormatException caught while parsing columnValue in getCompanyHierarchyReportFile(). Nested exception is ",
+                        e );
+                    throw e;
+                }
+            }
+            try {
+                String profileLevel = getProfileLevel( columnName );
+                String fileName = "Company_Hierarchy_Report-" + profileLevel + "-" + user.getFirstName() + "_"
+                    + user.getLastName() + "-" + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = dashboardService.downloadCompanyHierarchyReportData( iden );
+                response.setContentType( EXCEL_FORMAT );
+                String headerKey = CONTENT_DISPOSITION_HEADER;
+                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
+                response.setHeader( headerKey, headerValue );
+
+                // write into file
+                OutputStream responseStream = null;
+                try {
+                    responseStream = response.getOutputStream();
+                    workbook.write( responseStream );
+                } catch ( IOException e ) {
+                    LOG.error( "IOException caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
+                } finally {
+                    try {
+                        responseStream.close();
+                    } catch ( IOException e ) {
+                        LOG.error( "IOException caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
+                    }
+                }
+                response.flushBuffer();
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
+                throw e;
+            } catch ( IOException e ) {
+                LOG.error( "IOException caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
+        }
+        LOG.info( "Method to get company hierarchy report file, getCompanyHierarchyReportFile() ended." );
     }
 }
 // JIRA SS-137 : by RM-05 : EOC

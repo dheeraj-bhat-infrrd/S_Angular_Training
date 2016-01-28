@@ -51,7 +51,6 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -715,37 +714,181 @@ public class OrganizationManagementController
         LOG.info( "Saving encompass details" );
         User user = sessionHelper.getCurrentUser();
         request.setAttribute( "saveencompassdetails", "true" );
+        
+        String encompassUsername = request.getParameter( "encompass-username" );
+        String encompassPassword = request.getParameter( "encompass-password" );
+        String encompassUrl = request.getParameter( "encompass-url" );
+        String encompassFieldId = request.getParameter( "encompass-fieldId" );
+        String state = request.getParameter( "encompass-state" );
+        Map<String, Object> responseMap = new HashMap<String, Object>();
         String message;
+        boolean status = true;
 
         try {
-            testEncompassConnection( model, request );
+            
+            if(encompassUsername == null || encompassUsername.isEmpty()){
+                throw new InvalidInputException( "User name can not be empty" );
+            }
+            if(encompassPassword == null || encompassPassword.isEmpty()){
+                throw new InvalidInputException( "Password can not be empty" );  
+            }
+            if(encompassUrl == null || encompassUrl.isEmpty()){
+                throw new InvalidInputException( "Url can not be empty" );
+            }
+            if(encompassFieldId == null || encompassFieldId.isEmpty()){
+                LOG.info( "Field Id is empty" );
+                encompassFieldId = CommonConstants.ENCOMPASS_DEFAULT_FEILD_ID;
+            }
+            if ( state == null || state.isEmpty() || state.equals( CommonConstants.ENCOMPASS_DRY_RUN_STATE ) ){
+                state = CommonConstants.ENCOMPASS_DRY_RUN_STATE;
+            } else {
+                state = CommonConstants.ENCOMPASS_PRODUCTION_STATE;                
+            }
 
-            // Encrypting the password
-            String plainPassword = request.getParameter( "encompass-password" );
-            String cipherPassword = plainPassword;
-
-            EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
-            encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
-            encompassCrmInfo.setCrm_username( request.getParameter( "encompass-username" ) );
-            encompassCrmInfo.setCrm_fieldId( request.getParameter( "encompass-fieldId" ) );
-            encompassCrmInfo.setCrm_password( cipherPassword );
-            encompassCrmInfo.setUrl( request.getParameter( "encompass-url" ) );
-            encompassCrmInfo.setConnection_successful( true );
+            // TODO : Encrypting the password
+            String cipherPassword = encompassPassword;
 
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
                 .getCompanyId() );
-            encompassCrmInfo.setCompanyId( companySettings.getIden() );
+            EncompassCrmInfo encompassCrmInfo;
+            if ( companySettings.getCrm_info() != null && companySettings.getCrm_info().getCrm_source().equals( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
+                encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            } else {
+                encompassCrmInfo = new EncompassCrmInfo();
+                encompassCrmInfo.setCrm_source( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS );
+                encompassCrmInfo.setState( state );
+                encompassCrmInfo.setConnection_successful( true );
+                encompassCrmInfo.setCompanyId( companySettings.getIden() );
+            }
+            encompassCrmInfo.setCrm_username( encompassUsername );
+            encompassCrmInfo.setCrm_fieldId( encompassFieldId );
+            encompassCrmInfo.setCrm_password( cipherPassword );
+            encompassCrmInfo.setUrl( encompassUrl );
+            
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
 
             // set the updated settings value in session with plain password
-            encompassCrmInfo.setCrm_password( plainPassword );
+            encompassCrmInfo.setCrm_password( cipherPassword );
             companySettings.setCrm_info( encompassCrmInfo );
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+            status = false;
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        String response = new Gson().toJson( responseMap );
+        return response;
+    }
+
+
+    /**
+     * Method to enable an encompass connection
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/enableencompassdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String enableEncompassConnection( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating encompass details to 'Enabled'" );
+        User user = sessionHelper.getCurrentUser();
+        String message;
+
+        try {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            encompassCrmInfo.setState( CommonConstants.ENCOMPASS_PRODUCTION_STATE );
+            encompassCrmInfo.setNumberOfDays( 0 );
+            encompassCrmInfo.setEmailAddressForReport( null );
+            encompassCrmInfo.setGenerateReport( false );
+            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while saving encompass detials. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
+    
+    
+    
+    /**
+     * Method to disable an encompass connection
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/disableencompassdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String disableEncompassConnection( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating encompass details to 'Disabled'" );
+        User user = sessionHelper.getCurrentUser();
+        String message;
+
+        try {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
+            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while disabling encompass. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        return message;
+    }
+    
+    
+    /**
+     * Method to enable report generation for encompass
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/enableencompassreportgeneration", method = RequestMethod.POST)
+    @ResponseBody
+    public String enableEncompassReportGeneration( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Enabling report generation for encompass details" );
+        User user = sessionHelper.getCurrentUser();
+        String message;
+        try {
+            String numOfDaysStr = request.getParameter( "encompassNoOfdays" );
+
+            if ( numOfDaysStr == null || numOfDaysStr.isEmpty() ) {
+                throw new InvalidInputException( "Number of days cannot be empty" );
+            }
+
+            int numOfDays = Integer.parseInt( numOfDaysStr );
+            String emailIdForReport = request.getParameter( "encompassReportEmail" );
+            if ( emailIdForReport == null || emailIdForReport.isEmpty() ) {
+                throw new InvalidInputException( "emailId cannot be empty" );
+            }
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            encompassCrmInfo.setNumberOfDays( numOfDays );
+            encompassCrmInfo.setEmailAddressForReport( emailIdForReport );
+            encompassCrmInfo.setGenerateReport( true );
+            organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
+                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_GENERATE_REPORT_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while enabling report generation for encompass. Reason : " + e.getMessage(), e );
+            message = e.getMessage();
         }
         return message;
     }
@@ -753,7 +896,7 @@ public class OrganizationManagementController
 
     /**
      * Method to test encompass details / CRM info
-     * 
+     * NO LONGER USED
      * @param model
      * @param request
      * @return
@@ -785,7 +928,7 @@ public class OrganizationManagementController
 
     /**
      * Method to validate encompass details / CRM info
-     * 
+     * NO LONGER USED
      * @param request
      * @return
      */
@@ -1237,6 +1380,7 @@ public class OrganizationManagementController
     }
 
 
+    @SuppressWarnings ( "unused")
     private LockSettings updateLockSettings( LockSettings parentLock, LockSettings lockSettings, boolean status )
     {
         if ( !parentLock.getIsLogoLocked() ) {
@@ -1358,7 +1502,14 @@ public class OrganizationManagementController
                 int reminderInterval = Integer.parseInt( request.getParameter( "post-reminder-interval" ) );
                 if ( reminderInterval == 0 ) {
                     LOG.warn( "Reminder Interval is 0." );
-                    throw new InvalidInputException( "Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR );
+                    throw new InvalidInputException( "Reminder Interval is 0.",
+                        DisplayMessageConstants.INVALID_SOCIAL_POST_REMINDER_ERROR );
+                }
+
+                if ( reminderInterval > 4 ) {
+                    LOG.warn( "Reminder Interval is greater than 4." );
+                    throw new InvalidInputException( "Reminder Interval is greater than 4.",
+                        DisplayMessageConstants.INVALID_SOCIAL_POST_REMINDER_ERROR );
                 }
 
                 originalSurveySettings = companySettings.getSurvey_settings();
@@ -1400,7 +1551,7 @@ public class OrganizationManagementController
     
     
     /**
-     * Method to update Survey Reminder Settings
+     * Method to update Social Post Reminder Settings
      * 
      * @param model
      * @param request

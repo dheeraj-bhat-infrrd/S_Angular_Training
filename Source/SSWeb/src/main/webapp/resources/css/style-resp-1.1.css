@@ -323,6 +323,9 @@
 	.position-align{
 	padding-left: 30px;
 	}
+	.btn-wid-sm{
+	width:330px !important;
+	}
 }
 
 
@@ -545,7 +548,7 @@
     	height: 100px;
     }
     .dash-btn-dl-sd{
-    	width: 300px;
+    	width: 300px !important;
     }
     .dash-btn-dl-sd *{
     	font-size: 11px;
@@ -618,6 +621,9 @@
 		width: 35%;
 		text-align: center;
 	}
+	.picker-sm{
+	width: 20% !important;
+	}
 	.dash-download-sel-item {
 		width: 100%;
 		border-bottom: 1px solid #009FE0;
@@ -663,6 +669,23 @@
 	}
 	.help-save-small{
 	margin-left: 125px !important;
+	}
+	.bd-check-wrp{
+	width: 150px !important;
+	}
+	.bd-check-sm{
+	width: 75% !important;
+	}
+	.add-team-save{
+	margin-left: 0px !important;
+	}
+	.clear-both-sm{
+	clear:both;
+	float:none !important;
+	margin-left: 20px;
+	}
+	.float-none{
+	float:none;
 	}
 	
 	
