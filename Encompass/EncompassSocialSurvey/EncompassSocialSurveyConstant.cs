@@ -46,6 +46,8 @@ namespace EncompassSocialSurvey
         public const int REMINDER_COUNT = 0;
         public const int STATUS = 4;
 
+        public const int DAYS_BEFORE = 3;
+
         public const string COMPANY_CREDENTIALS_CRM_SOURCE = "encompass";
 
         //

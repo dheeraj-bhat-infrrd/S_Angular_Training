@@ -458,7 +458,7 @@
 	                    			</div>
 	                    			<div class="lp-row">
 		                    			<div class="prof-captcha-cont">
-		                    			<div class="g-recaptcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
+		                    			<div class="g-recaptcha profile-captcha" data-sitekey="6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K"></div>
 		                    				<!-- <div id="prof-captcha-img" class="prof-captcha-img"></div>
 											<div class="reg-captcha-btns clearfix">
 												<input id="captcha-text" class="float-left prof-cap-txt"
