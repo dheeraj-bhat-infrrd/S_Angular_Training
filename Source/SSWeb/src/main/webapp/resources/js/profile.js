@@ -361,11 +361,7 @@ function paintProfilePage(result) {
 				}
             	address=address.replace(/,/g,"");
             	
-            	if (apikey == undefined) {
-            		fetchGoogleMapApi(function() {
-            			$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>');
-					});
-            	}
+            	$("#prof-company-logo").html('<iframe src="https://maps.google.com/maps?hl=en&q='+address+'&ie=UTF8&t=m&z=10&iwloc=B&output=embed"></iframe>');
             }
 		}
 		
