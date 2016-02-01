@@ -48,6 +48,7 @@ public class OrganizationUnitSettings {
 	private boolean isLogoImageProcessed;
 	private String[] hideSectionsFromProfilePage;
 	private SocialMediaTokens deletedSocialTokens;
+	private boolean allowOverrideForSocialMedia;
 
 	// status of the record, A for active and D for deleted
 	private String status;
@@ -354,6 +355,22 @@ public class OrganizationUnitSettings {
     public void setDeletedSocialTokens( SocialMediaTokens deletedSocialTokens )
     {
         this.deletedSocialTokens = deletedSocialTokens;
+    }
+
+    /**
+     * @return the allowOverrideForSocialMedia
+     */
+    public boolean isAllowOverrideForSocialMedia()
+    {
+        return allowOverrideForSocialMedia;
+    }
+
+    /**
+     * @param allowOverrideForSocialMedia the allowOverrideForSocialMedia to set
+     */
+    public void setAllowOverrideForSocialMedia( boolean allowOverrideForSocialMedia )
+    {
+        this.allowOverrideForSocialMedia = allowOverrideForSocialMedia;
     }
 
     @Override
