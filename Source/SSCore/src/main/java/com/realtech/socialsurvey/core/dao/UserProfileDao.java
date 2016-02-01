@@ -78,4 +78,7 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     void activateAllUserProfilesForUser( User userToBeActivated );
+
+
+    public void updateEmailIdForUserProfile( long userId, String emailId ) throws InvalidInputException;
 }

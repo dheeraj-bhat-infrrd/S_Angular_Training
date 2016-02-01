@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import scala.util.continuations.cpsSym;
 import sun.misc.BASE64Decoder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -213,6 +214,7 @@ public class ProfileManagementController
             entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         }
 
+        boolean allowOverrideForSocialMedia = false;
         long branchId = 0;
         long regionId = 0;
         long companyId = 0;
@@ -264,6 +266,8 @@ public class ProfileManagementController
 
                 long reviewsCount = profileManagementService.getReviewsCount( companyId, CommonConstants.MIN_RATING_SCORE,
                     CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_COMPANY, false, false );
+                //Check if social media override is allowed
+                allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
@@ -284,7 +288,9 @@ public class ProfileManagementController
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
                 //set setting detail by region Setting
                 setSettingSetByEntityInModel( model, regionProfile );
-
+                //Check if social media override is allowed
+                allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
+                
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
                         regionProfile.getIden() );
@@ -344,7 +350,9 @@ public class ProfileManagementController
 
                 //set setting detail by branch Setting
                 setSettingSetByEntityInModel( model, branchProfile );
-
+                
+                //Check if social media override is allowed
+                allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID_COLUMN,
                         branchProfile.getIden() );
@@ -398,7 +406,7 @@ public class ProfileManagementController
             OrganizationUnitSettings regionProfile = null;
             OrganizationUnitSettings branchProfile = null;
             AgentSettings individualProfile = null;
-
+            
             try {
                 companyProfile = organizationManagementService.getCompanySettings( companyId );
                 regionProfile = organizationManagementService.getRegionSettings( regionId );
@@ -407,6 +415,9 @@ public class ProfileManagementController
 
                 //set setting detail by agent Setting
                 setSettingSetByEntityInModel( model, individualProfile );
+                
+                //Check if social media override is allowed
+                allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
 
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
@@ -459,7 +470,7 @@ public class ProfileManagementController
 
         }
 
-
+        model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
         model.addAttribute( "profileSettings", profileSettings );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
 

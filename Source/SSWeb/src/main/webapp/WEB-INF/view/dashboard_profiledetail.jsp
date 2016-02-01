@@ -3,6 +3,16 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
+<!-- Check if auto login -->
+<c:choose>
+	<c:when test="${isAutoLogin == 'true' && allowOverrideForSocialMedia == 'false' }">
+		<c:set var="isAutoLogin" value="true"></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="isAutoLogin" value="false"></c:set>
+	</c:otherwise>
+</c:choose>
+
 <c:choose>
 	<c:when test="${entityType == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>

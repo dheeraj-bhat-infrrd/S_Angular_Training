@@ -2811,6 +2811,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         LOG.info( "Method updateUser() started to update user." );
         userDao.merge( user );
+        userProfileDao.updateEmailIdForUserProfile( user.getUserId(), user.getEmailId() );
         solrSearchService.editUserInSolrWithMultipleValues( user.getUserId(), map );
         LOG.info( "Method updateUser() finished to update user." );
     }
