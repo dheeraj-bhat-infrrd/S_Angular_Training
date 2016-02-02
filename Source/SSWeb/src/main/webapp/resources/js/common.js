@@ -381,9 +381,20 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 
 	var roundedFloatingVal = parseFloat(rating).toFixed(1);
 	var ratingImgHtml = "";
-	if(source != undefined && source == "Zillow"){
+	
+	/*if(source =="encompass" || source == "DOTLOOP"){
 		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
 	}else {
+		ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";		
+	}*/
+	
+	if(source != undefined && source == "Zillow"){
+		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
+	}else if(source =="encompass" || source == "DOTLOOP"){
+		ratingImgHtml="<div class='verified-badge float-left verify-image' ></div>";
+		
+	}
+		else {
 		ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";		
 	}
 	
