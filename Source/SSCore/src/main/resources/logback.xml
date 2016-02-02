@@ -51,17 +51,36 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
             <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
         </layout>
     </appender>
-
+	<appender name="auditlog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>../standalone/log/audit.log</file>
+	    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+			</Pattern>
+		</encoder>
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${DEV_HOME}/archived/audit.%d{yyyy-MM-dd HH:mm:ss}.%i.log
+                        </fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+	
+	
     <!-- <logger name="org.hibernate" level="debug"/> -->
    <!-- Uncomment and add your logger here: -->
     <logger name="com.realtech.socialsurvey" level="DEBUG">
         <appender-ref ref="logfile"/>        
     </logger>
-    
     <logger name="org.hibernate.SQL">
         <appender-ref ref="sqllogfile"/>        
     </logger>
-
+	<logger name="com.realtech.socialsurvey.core.services.audit.impl" level="info" additivity="false">
+		<appender-ref ref="auditlog" />
+	</logger>
     <root level="INFO">
         <appender-ref ref="console"/>
     </root>
