@@ -1479,9 +1479,9 @@ $(document).click(function(){
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
 		$('#da-dd-wrapper-profiles').toggle();
 	}
-	if($('.v-tbl-icn-wraper').is(':visible')) {
+	/*if($('.v-tbl-icn-wraper').is(':visible')) {
 		$('.v-tbl-icn-wraper').hide();
-	}
+	}*/
 });
 
 //Populate Existing Survey Questions 
