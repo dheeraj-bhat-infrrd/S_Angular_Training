@@ -1619,7 +1619,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias( UserProfile.class, queries,
-            "firstName", "user" );
+            Arrays.asList(new String [] { "firstName", "lastName" } ) , "user" );
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             users = new ArrayList<AgentSettings>();
             for ( UserProfile userProfile : userProfiles ) {
@@ -1703,7 +1703,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
 
         LOG.debug( "calling method to fetch user profiles under region :" + regionId );
-        List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+        List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias( UserProfile.class, queries,
+            Arrays.asList( new String[] { "firstName", "lastName" } ), "user" );
 
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             LOG.debug( "Obtained userProfiles with size : " + userProfiles.size() );

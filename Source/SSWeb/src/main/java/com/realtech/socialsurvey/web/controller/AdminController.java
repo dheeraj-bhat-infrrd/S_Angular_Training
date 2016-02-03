@@ -375,7 +375,7 @@ public class AdminController
     @RequestMapping ( value = "/fetchbranchusersforadmin", method = RequestMethod.GET)
     public String fetchHierarchyViewUsersForBranchForAdmin( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method fetchHierarchyViewUsersForBranch called in Hierarchy management controller" );
+        LOG.info( "Method fetchHierarchyViewUsersForBranch called in admin controller" );
         String strBranchId = request.getParameter( "branchId" );
         String strRegionId = request.getParameter( "regionId" );
         String strCompanyId = request.getParameter( "companyId" );
