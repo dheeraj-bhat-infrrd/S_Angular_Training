@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -131,6 +132,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( rows > 0 ) {
                 solrQuery.setRows( rows );
             }
+            solrQuery.addSort( CommonConstants.REGION_NAME_SOLR, ORDER.asc );
 
             LOG.debug( "Querying solr for searching regions" );
             response = solrServer.query( solrQuery );
@@ -284,6 +286,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( rows > 0 ) {
                 query.setRows( rows );
             }
+            query.addSort( CommonConstants.BRANCH_NAME_SOLR, ORDER.asc );
 
             LOG.debug( "Querying solr for searching branches" );
             response = solrServer.query( query );
@@ -1085,6 +1088,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( noOfRows > -1 ) {
                 solrQuery.setRows( noOfRows );
             }
+            solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
 
             LOG.debug( "Querying solr for searching users" );
             response = solrServer.query( solrQuery );
@@ -1542,6 +1546,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( rows > 0 ) {
                 solrQuery.setRows( rows );
             }
+            solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
 
             LOG.debug( "Querying solr for searching users under the branches" );
             response = solrServer.query( solrQuery );
@@ -2100,7 +2105,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     private Collection<BranchFromSearch> getBranchesFromSolrDocuments( SolrDocumentList documentList )
     {
-        Map<Long, BranchFromSearch> matchedBranches = new HashMap<>();
+        Map<Long, BranchFromSearch> matchedBranches = new LinkedHashMap<>();
         for ( SolrDocument document : documentList ) {
             BranchFromSearch branch = new BranchFromSearch();
 
@@ -2135,7 +2140,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     private Collection<RegionFromSearch> getRegionsFromSolrDocuments( SolrDocumentList documentList )
     {
-        Map<Long, RegionFromSearch> matchedRegions = new HashMap<>();
+        Map<Long, RegionFromSearch> matchedRegions = new LinkedHashMap<>();
         for ( SolrDocument document : documentList ) {
             RegionFromSearch region = new RegionFromSearch();
 
