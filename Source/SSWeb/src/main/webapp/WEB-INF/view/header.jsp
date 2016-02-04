@@ -214,7 +214,9 @@
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showhelppage.do')" onclick="showOverlay();"><spring:message code="label.help.key" /></a>
 				</div>
-				
+				<div class="hdr-link-item">
+					<a href="javascript:showMainContent('./hierarchyupload.do')" onclick="showOverlay();"><spring:message code="label.hierarchyupload.key" /></a>
+				</div>
 				
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
