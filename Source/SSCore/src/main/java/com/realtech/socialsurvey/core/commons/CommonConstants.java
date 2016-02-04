@@ -999,4 +999,10 @@ public interface CommonConstants
     public static final String CHR_ID_DESC = "Unique ID used for assignment.";
     public static final String CHR_BRANCH_REGION_ID_DESC = "Region ID from the Region sheet.";
     public static final String CHR_REGION_REGION_NAME_DESC = "Name to be displayed.";
+    
+    //API Call details constants
+    public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
+    public static final String HTTP_METHOD_GET = "GET";
+    public static final String HTTP_METHOD_POST = "POST";
+    public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&count=10";
 }

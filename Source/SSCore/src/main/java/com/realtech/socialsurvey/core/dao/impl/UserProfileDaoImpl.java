@@ -548,4 +548,32 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.executeUpdate();
         LOG.info( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE finished." );
     }
+
+
+    /**
+     * Method to update emailId for a user's user profiles
+     * @param userId
+     * @param emailId
+     * @throws InvalidInputException
+     */
+    @Override
+    public void updateEmailIdForUserProfile( long userId, String emailId ) throws InvalidInputException
+    {
+        LOG.info( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " started." );
+        //Check if userId and emailId are null
+        if ( userId <= 0l ) {
+            throw new InvalidInputException( "Invalid user ID  : " + userId );
+        }
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "EmailId cannot be empty" );
+        }
+
+        String hqlUpdate = "update UserProfile up set up.emailId = :emailId where up.user.userId = :userId";
+        Query query = getSession().createQuery( hqlUpdate );
+        query.setString( "emailId", emailId );
+        query.setLong( "userId", userId );
+        query.executeUpdate();
+        LOG.info( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " finished." );
+    }
  }

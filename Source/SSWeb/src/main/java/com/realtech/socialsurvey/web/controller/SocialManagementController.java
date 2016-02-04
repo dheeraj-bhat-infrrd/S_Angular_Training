@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,12 +47,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
@@ -211,6 +214,12 @@ public class SocialManagementController
     private BatchTrackerService batchTrackerService;
     
     private final static int SOLR_BATCH_SIZE = 20;
+    
+    @Value ( "${ZILLOW_ENDPOINT}")
+    private String zillowEndpoint;
+    
+    @Autowired
+    private ExternalApiCallDetailsDao externalApiCallDetailsDao;
     
     /**
      * Returns the social authorization page
@@ -1858,6 +1867,18 @@ public class SocialManagementController
                 if ( response != null ) {
                     jsonString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
                 }
+                
+                //Store the API call details
+                ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
+                zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
+                zillowAPICallDetails.setRequest( zillowEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
+                    + zillowWebserviceId + "&screenname=" + zillowScreenName );
+                zillowAPICallDetails.setResponse( jsonString );
+                zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );
+                zillowAPICallDetails.setSource( CommonConstants.ZILLOW_SOCIAL_SITE );
+                //Store this record in mongo
+                externalApiCallDetailsDao.insertApiCallDetails( zillowAPICallDetails );
+                
                 if ( jsonString != null ) {
                     map = new ObjectMapper().readValue( jsonString, new TypeReference<HashMap<String, Object>>() {} );
                 }
@@ -2318,6 +2339,17 @@ public class SocialManagementController
                 unitSettings = userManagementService.getUserSettings( entityId );
             }
 
+            boolean allowOverrideForSocialMedia = false;
+            //Code to determine if social media can be overridden during autologin
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                allowOverrideForSocialMedia = unitSettings.isAllowOverrideForSocialMedia();
+            } else {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                    .getCompanyId() );
+                allowOverrideForSocialMedia = companySettings.isAllowOverrideForSocialMedia();
+            }
+            model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
+            
             SocialMediaTokens tokens = unitSettings.getSocialMediaTokens();
 
             if ( tokens != null ) {
