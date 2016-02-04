@@ -12,7 +12,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -47,6 +50,7 @@ import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -150,6 +154,10 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	
 	@Autowired
 	private Utils utils;
+	
+    @Autowired
+    private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
+
 
 	@Value("${FILEUPLOAD_DIRECTORY_LOCATION}")
 	private String fileDirectory;
@@ -171,7 +179,7 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	@Value("${AMAZON_IMAGE_BUCKET}")
 	private String amazonImageBucket;
-
+	
 	private static Logger LOG = LoggerFactory.getLogger(CsvUploadServiceImpl.class);
 
 	@Transactional
@@ -639,67 +647,72 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		Map<Object, Object> userMap = new HashMap<Object, Object>();
 		Map<UserUploadVO, User> map = new HashMap<UserUploadVO, User>();
 		for (UserUploadVO userToBeUploaded : usersToUpload) {
-			if (checkIfEmailIdExists(userToBeUploaded.getEmailId(), adminUser.getCompany())) {
-				try {
-					User user = assignUser(userToBeUploaded, adminUser);
-					if (user != null) {
-						map.put(userToBeUploaded, user);
-					}
-				}
-				catch (UserAdditionException e) {
-					LOG.error("UserAdditionException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("UserAdditionException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
-				}
-				catch (InvalidInputException e) {
-					LOG.error("InvalidInputException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("InvalidInputException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
-				}
-				catch (SolrException e) {
-					LOG.error("SolrException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("SolrException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
-				}
-				catch (NoRecordsFetchedException e) {
-					LOG.error("NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
-							+ e.getMessage());
-				}
-				catch (UserAssignmentException e) {
-					LOG.error("UserAssignmentException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("UserAssignmentException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
-							+ e.getMessage());
-				}
-			}
-			else {
-				// add user
-				try {
-					User user = addUser(userToBeUploaded, adminUser);
-					if (user != null) {
-						map.put(userToBeUploaded, user);
-					}
-				}
-				catch (InvalidInputException e) {
-					LOG.error("InvalidInputException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("InvalidInputException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
-				}
-				catch (NoRecordsFetchedException e) {
-					LOG.error("NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
-							+ e.getMessage());
-				}
-				catch (SolrException e) {
-					LOG.error("SolrException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("SolrException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
-				}
-				catch (UserAssignmentException e) {
-					LOG.error("UserAssignmentException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("UserAssignmentException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
-							+ e.getMessage());
-				}
-				catch (UserAdditionException e) {
-					LOG.error("UserAdditionException while adding user: " + userToBeUploaded.getEmailId());
-					userErrors.add("UserAdditionException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
-				}
-			}
+			try {
+                if (checkIfEmailIdExists(userToBeUploaded.getEmailId(), adminUser.getCompany())) {
+                	try {
+                		User user = assignUser(userToBeUploaded, adminUser);
+                		if (user != null) {
+                			map.put(userToBeUploaded, user);
+                		}
+                	}
+                	catch (UserAdditionException e) {
+                		LOG.error("UserAdditionException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("UserAdditionException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
+                	}
+                	catch (InvalidInputException e) {
+                		LOG.error("InvalidInputException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("InvalidInputException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
+                	}
+                	catch (SolrException e) {
+                		LOG.error("SolrException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("SolrException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
+                	}
+                	catch (NoRecordsFetchedException e) {
+                		LOG.error("NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
+                				+ e.getMessage());
+                	}
+                	catch (UserAssignmentException e) {
+                		LOG.error("UserAssignmentException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("UserAssignmentException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
+                				+ e.getMessage());
+                	}
+                }
+                else {
+                	// add user
+                	try {
+                		User user = addUser(userToBeUploaded, adminUser);
+                		if (user != null) {
+                			map.put(userToBeUploaded, user);
+                		}
+                	}
+                	catch (InvalidInputException e) {
+                		LOG.error("InvalidInputException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("InvalidInputException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
+                	}
+                	catch (NoRecordsFetchedException e) {
+                		LOG.error("NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
+                				+ e.getMessage());
+                	}
+                	catch (SolrException e) {
+                		LOG.error("SolrException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("SolrException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
+                	}
+                	catch (UserAssignmentException e) {
+                		LOG.error("UserAssignmentException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("UserAssignmentException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : "
+                				+ e.getMessage());
+                	}
+                	catch (UserAdditionException e) {
+                		LOG.error("UserAdditionException while adding user: " + userToBeUploaded.getEmailId());
+                		userErrors.add("UserAdditionException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
+                	}
+                }
+            } catch ( InvalidInputException e ) {
+                LOG.error("InvalidInputException while adding user: " + userToBeUploaded.getEmailId());
+                userErrors.add("InvalidInputException while adding user: " + userToBeUploaded.getEmailId() + " Exception is : " + e.getMessage());
+            }
 		}
 		userMap.put("ValidUser", map);
 		userMap.put("InvalidUser", userErrors);
@@ -1029,17 +1042,21 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 	}
 
-	boolean checkIfEmailIdExists(String emailId, Company company) {
-		boolean status = false;
-		try {
-			userDao.getActiveUser(emailId);
-			status = true;
-		}
-		catch (NoRecordsFetchedException e) {
-			status = false;
-		}
-		return status;
-	}
+
+    boolean checkIfEmailIdExists( String emailId, Company company ) throws InvalidInputException
+    {
+        boolean status = false;
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "EmailId is empty" );
+        }
+        try {
+            userManagementService.getUserByEmailAddress( emailId );
+            status = true;
+        } catch ( NoRecordsFetchedException e ) {
+            status = false;
+        }
+        return status;
+    }
 
 	Company getCompany(User user) throws InvalidInputException {
 		Company company = user.getCompany();

@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
@@ -25,6 +26,7 @@ import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.exception.BranchAdditionException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -34,6 +36,7 @@ import com.realtech.socialsurvey.core.exception.UserAdditionException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
@@ -45,6 +48,8 @@ public class CsvUploadServiceImplTest
     @Mock
     private OrganizationManagementService organizationManagementService;
 
+    @Mock
+    private UserManagementService userManagementService;
     @Mock
     private GenericDao<FileUpload, Long> fileUploadDao;
 
@@ -233,18 +238,22 @@ public class CsvUploadServiceImplTest
 
     //Tests for checkIfEmailIdExists
     @Test
-    public void checkIfEmailIdExistsTestUserExists() throws NoRecordsFetchedException
+    public void checkIfEmailIdExistsTestUserExists() throws NoRecordsFetchedException, InvalidInputException
     {
-        Mockito.when( userDao.getActiveUser( Mockito.anyString() ) ).thenReturn( new User() );
-        assertTrue( csvUploadServiceImpl.checkIfEmailIdExists( null, null ) );
+        List<UserEmailMapping> userEmailMappings = new ArrayList<UserEmailMapping>();
+        userEmailMappings.add( new UserEmailMapping() );
+        Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenReturn( new User() );
+        assertTrue( csvUploadServiceImpl.checkIfEmailIdExists( TestConstants.TEST_MAIL_ID_STRING, null ) );
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Test
-    public void checkIfEmailIdExistsTestUserDoesNotExist() throws NoRecordsFetchedException
+    public void checkIfEmailIdExistsTestUserDoesNotExist() throws NoRecordsFetchedException, InvalidInputException
     {
-        Mockito.when( userDao.getActiveUser( Mockito.anyString() ) ).thenThrow( new NoRecordsFetchedException() );
-        assertFalse( csvUploadServiceImpl.checkIfEmailIdExists( null, null ) );
+        Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenThrow(
+            NoRecordsFetchedException.class );
+        assertFalse( csvUploadServiceImpl.checkIfEmailIdExists( TestConstants.TEST_MAIL_ID_STRING, null ) );
     }
 
 

@@ -2505,7 +2505,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( validateEmail( emailId ) ) {
 
                 try {
-                    user = userManagementService.getUserByLoginName( adminUser, emailId );
+                    user = userManagementService.getUserByEmailAddress( emailId );
                 } catch ( NoRecordsFetchedException e ) {
                     /**
                      * if no user is present with the specified emailId, send an invite to register

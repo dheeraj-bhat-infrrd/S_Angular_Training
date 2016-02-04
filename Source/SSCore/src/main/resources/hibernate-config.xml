@@ -76,6 +76,7 @@
 				<value>com.realtech.socialsurvey.core.entities.LoopProfileMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.BatchTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.CrmBatchTracker</value>
+				<value>com.realtech.socialsurvey.core.entities.UserEmailMapping</value>
 			</list>
 		</property>
 	</bean>

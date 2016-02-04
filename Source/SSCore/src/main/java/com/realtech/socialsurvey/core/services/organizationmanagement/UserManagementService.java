@@ -507,5 +507,8 @@ public interface UserManagementService
 
 
     public void restoreDeletedUser( long userId, boolean restoreSocial  ) throws InvalidInputException, SolrException;
+
+
+    public User getUserByEmailAddress( String emailId ) throws InvalidInputException, NoRecordsFetchedException;
 }
 // JIRA SS-34 BY RM02 BOC
