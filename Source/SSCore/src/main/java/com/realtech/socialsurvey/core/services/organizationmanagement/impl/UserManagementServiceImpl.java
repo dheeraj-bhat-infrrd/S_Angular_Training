@@ -1936,7 +1936,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             if ( userEmailMappings == null || userEmailMappings.isEmpty() ) {
                 userDao.getActiveUser( userName );
             }
-            userDao.getActiveUser( userName );
             isUserPresent = true;
         } catch ( NoRecordsFetchedException e ) {
             LOG.debug( "No user found with the user name " + userName );

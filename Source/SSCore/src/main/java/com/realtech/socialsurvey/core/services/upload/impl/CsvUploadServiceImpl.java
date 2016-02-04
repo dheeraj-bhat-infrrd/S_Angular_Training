@@ -1050,8 +1050,12 @@ public class CsvUploadServiceImpl implements CsvUploadService {
             throw new InvalidInputException( "EmailId is empty" );
         }
         try {
-            userManagementService.getUserByEmailAddress( emailId );
-            status = true;
+            User user = userManagementService.getUserByEmailAddress( emailId );
+            if ( user.getCompany().getCompanyId() == company.getCompanyId() ) {
+                status = true;
+            } else {
+                status = false;
+            }
         } catch ( NoRecordsFetchedException e ) {
             status = false;
         }
