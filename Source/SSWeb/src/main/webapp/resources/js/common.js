@@ -1169,6 +1169,27 @@ function logoValidate(logo) {
     return true;
     
 }
+/*var fileExtensions=".xlsx";
+function fileValidate(fileformat){
+	if($(fileformat).attr("type")=="file"){
+		var FileName=$(fileFormat).val();
+		if(FileName.length>0){
+			var blnValid= false;
+			if (FileName.substr(FileName.length - fileExtensions.length, fileExtensions.length).toLowerCase() == fileExtensions.toLowerCase()) {
+                blnValid = true;
+                break;
+            }
+		}
+		 if (!blnValid) {
+         	var msg="Please upload xlsx file";
+         	showErrorMobileAndWeb(msg);
+             $(logo).val="";
+             
+             return false;
+         }
+	}
+	return true;
+}*/
 
 
 //update GA tracking Id
