@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -1046,6 +1047,24 @@ public class CsvUploadServiceImpl implements CsvUploadService {
     boolean checkIfEmailIdExists( String emailId, Company company ) throws InvalidInputException
     {
         boolean status = false;
+        emailId = extractEmailId( emailId );
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "EmailId is empty" );
+        }
+        try {
+            userManagementService.getUserByEmailAddress( emailId );
+            status = true;
+        } catch ( NoRecordsFetchedException e ) {
+            status = false;
+        }
+        return status;
+    }
+    
+    
+    boolean checkIfEmailIdExistsWithCompany( String emailId, Company company ) throws InvalidInputException
+    {
+        boolean status = false;
+        emailId = extractEmailId( emailId );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "EmailId is empty" );
         }
@@ -1053,15 +1072,137 @@ public class CsvUploadServiceImpl implements CsvUploadService {
             User user = userManagementService.getUserByEmailAddress( emailId );
             if ( user.getCompany().getCompanyId() == company.getCompanyId() ) {
                 status = true;
-            } else {
-                status = false;
             }
         } catch ( NoRecordsFetchedException e ) {
             status = false;
         }
         return status;
     }
+    
+    
 
+    public static String[] removeElements( String[] input, String deleteMe )
+    {
+        List<String> result = new LinkedList<String>();
+
+        for ( String item : input )
+            if ( !deleteMe.equals( item ) )
+                result.add( item );
+
+        String[] modifiedArray = result.toArray( new String[result.size()] );
+        return modifiedArray;
+    }
+    
+    
+    String extractEmailId( String emailId )
+    {
+        if ( emailId.contains( "\"" ) ) {
+            emailId = emailId.replace( "\"", "" );
+        }
+        String firstName = "";
+        String lastName = "";
+        String toRemove = null;
+        if ( emailId.indexOf( "@" ) != -1 && emailId.indexOf( "." ) != -1 ) {
+            if ( emailId.contains( " " ) ) {
+                String[] userArray = emailId.split( " " );
+                String[] userInformation = removeElements( userArray, "" );
+                List<String> tempList = new LinkedList<String>();
+                for ( String str : userInformation ) {
+                    tempList.add( str );
+                }
+                String tempString = "";
+                for ( int i = 0; i < tempList.size(); i++ ) {
+
+                    LOG.debug( "removing extra spaces " );
+                    if ( tempList.get( i ).equalsIgnoreCase( "<" ) ) {
+                        if ( i + 1 < tempList.size() ) {
+                            if ( !tempList.get( i + 1 ).contains( "<" ) ) {
+                                tempString = tempList.get( i ).concat( tempList.get( i + 1 ) );
+
+                                toRemove = tempList.get( i + 1 );
+                                if ( i + 2 < tempList.size() ) {
+
+                                    if ( tempList.get( i + 2 ).equalsIgnoreCase( ">" ) ) {
+                                        tempString = tempString.concat( tempList.get( i + 2 ) );
+
+
+                                    }
+                                }
+                            }
+                        }
+                    } else if ( tempList.get( i ).equalsIgnoreCase( ">" ) ) {
+                        if ( !tempList.get( i - 1 ).contains( ">" ) ) {
+                            if ( tempString.isEmpty() ) {
+                                tempString = tempList.get( i - 1 ).concat( tempList.get( i ) );
+                                toRemove = tempList.get( i - 1 );
+                            }
+
+                        }
+                    }
+
+                }
+                if ( !tempString.isEmpty() ) {
+                    tempList.add( tempString );
+                }
+                Iterator<String> it = tempList.iterator();
+                while ( it.hasNext() ) {
+                    String iteratedValue = it.next();
+                    if ( iteratedValue.equalsIgnoreCase( "<" ) || iteratedValue.equalsIgnoreCase( ">" ) ) {
+                        it.remove();
+                    }
+                    if ( toRemove != null ) {
+                        if ( iteratedValue.equalsIgnoreCase( toRemove ) ) {
+                            it.remove();
+                        }
+                    }
+                }
+                userInformation = tempList.toArray( new String[tempList.size()] );
+                if ( userInformation.length >= 3 ) {
+                    LOG.debug( "This contains middle name as well" );
+                    for ( int i = 0; i < userInformation.length - 1; i++ ) {
+                        firstName = firstName + userInformation[i] + " ";
+                    }
+                    firstName = firstName.trim();
+                    lastName = userInformation[userInformation.length - 1];
+                    if ( lastName.contains( "<" ) ) {
+                        emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
+                        lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
+                        if ( lastName.equalsIgnoreCase( "" ) ) {
+                            lastName = userInformation[userInformation.length - 2];
+                            if ( firstName.contains( lastName ) ) {
+                                firstName = firstName.substring( 0, firstName.indexOf( lastName ) );
+                            }
+                        }
+                    }
+
+                } else if ( userInformation.length == 2 ) {
+                    firstName = userInformation[0];
+                    lastName = userInformation[1];
+                    if ( lastName.contains( "<" ) ) {
+                        emailId = lastName.substring( lastName.indexOf( "<" ) + 1, lastName.length() - 1 );
+                        lastName = lastName.substring( 0, lastName.indexOf( "<" ) );
+                    }
+                }
+            } else {
+                LOG.debug( "Contains no space hence wont have a last name" );
+                lastName = null;
+                if ( emailId.contains( "<" ) ) {
+                    firstName = emailId.substring( 0, emailId.indexOf( "<" ) );
+                    if ( firstName.equalsIgnoreCase( "" ) ) {
+                        firstName = emailId.substring( emailId.indexOf( "<" ) + 1, emailId.indexOf( "@" ) );
+                    }
+                    emailId = emailId.substring( emailId.indexOf( "<" ) + 1, emailId.indexOf( ">" ) );
+
+                } else {
+                    LOG.debug( "This doesnt contain a first name and last name" );
+                    firstName = emailId.substring( 0, emailId.indexOf( "@" ) );
+                }
+
+            }
+        }
+        return emailId;
+    }
+    
 	Company getCompany(User user) throws InvalidInputException {
 		Company company = user.getCompany();
 		if (company == null) {
@@ -1090,6 +1231,9 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		User uploadedUser = null;
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<User> userList = new ArrayList<User>();
+		if ( checkIfEmailIdExists( user.getEmailId(), adminUser.getCompany() ) ) {
+            throw new UserAdditionException( "The user already exists" );
+        }
 		if (user.isBelongsToCompany()) {
 			// He belongs to the company
 			LOG.debug("Adding user : " + user.getEmailId() + " belongs to company");
@@ -1166,12 +1310,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			NoRecordsFetchedException, UserAssignmentException {
 
 		LOG.info("User already exists so assigning user to approprite place");
-		List<User> assigneeUsers = userDao.findByColumn(User.class, CommonConstants.EMAIL_ID, user.getEmailId());
-		if (assigneeUsers == null || assigneeUsers.isEmpty()) {
-			LOG.error("User : " + user.getEmailId() + " not found in the database");
-			throw new UserAdditionException("User : " + user.getEmailId() + " not found in the database");
-		}
-		User assigneeUser = assigneeUsers.get(CommonConstants.INITIAL_INDEX);
+        if ( !( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) {
+            throw new UserAdditionException( "User : " + user.getEmailId()
+                + " belongs to a different company" );
+        }
+		User assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId(user.getEmailId()) );
 
 		if (user.isBelongsToCompany()) {
 			LOG.debug("Assigning user id : " + assigneeUser.getUserId());
