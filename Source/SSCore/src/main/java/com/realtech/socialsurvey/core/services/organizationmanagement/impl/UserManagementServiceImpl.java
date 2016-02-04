@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -184,6 +185,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
+    
+    @Autowired
+    private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -529,6 +533,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         removedUser.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         removedUserDao.save( removedUser );
 
+        //Deactivate all email addresses for the user
+        List<UserEmailMapping> userEmailMappings = userToBeDeactivated.getUserEmailMappings();
+        for ( UserEmailMapping userEmailMapping : userEmailMappings ) {
+            userEmailMapping.setStatus( CommonConstants.STATUS_INACTIVE );
+            userEmailMappingDao.update( userEmailMapping );
+        }
+        
         // Marks all the user profiles for given user as inactive.
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
 
@@ -572,14 +583,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "User with userId : " + userId + " already exists." );
         }
         //Check if any user has emailId = user's emailId.
-        List<User> usersWithSameEmail = getUsersByEmailId( user.getEmailId() );
-        if ( usersWithSameEmail != null && !( usersWithSameEmail.isEmpty() ) ) {
-            for ( User userWithSameEmail : usersWithSameEmail ) {
-                if ( user.getUserId() != userWithSameEmail.getUserId() ) {
-                    throw new InvalidInputException( "Another User exists with the same Email ID. UserId : "
-                        + userWithSameEmail.getUserId() );
-                }
+        try {
+            User userWithSameEmail = getUserByEmailAddress( user.getEmailId() );
+            if ( user.getUserId() != userWithSameEmail.getUserId() ) {
+                throw new InvalidInputException( "Another User exists with the same Email ID. UserId : "
+                    + userWithSameEmail.getUserId() );
             }
+        } catch ( NoRecordsFetchedException e1 ) {
+            LOG.debug( "No existing user found. Restoring." );
         }
 
         //Start restoring the user
@@ -595,6 +606,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Set the status of all user profiles for that user as 1
         userProfileDao.activateAllUserProfilesForUser( user );
 
+        //Restore mapped emailIds if possible
+        List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class,
+            CommonConstants.USER_COLUMN, user );
+        for ( UserEmailMapping userEmailMapping : userEmailMappings ) {
+            try {
+                User foundUser = getUserByEmailAddress( userEmailMapping.getEmailId() );
+                LOG.error( "An active user : " + foundUser.getUserId() + " was found having emailId : "
+                    + userEmailMapping.getEmailId() + ".Could not restore" );
+            } catch ( NoRecordsFetchedException e ) {
+                userEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
+                userEmailMappingDao.update( userEmailMapping );
+            }
+        }
+        
         //Remove entry from RemovedUser table
 
         List<RemovedUser> entriesToDelete = removedUserDao.findByColumn( RemovedUser.class, CommonConstants.USER_COLUMN, user );
@@ -672,6 +697,34 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         LOG.info( "Method to fetch list of users on the basis of email id is finished." );
         return users.get( CommonConstants.INITIAL_INDEX );
+    }
+    
+    
+    /**
+     * Method to get user by email address
+     * @param emailId
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @Transactional
+    @Override
+    public User getUserByEmailAddress( String emailId ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method to fetch user having emailId : " + emailId + " started." );
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty" );
+        }
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.EMAIL_ID, emailId );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+        if ( userEmailMappings == null || userEmailMappings.isEmpty() ) {
+            User user = userDao.getActiveUser( emailId );
+            return user;
+        } else {
+            return userEmailMappings.get( CommonConstants.INITIAL_INDEX ).getUser();
+        }
     }
 
     /**
@@ -1870,12 +1923,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public boolean userExists( String userName ) throws InvalidInputException
     {
         LOG.debug( "Method to check if user exists called for username : " + userName );
-        if(userName == null || userName.isEmpty()){
-            throw new InvalidInputException("Invalid parameter passed : passed parameter user name is null or empty");
+        if ( userName == null || userName.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter user name is null or empty" );
         }
         boolean isUserPresent = false;
         try {
-            userDao.getActiveUser( userName );
+            Map<String, Object> queries = new HashMap<String, Object>();
+            queries.put( CommonConstants.EMAIL_ID, userName );
+            queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+            List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+
+            if ( userEmailMappings == null || userEmailMappings.isEmpty() ) {
+                userDao.getActiveUser( userName );
+            }
             isUserPresent = true;
         } catch ( NoRecordsFetchedException e ) {
             LOG.debug( "No user found with the user name " + userName );
@@ -3298,7 +3358,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( company == null ) {
             throw new NoRecordsFetchedException( "No company found with the id " + companyId );
         }
-        User user = userDao.getActiveUserByEmailAndCompany( emailId, company );
+        
+        User user = getUserByEmailAddress( emailId );
+        if ( user.getCompany().getCompanyId() != companyId ) {
+            throw new InvalidInputException( "The user is not part of the specified company" );
+        }
+        //User user = userDao.getActiveUserByEmailAndCompany( emailId, company );
 
         LOG.info( "Method getUserByEmailAndCompany() finished from UserManagementService" );
         return user;
