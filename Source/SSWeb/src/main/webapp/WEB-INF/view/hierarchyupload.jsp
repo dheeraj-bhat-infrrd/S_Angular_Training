@@ -80,7 +80,7 @@
 					var formData = new FormData();
 					formData.append("logo", $('#com-file').prop("files")[0]);
 					formData.append("logo_name", $('#com-file').prop("files")[0].name);
-					callAjaxPOSTWithTextDataLogo("./uploadcompanylogo.do", companyRegistration.uploadImageSuccessCallback, true, formData);
+					callAjaxPOSTWithTextDataLogo("./.do", companyRegistration.uploadImageSuccessCallback, true, formData);
 					}
 				});
 				function fileValidate(fileformat){
