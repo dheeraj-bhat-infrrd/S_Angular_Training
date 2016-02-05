@@ -5,10 +5,18 @@
 <!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
 <c:if test="${not empty branches}">
 	<c:forEach var="branch" items="${branches}">
+		<c:choose>
+			<c:when test="${not empty regionId}">
+				<c:set var="regionIdVal" value="${regionId }"></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="regionIdVal" value="${branch.region.regionId }"></c:set>
+			</c:otherwise>
+		</c:choose>
 		<tr id="tr-branch-row-${branch.branchId}"
-			data-regionid="${branch.regionId}" data-branchid="${branch.branchId}"
+			data-regionid="${regionIdVal}" data-branchid="${branch.branchId}"
 			clicked="false"
-			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-r${branch.regionId}-b${branch.branchId}">
+			class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-r${regionIdVal}-b${branch.branchId}">
 			<td class="v-tbl-line">
 				<div class="v-line-brnch"></div>
 			</td>
@@ -26,7 +34,7 @@
     				</c:otherwise>
 				</c:choose>
            	</td> --%>
-			<td class="v-tbl-name">${branch.branchName}</td>
+			<td class="v-tbl-name">${branch.branch}</td>
 			<td class="v-tbl-add"><c:if test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if
 					test="${not empty branch.address2}">${branch.address2}</c:if></td>
 			<td class="v-tbl-role"></td>
