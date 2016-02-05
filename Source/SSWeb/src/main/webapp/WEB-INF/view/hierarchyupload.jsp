@@ -74,13 +74,12 @@
 
 				$("#com-file").on("change", function() {
 					if(fileValidate("#com-file")){
-					 set=true;
+					 	set=true;
 					}
 					if(set==true){
-					var formData = new FormData();
-					formData.append("logo", $('#com-file').prop("files")[0]);
-					formData.append("logo_name", $('#com-file').prop("files")[0].name);
-					callAjaxPOSTWithTextDataLogo("./uploadcompanylogo.do", companyRegistration.uploadImageSuccessCallback, true, formData);
+						var formData = new FormData();
+						formData.append("logo", $('#com-file').prop("files")[0]);
+						formData.append("logo_name", $('#com-file').prop("files")[0].name);
 					}
 				});
 				function fileValidate(fileformat){

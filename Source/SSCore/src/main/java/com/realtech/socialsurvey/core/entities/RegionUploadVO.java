@@ -37,6 +37,8 @@ public class RegionUploadVO
     private boolean isRegionZipcodeModified;
     private StringUploadHistory[] regionZipcodeHistory;
     private boolean isAddressSet;
+    private boolean isRegionAdded;
+    private boolean isRegionModified;
 
 
     public long getRegionId()
@@ -48,126 +50,6 @@ public class RegionUploadVO
     public void setRegionId( long regionId )
     {
         this.regionId = regionId;
-    }
-
-
-    public String getSourceRegionId()
-    {
-        return sourceRegionId;
-    }
-
-
-    public void setSourceRegionId( String sourceRegionId )
-    {
-        this.sourceRegionId = sourceRegionId;
-    }
-
-
-    public String getRegionName()
-    {
-        return regionName;
-    }
-
-
-    public void setRegionName( String regionName )
-    {
-        this.regionName = regionName;
-    }
-
-
-    public String getRegionAddress1()
-    {
-        return regionAddress1;
-    }
-
-
-    public void setRegionAddress1( String regionAddress1 )
-    {
-        this.regionAddress1 = regionAddress1;
-    }
-
-
-    public String getRegionAddress2()
-    {
-        return regionAddress2;
-    }
-
-
-    public void setRegionAddress2( String regionAddress2 )
-    {
-        this.regionAddress2 = regionAddress2;
-    }
-
-
-    public String getRegionCountry()
-    {
-        return regionCountry;
-    }
-
-
-    public void setRegionCountry( String regionCountry )
-    {
-        this.regionCountry = regionCountry;
-    }
-
-
-    public String getRegionCountryCode()
-    {
-        return regionCountryCode;
-    }
-
-
-    public void setRegionCountryCode( String regionCountryCode )
-    {
-        this.regionCountryCode = regionCountryCode;
-    }
-
-
-    public String getRegionCity()
-    {
-        return regionCity;
-    }
-
-
-    public void setRegionCity( String regionCity )
-    {
-        this.regionCity = regionCity;
-    }
-
-
-    public String getRegionState()
-    {
-        return regionState;
-    }
-
-
-    public void setRegionState( String regionState )
-    {
-        this.regionState = regionState;
-    }
-
-
-    public String getRegionZipcode()
-    {
-        return regionZipcode;
-    }
-
-
-    public void setRegionZipcode( String regionZipcode )
-    {
-        this.regionZipcode = regionZipcode;
-    }
-
-
-    public boolean isAddressSet()
-    {
-        return isAddressSet;
-    }
-
-
-    public void setAddressSet( boolean isAddressSet )
-    {
-        this.isAddressSet = isAddressSet;
     }
 
 
@@ -195,6 +77,18 @@ public class RegionUploadVO
     }
 
 
+    public String getSourceRegionId()
+    {
+        return sourceRegionId;
+    }
+
+
+    public void setSourceRegionId( String sourceRegionId )
+    {
+        this.sourceRegionId = sourceRegionId;
+    }
+
+
     public boolean isSourceRegionIdModified()
     {
         return isSourceRegionIdModified;
@@ -216,6 +110,18 @@ public class RegionUploadVO
     public void setSourceRegionIdHistory( StringUploadHistory[] sourceRegionIdHistory )
     {
         this.sourceRegionIdHistory = sourceRegionIdHistory;
+    }
+
+
+    public String getRegionName()
+    {
+        return regionName;
+    }
+
+
+    public void setRegionName( String regionName )
+    {
+        this.regionName = regionName;
     }
 
 
@@ -243,6 +149,18 @@ public class RegionUploadVO
     }
 
 
+    public String getRegionAddress1()
+    {
+        return regionAddress1;
+    }
+
+
+    public void setRegionAddress1( String regionAddress1 )
+    {
+        this.regionAddress1 = regionAddress1;
+    }
+
+
     public boolean isRegionAddress1Modified()
     {
         return isRegionAddress1Modified;
@@ -264,6 +182,18 @@ public class RegionUploadVO
     public void setRegionAddress1History( StringUploadHistory[] regionAddress1History )
     {
         this.regionAddress1History = regionAddress1History;
+    }
+
+
+    public String getRegionAddress2()
+    {
+        return regionAddress2;
+    }
+
+
+    public void setRegionAddress2( String regionAddress2 )
+    {
+        this.regionAddress2 = regionAddress2;
     }
 
 
@@ -291,6 +221,18 @@ public class RegionUploadVO
     }
 
 
+    public String getRegionCountry()
+    {
+        return regionCountry;
+    }
+
+
+    public void setRegionCountry( String regionCountry )
+    {
+        this.regionCountry = regionCountry;
+    }
+
+
     public boolean isRegionCountryModified()
     {
         return isRegionCountryModified;
@@ -312,6 +254,18 @@ public class RegionUploadVO
     public void setRegionCountryHistory( StringUploadHistory[] regionCountryHistory )
     {
         this.regionCountryHistory = regionCountryHistory;
+    }
+
+
+    public String getRegionCountryCode()
+    {
+        return regionCountryCode;
+    }
+
+
+    public void setRegionCountryCode( String regionCountryCode )
+    {
+        this.regionCountryCode = regionCountryCode;
     }
 
 
@@ -339,6 +293,18 @@ public class RegionUploadVO
     }
 
 
+    public String getRegionState()
+    {
+        return regionState;
+    }
+
+
+    public void setRegionState( String regionState )
+    {
+        this.regionState = regionState;
+    }
+
+
     public boolean isRegionStateModified()
     {
         return isRegionStateModified;
@@ -360,6 +326,18 @@ public class RegionUploadVO
     public void setRegionStateHistory( StringUploadHistory[] regionStateHistory )
     {
         this.regionStateHistory = regionStateHistory;
+    }
+
+
+    public String getRegionCity()
+    {
+        return regionCity;
+    }
+
+
+    public void setRegionCity( String regionCity )
+    {
+        this.regionCity = regionCity;
     }
 
 
@@ -387,6 +365,18 @@ public class RegionUploadVO
     }
 
 
+    public String getRegionZipcode()
+    {
+        return regionZipcode;
+    }
+
+
+    public void setRegionZipcode( String regionZipcode )
+    {
+        this.regionZipcode = regionZipcode;
+    }
+
+
     public boolean isRegionZipcodeModified()
     {
         return isRegionZipcodeModified;
@@ -408,6 +398,42 @@ public class RegionUploadVO
     public void setRegionZipcodeHistory( StringUploadHistory[] regionZipcodeHistory )
     {
         this.regionZipcodeHistory = regionZipcodeHistory;
+    }
+
+
+    public boolean isAddressSet()
+    {
+        return isAddressSet;
+    }
+
+
+    public void setAddressSet( boolean isAddressSet )
+    {
+        this.isAddressSet = isAddressSet;
+    }
+
+
+    public boolean isRegionAdded()
+    {
+        return isRegionAdded;
+    }
+
+
+    public void setRegionAdded( boolean isRegionAdded )
+    {
+        this.isRegionAdded = isRegionAdded;
+    }
+
+
+    public boolean isRegionModified()
+    {
+        return isRegionModified;
+    }
+
+
+    public void setRegionModified( boolean isRegionModified )
+    {
+        this.isRegionModified = isRegionModified;
     }
 
 

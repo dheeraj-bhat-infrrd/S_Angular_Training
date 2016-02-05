@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
@@ -43,6 +40,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -2605,6 +2603,38 @@ public class OrganizationManagementController
 
         // Redirect to complete url found based on the ID.
         return "redirect:" + completeUrl;
+    }
+    
+    @RequestMapping(value = "/hierarchyupload", method = RequestMethod.GET)
+    public String showUploadHierarchy(Model model, HttpServletRequest request){
+    	LOG.info("Showing the hierarchy page");
+    	return JspResolver.HIERARCHY_UPLOAD;
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/uploadxlxsfile", method = RequestMethod.POST)
+    public String validateHierarchyFile(Model model, HttpServletRequest request){
+    	LOG.info("Validating the hierarchy file");
+    	UploadValidation validationObject = prepareDummyValidation();
+    	return new Gson().toJson(validationObject);
+    }
+    
+    private UploadValidation prepareDummyValidation(){
+    	UploadValidation validation = new UploadValidation();
+    	validation.setNumberOfRegionsAdded(3);
+    	validation.setNumberOfRegionsModified(5);
+    	validation.setNumberOfBranchesAdded(10);
+    	validation.setNumberOfBranchesModified(25);
+    	validation.setNumberOfUsersModified(10);
+    	
+    	validation.setRegionValidationErrors(new String[]{"Region ABC does not look good.","What is wrong with the region below abc?"});
+    	validation.setBranchValidationErrors(new String[]{"Branch B does not have a region."});
+    	validation.setUserValidationErrors(new String[]{"User A has no assignments.", "Are you kidding me with that?"});
+    	
+    	validation.setRegionValidationWarnings(new String[]{"Region names are funny."});
+    	validation.setBranchValidationWarnings(new String[]{"Branches all around, but no tree to support them.", "That was a very bad joke."});
+    	
+    	return validation;
     }
 
 }
