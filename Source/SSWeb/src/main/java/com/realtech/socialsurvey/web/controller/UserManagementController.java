@@ -196,7 +196,7 @@ public class UserManagementController
             try {
                 if ( userManagementService.isUserAdditionAllowed( admin ) ) {
                     try {
-                        user = userManagementService.getUserByLoginName( admin, emailId );
+                        user = userManagementService.getUserByEmailAddress( emailId );
                         LOG.debug( "User already exists in the company with the email id : " + emailId );
                         model.addAttribute( "existingUserId", user.getUserId() );
                         throw new UserAlreadyExistsException( "User already exists with the email id : " + emailId );
@@ -1669,7 +1669,7 @@ public class UserManagementController
 
             // Check for email in DB for other users
             try {
-                User existingUser = userManagementService.getUserByEmail( emailId );
+                User existingUser = userManagementService.getUserByEmailAddress( emailId );
                 if ( existingUser != null && existingUser.getUserId() != userId ) {
                     return "Email address is already in use";
                 }

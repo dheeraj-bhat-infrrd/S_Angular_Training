@@ -1949,7 +1949,7 @@ public class ProfileManagementController
                     }
                 }
                 try {
-                    userManagementService.getUserByEmail( primaryMailId );
+                    userManagementService.getUserByEmailAddress( primaryMailId );
                     throw new UserAlreadyExistsException( "User already exists with emailId : " + primaryMailId );
                 } catch ( NoRecordsFetchedException e ) {
                     LOG.debug( "User not registerd already with email Id : " + primaryMailId );

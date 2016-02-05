@@ -21,6 +21,7 @@ public class AuditImpl implements Audit
     @Override
     public void auditActions( String auditType, Map<String, String> auditParams, String... auditMetaData )
     {
+        // Format will be like: LOGIN_ATTEMPTED|^|SESSION_ID|~|jsessionId232323|^|IP_ADDRESS|~|192.0.0.1|^|METADATA|~|<String array>
         try {
             StringBuilder pattern = new StringBuilder( auditType ).append( DELIMITER );
             if(auditParams != null && auditParams.size() > 0){
