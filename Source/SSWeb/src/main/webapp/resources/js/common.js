@@ -391,7 +391,8 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	if(source != undefined && source == "Zillow"){
 		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml="<div class='verified-badge float-left verify-image' ></div>";
+		ratingImgHtml+="<div class='verified-badge float-left verify-image' ></div>";
+		ratingImgHtml += "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";	
 		
 	}
 		else {
