@@ -8202,3 +8202,7 @@ label.url-change-input-label {
     margin: auto;
 }
 
+.hierarchy-btn{
+	float:left;
+	margin-left:5px;
+}

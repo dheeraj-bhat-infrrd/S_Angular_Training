@@ -326,6 +326,10 @@
 	.btn-wid-sm{
 	width:330px !important;
 	}
+	.hierarchy-btn{
+	float:none;
+	margin-top:10px;
+	}
 }
 
 
