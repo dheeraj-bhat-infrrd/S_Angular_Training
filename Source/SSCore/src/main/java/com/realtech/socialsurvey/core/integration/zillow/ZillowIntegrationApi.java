@@ -6,7 +6,7 @@ import retrofit.http.Query;
 
 
 /**
- * API methods to integrate with Encompass
+ * API methods to integrate with Zillow
  *
  */
 public interface ZillowIntegrationApi
