@@ -1,49 +1,50 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
 import java.util.Map;
 
 
-public class UserUpload
+public class HierarchyUpload
 {
-    private RegionUploadVO[] regions;
-    private BranchUploadVO[] branches;
-    private UserUploadVO[] users;
+    private List<RegionUploadVO> regions;
+    private List<BranchUploadVO> branches;
+    private List<UserUploadVO> users;
     private Map<Long, String> regionSourceMapping;
     private Map<Long, String> branchSourceMapping;
     private Map<Long, String> userSourceMapping;
 
 
-    public RegionUploadVO[] getRegions()
+    public List<RegionUploadVO> getRegions()
     {
         return regions;
     }
 
 
-    public void setRegions( RegionUploadVO[] regions )
+    public void setRegions( List<RegionUploadVO> regions )
     {
         this.regions = regions;
     }
 
 
-    public BranchUploadVO[] getBranches()
+    public List<BranchUploadVO> getBranches()
     {
         return branches;
     }
 
 
-    public void setBranches( BranchUploadVO[] branches )
+    public void setBranches( List<BranchUploadVO> branches )
     {
         this.branches = branches;
     }
 
 
-    public UserUploadVO[] getUsers()
+    public List<UserUploadVO> getUsers()
     {
         return users;
     }
 
 
-    public void setUsers( UserUploadVO[] users )
+    public void setUsers( List<UserUploadVO> users )
     {
         this.users = users;
     }

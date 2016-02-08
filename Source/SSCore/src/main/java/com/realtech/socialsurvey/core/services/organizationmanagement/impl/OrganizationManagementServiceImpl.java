@@ -94,6 +94,7 @@ import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -6309,6 +6310,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
         return setterValue;
+    }
+    
+    @Override
+    public UploadValidation validateUserUploadSheet(String uploadFileName) throws InvalidInputException{
+        // get the file and read the file
+        if(uploadFileName == null || uploadFileName.isEmpty()){
+            LOG.error( "Uploaded file is not present "+uploadFileName );
+            throw new InvalidInputException("Uploaded file is not present "+uploadFileName);
+        }
+        // read the file
+        
+        return null;
     }
 }
 // JIRA: SS-27: By RM05: EOC
