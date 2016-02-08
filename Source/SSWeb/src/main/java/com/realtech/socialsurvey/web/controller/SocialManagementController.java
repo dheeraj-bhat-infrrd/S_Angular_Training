@@ -500,7 +500,9 @@ public class SocialManagementController
                 throw new InvalidInputException( "Invalid input exception occurred while creating access token for facebook",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
+            String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
             model.addAttribute( "pageNames", facebookPages );
+            model.addAttribute( "fbAccessToken", fbAccessTokenStr );
         } catch ( Exception e ) {
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             LOG.error( "Exception while getting facebook access token. Reason : " + e.getMessage(), e );
@@ -540,13 +542,13 @@ public class SocialManagementController
             model.addAttribute( "fromDashboard", 1 );
         }
         boolean updated = false;
-        //Get media tokens as a string
-        String mediaTokenStr = request.getParameter( "mediaTokens" );
-        if ( mediaTokenStr == null || mediaTokenStr.isEmpty() ) {
-            LOG.error( "Media Tokens are empty!" );
+        SocialMediaTokens mediaTokens = null;
+        String fbAccessTokenStr = request.getParameter( "fbAccessToken" );
+        if ( fbAccessTokenStr == null || fbAccessTokenStr.isEmpty() ) {
+            LOG.error( "Facebook access token is empty!" );
         }
-        //Parse it into SMT object
-        SocialMediaTokens mediaTokens = new Gson().fromJson( mediaTokenStr, SocialMediaTokens.class );
+
+        facebook4j.auth.AccessToken accessToken = new Gson().fromJson( fbAccessTokenStr, facebook4j.auth.AccessToken.class );
         try {
             
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -555,7 +557,8 @@ public class SocialManagementController
                 if ( companySettings == null ) {
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
-                //mediaTokens = companySettings.getSocialMediaTokens();
+                mediaTokens = companySettings.getSocialMediaTokens();
+                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
@@ -579,7 +582,8 @@ public class SocialManagementController
                 if ( regionSettings == null ) {
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
-                //mediaTokens = regionSettings.getSocialMediaTokens();
+                mediaTokens = regionSettings.getSocialMediaTokens();
+                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
@@ -603,7 +607,8 @@ public class SocialManagementController
                 if ( branchSettings == null ) {
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
-                //mediaTokens = branchSettings.getSocialMediaTokens();
+                mediaTokens = branchSettings.getSocialMediaTokens();
+                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
@@ -629,7 +634,8 @@ public class SocialManagementController
                 if ( agentSettings == null ) {
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
-                //mediaTokens = agentSettings.getSocialMediaTokens();
+                mediaTokens = agentSettings.getSocialMediaTokens();
+                mediaTokens = updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
