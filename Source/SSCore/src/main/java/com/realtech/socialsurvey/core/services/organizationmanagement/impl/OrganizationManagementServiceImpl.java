@@ -2018,7 +2018,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
-        regions = regionDao.findProjectionsByKeyValue( Region.class, columnNames, queries );
+        regions = regionDao.findProjectionsByKeyValue( Region.class, columnNames, queries, CommonConstants.REGION_COLUMN );
         
         //SS-1421: populate the address of the regions from Solr before sending this list back
         populateAddressOfRegionFromSolr(regions, companyId);
@@ -2144,7 +2144,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
 
-        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
+        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries, CommonConstants.BRANCH_NAME_COLUMN );
         
         //SS-1421: populate the address of the branches from Solr before sending this list back
         populateAddressOfBranchFromSolr(branches, defaultRegion.getRegionId(), null, null);
@@ -2306,7 +2306,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
+        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries, CommonConstants.BRANCH_NAME_COLUMN );
         
         //SS-1421: populate the address of the branches from Solr before sending this list back
         populateAddressOfBranchFromSolr(branches, regionId, null, null);
@@ -2506,7 +2506,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( validateEmail( emailId ) ) {
 
                 try {
-                    user = userManagementService.getUserByLoginName( adminUser, emailId );
+                    user = userManagementService.getUserByEmailAddress( emailId );
                 } catch ( NoRecordsFetchedException e ) {
                     /**
                      * if no user is present with the specified emailId, send an invite to register

@@ -37,11 +37,13 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
@@ -176,8 +178,8 @@ public class AdminController
         LOG.info( "Inside companyHierarchyView() method in admin controller" );
 
         String companyIdStr = request.getParameter( "companyId" );
-        List<RegionFromSearch> regions = null;
-        List<BranchFromSearch> branches = null;
+        List<Region> regions = null;
+        List<Branch> branches = null;
         List<UserFromSearch> users = null;
         int start = 0;
 
@@ -191,14 +193,12 @@ public class AdminController
 
             Company company = organizationManagementService.getCompanyById( companyId );
 
-            int regionCount = (int) solrSearchService.getRegionsCount( "*", company, null );
-            String regionsJson = solrSearchService.searchRegions( "*", company, null, start, regionCount );
-            Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
-            regions = new Gson().fromJson( regionsJson, searchedRegionsList );
+            LOG.debug( "fetching regions under company" );
+            regions = organizationManagementService.getRegionsForCompany( companyId );;
 
             try {
-                LOG.debug( "fetching branches under company from solr" );
-                branches = organizationManagementService.getBranchesUnderCompanyFromSolr( company, start );
+                LOG.debug( "fetching branches under company" );
+                branches = organizationManagementService.getBranchesUnderCompany( companyId );
 
                 LOG.debug( "fetching users under company from solr" );
                 users = organizationManagementService.getUsersUnderCompanyFromSolr( company, start );
@@ -303,7 +303,7 @@ public class AdminController
         String companyIdStr = request.getParameter( "companyId" );
         long regionId = 0l;
         long companyId = 0l;
-        List<BranchFromSearch> branches = null;
+        List<Branch> branches = null;
         int start = 0;
         int rows = -1;
         try {
@@ -319,11 +319,8 @@ public class AdminController
                 throw new InvalidInputException( "Error while parsing company in fetchHierarchyViewBranches.Reason : "
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            int branchCount = (int) solrSearchService.getBranchCountByRegion( regionId );
-            String branchesJson = solrSearchService.searchBranchesByRegion( regionId, start, branchCount );
-            LOG.debug( "Fetched branch .branches json is :" + branchesJson );
-            Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
-            branches = new Gson().fromJson( branchesJson, searchedBranchesList );
+            LOG.debug( "Fetching branches for region id : " + regionId );
+            branches = organizationManagementService.getBranchesByRegionId( regionId );
 
             Set<Long> regionIds = new HashSet<Long>();
             regionIds.add( regionId );
@@ -375,7 +372,7 @@ public class AdminController
     @RequestMapping ( value = "/fetchbranchusersforadmin", method = RequestMethod.GET)
     public String fetchHierarchyViewUsersForBranchForAdmin( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method fetchHierarchyViewUsersForBranch called in Hierarchy management controller" );
+        LOG.info( "Method fetchHierarchyViewUsersForBranch called in admin controller" );
         String strBranchId = request.getParameter( "branchId" );
         String strRegionId = request.getParameter( "regionId" );
         String strCompanyId = request.getParameter( "companyId" );

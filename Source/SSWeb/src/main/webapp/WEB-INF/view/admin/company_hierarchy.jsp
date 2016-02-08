@@ -27,7 +27,7 @@
     					</c:otherwise>
 						</c:choose>
            			</td> --%>
-					<td class="v-tbl-name">${region.regionName}</td>
+					<td class="v-tbl-name">${region.region}</td>
 					<td class="v-tbl-add"><c:if
 							test="${not empty region.address1}">${region.address1}</c:if>&nbsp;<c:if
 							test="${not empty region.address2}">${region.address2}</c:if></td>
@@ -74,7 +74,7 @@
     					</c:otherwise>
 						</c:choose>
            			</td> --%>
-					<td class="v-tbl-name">${branch.branchName}</td>
+					<td class="v-tbl-name">${branch.branch}</td>
 					<td class="v-tbl-add"><c:if
 							test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if
 							test="${not empty branch.address2}">${branch.address2}</c:if></td>
