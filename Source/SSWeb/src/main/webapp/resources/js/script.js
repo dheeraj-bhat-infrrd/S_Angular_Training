@@ -1982,13 +1982,13 @@ var hierarchyUpload={
 							
 							if (hierarchyUpload.verified == true) {
 								var formData = new FormData();
-								formData.append("logo", $('#com-file')
+								formData.append("file", $('#com-file')
 										.prop("files")[0]);
 								formData
-										.append("logo_name", $(
+										.append("filename", $(
 												'#com-file').prop(
 												"files")[0].name);
-								callAjaxPOSTWithTextDataLogo("./uploadxlsxfile.do",
+								callAjaxPOSTWithTextDataLogo("./verifyxlsxfile.do",
 										hierarchyUpload.uploadXlxsSuccessCallback, true, formData); 
 								hierarchyUpload.verified=false;
 							}

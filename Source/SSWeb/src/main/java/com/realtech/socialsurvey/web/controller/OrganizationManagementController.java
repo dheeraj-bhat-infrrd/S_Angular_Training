@@ -1,13 +1,16 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
@@ -71,6 +75,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -160,6 +165,8 @@ public class OrganizationManagementController
     @Autowired
     private UrlService urlService;
 
+    @Autowired
+    private CsvUploadService csvUploadService;
 
     /**
      * Method to upload logo image for a company
@@ -2610,15 +2617,42 @@ public class OrganizationManagementController
     	LOG.info("Showing the hierarchy page");
     	return JspResolver.HIERARCHY_UPLOAD;
     }
-    
+
+
     @ResponseBody
-    @RequestMapping(value = "/uploadxlsxfile", method = RequestMethod.POST)
-    public String validateHierarchyFile(Model model, HttpServletRequest request){
-    	LOG.info("Validating the hierarchy file");
-    	UploadValidation validationObject = prepareDummyValidation();
-    	return new Gson().toJson(validationObject);
+    @RequestMapping ( value = "/verifyxlsxfile", method = RequestMethod.POST)
+    public String validateHierarchyFile( Model model, @RequestParam ( "file") MultipartFile fileLocal,
+        HttpServletRequest request ) throws InvalidInputException
+    {
+        //TODO : Add null checks
+        if ( fileLocal == null ) {
+            throw new InvalidInputException( "file is null" );
+        }
+        LOG.info( "Validating the hierarchy file" );
+        String fileLocalName = request.getParameter( "filename" );
+
+        if ( fileLocalName == null || fileLocalName.isEmpty() ) {
+            throw new InvalidInputException( "filename cannot be empty" );
+        }
+
+        File convFile = new File( fileLocalName );
+        try {
+            fileLocal.transferTo( convFile );
+            fileUploadService.uploadFileAtDefautBucket( convFile, fileLocalName );
+        } catch ( Exception e ) {
+            LOG.error( "An exception occured during the file upload. Reason : ", e );
+            throw new InvalidInputException( "An exception occured during the file upload. Reason : ", e );
+        }
+        // Setting the complete logo url in session
+        String fileName = endpoint + CommonConstants.FILE_SEPARATOR + fileLocalName;
+        User user = sessionHelper.getCurrentUser();
+        UploadValidation uploadValidation = csvUploadService.validateUserUploadFile( user.getCompany(), fileName );
+
+        return new Gson().toJson( uploadValidation );
     }
-    
+
+
+    @SuppressWarnings ( "unused")
     private UploadValidation prepareDummyValidation(){
     	UploadValidation validation = new UploadValidation();
     	validation.setNumberOfRegionsAdded(3);
