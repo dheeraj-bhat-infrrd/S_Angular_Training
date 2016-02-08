@@ -16,7 +16,7 @@
 	<div class="float-left rfr_lbl">
 		<spring:message code="label.xlsxfile.key" />
 	</div>
-	<div class="float-left rfr_txt" style="margin-top:10px;">
+	<div class="float-left rfr_txt" style="margin-top: 10px;">
 		<div class="rfr_icn icn-logo"></div>
 		<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
 		<div class="rfr_txt_fld">
@@ -33,77 +33,21 @@
 			class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj"
 			id="icn-xlsxfile"></div>
 	</div>
-	<div class="reg_form_row clearfix" style="margin-top:10px;">
+	<div class="reg_form_row clearfix hierarchy-btn" >
+		<div class="reg_btn" id="xlsx-file-verify">
+			<spring:message code="label.verify.key" />
+		</div>
+	</div>
+	<div id="hierarchy-upload" class="reg_form_row clearfix hierarchy-btn hide" >
 		<div class="reg_btn" id="xlsx-file-upload">
 			<spring:message code="label.upload.key" />
 		</div>
 	</div>
 </div>
+<table id="json-response" class="hierarchy-table"></table>
+
 <script>
 	$(document).ready(function() {
-				var set= false;
-				$('#com-file').change(function() {
-					var fileAdd = $(this).val().split('\\');
-					$('#com-xlsx-file').val(fileAdd[fileAdd.length - 1]);
-				});
-
-				$('#xlsx-file-upload').click(function() {
-							var formData = new FormData();
-							formData.append("xlsxfile", $('#com-file').prop(
-									"files")[0]);
-							formData.append("xlsxfile_name", $('#com-file')
-									.prop("files")[0].name);
-							callAjaxPOSTWithTextDataLogo("./uploadxlxsfile.do",
-									uploadXlxsSuccessCallback, true, formData);
-						});
-
-				function uploadXlxsSuccessCallback(response) {
-					var success = "File has been uploaded successfully";
-					if (success != response.trim()) {
-						$('#com-file').val('');
-						$('#com-xlsx-file').val('');
-						showError(response);
-					} else {
-						showInfo(response);
-					}
-				}
-				$('#icn-xlsxfile').click(function(){
-					$('#com-file').trigger('click');
-				});
-				
-
-				$("#com-file").on("change", function() {
-					if(fileValidate("#com-file")){
-					 	set=true;
-					}
-					if(set==true){
-						var formData = new FormData();
-						formData.append("logo", $('#com-file').prop("files")[0]);
-						formData.append("logo_name", $('#com-file').prop("files")[0].name);
-					}
-				});
-				function fileValidate(fileformat){
-					var fileExtensions=".xlsx";
-					if($(fileformat).attr("type")=="file"){
-						var FileName=$(fileformat).val();
-						if(FileName.length>0){
-							var blnValid= false;
-							if (FileName.substr(FileName.length - fileExtensions.length, fileExtensions.length).toLowerCase() == fileExtensions.toLowerCase()) {
-				                blnValid = true;
-				            }
-						}
-						 if (!blnValid) {
-				         	var msg="Please upload xlsx file";
-				         	showErrorMobileAndWeb(msg);
-				             $(fileformat).val="";
-				             
-				             return false;
-				         }
-					}
-					return true;
-				}
-			});
-	
-	
-	
+		hierarchyUpload.fileUpload();
+					});
 </script>
