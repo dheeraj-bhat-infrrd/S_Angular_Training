@@ -2612,7 +2612,7 @@ public class OrganizationManagementController
     }
     
     @ResponseBody
-    @RequestMapping(value = "/uploadxlxsfile", method = RequestMethod.POST)
+    @RequestMapping(value = "/uploadxlsxfile", method = RequestMethod.POST)
     public String validateHierarchyFile(Model model, HttpServletRequest request){
     	LOG.info("Validating the hierarchy file");
     	UploadValidation validationObject = prepareDummyValidation();

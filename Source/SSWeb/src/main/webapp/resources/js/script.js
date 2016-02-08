@@ -1951,7 +1951,133 @@ function initializeUserCompanyRegistrationPage() {
 		}
 	});
 }
+var hierarchyUpload={
+		 set : false,
+		verified:false,
+		
+		fileUpload:function(){
+			$('#com-file').change(
+		
+				function() {
+					var fileAdd = $(this).val().split('\\');
+					$('#com-xlsx-file').val(
+							fileAdd[fileAdd.length - 1]);
+				});
 
+		
+				$('#xlsx-file-verify').click(
+						function() {
+							if (hierarchyUpload.fileValidate("#com-file")) {
+								hierarchyUpload.set = true;
+								hierarchyUpload.verified =true;
+							}
+							if (hierarchyUpload.set == true) {
+								showInfo("Valid File Format");
+								$('#hierarchy-upload').show();
+								hierarchyUpload.set =false;
+							}
+							if(hierarchyUpload.verified==false){
+								showError("Please upload xlsx file");
+							}
+							
+							if (hierarchyUpload.verified == true) {
+								var formData = new FormData();
+								formData.append("logo", $('#com-file')
+										.prop("files")[0]);
+								formData
+										.append("logo_name", $(
+												'#com-file').prop(
+												"files")[0].name);
+								callAjaxPOSTWithTextDataLogo("./uploadxlsxfile.do",
+										hierarchyUpload.uploadXlxsSuccessCallback, true, formData); 
+								hierarchyUpload.verified=false;
+							}
+							
+							else{
+								showError("Please select a valid file");
+							}
+							
+							
+						});
+				$('#xlsx-file-upload').click(
+						function() {
+							/*if (hierarchyUpload.verified == true) {
+								var formData = new FormData();
+								formData.append("logo", $('#com-file')
+										.prop("files")[0]);
+								formData
+										.append("logo_name", $(
+												'#com-file').prop(
+												"files")[0].name);
+								callAjaxPOSTWithTextDataLogo("./uploadxlsxfile.do",
+										hierarchyUpload.uploadXlxsSuccessCallback, true, formData); 
+								hierarchyUpload.verified=false;
+							}
+							else{
+								showError("File is not verified");
+							}
+							*/
+						});
+				$('#icn-xlsxfile').click(function() {
+					$('#com-file').trigger('click');
+				});
+		},
+		uploadXlxsSuccessCallback:function(response){
+			
+			if (!response) {
+				$('#com-file').val('');
+				$('#com-xlsx-file').val('');
+				showError(response);
+			} else {
+				$.each($.parseJSON(response), function(key, value) {
+					function fixStr(key) {
+					    var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
+					        if (offset == 0) {
+					            return(key.toUpperCase());
+					        } else {
+					            return(key.substr(0,1) + " " + key.substr(1).toUpperCase());
+					        }
+					    });
+					    return(out);
+					}
+					if(value!=0){
+					 $('<tr><td style="text-align:right"> '+fixStr(key)+':</td><td id="'+key+'">'+value+'</td><tr>').appendTo('#json-response');
+					 $('#com-file').val('');
+						$('#com-xlsx-file').val('');
+					}
+					
+					});
+			
+				}
+		},
+		fileValidate:function(fileformat){
+			var fileExtensions = ".xlsx";
+			if ($(fileformat).attr("type") == "file") {
+				var FileName = $(fileformat).val();
+				if (FileName.length > 0) {
+					var blnValid = false;
+					if (FileName.substr(
+							FileName.length
+									- fileExtensions.length,
+							fileExtensions.length)
+							.toLowerCase() == fileExtensions
+							.toLowerCase()) {
+						blnValid = true;
+					}
+				}
+				if (!blnValid) {
+					var msg = "Please upload xlsx file";
+					showErrorMobileAndWeb(msg);
+					$(fileformat).val = "";
+
+					return false;
+				}
+			}
+			return true;
+		}
+		
+
+};
 //Company registration variables
 var companyRegistration = {
 	isFormSubmitted : false, //is form submitted to avoid dbl click

@@ -38,129 +38,16 @@
 			<spring:message code="label.verify.key" />
 		</div>
 	</div>
-	<div class="reg_form_row clearfix hierarchy-btn" >
+	<div id="hierarchy-upload" class="reg_form_row clearfix hierarchy-btn hide" >
 		<div class="reg_btn" id="xlsx-file-upload">
 			<spring:message code="label.upload.key" />
 		</div>
 	</div>
 </div>
-<table id="json-response"></table>
+<table id="json-response" class="hierarchy-table"></table>
 
 <script>
 	$(document).ready(function() {
-						var set = false;
-						$('#com-file').change(
-								function() {
-									var fileAdd = $(this).val().split('\\');
-									$('#com-xlsx-file').val(
-											fileAdd[fileAdd.length - 1]);
-								});
-
-						/* $('#xlsx-file-upload').click(
-								function() {
-									if (fileValidate("#com-file")) {
-										set = true;
-									}
-									if (set == true) {
-										var formData = new FormData();
-										formData.append("logo", $('#com-file')
-												.prop("files")[0]);
-										formData
-												.append("logo_name", $(
-														'#com-file').prop(
-														"files")[0].name);
-										callAjaxPOSTWithTextDataLogo("./uploadxlxsfile.do",
-												uploadXlxsSuccessCallback, true, formData); 
-									}
-									
-									
-								}); */
-								$('#xlsx-file-verify').click(
-										function() {
-											if (fileValidate("#com-file")) {
-												set = true;
-											}
-											if (set == true) {
-												showInfo("Valid File Format");
-											}
-											
-											
-										});
-								$('#xlsx-file-upload').click(
-										function() {
-											if (set == true) {
-												var formData = new FormData();
-												formData.append("logo", $('#com-file')
-														.prop("files")[0]);
-												formData
-														.append("logo_name", $(
-																'#com-file').prop(
-																"files")[0].name);
-												callAjaxPOSTWithTextDataLogo("./uploadxlxsfile.do",
-														uploadXlxsSuccessCallback, true, formData); 
-											}
-											set=false;
-											
-										});
-
-						function uploadXlxsSuccessCallback(response) {
-							
-							$.each($.parseJSON(response), function(key, value) {
-								  console.log(key+ ':' + value);
-								});
-							
-							
-							if (!response) {
-								$('#com-file').val('');
-								$('#com-xlsx-file').val('');
-								showError(response);
-							} else {
-								$.each($.parseJSON(response), function(key, value) {
-									 $('<tr><td> '+key+':</td><td id="'+key+'">'+value+'</td><tr>').appendTo('#json-response');
-									
-									});
-							
-								}
-							
-						}
-						$('#icn-xlsxfile').click(function() {
-							$('#com-file').trigger('click');
-						});
-
-						/* $("#com-file").on("change", function() {
-							if(fileValidate("#com-file")){
-							 	set=true;
-							}
-							if(set==true){
-						var formData = new FormData();
-								formData.append("logo", $('#com-file').prop("files")[0]);
-								formData.append("logo_name", $('#com-file').prop("files")[0].name);
-							}
-						}); */
-						function fileValidate(fileformat) {
-							var fileExtensions = ".xlsx";
-							if ($(fileformat).attr("type") == "file") {
-								var FileName = $(fileformat).val();
-								if (FileName.length > 0) {
-									var blnValid = false;
-									if (FileName.substr(
-											FileName.length
-													- fileExtensions.length,
-											fileExtensions.length)
-											.toLowerCase() == fileExtensions
-											.toLowerCase()) {
-										blnValid = true;
-									}
-								}
-								if (!blnValid) {
-									var msg = "Please upload xlsx file";
-									showErrorMobileAndWeb(msg);
-									$(fileformat).val = "";
-
-									return false;
-								}
-							}
-							return true;
-						}
+		hierarchyUpload.fileUpload();
 					});
 </script>

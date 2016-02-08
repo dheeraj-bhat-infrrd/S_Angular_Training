@@ -8206,3 +8206,9 @@ label.url-change-input-label {
 	float:left;
 	margin-left:5px;
 }
+.hierarchy-table{
+	margin:auto;
+}
+#json-response td{
+	padding:10px;
+}
