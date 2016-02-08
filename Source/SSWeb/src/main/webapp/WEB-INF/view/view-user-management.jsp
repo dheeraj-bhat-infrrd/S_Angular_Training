@@ -19,6 +19,9 @@
 				<div class="float-right hm-header-right text-center" onclick="javascript:showMainContent('./showbuildhierarchypage.do')">
 					<spring:message code="label.header.buildhierarchy.key" />
 				</div>
+				<div class="float-right hm-header-right text-center" onclick="javascript:showMainContent('./hierarchyupload.do')">
+					<spring:message code="label.header.Hierarchyupload.key" />
+				</div>
 			</div>
 		</div>
 	</div>
