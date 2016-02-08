@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2442,7 +2443,6 @@ public class OrganizationManagementController
 
         String message = "";
         String mailIDStr = new String();
-        HttpSession session = request.getSession();
         User user = sessionHelper.getCurrentUser();
         OrganizationUnitSettings unitSettings = null;
         ComplaintResolutionSettings originalComplaintRegSettings = new ComplaintResolutionSettings();
@@ -2627,12 +2627,12 @@ public class OrganizationManagementController
     	validation.setNumberOfBranchesModified(25);
     	validation.setNumberOfUsersModified(10);
     	
-    	validation.setRegionValidationErrors(new String[]{"Region ABC does not look good.","What is wrong with the region below abc?"});
-    	validation.setBranchValidationErrors(new String[]{"Branch B does not have a region."});
-    	validation.setUserValidationErrors(new String[]{"User A has no assignments.", "Are you kidding me with that?"});
+    	validation.setRegionValidationErrors(Arrays.asList(new String[]{"Region ABC does not look good.","What is wrong with the region below abc?"}));
+    	validation.setBranchValidationErrors(Arrays.asList(new String[]{"Branch B does not have a region."}));
+    	validation.setUserValidationErrors(Arrays.asList(new String[]{"User A has no assignments.", "Are you kidding me with that?"}));
     	
-    	validation.setRegionValidationWarnings(new String[]{"Region names are funny."});
-    	validation.setBranchValidationWarnings(new String[]{"Branches all around, but no tree to support them.", "That was a very bad joke."});
+    	validation.setRegionValidationWarnings(Arrays.asList(new String[]{"Region names are funny."}));
+    	validation.setBranchValidationWarnings(Arrays.asList(new String[]{"Branches all around, but no tree to support them.", "That was a very bad joke."}));
     	
     	return validation;
     }

@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -1259,5 +1260,12 @@ public interface OrganizationManagementService
      * @return
      */
     public List<HierarchySettingsCompare> mismatchRegionHierarchySettings(List<Region> regions);
+    
+    /**
+     * Validates the upload file
+     * @param uploadFileName
+     * @return
+     */
+    public UploadValidation validateUserUploadSheet(String uploadFileName) throws InvalidInputException;
 
 }

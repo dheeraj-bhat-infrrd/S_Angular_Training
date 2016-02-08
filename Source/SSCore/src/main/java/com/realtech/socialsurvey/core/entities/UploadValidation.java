@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
+
 /**
  * User upload validation object. Holds the snapshot of the uploaded file 
  *
@@ -8,20 +11,23 @@ public class UploadValidation
 {
     private int numberOfRegionsAdded;
     private int numberOfRegionsModified;
+    private int numberOfRegionsDeleted;
     private int numberOfBranchesAdded;
     private int numberOfBranchesModified;
+    private int numberOfBranchesDeleted;
     private int numberOfUsersAdded;
     private int numberOfUsersModified;
+    private int numberOfUsersDeleted;
 
-    private String[] regionValidationErrors;
-    private String[] branchValidationErrors;
-    private String[] userValidationErrors;
+    private List<String> regionValidationErrors;
+    private List<String> branchValidationErrors;
+    private List<String> userValidationErrors;
 
-    private String[] regionValidationWarnings;
-    private String[] branchValidationWarnings;
-    private String[] userValidationWarnings;
+    private List<String> regionValidationWarnings;
+    private List<String> branchValidationWarnings;
+    private List<String> userValidationWarnings;
 
-    private UserUpload upload;
+    private HierarchyUpload upload;
 
 
     public int getNumberOfRegionsAdded()
@@ -45,6 +51,18 @@ public class UploadValidation
     public void setNumberOfRegionsModified( int numberOfRegionsModified )
     {
         this.numberOfRegionsModified = numberOfRegionsModified;
+    }
+
+
+    public int getNumberOfRegionsDeleted()
+    {
+        return numberOfRegionsDeleted;
+    }
+
+
+    public void setNumberOfRegionsDeleted( int numberOfRegionsDeleted )
+    {
+        this.numberOfRegionsDeleted = numberOfRegionsDeleted;
     }
 
 
@@ -72,6 +90,18 @@ public class UploadValidation
     }
 
 
+    public int getNumberOfBranchesDeleted()
+    {
+        return numberOfBranchesDeleted;
+    }
+
+
+    public void setNumberOfBranchesDeleted( int numberOfBranchesDeleted )
+    {
+        this.numberOfBranchesDeleted = numberOfBranchesDeleted;
+    }
+
+
     public int getNumberOfUsersAdded()
     {
         return numberOfUsersAdded;
@@ -90,91 +120,103 @@ public class UploadValidation
     }
 
 
+    public int getNumberOfUsersDeleted()
+    {
+        return numberOfUsersDeleted;
+    }
+
+
+    public void setNumberOfUsersDeleted( int numberOfUsersDeleted )
+    {
+        this.numberOfUsersDeleted = numberOfUsersDeleted;
+    }
+
+
     public void setNumberOfUsersModified( int numberOfUsersModified )
     {
         this.numberOfUsersModified = numberOfUsersModified;
     }
 
 
-    public String[] getRegionValidationErrors()
+    public List<String> getRegionValidationErrors()
     {
         return regionValidationErrors;
     }
 
 
-    public void setRegionValidationErrors( String[] regionValidationErrors )
+    public void setRegionValidationErrors( List<String> regionValidationErrors )
     {
         this.regionValidationErrors = regionValidationErrors;
     }
 
 
-    public String[] getBranchValidationErrors()
+    public List<String> getBranchValidationErrors()
     {
         return branchValidationErrors;
     }
 
 
-    public void setBranchValidationErrors( String[] branchValidationErrors )
+    public void setBranchValidationErrors( List<String> branchValidationErrors )
     {
         this.branchValidationErrors = branchValidationErrors;
     }
 
 
-    public String[] getUserValidationErrors()
+    public List<String> getUserValidationErrors()
     {
         return userValidationErrors;
     }
 
 
-    public void setUserValidationErrors( String[] userValidationErrors )
+    public void setUserValidationErrors( List<String> userValidationErrors )
     {
         this.userValidationErrors = userValidationErrors;
     }
 
 
-    public String[] getRegionValidationWarnings()
+    public List<String> getRegionValidationWarnings()
     {
         return regionValidationWarnings;
     }
 
 
-    public void setRegionValidationWarnings( String[] regionValidationWarnings )
+    public void setRegionValidationWarnings( List<String> regionValidationWarnings )
     {
         this.regionValidationWarnings = regionValidationWarnings;
     }
 
 
-    public String[] getBranchValidationWarnings()
+    public List<String> getBranchValidationWarnings()
     {
         return branchValidationWarnings;
     }
 
 
-    public void setBranchValidationWarnings( String[] branchValidationWarnings )
+    public void setBranchValidationWarnings( List<String> branchValidationWarnings )
     {
         this.branchValidationWarnings = branchValidationWarnings;
     }
 
 
-    public String[] getUserValidationWarnings()
+    public List<String> getUserValidationWarnings()
     {
         return userValidationWarnings;
     }
 
 
-    public void setUserValidationWarnings( String[] userValidationWarnings )
+    public void setUserValidationWarnings( List<String> userValidationWarnings )
     {
         this.userValidationWarnings = userValidationWarnings;
     }
 
 
-    public UserUpload getUpload()
+    public HierarchyUpload getUpload()
     {
         return upload;
     }
 
 
-    public void setUpload( UserUpload upload )
+    public void setUpload( HierarchyUpload upload )
     {
         this.upload = upload;
     }

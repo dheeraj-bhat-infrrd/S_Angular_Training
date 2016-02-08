@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,9 +17,11 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 
 /**
@@ -125,6 +128,10 @@ public class User implements UserDetails, Serializable {
 	// bi-directional many-to-one association to RemovedUser
 	@OneToMany(mappedBy = "user")
 	private List<RemovedUser> removedUsers;
+	
+	// bi-directional many-to-one association to UserEmailMapping
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserEmailMapping> userEmailMappings;
 
 	public long getUserId() {
 		return this.userId;
@@ -478,4 +485,20 @@ public class User implements UserDetails, Serializable {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return null;
 	}
+
+    /**
+     * @return the userEmailMappings
+     */
+    public List<UserEmailMapping> getUserEmailMappings()
+    {
+        return userEmailMappings;
+    }
+
+    /**
+     * @param userEmailMappings the userEmailMappings to set
+     */
+    public void setUserEmailMappings( List<UserEmailMapping> userEmailMappings )
+    {
+        this.userEmailMappings = userEmailMappings;
+    }
 }

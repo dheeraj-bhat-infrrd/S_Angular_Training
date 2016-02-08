@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -368,10 +369,19 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 
     @Override
-    @SuppressWarnings ( "unchecked")
     @Transactional
     public List<T> findByKeyValueAscendingWithAlias( Class<T> dataClass, Map<String, Object> queries, String ascendingColumn,
         String alias )
+    {
+        return findByKeyValueAscendingWithAlias( dataClass, queries, Arrays.asList( new String[] { ascendingColumn } ), alias );
+    }
+
+
+    @Override
+    @SuppressWarnings ( "unchecked")
+    @Transactional
+    public List<T> findByKeyValueAscendingWithAlias( Class<T> dataClass, Map<String, Object> queries,
+        List<String> ascendingColumns, String alias )
     {
         Criteria criteria = getSession().createCriteria( dataClass );
         try {
@@ -379,7 +389,11 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
                 criteria.add( Restrictions.eq( query.getKey(), query.getValue() ) );
             }
             criteria.createAlias( alias, "alias" );
-            criteria.addOrder( Order.asc( "alias." + ascendingColumn ) );
+            if ( ascendingColumns != null && !ascendingColumns.isEmpty() ) {
+                for ( String ascendingColumn : ascendingColumns ) {
+                    criteria.addOrder( Order.asc( "alias." + ascendingColumn ) );
+                }
+            }
         } catch ( HibernateException hibernateException ) {
             LOG.error( "HibernateException caught in findByKeyValueAscendingWithAlias().", hibernateException );
             throw new DatabaseException( "HibernateException caught in findByKeyValueAscendingWithAlias().", hibernateException );
@@ -388,10 +402,19 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
     }
 
 
-    @SuppressWarnings ( "unchecked")
     @Override
     @Transactional
     public List<T> findProjectionsByKeyValue( Class<T> dataClass, List<String> columnNames, Map<String, Object> queries )
+    {
+        return findProjectionsByKeyValue( dataClass, columnNames, queries, null );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<T> findProjectionsByKeyValue( Class<T> dataClass, List<String> columnNames, Map<String, Object> queries,
+        String orderColumnName )
     {
         Criteria crit = null;
         try {
@@ -405,17 +428,21 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
             for ( Entry<String, Object> query : queries.entrySet() ) {
                 crit.add( Restrictions.eq( query.getKey(), query.getValue() ) );
             }
+            if ( orderColumnName != null && !orderColumnName.isEmpty() )
+                crit.addOrder( Order.asc( orderColumnName ) );
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in findProjectionsByKeyValue(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in findProjectionsByKeyValue().", e );
         }
         return crit.setResultTransformer( Transformers.aliasToBean( dataClass ) ).list();
     }
-    
+
+
     @SuppressWarnings ( "unchecked")
     @Override
     @Transactional
-    public List<T> findProjectionsAscOrderByKeyValue( Class<T> dataClass, List<String> columnNames, Map<String, Object> queries, String columnToOrder )
+    public List<T> findProjectionsAscOrderByKeyValue( Class<T> dataClass, List<String> columnNames,
+        Map<String, Object> queries, String columnToOrder )
     {
         Criteria crit = null;
         try {
@@ -429,7 +456,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
             for ( Entry<String, Object> query : queries.entrySet() ) {
                 crit.add( Restrictions.eq( query.getKey(), query.getValue() ) );
             }
-            crit.addOrder(Order.asc(columnToOrder));
+            crit.addOrder( Order.asc( columnToOrder ) );
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in findProjectionsByKeyValue(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in findProjectionsByKeyValue().", e );

@@ -2,12 +2,17 @@ package com.realtech.socialsurvey.core.services.upload;
 
 import java.util.List;
 import java.util.Map;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.exception.BranchAdditionException;
@@ -21,6 +26,22 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 @Component
 public interface CsvUploadService {
 
+    /**
+     * Validates the user uploaded file for hierarchy upload
+     * @param company
+     * @param fileName
+     * @return
+     * @throws InvalidInputException
+     */
+    public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException;
+    
+    /**
+     * Parse regions from the sheet and update the validation object
+     * @param workBook
+     * @param validationObject
+     */
+    public void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject );
+    
 	/**
 	 * Parses the temp csv and upload
 	 * @param fileUpload
