@@ -374,6 +374,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
     private boolean isNewRegion( RegionUploadVO uploadedRegion, HierarchyUpload upload )
     {
+        // TODO: check for new region addition
         return true;
     }
 
@@ -386,7 +387,14 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
     public void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject )
     {
-
+        // Parse each row for branches and then check for valid branches. On successful validation, check if the branch is a new, modified or deleted branch.
+        // Possible reasons for errors
+        // 1. Branch Source id is not present
+        // 2. Branch name is not present.
+        // 3. Branch address is not present.
+        // 4. Source region id is not present in the regions tab
+        // Possible warnings
+        // 1. For a company with regions, if the branch does not have a source region id
     }
 
 
