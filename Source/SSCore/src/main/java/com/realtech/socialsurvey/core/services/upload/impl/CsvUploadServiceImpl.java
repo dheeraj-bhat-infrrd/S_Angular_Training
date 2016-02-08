@@ -182,6 +182,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
     private static Logger LOG = LoggerFactory.getLogger( CsvUploadServiceImpl.class );
 
 
+    @Override
     public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException
     {
         if ( fileName == null || fileName.isEmpty() ) {
@@ -192,6 +193,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
             LOG.error( "Invalid company details" );
             throw new InvalidInputException( "Invalid company details" );
         }
+        LOG.info( "Validating the file for "+company.getCompany()+" and file "+fileName );
         UploadValidation validationObject = new UploadValidation();
         // get current hierarchy upload
         validationObject.setUpload( getHierarchyStructure( company ) );
@@ -223,6 +225,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
      * @param workBook
      * @param validationObject
      */
+    @Override
     public void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject )
     {
         // Parse the list of regions from the sheet. Parse each row. Check for validation errors. If validation is successful, check if region is modified or added. If modified then add to the modified count or to the addition count. 
@@ -232,14 +235,13 @@ public class CsvUploadServiceImpl implements CsvUploadService
         // 2. Region name is not present
         // 3. Region cannot be deleted if branches and users are associated.
         LOG.debug( "Parsing regions from sheet" );
-        List<RegionUploadVO> uploadedRegions = null;
         XSSFSheet regionSheet = workBook.getSheet( REGION_SHEET );
         Iterator<Row> rows = regionSheet.rowIterator();
         Iterator<Cell> cells = null;
         XSSFRow row = null;
         XSSFCell cell = null;
         RegionUploadVO uploadedRegion = null;
-        boolean rowContainsError = false;
+        List<RegionUploadVO> uploadedRegions = new ArrayList<>();
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
             // skip the first 2 row. first row is the schema and second is the header
@@ -249,69 +251,86 @@ public class CsvUploadServiceImpl implements CsvUploadService
             cells = row.cellIterator();
             uploadedRegion = new RegionUploadVO();
             int cellIndex = 0;
-            while ( cells.hasNext() ) {
-                cell = (XSSFCell) cells.next();
-                cellIndex = cell.getColumnIndex();
-                if ( cellIndex == REGION_ID_INDEX ) {
-                    if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
-                        try {
-                            uploadedRegion.setSourceRegionId( String.valueOf( cell.getNumericCellValue() ) );
-                        } catch ( NumberFormatException nfe ) {
-                            // TODO: mark this record as error
-                            LOG.error( "Source region id is not present" );
-                            rowContainsError = true;
-                            break;
+            try {
+                while ( cells.hasNext() ) {
+                    cell = (XSSFCell) cells.next();
+                    cellIndex = cell.getColumnIndex();
+                    if ( cellIndex == REGION_ID_INDEX ) {
+                        if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
+                            try {
+                                uploadedRegion.setSourceRegionId( String.valueOf( cell.getNumericCellValue() ) );
+                            } catch ( NumberFormatException nfe ) {
+                                LOG.error( "Source Id at row: " + row.getRowNum() + " is not provided." );
+                                throw new InvalidInputException( "Source Id at row: " + row.getRowNum() + " is not provided." );
+                            }
+                        } else {
+                            uploadedRegion.setSourceRegionId( cell.getStringCellValue() );
                         }
-                    } else {
-                        uploadedRegion.setSourceRegionId( cell.getStringCellValue() );
-                    }
-                } else if ( cellIndex == REGION_NAME_INDEX ) {
-                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        uploadedRegion.setRegionName( cell.getStringCellValue().trim() );
-                    } else {
-                        LOG.error( "Region name is not present" );
-                        rowContainsError = true;
-                        break;
-                    }
-                } else if ( cellIndex == REGION_ADDRESS1_INDEX ) {
-                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        uploadedRegion.setRegionAddress1( cell.getStringCellValue() );
-                        uploadedRegion.setAddressSet( true );
-                    }
-                } else if ( cellIndex == REGION_ADDRESS2_INDEX ) {
-                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        uploadedRegion.setRegionAddress2( cell.getStringCellValue() );
-                        uploadedRegion.setAddressSet( true );
-                    }
-                } else if ( cellIndex == REGION_CITY_INDEX ) {
-                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        uploadedRegion.setRegionCity( cell.getStringCellValue() );
-                    }
-                } else if ( cellIndex == REGION_STATE_INDEX ) {
-                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        uploadedRegion.setRegionState( cell.getStringCellValue() );
-                    }
-                } else if ( cellIndex == REGION_ZIP_INDEX ) {
-                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        if ( cell.getCellType() == XSSFCell.CELL_TYPE_STRING ) {
-                            uploadedRegion.setRegionZipcode( cell.getStringCellValue() );
-                        } else if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
-                            uploadedRegion.setRegionZipcode( String.valueOf( (int) cell.getNumericCellValue() ) );
+                    } else if ( cellIndex == REGION_NAME_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedRegion.setRegionName( cell.getStringCellValue().trim() );
+                        } else {
+                            LOG.error( "Region name at row: " + row.getRowNum() + " is not provided." );
+                            throw new InvalidInputException( "Region name at row: " + row.getRowNum() + " is not provided." );
+                        }
+                    } else if ( cellIndex == REGION_ADDRESS1_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedRegion.setRegionAddress1( cell.getStringCellValue() );
+                            uploadedRegion.setAddressSet( true );
+                        }
+                    } else if ( cellIndex == REGION_ADDRESS2_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedRegion.setRegionAddress2( cell.getStringCellValue() );
+                            uploadedRegion.setAddressSet( true );
+                        }
+                    } else if ( cellIndex == REGION_CITY_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedRegion.setRegionCity( cell.getStringCellValue() );
+                        }
+                    } else if ( cellIndex == REGION_STATE_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedRegion.setRegionState( cell.getStringCellValue() );
+                        }
+                    } else if ( cellIndex == REGION_ZIP_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_STRING ) {
+                                uploadedRegion.setRegionZipcode( cell.getStringCellValue() );
+                            } else if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
+                                uploadedRegion.setRegionZipcode( String.valueOf( (int) cell.getNumericCellValue() ) );
+                            }
                         }
                     }
                 }
+                // check if region is added or modified
+                if ( isNewRegion( uploadedRegion, validationObject.getUpload() ) ) {
+                    validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
+                    uploadedRegion.setRegionAdded( true );
+                    validationObject.getUpload().getRegions().add( uploadedRegion );
+                } else {
+                    // region already exists
+                    // TODO: check if region is modified. If modified then set the modified details 
+                }
+                // add to uploaded regions list.
+                uploadedRegions.add( uploadedRegion );
+            } catch ( InvalidInputException iie ) {
+                // add to region errors
+                if ( validationObject.getRegionValidationErrors() != null ) {
+                    validationObject.setRegionValidationErrors( new ArrayList<String>() );
+                }
+                validationObject.getRegionValidationErrors().add( iie.getMessage() );
             }
-           /* if ( rowContainsError ) {
-                LOG.error( "Could not process row" );
-                if ( regionErrors == null ) {
-                    regionErrors = new ArrayList<>();
-                }
-                regionErrors.add( "Error in Region row " + row.getRowNum() );
-                rowContainsError = false;
-                continue;
-            }*/
-            uploadedRegions.add( uploadedRegion );
         }
+        markDeletedRegions( uploadedRegions, validationObject.getUpload() );
+    }
+
+
+    private boolean isNewRegion( RegionUploadVO uploadedRegion, HierarchyUpload upload )
+    {
+        return true;
+    }
+    
+    private void markDeletedRegions(List<RegionUploadVO> uploadedRegions, HierarchyUpload upload){
+        // TODO: iterate and mark the delted regions
     }
 
 
