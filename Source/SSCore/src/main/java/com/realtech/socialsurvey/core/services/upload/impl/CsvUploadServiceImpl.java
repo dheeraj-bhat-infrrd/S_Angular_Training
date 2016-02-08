@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -205,7 +206,8 @@ public class CsvUploadServiceImpl implements CsvUploadService
         // read the file
         InputStream fileStream = null;
         try {
-            fileStream = new FileInputStream( fileName );
+            //fileStream = new FileInputStream( fileName );
+            fileStream = new URL( fileName ).openStream();
             XSSFWorkbook workBook = new XSSFWorkbook( fileStream );
             parseRegions( workBook, validationObject );
             parseBranches( workBook, validationObject );
