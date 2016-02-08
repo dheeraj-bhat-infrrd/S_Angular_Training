@@ -2400,7 +2400,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             solrQuery.addFilterQuery( CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR "
                 + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_NOT_VERIFIED + " OR "
                 + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE );
-            solrQuery.addSort( CommonConstants.USER_ID_SOLR, ORDER.asc );
+            solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
             solrQuery.addField( CommonConstants.USER_ID_SOLR );
             LOG.debug( "Querying solr for searching users" );
             if ( startIndex > -1 ) {
