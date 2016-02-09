@@ -1983,6 +1983,7 @@ var hierarchyUpload={
 								.append("filename", $(
 										'#com-file').prop(
 										"files")[0].name);
+						showOverlay();
 						callAjaxPOSTWithTextDataLogo("./savexlsxfile.do",
 								hierarchyUpload.saveXlxsSuccessCallback, true, formData); 
 						hierarchyUpload.verified=false;
@@ -2002,6 +2003,7 @@ var hierarchyUpload={
 							} else {
 								var formData = new FormData();
 								formData.append("fileUrl", url);
+								showOverlay();
 								callAjaxPOSTWithTextDataLogo("./verifyxlsxfile.do",
 										hierarchyUpload.uploadXlxsSuccessCallback, true, formData);
 								hierarchyUpload.verified=false;
@@ -2031,7 +2033,6 @@ var hierarchyUpload={
 				});
 		},
 		uploadXlxsSuccessCallback:function(response){
-			
 			if (!response) {
 				$('#com-file').val('');
 				$('#com-xlsx-file').val('');
@@ -2059,9 +2060,9 @@ var hierarchyUpload={
 					});
 			
 				}
+			
 		},
 		saveXlxsSuccessCallback:function(response){
-			
 			if(!response){
 				$('#com-file').val('');
 				$('#com-xlsx-file').val('');

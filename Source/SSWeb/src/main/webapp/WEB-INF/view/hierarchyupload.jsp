@@ -3,7 +3,32 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<div class="hm-header-main-wrapper clearfix">
+<div id="hm-header-main-wrapper" class="hm-header-main-wrapper">
+    <div class="container">
+		<div class="hm-header-row hm-header-row-main clearfix">
+			<div class="float-left hm-header-row-left text-center">
+				<spring:message code="label.hierarchyupload.key" />
+			</div> 
+			<div class="float-right hm-header-right text-center"
+				onclick="javascript:showMainContent('./viewhierarchy.do');">
+				<spring:message code="label.viewcompanyhierachy.key" />
+			</div>
+			<div class="float-right hm-header-right text-center"
+				onclick="javascript:showMainContent('./showusermangementpage.do')">
+				<spring:message code="label.header.editteam.key" />
+			</div>
+			<div class="float-right hm-header-right text-center"
+				onclick="javascript:showMainContent('./showbuildhierarchypage.do')">
+				<spring:message code="label.header.buildhierarchy.key" />
+			</div>
+			<div class="float-right hm-header-right text-center"
+			 onclick="javascript:showMainContent('./hierarchyupload.do')">
+					<spring:message code="label.header.Hierarchyupload.key" />
+				</div>
+		</div>
+	</div>
+</div>
+<%-- <div class="hm-header-main-wrapper clearfix">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="hm-header-row-left text-center lgn-adj">
@@ -11,7 +36,7 @@
 			</div>
 		</div>
 	</div>
-</div>
+</div> --%>
 <div class="clearfix">
 	<div class="float-left rfr_lbl">
 		<spring:message code="label.xlsxfile.key" />
