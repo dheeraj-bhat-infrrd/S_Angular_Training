@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2620,33 +2622,60 @@ public class OrganizationManagementController
 
 
     @ResponseBody
-    @RequestMapping ( value = "/verifyxlsxfile", method = RequestMethod.POST)
-    public String validateHierarchyFile( Model model, @RequestParam ( "file") MultipartFile fileLocal,
-        HttpServletRequest request ) throws InvalidInputException
+    @RequestMapping ( value = "/savexlsxfile", method = RequestMethod.POST)
+    public String saveHierarchyFile( Model model, @RequestParam ( "file") MultipartFile fileLocal, HttpServletRequest request )
     {
-        //TODO : Add null checks
-        if ( fileLocal == null ) {
-            throw new InvalidInputException( "file is null" );
-        }
-        LOG.info( "Validating the hierarchy file" );
-        String fileLocalName = request.getParameter( "filename" );
-
-        if ( fileLocalName == null || fileLocalName.isEmpty() ) {
-            throw new InvalidInputException( "filename cannot be empty" );
-        }
-
-        File convFile = new File( fileLocalName );
+        boolean status = true;
+        String response = null;
         try {
-            fileLocal.transferTo( convFile );
-            fileUploadService.uploadFileAtDefautBucket( convFile, fileLocalName );
-        } catch ( Exception e ) {
-            LOG.error( "An exception occured during the file upload. Reason : ", e );
-            throw new InvalidInputException( "An exception occured during the file upload. Reason : ", e );
+            if ( fileLocal == null ) {
+                throw new InvalidInputException( "file is empty" );
+            }
+            LOG.info( "Saving the hierarchy file" );
+            String fileLocalName = request.getParameter( "filename" );
+
+            if ( fileLocalName == null || fileLocalName.isEmpty() ) {
+                throw new InvalidInputException( "filename is empty" );
+            }
+
+            File convFile = new File( fileLocalName );
+            try {
+                fileLocal.transferTo( convFile );
+
+                //Set the new filename
+                User user = sessionHelper.getCurrentUser();
+                fileLocalName = "COMPANY_HIERARCHY_UPLOAD_" + user.getCompany().getCompany() + "_"
+                    + new DateTime( System.currentTimeMillis() ).toString() + ".xlsx";
+                fileUploadService.uploadFileAtDefautBucket( convFile, fileLocalName );
+                String fileName = endpoint + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileLocalName, "UTF-8" );
+                response = fileName;
+            } catch ( Exception e ) {
+                LOG.error( "An exception occured during the file upload. Reason : ", e );
+                throw new InvalidInputException( "An error occured during the file upload. Reason : ", e );
+            }
+        } catch ( InvalidInputException ex ) {
+            status = false;
+            response = ex.getMessage();
         }
-        // Setting the complete logo url in session
-        String fileName = endpoint + CommonConstants.FILE_SEPARATOR + fileLocalName;
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "response", response );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/verifyxlsxfile", method = RequestMethod.POST)
+    public String validateHierarchyFile( Model model, HttpServletRequest request ) throws InvalidInputException
+    {
+
+        LOG.info( "Validating the hierarchy file" );
+        String fileUrl = request.getParameter( "fileUrl" );
+        if ( fileUrl == null || fileUrl.isEmpty() ) {
+            throw new InvalidInputException( "File URL cannot be empty" );
+        }
         User user = sessionHelper.getCurrentUser();
-        UploadValidation uploadValidation = csvUploadService.validateUserUploadFile( user.getCompany(), fileName );
+        UploadValidation uploadValidation = csvUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
 
         return new Gson().toJson( uploadValidation );
     }
