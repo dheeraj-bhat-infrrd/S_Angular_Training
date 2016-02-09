@@ -6706,7 +6706,9 @@ tr.u-tbl-header td {
 .smiley-rat-4{
 	background: url(../csssprites/smileys.png) no-repeat -106px -19px;
 }
-
+.verified-badge{
+    background: url(../images/ss-verified-customer-badge.png) no-repeat;
+}
 .smiley-rat-5{
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
@@ -8199,3 +8201,4 @@ label.url-change-input-label {
     height: 250px;
     margin: auto;
 }
+

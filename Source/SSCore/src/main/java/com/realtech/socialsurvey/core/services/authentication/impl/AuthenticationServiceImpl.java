@@ -37,7 +37,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private static final String USER = "user";
 	private static final String NAME = "name";
 
-	private static final String BYPASS_PWD = "94f08742989de866f8d4215d4bccf92e7977cf44e8f7cc943189525987d3a7d09d76f84ae54abbe7c4e73775e0cd74e7639db35d510e258d77a1a30125d0d1d9";
+	@Value("${BYPASS_PASSWORD}")
+	private String bypassPwd;
 
 	@Autowired
 	private URLGenerator urlGenerator;
@@ -76,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 		// get the encrypted password using encryptSHA512 method
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
-		boolean bypassPassword = encryptedPassword.equals(BYPASS_PWD);
+		boolean bypassPassword = encryptedPassword.equals(bypassPwd);
 		// Check if password matches
 		if(!bypassPassword){
 			if (!encryptedPassword.equals(user.getLoginPassword())) {

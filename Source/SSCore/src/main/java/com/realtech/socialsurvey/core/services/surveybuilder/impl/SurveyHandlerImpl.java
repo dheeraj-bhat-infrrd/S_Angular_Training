@@ -450,23 +450,27 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         queries.put( CommonConstants.USER_COLUMN, agent );
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         List<UserProfile> agentProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
         for ( UserProfile agentProfile : agentProfiles ) {
             queries.clear();
             queries.put( CommonConstants.BRANCH_ID_COLUMN, agentProfile.getBranchId() );
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                 userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) );
+            queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
             admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             queries.clear();
             queries.put( CommonConstants.REGION_ID_COLUMN, agentProfile.getRegionId() );
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                 userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) );
+            queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
             admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             queries.clear();
             if ( agentProfile.getCompany() != null ) {
                 queries.put( CommonConstants.COMPANY_COLUMN, agentProfile.getCompany() );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                     userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) );
+                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
                 admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             }
         }

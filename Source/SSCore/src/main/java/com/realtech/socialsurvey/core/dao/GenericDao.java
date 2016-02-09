@@ -59,5 +59,11 @@ public interface GenericDao<T, ID extends Serializable> {
 			Map<String, Object> queries, String ascendingColumn, String alias);
 
 	public List<T> findProjectionsAscOrderByKeyValue(Class<T> dataClass, List<String> columnNames, Map<String, Object> queries, String columnToOrder);
+
+	public List<T> findProjectionsByKeyValue( Class<T> dataClass, List<String> columnNames, Map<String, Object> queries,
+        String orderColumnName );
+
+    public List<T> findByKeyValueAscendingWithAlias( Class<T> dataClass, Map<String, Object> queries, List<String> ascendingColumns,
+        String alias );
 }
 // JIRA: SS-8: By RM05: EOC

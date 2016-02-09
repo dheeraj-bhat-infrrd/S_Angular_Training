@@ -74,6 +74,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
 		if (accountType > -1) {
 			criteria.add(Restrictions.sqlRestriction("COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld where ACCOUNTS_MASTER_ID=" + accountType + ")"));
 		}
+		criteria.addOrder( Order.asc("company") );
 		return criteria.list();
 	}
 	
