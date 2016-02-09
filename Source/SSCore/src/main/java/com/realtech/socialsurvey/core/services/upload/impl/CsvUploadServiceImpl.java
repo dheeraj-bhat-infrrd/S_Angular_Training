@@ -336,6 +336,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 if ( validationObject.getRegionValidationErrors() == null ) {
                     validationObject.setRegionValidationErrors( new ArrayList<String>() );
                 }
+                uploadedRegion.setErrorRecord( true );
                 validationObject.getRegionValidationErrors().add( iie.getMessage() );
             }
         }
@@ -529,6 +530,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 if ( validationObject.getBranchValidationErrors() == null ) {
                     validationObject.setBranchValidationErrors( new ArrayList<String>() );
                 }
+                uploadedBranch.setErrorRecord( true );
                 validationObject.getBranchValidationErrors().add( iie.getMessage() );
             }
         }
