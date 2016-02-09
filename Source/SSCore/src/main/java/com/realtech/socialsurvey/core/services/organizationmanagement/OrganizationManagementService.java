@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
@@ -1230,5 +1231,33 @@ public interface OrganizationManagementService
 
 
     public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException, NoRecordsFetchedException;
+    
+    /**
+     * Get a list of non default active branches
+     * @return
+     * @throws NoRecordsFetchedException
+     */
+    public List<Branch> getAllNonDefaultBranches() throws NoRecordsFetchedException;
+    
+    /**
+     * Get a list of non default active regions
+     * @return
+     * @throws NoRecordsFetchedException
+     */
+    public List<Region> getAllNonDefaultRegions() throws NoRecordsFetchedException;
+    
+    /**
+     * Get the compare objects for mismatched branch hierarchy settings
+     * @param branches
+     * @return
+     */
+    public List<HierarchySettingsCompare> mismatchBranchHierarchySettings(List<Branch> branches);
+    
+    /**
+     * Get the compare objects for mismatched region hierarchy settings
+     * @param regions
+     * @return
+     */
+    public List<HierarchySettingsCompare> mismatchRegionHierarchySettings(List<Region> regions);
 
 }

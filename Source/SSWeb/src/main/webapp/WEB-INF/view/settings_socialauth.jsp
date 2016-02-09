@@ -3,7 +3,7 @@
 
 <!-- Check if auto login -->
 <c:choose>
-	<c:when test="${isAutoLogin == 'true' }">
+	<c:when test="${isAutoLogin == 'true' && allowOverrideForSocialMedia == 'false' }">
 		<c:set var="socialDisabled" value="social-auth-disabled"></c:set>
 	</c:when>
 	<c:otherwise>

@@ -276,6 +276,17 @@ public class DashboardController
                 realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
             }
 
+            boolean allowOverrideForSocialMedia = false;
+            //Code to determine if social media can be overridden during autologin
+            if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                allowOverrideForSocialMedia = unitSettings.isAllowOverrideForSocialMedia();
+            } else {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                    .getCompanyId() );
+                allowOverrideForSocialMedia = companySettings.isAllowOverrideForSocialMedia();
+            }
+            model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
+            
             // calculating details for circles
             int numberOfDays = -1;
             try {

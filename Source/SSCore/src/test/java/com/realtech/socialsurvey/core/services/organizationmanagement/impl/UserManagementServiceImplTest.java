@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
+import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -30,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -68,7 +70,9 @@ public class UserManagementServiceImplTest
     @Mock
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
-
+    @Mock
+    private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
+    
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
     {}
@@ -979,7 +983,7 @@ public class UserManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testRestoreDeletedUserForUserWithSameEmailExists() throws InvalidInputException, SolrException
+    public void testRestoreDeletedUserForUserWithSameEmailExists() throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
         User user = new User();
         String email = "abc@xyz.com";
@@ -994,7 +998,7 @@ public class UserManagementServiceImplTest
         user2.setUserId( 2l );
         user2.setEmailId( email );
         userList.add( user2 );
-        Mockito.doReturn( userList ).when( userManagementServiceImpl ).getUsersByEmailId( email );
+        Mockito.doReturn( user2 ).when( userManagementServiceImpl ).getUserByEmailAddress( email );
         userManagementServiceImpl.restoreDeletedUser( 50l, false );
     }
 
@@ -1054,5 +1058,31 @@ public class UserManagementServiceImplTest
         Mockito.when( userDao.findByKeyValueAscending( Mockito.eq( User.class ), Mockito.anyMap(), Mockito.anyString() ) )
             .thenReturn( new ArrayList<User>() );
         userManagementServiceImpl.searchUsersInCompanyByMultipleCriteria( map );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUserByEmailAddressForEmailIdNull() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getUserByEmailAddress( null );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUserByEmailAddressForEmailIdEmpty() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.getUserByEmailAddress( "" );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Test ( expected = NoRecordsFetchedException.class)
+    public void testGetUserByEmailAddressForMappingsNullActiveUserNull() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        Mockito.when( userEmailMappingDao.findByKeyValue( Mockito.eq( UserEmailMapping.class ), Mockito.anyMap() ) )
+            .thenReturn( null );
+        Mockito.when( userDao.getActiveUser( Mockito.anyString() ) ).thenThrow( NoRecordsFetchedException.class );
+        userManagementServiceImpl.getUserByEmailAddress( TestConstants.TEST_MAIL_ID_STRING );
     }
 }

@@ -31,7 +31,7 @@ namespace EncompassSocialSurvey
             return fieldIds;
         }
 
-        private QueryCriterion createCriteria(DateTime lastFetchedTime, string field)
+        /*private QueryCriterion createCriteria(DateTime lastFetchedTime, string field)
         {
             DateFieldCriterion upperLimitCriteria = new DateFieldCriterion();
             upperLimitCriteria.FieldName = "Fields." + field;
@@ -54,13 +54,30 @@ namespace EncompassSocialSurvey
             }
             lowerLimitCriteria.MatchType = OrdinalFieldMatchType.GreaterThanOrEquals;
             return upperLimitCriteria.And(lowerLimitCriteria);
+        }*/
+
+
+
+        private QueryCriterion createCriteria(int noOfDays, string field)
+        {
+            DateFieldCriterion upperLimitCriteria = new DateFieldCriterion();
+            upperLimitCriteria.FieldName = "Fields." + field;
+            upperLimitCriteria.Value = DateTime.Now;
+            upperLimitCriteria.MatchType = OrdinalFieldMatchType.LessThanOrEquals;
+
+            DateFieldCriterion lowerLimitCriteria = new DateFieldCriterion();
+            lowerLimitCriteria.FieldName = "Fields." + field;
+            lowerLimitCriteria.Value = DateTime.Now.AddDays(-1 * noOfDays);
+            lowerLimitCriteria.MatchType = OrdinalFieldMatchType.GreaterThanOrEquals;
+            return upperLimitCriteria.And(lowerLimitCriteria);
         }
+
 
 
         public List<LoanViewModel> PopulateLoanList(long runningCompanyId, string fieldid, Boolean isProductionRun , int noOfDaysToFetch ,  string emailDomain, string emailPrefix)
         {
             Logger.Info("Entering the method LoanUtility.PopulateLoanList() ");
-
+            int noOfDays = 0;
             List<LoanViewModel> returnLoansViewModel = null;
             CRMBatchTrackerEntity crmBatchTracker = null;
             try
@@ -87,17 +104,31 @@ namespace EncompassSocialSurvey
                         crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
                     }
                     lastRunTime = crmBatchTracker.RecentRecordFetchedDate;
+                    int result = DateTime.Compare(lastRunTime, EncompassSocialSurveyConstant.EPOCH_TIME);
+                    if (result != 0)
+                    {
+                        int days = (DateTime.Now - lastRunTime).Days;
+                        if (days > EncompassSocialSurveyConstant.DAYS_BEFORE)
+                            noOfDays = days;
+                        else
+                            noOfDays = EncompassSocialSurveyConstant.DAYS_BEFORE;
+                    }
+                    else
+                    {
+                        noOfDays = DAYS_INTERVAL;
+                    }
                 }
                 else 
                 {
-                    lastRunTime = DateTime.Now.AddDays(-1 * noOfDaysToFetch);
+                    //lastRunTime = DateTime.Now.AddDays(-1 * noOfDaysToFetch);
+                    noOfDays = noOfDaysToFetch;
                 }
                 
                 Logger.Info("Last Record Fetch time is " + lastRunTime);
                 Logger.Info("Company Id  " + runningCompanyId);
 
                 //fieldIds[8] is the loan closed date
-                LoanIdentityList loanIdentityList = EncompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(lastRunTime, fieldIds[8]));
+                LoanIdentityList loanIdentityList = EncompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(noOfDays, fieldIds[8]));
 
                 #region Load the list
 

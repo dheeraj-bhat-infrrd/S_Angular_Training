@@ -44,6 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
@@ -64,6 +65,7 @@ import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.CompanyProfileData;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
 import com.realtech.socialsurvey.core.entities.LendingTreeToken;
@@ -239,6 +241,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     String paramOrderTakeSurveyCustomer;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+
+    @Value ( "${ZILLOW_ENDPOINT}")
+    private String zillowEndpoint;
+    
+    @Autowired
+    private ExternalApiCallDetailsDao externalApiCallDetailsDao;
 
 
     @Override
@@ -1611,7 +1619,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias( UserProfile.class, queries,
-            "firstName", "user" );
+            Arrays.asList(new String [] { "firstName", "lastName" } ) , "user" );
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             users = new ArrayList<AgentSettings>();
             for ( UserProfile userProfile : userProfiles ) {
@@ -1695,7 +1703,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
 
         LOG.debug( "calling method to fetch user profiles under region :" + regionId );
-        List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+        List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias( UserProfile.class, queries,
+            Arrays.asList( new String[] { "firstName", "lastName" } ), "user" );
 
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             LOG.debug( "Obtained userProfiles with size : " + userProfiles.size() );
@@ -4127,9 +4136,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     } else {
                         Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
                             zillowScreenName );
+
+                        ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
+                        zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
+                        zillowAPICallDetails.setRequest( zillowEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
+                            + zwsId + "&screenname=" + zillowScreenName );
+
                         if ( response != null ) {
                             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
                         }
+
+                        zillowAPICallDetails.setResponse( responseString );
+                        zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );
+                        zillowAPICallDetails.setSource( CommonConstants.ZILLOW_SOCIAL_SITE );
+                        //Store this record in mongo
+                        externalApiCallDetailsDao.insertApiCallDetails( zillowAPICallDetails );
+                        
                         if ( responseString != null ) {
                             Map<String, Object> map = null;
                             try {

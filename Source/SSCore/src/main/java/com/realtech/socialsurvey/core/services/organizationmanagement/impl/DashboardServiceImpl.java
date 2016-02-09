@@ -1430,7 +1430,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 // col 7 zip
                 branchesReportToPopulate.add( branch.getBranchId() );
                 branchesReportToPopulate.add( branch.getBranch() );
-                if ( branch.getRegion() != null )
+                if ( branch.getRegion() != null && defaultRegion.getRegionId() != branch.getRegion().getRegionId()
+                    && CommonConstants.DEFAULT_REGION_ID != branch.getRegion().getRegionId() )
                     branchesReportToPopulate.add( branch.getRegion().getRegionId() );
                 else
                     branchesReportToPopulate.add( "" );

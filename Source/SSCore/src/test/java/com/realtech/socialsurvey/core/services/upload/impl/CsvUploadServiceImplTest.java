@@ -16,7 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
+import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
@@ -25,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.exception.BranchAdditionException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -34,17 +37,21 @@ import com.realtech.socialsurvey.core.exception.UserAdditionException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
 public class CsvUploadServiceImplTest
 {
+    @Spy
     @InjectMocks
     private CsvUploadServiceImpl csvUploadServiceImpl;
 
     @Mock
     private OrganizationManagementService organizationManagementService;
 
+    @Mock
+    private UserManagementService userManagementService;
     @Mock
     private GenericDao<FileUpload, Long> fileUploadDao;
 
@@ -153,7 +160,7 @@ public class CsvUploadServiceImplTest
     }
 
 
-    //Tests for createRegion
+    //Tests for createRegionUserAdditionException
     @Test ( expected = InvalidInputException.class)
     public void createRegionTestUserNull() throws InvalidInputException, UserAdditionException, NoRecordsFetchedException,
         SolrException, UserAssignmentException, BranchAdditionException, RegionAdditionException
@@ -233,18 +240,25 @@ public class CsvUploadServiceImplTest
 
     //Tests for checkIfEmailIdExists
     @Test
-    public void checkIfEmailIdExistsTestUserExists() throws NoRecordsFetchedException
+    public void checkIfEmailIdExistsTestUserExists() throws NoRecordsFetchedException, InvalidInputException
     {
-        Mockito.when( userDao.getActiveUser( Mockito.anyString() ) ).thenReturn( new User() );
-        assertTrue( csvUploadServiceImpl.checkIfEmailIdExists( null, null ) );
+        List<UserEmailMapping> userEmailMappings = new ArrayList<UserEmailMapping>();
+        userEmailMappings.add( new UserEmailMapping() );
+        User user = new User();
+        Company company = new Company();
+        user.setCompany( company );
+        Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenReturn( user );
+        assertTrue( csvUploadServiceImpl.checkIfEmailIdExists( TestConstants.TEST_MAIL_ID_STRING, company ) );
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Test
-    public void checkIfEmailIdExistsTestUserDoesNotExist() throws NoRecordsFetchedException
+    public void checkIfEmailIdExistsTestUserDoesNotExist() throws NoRecordsFetchedException, InvalidInputException
     {
-        Mockito.when( userDao.getActiveUser( Mockito.anyString() ) ).thenThrow( new NoRecordsFetchedException() );
-        assertFalse( csvUploadServiceImpl.checkIfEmailIdExists( null, null ) );
+        Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenThrow(
+            NoRecordsFetchedException.class );
+        assertFalse( csvUploadServiceImpl.checkIfEmailIdExists( TestConstants.TEST_MAIL_ID_STRING, null ) );
     }
 
 
@@ -278,6 +292,7 @@ public class CsvUploadServiceImplTest
     public void addUserTestInvalidRegionId() throws InvalidInputException, NoRecordsFetchedException, SolrException,
         UserAssignmentException, UserAdditionException
     {
+        Mockito.doReturn( true ).when( csvUploadServiceImpl ).checkIfEmailIdExists( Mockito.anyString(), (Company) Mockito.any() );
         csvUploadServiceImpl.addUser( new UserUploadVO(), new User() );
     }
 
@@ -287,8 +302,7 @@ public class CsvUploadServiceImplTest
     public void assignUserTestAsigneeUsersNull() throws UserAdditionException, InvalidInputException, SolrException,
         NoRecordsFetchedException, UserAssignmentException
     {
-        Mockito.when( userDao.findByColumn( Mockito.eq( User.class ), Mockito.anyString(), Mockito.anyObject() ) ).thenReturn(
-            null );
+        Mockito.doReturn( false ).when( csvUploadServiceImpl ).checkIfEmailIdExistsWithCompany( Mockito.anyString(), (Company) Mockito.any() );
         csvUploadServiceImpl.assignUser( new UserUploadVO(), new User() );
     }
 
@@ -297,8 +311,7 @@ public class CsvUploadServiceImplTest
     public void assignUserTestAsigneeUsersEmpty() throws UserAdditionException, InvalidInputException, SolrException,
         NoRecordsFetchedException, UserAssignmentException
     {
-        Mockito.when( userDao.findByColumn( Mockito.eq( User.class ), Mockito.anyString(), Mockito.anyObject() ) ).thenReturn(
-            new ArrayList<User>() );
+        Mockito.doReturn( false ).when( csvUploadServiceImpl ).checkIfEmailIdExistsWithCompany( Mockito.anyString(), (Company) Mockito.any() );
         csvUploadServiceImpl.assignUser( new UserUploadVO(), new User() );
     }
 }

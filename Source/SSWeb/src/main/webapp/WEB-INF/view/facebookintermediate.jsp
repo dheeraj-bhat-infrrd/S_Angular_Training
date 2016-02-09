@@ -56,6 +56,7 @@ $(document).ready(function() {
 	var mediaTokens = '${mediaTokens}';
 	// Onload before auth Url
 	var waitMessage = "${message}";
+	var fbAccessToken = '${fbAccessToken}';
 	if (parseInt(waitMessage) == 1) {
 		var authUrl = "${authUrl}";
 		if (authUrl != null) {
@@ -106,7 +107,7 @@ $(document).ready(function() {
 		var facebookToken = {
 			'selectedAccessFacebookToken' : selectedAccessFacebookToken,
 			'selectedProfileUrl' :  selectedProfileUrl,
-			'mediaTokens' : mediaTokens
+			'fbAccessToken' : fbAccessToken
 		};
 		$.ajax({
 			url : './saveSelectedAccessFacebookToken.do',
