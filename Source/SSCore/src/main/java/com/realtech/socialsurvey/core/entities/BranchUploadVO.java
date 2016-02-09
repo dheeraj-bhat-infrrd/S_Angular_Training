@@ -554,5 +554,23 @@ public class BranchUploadVO
         this.isBranchModified = isBranchModified;
     }
 
+    @Override
+    public boolean equals(Object uploadVo){
+        BranchUploadVO branchUploadVO = (BranchUploadVO)uploadVo;
+        if(this.sourceBranchId != null && !this.sourceBranchId.isEmpty() && branchUploadVO.sourceBranchId != null && !branchUploadVO.sourceBranchId.isEmpty()){
+            return this.sourceBranchId.equals( branchUploadVO.sourceBranchId );
+        }else{
+            return (this.branchId == branchUploadVO.branchId);
+        }
+    }
+    
+    @Override
+    public int hashCode(){
+        if(sourceBranchId != null && !sourceBranchId.isEmpty()){
+            return sourceBranchId.hashCode();
+        }else{
+            return (new Long(branchId)).hashCode();
+        }
+    }
 
 }

@@ -189,20 +189,6 @@ public class CsvUploadServiceImpl implements CsvUploadService
     private static Logger LOG = LoggerFactory.getLogger( CsvUploadServiceImpl.class );
 
 
-    public static void main( String[] args )
-    {
-        CsvUploadServiceImpl obj = new CsvUploadServiceImpl();
-        Company company = new Company();
-        company.setCompany( "Test" );
-        try {
-            obj.validateUserUploadFile( company, "/Users/nishit/work/Social_Survey/fileupload/Summit_data_import.xlsx" );
-        } catch ( InvalidInputException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-
     @Override
     public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException
     {
@@ -370,18 +356,50 @@ public class CsvUploadServiceImpl implements CsvUploadService
         }
         return true;
     }
+    
+    private boolean validateUploadedBranch( BranchUploadVO uploadedBranch, int rowNumber ) throws InvalidInputException{
+        LOG.debug( "Validating uploaded branch" );
+        if(uploadedBranch.getSourceBranchId() == null || uploadedBranch.getSourceBranchId().isEmpty()){
+            throw new InvalidInputException("Source Id at row: " + rowNumber + " is not provided.");
+        }
+        if(uploadedBranch.getBranchName() == null || uploadedBranch.getBranchName().isEmpty()){
+            throw new InvalidInputException("Office name at row: " + rowNumber + " is not provided.");
+        }
+        if(!uploadedBranch.isAddressSet()){
+            throw new InvalidInputException("Office address at row: " + rowNumber + " is not provided.");
+        }
+        return true;
+    }
 
+    private boolean validateUploadedBranchForWarnings( BranchUploadVO uploadedBranch, int rowNumber, HierarchyUpload upload ) throws InvalidInputException{
+        LOG.debug( "Validating uploaded branch for warning" );
+        if((upload.getRegions() != null && !upload.getRegions().isEmpty()) && (uploadedBranch.getSourceRegionId() == null || uploadedBranch.getSourceRegionId().isEmpty())){
+            throw new InvalidInputException("Office at " + rowNumber + " is not linked to any region.");
+        }
+        return true;
+    }
 
     private boolean isNewRegion( RegionUploadVO uploadedRegion, HierarchyUpload upload )
     {
         // TODO: check for new region addition
         return true;
     }
+    
+    private boolean isNewBranch( BranchUploadVO uploadedBranch, HierarchyUpload upload )
+    {
+        // TODO: check for new branch addition
+        return true;
+    }
 
 
     private void markDeletedRegions( List<RegionUploadVO> uploadedRegions, HierarchyUpload upload )
     {
-        // TODO: iterate and mark the delted regions
+        // TODO: iterate and mark the deleted regions
+    }
+    
+    private void markDeletedBranches( List<BranchUploadVO> uploadedBranches, HierarchyUpload upload )
+    {
+        // TODO: iterate and mark the deleted branches
     }
 
 
@@ -395,8 +413,137 @@ public class CsvUploadServiceImpl implements CsvUploadService
         // 4. Source region id is not present in the regions tab
         // Possible warnings
         // 1. For a company with regions, if the branch does not have a source region id
+
+        LOG.debug( "Parsing branches sheet" );
+        List<BranchUploadVO> uploadedBranches = new ArrayList<>();
+        XSSFSheet branchSheet = workBook.getSheet( BRANCH_SHEET );
+        Iterator<Row> rows = branchSheet.rowIterator();
+        Iterator<Cell> cells = null;
+        XSSFRow row = null;
+        XSSFCell cell = null;
+        BranchUploadVO uploadedBranch = null;
+        while ( rows.hasNext() ) {
+            row = (XSSFRow) rows.next();
+            // skip the first 2 row. first row is the schema and second is the header
+            if ( row.getRowNum() < 2 ) {
+                continue;
+            }
+            cells = row.cellIterator();
+            uploadedBranch = new BranchUploadVO();
+            int cellIndex = 0;
+            try {
+                while ( cells.hasNext() ) {
+                    cell = (XSSFCell) cells.next();
+                    cellIndex = cell.getColumnIndex();
+                    if ( cellIndex == BRANCH_ID_INDEX ) {
+                        if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
+                            try {
+                                uploadedBranch.setSourceBranchId( String.valueOf( cell.getNumericCellValue() ) );
+                            } catch ( NumberFormatException nfe ) {
+                                LOG.error( "Source Id at row: " + row.getRowNum() + " is not provided." );
+                                throw new InvalidInputException( "Source Id at row: " + row.getRowNum() + " is not provided." );
+                            }
+                        } else {
+                            uploadedBranch.setSourceBranchId( cell.getStringCellValue() );
+                        }
+                    } else if ( cellIndex == BRANCH_NAME_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchName( cell.getStringCellValue().trim() );
+                        } else {
+                            LOG.error( "Office name at row: " + row.getRowNum() + " is not provided." );
+                            throw new InvalidInputException( "Office name at row: " + row.getRowNum() + " is not provided." );
+                        }
+                    } else if ( cellIndex == BRANCH_REGION_ID_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            // map it with the region
+                            String sourceRegionId = null;
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
+                                sourceRegionId = String.valueOf( cell.getNumericCellValue() );
+                            } else if ( cell.getCellType() == XSSFCell.CELL_TYPE_STRING ) {
+                                sourceRegionId = cell.getStringCellValue();
+                            }
+                            // check if source region id is present in the hierarchy
+                            if(checkSourceRegionId(sourceRegionId, validationObject.getUpload())){
+                                uploadedBranch.setSourceRegionId( sourceRegionId );
+                            }else{
+                                LOG.error( "The region id in row: "+row.getRowNum()+" is not present." );
+                                throw new InvalidInputException("The region id in row: "+row.getRowNum()+" is not present.");
+                            }
+                        }
+                    } else if ( cellIndex == BRANCH_ADDRESS1_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchAddress1( cell.getStringCellValue() );
+                            uploadedBranch.setAddressSet( true );
+                        }
+                    } else if ( cellIndex == BRANCH_ADDRESS2_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchAddress2( cell.getStringCellValue() );
+                            uploadedBranch.setAddressSet( true );
+                        }
+                    } else if ( cellIndex == BRANCH_CITY_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchCity( cell.getStringCellValue() );
+                        } else {
+                            LOG.error( "Office city at row: " + row.getRowNum() + " is not provided." );
+                            throw new InvalidInputException( "Office city at row: " + row.getRowNum() + " is not provided." );
+                        }
+                    } else if ( cellIndex == BRANCH_STATE_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchState( cell.getStringCellValue() );
+                        }
+                    } else if ( cellIndex == BRANCH_ZIP_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_STRING ) {
+                                uploadedBranch.setBranchZipcode( cell.getStringCellValue() );
+                            } else if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
+                                uploadedBranch.setBranchZipcode( String.valueOf( (int) cell.getNumericCellValue() ) );
+                            }
+                        }
+                    }
+                }
+                // instances of above check for errors being bypassed have been found. Checking for more issues
+                if ( validateUploadedBranch( uploadedBranch, row.getRowNum() ) ) {
+                    // check if branch is added or modified
+                    if ( isNewBranch( uploadedBranch, validationObject.getUpload() ) ) {
+                        validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
+                        uploadedBranch.setBranchAdded( true );
+                        validationObject.getUpload().getBranches().add( uploadedBranch);
+                    } else {
+                        // branch already exists
+                        // TODO: check if branch is modified. If modified then set the modified details 
+                    }
+                    // add to uploaded regions list.
+                    uploadedBranches.add( uploadedBranch );
+                }
+                // validate for warnings
+                try{
+                    validateUploadedBranchForWarnings( uploadedBranch, row.getRowNum(), validationObject.getUpload() );
+                }catch ( InvalidInputException iie ) {
+                    if ( validationObject.getBranchValidationWarnings() == null ) {
+                        validationObject.setBranchValidationWarnings( new ArrayList<String>() );
+                    }
+                    validationObject.getBranchValidationWarnings().add( iie.getMessage() );
+                }
+            } catch ( InvalidInputException iie ) {
+                // add to region errors
+                if ( validationObject.getBranchValidationErrors() == null ) {
+                    validationObject.setBranchValidationErrors( new ArrayList<String>() );
+                }
+                validationObject.getBranchValidationErrors().add( iie.getMessage() );
+            }
+        }
+        markDeletedBranches( uploadedBranches, validationObject.getUpload() );
     }
 
+    private boolean checkSourceRegionId(String sourceRegionId, HierarchyUpload upload){
+        LOG.debug( "Checking if source region id is present" );
+        RegionUploadVO regionUploadVO = new RegionUploadVO();
+        regionUploadVO.setSourceRegionId( sourceRegionId );
+        if(upload.getRegions() != null && !upload.getRegions().isEmpty()){
+            return upload.getRegions().contains( regionUploadVO );
+        }
+        return false;
+    }
 
     public void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject )
     {

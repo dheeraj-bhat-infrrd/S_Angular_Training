@@ -449,5 +449,24 @@ public class RegionUploadVO
         this.isRegionModified = isRegionModified;
     }
 
+    @Override
+    public boolean equals(Object uploadVo){
+        RegionUploadVO regionUploadVO = (RegionUploadVO)uploadVo;
+        if(this.sourceRegionId != null && !this.sourceRegionId.isEmpty() && regionUploadVO.sourceRegionId != null && !regionUploadVO.sourceRegionId.isEmpty()){
+            return this.sourceRegionId.equals( regionUploadVO.sourceRegionId );
+        }else{
+            return (this.regionId == regionUploadVO.regionId);
+        }
+    }
+    
+    @Override
+    public int hashCode(){
+        if(sourceRegionId != null && !sourceRegionId.isEmpty()){
+            return sourceRegionId.hashCode();
+        }else{
+            return (new Long(regionId)).hashCode();
+        }
+    }
+
 
 }

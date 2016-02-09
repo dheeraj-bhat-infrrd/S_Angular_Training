@@ -2647,8 +2647,9 @@ public class OrganizationManagementController
         String fileName = endpoint + CommonConstants.FILE_SEPARATOR + fileLocalName;
         User user = sessionHelper.getCurrentUser();
         UploadValidation uploadValidation = csvUploadService.validateUserUploadFile( user.getCompany(), fileName );
-
-        return new Gson().toJson( uploadValidation );
+        String json = new Gson().toJson( uploadValidation );
+        LOG.debug("Returning: "+json);
+        return json;
     }
 
 
