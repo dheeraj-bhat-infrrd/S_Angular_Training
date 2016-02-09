@@ -11,6 +11,7 @@ public class RegionUploadVO
     private LongUploadHistory[] regionIdHistory;
     private String sourceRegionId;
     private boolean isSourceRegionIdModified;
+    private boolean isSourceRegionIdGenerated;
     private StringUploadHistory[] sourceRegionIdHistory;
     private String regionName;
     private boolean isRegionNameModified;
@@ -98,6 +99,18 @@ public class RegionUploadVO
     public void setSourceRegionIdModified( boolean isSourceRegionIdModified )
     {
         this.isSourceRegionIdModified = isSourceRegionIdModified;
+    }
+
+
+    public boolean isSourceRegionIdGenerated()
+    {
+        return isSourceRegionIdGenerated;
+    }
+
+
+    public void setSourceRegionIdGenerated( boolean isSourceRegionIdGenerated )
+    {
+        this.isSourceRegionIdGenerated = isSourceRegionIdGenerated;
     }
 
 
