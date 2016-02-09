@@ -1962,42 +1962,50 @@ var hierarchyUpload={
 					var fileAdd = $(this).val().split('\\');
 					$('#com-xlsx-file').val(
 							fileAdd[fileAdd.length - 1]);
+					if (hierarchyUpload.fileValidate("#com-file")) {
+						hierarchyUpload.set = true;
+						hierarchyUpload.verified =true;
+					}
+					if (hierarchyUpload.set == true) {
+						//TODO : Show loader instead
+						showInfo("Valid File Format");
+						hierarchyUpload.set =false;
+					}
+					if(hierarchyUpload.verified==false){
+						showError("Please upload xlsx file");
+					}
+					
+					if (hierarchyUpload.verified == true) {
+						var formData = new FormData();
+						formData.append("file", $('#com-file')
+								.prop("files")[0]);
+						formData
+								.append("filename", $(
+										'#com-file').prop(
+										"files")[0].name);
+						callAjaxPOSTWithTextDataLogo("./savexlsxfile.do",
+								hierarchyUpload.saveXlxsSuccessCallback, true, formData); 
+						hierarchyUpload.verified=false;
+					}
+					
+					else{
+						showError("Please select a valid file");
+					}
 				});
 
 		
 				$('#xlsx-file-verify').click(
 						function() {
-							if (hierarchyUpload.fileValidate("#com-file")) {
-								hierarchyUpload.set = true;
-								hierarchyUpload.verified =true;
-							}
-							if (hierarchyUpload.set == true) {
-								showInfo("Valid File Format");
-								$('#hierarchy-upload').show();
-								hierarchyUpload.set =false;
-							}
-							if(hierarchyUpload.verified==false){
-								showError("Please upload xlsx file");
-							}
-							
-							if (hierarchyUpload.verified == true) {
+							var url = $("#fileUrl").val();
+							if (url == undefined || url == '') {
+								showError("Please upload a valid file");
+							} else {
 								var formData = new FormData();
-								formData.append("file", $('#com-file')
-										.prop("files")[0]);
-								formData
-										.append("filename", $(
-												'#com-file').prop(
-												"files")[0].name);
+								formData.append("fileUrl", url);
 								callAjaxPOSTWithTextDataLogo("./verifyxlsxfile.do",
-										hierarchyUpload.uploadXlxsSuccessCallback, true, formData); 
+										hierarchyUpload.uploadXlxsSuccessCallback, true, formData);
 								hierarchyUpload.verified=false;
 							}
-							
-							else{
-								showError("Please select a valid file");
-							}
-							
-							
 						});
 				$('#xlsx-file-upload').click(
 						function() {
@@ -2027,8 +2035,10 @@ var hierarchyUpload={
 			if (!response) {
 				$('#com-file').val('');
 				$('#com-xlsx-file').val('');
+				$('#fileUrl').val('');
 				showError(response);
 			} else {
+				$('#xlsx-file-upload').show();
 				$.each($.parseJSON(response), function(key, value) {
 					function fixStr(key) {
 					    var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
@@ -2049,6 +2059,23 @@ var hierarchyUpload={
 					});
 			
 				}
+		},
+		saveXlxsSuccessCallback:function(response){
+			
+			if(!response){
+				$('#com-file').val('');
+				$('#com-xlsx-file').val('');
+				showError("Error saving the file");
+			} else {
+				var jsonResponse = $.parseJSON(response);
+				if(jsonResponse.status){
+					showInfo("Successfully saved the file");
+					$("#fileUrl").val(jsonResponse.response);
+				} else {
+					showError("Error : " + jsonResponse.response);
+				}
+			}
+			
 		},
 		fileValidate:function(fileformat){
 			var fileExtensions = ".xlsx";
