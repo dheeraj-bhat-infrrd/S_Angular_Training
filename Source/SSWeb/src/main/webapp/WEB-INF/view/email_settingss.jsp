@@ -406,7 +406,8 @@
 			$('#edit-participation-mail-content').show();
 			$('#edit-participation-mail-content-disabled').hide();
 		});
-		$('#revert-participation-mail').click(function() {
+		$('#revert-participation-mail').click(function(e) {
+			e.stopPropagation();
 			$('#overlay-main').show();
 			$('#overlay-continue').show();
 			$('#overlay-continue').html("Reset");
