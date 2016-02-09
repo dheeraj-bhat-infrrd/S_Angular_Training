@@ -28,6 +28,7 @@
 		<div>
 			<input type="file" class="rfr_input_fld com-logo-comp-info"
 				id="com-file" name="xlsxfile">
+			<input type="hidden" id="fileUrl" name="fileUrl">
 		</div>
 		<div
 			class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj"
@@ -49,5 +50,5 @@
 <script>
 	$(document).ready(function() {
 		hierarchyUpload.fileUpload();
-					});
+	});
 </script>
