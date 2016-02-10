@@ -37,6 +37,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -49,12 +50,14 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -185,6 +188,9 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
     @Value ( "${AMAZON_IMAGE_BUCKET}")
     private String amazonImageBucket;
+    
+    @Autowired
+    private HierarchyUploadDao hierarchyUploadDao;
 
     private static Logger LOG = LoggerFactory.getLogger( CsvUploadServiceImpl.class );
 
@@ -412,6 +418,400 @@ public class CsvUploadServiceImpl implements CsvUploadService
         upload.setBranches( new ArrayList<BranchUploadVO>() );
         upload.setUsers( new ArrayList<UserUploadVO>() );
         return upload;
+    }
+    
+    
+    /**
+     * Method to update company hierarchy structure in mongo
+     * @param company
+     * @return
+     * @throws InvalidInputException
+     */
+    public HierarchyUpload updateHierarchyStructure( Company company ) throws InvalidInputException
+    {
+        LOG.info( "Method updateHierarchyStructure started for company : " + company.getCompany() );
+        /* 
+         * 1. fetch from mongo (oldHierarchyStructure)
+         * 2. If empty go to step 5
+         * 3. create current hierarchy upload object that reflects the current hierarchy structure.
+         * 4. compare and update oldHierarchyStructure and currentHierarchyStructure)
+         */
+        HierarchyUpload oldHierarchyUpload = hierarchyUploadDao.getHierarchyUploadByCompany( company.getCompanyId() );
+        // Generate new hierarchyupload
+        HierarchyUpload currentHierarchyUpload = generateCurrentHierarchyStructure( company );
+        if ( oldHierarchyUpload == null ) {
+            LOG.warn( "No pre-existing hierarchy structure found for the company" );
+            //TODO: generate source Ids
+            hierarchyUploadDao.saveHierarchyUploadObject( currentHierarchyUpload );
+        } else {
+            //TODO : Compare and update hierarchy structures
+        }
+
+        LOG.info( "Method updateHierarchyStructure finished for company : " + company.getCompany() );
+        return null;
+    }
+    
+    
+    /**
+     * Method to aggregate hierarchy structure
+     * @param oldHierarchyUpload
+     * @param currentHierarchyUpload
+     * @return
+     * @throws InvalidInputException 
+     */
+    public HierarchyUpload aggregateHierarchyStructure( HierarchyUpload oldHierarchyUpload, HierarchyUpload currentHierarchyUpload ) throws InvalidInputException{
+        LOG.info( "Method to aggregate hierarchy structure started" );
+        if ( oldHierarchyUpload == null ) {
+            throw new InvalidInputException( "OldHierarchyUpload object is empty" );
+        }
+        if ( currentHierarchyUpload == null ) {
+            throw new InvalidInputException( "CurrentHierarchyUpload object is empty" );
+        }
+        
+        HierarchyUpload newHierarchyUpload = new HierarchyUpload();
+        
+        //TODO : Compare and aggregate regions
+        
+        //TODO : Compare and aggregate branches
+        //TODO : Compare and aggregate users
+        
+        LOG.info( "Method to aggregate hierarchy structure finished" );
+        return newHierarchyUpload;
+    }
+    
+    
+    public List<RegionUploadVO> aggregateRegionsStructure( List<RegionUploadVO> oldRegions, List<RegionUploadVO> currentRegions ){
+        List<RegionUploadVO> newRegions = new ArrayList<RegionUploadVO>();
+        
+        Map<Long, RegionUploadVO> oldRegionsMap = new HashMap<Long, RegionUploadVO>();
+        //Get map from RegionUploadVO
+        for ( RegionUploadVO regionUploadVO : oldRegions ) {
+            
+        }
+    }
+
+
+    /**
+     * Method to generate current hierarchy structure for a company
+     * @param company
+     * @return
+     * @throws InvalidInputException 
+     */
+    public HierarchyUpload generateCurrentHierarchyStructure( Company company ) throws InvalidInputException
+    {
+        LOG.info( "Method to generate current hierarchy structure for company : " + company.getCompany() + " started" );
+
+        HierarchyUpload hierarchyUpload = new HierarchyUpload();
+
+        //Set company Id
+        hierarchyUpload.setCompanyId( company.getCompanyId() );
+
+        //Set RegionVOs
+        List<RegionUploadVO> regions = generateRegionUploadVOsForCompany( company );
+        hierarchyUpload.setRegions( regions );
+
+        //Set BranchVOs
+        List<BranchUploadVO> branches = generateBranchUploadVOsForCompany( company );
+        hierarchyUpload.setBranches( branches );
+
+        //Set UserVOs
+        List<UserUploadVO> users = generateUserUploadVOsForCompany( company );
+        hierarchyUpload.setUsers( users );
+
+        LOG.info( "Method to generate current hierarchy structure for company : " + company.getCompany() + " finished" );
+        return hierarchyUpload;
+    }
+
+
+    /**
+     * Method to generate UserUploadVOs for a company
+     * @param company
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<UserUploadVO> generateUserUploadVOsForCompany( Company company ) throws InvalidInputException
+    {
+        LOG.info( "Method to generate user upload VOs for company : " + company.getCompany() + " started" );
+        List<UserUploadVO> userVOs = new ArrayList<UserUploadVO>();
+        List<User> users = company.getUsers();
+        for ( User user : users ) {
+            UserUploadVO userUploadVO = generateUserUploadVOForUser( user );
+            userVOs.add( userUploadVO );
+        }
+        LOG.info( "Method to generate user upload VOs for company : " + company.getCompany() + " finished" );
+        return userVOs;
+    }
+
+
+    /**
+     * Method to get user upload VO for user
+     * @param user
+     * @return
+     * @throws InvalidInputException
+     */
+    public UserUploadVO generateUserUploadVOForUser( User user ) throws InvalidInputException
+    {
+        if ( user == null ) {
+            throw new InvalidInputException( "User is null" );
+        }
+        LOG.info( "Method to get user upload VO for user : " + user.getUsername() + " started" );
+
+        //Get userSettings
+        AgentSettings agentSettings;
+        try {
+            agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+        } catch ( NoRecordsFetchedException e ) {
+            throw new InvalidInputException( "Agent Setting null for userId : " + user.getUserId() );
+        }
+
+        UserUploadVO userUploadVO = new UserUploadVO();
+
+        userUploadVO.setFirstName( user.getFirstName() );
+        if ( user.getLastName() != null && !( user.getLastName().isEmpty() ) ) {
+            userUploadVO.setLastName( user.getLastName() );
+        }
+
+        userUploadVO.setBelongsToCompany( true );
+
+        //Get list of branchIds, list of regionIds and isAgent
+        List<UserProfile> userProfiles = user.getUserProfiles();
+        List<Long> branchIds = new ArrayList<Long>();
+        List<Long> regionIds = new ArrayList<Long>();
+        for ( UserProfile userProfile : userProfiles ) {
+            if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                branchIds.add( userProfile.getBranchId() );
+                regionIds.add( userProfile.getRegionId() );
+                if ( userProfile.getIsPrimary() == 1 ) {
+                    if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                        userUploadVO.setAgent( true );
+                    }
+                }
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                    userUploadVO.setBranchAdmin( true );
+                }
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                    userUploadVO.setRegionAdmin( true );
+                }
+            }
+        }
+
+
+        if ( agentSettings.getContact_details() != null ) {
+            if ( agentSettings.getContact_details().getTitle() != null
+                && !( agentSettings.getContact_details().getTitle().isEmpty() ) ) {
+                userUploadVO.setTitle( agentSettings.getContact_details().getTitle() );
+            }
+            if ( agentSettings.getContact_details().getMail_ids() != null
+                && agentSettings.getContact_details().getMail_ids().getWork() != null
+                && !( agentSettings.getContact_details().getMail_ids().getWork().isEmpty() ) ) {
+                userUploadVO.setEmailId( agentSettings.getContact_details().getMail_ids().getWork() );
+            }
+            if ( agentSettings.getContact_details().getContact_numbers() != null
+                && agentSettings.getContact_details().getContact_numbers().getWork() != null
+                && !( agentSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) ) {
+                userUploadVO.setPhoneNumber( agentSettings.getContact_details().getContact_numbers().getWork() );
+            }
+            if ( agentSettings.getContact_details().getWeb_addresses() != null
+                && agentSettings.getContact_details().getWeb_addresses().getWork() != null
+                && !( agentSettings.getContact_details().getWeb_addresses().getWork().isEmpty() ) ) {
+                userUploadVO.setWebsiteUrl( agentSettings.getContact_details().getWeb_addresses().getWork() );
+            }
+            if ( agentSettings.getContact_details().getAbout_me() != null
+                && !( agentSettings.getContact_details().getAbout_me().isEmpty() ) ) {
+                userUploadVO.setAboutMeDescription( agentSettings.getContact_details().getAbout_me() );
+            }
+        }
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getLicense_disclaimer() != null
+            && !( agentSettings.getLicenses().getLicense_disclaimer().isEmpty() ) ) {
+            userUploadVO.setLicense( agentSettings.getLicenses().getLicense_disclaimer() );
+        }
+        if ( agentSettings.getDisclaimer() != null && !( agentSettings.getDisclaimer().isEmpty() ) ) {
+            userUploadVO.setLegalDisclaimer( agentSettings.getDisclaimer() );
+        }
+        if ( agentSettings.getProfileImageUrl() != null && !( agentSettings.getProfileImageUrl().isEmpty() ) ) {
+            userUploadVO.setUserPhotoUrl( agentSettings.getProfileImageUrl() );
+        }
+
+        LOG.info( "Method to get user upload VO for user : " + user.getUsername() + " finished" );
+        return userUploadVO;
+    }
+    
+
+    /**
+     * Method to generate BranchUploadVOs for a company
+     * @param company
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<BranchUploadVO> generateBranchUploadVOsForCompany( Company company ) throws InvalidInputException
+    {
+
+        LOG.info( "Method to generate branch upload VOs for company : " + company.getCompany() + " started" );
+        List<BranchUploadVO> branchVOs = new ArrayList<BranchUploadVO>();
+        List<Branch> branches = company.getBranches();
+        for ( Branch branch : branches ) {
+            BranchUploadVO branchUploadVO = generateBranchUploadVOForBranch( branch );
+            branchVOs.add( branchUploadVO );
+        }
+        LOG.info( "Method to generate branch upload VOs for company : " + company.getCompany() + " finished" );
+        return branchVOs;
+    }
+
+
+    /**
+     * Method to get BranchUploadVO for branch
+     * @param branch
+     * @return
+     * @throws InvalidInputException
+     */
+    public BranchUploadVO generateBranchUploadVOForBranch( Branch branch ) throws InvalidInputException
+    {
+        if ( branch == null ) {
+            throw new InvalidInputException( "Branch is null" );
+        }
+        LOG.info( "Method to get branch upload VO for branch : " + branch.getBranch() + " started" );
+
+        //Get branchSettings
+        OrganizationUnitSettings branchSettings;
+        try {
+            branchSettings = organizationManagementService.getBranchSettingsDefault( branch.getBranchId() );
+        } catch ( NoRecordsFetchedException e ) {
+            throw new InvalidInputException( "Branch settings is null for branch : " + branch.getBranchId() );
+        }
+
+        BranchUploadVO branchUploadVO = new BranchUploadVO();
+
+        branchUploadVO.setBranchId( branch.getBranchId() );
+        branchUploadVO.setRegionId( branch.getRegion().getRegionId() );
+        branchUploadVO.setBranchName( branch.getBranchName() );
+        branchUploadVO.setAssignedRegionName( branch.getRegion().getRegion() );
+
+        if ( branchSettings.getContact_details() != null ) {
+            if ( branchSettings.getContact_details().getAddress1() != null
+                && !( branchSettings.getContact_details().getAddress1().isEmpty() ) ) {
+                branchUploadVO.setBranchAddress1( branchSettings.getContact_details().getAddress1() );
+            }
+            if ( branchSettings.getContact_details().getAddress2() != null
+                && !( branchSettings.getContact_details().getAddress2().isEmpty() ) ) {
+                branchUploadVO.setBranchAddress2( branchSettings.getContact_details().getAddress2() );
+            }
+            if ( branchSettings.getContact_details().getCountry() != null
+                && !( branchSettings.getContact_details().getCountry().isEmpty() ) ) {
+                branchUploadVO.setBranchCountry( branchSettings.getContact_details().getCountry() );
+            }
+            if ( branchSettings.getContact_details().getCountryCode() != null
+                && !( branchSettings.getContact_details().getCountryCode().isEmpty() ) ) {
+                branchUploadVO.setBranchCountryCode( branchSettings.getContact_details().getCountryCode() );
+            }
+            if ( branchSettings.getContact_details().getState() != null
+                && !( branchSettings.getContact_details().getState().isEmpty() ) ) {
+                branchUploadVO.setBranchState( branchSettings.getContact_details().getState() );
+            }
+            if ( branchSettings.getContact_details().getCity() != null
+                && !( branchSettings.getContact_details().getCity().isEmpty() ) ) {
+                branchUploadVO.setBranchCity( branchSettings.getContact_details().getCity() );
+            }
+            if ( branchSettings.getContact_details().getZipcode() != null
+                && !( branchSettings.getContact_details().getZipcode().isEmpty() ) ) {
+                branchUploadVO.setBranchZipcode( branchSettings.getContact_details().getZipcode() );
+            }
+        }
+
+
+        LOG.info( "Method to get branch upload VO for branch : " + branch.getBranch() + " finished" );
+        return branchUploadVO;
+    }
+
+
+    /**
+     * Method to generate RegionUploadVOs for a company
+     * @param company
+     * @return
+     * @throws InvalidInputException 
+     */
+    public List<RegionUploadVO> generateRegionUploadVOsForCompany( Company company ) throws InvalidInputException
+    {
+
+        LOG.info( "Method to generate region upload VOs for comapny : " + company.getCompany() + " started" );
+        List<RegionUploadVO> regionVOs = new ArrayList<RegionUploadVO>();
+        List<Region> regions = company.getRegions();
+        for ( Region region : regions ) {
+            RegionUploadVO regionUploadVO = getRegionUploadVOForRegion( region );
+            regionVOs.add( regionUploadVO );
+        }
+        LOG.info( "Method to generate region upload VOs for comapny : " + company.getCompany() + " finished" );
+        return regionVOs;
+    }
+
+
+    /**
+     * Method to get RegionUploadVO for a region
+     * @param region
+     * @return
+     * @throws InvalidInputException 
+     */
+    public RegionUploadVO getRegionUploadVOForRegion( Region region ) throws InvalidInputException
+    {
+        if ( region == null ) {
+            throw new InvalidInputException( "Region is null" );
+        }
+        LOG.info( "Method to get region upload VO for region : " + region.getRegion() + " started" );
+
+        //Get regionSettings
+        OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( region.getRegionId() );
+        if ( regionSettings == null ) {
+            throw new InvalidInputException( "Region settings is null" );
+        }
+
+
+        RegionUploadVO regionUploadVO = new RegionUploadVO();
+        regionUploadVO.setRegionId( region.getRegionId() );
+        regionUploadVO.setRegionName( region.getRegion() );
+        if ( regionSettings.getContact_details() != null ) {
+            if ( regionSettings.getContact_details().getAddress1() != null
+                && !( regionSettings.getContact_details().getAddress1().isEmpty() ) ) {
+                regionUploadVO.setRegionAddress1( regionSettings.getContact_details().getAddress1() );
+            }
+
+            if ( regionSettings.getContact_details().getAddress2() != null
+                && !( regionSettings.getContact_details().getAddress2().isEmpty() ) ) {
+                regionUploadVO.setRegionAddress2( regionSettings.getContact_details().getAddress2() );
+            }
+
+            if ( regionSettings.getContact_details().getCountry() != null
+                && !( regionSettings.getContact_details().getCountry().isEmpty() ) ) {
+                regionUploadVO.setRegionCountry( regionSettings.getContact_details().getCountry() );
+            }
+
+            if ( regionSettings.getContact_details().getCountryCode() != null
+                && !( regionSettings.getContact_details().getCountryCode().isEmpty() ) ) {
+                regionUploadVO.setRegionCountryCode( regionSettings.getContact_details().getCountryCode() );
+            }
+
+            if ( regionSettings.getContact_details().getCountryCode() != null
+                && !( regionSettings.getContact_details().getCountryCode().isEmpty() ) ) {
+                regionUploadVO.setRegionCountryCode( regionSettings.getContact_details().getCountryCode() );
+            }
+
+            if ( regionSettings.getContact_details().getState() != null
+                && !( regionSettings.getContact_details().getState().isEmpty() ) ) {
+                regionUploadVO.setRegionState( regionSettings.getContact_details().getState() );
+            }
+
+            if ( regionSettings.getContact_details().getCity() != null
+                && !( regionSettings.getContact_details().getCity().isEmpty() ) ) {
+                regionUploadVO.setRegionCity( regionSettings.getContact_details().getCity() );
+            }
+
+            if ( regionSettings.getContact_details().getZipcode() != null
+                && !( regionSettings.getContact_details().getZipcode().isEmpty() ) ) {
+                regionUploadVO.setRegionZipcode( regionSettings.getContact_details().getZipcode() );
+            }
+
+        }
+
+        LOG.info( "Method to get region upload VO for region : " + region.getRegion() + " finished" );
+        return regionUploadVO;
     }
 
 

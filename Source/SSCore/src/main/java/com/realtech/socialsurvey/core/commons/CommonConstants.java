@@ -1005,4 +1005,8 @@ public interface CommonConstants
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
     public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&count=10";
+    
+    //Hierarchy Upload constants
+    public static final String HIERARCHY_UPLOAD_COLLECTION = "HIERARCHY_UPLOAD";
+    
 }

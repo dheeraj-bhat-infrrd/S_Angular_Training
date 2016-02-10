@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class HierarchyUpload
 {
+    private long companyId;
     private List<RegionUploadVO> regions;
     private List<BranchUploadVO> branches;
     private List<UserUploadVO> users;
@@ -83,6 +84,24 @@ public class HierarchyUpload
     public void setUserSourceMapping( Map<Long, String> userSourceMapping )
     {
         this.userSourceMapping = userSourceMapping;
+    }
+
+
+    /**
+     * @return the companyId
+     */
+    public long getCompanyId()
+    {
+        return companyId;
+    }
+
+
+    /**
+     * @param companyId the companyId to set
+     */
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
     }
 
 

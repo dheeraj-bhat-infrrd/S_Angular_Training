@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
+
 /*
  * The view class for User
  */
@@ -83,6 +86,8 @@ public class UserUploadVO
     private StringUploadHistory[] userPhotoUrlHistory;
     private boolean isUserAdded;
     private boolean isUserModified;
+    private List<Long> regionIds;
+    private List<Long> branchIds;
 
 
     public String getFirstName()
@@ -1006,6 +1011,42 @@ public class UserUploadVO
     public void setUserModified( boolean isUserModified )
     {
         this.isUserModified = isUserModified;
+    }
+
+
+    /**
+     * @return the regionIds
+     */
+    public List<Long> getRegionIds()
+    {
+        return regionIds;
+    }
+
+
+    /**
+     * @param regionIds the regionIds to set
+     */
+    public void setRegionIds( List<Long> regionIds )
+    {
+        this.regionIds = regionIds;
+    }
+
+
+    /**
+     * @return the branchIds
+     */
+    public List<Long> getBranchIds()
+    {
+        return branchIds;
+    }
+
+
+    /**
+     * @param branchIds the branchIds to set
+     */
+    public void setBranchIds( List<Long> branchIds )
+    {
+        this.branchIds = branchIds;
     }
 
 
