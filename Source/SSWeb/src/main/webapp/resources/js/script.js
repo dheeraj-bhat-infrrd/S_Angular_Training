@@ -2033,7 +2033,7 @@ var hierarchyUpload={
 				});
 		},
 		uploadXlxsSuccessCallback:function(response){
-			if (!response) {
+        if (!response) {
 				$('#com-file').val('');
 				$('#com-xlsx-file').val('');
 				$('#fileUrl').val('');

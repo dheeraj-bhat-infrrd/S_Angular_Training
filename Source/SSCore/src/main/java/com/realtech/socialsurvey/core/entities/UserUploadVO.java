@@ -6,6 +6,7 @@ package com.realtech.socialsurvey.core.entities;
 public class UserUploadVO
 {
 
+    private String sourceUserId;
     private String firstName;
     private boolean isFirstNameModified;
     private StringUploadHistory[] firstNameHistory;
@@ -83,6 +84,19 @@ public class UserUploadVO
     private StringUploadHistory[] userPhotoUrlHistory;
     private boolean isUserAdded;
     private boolean isUserModified;
+    private boolean isErrorRecord;
+
+
+    public String getSourceUserId()
+    {
+        return sourceUserId;
+    }
+
+
+    public void setSourceUserId( String sourceUserId )
+    {
+        this.sourceUserId = sourceUserId;
+    }
 
 
     public String getFirstName()
@@ -1006,6 +1020,18 @@ public class UserUploadVO
     public void setUserModified( boolean isUserModified )
     {
         this.isUserModified = isUserModified;
+    }
+
+
+    public boolean isErrorRecord()
+    {
+        return isErrorRecord;
+    }
+
+
+    public void setErrorRecord( boolean isErrorRecord )
+    {
+        this.isErrorRecord = isErrorRecord;
     }
 
 

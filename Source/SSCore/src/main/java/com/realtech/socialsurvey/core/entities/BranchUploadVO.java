@@ -49,6 +49,7 @@ public class BranchUploadVO
     private boolean isAddressSet;
     private boolean isBranchAdded;
     private boolean isBranchModified;
+    private boolean isErrorRecord;
 
 
     public long getBranchId()
@@ -554,5 +555,40 @@ public class BranchUploadVO
         this.isBranchModified = isBranchModified;
     }
 
+
+    public boolean isErrorRecord()
+    {
+        return isErrorRecord;
+    }
+
+
+    public void setErrorRecord( boolean isErrorRecord )
+    {
+        this.isErrorRecord = isErrorRecord;
+    }
+
+
+    @Override
+    public boolean equals( Object uploadVo )
+    {
+        BranchUploadVO branchUploadVO = (BranchUploadVO) uploadVo;
+        if ( this.sourceBranchId != null && !this.sourceBranchId.isEmpty() && branchUploadVO.sourceBranchId != null
+            && !branchUploadVO.sourceBranchId.isEmpty() ) {
+            return this.sourceBranchId.equals( branchUploadVO.sourceBranchId );
+        } else {
+            return ( this.branchId == branchUploadVO.branchId );
+        }
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        if ( sourceBranchId != null && !sourceBranchId.isEmpty() ) {
+            return sourceBranchId.hashCode();
+        } else {
+            return ( new Long( branchId ) ).hashCode();
+        }
+    }
 
 }

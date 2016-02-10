@@ -40,6 +40,7 @@ public class RegionUploadVO
     private boolean isAddressSet;
     private boolean isRegionAdded;
     private boolean isRegionModified;
+    private boolean isErrorRecord;
 
 
     public long getRegionId()
@@ -447,6 +448,42 @@ public class RegionUploadVO
     public void setRegionModified( boolean isRegionModified )
     {
         this.isRegionModified = isRegionModified;
+    }
+
+
+    public boolean isErrorRecord()
+    {
+        return isErrorRecord;
+    }
+
+
+    public void setErrorRecord( boolean isErrorRecord )
+    {
+        this.isErrorRecord = isErrorRecord;
+    }
+
+
+    @Override
+    public boolean equals( Object uploadVo )
+    {
+        RegionUploadVO regionUploadVO = (RegionUploadVO) uploadVo;
+        if ( this.sourceRegionId != null && !this.sourceRegionId.isEmpty() && regionUploadVO.sourceRegionId != null
+            && !regionUploadVO.sourceRegionId.isEmpty() ) {
+            return this.sourceRegionId.equals( regionUploadVO.sourceRegionId );
+        } else {
+            return ( this.regionId == regionUploadVO.regionId );
+        }
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        if ( sourceRegionId != null && !sourceRegionId.isEmpty() ) {
+            return sourceRegionId.hashCode();
+        } else {
+            return ( new Long( regionId ) ).hashCode();
+        }
     }
 
 
