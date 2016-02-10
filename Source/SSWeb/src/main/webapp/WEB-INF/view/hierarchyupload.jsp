@@ -10,6 +10,10 @@
 				<spring:message code="label.hierarchyupload.key" />
 			</div> 
 			<div class="float-right hm-header-right text-center"
+			 onclick="javascript:showMainContent('./hierarchyupload.do')">
+					<spring:message code="label.header.Hierarchyupload.key" />
+				</div>
+			<div class="float-right hm-header-right text-center"
 				onclick="javascript:showMainContent('./viewhierarchy.do');">
 				<spring:message code="label.viewcompanyhierachy.key" />
 			</div>
@@ -21,10 +25,7 @@
 				onclick="javascript:showMainContent('./showbuildhierarchypage.do')">
 				<spring:message code="label.header.buildhierarchy.key" />
 			</div>
-			<div class="float-right hm-header-right text-center"
-			 onclick="javascript:showMainContent('./hierarchyupload.do')">
-					<spring:message code="label.header.Hierarchyupload.key" />
-				</div>
+			
 		</div>
 	</div>
 </div>
@@ -38,7 +39,7 @@
 	</div>
 </div> --%>
 <div class="clearfix">
-	<div class="float-left rfr_lbl">
+	<div class="float-left rfr_lbl" style="margin-top:10px;">
 		<spring:message code="label.xlsxfile.key" />
 	</div>
 	<div class="float-left rfr_txt" style="margin-top: 10px;">

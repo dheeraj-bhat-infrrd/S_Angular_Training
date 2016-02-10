@@ -1952,7 +1952,6 @@ function initializeUserCompanyRegistrationPage() {
 	});
 }
 var hierarchyUpload={
-		 set : false,
 		verified:false,
 		
 		fileUpload:function(){
@@ -1963,14 +1962,9 @@ var hierarchyUpload={
 					$('#com-xlsx-file').val(
 							fileAdd[fileAdd.length - 1]);
 					if (hierarchyUpload.fileValidate("#com-file")) {
-						hierarchyUpload.set = true;
 						hierarchyUpload.verified =true;
 					}
-					if (hierarchyUpload.set == true) {
-						//TODO : Show loader instead
-						showInfo("Valid File Format");
-						hierarchyUpload.set =false;
-					}
+					
 					if(hierarchyUpload.verified==false){
 						showError("Please upload xlsx file");
 					}
