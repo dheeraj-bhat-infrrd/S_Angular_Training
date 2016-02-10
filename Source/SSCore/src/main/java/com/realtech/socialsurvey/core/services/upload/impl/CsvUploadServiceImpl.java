@@ -107,16 +107,15 @@ public class CsvUploadServiceImpl implements CsvUploadService
     private static final int USER_TITLE_INDEX = 3;
     private static final int USER_BRANCH_ID_INDEX = 4;
     private static final int USER_REGION_ID_INDEX = 5;
-    private static final int USER_HAS_PUBLIC_PAGE_INDEX = 6;
-    private static final int USER_BRANCH_ID_ADMIN_INDEX = 7;
-    private static final int USER_REGION_ID_ADMIN_INDEX = 8;
-    private static final int USER_EMAIL_INDEX = 9;
-    private static final int USER_PHONE_NUMBER = 10;
-    private static final int USER_WEBSITE = 11;
-    private static final int USER_LICENSES = 12;
-    private static final int USER_LEGAL_DISCLAIMER = 13;
-    private static final int USER_PHOTO_PROFILE_URL = 14;
-    private static final int USER_ABOUT_ME_DESCRIPTION = 15;
+    private static final int USER_BRANCH_ID_ADMIN_INDEX = 6;
+    private static final int USER_REGION_ID_ADMIN_INDEX = 7;
+    private static final int USER_EMAIL_INDEX = 8;
+    private static final int USER_PHONE_NUMBER = 9;
+    private static final int USER_WEBSITE = 10;
+    private static final int USER_LICENSES = 11;
+    private static final int USER_LEGAL_DISCLAIMER = 12;
+    private static final int USER_PHOTO_PROFILE_URL = 13;
+    private static final int USER_ABOUT_ME_DESCRIPTION = 14;
 
     private static final String COUNTRY = "United States";
     private static final String COUNTRY_CODE = "US";
@@ -252,8 +251,8 @@ public class CsvUploadServiceImpl implements CsvUploadService
         List<RegionUploadVO> uploadedRegions = new ArrayList<>();
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
-            // skip the first 2 row. first row is the schema and second is the header
-            if ( row.getRowNum() < 2 ) {
+            // skip the first header row.
+            if ( row.getRowNum() < 1 ) {
                 continue;
             }
             cells = row.cellIterator();
@@ -425,8 +424,8 @@ public class CsvUploadServiceImpl implements CsvUploadService
         BranchUploadVO uploadedBranch = null;
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
-            // skip the first 2 row. first row is the schema and second is the header
-            if ( row.getRowNum() < 2 ) {
+            // skip the first header row.
+            if ( row.getRowNum() < 1 ) {
                 continue;
             }
             cells = row.cellIterator();
@@ -549,7 +548,17 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
     public void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject )
     {
-
+        // Parse each row for users and then check for valid users. On successful validation, check if the user is a new, modified or deleted user.
+        // Possible reasons for errors
+        // 1. User source id is not present.
+        // 2. User first name is not present.
+        // 3. User assigned branches do not match the branches sheet.
+        // 4. User assigned regions do not match the regions sheet.
+        // 5. User admin assignment branches do not match the branches sheet.
+        // 6. User admin assignment regions do not match the regions sheet.
+        // 7. User email address is not present
+        // Possible warnings
+        // 1. There are no branch, region, branch admin, region admin assignments. The user will be added under the company as an individual.
     }
 
 
@@ -904,13 +913,6 @@ public class CsvUploadServiceImpl implements CsvUploadService
                             LOG.error( "Could not find region" );
                             rowContainsError = true;
                             break;
-                        }
-                    }
-                } else if ( cellIndex == USER_HAS_PUBLIC_PAGE_INDEX ) {
-                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        String hasProfilePage = cell.getStringCellValue();
-                        if ( hasProfilePage.equalsIgnoreCase( "YES" ) ) {
-                            uploadedUser.setAgent( true );
                         }
                     }
                 } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX ) {
