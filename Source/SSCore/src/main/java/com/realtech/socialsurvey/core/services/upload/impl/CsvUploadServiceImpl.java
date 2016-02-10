@@ -325,7 +325,14 @@ public class CsvUploadServiceImpl implements CsvUploadService
                         validationObject.getUpload().getRegions().add( uploadedRegion );
                     } else {
                         // region already exists
-                        // TODO: check if region is modified. If modified then set the modified details 
+                        // Check all the fields 
+                        int index = validationObject.getUpload().getRegions().indexOf( uploadedRegion );
+                        if(index > -1){
+                            RegionUploadVO currentObject = validationObject.getUpload().getRegions().get( index );
+                            if(checkForModificationAndSuperImpose(currentObject, uploadedRegion)){
+                                currentObject.setRegionModified( true );
+                            }
+                        }
                     }
                     // add to uploaded regions list.
                     uploadedRegions.add( uploadedRegion );
@@ -342,7 +349,49 @@ public class CsvUploadServiceImpl implements CsvUploadService
         markDeletedRegions( uploadedRegions, validationObject.getUpload() );
     }
 
-
+    // checks the fields that are modified. return true of the value is modified and modify the current region
+    private boolean checkForModificationAndSuperImpose(RegionUploadVO currentRegion, RegionUploadVO uploadedRegion){
+        boolean isModified = false;
+        if(!currentRegion.getRegionName().equals( uploadedRegion.getRegionName() )){
+            isModified = true;
+            currentRegion.setRegionName( uploadedRegion.getRegionName() );
+            currentRegion.setRegionNameModified( true );
+        }
+        if(currentRegion.getRegionAddress1() == null){
+            currentRegion.setRegionAddress1("");
+        }
+        if(uploadedRegion.getRegionAddress1() == null){
+            uploadedRegion.setRegionAddress1("");
+        }
+        if(!currentRegion.getRegionAddress1().equals( uploadedRegion.getRegionAddress1() )){
+            if(uploadedRegion.getRegionAddress1().equals( "" )){
+                isModified = true;
+                currentRegion.setRegionAddress1( null );
+            }else{
+                currentRegion.setRegionAddress1( uploadedRegion.getRegionAddress1() );
+            }
+            currentRegion.setRegionAddress1Modified( true );
+        }
+        
+        if(currentRegion.getRegionAddress2() == null){
+            currentRegion.setRegionAddress2("");
+        }
+        if(uploadedRegion.getRegionAddress2() == null){
+            uploadedRegion.setRegionAddress2("");
+        }
+        if(!currentRegion.getRegionAddress2().equals( uploadedRegion.getRegionAddress2() )){
+            if(uploadedRegion.getRegionAddress2().equals( "" )){
+                isModified = true;
+                currentRegion.setRegionAddress2( null );
+            }else{
+                currentRegion.setRegionAddress2( uploadedRegion.getRegionAddress2() );
+            }
+            currentRegion.setRegionAddress2Modified( true );
+        }
+        
+        return isModified;
+    }
+    
     private boolean validateUploadedRegion( RegionUploadVO uploadedRegion, int rowNumber ) throws InvalidInputException
     {
         LOG.debug( "Validating uploaded region" );
@@ -381,8 +430,18 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
     private boolean isNewRegion( RegionUploadVO uploadedRegion, HierarchyUpload upload )
     {
-        // TODO: check for new region addition
-        return true;
+        // If the source is present in the mapping, then its a modified record
+        if(upload.getRegionSourceMapping() != null && upload.getRegionSourceMapping().size() > 0){
+           if(upload.getRegionSourceMapping().containsKey( uploadedRegion.getSourceRegionId() )){
+               // record already present.
+               return false;
+           }else{
+               // new record
+               return true;
+           }
+        }else{
+            return true;
+        }
     }
     
     private boolean isNewBranch( BranchUploadVO uploadedBranch, HierarchyUpload upload )
