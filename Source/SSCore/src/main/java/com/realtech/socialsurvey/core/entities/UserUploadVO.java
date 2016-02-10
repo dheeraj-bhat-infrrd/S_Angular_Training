@@ -85,6 +85,7 @@ public class UserUploadVO
     private boolean isUserAdded;
     private boolean isUserModified;
     private boolean isErrorRecord;
+    private boolean isDeletedRecord;
 
 
     public String getSourceUserId()
@@ -1032,6 +1033,18 @@ public class UserUploadVO
     public void setErrorRecord( boolean isErrorRecord )
     {
         this.isErrorRecord = isErrorRecord;
+    }
+
+
+    public boolean isDeletedRecord()
+    {
+        return isDeletedRecord;
+    }
+
+
+    public void setDeletedRecord( boolean isDeletedRecord )
+    {
+        this.isDeletedRecord = isDeletedRecord;
     }
 
 

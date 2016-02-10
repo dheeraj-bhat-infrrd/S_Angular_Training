@@ -41,6 +41,7 @@ public class RegionUploadVO
     private boolean isRegionAdded;
     private boolean isRegionModified;
     private boolean isErrorRecord;
+    private boolean isDeletedRecord;
 
 
     public long getRegionId()
@@ -460,6 +461,18 @@ public class RegionUploadVO
     public void setErrorRecord( boolean isErrorRecord )
     {
         this.isErrorRecord = isErrorRecord;
+    }
+
+
+    public boolean isDeletedRecord()
+    {
+        return isDeletedRecord;
+    }
+
+
+    public void setDeletedRecord( boolean isDeletedRecord )
+    {
+        this.isDeletedRecord = isDeletedRecord;
     }
 
 

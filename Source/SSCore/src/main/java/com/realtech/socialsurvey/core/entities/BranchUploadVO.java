@@ -50,6 +50,7 @@ public class BranchUploadVO
     private boolean isBranchAdded;
     private boolean isBranchModified;
     private boolean isErrorRecord;
+    private boolean isDeletedRecord;
 
 
     public long getBranchId()
@@ -565,6 +566,18 @@ public class BranchUploadVO
     public void setErrorRecord( boolean isErrorRecord )
     {
         this.isErrorRecord = isErrorRecord;
+    }
+
+
+    public boolean isDeletedRecord()
+    {
+        return isDeletedRecord;
+    }
+
+
+    public void setDeletedRecord( boolean isDeletedRecord )
+    {
+        this.isDeletedRecord = isDeletedRecord;
     }
 
 
