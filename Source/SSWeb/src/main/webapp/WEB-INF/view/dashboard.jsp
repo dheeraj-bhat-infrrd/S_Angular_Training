@@ -144,7 +144,7 @@
 							
 								<option value=6 data-report="company-hierarchy"><spring:message code="label.downloadcompanyhierarchydata.key" /></option>
 							</c:if>
-							<c:if test="${ realTechAdminId == 1 }">
+							<c:if test="${not empty realTechAdminId }">
 								<option value=5 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 
 							</c:if>
 						</select>
