@@ -48,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -55,7 +56,6 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
@@ -110,16 +110,15 @@ public class CsvUploadServiceImpl implements CsvUploadService
     private static final int USER_TITLE_INDEX = 3;
     private static final int USER_BRANCH_ID_INDEX = 4;
     private static final int USER_REGION_ID_INDEX = 5;
-    private static final int USER_HAS_PUBLIC_PAGE_INDEX = 6;
-    private static final int USER_BRANCH_ID_ADMIN_INDEX = 7;
-    private static final int USER_REGION_ID_ADMIN_INDEX = 8;
-    private static final int USER_EMAIL_INDEX = 9;
-    private static final int USER_PHONE_NUMBER = 10;
-    private static final int USER_WEBSITE = 11;
-    private static final int USER_LICENSES = 12;
-    private static final int USER_LEGAL_DISCLAIMER = 13;
-    private static final int USER_PHOTO_PROFILE_URL = 14;
-    private static final int USER_ABOUT_ME_DESCRIPTION = 15;
+    private static final int USER_BRANCH_ID_ADMIN_INDEX = 6;
+    private static final int USER_REGION_ID_ADMIN_INDEX = 7;
+    private static final int USER_EMAIL_INDEX = 8;
+    private static final int USER_PHONE_NUMBER = 9;
+    private static final int USER_WEBSITE = 10;
+    private static final int USER_LICENSES = 11;
+    private static final int USER_LEGAL_DISCLAIMER = 12;
+    private static final int USER_PHOTO_PROFILE_URL = 13;
+    private static final int USER_ABOUT_ME_DESCRIPTION = 14;
 
     private static final String COUNTRY = "United States";
     private static final String COUNTRY_CODE = "US";
@@ -195,20 +194,6 @@ public class CsvUploadServiceImpl implements CsvUploadService
     private static Logger LOG = LoggerFactory.getLogger( CsvUploadServiceImpl.class );
 
 
-    public static void main( String[] args )
-    {
-        CsvUploadServiceImpl obj = new CsvUploadServiceImpl();
-        Company company = new Company();
-        company.setCompany( "Test" );
-        try {
-            obj.validateUserUploadFile( company, "/Users/nishit/work/Social_Survey/fileupload/Summit_data_import.xlsx" );
-        } catch ( InvalidInputException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-
     @Override
     public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException
     {
@@ -272,8 +257,8 @@ public class CsvUploadServiceImpl implements CsvUploadService
         List<RegionUploadVO> uploadedRegions = new ArrayList<>();
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
-            // skip the first 2 row. first row is the schema and second is the header
-            if ( row.getRowNum() < 2 ) {
+            // skip the first header row.
+            if ( row.getRowNum() < 1 ) {
                 continue;
             }
             cells = row.cellIterator();
@@ -346,7 +331,14 @@ public class CsvUploadServiceImpl implements CsvUploadService
                         validationObject.getUpload().getRegions().add( uploadedRegion );
                     } else {
                         // region already exists
-                        // TODO: check if region is modified. If modified then set the modified details 
+                        // Check all the fields 
+                        int index = validationObject.getUpload().getRegions().indexOf( uploadedRegion );
+                        if(index > -1){
+                            RegionUploadVO currentObject = validationObject.getUpload().getRegions().get( index );
+                            if(checkForModificationAndSuperImpose(currentObject, uploadedRegion)){
+                                currentObject.setRegionModified( true );
+                            }
+                        }
                     }
                     // add to uploaded regions list.
                     uploadedRegions.add( uploadedRegion );
@@ -356,13 +348,56 @@ public class CsvUploadServiceImpl implements CsvUploadService
                 if ( validationObject.getRegionValidationErrors() == null ) {
                     validationObject.setRegionValidationErrors( new ArrayList<String>() );
                 }
+                uploadedRegion.setErrorRecord( true );
                 validationObject.getRegionValidationErrors().add( iie.getMessage() );
             }
         }
         markDeletedRegions( uploadedRegions, validationObject.getUpload() );
     }
 
-
+    // checks the fields that are modified. return true of the value is modified and modify the current region
+    private boolean checkForModificationAndSuperImpose(RegionUploadVO currentRegion, RegionUploadVO uploadedRegion){
+        boolean isModified = false;
+        if(!currentRegion.getRegionName().equals( uploadedRegion.getRegionName() )){
+            isModified = true;
+            currentRegion.setRegionName( uploadedRegion.getRegionName() );
+            currentRegion.setRegionNameModified( true );
+        }
+        if(currentRegion.getRegionAddress1() == null){
+            currentRegion.setRegionAddress1("");
+        }
+        if(uploadedRegion.getRegionAddress1() == null){
+            uploadedRegion.setRegionAddress1("");
+        }
+        if(!currentRegion.getRegionAddress1().equals( uploadedRegion.getRegionAddress1() )){
+            if(uploadedRegion.getRegionAddress1().equals( "" )){
+                isModified = true;
+                currentRegion.setRegionAddress1( null );
+            }else{
+                currentRegion.setRegionAddress1( uploadedRegion.getRegionAddress1() );
+            }
+            currentRegion.setRegionAddress1Modified( true );
+        }
+        
+        if(currentRegion.getRegionAddress2() == null){
+            currentRegion.setRegionAddress2("");
+        }
+        if(uploadedRegion.getRegionAddress2() == null){
+            uploadedRegion.setRegionAddress2("");
+        }
+        if(!currentRegion.getRegionAddress2().equals( uploadedRegion.getRegionAddress2() )){
+            if(uploadedRegion.getRegionAddress2().equals( "" )){
+                isModified = true;
+                currentRegion.setRegionAddress2( null );
+            }else{
+                currentRegion.setRegionAddress2( uploadedRegion.getRegionAddress2() );
+            }
+            currentRegion.setRegionAddress2Modified( true );
+        }
+        
+        return isModified;
+    }
+    
     private boolean validateUploadedRegion( RegionUploadVO uploadedRegion, int rowNumber ) throws InvalidInputException
     {
         LOG.debug( "Validating uploaded region" );
@@ -376,18 +411,60 @@ public class CsvUploadServiceImpl implements CsvUploadService
         }
         return true;
     }
+    
+    private boolean validateUploadedBranch( BranchUploadVO uploadedBranch, int rowNumber ) throws InvalidInputException{
+        LOG.debug( "Validating uploaded branch" );
+        if(uploadedBranch.getSourceBranchId() == null || uploadedBranch.getSourceBranchId().isEmpty()){
+            throw new InvalidInputException("Source Id at row: " + rowNumber + " is not provided.");
+        }
+        if(uploadedBranch.getBranchName() == null || uploadedBranch.getBranchName().isEmpty()){
+            throw new InvalidInputException("Office name at row: " + rowNumber + " is not provided.");
+        }
+        if(!uploadedBranch.isAddressSet()){
+            throw new InvalidInputException("Office address at row: " + rowNumber + " is not provided.");
+        }
+        return true;
+    }
 
+    private boolean validateUploadedBranchForWarnings( BranchUploadVO uploadedBranch, int rowNumber, HierarchyUpload upload ) throws InvalidInputException{
+        LOG.debug( "Validating uploaded branch for warning" );
+        if((upload.getRegions() != null && !upload.getRegions().isEmpty()) && (uploadedBranch.getSourceRegionId() == null || uploadedBranch.getSourceRegionId().isEmpty())){
+            throw new InvalidInputException("Office at " + rowNumber + " is not linked to any region.");
+        }
+        return true;
+    }
 
     private boolean isNewRegion( RegionUploadVO uploadedRegion, HierarchyUpload upload )
     {
-        // TODO: check for new region addition
+        // If the source is present in the mapping, then its a modified record
+        if(upload.getRegionSourceMapping() != null && upload.getRegionSourceMapping().size() > 0){
+           if(upload.getRegionSourceMapping().containsKey( uploadedRegion.getSourceRegionId() )){
+               // record already present.
+               return false;
+           }else{
+               // new record
+               return true;
+           }
+        }else{
+            return true;
+        }
+    }
+    
+    private boolean isNewBranch( BranchUploadVO uploadedBranch, HierarchyUpload upload )
+    {
+        // TODO: check for new branch addition
         return true;
     }
 
 
     private void markDeletedRegions( List<RegionUploadVO> uploadedRegions, HierarchyUpload upload )
     {
-        // TODO: iterate and mark the delted regions
+        // TODO: iterate and mark the deleted regions
+    }
+    
+    private void markDeletedBranches( List<BranchUploadVO> uploadedBranches, HierarchyUpload upload )
+    {
+        // TODO: iterate and mark the deleted branches
     }
 
 
@@ -401,12 +478,152 @@ public class CsvUploadServiceImpl implements CsvUploadService
         // 4. Source region id is not present in the regions tab
         // Possible warnings
         // 1. For a company with regions, if the branch does not have a source region id
+
+        LOG.debug( "Parsing branches sheet" );
+        List<BranchUploadVO> uploadedBranches = new ArrayList<>();
+        XSSFSheet branchSheet = workBook.getSheet( BRANCH_SHEET );
+        Iterator<Row> rows = branchSheet.rowIterator();
+        Iterator<Cell> cells = null;
+        XSSFRow row = null;
+        XSSFCell cell = null;
+        BranchUploadVO uploadedBranch = null;
+        while ( rows.hasNext() ) {
+            row = (XSSFRow) rows.next();
+            // skip the first header row.
+            if ( row.getRowNum() < 1 ) {
+                continue;
+            }
+            cells = row.cellIterator();
+            uploadedBranch = new BranchUploadVO();
+            int cellIndex = 0;
+            try {
+                while ( cells.hasNext() ) {
+                    cell = (XSSFCell) cells.next();
+                    cellIndex = cell.getColumnIndex();
+                    if ( cellIndex == BRANCH_ID_INDEX ) {
+                        if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
+                            try {
+                                uploadedBranch.setSourceBranchId( String.valueOf( cell.getNumericCellValue() ) );
+                            } catch ( NumberFormatException nfe ) {
+                                LOG.error( "Source Id at row: " + row.getRowNum() + " is not provided." );
+                                throw new InvalidInputException( "Source Id at row: " + row.getRowNum() + " is not provided." );
+                            }
+                        } else {
+                            uploadedBranch.setSourceBranchId( cell.getStringCellValue() );
+                        }
+                    } else if ( cellIndex == BRANCH_NAME_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchName( cell.getStringCellValue().trim() );
+                        } else {
+                            LOG.error( "Office name at row: " + row.getRowNum() + " is not provided." );
+                            throw new InvalidInputException( "Office name at row: " + row.getRowNum() + " is not provided." );
+                        }
+                    } else if ( cellIndex == BRANCH_REGION_ID_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            // map it with the region
+                            String sourceRegionId = null;
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
+                                sourceRegionId = String.valueOf( cell.getNumericCellValue() );
+                            } else if ( cell.getCellType() == XSSFCell.CELL_TYPE_STRING ) {
+                                sourceRegionId = cell.getStringCellValue();
+                            }
+                            // check if source region id is present in the hierarchy
+                            if(checkSourceRegionId(sourceRegionId, validationObject.getUpload())){
+                                uploadedBranch.setSourceRegionId( sourceRegionId );
+                            }else{
+                                LOG.error( "The region id in row: "+row.getRowNum()+" is not present." );
+                                throw new InvalidInputException("The region id in row: "+row.getRowNum()+" is not present.");
+                            }
+                        }
+                    } else if ( cellIndex == BRANCH_ADDRESS1_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchAddress1( cell.getStringCellValue() );
+                            uploadedBranch.setAddressSet( true );
+                        }
+                    } else if ( cellIndex == BRANCH_ADDRESS2_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchAddress2( cell.getStringCellValue() );
+                            uploadedBranch.setAddressSet( true );
+                        }
+                    } else if ( cellIndex == BRANCH_CITY_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchCity( cell.getStringCellValue() );
+                        } else {
+                            LOG.error( "Office city at row: " + row.getRowNum() + " is not provided." );
+                            throw new InvalidInputException( "Office city at row: " + row.getRowNum() + " is not provided." );
+                        }
+                    } else if ( cellIndex == BRANCH_STATE_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            uploadedBranch.setBranchState( cell.getStringCellValue() );
+                        }
+                    } else if ( cellIndex == BRANCH_ZIP_INDEX ) {
+                        if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_STRING ) {
+                                uploadedBranch.setBranchZipcode( cell.getStringCellValue() );
+                            } else if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC ) {
+                                uploadedBranch.setBranchZipcode( String.valueOf( (int) cell.getNumericCellValue() ) );
+                            }
+                        }
+                    }
+                }
+                // instances of above check for errors being bypassed have been found. Checking for more issues
+                if ( validateUploadedBranch( uploadedBranch, row.getRowNum() ) ) {
+                    // check if branch is added or modified
+                    if ( isNewBranch( uploadedBranch, validationObject.getUpload() ) ) {
+                        validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
+                        uploadedBranch.setBranchAdded( true );
+                        validationObject.getUpload().getBranches().add( uploadedBranch);
+                    } else {
+                        // branch already exists
+                        // TODO: check if branch is modified. If modified then set the modified details 
+                    }
+                    // add to uploaded regions list.
+                    uploadedBranches.add( uploadedBranch );
+                }
+                // validate for warnings
+                try{
+                    validateUploadedBranchForWarnings( uploadedBranch, row.getRowNum(), validationObject.getUpload() );
+                }catch ( InvalidInputException iie ) {
+                    if ( validationObject.getBranchValidationWarnings() == null ) {
+                        validationObject.setBranchValidationWarnings( new ArrayList<String>() );
+                    }
+                    validationObject.getBranchValidationWarnings().add( iie.getMessage() );
+                }
+            } catch ( InvalidInputException iie ) {
+                // add to region errors
+                if ( validationObject.getBranchValidationErrors() == null ) {
+                    validationObject.setBranchValidationErrors( new ArrayList<String>() );
+                }
+                uploadedBranch.setErrorRecord( true );
+                validationObject.getBranchValidationErrors().add( iie.getMessage() );
+            }
+        }
+        markDeletedBranches( uploadedBranches, validationObject.getUpload() );
     }
 
+    private boolean checkSourceRegionId(String sourceRegionId, HierarchyUpload upload){
+        LOG.debug( "Checking if source region id is present" );
+        RegionUploadVO regionUploadVO = new RegionUploadVO();
+        regionUploadVO.setSourceRegionId( sourceRegionId );
+        if(upload.getRegions() != null && !upload.getRegions().isEmpty()){
+            return upload.getRegions().contains( regionUploadVO );
+        }
+        return false;
+    }
 
     public void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject )
     {
-
+        // Parse each row for users and then check for valid users. On successful validation, check if the user is a new, modified or deleted user.
+        // Possible reasons for errors
+        // 1. User source id is not present.
+        // 2. User first name is not present.
+        // 3. User assigned branches do not match the branches sheet.
+        // 4. User assigned regions do not match the regions sheet.
+        // 5. User admin assignment branches do not match the branches sheet.
+        // 6. User admin assignment regions do not match the regions sheet.
+        // 7. User email address is not present
+        // Possible warnings
+        // 1. There are no branch, region, branch admin, region admin assignments. The user will be added under the company as an individual.
     }
 
 
@@ -441,7 +658,8 @@ public class CsvUploadServiceImpl implements CsvUploadService
         HierarchyUpload currentHierarchyUpload = generateCurrentHierarchyStructure( company );
         if ( oldHierarchyUpload == null ) {
             LOG.warn( "No pre-existing hierarchy structure found for the company" );
-            //TODO: generate source Ids
+            //generate source Ids and save in map
+            generateSourceIdsForNewHierarchyUpload( currentHierarchyUpload );
             hierarchyUploadDao.saveHierarchyUploadObject( currentHierarchyUpload );
         } else {
             //TODO : Compare and update hierarchy structures
@@ -450,8 +668,58 @@ public class CsvUploadServiceImpl implements CsvUploadService
         LOG.info( "Method updateHierarchyStructure finished for company : " + company.getCompany() );
         return null;
     }
+
     
-    
+    /**
+     * Method to generate source ids for new hierarchy uploads
+     * @param hierarchyUpload
+     */
+    public void generateSourceIdsForNewHierarchyUpload( HierarchyUpload hierarchyUpload )
+    {
+        //Set source ids for users, regions and branches
+        Map<String, Long> regionSourceMap = hierarchyUpload.getRegionSourceMapping();
+        Map<Long, String> regionMap = new HashMap<Long, String>();
+        
+        List<RegionUploadVO> regionUploadVOs = hierarchyUpload.getRegions();
+        for ( RegionUploadVO regionUploadVO : regionUploadVOs ) {
+            String sourceId = generateSourceId( CommonConstants.REGION_COLUMN );
+            regionUploadVO.setSourceRegionId( sourceId );
+            regionSourceMap.put( sourceId, regionUploadVO.getRegionId() );
+            regionMap.put( regionUploadVO.getRegionId(), sourceId );
+
+        }
+        hierarchyUpload.setRegionSourceMapping( regionSourceMap );
+        
+        Map<String, Long> branchSourceMap = hierarchyUpload.getBranchSourceMapping();
+        Map<Long, String> branchMap = new HashMap<Long, String>();
+        
+        List<BranchUploadVO> branchUploadVOs = hierarchyUpload.getBranches();
+        for ( BranchUploadVO branchUploadVO : branchUploadVOs ) {
+            String sourceId = generateSourceId( CommonConstants.BRANCH_NAME_COLUMN );
+            branchUploadVO.setSourceBranchId( sourceId );
+            branchUploadVO.setSourceRegionId( regionMap.get( branchUploadVO.getRegionId() ) );
+            branchSourceMap.put( sourceId, branchUploadVO.getBranchId() );
+            branchMap.put( branchUploadVO.getBranchId(), sourceId );
+        }
+        hierarchyUpload.setBranchSourceMapping( branchSourceMap );
+        
+        Map<String, Long> userSourceMap = hierarchyUpload.getUserSourceMapping();
+        
+        List<UserUploadVO> userUploadVOs = hierarchyUpload.getUsers();
+        for ( UserUploadVO userUploadVO : userUploadVOs ) {
+            String sourceId = generateSourceId( CommonConstants.USER_COLUMN );
+            userUploadVO.setSourceUserId( sourceId );
+            userUploadVO.setSourceBranchId( branchMap.get( userUploadVO.getBranchId() ) );
+            userUploadVO.setSourceRegionId( regionMap.get( userUploadVO.getRegionId() ) );
+            userSourceMap.put( sourceId, userUploadVO.getUserId() );
+        }
+        
+        //Set source ids in maps
+        hierarchyUpload.setRegionSourceMapping( regionSourceMap );
+        hierarchyUpload.setBranchSourceMapping( branchSourceMap );
+        hierarchyUpload.setUserSourceMapping( userSourceMap );
+    }
+
     /**
      * Method to aggregate hierarchy structure
      * @param oldHierarchyUpload
@@ -459,7 +727,9 @@ public class CsvUploadServiceImpl implements CsvUploadService
      * @return
      * @throws InvalidInputException 
      */
-    public HierarchyUpload aggregateHierarchyStructure( HierarchyUpload oldHierarchyUpload, HierarchyUpload currentHierarchyUpload ) throws InvalidInputException{
+    public HierarchyUpload aggregateHierarchyStructure( HierarchyUpload oldHierarchyUpload,
+        HierarchyUpload currentHierarchyUpload ) throws InvalidInputException
+    {
         LOG.info( "Method to aggregate hierarchy structure started" );
         if ( oldHierarchyUpload == null ) {
             throw new InvalidInputException( "OldHierarchyUpload object is empty" );
@@ -467,27 +737,250 @@ public class CsvUploadServiceImpl implements CsvUploadService
         if ( currentHierarchyUpload == null ) {
             throw new InvalidInputException( "CurrentHierarchyUpload object is empty" );
         }
-        
-        HierarchyUpload newHierarchyUpload = new HierarchyUpload();
-        
-        //TODO : Compare and aggregate regions
-        
-        //TODO : Compare and aggregate branches
-        //TODO : Compare and aggregate users
-        
+
+        HierarchyUpload newHierarchyUpload = oldHierarchyUpload;
+
+        //Compare and aggregate regions
+        aggregateRegionsStructure( oldHierarchyUpload.getRegions(), currentHierarchyUpload.getRegions(), newHierarchyUpload );
+
+        //Compare and aggregate branches
+        aggregateBranchesStructure( oldHierarchyUpload.getBranches(), currentHierarchyUpload.getBranches(), newHierarchyUpload );
+
+        //Compare and aggregate users
+        aggregateUsersStructure( oldHierarchyUpload.getUsers(), currentHierarchyUpload.getUsers(), newHierarchyUpload );
+
         LOG.info( "Method to aggregate hierarchy structure finished" );
         return newHierarchyUpload;
     }
-    
-    
-    public List<RegionUploadVO> aggregateRegionsStructure( List<RegionUploadVO> oldRegions, List<RegionUploadVO> currentRegions ){
-        List<RegionUploadVO> newRegions = new ArrayList<RegionUploadVO>();
+
+
+    public void aggregateUsersStructure( List<UserUploadVO> oldUsers, List<UserUploadVO> currentUsers,
+        HierarchyUpload newHierarchyUpload )
+    {
+        LOG.info( "Method to aggregate users structure started" );
+        List<UserUploadVO> newUsers = new ArrayList<UserUploadVO>();
+
+        Map<Long, UserUploadVO> oldUsersMap = new HashMap<Long, UserUploadVO>();
+        //Get map from UserUploadVO
+        for ( UserUploadVO userUploadVO : oldUsers ) {
+            oldUsersMap.put( userUploadVO.getUserId(), userUploadVO );
+        }
+
+        /*
+         * Things to check
+         * 1. user addition
+         * 2. user deletion
+         */
         
+        Map<String, Long> regionMapping = newHierarchyUpload.getRegionSourceMapping();
+        
+        Map<Long, String> mappedRegion = new HashMap<Long, String>();
+        for ( String key : regionMapping.keySet() ) {
+            mappedRegion.put( regionMapping.get( key ), key );
+        }
+        
+        Map<String, Long> branchMapping = newHierarchyUpload.getBranchSourceMapping();
+        
+        Map<Long, String> mappedBranch = new HashMap<Long, String>();
+        for ( String key : branchMapping.keySet() ) {
+            mappedBranch.put( branchMapping.get( key ), key );
+        }
+        
+        Map<String, Long> userMapping = newHierarchyUpload.getUserSourceMapping();
+        
+        //Iterate through new list
+        for ( UserUploadVO currentUser : currentUsers ) {
+            UserUploadVO oldUser = oldUsersMap.get( currentUser.getUserId() );
+            //If oldUser does not exist, then the currentUser is a new user
+            if ( oldUser == null ) {
+                //Generate sourceId for it and set the flag as true
+                currentUser.setSourceUserId( generateSourceId( CommonConstants.USER_COLUMN ) );
+                currentUser.setSourceUserIdGenerated( true );
+                newUsers.add( currentUser );
+                //Add new users' sourceIds in the hierarchyupload
+                userMapping.put( currentUser.getSourceUserId(), currentUser.getUserId() );
+            } else {
+                //Superimpose current on old and store in new list
+                UserUploadVO amalgamatedUser = oldUser;
+                //set sourceRegionId
+                amalgamatedUser.setSourceRegionId( mappedRegion.get( amalgamatedUser.getRegionId() ) );
+                
+                //set sourceBranchId
+                amalgamatedUser.setSourceBranchId( mappedRegion.get( amalgamatedUser.getBranchId() ) );
+                
+                amalgamatedUser.setFirstName( currentUser.getFirstName() );
+                amalgamatedUser.setLastName( currentUser.getLastName() );
+                amalgamatedUser.setTitle( currentUser.getTitle() );
+                amalgamatedUser.setBranchId( currentUser.getBranchId() );
+                amalgamatedUser.setRegionId( currentUser.getRegionId() );
+                amalgamatedUser.setAgent( currentUser.isAgent() );
+                amalgamatedUser.setEmailId( currentUser.getEmailId() );
+                amalgamatedUser.setBelongsToCompany( currentUser.isBelongsToCompany() );
+                amalgamatedUser.setBranchAdmin( currentUser.isBranchAdmin() );
+                amalgamatedUser.setPhoneNumber( currentUser.getPhoneNumber() );
+                amalgamatedUser.setWebsiteUrl( currentUser.getWebsiteUrl() );
+                amalgamatedUser.setLicense( currentUser.getLicense() );
+                amalgamatedUser.setLegalDisclaimer( currentUser.getLegalDisclaimer() );
+                amalgamatedUser.setAboutMeDescription( currentUser.getAboutMeDescription() );
+                amalgamatedUser.setUserPhotoUrl( currentUser.getUserPhotoUrl() );
+
+                newUsers.add( amalgamatedUser );
+
+                //Delete object entry from oldUsers
+                oldUsers.remove( oldUser );
+            }
+        }
+
+        if ( !( oldUsers.isEmpty() ) ) {
+            //The remaining users are the ones that have been deleted
+            //don't add these to the new list
+            //Remove deleted users' sourceIds in the hierarchyupload map
+            for ( UserUploadVO userUploadVO : oldUsers ) {
+                userMapping.remove( userUploadVO.getSourceUserId() );
+            }
+            LOG.warn( "Some users have been deleted recently" );
+        }
+        
+        newHierarchyUpload.setUserSourceMapping( userMapping );
+
+        newHierarchyUpload.setUsers( newUsers );
+        LOG.info( "Method to aggregate users structure finished" );
+    }
+
+
+    /**
+     * Method to aggregate branches structure
+     * @param oldBranches
+     * @param currentBranches
+     * @return
+     */
+    public void aggregateBranchesStructure( List<BranchUploadVO> oldBranches, List<BranchUploadVO> currentBranches,
+        HierarchyUpload newHierarchyUpload )
+    {
+        LOG.info( "Method to aggregate branches structure started" );
+        List<BranchUploadVO> newBranches = new ArrayList<BranchUploadVO>();
+
+        Map<Long, BranchUploadVO> oldBranchesMap = new HashMap<Long, BranchUploadVO>();
+        //Get map from BranchUploadVO
+        for ( BranchUploadVO branchUploadVO : oldBranches ) {
+            oldBranchesMap.put( branchUploadVO.getRegionId(), branchUploadVO );
+        }
+
+        /*
+         * Things to check
+         * 1. branch addition
+         * 2. branch deletion
+         */
+
+        //Iterate through new list
+        for ( BranchUploadVO currentBranch : currentBranches ) {
+            BranchUploadVO oldBranch = oldBranchesMap.get( currentBranch.getBranchId() );
+            //If oldBranch does not exist, then the currentBranch is a newly added branch
+            if ( oldBranch == null ) {
+                //Generate sourceId for it and set the flag as true
+                currentBranch.setSourceBranchId( generateSourceId( CommonConstants.BRANCH_NAME_COLUMN ) );
+                currentBranch.setSourceBrancIdGenerated( true );
+                newBranches.add( currentBranch );
+            } else {
+                //Superimpose current on old and store in new list
+                BranchUploadVO amalgamatedBranch = oldBranch;
+                amalgamatedBranch.setRegionId( currentBranch.getRegionId() );
+                amalgamatedBranch.setBranchName( currentBranch.getBranchName() );
+                amalgamatedBranch.setBranchAddress1( currentBranch.getBranchAddress1() );
+                amalgamatedBranch.setBranchAddress2( currentBranch.getBranchAddress2() );
+                amalgamatedBranch.setBranchCountry( currentBranch.getBranchCountry() );
+                amalgamatedBranch.setBranchCountryCode( currentBranch.getBranchCountryCode() );
+                amalgamatedBranch.setBranchCity( currentBranch.getBranchCity() );
+                amalgamatedBranch.setBranchZipcode( currentBranch.getBranchZipcode() );
+                //TODO: set sourceRegionId
+                newBranches.add( amalgamatedBranch );
+
+                //Delete object entry from oldRegions
+                oldBranches.remove( oldBranch );
+            }
+        }
+
+        if ( !( oldBranches.isEmpty() ) ) {
+            //The remaining branches are the ones that have been deleted
+            //don't add these to the new list
+            //TODO : Remove deleted branches' sourceIds in the hierarchyupload map
+            LOG.warn( "Some branches have been deleted recently" );
+        }
+
+        //TODO : Add new branches' sourceIds in the hierarchyupload
+
+        newHierarchyUpload.setBranches( newBranches );
+        LOG.info( "Method to aggregate branches structure finished" );
+    }
+
+
+    /**
+     * Method to aggregate region structure
+     * @param oldRegions
+     * @param currentRegions
+     * @return
+     */
+    public void aggregateRegionsStructure( List<RegionUploadVO> oldRegions, List<RegionUploadVO> currentRegions,
+        HierarchyUpload newHierarchyUpload )
+    {
+        LOG.info( "Method to aggregate regions structure started" );
+        List<RegionUploadVO> newRegions = new ArrayList<RegionUploadVO>();
+
         Map<Long, RegionUploadVO> oldRegionsMap = new HashMap<Long, RegionUploadVO>();
         //Get map from RegionUploadVO
         for ( RegionUploadVO regionUploadVO : oldRegions ) {
-            
+            oldRegionsMap.put( regionUploadVO.getRegionId(), regionUploadVO );
         }
+
+        /*
+         * Things to check
+         * 1. region addition
+         * 2. region deletion
+         */
+
+        //Iterate through new list
+        for ( RegionUploadVO currentRegion : currentRegions ) {
+            RegionUploadVO oldRegion = oldRegionsMap.get( currentRegion.getRegionId() );
+            //If oldRegion does not exist, then the currentRegion is a newly added region
+            if ( oldRegion == null ) {
+                //Generate sourceId for it and set the flag as true
+                currentRegion.setSourceRegionId( generateSourceId( CommonConstants.REGION_COLUMN ) );
+                currentRegion.setSourceRegionIdGenerated( true );
+                newRegions.add( currentRegion );
+            } else {
+                //Superimpose current on old and store in new list
+                RegionUploadVO amalgamatedRegion = oldRegion;
+                amalgamatedRegion.setRegionName( currentRegion.getRegionName() );
+                amalgamatedRegion.setRegionAddress1( currentRegion.getRegionAddress1() );
+                amalgamatedRegion.setRegionAddress2( currentRegion.getRegionAddress2() );
+                amalgamatedRegion.setRegionCountry( currentRegion.getRegionCountry() );
+                amalgamatedRegion.setRegionCountryCode( currentRegion.getRegionCountryCode() );
+                amalgamatedRegion.setRegionCity( currentRegion.getRegionCity() );
+                amalgamatedRegion.setRegionState( currentRegion.getRegionState() );
+                amalgamatedRegion.setRegionZipcode( currentRegion.getRegionZipcode() );
+                newRegions.add( amalgamatedRegion );
+
+                //Delete object entry from oldRegions
+                oldRegions.remove( oldRegion );
+            }
+        }
+
+        if ( !( oldRegions.isEmpty() ) ) {
+            //The remaining regions are the ones that have been deleted
+            //don't add these to the new list
+            //TODO : Remove deleted regions' sourceIds in the hierarchyupload map
+            LOG.warn( "Some regions have been deleted recently" );
+        }
+        //TODO: Add new regions' sourceIds in the hierarchyupload map
+
+        newHierarchyUpload.setRegions( newRegions );
+        LOG.info( "Method to aggregate regions structure finished" );
+    }
+
+
+    public String generateSourceId( String entityType )
+    {
+        return entityType + String.valueOf( System.currentTimeMillis() );
     }
 
 
@@ -635,7 +1128,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
         LOG.info( "Method to get user upload VO for user : " + user.getUsername() + " finished" );
         return userUploadVO;
     }
-    
+
 
     /**
      * Method to generate BranchUploadVOs for a company
@@ -1155,13 +1648,6 @@ public class CsvUploadServiceImpl implements CsvUploadService
                             LOG.error( "Could not find region" );
                             rowContainsError = true;
                             break;
-                        }
-                    }
-                } else if ( cellIndex == USER_HAS_PUBLIC_PAGE_INDEX ) {
-                    if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        String hasProfilePage = cell.getStringCellValue();
-                        if ( hasProfilePage.equalsIgnoreCase( "YES" ) ) {
-                            uploadedUser.setAgent( true );
                         }
                     }
                 } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX ) {

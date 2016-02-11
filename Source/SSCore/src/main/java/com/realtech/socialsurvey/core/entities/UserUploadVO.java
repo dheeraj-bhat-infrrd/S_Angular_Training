@@ -9,6 +9,9 @@ import java.util.List;
 public class UserUploadVO
 {
 
+    private long userId;
+    private String sourceUserId;
+    private boolean isSourceUserIdGenerated;
     private String firstName;
     private boolean isFirstNameModified;
     private StringUploadHistory[] firstNameHistory;
@@ -88,6 +91,44 @@ public class UserUploadVO
     private boolean isUserModified;
     private List<Long> regionIds;
     private List<Long> branchIds;
+    private boolean isErrorRecord;
+    private boolean isDeletedRecord;
+
+
+    public long getUserId()
+    {
+        return userId;
+    }
+
+
+    public void setUserId( long userId )
+    {
+        this.userId = userId;
+    }
+
+
+    public boolean isSourceUserIdGenerated()
+    {
+        return isSourceUserIdGenerated;
+    }
+
+
+    public void setSourceUserIdGenerated( boolean isSourceUserIdGenerated )
+    {
+        this.isSourceUserIdGenerated = isSourceUserIdGenerated;
+    }
+
+
+    public String getSourceUserId()
+    {
+        return sourceUserId;
+    }
+
+
+    public void setSourceUserId( String sourceUserId )
+    {
+        this.sourceUserId = sourceUserId;
+    }
 
 
     public String getFirstName()
@@ -1047,6 +1088,30 @@ public class UserUploadVO
     public void setBranchIds( List<Long> branchIds )
     {
         this.branchIds = branchIds;
+
+    }
+    
+    public boolean isErrorRecord()
+    {
+        return isErrorRecord;
+    }
+
+
+    public void setErrorRecord( boolean isErrorRecord )
+    {
+        this.isErrorRecord = isErrorRecord;
+    }
+
+
+    public boolean isDeletedRecord()
+    {
+        return isDeletedRecord;
+    }
+
+
+    public void setDeletedRecord( boolean isDeletedRecord )
+    {
+        this.isDeletedRecord = isDeletedRecord;
     }
 
 

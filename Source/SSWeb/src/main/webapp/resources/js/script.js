@@ -2031,7 +2031,7 @@ var hierarchyUpload={
 				});
 		},
 		uploadXlxsSuccessCallback:function(response){
-			
+			alert(response);
 			if (!response) {
 				$('#com-file').val('');
 				$('#com-xlsx-file').val('');
