@@ -86,6 +86,32 @@ public class UserUploadVO
     private boolean isUserModified;
     private boolean isErrorRecord;
     private boolean isDeletedRecord;
+    private boolean isWarningRecord;
+    private int rowNum;
+
+
+    public boolean isWarningRecord()
+    {
+        return isWarningRecord;
+    }
+
+
+    public void setWarningRecord( boolean isWarningRecord )
+    {
+        this.isWarningRecord = isWarningRecord;
+    }
+
+
+    public int getRowNum()
+    {
+        return rowNum;
+    }
+
+
+    public void setRowNum( int rowNum )
+    {
+        this.rowNum = rowNum;
+    }
 
 
     public String getSourceUserId()
