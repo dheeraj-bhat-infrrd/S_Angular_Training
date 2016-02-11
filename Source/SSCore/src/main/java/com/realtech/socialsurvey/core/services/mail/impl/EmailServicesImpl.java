@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,8 +191,8 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Recipients Email Id can not be null or empty" );
         }
         if ( name == null || name.isEmpty() ) {
-            LOG.error( "Recipients Name can not be null or empty" );
-            throw new InvalidInputException( "Recipients Name can not be null or empty" );
+            LOG.error( "Recipients name can not be null or empty" );
+            throw new InvalidInputException( "Recipients name can not be null or empty" );
         }
 
         LOG.info( "Initiating URL Service to shorten the url " + url );
@@ -621,16 +622,16 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendDefaultSurveyCompletionMail( String recipientMailId, String displayName, String agentName,
+    public void sendDefaultSurveyCompletionMail( String recipientMailId, String firstName, String agentName,
         String agentEmail, String agentProfileName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
-        if ( displayName == null || displayName.isEmpty() ) {
-            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
+        if ( firstName == null || firstName.isEmpty() ) {
+            LOG.error( "firstName parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
         }
 
         LOG.info( "Sending survey completion email to : " + recipientMailId );
@@ -642,10 +643,10 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY );
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, agentName,
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), agentName, agentName,
                 appBaseUrl, agentProfileName, appBaseUrl, agentProfileName, agentName ) );
         } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, agentName, agentName, appBaseUrl,
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), agentName, agentName, appBaseUrl,
                 agentProfileName, appBaseUrl, agentProfileName, agentName ) );
         }
 
@@ -658,7 +659,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String displayName, String agentName,
+    public void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String firstName, String agentName,
         String agentEmail, String companyName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -666,10 +667,10 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException(
                 "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
         }
-        if ( displayName == null || displayName.isEmpty() ) {
-            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
+        if ( firstName == null || firstName.isEmpty() ) {
+            LOG.error( "firstName parameter is empty or null for sending account upgrade mail " );
             throw new InvalidInputException(
-                "displayName parameter is empty or null for sending survey completion unpleasant mail " );
+                "firstName parameter is empty or null for sending survey completion unpleasant mail " );
         }
 
         LOG.info( "Sending survey completion email to : " + recipientMailId );
@@ -681,10 +682,10 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY );
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, agentName, companyName ) );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, agentName, companyName ) );
         } else {
             messageBodyReplacements
-                .setReplacementArgs( Arrays.asList( logoUrl, displayName, agentName, agentName, companyName ) );
+                .setReplacementArgs( Arrays.asList( logoUrl, firstName, agentName, agentName, companyName ) );
         }
 
 
@@ -733,11 +734,11 @@ public class EmailServicesImpl implements EmailServices
         String fullAddress = "";
 
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, "",
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), link, link, link, "",
                 agentSignature, appBaseUrl, appBaseUrl, recipientMailId, companyName, dateFormat.format( new Date() ),
                 agentEmailId, companyName, currentYear, fullAddress ) );
         } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, firstName, link, link, link, "",
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), link, link, link, "",
                 agentSignature, appBaseUrl, appBaseUrl, recipientMailId, companyName, dateFormat.format( new Date() ),
                 agentEmailId, companyName, currentYear, fullAddress ) );
         }
@@ -816,16 +817,16 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendDefaultSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle,
-        String companyName, String displayName, String agentName, String links, String logoUrl ) throws InvalidInputException,
+        String companyName, String firstName, String agentName, String links, String logoUrl ) throws InvalidInputException,
         UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
-        if ( displayName == null || displayName.isEmpty() ) {
-            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
+        if ( firstName == null || firstName.isEmpty() ) {
+            LOG.error( "firstName parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
         }
 
         LOG.info( "Sending survey reminder email to : " + recipientMailId );
@@ -839,9 +840,9 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_BODY );
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, links, "", agentSignature ) );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), links, "", agentSignature ) );
         } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, links, "", agentSignature ) );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), links, "", agentSignature ) );
         }
 
         LOG.debug( "Calling email sender to send mail" );
@@ -940,11 +941,11 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
 
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, link, link, link, "",
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), link, link, link, "",
                 agentSignature, recipientMailId, companyName, surveyInitiatedOn, agentEmailId, companyName, currentYear,
                 fullAddress ) );
         } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, firstName, link, link, link, "",
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), link, link, link, "",
                 agentSignature, recipientMailId, companyName, surveyInitiatedOn, agentEmailId, companyName, currentYear,
                 fullAddress ) );
         }
@@ -1155,8 +1156,8 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
         if ( firstName == null || firstName.isEmpty() ) {
-            LOG.error( "displayName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
+            LOG.error( "firstName parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
         }
 
         LOG.info( "Initiating URL Service to shorten the url " + link );
@@ -1171,7 +1172,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_INVITATION_MAIL_CUSTOMER_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, agentName, link, link, link,
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), agentName, link, link, link,
             appBaseUrl, appBaseUrl ) );
 
         LOG.debug( "Calling email sender to send mail" );
@@ -1183,19 +1184,19 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyInvitationMailByCustomer( String recipientMailId, String subject, String mailBody, String emailId,
-        String name, long agentId ) throws InvalidInputException, UndeliveredEmailException
+        String firstName, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
+            LOG.error( "Recipient email Id is empty or null for sending survey invitation mail by customer" );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey invitation mail by customer" );
         }
         if ( subject == null || subject.isEmpty() ) {
-            LOG.error( "subject parameter is empty or null for sending social post reminder mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
+            LOG.error( "subject parameter is empty or null for sending survey invitation mail by customer" );
+            throw new InvalidInputException( "subject parameter is empty or null for sending survey invitation mail by customer" );
         }
 
         LOG.info( "Sending survey invitation email to : " + recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, name );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, firstName );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmail( emailEntity, subject, mailBody, false, false );
@@ -1205,16 +1206,16 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendDefaultSurveyRestartMail( String recipientMailId, String logoUrl, String displayName, String agentName,
+    public void sendDefaultSurveyRestartMail( String recipientMailId, String logoUrl, String firstName, String agentName,
         String link, String agentEmailId, String agentSignature, long agentId ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending survey restart mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey restart mail " );
         }
-        if ( displayName == null || displayName.isEmpty() ) {
-            LOG.error( "displayName parameter is empty or null for sending survey restart mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey restart mail " );
+        if ( firstName == null || firstName.isEmpty() ) {
+            LOG.error( "firstName parameter is empty or null for sending survey restart mail " );
+            throw new InvalidInputException( "firstName parameter is empty or null for sending survey restart mail " );
         }
 
         LOG.info( "Initiating URL Service to shorten the url " + link );
@@ -1231,10 +1232,10 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.SURVEY_RESTART_MAIL_BODY );
 
         if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, link, link, link, "",
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), link, link, link, "",
                 agentSignature ) );
         } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, displayName, link, link, link, "",
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), link, link, link, "",
                 agentSignature ) );
         }
 
@@ -1551,18 +1552,8 @@ public class EmailServicesImpl implements EmailServices
             String fullAddress = "";
 
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
-            } else {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                logoUrl = appLogoUrl;
             }
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", appBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
-            mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
-            mailBody = mailBody
-                .replaceAll(
-                    "\\[Name\\]",
-                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
-                        survey.getCustomerLastName() ) );
             LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
             try {
                 surveyLink = urlService.shortenUrl( surveyLink );
@@ -1570,21 +1561,21 @@ public class EmailServicesImpl implements EmailServices
                 LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
             }
             LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
-            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
-            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
-            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );
-            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
-            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
-            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
-            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
-            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
-            mailBody = mailBody.replaceAll( "null", "" );
+
+
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, surveyLink,
+                survey.getCustomerFirstName(), survey.getCustomerFirstName(), agentName, agentSignature,
+                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress );
+
             String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + agentName;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
-                mailSubject = mailSubject.replaceAll( "\\[AgentName\\]", agentName );
             }
-
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, surveyLink,
+                survey.getCustomerFirstName(), survey.getCustomerFirstName(), agentName, agentSignature,
+                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress );
             try {
                 sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
@@ -1593,12 +1584,9 @@ public class EmailServicesImpl implements EmailServices
             }
         } else {
             try {
-                sendDefaultSurveyReminderMail(
-                    survey.getCustomerEmailId(),
-                    logoUrl,
-                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
-                        survey.getCustomerLastName() ), agentName, agentEmailId, surveyLink, agentPhone, agentTitle,
-                    companyName );
+                sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), logoUrl,
+                    survey.getCustomerFirstName(), agentName, agentEmailId, surveyLink, agentPhone,
+                    agentTitle, companyName );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
                     + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );

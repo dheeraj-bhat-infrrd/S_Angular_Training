@@ -2056,6 +2056,94 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.error("InvalidInputException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e);
 		}
     }
+    
+    /**
+     * Method to fetch all regions of a company based on company id
+     *
+     * @param companyProfileName
+     * @return
+     * @throws SolrException 
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<Region> getRegionsBySearchKey( String searchKey ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method getRegionsBySearchKey called for search key:" + searchKey );
+        if( searchKey == null )
+            throw new InvalidInputException("Invalid searchKey passed as argument ");
+        List<Region> regions = new ArrayList<Region>();
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin( CommonConstants.REGION_NAME_SOLR, searchKey );
+        
+        for ( SolrDocument document : solrDocumentList ) {
+            Region region = new Region();
+            region.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
+            region.setRegionName( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
+            region.setRegion( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS1_SOLR ) != null)
+                region.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS2_SOLR ) != null)
+                region.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
+            regions.add( region );
+        }
+        
+        return regions;
+    }
+    
+    @Override
+    @Transactional
+    public List<Branch> getBranchesBySearchKey( String searchKey ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method getBranchesBySearchKey called for search key:" + searchKey );
+        if( searchKey == null)
+            throw new InvalidInputException("Invalid searchKey passed as argument ");
+        List<Branch> branches = new ArrayList<Branch>();
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin( CommonConstants.BRANCH_NAME_SOLR, searchKey );
+        
+        for ( SolrDocument document : solrDocumentList ) {
+            Branch branch = new Branch();
+            branch.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR).toString() ) );
+            branch.setBranchName( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
+            branch.setBranch( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS1_SOLR ) != null)
+                branch.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS2_SOLR ) != null)
+                branch.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
+            branches.add( branch );
+        }
+        
+        return branches;
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<UserFromSearch> getUsersBySearchKey( String searchKey ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method getUsersBySearchKey called for search key:" + searchKey );
+        if( searchKey == null)
+            throw new InvalidInputException("Invalid searchKey passed as argument ");
+        List<UserFromSearch> users = new ArrayList<UserFromSearch>();
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin( CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey );
+        
+        for ( SolrDocument document : solrDocumentList ) {
+            UserFromSearch user = new UserFromSearch();
+            user.setUserId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
+            user.setEmailId( document.get( CommonConstants.USER_EMAIL_ID_SOLR ).toString() );
+            user.setDisplayName( document.get( CommonConstants.USER_DISPLAY_NAME_SOLR).toString() );
+            user.setCompanyId( Long.parseLong( document.get( CommonConstants.COMPANY_ID_SOLR ).toString() ) );
+            user.setAgent( Boolean.parseBoolean( document.get( CommonConstants.IS_AGENT_SOLR ).toString() ) );
+            user.setStatus( Integer.parseInt( document.get( CommonConstants.STATUS_SOLR ).toString() ) );
+            user.setIsOwner( Integer.parseInt( document.get( CommonConstants.IS_OWNER_COLUMN ).toString() ) );
+            user.setBranchAdmin( Boolean.parseBoolean( document.get( CommonConstants.IS_BRANCH_ADMIN_SOLR ).toString() ) );
+            user.setRegionAdmin( Boolean.parseBoolean( document.get( CommonConstants.IS_REGION_ADMIN_SOLR ).toString() ) );
+            user.setRegions( (List<Long>) document.get( CommonConstants.REGIONS_SOLR ) );
+            user.setBranches( (List<Long>) document.get( CommonConstants.BRANCHES_SOLR ) );
+            users.add( user );
+        }
+        
+        return users;
+    }
 
 
     @Override
@@ -5044,10 +5132,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Transactional
     @Override
-    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status )
+    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status , boolean inCompleteCompany )
     {
 
-        List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status );
+        List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status, inCompleteCompany );
         Set<Long> companyIds = new HashSet<>();
         for ( Company company : companyList ) {
             companyIds.add( company.getCompanyId() );

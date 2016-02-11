@@ -94,4 +94,40 @@ public class EmailFormatHelper {
         }
         return WordUtils.capitalize(custDisplayName);
 	}
+
+
+    public String replaceLegends( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
+        String custFirstName, String custLastName, String agentName, String agentSignature, String recipientMailId,
+        String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress )
+        throws InvalidInputException
+    {
+        LOG.info( "Method to replace legends with values called, replaceLegends() started");
+        if ( content == null || content.isEmpty() ) {
+            LOG.error( "Content passed in replaceLegends is null or empty" );
+            throw new InvalidInputException( "Content passed in replaceLegends is null or empty" );
+        }
+
+        String customerName = getCustomerDisplayNameForEmail( custFirstName, custLastName );
+
+        content = content.replaceAll( "\\[BaseUrl\\]", "" + baseUrl );
+        content = content.replaceAll( "\\[LogoUrl\\]", "" + logoUrl );
+        content = content.replaceAll( "\\[Link\\]", "" + link );
+        content = content.replaceAll( "\\[Name\\]", "" + customerName );
+        if ( !isSubject ) {
+            content = content.replaceFirst( "\\[FirstName\\]", WordUtils.capitalize( custFirstName ) );
+        }
+
+        content = content.replaceAll( "\\[FirstName\\]", "" + custFirstName );
+        content = content.replaceAll( "\\[AgentName\\]", "" + agentName );
+        content = content.replaceAll( "\\[AgentSignature\\]", "" + agentSignature );
+        content = content.replaceAll( "\\[RecipientEmail\\]", "" + recipientMailId );
+        content = content.replaceAll( "\\[SenderEmail\\]", "" + senderEmail );
+        content = content.replaceAll( "\\[CompanyName\\]", "" + companyName );
+        content = content.replaceAll( "\\[InitiatedDate\\]", "" + initiatedDate );
+        content = content.replaceAll( "\\[CurrentYear\\]", "" + currentYear );
+        content = content.replaceAll( "\\[FullAddress\\]", "" + fullAddress );
+        content = content.replaceAll( "null", "" );
+        LOG.info( "Method to replace legends with values called, replaceLegends() ended");
+        return content;
+    }
 }
