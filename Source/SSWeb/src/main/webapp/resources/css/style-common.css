@@ -2944,11 +2944,11 @@ margin-top:10px;
 }
 
 .sq-smile-4 {
-	background: url(../csssprites/smileys.png) no-repeat -54px -150px;
+	background: url(../csssprites/smileys.png) no-repeat 0px -150px;
 }
 
 .sq-smile-5 {
-	background: url(../csssprites/smileys.png) no-repeat 0px -150px;
+	background: url(../csssprites/smileys.png) no-repeat -54px -150px;
 }
 
 .sq-full-smile {

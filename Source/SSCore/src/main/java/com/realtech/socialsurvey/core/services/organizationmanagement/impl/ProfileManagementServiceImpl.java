@@ -241,7 +241,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     String paramOrderTakeSurveyCustomer;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
-    
+
     @Value ( "${ZILLOW_ENDPOINT}")
     private String zillowEndpoint;
     
@@ -4137,7 +4137,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
                             zillowScreenName );
 
-                        //Store the API call details
                         ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
                         zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
                         zillowAPICallDetails.setRequest( zillowEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="

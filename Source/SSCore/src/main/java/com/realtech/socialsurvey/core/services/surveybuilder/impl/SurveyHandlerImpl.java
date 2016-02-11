@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -835,30 +836,26 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( restartSurvey.getMail_body(),
                 restartSurvey.getParam_order() );
 
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
-            } else {
-
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                logoUrl = appLogoUrl;
             }
-            mailBody = mailBody.replaceAll( "\\[Name\\]",
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
-            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
-            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
-            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
-            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
-            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
-            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
-            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
-            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
-            mailBody = mailBody.replaceAll( "null", "" );
+
+            LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
+            surveyUrl = urlService.shortenUrl( surveyUrl );
+            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
+
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyUrl,
+                custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
 
             String mailSubject = restartSurvey.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
                 mailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
             }
+
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyUrl,
+                custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
 
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
@@ -868,9 +865,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         } else {
             emailServices.sendDefaultSurveyRestartMail( custEmail, logoUrl,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
-                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
-                user.getEmailId(), agentSignature, user.getUserId() );
+                custFirstName, user.getFirstName(),
+                surveyUrl, user.getEmailId(), agentSignature, user.getUserId() );
         }
         LOG.info( "sendSurveyRestartMail() finished." );
     }
@@ -976,31 +972,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( surveyCompletion.getMail_body(),
                 surveyCompletion.getParam_order() );
 
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
-            } else {
-
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                logoUrl = appLogoUrl;
             }
-            mailBody = mailBody.replaceAll( "\\[Name\\]",
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
-            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
-            mailBody = mailBody.replaceAll( "\\[AppBaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
-            mailBody = mailBody.replaceAll( "\\[AgentProfileName\\]", user.getProfileName() );
-            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
-            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
-            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
-            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
-            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
-            mailBody = mailBody.replaceAll( "null", "" );
+
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
+                custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
 
             String mailSubject = surveyCompletion.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
                 mailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
             }
+
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null,
+                custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1008,10 +995,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-
-            emailServices.sendDefaultSurveyCompletionMail( custEmail,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
-                user.getProfileName(), logoUrl, user.getUserId() );
+            emailServices.sendDefaultSurveyCompletionMail( custEmail, custFirstName, agentName,
+                user.getEmailId(), user.getProfileName(), logoUrl, user.getUserId() );
         }
         LOG.info( "sendSurveyCompletionMail() finished." );
     }
@@ -1125,31 +1110,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( surveyCompletionUnpleasant.getMail_body(),
                 surveyCompletionUnpleasant.getParam_order() );
 
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
-            } else {
-
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                logoUrl = appLogoUrl;
             }
-            mailBody = mailBody.replaceAll( "\\[Name\\]",
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
-            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
-            mailBody = mailBody.replaceAll( "\\[AppBaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
-            mailBody = mailBody.replaceAll( "\\[AgentProfileName\\]", user.getProfileName() );
-            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
-            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
-            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
-            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
-            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
-            mailBody = mailBody.replaceAll( "null", "" );
+
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
+                custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
                 mailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
             }
+
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null,
+                custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1157,10 +1133,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-
-            emailServices.sendDefaultSurveyCompletionMail( custEmail,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, user.getEmailId(),
-                companyName, logoUrl, user.getUserId() );
+            sendSurveyCompletionMail( custEmail, custFirstName, custLastName, user );
         }
         LOG.info( "sendSurveyCompletionUnpleasantMail() finished." );
     }
@@ -1265,46 +1238,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             MailContent socialPostReminder = companySettings.getMail_content().getSocial_post_reminder_mail();
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( socialPostReminder.getMail_body(),
                 socialPostReminder.getParam_order() );
-
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
-            } else {
-
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                logoUrl = appLogoUrl;
             }
-            mailBody = mailBody.replaceAll( "\\[Name\\]",
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", agentName );
-            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
-            mailBody = mailBody.replaceAll( "\\[AppBaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
-            mailBody = mailBody.replaceAll( "\\[AgentProfileName\\]", user.getProfileName() );
-            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
-            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
-            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
-            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
-            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
-            mailBody = mailBody.replaceAll( "\\[Links\\]", links );
-            mailBody = mailBody.replaceAll( "null", "" );
+
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, links, custFirstName,
+                custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
 
             String mailSubject = socialPostReminder.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
                 mailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
             }
-            // replace arguments
-            mailSubject = mailSubject.replaceAll("\\[Name\\]", emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
-            mailSubject = mailSubject.replaceAll("\\[AgentName\\]", agentName);
+
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, links,
+                custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
 
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
+                    user.getFirstName(), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
             emailServices.sendDefaultSocialPostReminderMail( custEmail, agentPhone, agentTitle, companyName,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ), agentName, links, logoUrl );
+                custFirstName, agentName, links, logoUrl );
         }
         LOG.info( "sendSocialPostReminderMail() finished." );
     }
@@ -1598,38 +1557,27 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( takeSurvey.getMail_body(),
                 takeSurvey.getParam_order() );
 
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
-            } else {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                logoUrl = appLogoUrl;
             }
 
             LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
             surveyUrl = urlService.shortenUrl( surveyUrl );
             LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
-            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyUrl );
-            mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
-            mailBody = mailBody.replaceAll( "\\[Name\\]",
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
-            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
-            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", custEmail );
-            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
-            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
-            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
-            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
-            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
-            mailBody = mailBody.replaceAll( "null", "" );
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyUrl,
+                custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
 
             // Adding mail subject
             String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
             if ( takeSurvey.getMail_subject() != null && !takeSurvey.getMail_subject().isEmpty() ) {
                 mailSubject = takeSurvey.getMail_subject();
-                mailSubject = mailSubject.replaceAll( "\\[AgentName\\]", agentName );
             }
 
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyUrl,
+                custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                dateFormat.format( new Date() ), currentYear, fullAddress );
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1637,8 +1585,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
-            emailServices.sendDefaultSurveyInvitationMail( custEmail, logoUrl,
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ),
+            emailServices.sendDefaultSurveyInvitationMail( custEmail, logoUrl, custFirstName,
                 user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyUrl,
                 user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress,
                 user.getUserId() );
@@ -1664,25 +1611,23 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             MailContent takeSurveyCustomer = companySettings.getMail_content().getTake_survey_mail_customer();
             String mailBody = emailFormatHelper.replaceEmailBodyWithParams( takeSurveyCustomer.getMail_body(),
                 takeSurveyCustomer.getParam_order() );
-            mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", appLogoUrl );
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[FirstName\\]", custFirstName );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", user.getFirstName() + " " + user.getLastName() );
-            mailBody = mailBody.replaceAll( "\\[Name\\]",
-                emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName ) );
-            mailBody = mailBody.replaceAll( "\\[Link\\]", link );
-            mailBody = mailBody.replaceAll( "null", "" );
+
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, appLogoUrl, link, custFirstName,
+                custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null );
 
             String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, appLogoUrl, link,
+                custFirstName, custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null,
+                null, null );
             try {
                 emailServices.sendSurveyInvitationMailByCustomer( custEmail, mailSubject, mailBody, user.getEmailId(),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
+                    user.getFirstName(), user.getUserId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
             }
         } else {
             emailServices.sendDefaultSurveyInvitationMailByCustomer( custEmail, custFirstName,
-                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), link, user.getEmailId(),
+                user.getFirstName(), link, user.getEmailId(),
                 user.getUserId() );
         }
         LOG.debug( "sendInvitationMailByCustomer() finished." );
