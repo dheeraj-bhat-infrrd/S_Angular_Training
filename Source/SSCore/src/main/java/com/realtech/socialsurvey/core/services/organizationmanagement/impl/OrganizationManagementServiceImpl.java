@@ -2079,8 +2079,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             region.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
             region.setRegionName( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
             region.setRegion( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
-            region.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
-            region.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS1_SOLR ) != null)
+                region.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS2_SOLR ) != null)
+                region.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
             regions.add( region );
         }
         
@@ -2102,8 +2104,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             branch.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR).toString() ) );
             branch.setBranchName( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
             branch.setBranch( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
-            branch.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
-            branch.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS1_SOLR ) != null)
+                branch.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS2_SOLR ) != null)
+                branch.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
             branches.add( branch );
         }
         
