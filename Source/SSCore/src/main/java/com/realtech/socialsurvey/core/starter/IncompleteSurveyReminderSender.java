@@ -2,11 +2,13 @@ package com.realtech.socialsurvey.core.starter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.WordUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
@@ -298,37 +300,21 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                 mailContent.getParam_order() );
 
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", applicationLogoUrl );
-            } else {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                logoUrl = applicationLogoUrl;
             }
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
-            mailBody = mailBody
-                .replaceAll(
-                    "\\[FirstName\\]",
-                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
-                        survey.getCustomerLastName() ) );
-            mailBody = mailBody
-                .replaceAll(
-                    "\\[Name\\]",
-                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
-                        survey.getCustomerLastName() ) );
-            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
-            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
-            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );
-            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
-            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
-            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
-            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
-            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
-            mailBody = mailBody.replaceAll( "null", "" );
+
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
+                survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress );
             String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
-                mailSubject = mailSubject.replaceAll( "\\[AgentName\\]", agentName );
             }
-
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
+                survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress );
             try {
                 emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
                     user.getEmailId() );
@@ -339,12 +325,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         } else {
             try {
 
-                emailServices.sendDefaultSurveyReminderMail(
-                    survey.getCustomerEmailId(),
-                    logoUrl,
-                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
-                        survey.getCustomerLastName() ), agentName, agentEmailId, surveyLink, agentPhone, agentTitle,
-                    companyName );
+                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), logoUrl,
+                    survey.getCustomerFirstName(), agentName, agentEmailId, surveyLink, agentPhone,
+                    agentTitle, companyName );
 
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
@@ -469,18 +452,8 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                 mailContent.getParam_order() );
 
             if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", applicationLogoUrl );
-            } else {
-                mailBody = mailBody.replaceAll( "\\[LogoUrl\\]", logoUrl );
+                logoUrl = applicationLogoUrl;
             }
-            mailBody = mailBody.replaceAll( "\\[BaseUrl\\]", applicationBaseUrl );
-            mailBody = mailBody.replaceAll( "\\[AgentName\\]", "" );
-            mailBody = mailBody.replaceAll( "\\[FirstName\\]", survey.getCustomerFirstName() );
-            mailBody = mailBody
-                .replaceAll(
-                    "\\[Name\\]",
-                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
-                        survey.getCustomerLastName() ) );
             LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
             try {
                 surveyLink = urlService.shortenUrl( surveyLink );
@@ -488,21 +461,19 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                 LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
             }
             LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
-            mailBody = mailBody.replaceAll( "\\[Link\\]", surveyLink );
-            mailBody = mailBody.replaceAll( "\\[AgentSignature\\]", agentSignature );
-            mailBody = mailBody.replaceAll( "\\[RecipientEmail\\]", survey.getCustomerEmailId() );
-            mailBody = mailBody.replaceAll( "\\[SenderEmail\\]", user.getEmailId() );
-            mailBody = mailBody.replaceAll( "\\[CompanyName\\]", companyName );
-            mailBody = mailBody.replaceAll( "\\[InitiatedDate\\]", dateFormat.format( new Date() ) );
-            mailBody = mailBody.replaceAll( "\\[CurrentYear\\]", currentYear );
-            mailBody = mailBody.replaceAll( "\\[FullAddress\\]", fullAddress );
-            mailBody = mailBody.replaceAll( "null", "" );
+
+            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
+                survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress );
             String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
-                mailSubject = mailSubject.replaceAll( "\\[AgentName\\]", agentName );
             }
-
+            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
+                survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+                fullAddress );
             try {
                 emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
                     user.getEmailId() );
@@ -512,14 +483,10 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             }
         } else {
             try {
-                emailServices.sendDefaultSurveyInvitationMail(
-                    survey.getCustomerEmailId(),
-                    logoUrl,
-                    emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
-                        survey.getCustomerLastName() ),
-                    user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyLink,
-                    user.getEmailId(), agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress,
-                    user.getUserId() );
+                emailServices.sendDefaultSurveyInvitationMail( survey.getCustomerEmailId(), logoUrl,
+                    survey.getCustomerFirstName(), user.getFirstName()
+                        + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyLink, user.getEmailId(),
+                    agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress, user.getUserId() );
 
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
