@@ -43,13 +43,86 @@ $(document).on('click','#dsh-admin-report-dwn-btn',function(){
 $(document).on('keyup','#hr-comp-sel',function(e){
 	if(e.which == 13) {
 		var key = $(this).val();
-		searchAndDisplayCompanies(key);
+		//update filter drop down
+		$('#com-filter').val('active');
+		$('#com-type-filter').val('all');
+		
+		var srchType = $('#hr-comp-sel').attr("srch-type");
+		
+		if(srchType == "company")
+			searchAndDisplayCompanies(key);
+		else if(srchType == "region")
+			searchAndDisplayRegions(key);
+		else if(srchType == "office")
+			searchAndDisplayBranches(key);
+		else if(srchType == "user")
+			searchAndDisplayUsers(key);
 	}
 });
 
 $(document).on('click','#hr-comp-icn',function(e){
 	var key = $('#hr-comp-sel').val();
-	searchAndDisplayCompanies(key);
+	//update filter drop down
+	$('#com-filter').val('active');
+	$('#com-type-filter').val('all');
+	
+	var srchType = $('#hr-comp-sel').attr("srch-type");
+	if(srchType == "company")
+		searchAndDisplayCompanies(key);
+	else if(srchType == "region")
+		searchAndDisplayRegions(key);
+	else if(srchType == "office")
+		searchAndDisplayBranches(key);
+	else if(srchType == "user")
+		searchAndDisplayUsers(key);
+});
+
+//deelte company
+$(document).on('click','.comp-del-icn',function(e){
+	var companyId = $(this).attr('data-iden');
+	e.stopPropagation();
+	confirmDeleteCompany(companyId);
+});
+
+function confirmDeleteCompany(companyId){
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete Company");
+	$('#overlay-text').html("Are you sure you want to delete the company ?");
+	$('#overlay-continue').attr("onclick", "deleteCompany('" + companyId + "');");
+}
+
+function deleteCompany(companyId){
+	showOverlay();
+	var payload = {
+		"companyId" : companyId
+	};
+	//close the popup
+	$('#overlay-cancel').click();
+	callAjaxPostWithPayloadData("./purgeCompany.do", function(data) {
+		
+		if (data == "success") {
+			// remove the tab from UI
+			$('#tr-comp-' + companyId).remove();
+			$('#overlay-toast').html("Company successfully deleted");
+		}else{
+			$('#overlay-toast').html(data);
+			showToast();
+		}
+	}, payload, true);
+}
+
+$(document).on('click','#hr-drpdwn-icn',function(e){
+	e.stopPropagation();
+	$('#srch-crtria-list').slideToggle(200);
+});
+
+$(document).on('click','.hr-dd-item',function(e){
+	$('#hr-comp-sel').attr("placeholder" , "Search " + $(this).html());
+	$('#hr-comp-sel').attr("srch-type" , $(this).attr("srch-type"));
+	$('#srch-crtria-list').slideToggle(200);
 });
 
 function searchAndDisplayCompanies(key) {
@@ -57,6 +130,53 @@ function searchAndDisplayCompanies(key) {
 	var accountType = $('#com-type-filter').val();
 	callAjaxGET("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue+"&accountType="+accountType, function(data) {
 		$('#admin-com-list').html(data);
+	}, true);
+}
+
+function searchAndDisplayRegions(key) {
+	
+	callAjaxGET("/fetchregionsbykey.do?searchKey="+key, function(data) {
+		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
+		$('.comp-hr-cont[data-iden="'+0+'"]').html(data).show();
+		bindAdminRegionListClicks();
+	    
+	}, true);
+}
+
+function searchAndDisplayBranches(key) {
+	
+	callAjaxGET("/fetchbranchesbykey.do?searchKey="+key, function(data) {
+		
+		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
+		
+		var tableRowForVirtualRegion = '<tr class="v-tbl-row v-tbl-row-sel tr-region-edit hide" style=""><td colspan="7" id="td-region-edit-0" class="td-region-edit"></td></tr>'
+		var tableForVirtualCompany = '<table class="v-hr-tbl" style="margin-top: 0"><tbody>' + tableRowForVirtualRegion +'</tbody></table>';
+		var tableWrapperDiv = '<div class="v-hr-tbl-wrapper">' + tableForVirtualCompany + '</div>';
+		$('.comp-hr-cont[data-iden="'+0+'"]').html(tableWrapperDiv).show();
+		
+		$("#td-region-edit-"+0).parent(".tr-region-edit").after(data);
+		$("#tr-region-"+0).slideDown(200);
+		$(".tr-region-edit").slideUp(200);
+		bindAdminBranchListClicks();
+	}, true);
+}
+
+function searchAndDisplayUsers(key) {
+	
+	callAjaxGET("/fetchusersbykey.do?searchKey="+key, function(data) {
+		
+		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
+		
+		var tableRowForVirtualBranch = '<tr class="v-tbl-row v-tbl-row-sel tr-branch-edit hide" style=""><td colspan="7" id="td-branch-edit-0" class="td-branch-edit"></td></tr>'
+		var tableForVirtualCompany = '<table class="v-hr-tbl" style="margin-top: 0"><tbody>' + tableRowForVirtualBranch +'</tbody></table>';
+		var tableWrapperDiv = '<div class="v-hr-tbl-wrapper">' + tableForVirtualCompany + '</div>';
+		
+		$('.comp-hr-cont[data-iden="'+0+'"]').html(tableWrapperDiv).show();
+		
+		$("#td-branch-edit-"+0).parent(".tr-branch-edit").after(data);
+		$("#tr-branch-"+0).slideDown(200);
+		$(".tr-branch-edit").slideUp(200);
+		bindUserEditClicks();
 	}, true);
 }
 
@@ -88,9 +208,9 @@ function showSelectedCompanyHierarchy(companyId) {
 	callAjaxGET("/companyhierarchy.do?companyId="+companyId, function(data) {
 		$('.comp-hr-cont[data-iden="'+companyId+'"]').html(data).show();
 		bindAdminRegionListClicks();
-	    $('.v-tbl-icn').click(function(e){
+/*	    $('.v-tbl-icn').click(function(e){
 	        e.stopPropagation();
-	    });
+	    });*/
 	    bindAdminBranchListClicks();
 	    bindUserEditClicks();
 	}, true);
@@ -100,8 +220,7 @@ function bindAdminRegionListClicks() {
 	$(".region-row").click(function(e){
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
-			var companyId = $(this).closest('.comp-hr-cont').attr('data-iden');
-			fetchAdminHierarchyViewBranches(regionId, companyId);
+			fetchAdminHierarchyViewBranches(regionId);
 			 $(this).attr('clicked','true');
 		}
 		else {
@@ -148,8 +267,7 @@ function bindAdminBranchListClicks(){
 		var branchId = $(this).attr("data-branchid");
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
-			var companyId = $(this).closest('.comp-hr-cont').attr('data-iden');
-			fetchAdminUsersForBranch(branchId,regionId, companyId);
+			fetchAdminUsersForBranch(branchId,regionId);
 			 $(this).attr('clicked','true');
 		}
 		else {
@@ -165,8 +283,8 @@ function bindAdminBranchListClicks(){
 	});
 }
 
-function fetchAdminHierarchyViewBranches(regionId, companyId) {
-	var url = "./fetchhierarchyviewbranchesforadmin.do?regionId="+regionId + "&companyId="+companyId;
+function fetchAdminHierarchyViewBranches(regionId) {
+	var url = "./fetchhierarchyviewbranchesforadmin.do?regionId="+regionId;
 	callAjaxGET(url, function(data) {
 		paintAdminHierarchyViewBranches(data,regionId);
 	}, true);
@@ -181,7 +299,7 @@ function paintAdminHierarchyViewBranches(data,regionId) {
 }
 
 function fetchAdminUsersForBranch(branchId,regionId, companyId) {
-	var url="./fetchbranchusersforadmin.do?branchId="+branchId+"&regionId="+regionId + "&companyId="+companyId;
+	var url="./fetchbranchusersforadmin.do?branchId="+branchId+"&regionId="+regionId;
 	callAjaxGET(url, function(data) {
 		paintAdminUsersFromBranch(data,branchId);
 	}, true);
@@ -241,6 +359,9 @@ $(document).on('keyup','#send-invite-form',function(e){
 $(document).on('change', '#com-filter', function(e){
 	var key = "";
 	$('#hr-comp-sel').val(key);
+	$('#hr-comp-sel').attr("placeholder" , "Search Company");
+	$('#hr-comp-sel').attr("srch-type" , "company");
+	
 	searchAndDisplayCompanies(key);
 });
 
@@ -248,6 +369,9 @@ $(document).on('change', '#com-filter', function(e){
 $(document).on('change', '#com-type-filter', function(e){
 	var key = "";
 	$('#hr-comp-sel').val(key);
+	$('#hr-comp-sel').attr("placeholder" , "Search Company");
+	$('#hr-comp-sel').attr("srch-type" , "company");
+	
 	searchAndDisplayCompanies(key);
 });
 

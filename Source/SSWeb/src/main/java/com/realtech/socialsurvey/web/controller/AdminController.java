@@ -38,13 +38,11 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -127,24 +125,24 @@ public class AdminController
         Company company = organizationManagementService.getCompanyById( companyId );
         String message = CommonConstants.SUCCESS_ATTRIBUTE;
 
-        // delete company from braintree
-
-        if ( company != null ) {
-            try {
-                List<LicenseDetail> licenseDetails = company.getLicenseDetails();
-                if ( licenseDetails.size() > 0 ) {
-                    LicenseDetail licenseDetail = licenseDetails.get( 0 );
-                    if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
-                        LOG.debug( "Deleting company from braintree " );
-                        payment.deleteCustomer( Long.toString( company.getCompanyId() ) );
+        if ( company != null && company.getCompanyId() > 0 ) {
+            List<LicenseDetail> licenseDetails = company.getLicenseDetails();
+            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || licenseDetails.size() == 0) {
+                try {
+                    if ( licenseDetails.size() > 0 ) {
+                        // delete company from braintree
+                        LicenseDetail licenseDetail = licenseDetails.get( 0 );
+                        if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+                            LOG.debug( "Deleting company from braintree " );
+                            payment.deleteCustomer( Long.toString( company.getCompanyId() ) );
+                        }
                     }
+
+                } catch ( CustomerDeletionUnsuccessfulException | InvalidInputException e ) {
+                    LOG.error( "Exception Caught " + e.getMessage() );
+                    message = CommonConstants.ERROR;
                 }
 
-            } catch ( CustomerDeletionUnsuccessfulException | InvalidInputException e ) {
-                LOG.error( "Exception Caught " + e.getMessage() );
-                message = CommonConstants.ERROR;
-            }
-            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE ) {
                 try {
                     organizationManagementService.purgeCompany( company );
                 } catch ( InvalidInputException e ) {
@@ -194,7 +192,8 @@ public class AdminController
             Company company = organizationManagementService.getCompanyById( companyId );
 
             LOG.debug( "fetching regions under company" );
-            regions = organizationManagementService.getRegionsForCompany( companyId );;
+            regions = organizationManagementService.getRegionsForCompany( companyId );
+            ;
 
             try {
                 LOG.debug( "fetching branches under company" );
@@ -272,10 +271,15 @@ public class AdminController
         List<OrganizationUnitSettings> unitSettings = null;
         int accountType = -1;
         int status = CommonConstants.STATUS_ACTIVE;
-        ;
+        boolean canDelete = false; // to add attribute in model for providing company type
+        boolean searchInCompleteCompany = false;
         // Check for company status filer
         if ( filerValue != null && filerValue.equals( "inactive" ) ) {
             status = CommonConstants.STATUS_INACTIVE;
+            canDelete = true;
+        } else if ( filerValue.equals( "incomplete" ) ) {
+            searchInCompleteCompany = true;
+            canDelete = true;
         }
 
         // Check for account type filter
@@ -287,11 +291,97 @@ public class AdminController
             }
         }
 
-        unitSettings = organizationManagementService.getCompaniesByKeyValueFromMongo( searchKey, accountType, status );
+        unitSettings = organizationManagementService.getCompaniesByKeyValueFromMongo( searchKey, accountType, status,
+            searchInCompleteCompany );
 
         model.addAttribute( "companyList", unitSettings );
+        model.addAttribute( "canDelete", canDelete );
 
         return JspResolver.ADMIN_COMPANY_LIST;
+    }
+
+
+    @RequestMapping ( value = "/fetchregionsbykey", method = RequestMethod.GET)
+    public String fetchRegionsByKey( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Inside fetchRegionsByKey() method" );
+
+        String searchKey = request.getParameter( "searchKey" );
+
+        List<Region> regions = null;
+
+        try {
+
+
+            LOG.debug( "fetching regions " );
+            regions = organizationManagementService.getRegionsBySearchKey( searchKey );
+
+            model.addAttribute( "regions", regions );
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+        return JspResolver.ADMIN_COMPANY_HIERARCHY;
+    }
+
+
+    @RequestMapping ( value = "/fetchbranchesbykey", method = RequestMethod.GET)
+    public String fetchBranchesByKey( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Inside fetchBranchesByKey() method" );
+
+        String searchKey = request.getParameter( "searchKey" );
+
+        List<Branch> branches = null;
+
+        try {
+
+
+            LOG.debug( "fetching regions " );
+            branches = organizationManagementService.getBranchesBySearchKey( searchKey );
+
+            model.addAttribute( "branches", branches );
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+        return JspResolver.ADMIN_REGION_HIERARCHY;
+    }
+
+
+    @RequestMapping ( value = "/fetchusersbykey", method = RequestMethod.GET)
+    public String fetchUsersByKey( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Inside fetchUsersByKey() method" );
+
+        String searchKey = request.getParameter( "searchKey" );
+
+        List<UserFromSearch> usersList = null;
+
+        try {
+
+
+            LOG.debug( "fetching regions " );
+            usersList = organizationManagementService.getUsersBySearchKey( searchKey );
+
+            model.addAttribute( "users", usersList );
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+        return JspResolver.ADMIN_BRANCH_HIERARCHY;
     }
 
 
@@ -300,9 +390,7 @@ public class AdminController
     {
         LOG.info( "Method fetchHierarchyViewBranches called in controller" );
         String strRegionId = request.getParameter( "regionId" );
-        String companyIdStr = request.getParameter( "companyId" );
         long regionId = 0l;
-        long companyId = 0l;
         List<Branch> branches = null;
         int start = 0;
         int rows = -1;
@@ -313,12 +401,6 @@ public class AdminController
                 throw new InvalidInputException( "Error while parsing regionId in fetchHierarchyViewBranches.Reason : "
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            try {
-                companyId = Long.parseLong( companyIdStr );
-            } catch ( NumberFormatException e ) {
-                throw new InvalidInputException( "Error while parsing company in fetchHierarchyViewBranches.Reason : "
-                    + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
-            }
             LOG.debug( "Fetching branches for region id : " + regionId );
             branches = organizationManagementService.getBranchesByRegionId( regionId );
 
@@ -326,34 +408,6 @@ public class AdminController
             regionIds.add( regionId );
             LOG.debug( "Fetching users under region:" + regionId );
             List<UserFromSearch> users = organizationManagementService.getUsersUnderRegionFromSolr( regionIds, start, rows );
-
-            User admin = userManagementService.getCompanyAdmin( companyId );
-            /**
-             * fetching admin details
-             */
-            UserFromSearch adminUser = null;
-            try {
-                String adminUserDoc = JSONUtil.toJSON( solrSearchService.getUserByUniqueId( admin.getUserId() ) );
-                Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
-                adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
-            } catch ( SolrException e ) {
-                LOG.error( "SolrException while searching for user id. Reason : " + e.getMessage(), e );
-                throw new NonFatalException( "SolrException while searching for user id.",
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-
-            users = userManagementService.checkUserCanEdit( admin, adminUser, users );
-
-            //add profile image url            
-            /*for(BranchFromSearch branch : branches){
-                OrganizationUnitSettings branchSetting =  organizationManagementService.getBranchSettingsDefault( branch.getBranchId() );
-                branch.setProfileImageUrl( branchSetting.getProfileImageUrl() );
-            }
-            
-            for(UserFromSearch user : users){
-                OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
-                user.setProfileImageUrl( userSetting.getProfileImageUrl() );
-            }*/
 
             model.addAttribute( "branches", branches );
             model.addAttribute( "individuals", users );
@@ -375,9 +429,7 @@ public class AdminController
         LOG.info( "Method fetchHierarchyViewUsersForBranch called in admin controller" );
         String strBranchId = request.getParameter( "branchId" );
         String strRegionId = request.getParameter( "regionId" );
-        String strCompanyId = request.getParameter( "companyId" );
         long branchId = 0l;
-        long companyId = 01;
         int start = 0;
         try {
             try {
@@ -386,12 +438,7 @@ public class AdminController
                 throw new InvalidInputException( "Error while parsing branchId in fetchHierarchyViewBranches.Reason : "
                     + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            try {
-                companyId = Long.parseLong( strCompanyId );
-            } catch ( NumberFormatException e ) {
-                throw new InvalidInputException( "Error while parsing companyId in fetchHierarchyViewBranches.Reason : "
-                    + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
-            }
+
             int userCount = (int) solrSearchService.getUsersCountByIden( branchId, CommonConstants.BRANCHES_SOLR, false );
             Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden( branchId,
                 CommonConstants.BRANCHES_SOLR, false, start, userCount );
@@ -402,30 +449,6 @@ public class AdminController
              */
             Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
             List<UserFromSearch> usersList = new Gson().fromJson( usersJson, searchedUsersList );
-
-            User admin = userManagementService.getCompanyAdmin( companyId );
-            /**
-             * fetching admin details
-             */
-            UserFromSearch adminUser = null;
-            try {
-                String adminUserDoc = JSONUtil.toJSON( solrSearchService.getUserByUniqueId( admin.getUserId() ) );
-                Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
-                adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
-            } catch ( SolrException e ) {
-                LOG.error( "SolrException while searching for user id. Reason : " + e.getMessage(), e );
-                throw new NonFatalException( "SolrException while searching for user id.",
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
-
-            usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
-
-            //add profile image url
-            /*for(UserFromSearch user : usersList){
-                OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
-                user.setProfileImageUrl( userSetting.getProfileImageUrl() );
-            }*/
-
 
             model.addAttribute( "users", usersList );
             model.addAttribute( "branchId", branchId );
@@ -478,7 +501,7 @@ public class AdminController
             User newUser = userManagementService.getUserByUserId( id );
 
             HttpSession newSession = request.getSession( true );
-            
+
             //Set the autologin attribute as true
             newSession.setAttribute( CommonConstants.IS_AUTO_LOGIN, "true" );
             newSession.setAttribute( CommonConstants.REALTECH_USER_ID, adminUser.getUserId() );
@@ -644,21 +667,21 @@ public class AdminController
 
             surveyHandler.updateSurveyAsUnAbusive( surveyId );
             //post on social media if review is reported abusive by application
-            if ( ! surveyDetails.isAbuseRepByUser() ) {
+            if ( !surveyDetails.isAbuseRepByUser() ) {
                 if ( surveyDetails.getAgreedToShare().equalsIgnoreCase( CommonConstants.AGREE_SHARE_COLUMN_TRUE ) ) {
                     LOG.debug( "Survey is reported bu user so auto posting on social media" );
                     String serverBaseUrl = requestUtils.getRequestServerName( request );
                     socialManagementService.postToSocialMedia( surveyDetails.getAgentName(), user.getProfileUrl(),
                         surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName(), surveyDetails.getAgentId(),
                         surveyDetails.getScore(), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), false,
-                        serverBaseUrl , false );
+                        serverBaseUrl, false );
                 }
             }
 
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInput exception caught in unmarkAbusiveReview(). Nested exception is ", e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
-        } catch (NonFatalException e) {
+        } catch ( NonFatalException e ) {
             LOG.error( "NonFatal exception caught in unmarkAbusiveReview(). Nested exception is ", e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
         }

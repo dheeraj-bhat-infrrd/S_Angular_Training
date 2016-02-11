@@ -777,7 +777,25 @@ public class OrganizationManagementServiceImplTest
         organizationManagementServiceImpl.getRegionsForCompany( TestConstants.TEST_INT );
     }
 
-
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchesBySearchKey() throws InvalidInputException, ProfileNotFoundException, SolrException
+    {
+        organizationManagementServiceImpl.getRegionsBySearchKey( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetRegionsBySearchKey() throws InvalidInputException, ProfileNotFoundException, SolrException
+    {
+        organizationManagementServiceImpl.getBranchesBySearchKey( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testGetUsersBySearchKey() throws InvalidInputException, ProfileNotFoundException, SolrException
+    {
+        organizationManagementServiceImpl.getUsersBySearchKey( null );
+    }
+    
+    
     @Test ( expected = InvalidInputException.class)
     public void testGetAllVerticalsMasterWhenVerticalsMastersListIsEmpty() throws InvalidInputException
     {
