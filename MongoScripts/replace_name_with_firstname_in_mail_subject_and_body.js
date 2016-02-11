@@ -13,37 +13,37 @@ db.getCollection('COMPANY_SETTINGS').find({mail_content:{$exists:true,$ne:{}}}).
         record.mail_content.take_survey_mail.param_order = replaceParams(record.mail_content.take_survey_mail.param_order);
 
 	if(record.mail_content.take_survey_mail != undefined && record.mail_content.take_survey_mail.mail_subject != undefined)
-        record.mail_content.take_survey_mail.mail_subject = replaceParams(record.mail_content.take_survey_mail.mail_subject);
+        record.mail_content.take_survey_mail.mail_subject = record.mail_content.take_survey_mail.mail_subject.replace("[Name]", "[FirstName]");
     
     if(record.mail_content.take_survey_reminder_mail != undefined && record.mail_content.take_survey_reminder_mail.param_order != undefined)
         record.mail_content.take_survey_reminder_mail.param_order = replaceParams(record.mail_content.take_survey_reminder_mail.param_order);
 
     if(record.mail_content.take_survey_reminder_mail != undefined && record.mail_content.take_survey_reminder_mail.mail_subject != undefined)
-        record.mail_content.take_survey_reminder_mail.mail_subject = replaceParams(record.mail_content.take_survey_reminder_mail.mail_subject);
+        record.mail_content.take_survey_reminder_mail.mail_subject = record.mail_content.take_survey_reminder_mail.mail_subject.replace("[Name]", "[FirstName]");
     
     if(record.mail_content.restart_survey_mail != undefined && record.mail_content.restart_survey_mail.param_order != undefined)
         record.mail_content.restart_survey_mail.param_order = replaceParams(record.mail_content.restart_survey_mail.param_order);
 
     if(record.mail_content.restart_survey_mail != undefined && record.mail_content.restart_survey_mail.mail_subject != undefined)
-        record.mail_content.restart_survey_mail.mail_subject = replaceParams(record.mail_content.restart_survey_mail.mail_subject);
+        record.mail_content.restart_survey_mail.mail_subject = record.mail_content.restart_survey_mail.mail_subject.replace("[Name]", "[FirstName]");
    
     if(record.mail_content.survey_completion_mail != undefined && record.mail_content.survey_completion_mail.param_order != undefined)
         record.mail_content.survey_completion_mail.param_order = replaceParams(record.mail_content.survey_completion_mail.param_order);
 
     if(record.mail_content.survey_completion_mail != undefined && record.mail_content.survey_completion_mail.mail_subject != undefined)
-        record.mail_content.survey_completion_mail.mail_subject = replaceParams(record.mail_content.survey_completion_mail.mail_subject);
+        record.mail_content.survey_completion_mail.mail_subject = record.mail_content.survey_completion_mail.mail_subject.replace("[Name]", "[FirstName]");
     
     if(record.mail_content.social_post_reminder_mail != undefined && record.mail_content.social_post_reminder_mail.param_order != undefined)
         record.mail_content.social_post_reminder_mail.param_order = replaceParams(record.mail_content.social_post_reminder_mail.param_order);
 
     if(record.mail_content.social_post_reminder_mail != undefined && record.mail_content.social_post_reminder_mail.mail_subject != undefined)
-        record.mail_content.social_post_reminder_mail.mail_subject = replaceParams(record.mail_content.social_post_reminder_mail.mail_subject);
+        record.mail_content.social_post_reminder_mail.mail_subject = record.mail_content.social_post_reminder_mail.mail_subject.replace("[Name]", "[FirstName]");
     
     if(record.mail_content.survey_completion_unpleasant_mail != undefined && record.mail_content.survey_completion_unpleasant_mail.param_order != undefined)
         record.mail_content.survey_completion_unpleasant_mail.param_order = replaceParams(record.mail_content.survey_completion_unpleasant_mail.param_order);
 
     if(record.mail_content.survey_completion_unpleasant_mail != undefined && record.mail_content.survey_completion_unpleasant_mail.mail_subject != undefined)
-        record.mail_content.survey_completion_unpleasant_mail.mail_subject = replaceParams(record.mail_content.survey_completion_unpleasant_mail.mail_subject);
+        record.mail_content.survey_completion_unpleasant_mail.mail_subject = record.mail_content.survey_completion_unpleasant_mail.mail_subject.replace("[Name]", "[FirstName]");
     //Save changes into DB
     db.getCollection('COMPANY_SETTINGS').save(record);
 });
