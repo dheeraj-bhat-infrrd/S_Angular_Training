@@ -57,9 +57,6 @@
 		<!-- Admin pages -->
 		<intercept-url pattern="/adminlogin.do" access="permitAll" />
 		
-		<!--  purge company -->
-		<intercept-url pattern="/purgeCompany.do" access="permitAll" />
-		
 		<!--  generate api key -->
 		<intercept-url pattern="/generateApiKey.do" access="permitAll" />
 
@@ -75,7 +72,7 @@
 		</session-management>
 
 		<!-- Logout Services -->
-		<logout invalidate-session="true" logout-success-url="/?s=logout" />
+		<logout invalidate-session="true" logout-success-url="/login.do?s=logout" />
 		<custom-filter ref="logoutFilter" before="LOGOUT_FILTER" />
 	</http>
 	
@@ -97,7 +94,7 @@
 
 	<beans:bean id="logoutFilter"
 		class="org.springframework.security.web.authentication.logout.LogoutFilter">
-		<beans:constructor-arg index="0" value="/?s=logout" />
+		<beans:constructor-arg index="0" value="/login.do?s=logout" />
 		<beans:constructor-arg index="1">
 			<beans:list>
 				<beans:ref bean="securityContextLogoutHandler" />

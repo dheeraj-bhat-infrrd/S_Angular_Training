@@ -13,6 +13,7 @@
 				<select class="com-sel-filter" id="com-filter">
 					<option value="active">Active</option>
 					<option value="inactive">Inactive</option>
+					<option value="incomplete">Incomplete</option>
 				</select>
 			</div>
 		</div>
@@ -32,9 +33,20 @@
 			</select>
 		</div>
 		<div class="v-um-hdr-right float-right">
-			<input id="hr-comp-sel" class="v-comp-inp"
-				placeholder="Search Company"> <span id="hr-comp-icn"
-				class="um-search-icn"></span>
+			<div style="position: relative;">
+				<div style="float: left;">
+					<input id="hr-comp-sel" class="v-comp-inp float-left" placeholder="Search Company" srch-type="company">
+					<div id="hr-drpdwn-icn" class="v-icn-dropdown float-left"></div>
+				</div>
+				<span id="hr-comp-icn" class="um-search-icn float-left"></span>
+				<div id="srch-crtria-list" class="hr-dd-wrapper hide ps-container" style="display: none;">
+					<div class="hr-dd-item" style="display: block;" srch-type="company" >Company</div>
+					<div class="hr-dd-item" style="display: block;" srch-type="region">Region</div>
+					<div class="hr-dd-item" style="display: block;" srch-type="office">Office</div>
+					<div class="hr-dd-item" style="display: block;" srch-type="user">User</div>
+				</div>
+			</div>
+				
 		</div>
 	</div>
 	<div class="v-hr-tbl">
