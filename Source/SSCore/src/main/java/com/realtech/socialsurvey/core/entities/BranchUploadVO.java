@@ -12,7 +12,7 @@ public class BranchUploadVO
     private LongUploadHistory[] branchIdHistory;
     private String sourceBranchId;
     private boolean isSourceBranchIdModified;
-    private boolean isSourceBrancIdGenerated;
+    private boolean isSourceBranchIdGenerated;
     private StringUploadHistory[] sourceBranchIdHistory;
     private long regionId;
     private boolean isRegionIdModified;
@@ -141,13 +141,13 @@ public class BranchUploadVO
 
     public boolean isSourceBrancIdGenerated()
     {
-        return isSourceBrancIdGenerated;
+        return isSourceBranchIdGenerated;
     }
 
 
     public void setSourceBrancIdGenerated( boolean isSourceBrancIdGenerated )
     {
-        this.isSourceBrancIdGenerated = isSourceBrancIdGenerated;
+        this.isSourceBranchIdGenerated = isSourceBrancIdGenerated;
     }
 
 
