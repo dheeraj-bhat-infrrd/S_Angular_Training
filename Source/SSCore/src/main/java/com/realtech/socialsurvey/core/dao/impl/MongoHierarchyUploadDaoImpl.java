@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
+
 @Repository
 public class MongoHierarchyUploadDaoImpl implements HierarchyUploadDao
 {
@@ -37,6 +38,11 @@ public class MongoHierarchyUploadDaoImpl implements HierarchyUploadDao
             LOG.error( "The hierarchy upload object is null" );
             throw new InvalidInputException( "The hierarchy upload object is null" );
         }
+
+        //Delete previous instance
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( hierarchyUpload.getCompanyId() ) );
+        mongoTemplate.remove( query, HierarchyUpload.class, CommonConstants.HIERARCHY_UPLOAD_COLLECTION );
 
         //Save object in mongo
         mongoTemplate.save( hierarchyUpload, CommonConstants.HIERARCHY_UPLOAD_COLLECTION );
