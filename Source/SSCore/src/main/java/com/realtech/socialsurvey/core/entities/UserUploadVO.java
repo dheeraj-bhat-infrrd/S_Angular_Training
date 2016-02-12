@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
 
-
 /*
  * The view class for User
  */
@@ -14,79 +13,79 @@ public class UserUploadVO
     private boolean isSourceUserIdGenerated;
     private String firstName;
     private boolean isFirstNameModified;
-    private StringUploadHistory[] firstNameHistory;
+    private List<StringUploadHistory> firstNameHistory;
     private String lastName;
     private boolean isLastNameModified;
-    private StringUploadHistory[] lastNameHistory;
+    private List<StringUploadHistory> lastNameHistory;
     private String title;
     private boolean isTitleModified;
-    private StringUploadHistory[] titleHistory;
+    private List<StringUploadHistory> titleHistory;
     private String sourceBranchId;
     private boolean isSourceBranchIdModified;
-    private StringUploadHistory[] sourceBranchIdHistory;
+    private List<StringUploadHistory> sourceBranchIdHistory;
     private long branchId;
     private boolean isBranchIdModified;
-    private LongUploadHistory[] branchIdHistory;
+    private List<LongUploadHistory> branchIdHistory;
     private String sourceRegionId;
     private boolean isSourceRegionIdModified;
-    private StringUploadHistory[] sourceRegionIdHistory;
+    private List<StringUploadHistory> sourceRegionIdHistory;
     private long regionId;
     private boolean isRegionIdModified;
-    private LongUploadHistory[] regionIdHistory;
+    private List<LongUploadHistory> regionIdHistory;
     private boolean isAgent;
     private boolean isAgentModified;
-    private BooleanUploadHistory[] isAgentHistory;
+    private List<BooleanUploadHistory> isAgentHistory;
     private String emailId;
     private boolean isEmailIdModified;
-    private StringUploadHistory[] emailIdHistory;
+    private List<StringUploadHistory> emailIdHistory;
     private boolean belongsToCompany;
     private boolean isBelongsToCompanyModified;
-    private BooleanUploadHistory[] belongsToCompanyHistory;
+    private List<BooleanUploadHistory> belongsToCompanyHistory;
     private boolean assignToCompany;
     private boolean isAssignToCompanyModified;
-    private BooleanUploadHistory[] assignToCompanyHistory;
+    private List<BooleanUploadHistory> assignToCompanyHistory;
     private String assignedBranchName;
     private boolean isAssignedBranchNameModified;
-    private StringUploadHistory[] assignedBranchNameHistory;
-    private String[] assignedBranches;
+    private List<StringUploadHistory> assignedBranchNameHistory;
+    private List<String> assignedBranches;
     private boolean isAssignedBranchesModified;
-    private StringArrayUploadHistory[] assignedBranchesHistory;
+    private List<StringListUploadHistory> assignedBranchesHistory;
     private String assignedRegionName;
     private boolean isAssignedRegionNameModified;
-    private StringUploadHistory[] assignedRegionNameHistory;
-    private String[] assignedRegions;
+    private List<StringUploadHistory> assignedRegionNameHistory;
+    private List<String> assignedRegions;
     private boolean isAssignedRegionsModified;
-    private StringArrayUploadHistory[] assignedRegionsHistory;
+    private List<StringListUploadHistory> assignedRegionsHistory;
     private boolean isBranchAdmin;
     private boolean isBranchAdminModified;
     private BooleanUploadHistory[] isBranchAdminHistory;
-    private String[] assignedBrachesAdmin;
+    private List<String> assignedBranchesAdmin;
     private boolean isAssignedBrachesAdminModified;
-    private StringArrayUploadHistory[] assignedBrachesAdminHistory;
+    private List<StringListUploadHistory> assignedBrachesAdminHistory;
     private boolean isRegionAdmin;
     private boolean isRegionAdminModified;
-    private BooleanUploadHistory[] isRegionAdminHistory;
-    private String[] assignedRegionsAdmin;
+    private List<BooleanUploadHistory> isRegionAdminHistory;
+    private List<String> assignedRegionsAdmin;
     private boolean isAssignedRegionsAdminModified;
-    private StringArrayUploadHistory[] assignedRegionsAdminHistory;
+    private List<StringListUploadHistory> assignedRegionsAdminHistory;
     private String phoneNumber;
     private boolean isPhoneNumberModified;
-    private StringUploadHistory[] phoneNumberHistory;
+    private List<StringUploadHistory> phoneNumberHistory;
     private String websiteUrl;
     private boolean isWebsiteUrlModified;
-    private StringUploadHistory[] websiteUrlHistory;
+    private List<StringUploadHistory> websiteUrlHistory;
     private String license;
     private boolean isLicenseModified;
-    private StringUploadHistory[] licenseHistory;
+    private List<StringUploadHistory> licenseHistory;
     private String legalDisclaimer;
     private boolean isLegalDisclaimerModified;
-    private StringUploadHistory[] legalDisclaimerHistory;
+    private List<StringUploadHistory> legalDisclaimerHistory;
     private String aboutMeDescription;
     private boolean isAboutMeDescriptionModified;
-    private StringUploadHistory[] aboutMeDescriptionHistory;
+    private List<StringUploadHistory> aboutMeDescriptionHistory;
     private String userPhotoUrl;
     private boolean isUserPhotoUrlModified;
-    private StringUploadHistory[] userPhotoUrlHistory;
+    private List<StringUploadHistory> userPhotoUrlHistory;
     private boolean isUserAdded;
     private boolean isUserModified;
     private List<Long> regionIds;
@@ -181,13 +180,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getFirstNameHistory()
+    public List<StringUploadHistory> getFirstNameHistory()
     {
         return firstNameHistory;
     }
 
 
-    public void setFirstNameHistory( StringUploadHistory[] firstNameHistory )
+    public void setFirstNameHistory( List<StringUploadHistory> firstNameHistory )
     {
         this.firstNameHistory = firstNameHistory;
     }
@@ -217,13 +216,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getLastNameHistory()
+    public List<StringUploadHistory> getLastNameHistory()
     {
         return lastNameHistory;
     }
 
 
-    public void setLastNameHistory( StringUploadHistory[] lastNameHistory )
+    public void setLastNameHistory( List<StringUploadHistory> lastNameHistory )
     {
         this.lastNameHistory = lastNameHistory;
     }
@@ -253,13 +252,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getTitleHistory()
+    public List<StringUploadHistory> getTitleHistory()
     {
         return titleHistory;
     }
 
 
-    public void setTitleHistory( StringUploadHistory[] titleHistory )
+    public void setTitleHistory( List<StringUploadHistory> titleHistory )
     {
         this.titleHistory = titleHistory;
     }
@@ -289,13 +288,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getSourceBranchIdHistory()
+    public List<StringUploadHistory> getSourceBranchIdHistory()
     {
         return sourceBranchIdHistory;
     }
 
 
-    public void setSourceBranchIdHistory( StringUploadHistory[] sourceBranchIdHistory )
+    public void setSourceBranchIdHistory( List<StringUploadHistory> sourceBranchIdHistory )
     {
         this.sourceBranchIdHistory = sourceBranchIdHistory;
     }
@@ -325,13 +324,13 @@ public class UserUploadVO
     }
 
 
-    public LongUploadHistory[] getBranchIdHistory()
+    public List<LongUploadHistory> getBranchIdHistory()
     {
         return branchIdHistory;
     }
 
 
-    public void setBranchIdHistory( LongUploadHistory[] branchIdHistory )
+    public void setBranchIdHistory( List<LongUploadHistory> branchIdHistory )
     {
         this.branchIdHistory = branchIdHistory;
     }
@@ -361,13 +360,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getSourceRegionIdHistory()
+    public List<StringUploadHistory> getSourceRegionIdHistory()
     {
         return sourceRegionIdHistory;
     }
 
 
-    public void setSourceRegionIdHistory( StringUploadHistory[] sourceRegionIdHistory )
+    public void setSourceRegionIdHistory( List<StringUploadHistory> sourceRegionIdHistory )
     {
         this.sourceRegionIdHistory = sourceRegionIdHistory;
     }
@@ -397,13 +396,13 @@ public class UserUploadVO
     }
 
 
-    public LongUploadHistory[] getRegionIdHistory()
+    public List<LongUploadHistory> getRegionIdHistory()
     {
         return regionIdHistory;
     }
 
 
-    public void setRegionIdHistory( LongUploadHistory[] regionIdHistory )
+    public void setRegionIdHistory( List<LongUploadHistory> regionIdHistory )
     {
         this.regionIdHistory = regionIdHistory;
     }
@@ -433,13 +432,13 @@ public class UserUploadVO
     }
 
 
-    public BooleanUploadHistory[] getIsAgentHistory()
+    public List<BooleanUploadHistory> getIsAgentHistory()
     {
         return isAgentHistory;
     }
 
 
-    public void setIsAgentHistory( BooleanUploadHistory[] isAgentHistory )
+    public void setIsAgentHistory( List<BooleanUploadHistory> isAgentHistory )
     {
         this.isAgentHistory = isAgentHistory;
     }
@@ -469,13 +468,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getEmailIdHistory()
+    public List<StringUploadHistory> getEmailIdHistory()
     {
         return emailIdHistory;
     }
 
 
-    public void setEmailIdHistory( StringUploadHistory[] emailIdHistory )
+    public void setEmailIdHistory( List<StringUploadHistory> emailIdHistory )
     {
         this.emailIdHistory = emailIdHistory;
     }
@@ -505,13 +504,13 @@ public class UserUploadVO
     }
 
 
-    public BooleanUploadHistory[] getBelongsToCompanyHistory()
+    public List<BooleanUploadHistory> getBelongsToCompanyHistory()
     {
         return belongsToCompanyHistory;
     }
 
 
-    public void setBelongsToCompanyHistory( BooleanUploadHistory[] belongsToCompanyHistory )
+    public void setBelongsToCompanyHistory( List<BooleanUploadHistory> belongsToCompanyHistory )
     {
         this.belongsToCompanyHistory = belongsToCompanyHistory;
     }
@@ -541,13 +540,13 @@ public class UserUploadVO
     }
 
 
-    public BooleanUploadHistory[] getAssignToCompanyHistory()
+    public List<BooleanUploadHistory> getAssignToCompanyHistory()
     {
         return assignToCompanyHistory;
     }
 
 
-    public void setAssignToCompanyHistory( BooleanUploadHistory[] assignToCompanyHistory )
+    public void setAssignToCompanyHistory( List<BooleanUploadHistory> assignToCompanyHistory )
     {
         this.assignToCompanyHistory = assignToCompanyHistory;
     }
@@ -577,25 +576,25 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getAssignedBranchNameHistory()
+    public List<StringUploadHistory> getAssignedBranchNameHistory()
     {
         return assignedBranchNameHistory;
     }
 
 
-    public void setAssignedBranchNameHistory( StringUploadHistory[] assignedBranchNameHistory )
+    public void setAssignedBranchNameHistory( List<StringUploadHistory> assignedBranchNameHistory )
     {
         this.assignedBranchNameHistory = assignedBranchNameHistory;
     }
 
 
-    public String[] getAssignedBranches()
+    public List<String> getAssignedBranches()
     {
         return assignedBranches;
     }
 
 
-    public void setAssignedBranches( String[] assignedBranches )
+    public void setAssignedBranches( List<String> assignedBranches )
     {
         this.assignedBranches = assignedBranches;
     }
@@ -613,13 +612,13 @@ public class UserUploadVO
     }
 
 
-    public StringArrayUploadHistory[] getAssignedBranchesHistory()
+    public List<StringListUploadHistory> getAssignedBranchesHistory()
     {
         return assignedBranchesHistory;
     }
 
 
-    public void setAssignedBranchesHistory( StringArrayUploadHistory[] assignedBranchesHistory )
+    public void setAssignedBranchesHistory( List<StringListUploadHistory> assignedBranchesHistory )
     {
         this.assignedBranchesHistory = assignedBranchesHistory;
     }
@@ -649,25 +648,25 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getAssignedRegionNameHistory()
+    public List<StringUploadHistory> getAssignedRegionNameHistory()
     {
         return assignedRegionNameHistory;
     }
 
 
-    public void setAssignedRegionNameHistory( StringUploadHistory[] assignedRegionNameHistory )
+    public void setAssignedRegionNameHistory( List<StringUploadHistory> assignedRegionNameHistory )
     {
         this.assignedRegionNameHistory = assignedRegionNameHistory;
     }
 
 
-    public String[] getAssignedRegions()
+    public List<String> getAssignedRegions()
     {
         return assignedRegions;
     }
 
 
-    public void setAssignedRegions( String[] assignedRegions )
+    public void setAssignedRegions( List<String> assignedRegions )
     {
         this.assignedRegions = assignedRegions;
     }
@@ -685,13 +684,13 @@ public class UserUploadVO
     }
 
 
-    public StringArrayUploadHistory[] getAssignedRegionsHistory()
+    public List<StringListUploadHistory> getAssignedRegionsHistory()
     {
         return assignedRegionsHistory;
     }
 
 
-    public void setAssignedRegionsHistory( StringArrayUploadHistory[] assignedRegionsHistory )
+    public void setAssignedRegionsHistory( List<StringListUploadHistory> assignedRegionsHistory )
     {
         this.assignedRegionsHistory = assignedRegionsHistory;
     }
@@ -733,15 +732,15 @@ public class UserUploadVO
     }
 
 
-    public String[] getAssignedBrachesAdmin()
+    public List<String> getAssignedBranchesAdmin()
     {
-        return assignedBrachesAdmin;
+        return assignedBranchesAdmin;
     }
 
 
-    public void setAssignedBrachesAdmin( String[] assignedBrachesAdmin )
+    public void setAssignedBranchesAdmin( List<String> assignedBrachesAdmin )
     {
-        this.assignedBrachesAdmin = assignedBrachesAdmin;
+        this.assignedBranchesAdmin = assignedBrachesAdmin;
     }
 
 
@@ -757,13 +756,13 @@ public class UserUploadVO
     }
 
 
-    public StringArrayUploadHistory[] getAssignedBrachesAdminHistory()
+    public List<StringListUploadHistory> getAssignedBrachesAdminHistory()
     {
         return assignedBrachesAdminHistory;
     }
 
 
-    public void setAssignedBrachesAdminHistory( StringArrayUploadHistory[] assignedBrachesAdminHistory )
+    public void setAssignedBrachesAdminHistory( List<StringListUploadHistory> assignedBrachesAdminHistory )
     {
         this.assignedBrachesAdminHistory = assignedBrachesAdminHistory;
     }
@@ -793,25 +792,25 @@ public class UserUploadVO
     }
 
 
-    public BooleanUploadHistory[] getIsRegionAdminHistory()
+    public List<BooleanUploadHistory> getIsRegionAdminHistory()
     {
         return isRegionAdminHistory;
     }
 
 
-    public void setIsRegionAdminHistory( BooleanUploadHistory[] isRegionAdminHistory )
+    public void setIsRegionAdminHistory( List<BooleanUploadHistory> isRegionAdminHistory )
     {
         this.isRegionAdminHistory = isRegionAdminHistory;
     }
 
 
-    public String[] getAssignedRegionsAdmin()
+    public List<String> getAssignedRegionsAdmin()
     {
         return assignedRegionsAdmin;
     }
 
 
-    public void setAssignedRegionsAdmin( String[] assignedRegionsAdmin )
+    public void setAssignedRegionsAdmin( List<String> assignedRegionsAdmin )
     {
         this.assignedRegionsAdmin = assignedRegionsAdmin;
     }
@@ -829,13 +828,13 @@ public class UserUploadVO
     }
 
 
-    public StringArrayUploadHistory[] getAssignedRegionsAdminHistory()
+    public List<StringListUploadHistory> getAssignedRegionsAdminHistory()
     {
         return assignedRegionsAdminHistory;
     }
 
 
-    public void setAssignedRegionsAdminHistory( StringArrayUploadHistory[] assignedRegionsAdminHistory )
+    public void setAssignedRegionsAdminHistory( List<StringListUploadHistory> assignedRegionsAdminHistory )
     {
         this.assignedRegionsAdminHistory = assignedRegionsAdminHistory;
     }
@@ -865,13 +864,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getPhoneNumberHistory()
+    public List<StringUploadHistory> getPhoneNumberHistory()
     {
         return phoneNumberHistory;
     }
 
 
-    public void setPhoneNumberHistory( StringUploadHistory[] phoneNumberHistory )
+    public void setPhoneNumberHistory( List<StringUploadHistory> phoneNumberHistory )
     {
         this.phoneNumberHistory = phoneNumberHistory;
     }
@@ -901,13 +900,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getWebsiteUrlHistory()
+    public List<StringUploadHistory> getWebsiteUrlHistory()
     {
         return websiteUrlHistory;
     }
 
 
-    public void setWebsiteUrlHistory( StringUploadHistory[] websiteUrlHistory )
+    public void setWebsiteUrlHistory( List<StringUploadHistory> websiteUrlHistory )
     {
         this.websiteUrlHistory = websiteUrlHistory;
     }
@@ -937,13 +936,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getLicenseHistory()
+    public List<StringUploadHistory> getLicenseHistory()
     {
         return licenseHistory;
     }
 
 
-    public void setLicenseHistory( StringUploadHistory[] licenseHistory )
+    public void setLicenseHistory( List<StringUploadHistory> licenseHistory )
     {
         this.licenseHistory = licenseHistory;
     }
@@ -973,13 +972,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getLegalDisclaimerHistory()
+    public List<StringUploadHistory> getLegalDisclaimerHistory()
     {
         return legalDisclaimerHistory;
     }
 
 
-    public void setLegalDisclaimerHistory( StringUploadHistory[] legalDisclaimerHistory )
+    public void setLegalDisclaimerHistory( List<StringUploadHistory> legalDisclaimerHistory )
     {
         this.legalDisclaimerHistory = legalDisclaimerHistory;
     }
@@ -1009,13 +1008,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getAboutMeDescriptionHistory()
+    public List<StringUploadHistory> getAboutMeDescriptionHistory()
     {
         return aboutMeDescriptionHistory;
     }
 
 
-    public void setAboutMeDescriptionHistory( StringUploadHistory[] aboutMeDescriptionHistory )
+    public void setAboutMeDescriptionHistory( List<StringUploadHistory> aboutMeDescriptionHistory )
     {
         this.aboutMeDescriptionHistory = aboutMeDescriptionHistory;
     }
@@ -1045,13 +1044,13 @@ public class UserUploadVO
     }
 
 
-    public StringUploadHistory[] getUserPhotoUrlHistory()
+    public List<StringUploadHistory> getUserPhotoUrlHistory()
     {
         return userPhotoUrlHistory;
     }
 
 
-    public void setUserPhotoUrlHistory( StringUploadHistory[] userPhotoUrlHistory )
+    public void setUserPhotoUrlHistory( List<StringUploadHistory> userPhotoUrlHistory )
     {
         this.userPhotoUrlHistory = userPhotoUrlHistory;
     }
