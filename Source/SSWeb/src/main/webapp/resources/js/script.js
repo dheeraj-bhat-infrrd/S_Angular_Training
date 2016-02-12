@@ -2034,8 +2034,26 @@ var hierarchyUpload={
 				showError(response);
 			} else {
 				$('#xlsx-file-upload').show();
+				function fixStr(key) {
+				    var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
+				        if (offset == 0) {
+				            return(key.toUpperCase());
+				        } else {
+				            return(key.substr(0,1) + " " + key.substr(1).toUpperCase());
+				        }
+				    });
+				    return(out);
+				}
+				
 				$.each($.parseJSON(response), function(key, value) {
-					function fixStr(key) {
+						var number=key.indexOf("number");
+						if(number!=-1){
+							if(value!=0){
+								$('<div style="float:left;padding:10px;color: #009FE0;">'+fixStr(key)+':'+value+'</div>').appendTo('#json-response');
+							}
+						}
+					
+					/*function fixStr(key) {
 					    var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
 					        if (offset == 0) {
 					            return(key.toUpperCase());
@@ -2050,7 +2068,7 @@ var hierarchyUpload={
 					 $('#com-file').val('');
 						$('#com-xlsx-file').val('');
 					}
-					
+					*/
 					});
 			
 				}

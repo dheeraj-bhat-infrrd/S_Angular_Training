@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+2<%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -71,7 +71,7 @@
 		</div>
 	</div>
 </div>
-<table id="json-response" class="hierarchy-table"></table>
+<div id="json-response" class="hierarchy-table clearfix"></div>
 
 <script>
 	$(document).ready(function() {
