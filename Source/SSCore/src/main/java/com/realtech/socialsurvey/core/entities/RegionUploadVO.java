@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
 /*
  * The view class for Region
  */
@@ -8,35 +10,35 @@ public class RegionUploadVO
 
     private long regionId;
     private boolean isRegionIdModified;
-    private LongUploadHistory[] regionIdHistory;
+    private List<LongUploadHistory> regionIdHistory;
     private String sourceRegionId;
     private boolean isSourceRegionIdModified;
     private boolean isSourceRegionIdGenerated;
-    private StringUploadHistory[] sourceRegionIdHistory;
+    private List<StringUploadHistory> sourceRegionIdHistory;
     private String regionName;
     private boolean isRegionNameModified;
-    private StringUploadHistory[] regionNameHistory;
+    private List<StringUploadHistory> regionNameHistory;
     private String regionAddress1;
     private boolean isRegionAddress1Modified;
-    private StringUploadHistory[] regionAddress1History;
+    private List<StringUploadHistory> regionAddress1History;
     private String regionAddress2;
     private boolean isRegionAddress2Modified;
-    private StringUploadHistory[] regionAddress2History;
+    private List<StringUploadHistory> regionAddress2History;
     private String regionCountry;
     private boolean isRegionCountryModified;
-    private StringUploadHistory[] regionCountryHistory;
+    private List<StringUploadHistory> regionCountryHistory;
     private String regionCountryCode;
     private boolean isRegionCountryCodeModified;
-    private StringUploadHistory[] regionCountryCodeHistory;
+    private List<StringUploadHistory> regionCountryCodeHistory;
     private String regionState;
     private boolean isRegionStateModified;
-    private StringUploadHistory[] regionStateHistory;
+    private List<StringUploadHistory> regionStateHistory;
     private String regionCity;
     private boolean isRegionCityModified;
-    private StringUploadHistory[] regionCityHistory;
+    private List<StringUploadHistory> regionCityHistory;
     private String regionZipcode;
     private boolean isRegionZipcodeModified;
-    private StringUploadHistory[] regionZipcodeHistory;
+    private List<StringUploadHistory> regionZipcodeHistory;
     private boolean isAddressSet;
     private boolean isRegionAdded;
     private boolean isRegionModified;
@@ -94,13 +96,13 @@ public class RegionUploadVO
     }
 
 
-    public LongUploadHistory[] getRegionIdHistory()
+    public List<LongUploadHistory> getRegionIdHistory()
     {
         return regionIdHistory;
     }
 
 
-    public void setRegionIdHistory( LongUploadHistory[] regionIdHistory )
+    public void setRegionIdHistory( List<LongUploadHistory> regionIdHistory )
     {
         this.regionIdHistory = regionIdHistory;
     }
@@ -142,13 +144,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getSourceRegionIdHistory()
+    public List<StringUploadHistory> getSourceRegionIdHistory()
     {
         return sourceRegionIdHistory;
     }
 
 
-    public void setSourceRegionIdHistory( StringUploadHistory[] sourceRegionIdHistory )
+    public void setSourceRegionIdHistory( List<StringUploadHistory> sourceRegionIdHistory )
     {
         this.sourceRegionIdHistory = sourceRegionIdHistory;
     }
@@ -178,13 +180,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getRegionNameHistory()
+    public List<StringUploadHistory> getRegionNameHistory()
     {
         return regionNameHistory;
     }
 
 
-    public void setRegionNameHistory( StringUploadHistory[] regionNameHistory )
+    public void setRegionNameHistory( List<StringUploadHistory> regionNameHistory )
     {
         this.regionNameHistory = regionNameHistory;
     }
@@ -214,13 +216,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getRegionAddress1History()
+    public List<StringUploadHistory> getRegionAddress1History()
     {
         return regionAddress1History;
     }
 
 
-    public void setRegionAddress1History( StringUploadHistory[] regionAddress1History )
+    public void setRegionAddress1History( List<StringUploadHistory> regionAddress1History )
     {
         this.regionAddress1History = regionAddress1History;
     }
@@ -250,13 +252,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getRegionAddress2History()
+    public List<StringUploadHistory> getRegionAddress2History()
     {
         return regionAddress2History;
     }
 
 
-    public void setRegionAddress2History( StringUploadHistory[] regionAddress2History )
+    public void setRegionAddress2History( List<StringUploadHistory> regionAddress2History )
     {
         this.regionAddress2History = regionAddress2History;
     }
@@ -286,13 +288,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getRegionCountryHistory()
+    public List<StringUploadHistory> getRegionCountryHistory()
     {
         return regionCountryHistory;
     }
 
 
-    public void setRegionCountryHistory( StringUploadHistory[] regionCountryHistory )
+    public void setRegionCountryHistory( List<StringUploadHistory> regionCountryHistory )
     {
         this.regionCountryHistory = regionCountryHistory;
     }
@@ -322,13 +324,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getRegionCountryCodeHistory()
+    public List<StringUploadHistory> getRegionCountryCodeHistory()
     {
         return regionCountryCodeHistory;
     }
 
 
-    public void setRegionCountryCodeHistory( StringUploadHistory[] regionCountryCodeHistory )
+    public void setRegionCountryCodeHistory( List<StringUploadHistory> regionCountryCodeHistory )
     {
         this.regionCountryCodeHistory = regionCountryCodeHistory;
     }
@@ -358,13 +360,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getRegionStateHistory()
+    public List<StringUploadHistory> getRegionStateHistory()
     {
         return regionStateHistory;
     }
 
 
-    public void setRegionStateHistory( StringUploadHistory[] regionStateHistory )
+    public void setRegionStateHistory( List<StringUploadHistory> regionStateHistory )
     {
         this.regionStateHistory = regionStateHistory;
     }
@@ -394,13 +396,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getRegionCityHistory()
+    public List<StringUploadHistory> getRegionCityHistory()
     {
         return regionCityHistory;
     }
 
 
-    public void setRegionCityHistory( StringUploadHistory[] regionCityHistory )
+    public void setRegionCityHistory( List<StringUploadHistory> regionCityHistory )
     {
         this.regionCityHistory = regionCityHistory;
     }
@@ -430,13 +432,13 @@ public class RegionUploadVO
     }
 
 
-    public StringUploadHistory[] getRegionZipcodeHistory()
+    public List<StringUploadHistory> getRegionZipcodeHistory()
     {
         return regionZipcodeHistory;
     }
 
 
-    public void setRegionZipcodeHistory( StringUploadHistory[] regionZipcodeHistory )
+    public void setRegionZipcodeHistory( List<StringUploadHistory> regionZipcodeHistory )
     {
         this.regionZipcodeHistory = regionZipcodeHistory;
     }
