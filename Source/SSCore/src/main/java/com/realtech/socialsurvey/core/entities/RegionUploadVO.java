@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
 
+
 /*
  * The view class for Region
  */
@@ -511,8 +512,10 @@ public class RegionUploadVO
         if ( this.sourceRegionId != null && !this.sourceRegionId.isEmpty() && regionUploadVO.sourceRegionId != null
             && !regionUploadVO.sourceRegionId.isEmpty() ) {
             return this.sourceRegionId.equals( regionUploadVO.sourceRegionId );
-        } else {
+        } else if ( this.regionId != 0 && regionUploadVO.regionId != 0 ) {
             return ( this.regionId == regionUploadVO.regionId );
+        } else {
+            return false;
         }
     }
 
