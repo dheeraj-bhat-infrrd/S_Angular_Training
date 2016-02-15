@@ -62,7 +62,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
-    private void uploadRegions( HierarchyUpload upload, User user, Company company )
+    void uploadRegions( HierarchyUpload upload, User user, Company company )
     {
         LOG.debug( "Uploading new regions." );
         List<RegionUploadVO> regionsToBeUploaded = upload.getRegions();
@@ -91,7 +91,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
-    private RegionUploadVO mapRegionModificationHistory( RegionUploadVO regionUpload, Region region )
+    RegionUploadVO mapRegionModificationHistory( RegionUploadVO regionUpload, Region region )
     {
         LOG.debug( "mapping region history" );
         Timestamp currentTimestamp = new Timestamp( System.currentTimeMillis() );
