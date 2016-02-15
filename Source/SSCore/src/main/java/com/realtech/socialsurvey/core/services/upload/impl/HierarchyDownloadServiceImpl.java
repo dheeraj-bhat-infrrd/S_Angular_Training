@@ -141,7 +141,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     {
         //Regions
         Map<String, Long> oldMap = oldHierarchyUpload.getRegionSourceMapping();
-        Map<String, Long> newMap = newHierarchyUpload.getRegionSourceMapping();
+        Map<String, Long> newMap = currentHierarchyUpload.getRegionSourceMapping();
         newMap.putAll( oldMap );
         newHierarchyUpload.setRegionSourceMapping( newMap );
 
@@ -950,7 +950,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 // col 12 - legal disclaimer
                 // col 13 - photo - profile image url
                 // col 14 - about me
-                userReportToPopulate.add( user.getUserId() );
+                userReportToPopulate.add( user.getSourceUserId() );
                 userReportToPopulate.add( user.getFirstName() );
                 if ( user.getLastName() != null && !user.getLastName().trim().equalsIgnoreCase( "" )
                     && !user.getLastName().trim().equalsIgnoreCase( "null" ) )
@@ -986,7 +986,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 } else {
                     userReportToPopulate.add( "" );
                 }
-                
+
                 userReportToPopulate.add( user.getEmailId() );
 
                 if ( user.getPhoneNumber() != null && !( user.getPhoneNumber().isEmpty() ) ) {
@@ -1062,7 +1062,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 // col 6 state
                 // col 7 zip
 
-                branchesReportToPopulate.add( branch.getBranchId() );
+                branchesReportToPopulate.add( branch.getSourceBranchId() );
                 branchesReportToPopulate.add( branch.getBranchName() );
                 branchesReportToPopulate.add( branch.getRegionId() );
                 branchesReportToPopulate.add( branch.getBranchAddress1() );
@@ -1103,7 +1103,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 // col 4 city
                 // col 5 state
                 // col 6 zip
-                regionsReportToPopulate.add( region.getRegionId() );
+                regionsReportToPopulate.add( region.getSourceRegionId() );
                 regionsReportToPopulate.add( region.getRegionName() );
                 regionsReportToPopulate.add( region.getRegionAddress1() );
                 if ( region.getRegionAddress2() != null && !( region.getRegionAddress2().isEmpty() ) ) {
