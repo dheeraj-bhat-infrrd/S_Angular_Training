@@ -2026,6 +2026,16 @@ var hierarchyUpload={
 					$('#com-file').trigger('click');
 				});
 		},
+		fixStr:function (key) {
+		    var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
+		        if (offset == 0) {
+		            return(key.toUpperCase());
+		        } else {
+		            return(key.substr(0,1) + " " + key.substr(1).toUpperCase());
+		        }
+		    });
+		    return(out);
+		},
 		uploadXlxsSuccessCallback:function(response){
         if (!response) {
 				$('#com-file').val('');
@@ -2033,47 +2043,83 @@ var hierarchyUpload={
 				$('#fileUrl').val('');
 				showError(response);
 			} else {
-				$('#xlsx-file-upload').show();
-				function fixStr(key) {
-				    var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
-				        if (offset == 0) {
-				            return(key.toUpperCase());
-				        } else {
-				            return(key.substr(0,1) + " " + key.substr(1).toUpperCase());
-				        }
-				    });
-				    return(out);
-				}
+				$.each($.parseJSON(response),function(key,value){
+					if(key=='numberOfRegionsAdded'||key=='numberOfRegionsModified'||key=='numberOfRegionsDeleted'){
+						if(value!=0){
+							$('<div class="float-left" style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#region-summary');
+						}
+					}
+					else if(key=='numberOfBranchesAdded'||key=='numberOfBranchesModified'||key=='numberOfBranchesDeleted'){
+						if(value!=0){
+							$('<div class="float-left" style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#branch-summary');
+						}
+					}
+					else if(key=='numberOfUsersAdded'||key=='numberOfUsersModified'||key=='numberOfUsersDeleted'){
+						if(value!=0){
+							$('<div class="float-left" style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#user-summary');
+						}
+					}
+				});
+				$('#summary').show();
 				
+				
+				/*
+				$('#xlsx-file-upload').show();
 				$.each($.parseJSON(response), function(key, value) {
-						var number=key.indexOf("number");
-						if(number!=-1){
-							if(value!=0){
-								$('<div style="float:left;padding:10px;color: #009FE0;">'+fixStr(key)+':'+value+'</div>').appendTo('#json-response');
+						if(value!=0){
+							if(key=="numberOfRegionsAdded"||key=="numberOfRegionsModified"||key=="numberOfRegionsDeleted"){
+								$('#region-upload').show();
+							}
+							else if(key=="numberOfBranchesAdded"||key=="numberOfBranchesModified"||key=="numberOfBranchesDeleted"){
+								$('#branch-upload').show();
+							}
+							else if(key=="numberOfUsersAdded"||key=="numberOfUsersModified"||key=="numberOfUsersDeleted"){
+								$('#user-upload').show();
 							}
 						}
-					
-					/*function fixStr(key) {
-					    var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
-					        if (offset == 0) {
-					            return(key.toUpperCase());
-					        } else {
-					            return(key.substr(0,1) + " " + key.substr(1).toUpperCase());
-					        }
-					    });
-					    return(out);
-					}
-					if(value!=0){
-					 $('<tr><td style="text-align:right"> '+fixStr(key)+':</td><td id="'+key+'">'+value+'</td><tr>').appendTo('#json-response');
-					 $('#com-file').val('');
-						$('#com-xlsx-file').val('');
-					}
-					*/
+						$('#region-upload').click(function(){
+							
+							$('#upload-summery-branch').hide();
+							$('#upload-summery-user').hide();
+							var region=key.indexOf('region');
+							var Region=key.indexOf('Region');
+							if(region!=-1||Region!=-1){
+								$('#upload-summery-region').show();
+								$('<div>'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#upload-summery-region');
+								
+							};
+						});
+						$('#branch-upload').click(function(){
+							$('#upload-summery-region').hide();
+							
+							$('#upload-summery-user').hide();
+							var branch=key.indexOf('branch');
+							var Branch=key.indexOf('Branch');
+							if(branch!=-1||Branch!=-1){
+								$('#upload-summery-branch').show();
+								$('<div>'+fixStr(key)+':'+value+'</div>').appendTo('#upload-summery-branch');
+								
+							};
+						});
+						$('#user-upload').click(function(){
+							$('#upload-summery-region').hide();
+							$('#upload-summery-branch').hide();
+						
+							var user=key.indexOf('user');
+							var User=key.indexOf('User');
+							if(user!=-1||User!=-1){
+								$('#upload-summery-user').show();
+								$('<div>'+fixStr(key)+':'+value+'</div>').appendTo('#upload-summery-user');
+								
+							};
+						});
+							
 					});
-			
+			*/
 				}
 			
 		},
+		
 		saveXlxsSuccessCallback:function(response){
 			if(!response){
 				$('#com-file').val('');

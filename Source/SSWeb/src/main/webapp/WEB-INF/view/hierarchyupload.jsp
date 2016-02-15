@@ -1,4 +1,4 @@
-2<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -71,7 +71,59 @@
 		</div>
 	</div>
 </div>
-<div id="json-response" class="hierarchy-table clearfix"></div>
+
+<div class="container hide" id="summary" style="margin-top:10px;">
+    
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" >
+      <li class="active">
+          <a href="#upload-summery-region"  data-toggle="tab" >
+              Regions
+          </a>
+      </li>
+      <li><a href="#upload-summery-branch" data-toggle="tab" >
+           Branches
+          </a>
+      </li>
+      <li>
+          <a href="#upload-summery-user"  data-toggle="tab" >
+               Users
+          </a>
+      </li>
+      
+    </ul>
+    
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div class="tab-pane fade active in" id="upload-summery-region">
+          <h2>Region Summary</h2>
+          <div id="region-summary" class="clearfix"></div>
+          <table class="table">
+    <thead>
+      <tr>
+        <th>Source Region ID</th>
+        <th>Region Name</th>
+      </tr>
+    </thead>
+    <tbody id="region-upload"></tbody>
+  </table>
+      </div>
+      <div class="tab-pane fade" id="upload-summery-branch">
+          <h2>Branch Summary</h2>
+          <div id="branch-summary" class="clearfix"></div>
+      </div>
+      <div class="tab-pane fade" id="upload-summery-user">
+          <h2>User Summary</h2>
+          <div id="user-summary" class="clearfix"></div>
+      </div>
+    </div>
+    
+</div>
+
+
+
+
+
 
 <script>
 	$(document).ready(function() {
