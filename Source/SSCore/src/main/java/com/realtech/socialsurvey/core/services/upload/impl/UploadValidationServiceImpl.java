@@ -167,8 +167,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
             userValidationErrors.add( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
         }
-        if ( uploadedUser.getAssignedBrachesAdmin() != null && !uploadedUser.getAssignedBrachesAdmin().isEmpty() ) {
-            if ( isSourceBranchIdMappedToBranch( uploadedUser.getAssignedBrachesAdmin(), upload ) ) {
+        if ( uploadedUser.getAssignedBranchesAdmin() != null && !uploadedUser.getAssignedBranchesAdmin().isEmpty() ) {
+            if ( isSourceBranchIdMappedToBranch( uploadedUser.getAssignedBranchesAdmin(), upload ) ) {
                 uploadedUser.setBranchAdmin( true );
             } else {
                 LOG.error( "The admin branch id at row: " + uploadedUser.getRowNum() + " is not valid" );
@@ -204,7 +204,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
             userValidationWarnings.add( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             isWarningRecord = true;
         }
-        if ( uploadedUser.getAssignedBrachesAdmin() == null || uploadedUser.getAssignedBrachesAdmin().isEmpty() ) {
+        if ( uploadedUser.getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) {
             LOG.error( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             userValidationWarnings
                 .add( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );

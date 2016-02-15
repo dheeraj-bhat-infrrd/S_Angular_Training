@@ -200,7 +200,7 @@ public class UploadValidationServiceImplTest
         user.setEmailId( email );
         user.setSourceRegionId( regionId );
         user.setSourceBranchId( branchId );
-        user.setAssignedBrachesAdmin( branchAdmin );
+        user.setAssignedBranchesAdmin( branchAdmin );
         user.setAssignedRegionsAdmin( regionAdmin );
         user.setRowNum( rowNum );
         return user;

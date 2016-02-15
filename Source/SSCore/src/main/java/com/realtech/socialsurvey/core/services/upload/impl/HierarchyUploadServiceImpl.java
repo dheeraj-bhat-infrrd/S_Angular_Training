@@ -330,7 +330,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else if ( cellIndex == USER_REGION_ID_INDEX ) {
                         uploadedUser.setSourceRegionId( cell.getStringCellValue() );
                     } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX ) {
-                        uploadedUser.setAssignedBrachesAdmin( Arrays.asList( cell.getStringCellValue().split( "\\s*,\\s*" ) ) );
+                        uploadedUser.setAssignedBranchesAdmin( Arrays.asList( cell.getStringCellValue().split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_REGION_ID_ADMIN_INDEX ) {
                         uploadedUser.setAssignedRegionsAdmin( Arrays.asList( cell.getStringCellValue().split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_EMAIL_INDEX ) {
@@ -367,7 +367,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 }
             }
             if ( uploadedUser.getSourceBranchId() == null && uploadedUser.getSourceRegionId() == null
-                && ( uploadedUser.getAssignedBrachesAdmin() == null || uploadedUser.getAssignedBrachesAdmin().isEmpty() )
+                && ( uploadedUser.getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() )
                 && ( uploadedUser.getAssignedRegionsAdmin() == null || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) ) {
                 uploadedUser.setBelongsToCompany( true );
             }
