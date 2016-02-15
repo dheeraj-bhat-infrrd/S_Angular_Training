@@ -429,7 +429,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
     public String generateSourceId( String entityType )
     {
-        return entityType + String.valueOf( System.currentTimeMillis() );
+        return entityType + Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() );
     }
 
 
