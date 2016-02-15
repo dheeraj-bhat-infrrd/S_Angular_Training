@@ -8,7 +8,9 @@ import java.util.List;
 public class UserUploadVO
 {
 
+    private long userId;
     private String sourceUserId;
+    private boolean isSourceUserIdGenerated;
     private String firstName;
     private boolean isFirstNameModified;
     private List<StringUploadHistory> firstNameHistory;
@@ -57,7 +59,7 @@ public class UserUploadVO
     private boolean isBranchAdmin;
     private boolean isBranchAdminModified;
     private BooleanUploadHistory[] isBranchAdminHistory;
-    private List<String> assignedBrachesAdmin;
+    private List<String> assignedBranchesAdmin;
     private boolean isAssignedBrachesAdminModified;
     private List<StringListUploadHistory> assignedBrachesAdminHistory;
     private boolean isRegionAdmin;
@@ -86,6 +88,8 @@ public class UserUploadVO
     private List<StringUploadHistory> userPhotoUrlHistory;
     private boolean isUserAdded;
     private boolean isUserModified;
+    private List<Long> regionIds;
+    private List<Long> branchIds;
     private boolean isErrorRecord;
     private boolean isDeletedRecord;
     private boolean isWarningRecord;
@@ -113,6 +117,30 @@ public class UserUploadVO
     public void setRowNum( int rowNum )
     {
         this.rowNum = rowNum;
+    }
+
+
+    public long getUserId()
+    {
+        return userId;
+    }
+
+
+    public void setUserId( long userId )
+    {
+        this.userId = userId;
+    }
+
+
+    public boolean isSourceUserIdGenerated()
+    {
+        return isSourceUserIdGenerated;
+    }
+
+
+    public void setSourceUserIdGenerated( boolean isSourceUserIdGenerated )
+    {
+        this.isSourceUserIdGenerated = isSourceUserIdGenerated;
     }
 
 
@@ -704,15 +732,15 @@ public class UserUploadVO
     }
 
 
-    public List<String> getAssignedBrachesAdmin()
+    public List<String> getAssignedBranchesAdmin()
     {
-        return assignedBrachesAdmin;
+        return assignedBranchesAdmin;
     }
 
 
-    public void setAssignedBrachesAdmin( List<String> assignedBrachesAdmin )
+    public void setAssignedBranchesAdmin( List<String> assignedBrachesAdmin )
     {
-        this.assignedBrachesAdmin = assignedBrachesAdmin;
+        this.assignedBranchesAdmin = assignedBrachesAdmin;
     }
 
 
@@ -1052,6 +1080,42 @@ public class UserUploadVO
     }
 
 
+    /**
+     * @return the regionIds
+     */
+    public List<Long> getRegionIds()
+    {
+        return regionIds;
+    }
+
+
+    /**
+     * @param regionIds the regionIds to set
+     */
+    public void setRegionIds( List<Long> regionIds )
+    {
+        this.regionIds = regionIds;
+    }
+
+
+    /**
+     * @return the branchIds
+     */
+    public List<Long> getBranchIds()
+    {
+        return branchIds;
+    }
+
+
+    /**
+     * @param branchIds the branchIds to set
+     */
+    public void setBranchIds( List<Long> branchIds )
+    {
+        this.branchIds = branchIds;
+
+    }
+    
     public boolean isErrorRecord()
     {
         return isErrorRecord;

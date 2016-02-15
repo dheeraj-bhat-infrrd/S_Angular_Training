@@ -1498,8 +1498,8 @@ public class CsvUploadServiceImpl implements CsvUploadService
         if ( organizationManagementService.isRegionAdditionAllowed( adminUser,
             AccountType.getAccountType( licenseDetail.getAccountsMaster().getAccountsMasterId() ) ) ) {
             /*if (!validateRegion(region, company)) {
-            	LOG.error("Region with that name already exists!");
-            	throw new RegionAdditionException("Region with that name already exists!");
+                LOG.error("Region with that name already exists!");
+                throw new RegionAdditionException("Region with that name already exists!");
             }*/
             LOG.debug( "Adding region : " + region.getRegionName() );
             newRegion = organizationManagementService.addNewRegion( adminUser, region.getRegionName(), CommonConstants.NO,

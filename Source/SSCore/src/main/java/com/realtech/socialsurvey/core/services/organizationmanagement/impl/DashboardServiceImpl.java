@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -50,32 +51,27 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BillingReportData;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
-import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 
 
 // JIRA SS-137 BY RM05:BOC
@@ -128,6 +124,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Resource
     @Qualifier ( "branch")
     private BranchDao branchDao;
+    
+    @Autowired
+    private HierarchyDownloadService hierarchyDownloadService;
 
     @Transactional
     @Override
@@ -1110,7 +1109,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
 
         Company company = companyDao.findById( Company.class, companyId );
-        Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( company );
+        /*Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( company );
         Branch defaultBranchOfDefaultRegion = organizationManagementService.getDefaultBranchForRegion( defaultRegion
             .getRegionId() );
         List<Region> regionList = new ArrayList<Region>();
@@ -1566,8 +1565,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 if ( obj instanceof Long )
                     cell.setCellValue( String.valueOf( (Long) obj ) );
             }
-        }
-        return workbook;
+        }*/
+        HierarchyUpload hierarchyUpload = hierarchyDownloadService.fetchUpdatedHierarchyStructure( company );
+        return hierarchyDownloadService.generateHierarchyDownloadReport( hierarchyUpload, company );
     }
 }
 // JIRA SS-137 BY RM05:EOC

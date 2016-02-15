@@ -15,18 +15,6 @@ public class HierarchyUpload
     private Map<String, Long> userSourceMapping;
 
 
-    public long getCompanyId()
-    {
-        return companyId;
-    }
-
-
-    public void setCompanyId( long companyId )
-    {
-        this.companyId = companyId;
-    }
-
-
     public List<RegionUploadVO> getRegions()
     {
         return regions;
@@ -96,6 +84,24 @@ public class HierarchyUpload
     public void setUserSourceMapping( Map<String, Long> userSourceMapping )
     {
         this.userSourceMapping = userSourceMapping;
+    }
+
+
+    /**
+     * @return the companyId
+     */
+    public long getCompanyId()
+    {
+        return companyId;
+    }
+
+
+    /**
+     * @param companyId the companyId to set
+     */
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
     }
 
 
