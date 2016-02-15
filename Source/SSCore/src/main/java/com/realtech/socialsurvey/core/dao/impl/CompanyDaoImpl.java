@@ -65,14 +65,22 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Company> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status) {
+	public List<Company> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status , boolean inCompleteCompany) {
 		Criteria criteria = getSession().createCriteria(Company.class);
 		criteria.add(Restrictions.ilike("company", namePattern, MatchMode.START));
-		if (status > -1) {
-			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, status));
-		}
-		if (accountType > -1) {
-			criteria.add(Restrictions.sqlRestriction("COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld where ACCOUNTS_MASTER_ID=" + accountType + ")"));
+		
+		if(inCompleteCompany){
+            criteria.add(Restrictions.sqlRestriction("COMPANY_ID NOT in (select ld.COMPANY_ID from LICENSE_DETAILS ld)"));		    
+		}else{
+		    if (status > -1) {
+                criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, status));
+            }
+		    if(status == CommonConstants.STATUS_ACTIVE){
+	            criteria.add(Restrictions.sqlRestriction("COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld)"));          
+		    }
+            if (accountType > -1) {
+                criteria.add(Restrictions.sqlRestriction("COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld where ACCOUNTS_MASTER_ID=" + accountType + ")"));
+            }
 		}
 		criteria.addOrder( Order.asc("company") );
 		return criteria.list();

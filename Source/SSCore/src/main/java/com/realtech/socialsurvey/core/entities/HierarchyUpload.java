@@ -6,12 +6,13 @@ import java.util.Map;
 
 public class HierarchyUpload
 {
+    private long companyId;
     private List<RegionUploadVO> regions;
     private List<BranchUploadVO> branches;
     private List<UserUploadVO> users;
-    private Map<Long, String> regionSourceMapping;
-    private Map<Long, String> branchSourceMapping;
-    private Map<Long, String> userSourceMapping;
+    private Map<String, Long> regionSourceMapping;
+    private Map<String, Long> branchSourceMapping;
+    private Map<String, Long> userSourceMapping;
 
 
     public List<RegionUploadVO> getRegions()
@@ -50,39 +51,57 @@ public class HierarchyUpload
     }
 
 
-    public Map<Long, String> getRegionSourceMapping()
+    public Map<String, Long> getRegionSourceMapping()
     {
         return regionSourceMapping;
     }
 
 
-    public void setRegionSourceMapping( Map<Long, String> regionSourceMapping )
+    public void setRegionSourceMapping( Map<String, Long> regionSourceMapping )
     {
         this.regionSourceMapping = regionSourceMapping;
     }
 
 
-    public Map<Long, String> getBranchSourceMapping()
+    public Map<String, Long> getBranchSourceMapping()
     {
         return branchSourceMapping;
     }
 
 
-    public void setBranchSourceMapping( Map<Long, String> branchSourceMapping )
+    public void setBranchSourceMapping( Map<String, Long> branchSourceMapping )
     {
         this.branchSourceMapping = branchSourceMapping;
     }
 
 
-    public Map<Long, String> getUserSourceMapping()
+    public Map<String, Long> getUserSourceMapping()
     {
         return userSourceMapping;
     }
 
 
-    public void setUserSourceMapping( Map<Long, String> userSourceMapping )
+    public void setUserSourceMapping( Map<String, Long> userSourceMapping )
     {
         this.userSourceMapping = userSourceMapping;
+    }
+
+
+    /**
+     * @return the companyId
+     */
+    public long getCompanyId()
+    {
+        return companyId;
+    }
+
+
+    /**
+     * @param companyId the companyId to set
+     */
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
     }
 
 

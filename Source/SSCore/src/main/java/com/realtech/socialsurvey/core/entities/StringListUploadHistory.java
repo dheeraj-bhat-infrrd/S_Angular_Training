@@ -1,21 +1,22 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 
-public class StringArrayUploadHistory
+public class StringListUploadHistory
 {
-    private String[] value;
+    private List<String> value;
     private Timestamp time;
 
 
-    public String[] getValue()
+    public List<String> getValue()
     {
         return value;
     }
 
 
-    public void setValue( String[] value )
+    public void setValue( List<String> value )
     {
         this.value = value;
     }

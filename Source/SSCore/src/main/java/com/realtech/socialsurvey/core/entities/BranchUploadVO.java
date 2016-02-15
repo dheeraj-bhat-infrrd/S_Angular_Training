@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
 /*
  * The view class for Branch
  */
@@ -9,47 +11,74 @@ public class BranchUploadVO
 
     private long branchId;
     private boolean isBranchIdModified;
-    private LongUploadHistory[] branchIdHistory;
+    private List<LongUploadHistory> branchIdHistory;
     private String sourceBranchId;
     private boolean isSourceBranchIdModified;
-    private boolean isSourceBrancIdGenerated;
-    private StringUploadHistory[] sourceBranchIdHistory;
+    private boolean isSourceBranchIdGenerated;
+    private List<StringUploadHistory> sourceBranchIdHistory;
     private long regionId;
     private boolean isRegionIdModified;
-    private LongUploadHistory[] regionIdHistory;
+    private List<LongUploadHistory> regionIdHistory;
     private String sourceRegionId;
     private boolean isSourceRegionIdModified;
-    private StringUploadHistory[] sourceRegionIdHistory;
+    private List<StringUploadHistory> sourceRegionIdHistory;
     private String branchName;
     private boolean isBranchNameModified;
-    private StringUploadHistory[] branchNameHistory;
+    private List<StringUploadHistory> branchNameHistory;
     private String branchAddress1;
     private boolean isBranchAddress1Modified;
-    private StringUploadHistory[] branchAddress1History;
+    private List<StringUploadHistory> branchAddress1History;
     private String branchAddress2;
     private boolean isBranchAddress2Modified;
-    private StringUploadHistory[] branchAddress2History;
+    private List<StringUploadHistory> branchAddress2History;
     private String branchCountry;
     private boolean isBranchCountryModified;
-    private StringUploadHistory[] branchCountryHistory;
+    private List<StringUploadHistory> branchCountryHistory;
     private String branchCountryCode;
     private boolean isBranchCountryCodeModified;
-    private StringUploadHistory[] branchCountryCodeHistory;
+    private List<StringUploadHistory> branchCountryCodeHistory;
     private String branchState;
     private boolean isBranchStateModified;
-    private StringUploadHistory[] branchStateHistory;
+    private List<StringUploadHistory> branchStateHistory;
     private String branchCity;
     private boolean isBranchCityModified;
-    private StringUploadHistory[] branchCityHistory;
+    private List<StringUploadHistory> branchCityHistory;
     private String branchZipcode;
     private boolean isBranchZipcodeModified;
-    private StringUploadHistory[] branchZipcodeHistory;
+    private List<StringUploadHistory> branchZipcodeHistory;
     private boolean assignToCompany;
     private String assignedRegionName;
     private boolean isAddressSet;
     private boolean isBranchAdded;
     private boolean isBranchModified;
     private boolean isErrorRecord;
+    private boolean isDeletedRecord;
+    private int rowNum;
+    private boolean isWarningRecord;
+
+
+    public boolean isWarningRecord()
+    {
+        return isWarningRecord;
+    }
+
+
+    public void setWarningRecord( boolean isWarningRecord )
+    {
+        this.isWarningRecord = isWarningRecord;
+    }
+
+
+    public int getRowNum()
+    {
+        return rowNum;
+    }
+
+
+    public void setRowNum( int rowNum )
+    {
+        this.rowNum = rowNum;
+    }
 
 
     public long getBranchId()
@@ -76,13 +105,13 @@ public class BranchUploadVO
     }
 
 
-    public LongUploadHistory[] getBranchIdHistory()
+    public List<LongUploadHistory> getBranchIdHistory()
     {
         return branchIdHistory;
     }
 
 
-    public void setBranchIdHistory( LongUploadHistory[] branchIdHistory )
+    public void setBranchIdHistory( List<LongUploadHistory> branchIdHistory )
     {
         this.branchIdHistory = branchIdHistory;
     }
@@ -112,25 +141,25 @@ public class BranchUploadVO
     }
 
 
-    public boolean isSourceBrancIdGenerated()
+    public boolean isSourceBranchIdGenerated()
     {
-        return isSourceBrancIdGenerated;
+        return isSourceBranchIdGenerated;
     }
 
 
-    public void setSourceBrancIdGenerated( boolean isSourceBrancIdGenerated )
+    public void setSourceBranchIdGenerated( boolean isSourceBrancIdGenerated )
     {
-        this.isSourceBrancIdGenerated = isSourceBrancIdGenerated;
+        this.isSourceBranchIdGenerated = isSourceBrancIdGenerated;
     }
 
 
-    public StringUploadHistory[] getSourceBranchIdHistory()
+    public List<StringUploadHistory> getSourceBranchIdHistory()
     {
         return sourceBranchIdHistory;
     }
 
 
-    public void setSourceBranchIdHistory( StringUploadHistory[] sourceBranchIdHistory )
+    public void setSourceBranchIdHistory( List<StringUploadHistory> sourceBranchIdHistory )
     {
         this.sourceBranchIdHistory = sourceBranchIdHistory;
     }
@@ -160,13 +189,13 @@ public class BranchUploadVO
     }
 
 
-    public LongUploadHistory[] getRegionIdHistory()
+    public List<LongUploadHistory> getRegionIdHistory()
     {
         return regionIdHistory;
     }
 
 
-    public void setRegionIdHistory( LongUploadHistory[] regionIdHistory )
+    public void setRegionIdHistory( List<LongUploadHistory> regionIdHistory )
     {
         this.regionIdHistory = regionIdHistory;
     }
@@ -196,13 +225,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getSourceRegionIdHistory()
+    public List<StringUploadHistory> getSourceRegionIdHistory()
     {
         return sourceRegionIdHistory;
     }
 
 
-    public void setSourceRegionIdHistory( StringUploadHistory[] sourceRegionIdHistory )
+    public void setSourceRegionIdHistory( List<StringUploadHistory> sourceRegionIdHistory )
     {
         this.sourceRegionIdHistory = sourceRegionIdHistory;
     }
@@ -232,13 +261,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getBranchNameHistory()
+    public List<StringUploadHistory> getBranchNameHistory()
     {
         return branchNameHistory;
     }
 
 
-    public void setBranchNameHistory( StringUploadHistory[] branchNameHistory )
+    public void setBranchNameHistory( List<StringUploadHistory> branchNameHistory )
     {
         this.branchNameHistory = branchNameHistory;
     }
@@ -268,13 +297,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getBranchAddress1History()
+    public List<StringUploadHistory> getBranchAddress1History()
     {
         return branchAddress1History;
     }
 
 
-    public void setBranchAddress1History( StringUploadHistory[] branchAddress1History )
+    public void setBranchAddress1History( List<StringUploadHistory> branchAddress1History )
     {
         this.branchAddress1History = branchAddress1History;
     }
@@ -304,13 +333,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getBranchAddress2History()
+    public List<StringUploadHistory> getBranchAddress2History()
     {
         return branchAddress2History;
     }
 
 
-    public void setBranchAddress2History( StringUploadHistory[] branchAddress2History )
+    public void setBranchAddress2History( List<StringUploadHistory> branchAddress2History )
     {
         this.branchAddress2History = branchAddress2History;
     }
@@ -340,13 +369,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getBranchCountryHistory()
+    public List<StringUploadHistory> getBranchCountryHistory()
     {
         return branchCountryHistory;
     }
 
 
-    public void setBranchCountryHistory( StringUploadHistory[] branchCountryHistory )
+    public void setBranchCountryHistory( List<StringUploadHistory> branchCountryHistory )
     {
         this.branchCountryHistory = branchCountryHistory;
     }
@@ -376,13 +405,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getBranchCountryCodeHistory()
+    public List<StringUploadHistory> getBranchCountryCodeHistory()
     {
         return branchCountryCodeHistory;
     }
 
 
-    public void setBranchCountryCodeHistory( StringUploadHistory[] branchCountryCodeHistory )
+    public void setBranchCountryCodeHistory( List<StringUploadHistory> branchCountryCodeHistory )
     {
         this.branchCountryCodeHistory = branchCountryCodeHistory;
     }
@@ -412,13 +441,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getBranchStateHistory()
+    public List<StringUploadHistory> getBranchStateHistory()
     {
         return branchStateHistory;
     }
 
 
-    public void setBranchStateHistory( StringUploadHistory[] branchStateHistory )
+    public void setBranchStateHistory( List<StringUploadHistory> branchStateHistory )
     {
         this.branchStateHistory = branchStateHistory;
     }
@@ -448,13 +477,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getBranchCityHistory()
+    public List<StringUploadHistory> getBranchCityHistory()
     {
         return branchCityHistory;
     }
 
 
-    public void setBranchCityHistory( StringUploadHistory[] branchCityHistory )
+    public void setBranchCityHistory( List<StringUploadHistory> branchCityHistory )
     {
         this.branchCityHistory = branchCityHistory;
     }
@@ -484,13 +513,13 @@ public class BranchUploadVO
     }
 
 
-    public StringUploadHistory[] getBranchZipcodeHistory()
+    public List<StringUploadHistory> getBranchZipcodeHistory()
     {
         return branchZipcodeHistory;
     }
 
 
-    public void setBranchZipcodeHistory( StringUploadHistory[] branchZipcodeHistory )
+    public void setBranchZipcodeHistory( List<StringUploadHistory> branchZipcodeHistory )
     {
         this.branchZipcodeHistory = branchZipcodeHistory;
     }
@@ -565,6 +594,18 @@ public class BranchUploadVO
     public void setErrorRecord( boolean isErrorRecord )
     {
         this.isErrorRecord = isErrorRecord;
+    }
+
+
+    public boolean isDeletedRecord()
+    {
+        return isDeletedRecord;
+    }
+
+
+    public void setDeletedRecord( boolean isDeletedRecord )
+    {
+        this.isDeletedRecord = isDeletedRecord;
     }
 
 

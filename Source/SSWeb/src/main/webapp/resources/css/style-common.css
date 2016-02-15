@@ -4007,9 +4007,9 @@ img.prof-image {
 	position: absolute;
 	right: 0;
 	line-height: 24px;
-	top: 55px;
-	width: 100px;
-	right: 20px;
+	top: 30px;
+	width: 172px;
+	right: 18px;
 	background-color: #f9f9fb;
 	border: 1px solid #dcdcdc;
 	z-index: 999;
@@ -4024,6 +4024,35 @@ img.prof-image {
 }
 
 .hr-dd-item: last-child {
+	border-bottom: 0;
+}
+
+.hr-dd-item:hover {
+	color: #fff;
+	background-color: #5cc7ef;
+}
+
+
+.pr-dd-wrapper {
+	position: absolute;
+    line-height: 24px;
+    top: 33px;
+    width: 172px;
+    right: 18px;
+    background-color: #f9f9fb;
+    border: 1px solid #dcdcdc;
+    z-index: 999;
+}
+
+.pr-dd-item {
+	cursor: pointer;
+    font-size: 14px;
+    line-height: 30px;
+    padding: 0 5px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.pr-dd-item: last-child {
 	border-bottom: 0;
 }
 
@@ -7606,6 +7635,13 @@ div.v-tbl-spacer {
 	box-shadow: none;
 	height: 32px;
 	background-color: transparent;
+}
+
+.v-icn-dropdown {
+	cursor: pointer;
+	height: 32px;
+    width: 20px;
+    background: url(../images/sb-dd-icn-pd.png) no-repeat right center;
 }
 
 .v-icn-login {
