@@ -9,7 +9,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
  * Uploads hierarchy for a company
  *
  */
-public interface HierarchyUploadService
+public interface HierarchyStructureUploadService
 {
     /**
      * Uploads the hierarchy for the company. Validations are assumed to be done prior to invoking this method

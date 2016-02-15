@@ -22,14 +22,14 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.RegionAdditionException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
+import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 
 
 @Component
-public class HierarchyUploadServiceImpl implements HierarchyUploadService
+public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUploadService
 {
 
-    private static Logger LOG = LoggerFactory.getLogger( HierarchyUploadServiceImpl.class );
+    private static Logger LOG = LoggerFactory.getLogger( HierarchyStructureUploadServiceImpl.class );
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
