@@ -187,12 +187,14 @@ public class UploadValidationServiceImpl implements UploadValidationService
     private void addUserToMap( String key, UserUploadVO user, Map<String, List<UserUploadVO>> usersBySourceRegionId )
     {
         List<UserUploadVO> users = null;
-        if ( usersBySourceRegionId.get( key ) == null ) {
-            users = new ArrayList<UserUploadVO>();
-            users.add( user );
-            usersBySourceRegionId.put( key, users );
-        } else {
-            usersBySourceRegionId.get( key ).add( user );
+        if ( key != null && !key.isEmpty() ) {
+            if ( usersBySourceRegionId.get( key ) == null ) {
+                users = new ArrayList<UserUploadVO>();
+                users.add( user );
+                usersBySourceRegionId.put( key, users );
+            } else {
+                usersBySourceRegionId.get( key ).add( user );
+            }
         }
     }
 
@@ -202,12 +204,14 @@ public class UploadValidationServiceImpl implements UploadValidationService
         Map<String, List<BranchUploadVO>> branchesBySourceRegionId = new HashMap<String, List<BranchUploadVO>>();
         List<BranchUploadVO> branches = null;
         for ( BranchUploadVO branch : uploadedBranches ) {
-            if ( branchesBySourceRegionId.get( branch.getSourceRegionId() ) == null ) {
-                branches = new ArrayList<BranchUploadVO>();
-                branches.add( branch );
-                branchesBySourceRegionId.put( branch.getSourceRegionId(), branches );
-            } else {
-                branchesBySourceRegionId.get( branch.getSourceRegionId() ).add( branch );
+            if ( branch.getSourceRegionId() != null && !branch.getSourceRegionId().isEmpty() ) {
+                if ( branchesBySourceRegionId.get( branch.getSourceRegionId() ) == null ) {
+                    branches = new ArrayList<BranchUploadVO>();
+                    branches.add( branch );
+                    branchesBySourceRegionId.put( branch.getSourceRegionId(), branches );
+                } else {
+                    branchesBySourceRegionId.get( branch.getSourceRegionId() ).add( branch );
+                }
             }
         }
         return branchesBySourceRegionId;
