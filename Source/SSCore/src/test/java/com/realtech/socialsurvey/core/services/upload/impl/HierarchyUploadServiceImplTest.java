@@ -119,7 +119,7 @@ public class HierarchyUploadServiceImplTest
         Assert.assertEquals( 0, validationObj.getNumberOfRegionsDeleted() );
         Assert.assertEquals( 1, validationObj.getNumberOfRegionsModified() );
         Assert.assertEquals( 48, validationObj.getNumberOfUsersAdded() );
-        Assert.assertEquals( 0, validationObj.getNumberOfUsersDeleted() );
+        Assert.assertEquals( 1, validationObj.getNumberOfUsersDeleted() );
         Assert.assertEquals( 1, validationObj.getNumberOfUsersModified() );
     }
     
