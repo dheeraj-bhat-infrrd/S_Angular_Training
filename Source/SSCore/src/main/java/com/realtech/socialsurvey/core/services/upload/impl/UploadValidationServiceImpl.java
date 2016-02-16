@@ -19,7 +19,7 @@ import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 public class UploadValidationServiceImpl implements UploadValidationService
 {
 
-    static Logger LOG = LoggerFactory.getLogger( UploadValidationServiceImpl.class );
+    private static Logger LOG = LoggerFactory.getLogger( UploadValidationServiceImpl.class );
 
 
     @Override
