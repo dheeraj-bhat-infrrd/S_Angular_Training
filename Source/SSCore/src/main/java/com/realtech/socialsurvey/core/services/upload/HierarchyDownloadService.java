@@ -9,7 +9,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
-@Component
+
 public interface HierarchyDownloadService
 {
 
