@@ -96,9 +96,9 @@ public class HierarchyUploadServiceImplTest
             "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx" );
         Assert.assertNotNull( validationObj );
         Assert.assertNotNull( validationObj.getUpload() );
-        Assert.assertEquals( 10, validationObj.getUpload().getRegions().size() );
-        Assert.assertEquals( 77, validationObj.getUpload().getBranches().size() );
-        Assert.assertEquals( 49, validationObj.getUpload().getUsers().size() );
+        Assert.assertEquals( 11, validationObj.getUpload().getRegions().size() );
+        Assert.assertEquals( 78, validationObj.getUpload().getBranches().size() );
+        Assert.assertEquals( 50, validationObj.getUpload().getUsers().size() );
     }
 
 
@@ -196,4 +196,5 @@ public class HierarchyUploadServiceImplTest
         region.setRowNum( rowNum );
         return region;
     }
+
 }
