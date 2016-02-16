@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
 
+
 /*
  * The view class for User
  */
@@ -1115,7 +1116,8 @@ public class UserUploadVO
         this.branchIds = branchIds;
 
     }
-    
+
+
     public boolean isErrorRecord()
     {
         return isErrorRecord;
@@ -1139,5 +1141,28 @@ public class UserUploadVO
         this.isDeletedRecord = isDeletedRecord;
     }
 
+
+    @Override
+    public boolean equals( Object uploadVo )
+    {
+        UserUploadVO userUploadVO = (UserUploadVO) uploadVo;
+        if ( this.sourceUserId != null && !this.sourceUserId.isEmpty() && userUploadVO.sourceUserId != null
+            && !userUploadVO.sourceUserId.isEmpty() ) {
+            return this.sourceUserId.equals( userUploadVO.sourceUserId );
+        } else {
+            return ( this.userId == userUploadVO.userId );
+        }
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        if ( sourceUserId != null && !sourceUserId.isEmpty() ) {
+            return sourceUserId.hashCode();
+        } else {
+            return ( new Long( userId ) ).hashCode();
+        }
+    }
 
 }
