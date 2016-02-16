@@ -198,10 +198,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
                 uploadedRegion.setRegionAdded( true );
                 validationObject.getUpload().getRegions().add( uploadedRegion );
-                uploadedRegions.add( uploadedRegion );
             } else {
                 updateUploadValidationWithModifiedRegion( uploadedRegion, validationObject );
             }
+            uploadedRegions.add( uploadedRegion );
         }
         markDeletedRegions( uploadedRegions, validationObject );
     }
@@ -278,10 +278,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
                 uploadedBranch.setBranchAdded( true );
                 validationObject.getUpload().getBranches().add( uploadedBranch );
-                uploadedBranches.add( uploadedBranch );
             } else {
                 updateUploadValidationWithModifiedBranch( uploadedBranch, validationObject );
             }
+            uploadedBranches.add( uploadedBranch );
         }
         markDeletedBranches( uploadedBranches, validationObject );
     }
@@ -384,12 +384,12 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 validationObject.setNumberOfUsersAdded( validationObject.getNumberOfUsersAdded() + 1 );
                 uploadedUser.setUserAdded( true );
                 validationObject.getUpload().getUsers().add( uploadedUser );
-                uploadedUsers.add( uploadedUser );
             } else {
                 updateUploadValidationWithModifiedUser( uploadedUser, validationObject );
             }
+            uploadedUsers.add( uploadedUser );
         }
-        markDeletedUsers( validationObject.getUpload().getUsers(), validationObject );
+        markDeletedUsers( uploadedUsers, validationObject );
     }
 
 
@@ -629,24 +629,39 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     void markDeletedRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject )
     {
         if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null
-            && !validationObject.getUpload().getRegions().isEmpty() )
+            && !validationObject.getUpload().getRegions().isEmpty() ) {
             for ( RegionUploadVO region : validationObject.getUpload().getRegions() ) {
                 if ( !uploadedRegions.contains( region ) ) {
-
+                    region.setDeletedRecord( true );
                 }
             }
+        }
     }
 
 
     void markDeletedBranches( List<BranchUploadVO> uploadedBranches, UploadValidation validationObject )
     {
-        // TODO: iterate and mark the deleted branches
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getBranches() != null
+            && !validationObject.getUpload().getBranches().isEmpty() ) {
+            for ( BranchUploadVO branch : validationObject.getUpload().getBranches() ) {
+                if ( !uploadedBranches.contains( branch ) ) {
+                    branch.setDeletedRecord( true );
+                }
+            }
+        }
     }
 
 
     void markDeletedUsers( List<UserUploadVO> uploadeUsers, UploadValidation validationObject )
     {
-        // TODO Auto-generated method stub
-
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getUsers() != null
+            && !validationObject.getUpload().getUsers().isEmpty() ) {
+            for ( UserUploadVO user : validationObject.getUpload().getUsers() ) {
+                if ( !uploadeUsers.contains( user ) ) {
+                    user.setDeletedRecord( true );
+                    validationObject.setNumberOfUsersDeleted( validationObject.getNumberOfUsersDeleted() + 1 );
+                }
+            }
+        }
     }
 }

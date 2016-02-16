@@ -122,8 +122,44 @@ public class HierarchyUploadServiceImplTest
         Assert.assertEquals( 0, validationObj.getNumberOfUsersDeleted() );
         Assert.assertEquals( 1, validationObj.getNumberOfUsersModified() );
     }
+    
+    @Test
+    public void testValidateUserUploadFileForDeletedUsers() throws InvalidInputException
+    {
+        Company company = new Company();
+        company.setCompany( "Raremile" );
+        Mockito.when( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) ).thenReturn( getHierarchyUpload_deletedUser() );
+        File file = new File( "." );
+        UploadValidation validationObj = hierarchyUploadServiceImpl.validateUserUploadFile( company,
+            "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx" );
+        Assert.assertNotNull( validationObj );
+        Assert.assertEquals( 1, validationObj.getNumberOfUsersDeleted() );
+    }
 
-
+    private HierarchyUpload getHierarchyUpload_deletedUser()
+    {
+        HierarchyUpload upload = new HierarchyUpload();
+        List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "SCT", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
+        upload.setBranches( branches );
+        List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
+        regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
+        regions.add( getRegion( "Lee", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
+        upload.setRegions( regions );
+        List<UserUploadVO> users = new ArrayList<UserUploadVO>();
+        List<String> branchAdmins = new ArrayList<String>();
+        branchAdmins.add( "ABC" );
+        branchAdmins.add( "SCT" );
+        List<String> regionAdmins = new ArrayList<String>();
+        regionAdmins.add( "ABC" );
+        regionAdmins.add( "Lee" );
+        users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
+        users.add( getUser( "mmckinley", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
+        upload.setUsers( users );
+        return upload;
+    }
+    
     private HierarchyUpload getHierarchyUpload()
     {
         HierarchyUpload upload = new HierarchyUpload();
