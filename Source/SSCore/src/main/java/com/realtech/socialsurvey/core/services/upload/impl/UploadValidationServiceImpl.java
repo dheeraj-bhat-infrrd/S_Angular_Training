@@ -102,17 +102,23 @@ public class UploadValidationServiceImpl implements UploadValidationService
                         + " cannot be deleted as it has active branches and users associated with it" );
                     validationObject.getRegionValidationErrors().add( "Region at row " + region.getRowNum()
                         + " cannot be deleted as it has active branches and users associated with it" );
+                    region.getValidationErrors().add( "Region at row " + region.getRowNum()
+                        + " cannot be deleted as it has active branches and users associated with it" );
                 } else if ( errorRecordDueToActiveBranch && !errorRecordDueToActiveUser ) {
                     region.setErrorRecord( true );
                     LOG.error( "Region at row " + region.getRowNum()
                         + " cannot be deleted as it has active branches associated with it" );
                     validationObject.getRegionValidationErrors().add( "Region at row " + region.getRowNum()
                         + " cannot be deleted as it has active branches associated with it" );
+                    region.getValidationErrors().add( "Region at row " + region.getRowNum()
+                        + " cannot be deleted as it has active branches associated with it" );
                 } else if ( !errorRecordDueToActiveBranch && errorRecordDueToActiveUser ) {
                     region.setErrorRecord( true );
                     LOG.error( "Region at row " + region.getRowNum()
                         + " cannot be deleted as it has active users associated with it" );
                     validationObject.getRegionValidationErrors().add( "Region at row " + region.getRowNum()
+                        + " cannot be deleted as it has active users associated with it" );
+                    region.getValidationErrors().add( "Region at row " + region.getRowNum()
                         + " cannot be deleted as it has active users associated with it" );
                 } else {
                     validationObject.setNumberOfRegionsDeleted( validationObject.getNumberOfRegionsDeleted() + 1 );
@@ -141,6 +147,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
                     LOG.error( "Branch at row " + branch.getRowNum()
                         + " cannot be deleted as it has active users associated with it" );
                     validationObject.getBranchValidationErrors().add( "Branch at row " + branch.getRowNum()
+                        + " cannot be deleted as it has active users associated with it" );
+                    branch.getValidationErrors().add( "Branch at row " + branch.getRowNum()
                         + " cannot be deleted as it has active users associated with it" );
                 } else {
                     validationObject.setNumberOfBranchesDeleted( validationObject.getNumberOfBranchesDeleted() + 1 );
@@ -224,11 +232,14 @@ public class UploadValidationServiceImpl implements UploadValidationService
         if ( uploadedRegion.getSourceRegionId() == null || uploadedRegion.getSourceRegionId().isEmpty() ) {
             LOG.error( "Source Region Id at row: " + uploadedRegion.getRowNum() + " is not provided" );
             regionValidationErrors.add( "Source Id at row: " + uploadedRegion.getRowNum() + " is not provided" );
+            uploadedRegion.getValidationErrors().add( "Source Id at row: " + uploadedRegion.getRowNum() + " is not provided" );
             errorRecord = true;
         }
         if ( uploadedRegion.getRegionName() == null || uploadedRegion.getRegionName().isEmpty() ) {
             LOG.error( "Region name at row: " + uploadedRegion.getRowNum() + " is not provided" );
             regionValidationErrors.add( "Region name at row: " + uploadedRegion.getRowNum() + " is not provided" );
+            uploadedRegion.getValidationErrors()
+                .add( "Region name at row: " + uploadedRegion.getRowNum() + " is not provided" );
             errorRecord = true;
         }
 
@@ -245,27 +256,35 @@ public class UploadValidationServiceImpl implements UploadValidationService
         if ( uploadedBranch.getSourceBranchId() == null || uploadedBranch.getSourceBranchId().isEmpty() ) {
             LOG.error( "Source Id at row: " + uploadedBranch.getRowNum() + " is not provided" );
             branchValidationErrors.add( "Source Id at row: " + uploadedBranch.getRowNum() + " is not provided" );
+            uploadedBranch.getValidationErrors().add( "Source Id at row: " + uploadedBranch.getRowNum() + " is not provided" );
             errorRecord = true;
         }
         if ( uploadedBranch.getBranchName() == null || uploadedBranch.getBranchName().isEmpty() ) {
             LOG.error( "Office name at row: " + uploadedBranch.getRowNum() + " is not provided" );
             branchValidationErrors.add( "Office name at row: " + uploadedBranch.getRowNum() + " is not provided" );
+            uploadedBranch.getValidationErrors()
+                .add( "Office name at row: " + uploadedBranch.getRowNum() + " is not provided" );
             errorRecord = true;
         }
         if ( !uploadedBranch.isAddressSet() ) {
             LOG.error( "Office address at row: " + uploadedBranch.getRowNum() + " is not provided" );
             branchValidationErrors.add( "Office address at row: " + uploadedBranch.getRowNum() + " is not provided" );
+            uploadedBranch.getValidationErrors()
+                .add( "Office address at row: " + uploadedBranch.getRowNum() + " is not provided" );
             errorRecord = true;
         }
         if ( uploadedBranch.getBranchCity() == null || uploadedBranch.getBranchCity().isEmpty() ) {
             LOG.error( "Office city at row: " + uploadedBranch.getRowNum() + " is not provided" );
             branchValidationErrors.add( "Office city at row: " + uploadedBranch.getRowNum() + " is not provided" );
+            uploadedBranch.getValidationErrors()
+                .add( "Office city at row: " + uploadedBranch.getRowNum() + " is not provided" );
             errorRecord = true;
         }
         if ( uploadedBranch.getSourceRegionId() != null && !uploadedBranch.getSourceRegionId().isEmpty()
             && !isSourceRegionIdMappedToRegion( uploadedBranch.getSourceRegionId(), upload ) ) {
             LOG.error( "The region id at row: " + uploadedBranch.getRowNum() + " is not valid" );
             branchValidationErrors.add( "The region id at row: " + uploadedBranch.getRowNum() + " is not valid" );
+            uploadedBranch.getValidationErrors().add( "The region id at row: " + uploadedBranch.getRowNum() + " is not valid" );
             errorRecord = true;
         }
 
@@ -281,6 +300,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
         if ( uploadedBranch.getSourceRegionId() == null || uploadedBranch.getSourceRegionId().isEmpty() ) {
             LOG.error( "Office region Id at " + uploadedBranch.getRowNum() + " is not linked to any region" );
             branchValidationWarnings.add( "Office at row " + uploadedBranch.getRowNum() + " is not linked to any region" );
+            uploadedBranch.getValidationWarnings()
+                .add( "Office at row " + uploadedBranch.getRowNum() + " is not linked to any region" );
             isWarningRecord = true;
         }
         if ( isWarningRecord ) {
@@ -295,28 +316,33 @@ public class UploadValidationServiceImpl implements UploadValidationService
         if ( uploadedUser.getSourceUserId() == null || uploadedUser.getSourceUserId().isEmpty() ) {
             LOG.error( "Source user Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             userValidationErrors.add( "Source user Id at row: " + uploadedUser.getRowNum() + " is not provided" );
+            uploadedUser.getValidationErrors().add( "Source user Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             errorRecord = true;
         }
         if ( uploadedUser.getFirstName() == null || uploadedUser.getFirstName().isEmpty() ) {
             LOG.error( "First name at row: " + uploadedUser.getRowNum() + " is not provided" );
             userValidationErrors.add( "First name at row: " + uploadedUser.getRowNum() + " is not provided" );
+            uploadedUser.getValidationErrors().add( "First name at row: " + uploadedUser.getRowNum() + " is not provided" );
             errorRecord = true;
         }
         if ( uploadedUser.getEmailId() == null || uploadedUser.getEmailId().isEmpty() ) {
             LOG.error( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             userValidationErrors.add( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
+            uploadedUser.getValidationErrors().add( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             errorRecord = true;
         }
         if ( uploadedUser.getSourceBranchId() != null && !uploadedUser.getSourceBranchId().isEmpty()
             && !isSourceBranchIdMappedToBranch( uploadedUser.getSourceBranchId(), upload ) ) {
             LOG.error( "The branch id at row: " + uploadedUser.getRowNum() + " is not valid" );
             userValidationErrors.add( "The branchId at row: " + uploadedUser.getRowNum() + " is not valid" );
+            uploadedUser.getValidationErrors().add( "The branchId at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
         }
         if ( uploadedUser.getSourceRegionId() != null && !uploadedUser.getSourceRegionId().isEmpty()
             && !isSourceRegionIdMappedToRegion( uploadedUser.getSourceRegionId(), upload ) ) {
             LOG.error( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
             userValidationErrors.add( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
+            uploadedUser.getValidationErrors().add( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
         }
         if ( uploadedUser.getAssignedBranchesAdmin() != null && !uploadedUser.getAssignedBranchesAdmin().isEmpty() ) {
@@ -325,6 +351,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
             } else {
                 LOG.error( "The admin branch id at row: " + uploadedUser.getRowNum() + " is not valid" );
                 userValidationErrors.add( "The admin branch id at row: " + uploadedUser.getRowNum() + " is not valid" );
+                uploadedUser.getValidationErrors()
+                    .add( "The admin branch id at row: " + uploadedUser.getRowNum() + " is not valid" );
                 errorRecord = true;
             }
         }
@@ -334,6 +362,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
             } else {
                 LOG.error( "The admin region id at row: " + uploadedUser.getRowNum() + " is not valid" );
                 userValidationErrors.add( "The admin region id at row: " + uploadedUser.getRowNum() + " is not valid" );
+                uploadedUser.getValidationErrors()
+                    .add( "The admin region id at row: " + uploadedUser.getRowNum() + " is not valid" );
                 errorRecord = true;
             }
         }
@@ -349,22 +379,30 @@ public class UploadValidationServiceImpl implements UploadValidationService
         if ( uploadedUser.getSourceRegionId() == null || uploadedUser.getSourceRegionId().isEmpty() ) {
             LOG.error( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             userValidationWarnings.add( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
+            uploadedUser.getValidationWarnings()
+                .add( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             isWarningRecord = true;
         }
         if ( uploadedUser.getSourceBranchId() == null || uploadedUser.getSourceBranchId().isEmpty() ) {
             LOG.error( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             userValidationWarnings.add( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
+            uploadedUser.getValidationWarnings()
+                .add( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             isWarningRecord = true;
         }
         if ( uploadedUser.getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) {
             LOG.error( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             userValidationWarnings
                 .add( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
+            uploadedUser.getValidationWarnings()
+                .add( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             isWarningRecord = true;
         }
         if ( uploadedUser.getAssignedRegionsAdmin() == null || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) {
             LOG.error( "admin branch id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             userValidationWarnings
+                .add( "admin branch id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
+            uploadedUser.getValidationWarnings()
                 .add( "admin branch id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             isWarningRecord = true;
         }

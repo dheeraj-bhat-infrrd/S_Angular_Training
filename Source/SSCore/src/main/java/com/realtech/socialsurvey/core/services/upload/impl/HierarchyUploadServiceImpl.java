@@ -631,7 +631,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null
             && !validationObject.getUpload().getRegions().isEmpty() ) {
             for ( RegionUploadVO region : validationObject.getUpload().getRegions() ) {
-                if ( !uploadedRegions.contains( region ) ) {
+                if ( region.getSourceRegionId() != null && !region.getSourceRegionId().isEmpty()
+                    && !region.isSourceRegionIdGenerated() && !uploadedRegions.contains( region ) ) {
                     region.setDeletedRecord( true );
                 }
             }
@@ -644,7 +645,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         if ( validationObject.getUpload() != null && validationObject.getUpload().getBranches() != null
             && !validationObject.getUpload().getBranches().isEmpty() ) {
             for ( BranchUploadVO branch : validationObject.getUpload().getBranches() ) {
-                if ( !uploadedBranches.contains( branch ) ) {
+                if ( branch.getSourceBranchId() != null && !branch.getSourceBranchId().isEmpty()
+                    && !branch.isSourceBranchIdGenerated() && !uploadedBranches.contains( branch ) ) {
                     branch.setDeletedRecord( true );
                 }
             }
@@ -657,7 +659,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         if ( validationObject.getUpload() != null && validationObject.getUpload().getUsers() != null
             && !validationObject.getUpload().getUsers().isEmpty() ) {
             for ( UserUploadVO user : validationObject.getUpload().getUsers() ) {
-                if ( !uploadeUsers.contains( user ) ) {
+                if ( user.getSourceUserId() != null && !user.getSourceUserId().isEmpty() && !user.isSourceUserIdGenerated()
+                    && !uploadeUsers.contains( user ) ) {
                     user.setDeletedRecord( true );
                     validationObject.setNumberOfUsersDeleted( validationObject.getNumberOfUsersDeleted() + 1 );
                 }
