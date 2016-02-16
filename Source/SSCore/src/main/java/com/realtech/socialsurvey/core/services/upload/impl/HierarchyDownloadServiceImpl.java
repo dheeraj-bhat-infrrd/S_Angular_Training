@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -77,6 +78,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
      * @throws InvalidInputException
      */
     @Override
+    @Transactional
     public HierarchyUpload fetchUpdatedHierarchyStructure( Company company ) throws InvalidInputException
     {
         LOG.info( "Method updateHierarchyStructure started for company : " + company.getCompany() );
@@ -777,6 +779,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
      * @return
      * @throws InvalidInputException 
      */
+    @Transactional
     public List<RegionUploadVO> generateRegionUploadVOsForCompany( Company company, HierarchyUpload oldHierarchyUpload,
         HierarchyUpload currentHierarchyUpload ) throws InvalidInputException
     {
@@ -906,6 +909,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
      * @throws NoRecordsFetchedException
      */
     @Override
+    @Transactional
     public XSSFWorkbook generateHierarchyDownloadReport( HierarchyUpload hierarchyUpload, Company company )
         throws InvalidInputException, NoRecordsFetchedException
     {
