@@ -197,15 +197,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions() ) ) {
                 validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
                 uploadedRegion.setRegionAdded( true );
-            } else if ( isModifiedRegion( uploadedRegion, validationObject.getUpload().getRegions() ) ) {
-                validationObject.setNumberOfRegionsModified( validationObject.getNumberOfRegionsModified() + 1 );
-                uploadedRegion.setRegionModified( true );
+                validationObject.getUpload().getRegions().add( uploadedRegion );
+                uploadedRegions.add( uploadedRegion );
+            } else {
+                updateUploadValidationWithModifiedRegion( uploadedRegion, validationObject );
             }
-            // add to uploaded regions list.
-            uploadedRegions.add( uploadedRegion );
         }
         markDeletedRegions( uploadedRegions, validationObject );
-        validationObject.getUpload().setRegions( uploadedRegions );
     }
 
 
@@ -279,15 +277,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches() ) ) {
                 validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
                 uploadedBranch.setBranchAdded( true );
-            } else if ( isModifiedBranch( uploadedBranch, validationObject.getUpload().getBranches() ) ) {
-                validationObject.setNumberOfBranchesModified( validationObject.getNumberOfBranchesModified() + 1 );
-                uploadedBranch.setBranchModified( true );
+                validationObject.getUpload().getBranches().add( uploadedBranch );
+                uploadedBranches.add( uploadedBranch );
+            } else {
+                updateUploadValidationWithModifiedBranch( uploadedBranch, validationObject );
             }
-            // add to uploaded regions list.
-            uploadedBranches.add( uploadedBranch );
         }
         markDeletedBranches( uploadedBranches, validationObject );
-        validationObject.getUpload().setBranches( uploadedBranches );
     }
 
 
@@ -387,15 +383,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             if ( isNewUser( uploadedUser, validationObject.getUpload().getUsers() ) ) {
                 validationObject.setNumberOfUsersAdded( validationObject.getNumberOfUsersAdded() + 1 );
                 uploadedUser.setUserAdded( true );
-            } else if ( isModifiedUser( uploadedUser, validationObject.getUpload().getUsers() ) ) {
-                validationObject.setNumberOfUsersModified( validationObject.getNumberOfUsersModified() + 1 );
-                uploadedUser.setUserModified( true );
+                validationObject.getUpload().getUsers().add( uploadedUser );
+                uploadedUsers.add( uploadedUser );
+            } else {
+                updateUploadValidationWithModifiedUser( uploadedUser, validationObject );
             }
-            // add to uploaded users list.
-            uploadedUsers.add( uploadedUser );
         }
         markDeletedUsers( validationObject.getUpload().getUsers(), validationObject );
-        validationObject.getUpload().setUsers( uploadedUsers );
     }
 
 
@@ -435,153 +429,212 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
 
-    boolean isModifiedRegion( RegionUploadVO uploadedRegion, List<RegionUploadVO> uploadedRegions )
+    void updateUploadValidationWithModifiedRegion( RegionUploadVO uploadedRegion, UploadValidation validationObject )
     {
-        boolean isModified = false;
-        if ( uploadedRegions != null ) {
-            for ( RegionUploadVO region : uploadedRegions ) {
-                if ( region.getRegionName() != uploadedRegion.getRegionName() && region.getRegionName() != null
-                    && !region.getRegionName().equalsIgnoreCase( uploadedRegion.getRegionName() ) ) {
-                    isModified = true;
-                }
-                if ( region.getRegionAddress1() != uploadedRegion.getRegionAddress1() && region.getRegionAddress1() != null
-                    && !region.getRegionAddress1().equalsIgnoreCase( uploadedRegion.getRegionAddress1() ) ) {
-                    isModified = true;
-                }
-                if ( region.getRegionAddress2() != uploadedRegion.getRegionAddress2() && region.getRegionAddress2() != null
-                    && !region.getRegionAddress2().equalsIgnoreCase( uploadedRegion.getRegionAddress2() ) ) {
-                    isModified = true;
-                }
-                if ( region.getRegionCity() != uploadedRegion.getRegionCity() && region.getRegionCity() != null
-                    && !region.getRegionCity().equalsIgnoreCase( uploadedRegion.getRegionCity() ) ) {
-                    isModified = true;
-                }
-                if ( region.getRegionState() != uploadedRegion.getRegionState() && region.getRegionState() != null
-                    && !region.getRegionState().equalsIgnoreCase( uploadedRegion.getRegionState() ) ) {
-                    isModified = true;
-                }
-                if ( region.getRegionZipcode() != uploadedRegion.getRegionZipcode() && region.getRegionZipcode() != null
-                    && !region.getRegionZipcode().equalsIgnoreCase( uploadedRegion.getRegionZipcode() ) ) {
-                    isModified = true;
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null
+            && !validationObject.getUpload().getRegions().isEmpty() ) {
+            for ( RegionUploadVO region : validationObject.getUpload().getRegions() ) {
+                if ( !region.isRegionAdded()
+                    && region.getSourceRegionId().equalsIgnoreCase( uploadedRegion.getSourceRegionId() ) ) {
+                    if ( region.getRegionName() != uploadedRegion.getRegionName() && region.getRegionName() != null
+                        && !region.getRegionName().equalsIgnoreCase( uploadedRegion.getRegionName() ) ) {
+                        region.setRegionName( uploadedRegion.getRegionName() );
+                        region.setRegionNameModified( true );
+                    }
+                    if ( region.getRegionAddress1() != uploadedRegion.getRegionAddress1() && region.getRegionAddress1() != null
+                        && !region.getRegionAddress1().equalsIgnoreCase( uploadedRegion.getRegionAddress1() ) ) {
+                        region.setRegionAddress1( uploadedRegion.getRegionAddress1() );
+                        region.setRegionAddress1Modified( true );
+                    }
+                    if ( region.getRegionAddress2() != uploadedRegion.getRegionAddress2() && region.getRegionAddress2() != null
+                        && !region.getRegionAddress2().equalsIgnoreCase( uploadedRegion.getRegionAddress2() ) ) {
+                        region.setRegionAddress2( uploadedRegion.getRegionAddress2() );
+                        region.setRegionAddress2Modified( true );
+                    }
+                    if ( region.getRegionCity() != uploadedRegion.getRegionCity() && region.getRegionCity() != null
+                        && !region.getRegionCity().equalsIgnoreCase( uploadedRegion.getRegionCity() ) ) {
+                        region.setRegionCity( uploadedRegion.getRegionCity() );
+                        region.setRegionCityModified( true );
+                    }
+                    if ( region.getRegionState() != uploadedRegion.getRegionState() && region.getRegionState() != null
+                        && !region.getRegionState().equalsIgnoreCase( uploadedRegion.getRegionState() ) ) {
+                        region.setRegionState( uploadedRegion.getRegionState() );
+                        region.setRegionStateModified( true );
+                    }
+                    if ( region.getRegionZipcode() != uploadedRegion.getRegionZipcode() && region.getRegionZipcode() != null
+                        && !region.getRegionZipcode().equalsIgnoreCase( uploadedRegion.getRegionZipcode() ) ) {
+                        region.setRegionZipcode( uploadedRegion.getRegionZipcode() );
+                        region.setRegionZipcodeModified( true );
+                    }
+                    if ( region.isRegionNameModified() || region.isRegionAddress1Modified() || region.isRegionAddress2Modified()
+                        || region.isRegionCityModified() || region.isRegionStateModified()
+                        || region.isRegionZipcodeModified() ) {
+                        validationObject.setNumberOfRegionsModified( validationObject.getNumberOfRegionsModified() + 1 );
+                        region.setRegionModified( true );
+                    }
                 }
             }
         }
-        return isModified;
     }
 
 
-    boolean isModifiedBranch( BranchUploadVO uploadedBranch, List<BranchUploadVO> uploadedBranches )
+    void updateUploadValidationWithModifiedBranch( BranchUploadVO uploadedBranch, UploadValidation validationObject )
     {
-        boolean isModified = false;
-        if ( uploadedBranches != null ) {
-            for ( BranchUploadVO branch : uploadedBranches ) {
-                if ( branch.getBranchName() != uploadedBranch.getBranchName() && branch.getBranchName() != null
-                    && !branch.getBranchName().equalsIgnoreCase( uploadedBranch.getBranchName() ) ) {
-                    isModified = true;
-                }
-                if ( branch.getBranchAddress1() != uploadedBranch.getBranchAddress1() && branch.getBranchAddress1() != null
-                    && !branch.getBranchAddress1().equalsIgnoreCase( uploadedBranch.getBranchAddress1() ) ) {
-                    isModified = true;
-                }
-                if ( branch.getBranchAddress2() != uploadedBranch.getBranchAddress2() && branch.getBranchAddress2() != null
-                    && !branch.getBranchAddress2().equalsIgnoreCase( uploadedBranch.getBranchAddress2() ) ) {
-                    isModified = true;
-                }
-                if ( branch.getBranchCity() != uploadedBranch.getBranchCity() && branch.getBranchCity() != null
-                    && !branch.getBranchCity().equalsIgnoreCase( uploadedBranch.getBranchCity() ) ) {
-                    isModified = true;
-                }
-                if ( branch.getBranchState() != uploadedBranch.getBranchState() && branch.getBranchState() != null
-                    && !branch.getBranchState().equalsIgnoreCase( uploadedBranch.getBranchState() ) ) {
-                    isModified = true;
-                }
-                if ( branch.getBranchZipcode() != uploadedBranch.getBranchZipcode() && branch.getBranchZipcode() != null
-                    && !branch.getBranchZipcode().equalsIgnoreCase( uploadedBranch.getBranchZipcode() ) ) {
-                    isModified = true;
-                }
-                if ( branch.getSourceRegionId() != uploadedBranch.getSourceRegionId() && branch.getSourceRegionId() != null
-                    && !branch.getSourceRegionId().equalsIgnoreCase( uploadedBranch.getSourceRegionId() ) ) {
-                    isModified = true;
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null
+            && !validationObject.getUpload().getBranches().isEmpty() ) {
+            for ( BranchUploadVO branch : validationObject.getUpload().getBranches() ) {
+                if ( !branch.isBranchAdded()
+                    && branch.getSourceBranchId().equalsIgnoreCase( uploadedBranch.getSourceBranchId() ) ) {
+                    if ( branch.getBranchName() != uploadedBranch.getBranchName() && branch.getBranchName() != null
+                        && !branch.getBranchName().equalsIgnoreCase( uploadedBranch.getBranchName() ) ) {
+                        branch.setBranchName( uploadedBranch.getBranchName() );
+                        branch.setBranchNameModified( true );
+                    }
+                    if ( branch.getBranchAddress1() != uploadedBranch.getBranchAddress1() && branch.getBranchAddress1() != null
+                        && !branch.getBranchAddress1().equalsIgnoreCase( uploadedBranch.getBranchAddress1() ) ) {
+                        branch.setBranchAddress1( uploadedBranch.getBranchAddress1() );
+                        branch.setBranchAddress1Modified( true );
+                    }
+                    if ( branch.getBranchAddress2() != uploadedBranch.getBranchAddress2() && branch.getBranchAddress2() != null
+                        && !branch.getBranchAddress2().equalsIgnoreCase( uploadedBranch.getBranchAddress2() ) ) {
+                        branch.setBranchAddress2( uploadedBranch.getBranchAddress2() );
+                        branch.setBranchAddress2Modified( true );
+                    }
+                    if ( branch.getBranchCity() != uploadedBranch.getBranchCity() && branch.getBranchCity() != null
+                        && !branch.getBranchCity().equalsIgnoreCase( uploadedBranch.getBranchCity() ) ) {
+                        branch.setBranchCity( uploadedBranch.getBranchCity() );
+                        branch.setBranchCityModified( true );
+                    }
+                    if ( branch.getBranchState() != uploadedBranch.getBranchState() && branch.getBranchState() != null
+                        && !branch.getBranchState().equalsIgnoreCase( uploadedBranch.getBranchState() ) ) {
+                        branch.setBranchState( uploadedBranch.getBranchState() );
+                        branch.setBranchStateModified( true );
+                    }
+                    if ( branch.getBranchZipcode() != uploadedBranch.getBranchZipcode() && branch.getBranchZipcode() != null
+                        && !branch.getBranchZipcode().equalsIgnoreCase( uploadedBranch.getBranchZipcode() ) ) {
+                        branch.setBranchZipcode( uploadedBranch.getBranchZipcode() );
+                        branch.setBranchZipcodeModified( true );
+                    }
+                    if ( branch.getSourceRegionId() != uploadedBranch.getSourceRegionId() && branch.getSourceRegionId() != null
+                        && !branch.getSourceRegionId().equalsIgnoreCase( uploadedBranch.getSourceRegionId() ) ) {
+                        branch.setSourceRegionId( uploadedBranch.getSourceRegionId() );
+                        branch.setSourceRegionIdModified( true );
+                    }
+                    if ( branch.isBranchNameModified() || branch.isBranchAddress1Modified() || branch.isBranchAddress2Modified()
+                        || branch.isBranchCityModified() || branch.isBranchStateModified() || branch.isBranchZipcodeModified()
+                        || branch.isSourceRegionIdModified() ) {
+                        validationObject.setNumberOfBranchesModified( validationObject.getNumberOfBranchesModified() + 1 );
+                        uploadedBranch.setBranchModified( true );
+                    }
                 }
             }
         }
-        return isModified;
     }
 
 
-    boolean isModifiedUser( UserUploadVO uploadedUser, List<UserUploadVO> uploadedUsers )
+    void updateUploadValidationWithModifiedUser( UserUploadVO uploadedUser, UploadValidation validationObject )
     {
-        boolean isModified = false;
-        if ( uploadedUsers != null ) {
-            for ( UserUploadVO user : uploadedUsers ) {
-                if ( user.getFirstName() != uploadedUser.getFirstName() && user.getFirstName() != null
-                    && !user.getFirstName().equalsIgnoreCase( uploadedUser.getFirstName() ) ) {
-                    isModified = true;
-                }
-                if ( user.getLastName() != uploadedUser.getLastName() && user.getLastName() != null
-                    && !user.getLastName().equalsIgnoreCase( uploadedUser.getLastName() ) ) {
-                    isModified = true;
-                }
-                if ( user.getTitle() != uploadedUser.getTitle() && user.getTitle() != null
-                    && !user.getTitle().equalsIgnoreCase( uploadedUser.getTitle() ) ) {
-                    isModified = true;
-                }
-                if ( user.getSourceRegionId() != uploadedUser.getSourceRegionId() && user.getSourceRegionId() != null
-                    && !user.getSourceRegionId().equalsIgnoreCase( uploadedUser.getSourceRegionId() ) ) {
-                    isModified = true;
-                }
-                if ( user.getSourceBranchId() != uploadedUser.getSourceBranchId() && user.getSourceBranchId() != null
-                    && !user.getSourceBranchId().equalsIgnoreCase( uploadedUser.getSourceBranchId() ) ) {
-                    isModified = true;
-                }
-                if ( user.getAssignedBranchesAdmin() != uploadedUser.getAssignedBranchesAdmin()
-                    && user.getAssignedBranchesAdmin() != null && uploadedUser.getAssignedBranchesAdmin() != null
-                    && !user.getAssignedBranchesAdmin().containsAll( uploadedUser.getAssignedBranchesAdmin() ) ) {
-                    isModified = true;
-                }
-                if ( user.getAssignedRegionsAdmin() != uploadedUser.getAssignedRegionsAdmin()
-                    && user.getAssignedRegionsAdmin() != null && uploadedUser.getAssignedRegionsAdmin() != null
-                    && !user.getAssignedRegionsAdmin().containsAll( uploadedUser.getAssignedRegionsAdmin() ) ) {
-                    isModified = true;
-                }
-                if ( user.getEmailId() != uploadedUser.getEmailId() && user.getEmailId() != null
-                    && !user.getEmailId().equalsIgnoreCase( uploadedUser.getEmailId() ) ) {
-                    isModified = true;
-                }
-                if ( user.getPhoneNumber() != uploadedUser.getPhoneNumber() && user.getPhoneNumber() != null
-                    && !user.getPhoneNumber().equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) {
-                    isModified = true;
-                }
-                if ( user.getWebsiteUrl() != uploadedUser.getWebsiteUrl() && user.getWebsiteUrl() != null
-                    && !user.getWebsiteUrl().equalsIgnoreCase( uploadedUser.getWebsiteUrl() ) ) {
-                    isModified = true;
-                }
-                if ( user.getLicense() != uploadedUser.getLicense() && user.getLicense() != null
-                    && !user.getLicense().equalsIgnoreCase( uploadedUser.getLicense() ) ) {
-                    isModified = true;
-                }
-                if ( user.getLegalDisclaimer() != uploadedUser.getLegalDisclaimer() && user.getLegalDisclaimer() != null
-                    && !user.getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() ) ) {
-                    isModified = true;
-                }
-                if ( user.getUserPhotoUrl() != uploadedUser.getUserPhotoUrl() && user.getUserPhotoUrl() != null
-                    && !user.getUserPhotoUrl().equalsIgnoreCase( uploadedUser.getUserPhotoUrl() ) ) {
-                    isModified = true;
-                }
-                if ( user.getAboutMeDescription() != uploadedUser.getAboutMeDescription()
-                    && user.getAboutMeDescription() != null
-                    && !user.getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() ) ) {
-                    isModified = true;
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getUsers() != null
+            && !validationObject.getUpload().getUsers().isEmpty() ) {
+            for ( UserUploadVO user : validationObject.getUpload().getUsers() ) {
+                if ( !user.isUserAdded() && user.getSourceUserId().equalsIgnoreCase( uploadedUser.getSourceUserId() ) ) {
+                    if ( user.getFirstName() != uploadedUser.getFirstName() && user.getFirstName() != null
+                        && !user.getFirstName().equalsIgnoreCase( uploadedUser.getFirstName() ) ) {
+                        user.setFirstName( uploadedUser.getFirstName() );
+                        user.setFirstNameModified( true );
+                    }
+                    if ( user.getLastName() != uploadedUser.getLastName() && user.getLastName() != null
+                        && !user.getLastName().equalsIgnoreCase( uploadedUser.getLastName() ) ) {
+                        user.setLastName( uploadedUser.getLastName() );
+                        user.setLastNameModified( true );
+                    }
+                    if ( user.getTitle() != uploadedUser.getTitle() && user.getTitle() != null
+                        && !user.getTitle().equalsIgnoreCase( uploadedUser.getTitle() ) ) {
+                        user.setTitle( uploadedUser.getTitle() );
+                        user.setTitleModified( true );
+                    }
+                    if ( user.getSourceRegionId() != uploadedUser.getSourceRegionId() && user.getSourceRegionId() != null
+                        && !user.getSourceRegionId().equalsIgnoreCase( uploadedUser.getSourceRegionId() ) ) {
+                        user.setSourceRegionId( uploadedUser.getFirstName() );
+                        user.setSourceRegionIdModified( true );
+                    }
+                    if ( user.getSourceBranchId() != uploadedUser.getSourceBranchId() && user.getSourceBranchId() != null
+                        && !user.getSourceBranchId().equalsIgnoreCase( uploadedUser.getSourceBranchId() ) ) {
+                        user.setSourceBranchId( uploadedUser.getSourceBranchId() );
+                        user.setSourceBranchIdModified( true );
+                    }
+                    if ( user.getAssignedBranchesAdmin() != uploadedUser.getAssignedBranchesAdmin()
+                        && user.getAssignedBranchesAdmin() != null && uploadedUser.getAssignedBranchesAdmin() != null
+                        && !user.getAssignedBranchesAdmin().containsAll( uploadedUser.getAssignedBranchesAdmin() ) ) {
+                        user.setAssignedBranchesAdmin( uploadedUser.getAssignedBranchesAdmin() );
+                        user.setAssignedBrachesAdminModified( true );
+                    }
+                    if ( user.getAssignedRegionsAdmin() != uploadedUser.getAssignedRegionsAdmin()
+                        && user.getAssignedRegionsAdmin() != null && uploadedUser.getAssignedRegionsAdmin() != null
+                        && !user.getAssignedRegionsAdmin().containsAll( uploadedUser.getAssignedRegionsAdmin() ) ) {
+                        user.setAssignedRegionsAdmin( uploadedUser.getAssignedRegionsAdmin() );
+                        user.setAssignedRegionsAdminModified( true );
+                    }
+                    if ( user.getEmailId() != uploadedUser.getEmailId() && user.getEmailId() != null
+                        && !user.getEmailId().equalsIgnoreCase( uploadedUser.getEmailId() ) ) {
+                        user.setEmailId( uploadedUser.getEmailId() );
+                        user.setEmailIdModified( true );
+                    }
+                    if ( user.getPhoneNumber() != uploadedUser.getPhoneNumber() && user.getPhoneNumber() != null
+                        && !user.getPhoneNumber().equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) {
+                        user.setPhoneNumber( uploadedUser.getPhoneNumber() );
+                        user.setPhoneNumberModified( true );
+                    }
+                    if ( user.getWebsiteUrl() != uploadedUser.getWebsiteUrl() && user.getWebsiteUrl() != null
+                        && !user.getWebsiteUrl().equalsIgnoreCase( uploadedUser.getWebsiteUrl() ) ) {
+                        user.setWebsiteUrl( uploadedUser.getWebsiteUrl() );
+                        user.setWebsiteUrlModified( true );
+                    }
+                    if ( user.getLicense() != uploadedUser.getLicense() && user.getLicense() != null
+                        && !user.getLicense().equalsIgnoreCase( uploadedUser.getLicense() ) ) {
+                        user.setLicense( uploadedUser.getLicense() );
+                        user.setLicenseModified( true );
+                    }
+                    if ( user.getLegalDisclaimer() != uploadedUser.getLegalDisclaimer() && user.getLegalDisclaimer() != null
+                        && !user.getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() ) ) {
+                        user.setLegalDisclaimer( uploadedUser.getLegalDisclaimer() );
+                        user.setLegalDisclaimerModified( true );
+                    }
+                    if ( user.getUserPhotoUrl() != uploadedUser.getUserPhotoUrl() && user.getUserPhotoUrl() != null
+                        && !user.getUserPhotoUrl().equalsIgnoreCase( uploadedUser.getUserPhotoUrl() ) ) {
+                        user.setUserPhotoUrl( uploadedUser.getUserPhotoUrl() );
+                        user.setUserPhotoUrlModified( true );
+                    }
+                    if ( user.getAboutMeDescription() != uploadedUser.getAboutMeDescription()
+                        && user.getAboutMeDescription() != null
+                        && !user.getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() ) ) {
+                        user.setAboutMeDescription( uploadedUser.getAboutMeDescription() );
+                        user.setAboutMeDescriptionModified( true );
+                    }
+                    if ( user.isFirstNameModified() || user.isLastNameModified() || user.isTitleModified()
+                        || user.isSourceRegionIdModified() || user.isSourceBranchIdModified()
+                        || user.isAssignedBrachesAdminModified() || user.isAssignedRegionsAdminModified()
+                        || user.isEmailIdModified() || user.isPhoneNumberModified() || user.isWebsiteUrlModified()
+                        || user.isLicenseModified() || user.isLegalDisclaimerModified() || user.isUserPhotoUrlModified()
+                        || user.isAboutMeDescriptionModified() ) {
+                        validationObject.setNumberOfUsersModified( validationObject.getNumberOfUsersModified() + 1 );
+                        uploadedUser.setUserModified( true );
+                    }
                 }
             }
         }
-        return isModified;
     }
 
 
     void markDeletedRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject )
     {
-        // TODO: iterate and mark the deleted regions
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null
+            && !validationObject.getUpload().getRegions().isEmpty() )
+            for ( RegionUploadVO region : validationObject.getUpload().getRegions() ) {
+                if ( !uploadedRegions.contains( region ) ) {
+
+                }
+            }
     }
 
 

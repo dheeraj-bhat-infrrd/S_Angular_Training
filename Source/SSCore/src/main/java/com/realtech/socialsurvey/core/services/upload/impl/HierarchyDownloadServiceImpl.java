@@ -149,13 +149,13 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
         //Branches
         oldMap = oldHierarchyUpload.getBranchSourceMapping();
-        newMap = newHierarchyUpload.getBranchSourceMapping();
+        newMap = currentHierarchyUpload.getBranchSourceMapping();
         newMap.putAll( oldMap );
         newHierarchyUpload.setBranchSourceMapping( newMap );
 
         //Users
         oldMap = oldHierarchyUpload.getUserSourceMapping();
-        newMap = newHierarchyUpload.getUserSourceMapping();
+        newMap = currentHierarchyUpload.getUserSourceMapping();
         newMap.putAll( oldMap );
         newHierarchyUpload.setUserSourceMapping( newMap );
     }

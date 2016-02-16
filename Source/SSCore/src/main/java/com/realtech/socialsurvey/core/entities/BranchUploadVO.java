@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
 
+
 /*
  * The view class for Branch
  */
@@ -616,8 +617,10 @@ public class BranchUploadVO
         if ( this.sourceBranchId != null && !this.sourceBranchId.isEmpty() && branchUploadVO.sourceBranchId != null
             && !branchUploadVO.sourceBranchId.isEmpty() ) {
             return this.sourceBranchId.equals( branchUploadVO.sourceBranchId );
-        } else {
+        } else if ( this.branchId != 0 && branchUploadVO.branchId != 0 ) {
             return ( this.branchId == branchUploadVO.branchId );
+        } else {
+            return false;
         }
     }
 

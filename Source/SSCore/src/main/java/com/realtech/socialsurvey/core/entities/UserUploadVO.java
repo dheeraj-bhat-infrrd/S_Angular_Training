@@ -1149,8 +1149,10 @@ public class UserUploadVO
         if ( this.sourceUserId != null && !this.sourceUserId.isEmpty() && userUploadVO.sourceUserId != null
             && !userUploadVO.sourceUserId.isEmpty() ) {
             return this.sourceUserId.equals( userUploadVO.sourceUserId );
-        } else {
+        } else if ( this.userId != 0 && userUploadVO.userId != 0 ) {
             return ( this.userId == userUploadVO.userId );
+        } else {
+            return false;
         }
     }
 
