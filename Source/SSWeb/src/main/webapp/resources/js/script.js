@@ -2046,76 +2046,74 @@ var hierarchyUpload={
 				$.each($.parseJSON(response),function(key,value){
 					if(key=='numberOfRegionsAdded'||key=='numberOfRegionsModified'||key=='numberOfRegionsDeleted'){
 						if(value!=0){
-							$('<div class="float-left" style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#region-summary');
+							$('<div  style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#region-summary');
+						
 						}
 					}
 					else if(key=='numberOfBranchesAdded'||key=='numberOfBranchesModified'||key=='numberOfBranchesDeleted'){
 						if(value!=0){
-							$('<div class="float-left" style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#branch-summary');
+							$('<div  style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#branch-summary');
 						}
 					}
 					else if(key=='numberOfUsersAdded'||key=='numberOfUsersModified'||key=='numberOfUsersDeleted'){
 						if(value!=0){
-							$('<div class="float-left" style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#user-summary');
+							$('<div  style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#user-summary');
 						}
 					}
+					
 				});
-				$('#summary').show();
 				
-				
-				/*
-				$('#xlsx-file-upload').show();
-				$.each($.parseJSON(response), function(key, value) {
-						if(value!=0){
-							if(key=="numberOfRegionsAdded"||key=="numberOfRegionsModified"||key=="numberOfRegionsDeleted"){
-								$('#region-upload').show();
-							}
-							else if(key=="numberOfBranchesAdded"||key=="numberOfBranchesModified"||key=="numberOfBranchesDeleted"){
-								$('#branch-upload').show();
-							}
-							else if(key=="numberOfUsersAdded"||key=="numberOfUsersModified"||key=="numberOfUsersDeleted"){
-								$('#user-upload').show();
-							}
+					var regionerror=$.parseJSON(response).regionValidationErrors.length;
+					if(regionerror!=0){
+					for(var i=0;i<regionerror;i++){
+						$('<div  style="margin-left:10px;color:#FF3400;">'+$.parseJSON(response).regionValidationErrors[i]+'</div>').appendTo('#region-errors');
+					}
+					}
+					var brancherror=$.parseJSON(response).branchValidationErrors.length;
+					if(brancherror!=0){
+					for(var i=0;i<brancherror;i++){
+						$('<div  style="margin-left:10px;color:#FF3400;">'+$.parseJSON(response).branchValidationErrors[i]+'</div>').appendTo('#branch-errors');
+					}
+					}
+					var usererror=$.parseJSON(response).userValidationErrors.length;
+					if(usererror!=0){
+						for(var i=0;i<usererror;i++){
+							$('<div  style="margin-left:10px;color:#FF3400;">'+$.parseJSON(response).userValidationErrors[i]+'</div>').appendTo('#user-errors');
 						}
-						$('#region-upload').click(function(){
-							
-							$('#upload-summery-branch').hide();
-							$('#upload-summery-user').hide();
-							var region=key.indexOf('region');
-							var Region=key.indexOf('Region');
-							if(region!=-1||Region!=-1){
-								$('#upload-summery-region').show();
-								$('<div>'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#upload-summery-region');
-								
-							};
-						});
-						$('#branch-upload').click(function(){
-							$('#upload-summery-region').hide();
-							
-							$('#upload-summery-user').hide();
-							var branch=key.indexOf('branch');
-							var Branch=key.indexOf('Branch');
-							if(branch!=-1||Branch!=-1){
-								$('#upload-summery-branch').show();
-								$('<div>'+fixStr(key)+':'+value+'</div>').appendTo('#upload-summery-branch');
-								
-							};
-						});
-						$('#user-upload').click(function(){
-							$('#upload-summery-region').hide();
-							$('#upload-summery-branch').hide();
-						
-							var user=key.indexOf('user');
-							var User=key.indexOf('User');
-							if(user!=-1||User!=-1){
-								$('#upload-summery-user').show();
-								$('<div>'+fixStr(key)+':'+value+'</div>').appendTo('#upload-summery-user');
-								
-							};
-						});
-							
-					});
-			*/
+				    }
+					/*var regionwarnings=$.parseJSON(response).regionValidationWarnings.length;
+					if(regionwarnings!=0){
+						for(var i=0;i<regionwarnings;i++){
+							$('<div class="float-left" style="margin-left:10px;color:#F9C42A;">'+$.parseJSON(response).regionValidationWarnings[i]+'</div>').appendTo('#branch-warnings');
+						}
+				    }*/
+					var branchwarnings=$.parseJSON(response).branchValidationWarnings.length;
+					if(branchwarnings!=0){
+						for(var i=0;i<branchwarnings;i++){
+							$('<div  style="margin-left:10px;color:#F9C42A;">'+$.parseJSON(response).branchValidationWarnings[i]+'</div>').appendTo('#branch-warnings');
+						}
+				    }
+					var userwarnings=$.parseJSON(response).userValidationWarnings.length;
+					if(userwarnings!=0){
+						for(var i=0;i<userwarnings;i++){
+							$('<div  style="margin-left:10px;color:#F9C42A;">'+$.parseJSON(response).userValidationWarnings[i]+'</div>').appendTo('#user-warnings');
+						}
+				    }
+				
+				var regionlength=$.parseJSON(response).upload.regions.length;
+				for(var i=0;i<regionlength;i++){
+					$('<tr><td>'+$.parseJSON(response).upload.regions[i].rowNum+'</td><td>'+$.parseJSON(response).upload.regions[i].sourceRegionId+'</td><td>'+$.parseJSON(response).upload.regions[i].regionName+'</td></tr>').appendTo('#region-upload');
+				}
+				var branchlength=$.parseJSON(response).upload.branches.length;
+				for(var i=0;i<branchlength;i++){
+					$('<tr><td>'+$.parseJSON(response).upload.branches[i].rowNum+'</td><td>'+$.parseJSON(response).upload.branches[i].sourceBranchId+'</td><td>'+$.parseJSON(response).upload.branches[i].branchName+'</td><td>'+$.parseJSON(response).upload.branches[i].sourceRegionId+'</td><td>'+$.parseJSON(response).upload.branches[i].branchAddress1+'</td><td>'+$.parseJSON(response).upload.branches[i].branchAddress2+'</td><td>'+$.parseJSON(response).upload.branches[i].branchState+'</td><td>'+$.parseJSON(response).upload.branches[i].branchCity+'</td><td>'+$.parseJSON(response).upload.branches[i].branchZipcode+'</td></tr>').appendTo('#branch-upload');
+				}
+				var userlength=$.parseJSON(response).upload.users.length;
+				for(var i=0;i<userlength;i++){
+					$('<tr><td>'+$.parseJSON(response).upload.users[i].rowNum+'</td><td>'+$.parseJSON(response).upload.users[i].sourceUserId+'</td><td>'+$.parseJSON(response).upload.users[i].firstName+'</td><td>'+$.parseJSON(response).upload.users[i].lastName+'</td><td>'+$.parseJSON(response).upload.users[i].title+'</td><td>'+$.parseJSON(response).upload.users[i].sourceBranchId+'</td><td>'+$.parseJSON(response).upload.users[i].sourceRegionId+'</td><td>'+$.parseJSON(response).upload.users[i].assignedBranchesAdmin+'</td><td>'+$.parseJSON(response).upload.users[i].emailId+'</td><td>'+$.parseJSON(response).upload.users[i].phoneNumber+'</td><td>'+$.parseJSON(response).upload.users[i].websiteUrl+'</td><td>'+$.parseJSON(response).upload.users[i].license+'</td><td></tr>').appendTo('#user-upload');
+				}
+				$('#summary').show();
+			
 				}
 			
 		},

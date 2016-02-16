@@ -72,52 +72,141 @@
 	</div>
 </div>
 
-<div class="container hide" id="summary" style="margin-top:10px;">
-    
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist" >
-      <li class="active">
-          <a href="#upload-summery-region"  data-toggle="tab" >
-              Regions
-          </a>
-      </li>
-      <li><a href="#upload-summery-branch" data-toggle="tab" >
-           Branches
-          </a>
-      </li>
-      <li>
-          <a href="#upload-summery-user"  data-toggle="tab" >
-               Users
-          </a>
-      </li>
-      
-    </ul>
-    
-    <!-- Tab panes -->
-    <div class="tab-content">
-      <div class="tab-pane fade active in" id="upload-summery-region">
-          <h2>Region Summary</h2>
-          <div id="region-summary" class="clearfix"></div>
-          <table class="table">
-    <thead>
-      <tr>
-        <th>Source Region ID</th>
-        <th>Region Name</th>
-      </tr>
-    </thead>
-    <tbody id="region-upload"></tbody>
-  </table>
-      </div>
-      <div class="tab-pane fade" id="upload-summery-branch">
-          <h2>Branch Summary</h2>
-          <div id="branch-summary" class="clearfix"></div>
-      </div>
-      <div class="tab-pane fade" id="upload-summery-user">
-          <h2>User Summary</h2>
-          <div id="user-summary" class="clearfix"></div>
-      </div>
-    </div>
-    
+<div class="container hide" id="summary" style="margin-top: 10px;">
+
+	<!-- Nav tabs -->
+	<ul class="nav nav-tabs" role="tablist">
+		<li class="active"><a href="#upload-summery-region"
+			data-toggle="tab"> Regions </a></li>
+		<li><a href="#upload-summery-branch" data-toggle="tab">
+				Branches </a></li>
+		<li><a href="#upload-summery-user" data-toggle="tab"> Users
+		</a></li>
+
+	</ul>
+
+	<!-- Tab panes -->
+	<div class="tab-content">
+		<div class="tab-pane fade active in" id="upload-summery-region"
+			style="overflow: auto; max-height: 500px;">
+			<h2 style="color: #666;">Region Summary</h2>
+			<div class="clearfix">
+				<div id="region-summary" class="float-left"></div>
+				<div id="region-errors" class="float-left"></div>
+				<div id="region-warnings" class="float-left"></div>
+			</div>
+			<table class="table">
+				<thead>
+					<tr>
+					<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Serial No.
+							</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Region
+							ID</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Region
+							Name</th>
+							
+					</tr>
+				</thead>
+				<tbody id="region-upload"></tbody>
+			</table>
+		</div>
+		<div class="tab-pane fade" id="upload-summery-branch"
+			style="overflow: auto; max-height: 500px;">
+			<h2 style="color: #666;">Branch Summary</h2>
+			<div class="clearfix">
+				<div id="branch-summary" class="float-left"></div>
+				<div id="branch-errors" class="float-left"></div>
+				<div id="branch-warnings" class="float-left"></div>
+			</div>
+			<table class="table">
+				<thead>
+					<tr>
+					<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Serial No.
+							</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Branch
+							ID</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Branch
+							Name</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Region
+							ID</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Address
+							1</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Address
+							2</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">City</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">State</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Zip</th>
+					</tr>
+				</thead>
+				<tbody id="branch-upload"></tbody>
+			</table>
+		</div>
+		<div class="tab-pane fade" id="upload-summery-user"
+			style="overflow: auto; max-height: 500px;">
+			<h2 style="color: #666;">User Summary</h2>
+			<div class="clearfix">
+				<div id="user-summary" class="float-left"></div>
+				<div id="user-errors" class="float-left"></div>
+				<div id="user-warnings" class="float-left"></div>
+			</div>
+			<table class="table">
+				<thead>
+					<tr>
+					<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Serial No.
+							</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">User
+							ID</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">First
+							Name</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Last
+							Name</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Title</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Office
+							Assignment(s)</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Region
+							Assignment(s)</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Office
+							Admin Privilege</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Email</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Phone</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Website</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;">License</th>
+					</tr>
+				</thead>
+				<tbody id="user-upload"></tbody>
+			</table>
+		</div>
+	</div>
+
+ <div id="hierarchy-upload" class="reg_form_row clearfix hierarchy-btn" style="float:none !important;">
+		<div class="reg_btn" id="xlsx-file-upload">
+			<spring:message code="label.upload.key" />
+		</div>
+	</div>
 </div>
 
 
