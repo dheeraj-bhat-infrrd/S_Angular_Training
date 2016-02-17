@@ -93,10 +93,54 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         HierarchyUpload currentHierarchyUpload = generateCurrentHierarchyStructure( company, oldHierarchyUpload );
         if ( oldHierarchyUpload != null ) {
             currentHierarchyUpload = aggregateHierarchyStructure( oldHierarchyUpload, currentHierarchyUpload );
+        } else {
+            // set all source ids generated to true
+            currentHierarchyUpload = setSourceIdsGeneratedToTrue( currentHierarchyUpload );
         }
         hierarchyUploadDao.saveHierarchyUploadObject( currentHierarchyUpload );
         LOG.info( "Method updateHierarchyStructure finished for company : " + company.getCompany() );
         return currentHierarchyUpload;
+    }
+
+
+    /**
+     * Method to set source ids generated to true for newly generated records
+     * @param upload
+     * @return
+     */
+    HierarchyUpload setSourceIdsGeneratedToTrue( HierarchyUpload upload )
+    {
+        LOG.info( "Method setSourceIdsGeneratedToTrue() started." );
+
+        // set region source ids generated to true
+        List<RegionUploadVO> regions = upload.getRegions();
+        if ( regions != null && !regions.isEmpty() ) {
+            for ( RegionUploadVO region : regions ) {
+                region.setSourceRegionIdGenerated( true );
+            }
+        }
+        upload.setRegions( regions );
+
+        // set branch source ids generated to true
+        List<BranchUploadVO> branches = upload.getBranches();
+        if ( branches != null && !branches.isEmpty() ) {
+            for ( BranchUploadVO branch : branches ) {
+                branch.setSourceBranchIdGenerated( true );
+            }
+        }
+        upload.setBranches( branches );
+
+        // set user source ids generated to true
+        List<UserUploadVO> users = upload.getUsers();
+        if ( users != null && !users.isEmpty() ) {
+            for ( UserUploadVO user : users ) {
+                user.setSourceUserIdGenerated( true );
+            }
+        }
+        upload.setUsers( users );
+
+        LOG.info( "Method setSourceIdsGeneratedToTrue() finished." );
+        return upload;
     }
 
 
