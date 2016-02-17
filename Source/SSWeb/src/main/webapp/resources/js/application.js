@@ -1475,10 +1475,16 @@ $(document).on('click','.da-dd-item',function(e){
 	});
 });
 
-$(document).click(function(){
+$(document).click(function(e){
+	e.stopPropagation();
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
 		$('#da-dd-wrapper-profiles').toggle();
 	}
+	
+	if ($('#srch-crtria-list').css('display') == "block") {
+		$('#srch-crtria-list').toggle();
+	}
+	
 	/*if($('.v-tbl-icn-wraper').is(':visible')) {
 		$('.v-tbl-icn-wraper').hide();
 	}*/

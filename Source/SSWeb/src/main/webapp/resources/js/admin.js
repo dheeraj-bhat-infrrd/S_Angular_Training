@@ -122,20 +122,23 @@ $(document).on('click','#hr-drpdwn-icn',function(e){
 $(document).on('click','.hr-dd-item',function(e){
 	$('#hr-comp-sel').attr("placeholder" , "Search " + $(this).html());
 	$('#hr-comp-sel').attr("srch-type" , $(this).attr("srch-type"));
+	$('#hr-comp-sel').val('');
 	$('#srch-crtria-list').slideToggle(200);
 });
 
 function searchAndDisplayCompanies(key) {
 	var filterValue = $('#com-filter').val();
 	var accountType = $('#com-type-filter').val();
-	callAjaxGET("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue+"&accountType="+accountType, function(data) {
+	showOverlay();
+	callAjaxGETAndAbortLastRequest("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue+"&accountType="+accountType, function(data) {
 		$('#admin-com-list').html(data);
 	}, true);
 }
 
 function searchAndDisplayRegions(key) {
 	
-	callAjaxGET("/fetchregionsbykey.do?searchKey="+key, function(data) {
+	showOverlay();
+	callAjaxGETAndAbortLastRequest("/fetchregionsbykey.do?searchKey="+key, function(data) {
 		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
 		$('.comp-hr-cont[data-iden="'+0+'"]').html(data).show();
 		bindAdminRegionListClicks();
@@ -145,7 +148,8 @@ function searchAndDisplayRegions(key) {
 
 function searchAndDisplayBranches(key) {
 	
-	callAjaxGET("/fetchbranchesbykey.do?searchKey="+key, function(data) {
+	showOverlay();
+	callAjaxGETAndAbortLastRequest("/fetchbranchesbykey.do?searchKey="+key, function(data) {
 		
 		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
 		
@@ -163,7 +167,8 @@ function searchAndDisplayBranches(key) {
 
 function searchAndDisplayUsers(key) {
 	
-	callAjaxGET("/fetchusersbykey.do?searchKey="+key, function(data) {
+	showOverlay();
+	callAjaxGETAndAbortLastRequest("/fetchusersbykey.do?searchKey="+key, function(data) {
 		
 		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
 		
