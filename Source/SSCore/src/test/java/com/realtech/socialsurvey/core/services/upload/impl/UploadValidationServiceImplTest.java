@@ -64,7 +64,7 @@ public class UploadValidationServiceImplTest
         validation.setUpload( upload );
         uploadValidationServiceImpl.validateRegions( validation );
         Assert.assertEquals( 0, validation.getRegionValidationErrors().size() );
-        LOG.info( "" + validation.getRegionValidationErrors() );
+        LOG.info( "Errors: " + validation.getRegionValidationErrors() );
     }
 
 
@@ -81,7 +81,7 @@ public class UploadValidationServiceImplTest
         validation.setUpload( upload );
         uploadValidationServiceImpl.validateRegions( validation );
         Assert.assertEquals( 4, validation.getRegionValidationErrors().size() );
-        LOG.info( "" + validation.getRegionValidationErrors() );
+        LOG.info( "Errors: " + validation.getRegionValidationErrors() );
     }
 
 
@@ -191,6 +191,162 @@ public class UploadValidationServiceImplTest
     }
 
 
+    @Test
+    public void testDeletedRegionValidationsWithActiveBranchAndUsers()
+    {
+        UploadValidation validation = new UploadValidation();
+        HierarchyUpload upload = new HierarchyUpload();
+        List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2 ) );
+        upload.setBranches( branches );
+        List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
+        regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
+        regions.add( getRegion( "DEF", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 2 ) );
+        upload.setRegions( regions );
+        List<UserUploadVO> users = new ArrayList<UserUploadVO>();
+        List<String> branchAdmins = new ArrayList<String>();
+        branchAdmins.add( "ABC" );
+        branchAdmins.add( "DEF" );
+        List<String> regionAdmins = new ArrayList<String>();
+        regionAdmins.add( "ABC" );
+        regionAdmins.add( "DEF" );
+        users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
+
+        upload.setUsers( users );
+        validation.setUpload( upload );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        Assert.assertEquals( 1, validation.getRegionValidationErrors().size() );
+        Assert.assertEquals( 0, validation.getNumberOfRegionsDeleted() );
+        LOG.info( "Errors: " + validation.getRegionValidationErrors() );
+    }
+
+
+    @Test
+    public void testDeletedRegionValidationsWithOnlyActiveUsers()
+    {
+        UploadValidation validation = new UploadValidation();
+        HierarchyUpload upload = new HierarchyUpload();
+        List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1, true ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2, true ) );
+        upload.setBranches( branches );
+        List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
+        regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
+        regions.add( getRegion( "DEF", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 2 ) );
+        upload.setRegions( regions );
+        List<UserUploadVO> users = new ArrayList<UserUploadVO>();
+        List<String> branchAdmins = new ArrayList<String>();
+        branchAdmins.add( "ABC" );
+        branchAdmins.add( "DEF" );
+        List<String> regionAdmins = new ArrayList<String>();
+        regionAdmins.add( "ABC" );
+        regionAdmins.add( "DEF" );
+        users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
+        upload.setUsers( users );
+        validation.setUpload( upload );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        Assert.assertEquals( 1, validation.getRegionValidationErrors().size() );
+        Assert.assertEquals( 0, validation.getNumberOfRegionsDeleted() );
+        LOG.info( "Errors: " + validation.getRegionValidationErrors() );
+    }
+
+
+    @Test
+    public void testDeletedRegionValidationsWithNoErrors()
+    {
+        UploadValidation validation = new UploadValidation();
+        HierarchyUpload upload = new HierarchyUpload();
+        List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1, true ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2, true ) );
+        upload.setBranches( branches );
+        List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
+        regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
+        regions.add( getRegion( "DEF", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 2 ) );
+        regions.add( getRegion( "DEF1", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 3, true ) );
+        upload.setRegions( regions );
+        List<UserUploadVO> users = new ArrayList<UserUploadVO>();
+        List<String> branchAdmins = new ArrayList<String>();
+        branchAdmins.add( "ABC" );
+        branchAdmins.add( "DEF" );
+        List<String> regionAdmins = new ArrayList<String>();
+        regionAdmins.add( "ABC" );
+        regionAdmins.add( "DEF" );
+        users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1, true ) );
+        users.add( getUser( "XYZ1", "cdcdvd", "asncj@dmck.com", null, null, null, null, 2, true ) );
+        upload.setUsers( users );
+        validation.setUpload( upload );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        Assert.assertEquals( 0, validation.getRegionValidationErrors().size() );
+        Assert.assertEquals( 2, validation.getNumberOfRegionsDeleted() );
+        LOG.info( "Errors: " + validation.getRegionValidationErrors() );
+    }
+
+
+    @Test
+    public void testDeletedBranchValidationsWithActiveUsers()
+    {
+        UploadValidation validation = new UploadValidation();
+        HierarchyUpload upload = new HierarchyUpload();
+        List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1, true ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2, true ) );
+        upload.setBranches( branches );
+        List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
+        regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
+        regions.add( getRegion( "DEF", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 2 ) );
+        upload.setRegions( regions );
+        List<UserUploadVO> users = new ArrayList<UserUploadVO>();
+        List<String> branchAdmins = new ArrayList<String>();
+        branchAdmins.add( "ABC" );
+        branchAdmins.add( "DEF" );
+        List<String> regionAdmins = new ArrayList<String>();
+        regionAdmins.add( "ABC" );
+        regionAdmins.add( "DEF" );
+        users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
+        users.add( getUser( "XYZ1", "cdcdvd", "asncj@dmck.com", "DEF", "ABC", branchAdmins, regionAdmins, 2 ) );
+        upload.setUsers( users );
+        validation.setUpload( upload );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        Assert.assertEquals( 2, validation.getBranchValidationErrors().size() );
+        Assert.assertEquals( 0, validation.getNumberOfBranchesDeleted() );
+        LOG.info( "Errors: " + validation.getBranchValidationErrors() );
+    }
+
+
+    @Test
+    public void testDeletedBranchValidationsWithNoErrors()
+    {
+        UploadValidation validation = new UploadValidation();
+        HierarchyUpload upload = new HierarchyUpload();
+        List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1, true ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2, true ) );
+        branches.add( getBranch( "DEF1", "abcdefh", "", true, "Bangalore", "KA", "123456", 3, true ) );
+        upload.setBranches( branches );
+        List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
+        regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
+        regions.add( getRegion( "DEF", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 2 ) );
+        upload.setRegions( regions );
+        List<UserUploadVO> users = new ArrayList<UserUploadVO>();
+        List<String> branchAdmins = new ArrayList<String>();
+        branchAdmins.add( "ABC" );
+        branchAdmins.add( "DEF" );
+        List<String> regionAdmins = new ArrayList<String>();
+        regionAdmins.add( "ABC" );
+        regionAdmins.add( "DEF" );
+        users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1, true ) );
+        users.add( getUser( "XYZ1", "cdcdvd", "asncj@dmck.com", null, null, null, null, 2, true ) );
+        upload.setUsers( users );
+        validation.setUpload( upload );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        Assert.assertEquals( 0, validation.getBranchValidationErrors().size() );
+        Assert.assertEquals( 3, validation.getNumberOfBranchesDeleted() );
+        LOG.info( "Errors: " + validation.getBranchValidationErrors() );
+    }
+
+
     private UserUploadVO getUser( String userId, String name, String email, String regionId, String branchId,
         List<String> regionAdmin, List<String> branchAdmin, int rowNum )
     {
@@ -203,6 +359,15 @@ public class UploadValidationServiceImplTest
         user.setAssignedBranchesAdmin( branchAdmin );
         user.setAssignedRegionsAdmin( regionAdmin );
         user.setRowNum( rowNum );
+        return user;
+    }
+
+
+    private UserUploadVO getUser( String userId, String name, String email, String regionId, String branchId,
+        List<String> regionAdmin, List<String> branchAdmin, int rowNum, boolean isDeletedRecord )
+    {
+        UserUploadVO user = getUser( userId, name, email, regionId, branchId, regionAdmin, branchAdmin, rowNum );
+        user.setDeletedRecord( isDeletedRecord );
         return user;
     }
 
@@ -223,6 +388,15 @@ public class UploadValidationServiceImplTest
     }
 
 
+    private BranchUploadVO getBranch( String branchId, String name, String regionId, boolean isAddressSet, String city,
+        String state, String zip, int rowNum, boolean isDeletedRecord )
+    {
+        BranchUploadVO branch = getBranch( branchId, name, regionId, isAddressSet, city, state, zip, rowNum );
+        branch.setDeletedRecord( isDeletedRecord );
+        return branch;
+    }
+
+
     private RegionUploadVO getRegion( String regionId, String name, String address1, String address2, String city,
         String country, String state, String zip, int rowNum )
     {
@@ -236,6 +410,15 @@ public class UploadValidationServiceImplTest
         region.setRegionState( state );
         region.setRegionZipcode( zip );
         region.setRowNum( rowNum );
+        return region;
+    }
+
+
+    private RegionUploadVO getRegion( String regionId, String name, String address1, String address2, String city,
+        String country, String state, String zip, int rowNum, boolean isDeletedRecord )
+    {
+        RegionUploadVO region = getRegion( regionId, name, address1, address2, city, country, state, zip, rowNum );
+        region.setDeletedRecord( isDeletedRecord );
         return region;
     }
 }
