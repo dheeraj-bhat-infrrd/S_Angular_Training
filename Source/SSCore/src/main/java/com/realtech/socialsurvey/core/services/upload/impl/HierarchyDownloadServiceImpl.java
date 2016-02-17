@@ -619,23 +619,32 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         for ( UserProfile userProfile : userProfiles ) {
             if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                 if ( branchMap.containsKey( userProfile.getBranchId() ) ) {
-                    //Add sourceId to list instead
-                    assignedBranchSourceIds.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                    BranchUploadVO branchUpload = branchMap.get( userProfile.getBranchId() );
+                    if ( !branchUpload.getBranchName().equalsIgnoreCase( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
+
+                        //Add sourceId to list
+                        assignedBranchSourceIds.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
 
 
-                    if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                        userUploadVO.setBranchAdmin( true );
-                        assignedBranchesAdmin.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                        if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                            userUploadVO.setBranchAdmin( true );
+                            assignedBranchesAdmin.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                        }
                     }
                 }
                 if ( regionMap.containsKey( userProfile.getRegionId() ) ) {
-                    //Add sourceID to list
-                    assignedRegionSourceIds.add( regionMap.get( userProfile.getRegionId() ).getSourceRegionId() );
+                    RegionUploadVO regionUpload = regionMap.get( userProfile.getRegionId() );
 
+                    if ( !regionUpload.getRegionName().equalsIgnoreCase( CommonConstants.DEFAULT_REGION_NAME ) ) {
+                        if ( !branchMap.containsKey( userProfile.getBranchId() ) ) {
+                            //Add sourceID to list
+                            assignedRegionSourceIds.add( regionUpload.getSourceRegionId() );
 
-                    if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                        userUploadVO.setRegionAdmin( true );
-                        assignedRegionsAdmin.add( regionMap.get( userProfile.getRegionId() ).getSourceRegionId() );
+                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                                userUploadVO.setRegionAdmin( true );
+                                assignedRegionsAdmin.add( regionUpload.getSourceRegionId() );
+                            }
+                        }
                     }
                 }
                 if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
