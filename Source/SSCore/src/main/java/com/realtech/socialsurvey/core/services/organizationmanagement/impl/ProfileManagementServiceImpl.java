@@ -241,6 +241,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     String paramOrderTakeSurveyCustomer;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+
     @Value ( "${ZILLOW_ENDPOINT}")
     private String zillowEndpoint;
     
@@ -1618,7 +1619,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias( UserProfile.class, queries,
-            "firstName", "user" );
+            Arrays.asList(new String [] { "firstName", "lastName" } ) , "user" );
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             users = new ArrayList<AgentSettings>();
             for ( UserProfile userProfile : userProfiles ) {
@@ -1702,7 +1703,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
 
         LOG.debug( "calling method to fetch user profiles under region :" + regionId );
-        List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+        List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias( UserProfile.class, queries,
+            Arrays.asList( new String[] { "firstName", "lastName" } ), "user" );
 
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             LOG.debug( "Obtained userProfiles with size : " + userProfiles.size() );
@@ -4134,8 +4136,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     } else {
                         Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
                             zillowScreenName );
-                        
-                      //Store the API call details
+
                         ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
                         zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
                         zillowAPICallDetails.setRequest( zillowEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
@@ -4144,7 +4145,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         if ( response != null ) {
                             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
                         }
-                        
+
                         zillowAPICallDetails.setResponse( responseString );
                         zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );
                         zillowAPICallDetails.setSource( CommonConstants.ZILLOW_SOCIAL_SITE );
@@ -4506,7 +4507,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     User user = userDao.findById( User.class, iden );
                     long zillowReviewCount = 0;
                     long zillowTotalScore = 0;
-                    if ( user != null ) {
+                    if ( user != null &&  user.getIsZillowConnected() == CommonConstants.YES ) {
                         zillowReviewCount = user.getZillowReviewCount();
                         zillowTotalScore = (long) ( user.getZillowAverageScore() * zillowReviewCount );
                     }

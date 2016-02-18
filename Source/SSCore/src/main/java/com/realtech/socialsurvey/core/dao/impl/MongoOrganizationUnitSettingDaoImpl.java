@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -88,6 +89,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_CONTACT_NAME = "contact_details.name";
 	public static final String KEY_POSTIONS = "positions";
 	public static final String KEY_STATUS = "status";
+	
+	@Value("${AMAZON_ENDPOINT}")
+	private String amazonEndPoint;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 	
@@ -456,7 +460,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     	Query query = new Query();
     	query.addCriteria(Criteria.where(KEY_IDENTIFIER).in(companyIds));
     	query.fields().include(KEY_CONTACT_DETAILS).include(KEY_PROFILE_NAME).include(KEY_VERTICAL).include(KEY_IDEN).include(KEY_PROFILE_IMAGE).exclude("_id");
-    	query.with(new Sort(Sort.Direction.DESC, KEY_MODIFIED_ON));
     	
     	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
     	
@@ -640,13 +643,18 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     		throw new InvalidInputException("Invalid input getCollectionListOfUnprocessedImages");
     	}
     	Query query = new Query();
-    	if(imageType.equals(CommonConstants.IMAGE_TYPE_PROFILE)){
-    		query.addCriteria(Criteria.where(CommonConstants.PROFILE_IMAGE_URL_SOLR).exists(true)).addCriteria(Criteria.where(CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN).is(false));
-    	}else if(imageType.equals(CommonConstants.IMAGE_TYPE_LOGO)){
-    		query.addCriteria(Criteria.where(CommonConstants.LOGO_COLUMN).exists(true)).addCriteria(Criteria.where(CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN).is(false));
-    	}else{
-    		throw new InvalidInputException("Invalid image type");
-    	}
+        if ( imageType.equals( CommonConstants.IMAGE_TYPE_PROFILE ) ) {
+            query.addCriteria(
+                Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).regex(
+                    StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) ).addCriteria(
+                Criteria.where( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN ).is( false ) );
+        } else if ( imageType.equals( CommonConstants.IMAGE_TYPE_LOGO ) ) {
+            query.addCriteria(
+                Criteria.where( CommonConstants.LOGO_COLUMN ).regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )
+                .addCriteria( Criteria.where( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN ).is( false ) );
+        } else {
+            throw new InvalidInputException( "Invalid image type" );
+        }
     	query.fields().include(CommonConstants.PROFILE_IMAGE_URL_SOLR).include(CommonConstants.IDEN).include(CommonConstants.LOGO_COLUMN).exclude(CommonConstants.DEFAULT_MONGO_ID_COLUMN);
     	LOG.debug("Query: "+query.toString());
     	List<OrganizationUnitSettings> unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, collectionName);

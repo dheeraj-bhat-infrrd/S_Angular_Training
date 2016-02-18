@@ -131,6 +131,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( rows > 0 ) {
                 solrQuery.setRows( rows );
             }
+            solrQuery.addSort( CommonConstants.REGION_NAME_SOLR, ORDER.asc );
 
             LOG.debug( "Querying solr for searching regions" );
             response = solrServer.query( solrQuery );
@@ -284,6 +285,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( rows > 0 ) {
                 query.setRows( rows );
             }
+            query.addSort( CommonConstants.BRANCH_NAME_SOLR, ORDER.asc );
 
             LOG.debug( "Querying solr for searching branches" );
             response = solrServer.query( query );
@@ -1085,6 +1087,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( noOfRows > -1 ) {
                 solrQuery.setRows( noOfRows );
             }
+            solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
 
             LOG.debug( "Querying solr for searching users" );
             response = solrServer.query( solrQuery );
@@ -1294,6 +1297,75 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return results;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.search.SolrSearchService#searchBranchRegionOrAgentByNameForAdmin(java.lang.String, java.lang.String, java.lang.String, long)
+     */
+    @Override
+    public List<SolrDocument> searchBranchRegionOrAgentByNameForAdmin( String searchColumn, String searchKey )
+        throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company started" );
+
+        if ( searchColumn == null || searchColumn.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed searchColumn is null or invalid" );
+        }
+
+        List<SolrDocument> results = new ArrayList<SolrDocument>();
+        QueryResponse response = null;
+        searchKey = searchKey + "*";
+
+        SolrQuery query = new SolrQuery();
+        try {
+            SolrServer solrServer;
+            switch ( searchColumn ) {
+                case CommonConstants.REGION_NAME_SOLR:
+                    solrServer = new HttpSolrServer( solrRegionUrl );
+                    break;
+                case CommonConstants.BRANCH_NAME_SOLR:
+                    solrServer = new HttpSolrServer( solrBranchUrl );
+                    break;
+                case CommonConstants.USER_DISPLAY_NAME_SOLR:
+                    solrServer = new HttpSolrServer( solrUserUrl );
+                    break;
+                default:
+                    solrServer = new HttpSolrServer( solrRegionUrl );
+            }
+
+            query.setQuery( "*:*" );
+            
+            //search for login name also in case of user
+            if ( !searchColumn.equalsIgnoreCase( CommonConstants.USER_DISPLAY_NAME_SOLR ) ){
+                query
+                .addFilterQuery( CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO );
+                query.addFilterQuery( searchColumn + ":" + searchKey );
+            }else{
+                query.addFilterQuery( searchColumn + ":" + searchKey + " OR " + CommonConstants.USER_LOGIN_NAME_SOLR );
+            }
+               
+            //filter for only active user
+            query.addFilterQuery( "-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_INACTIVE );
+
+            LOG.debug( "Querying solr for searching " + searchKey );
+            response = solrServer.query( query );
+            // Change to get all matching records.
+            int rows = (int) response.getResults().getNumFound();
+            query.setRows( rows );
+            response = solrServer.query( query );
+            SolrDocumentList documentList = response.getResults();
+            for ( SolrDocument doc : documentList ) {
+                results.add( doc );
+            }
+
+            LOG.debug( "Results obtained from solr :" + results );
+        } catch ( SolrServerException e ) {
+            LOG.error( "SolrServerException while performing region, branch or agent search" );
+            throw new SolrException( "Exception while performing search. Reason : " + e.getMessage(), e );
+        }
+
+        LOG.info( "Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished" );
+        return results;
+    }
 
     @Override
     public String fetchRegionsByCompany( long companyId, int size ) throws InvalidInputException, SolrException,
@@ -1542,6 +1614,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( rows > 0 ) {
                 solrQuery.setRows( rows );
             }
+            solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
 
             LOG.debug( "Querying solr for searching users under the branches" );
             response = solrServer.query( solrQuery );
@@ -2100,7 +2173,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     private Collection<BranchFromSearch> getBranchesFromSolrDocuments( SolrDocumentList documentList )
     {
-        Map<Long, BranchFromSearch> matchedBranches = new HashMap<>();
+        Map<Long, BranchFromSearch> matchedBranches = new LinkedHashMap<>();
         for ( SolrDocument document : documentList ) {
             BranchFromSearch branch = new BranchFromSearch();
 
@@ -2135,7 +2208,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     private Collection<RegionFromSearch> getRegionsFromSolrDocuments( SolrDocumentList documentList )
     {
-        Map<Long, RegionFromSearch> matchedRegions = new HashMap<>();
+        Map<Long, RegionFromSearch> matchedRegions = new LinkedHashMap<>();
         for ( SolrDocument document : documentList ) {
             RegionFromSearch region = new RegionFromSearch();
 
@@ -2395,7 +2468,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             solrQuery.addFilterQuery( CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR "
                 + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_NOT_VERIFIED + " OR "
                 + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE );
-            solrQuery.addSort( CommonConstants.USER_ID_SOLR, ORDER.asc );
+            solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
             solrQuery.addField( CommonConstants.USER_ID_SOLR );
             LOG.debug( "Querying solr for searching users" );
             if ( startIndex > -1 ) {

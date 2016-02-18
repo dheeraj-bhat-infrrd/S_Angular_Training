@@ -29,6 +29,7 @@
 						&nbsp&nbsp&nbsp&nbsp[Link] : Url of the survey,
 						<br />
 						&nbsp&nbsp&nbsp&nbsp[Name] : Customer Name,
+						&nbsp&nbsp&nbsp&nbsp[FirstName] : Customer First Name,
 						&nbsp&nbsp&nbsp&nbsp[AgentName] : User Name,
 						&nbsp&nbsp&nbsp&nbsp[AgentSignature] : User's Signature,
 						<br />
@@ -406,7 +407,8 @@
 			$('#edit-participation-mail-content').show();
 			$('#edit-participation-mail-content-disabled').hide();
 		});
-		$('#revert-participation-mail').click(function() {
+		$('#revert-participation-mail').click(function(e) {
+			e.stopPropagation();
 			$('#overlay-main').show();
 			$('#overlay-continue').show();
 			$('#overlay-continue').html("Reset");
@@ -447,7 +449,8 @@
 			$('#edit-participation-reminder-mail-content').show();
 			$('#edit-participation-reminder-mail-content-disabled').hide();
 		});
-		$('#revert-participation-reminder-mail').click(function() {
+		$('#revert-participation-reminder-mail').click(function(e) {
+			e.stopPropagation();
 			$('#overlay-main').show();
 			$('#overlay-continue').show();
 			$('#overlay-continue').html("Reset");
@@ -487,7 +490,8 @@
 			$('#edit-survey-completion-mail-content').show();
 			$('#edit-survey-completion-mail-content-disabled').hide();
 		});
-		$('#revert-survey-completion-mail').click(function() {
+		$('#revert-survey-completion-mail').click(function(e) {
+			e.stopPropagation();
 			$('#overlay-main').show();
 			$('#overlay-continue').show();
 			$('#overlay-continue').html("Reset");
@@ -527,7 +531,8 @@
 			$('#edit-survey-completion-unpleasant-mail-content').show();
 			$('#edit-survey-completion-unpleasant-mail-content-disabled').hide();
 		});
-		$('#revert-survey-completion-unpleasant-mail').click(function() {
+		$('#revert-survey-completion-unpleasant-mail').click(function(e) {
+			e.stopPropagation();
 			$('#overlay-main').show();
 			$('#overlay-continue').show();
 			$('#overlay-continue').html("Reset");
@@ -567,7 +572,8 @@
 			$('#edit-social-post-reminder-mail-content').show();
 			$('#edit-social-post-reminder-mail-content-disabled').hide();
 		});
-		$('#revert-social-post-reminder-mail').click(function() {
+		$('#revert-social-post-reminder-mail').click(function(e) {
+			e.stopPropagation();
 			$('#overlay-main').show();
 			$('#overlay-continue').show();
 			$('#overlay-continue').html("Reset");
@@ -607,7 +613,8 @@
 			$('#edit-incomplete-survey-reminder-mail-content').show();
 			$('#edit-incomplete-survey-reminder-mail-content-disabled').hide();
 		});
-		$('#revert-incomplete-survey-reminder-mail').click(function() {
+		$('#revert-incomplete-survey-reminder-mail').click(function(e) {
+			e.stopPropagation();
 			$('#overlay-main').show();
 			$('#overlay-continue').show();
 			$('#overlay-continue').html("Reset");

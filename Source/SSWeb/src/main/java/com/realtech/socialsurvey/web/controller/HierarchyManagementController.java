@@ -1585,6 +1585,7 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Error while parsing regionId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			LOG.debug("Fetching branches under region:" + regionId);
             branches = organizationManagementService.getBranchesByRegionId( regionId );
 
 			Set<Long> regionIds = new HashSet<Long>();
@@ -1741,10 +1742,10 @@ public class HierarchyManagementController {
 			long companyId = admin.getCompany().getCompanyId();
 			int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
 			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				LOG.debug("fetching regions under company from solr");
+				LOG.debug("fetching regions under company");
 				regions = organizationManagementService.getRegionsForCompany( companyId );
 
-				LOG.debug("fetching branches under company from solr");
+				LOG.debug("fetching branches under company");
 				branches = organizationManagementService.getBranchesUnderCompany( companyId );
 
 				LOG.debug("fetching users under company from solr");

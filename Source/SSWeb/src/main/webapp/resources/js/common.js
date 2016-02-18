@@ -4,6 +4,7 @@
  * application
  */
 
+var lastAjaxRequestToDelete = null;
 
 //Function to redirect to login page if session time out
 function redirectToLoginPageOnSessionTimeOut(status) {
@@ -391,7 +392,7 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	if(source != undefined && source == "Zillow"){
 		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml+="<div class='verified-badge float-left verify-image' ></div>";
+		ratingImgHtml+="<div class='verified-badge float-left verify-image' title='Click here to know more'></div>";
 		ratingImgHtml += "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";	
 		
 	}
@@ -407,6 +408,9 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	ratingParent.html('');
 	ratingParent.append(ratingImgHtml).append(ratingValHtml);
 }
+$(document).on('click','.verified-badge',function(e){
+	window.open("https://socialsurvey.zendesk.com/hc/en-us/articles/216454118-Added-Verified-Customer-badge");
+});
 
 /**
  * function for adding delay to a function call
@@ -627,6 +631,51 @@ function shareOnGooglePlus(agentId, location, googleElement){
 	});
 }
 
+
+
+function callAjaxGETAndAbortLastRequest(url,  callBackFunction, isAsync,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	
+	if (isAsync == "undefined") {
+		isAsync = true;
+	}
+	lastAjaxRequestToDelete = $.ajax({
+		url : url,
+		type : "GET",
+		dataType : "html",
+		async : isAsync,
+		cache : false,
+		beforeSend : function()    {           
+	        if(lastAjaxRequestToDelete != null) {
+	        	lastAjaxRequestToDelete.abort();
+	        }
+	    },
+		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+						/*$(document).data('requestRunning', false);
+			*/
+			enable(disableEle);
+			
+			
+		},
+
+		error : function(jqXHR , e) {
+			if (jqXHR.statusText == "abort" || e == "abort")
+                return;
+
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
+	});
+}
 // Function to open forgot password page
 function openForgotPasswordPage(){
 	window.location.href = "./forgotpassword.do";

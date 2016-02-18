@@ -359,5 +359,8 @@ public interface SolrSearchService
 
 
     public void updateReviewCountOfUserInSolr( User user ) throws InvalidInputException, SolrException;
+
+    public List<SolrDocument> searchBranchRegionOrAgentByNameForAdmin( String searchColumn, String searchKey )
+        throws InvalidInputException, SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

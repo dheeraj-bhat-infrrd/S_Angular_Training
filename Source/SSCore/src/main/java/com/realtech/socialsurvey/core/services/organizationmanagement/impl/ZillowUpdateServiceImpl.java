@@ -79,6 +79,7 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
                         return;
                     }
 
+                    company.setIsZillowConnected( CommonConstants.YES );
                     company.setZillowAverageScore( zillowAverage );
                     company.setZillowReviewCount( new Double( zillowReviewCount ).intValue() );
                     company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -93,6 +94,7 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
                         return;
                     }
 
+                    region.setIsZillowConnected( CommonConstants.YES );
                     region.setZillowAverageScore( zillowAverage );
                     region.setZillowReviewCount( new Double( zillowReviewCount ).intValue() );
                     region.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -107,6 +109,7 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
                         return;
                     }
 
+                    branch.setIsZillowConnected( CommonConstants.YES );
                     branch.setZillowAverageScore( zillowAverage );
                     branch.setZillowReviewCount( new Double( zillowReviewCount ).intValue() );
                     branch.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -121,6 +124,7 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
                         return;
                     }
 
+                    user.setIsZillowConnected( CommonConstants.YES );
                     user.setZillowAverageScore( zillowAverage );
                     user.setZillowReviewCount( new Double( zillowReviewCount ).intValue() );
                     user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );

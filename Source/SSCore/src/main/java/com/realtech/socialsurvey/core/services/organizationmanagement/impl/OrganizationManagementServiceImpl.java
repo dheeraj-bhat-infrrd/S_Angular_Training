@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +49,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -2017,7 +2019,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE );
-        regions = regionDao.findProjectionsByKeyValue( Region.class, columnNames, queries );
+        regions = regionDao.findProjectionsByKeyValue( Region.class, columnNames, queries, CommonConstants.REGION_COLUMN );
         
         //SS-1421: populate the address of the regions from Solr before sending this list back
         populateAddressOfRegionFromSolr(regions, companyId);
@@ -2054,6 +2056,94 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		} catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while searching for region for company ID: " + companyId + ". Reason : " + e.getMessage(), e);
 		}
+    }
+    
+    /**
+     * Method to fetch all regions of a company based on company id
+     *
+     * @param companyProfileName
+     * @return
+     * @throws SolrException 
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<Region> getRegionsBySearchKey( String searchKey ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method getRegionsBySearchKey called for search key:" + searchKey );
+        if( searchKey == null )
+            throw new InvalidInputException("Invalid searchKey passed as argument ");
+        List<Region> regions = new ArrayList<Region>();
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin( CommonConstants.REGION_NAME_SOLR, searchKey );
+        
+        for ( SolrDocument document : solrDocumentList ) {
+            Region region = new Region();
+            region.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
+            region.setRegionName( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
+            region.setRegion( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS1_SOLR ) != null)
+                region.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS2_SOLR ) != null)
+                region.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
+            regions.add( region );
+        }
+        
+        return regions;
+    }
+    
+    @Override
+    @Transactional
+    public List<Branch> getBranchesBySearchKey( String searchKey ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method getBranchesBySearchKey called for search key:" + searchKey );
+        if( searchKey == null)
+            throw new InvalidInputException("Invalid searchKey passed as argument ");
+        List<Branch> branches = new ArrayList<Branch>();
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin( CommonConstants.BRANCH_NAME_SOLR, searchKey );
+        
+        for ( SolrDocument document : solrDocumentList ) {
+            Branch branch = new Branch();
+            branch.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR).toString() ) );
+            branch.setBranchName( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
+            branch.setBranch( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS1_SOLR ) != null)
+                branch.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
+            if(document.get( CommonConstants.ADDRESS2_SOLR ) != null)
+                branch.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
+            branches.add( branch );
+        }
+        
+        return branches;
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<UserFromSearch> getUsersBySearchKey( String searchKey ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method getUsersBySearchKey called for search key:" + searchKey );
+        if( searchKey == null)
+            throw new InvalidInputException("Invalid searchKey passed as argument ");
+        List<UserFromSearch> users = new ArrayList<UserFromSearch>();
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin( CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey );
+        
+        for ( SolrDocument document : solrDocumentList ) {
+            UserFromSearch user = new UserFromSearch();
+            user.setUserId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
+            user.setEmailId( document.get( CommonConstants.USER_EMAIL_ID_SOLR ).toString() );
+            user.setDisplayName( document.get( CommonConstants.USER_DISPLAY_NAME_SOLR).toString() );
+            user.setCompanyId( Long.parseLong( document.get( CommonConstants.COMPANY_ID_SOLR ).toString() ) );
+            user.setAgent( Boolean.parseBoolean( document.get( CommonConstants.IS_AGENT_SOLR ).toString() ) );
+            user.setStatus( Integer.parseInt( document.get( CommonConstants.STATUS_SOLR ).toString() ) );
+            user.setIsOwner( Integer.parseInt( document.get( CommonConstants.IS_OWNER_COLUMN ).toString() ) );
+            user.setBranchAdmin( Boolean.parseBoolean( document.get( CommonConstants.IS_BRANCH_ADMIN_SOLR ).toString() ) );
+            user.setRegionAdmin( Boolean.parseBoolean( document.get( CommonConstants.IS_REGION_ADMIN_SOLR ).toString() ) );
+            user.setRegions( (List<Long>) document.get( CommonConstants.REGIONS_SOLR ) );
+            user.setBranches( (List<Long>) document.get( CommonConstants.BRANCHES_SOLR ) );
+            users.add( user );
+        }
+        
+        return users;
     }
 
 
@@ -2143,7 +2233,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
 
-        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
+        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries, CommonConstants.BRANCH_NAME_COLUMN );
         
         //SS-1421: populate the address of the branches from Solr before sending this list back
         populateAddressOfBranchFromSolr(branches, defaultRegion.getRegionId(), null, null);
@@ -2305,7 +2395,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
 
-        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries );
+        branches = branchDao.findProjectionsByKeyValue( Branch.class, columnNames, queries, CommonConstants.BRANCH_NAME_COLUMN );
         
         //SS-1421: populate the address of the branches from Solr before sending this list back
         populateAddressOfBranchFromSolr(branches, regionId, null, null);
@@ -2505,7 +2595,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( validateEmail( emailId ) ) {
 
                 try {
-                    user = userManagementService.getUserByLoginName( adminUser, emailId );
+                    user = userManagementService.getUserByEmailAddress( emailId );
                 } catch ( NoRecordsFetchedException e ) {
                     /**
                      * if no user is present with the specified emailId, send an invite to register
@@ -5027,7 +5117,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
-
+        Collections.sort( unitSettings,   new OrganizationUnitSettingsComparator() );
         return unitSettings;
     }
 
@@ -5043,16 +5133,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Transactional
     @Override
-    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status )
+    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status , boolean inCompleteCompany )
     {
 
-        List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status );
+        List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status, inCompleteCompany );
         Set<Long> companyIds = new HashSet<>();
         for ( Company company : companyList ) {
             companyIds.add( company.getCompanyId() );
         }
         LOG.debug( "Method getCompaniesByNameFromMongo() called" );
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
+        Collections.sort( unitSettings,   new OrganizationUnitSettingsComparator() );
         return unitSettings;
     }
 

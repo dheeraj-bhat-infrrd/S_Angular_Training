@@ -57,9 +57,6 @@
 		<!-- Admin pages -->
 		<intercept-url pattern="/adminlogin.do" access="permitAll" />
 		
-		<!--  purge company -->
-		<intercept-url pattern="/purgeCompany.do" access="permitAll" />
-		
 		<!--  generate api key -->
 		<intercept-url pattern="/generateApiKey.do" access="permitAll" />
 

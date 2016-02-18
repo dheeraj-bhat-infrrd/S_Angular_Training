@@ -43,16 +43,18 @@
 				</c:if>
 			</div>
 			<div class="v-tbl-role"></div>
+			<!-- 
 			<div class="v-tbl-btns">
 				<div class="clearfix v-tbl-icn-wraper">
-					<div
-						class="float-left v-tbl-icn v-icn-close comp-del-icn vis-hidden"
-						data-iden="${companyItem.iden}"></div>
+					<c:if test="${canDelete}">
+						<div class="float-right v-tbl-icn v-icn-close comp-del-icn" data-iden="${companyItem.iden}"></div>
+					</c:if>
 					<div
 						class="float-right v-tbl-icn v-icn-edit comp-edit-icn vis-hidden"
 						clicked="false" data-iden="${companyItem.iden}"></div>
 				</div>
 			</div>
+			-->
 			<div class="v-tbl-spacer"></div>
 		</div>
 		<div data-iden="${companyItem.iden}" class="hide comp-hr-cont"></div>

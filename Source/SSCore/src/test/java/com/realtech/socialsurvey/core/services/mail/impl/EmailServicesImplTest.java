@@ -129,14 +129,14 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendResetPasswordEmailTestNameNull() throws InvalidInputException, UndeliveredEmailException
+    public void sendResetPasswordEmailTestFirstNameNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendResetPasswordEmail( "test", "test", null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendResetPasswordEmailTestNameEmpty() throws InvalidInputException, UndeliveredEmailException
+    public void sendResetPasswordEmailTestFirstNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendResetPasswordEmail( "test", "test", "", "test" );
     }
@@ -538,14 +538,14 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionMailTestDisplayNameNull() throws InvalidInputException, UndeliveredEmailException
+    public void sendDefaultSurveyCompletionMailTestFirstNameNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionMail( "test", null, "test", null, null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionMailTestDisplayNameEmpty() throws InvalidInputException, UndeliveredEmailException
+    public void sendDefaultSurveyCompletionMailTestFirstNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionMail( "test", "", "test", null, null, null, 0 );
     }
@@ -569,7 +569,7 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionUnpleasantMailTestDisplayNameNull() throws InvalidInputException,
+    public void sendDefaultSurveyCompletionUnpleasantMailTestfirstNameNull() throws InvalidInputException,
         UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionUnpleasantMail( "test", null, "test", null, null, null, 0 );
@@ -577,7 +577,7 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyCompletionUnpleasantMailTestDisplayNameEmpty() throws InvalidInputException,
+    public void sendDefaultSurveyCompletionUnpleasantMailTestfirstNameEmpty() throws InvalidInputException,
         UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyCompletionUnpleasantMail( "test", "", "test", null, null, null, 0 );
@@ -1031,7 +1031,7 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyInvitationMailByCustomerTestDisplayNameNull() throws InvalidInputException,
+    public void sendDefaultSurveyInvitationMailByCustomerTestFirstNameNull() throws InvalidInputException,
         UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyInvitationMailByCustomer( "test", null, "test", null, null, 0 );
@@ -1039,7 +1039,7 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyInvitationMailByCustomerTestDisplayNameEmpty() throws InvalidInputException,
+    public void sendDefaultSurveyInvitationMailByCustomerTestFirstNameEmpty() throws InvalidInputException,
         UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyInvitationMailByCustomer( "test", "", "test", null, null, 0 );
@@ -1093,14 +1093,14 @@ public class EmailServicesImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyRestartMailTestDisplayNameNull() throws InvalidInputException, UndeliveredEmailException
+    public void sendDefaultSurveyRestartMailTestFirstNameNull() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyRestartMail( "test", "test", null, null, null, null, null, 0 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void sendDefaultSurveyRestartMailTestDisplayNameEmpty() throws InvalidInputException, UndeliveredEmailException
+    public void sendDefaultSurveyRestartMailTestFirstNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
         emailServicesImpl.sendDefaultSurveyRestartMail( "test", "test", "", null, null, null, null, 0 );
     }
