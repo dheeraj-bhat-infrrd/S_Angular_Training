@@ -2060,7 +2060,7 @@ var hierarchyUpload={
 							$('<div  style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#user-summary');
 						}
 					}
-					
+					$('#summary').show();
 				});
 				
 					var regionerror=$.parseJSON(response).regionValidationErrors.length;
@@ -2112,7 +2112,7 @@ var hierarchyUpload={
 				for(var i=0;i<userlength;i++){
 					$('<tr><td>'+$.parseJSON(response).upload.users[i].rowNum+'</td><td>'+$.parseJSON(response).upload.users[i].sourceUserId+'</td><td>'+$.parseJSON(response).upload.users[i].firstName+'</td><td>'+$.parseJSON(response).upload.users[i].lastName+'</td><td>'+$.parseJSON(response).upload.users[i].title+'</td><td>'+$.parseJSON(response).upload.users[i].sourceBranchId+'</td><td>'+$.parseJSON(response).upload.users[i].sourceRegionId+'</td><td>'+$.parseJSON(response).upload.users[i].assignedBranchesAdmin+'</td><td>'+$.parseJSON(response).upload.users[i].emailId+'</td><td>'+$.parseJSON(response).upload.users[i].phoneNumber+'</td><td>'+$.parseJSON(response).upload.users[i].websiteUrl+'</td><td>'+$.parseJSON(response).upload.users[i].license+'</td><td></tr>').appendTo('#user-upload');
 				}
-				$('#summary').show();
+				
 			
 				}
 			
