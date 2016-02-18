@@ -622,8 +622,12 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                     BranchUploadVO branchUpload = branchMap.get( userProfile.getBranchId() );
                     if ( !branchUpload.getBranchName().equalsIgnoreCase( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
 
-                        //Add sourceId to list
-                        assignedBranchSourceIds.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                        if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            userUploadVO.setAgent( true );
+
+                            //Add sourceId to list
+                            assignedBranchSourceIds.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                        }
 
 
                         if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
@@ -637,8 +641,13 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
                     if ( !regionUpload.getRegionName().equalsIgnoreCase( CommonConstants.DEFAULT_REGION_NAME ) ) {
                         if ( !branchMap.containsKey( userProfile.getBranchId() ) ) {
-                            //Add sourceID to list
-                            assignedRegionSourceIds.add( regionUpload.getSourceRegionId() );
+
+                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                                userUploadVO.setAgent( true );
+
+                                //Add sourceID to list
+                                assignedRegionSourceIds.add( regionUpload.getSourceRegionId() );
+                            }
 
                             if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                                 userUploadVO.setRegionAdmin( true );
@@ -646,9 +655,6 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                             }
                         }
                     }
-                }
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                    userUploadVO.setAgent( true );
                 }
             }
         }
