@@ -169,6 +169,33 @@ function callAjaxPOSTWithTextDataLogo(url, callBackFunction, isAsync, formData) 
 			});
 }
 
+function callAjaxPOSTWithTextDataUpload(url, callBackFunction, isAsync, formData) {
+
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+				url : url,
+				type : "POST",
+				dataType : "text",
+				contentType : false,
+				processData : false,
+				cache : false,
+				data : formData,
+				async : isAsync,
+				success : callBackFunction,
+				error : function(e) {
+					console.log(e);
+					if(e.status == 500) {
+						showError("Hierarchy upload failed. Please try again.");
+					}
+				},
+				complete : function() {
+					hideOverlay();
+				}
+			});
+}
+
 
 /**
  * Generic function to be used for making ajax get calls with datatype text and formdata
