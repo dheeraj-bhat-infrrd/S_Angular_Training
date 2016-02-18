@@ -2438,11 +2438,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( assigneeUser == null ) {
                 throw new NoRecordsFetchedException( "No user found in db for selectedUserId:" + selectedUserId );
             }
-            try {
-                assignRegionToUser( user, region.getRegionId(), assigneeUser, isAdmin );
-            } catch ( InvalidInputException | NoRecordsFetchedException | SolrException e ) {
-                LOG.error( "Exception while assigning region to a user. Reason:" + e.getMessage(), e );
-                throw new UserAssignmentException( e.getMessage(), e );
+            if ( validateUserAssignment( user, assigneeUser, userMap ) ) {
+                try {
+                    assignRegionToUser( user, region.getRegionId(), assigneeUser, isAdmin );
+                } catch ( InvalidInputException | NoRecordsFetchedException | SolrException e ) {
+                    LOG.error( "Exception while assigning region to a user. Reason:" + e.getMessage(), e );
+                    throw new UserAssignmentException( e.getMessage(), e );
+                }
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
@@ -2451,6 +2453,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
                 for ( User assigneeUser : assigneeUsers ) {
+                    if(!validateUserAssignment( user, assigneeUser, userMap )){
+                        continue;
+                    }
                     try {
                         assignRegionToUser( user, region.getRegionId(), assigneeUser, isAdmin );
                     } catch ( InvalidInputException | NoRecordsFetchedException | SolrException e ) {
@@ -2463,6 +2468,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         map.put( CommonConstants.REGION_OBJECT, region );
         if ( userMap != null ) {
             map.put( CommonConstants.INVALID_USERS_LIST, userMap.get( CommonConstants.INVALID_USERS_LIST ) );
+            map.put( CommonConstants.INVALID_USERS_ASSIGN_LIST, userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ) );
         }
         LOG.info( "Method addNewRegionWithUser completed successfully" );
         return map;
@@ -2901,6 +2907,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
                 for ( User assigneeUser : assigneeUsers ) {
+                    if( !validateUserAssignment( user, assigneeUser, userMap ) ){
+                        continue;
+                    }
                     try {
                         assignBranchToUser( user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin );
                     } catch ( InvalidInputException | NoRecordsFetchedException | SolrException e ) {
@@ -2913,6 +2922,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         map.put( CommonConstants.BRANCH_OBJECT, branch );
         if ( userMap != null ) {
             map.put( CommonConstants.INVALID_USERS_LIST, userMap.get( CommonConstants.INVALID_USERS_LIST ) );
+            map.put( CommonConstants.INVALID_USERS_ASSIGN_LIST, userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ) );
         }
         LOG.info( "Method addNewBranchWithUser completed successfully" );
         return map;
@@ -3049,6 +3059,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( branchId > 0l ) {
                 LOG.debug( "assigning individual(s) to branch :" + branchId + " in addIndividual" );
                 for ( User assigneeUser : assigneeUsers ) {
+                    if( !validateUserAssignment( adminUser, assigneeUser, userMap ) ){
+                        continue;
+                    }
                     assignBranchToUser( adminUser, branchId, regionId, assigneeUser, isAdmin );
                 }
             }
@@ -3058,6 +3071,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             else if ( regionId > 0l ) {
                 LOG.debug( "assigning individual(s) to region :" + regionId + " in addIndividual" );
                 for ( User assigneeUser : assigneeUsers ) {
+                    if( !validateUserAssignment( adminUser, assigneeUser, userMap ) ){
+                        continue;
+                    }
                     assignRegionToUser( adminUser, regionId, assigneeUser, isAdmin );
                 }
             }
@@ -3071,6 +3087,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     throw new NoRecordsFetchedException( "No default region found for company while adding individual" );
                 }
                 for ( User assigneeUser : assigneeUsers ) {
+                    if( !validateUserAssignment( adminUser, assigneeUser, userMap ) ){
+                        continue;
+                    }
                     assignRegionToUser( adminUser, region.getRegionId(), assigneeUser, isAdmin );
                 }
             }
@@ -3079,6 +3098,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method addNewIndividual executed successfully" );
         if ( userMap != null ) {
             map.put( CommonConstants.INVALID_USERS_LIST, userMap.get( CommonConstants.INVALID_USERS_LIST ) );
+            map.put( CommonConstants.INVALID_USERS_ASSIGN_LIST, userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ) );
             map.put( CommonConstants.VALID_USERS_LIST, userMap.get( CommonConstants.VALID_USERS_LIST ) );
         }
         return map;
@@ -6397,6 +6417,39 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
         return setterValue;
+    }
+
+
+    boolean validateUserAssignment( User adminUser, User assigneeUser, Map<String, List<User>> userMap )
+    {
+        LOG.info( "Method to check user assignment is possible for " + assigneeUser + ", validateUserAssignment called" );
+
+        boolean success = true;
+        if ( adminUser == null ) {
+            LOG.error( "adminUser passed in argument is empty, hence user assignment not possible" );
+            success = false;
+        }
+
+        if ( assigneeUser == null ) {
+            LOG.error( "assigneeUser passed in argument is empty, hence user assignment not possible" );
+            success = false;
+        }
+        if ( adminUser.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId() ) {
+            LOG.error( assigneeUser.getEmailId() + " already exist and belongs to a different company than the user in session" );
+            success = false;
+        }
+
+        if ( !success ) {
+            List<User> invalidUserAssignList = userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST );
+            if ( invalidUserAssignList == null ) {
+                invalidUserAssignList = new ArrayList<User>();
+            }
+            invalidUserAssignList.add( assigneeUser );
+            userMap.put( CommonConstants.INVALID_USERS_ASSIGN_LIST, invalidUserAssignList );
+        }
+
+        LOG.info( "Method to check user assignment is possible for " + assigneeUser + ", validateUserAssignment called" );
+        return success;
     }
 }
 // JIRA: SS-27: By RM05: EOC

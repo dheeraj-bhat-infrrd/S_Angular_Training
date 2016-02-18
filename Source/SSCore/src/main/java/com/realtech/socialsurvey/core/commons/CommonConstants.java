@@ -765,6 +765,8 @@ public interface CommonConstants
 
     public static final String INVALID_USERS_LIST = "invalidUsersList";
 
+    public static final String INVALID_USERS_ASSIGN_LIST = "invalidUsersAssignList";
+
     public static final String BRANCH_OBJECT = "branch";
 
     public static final String REGION_OBJECT = "region";
