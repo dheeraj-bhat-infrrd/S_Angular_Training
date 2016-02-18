@@ -1998,7 +1998,7 @@ var hierarchyUpload={
 								var formData = new FormData();
 								formData.append("fileUrl", url);
 								showOverlay();
-								callAjaxPOSTWithTextDataLogo("./verifyxlsxfile.do",
+								callAjaxPOSTWithTextDataUpload("./verifyxlsxfile.do",
 										hierarchyUpload.uploadXlxsSuccessCallback, true, formData);
 								hierarchyUpload.verified=false;
 							}
