@@ -391,7 +391,7 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	if(source != undefined && source == "Zillow"){
 		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml+="<div class='verified-badge float-left verify-image' ></div>";
+		ratingImgHtml+="<div class='verified-badge float-left verify-image' title='Click here to know more'></div>";
 		ratingImgHtml += "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";	
 		
 	}
@@ -407,6 +407,9 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	ratingParent.html('');
 	ratingParent.append(ratingImgHtml).append(ratingValHtml);
 }
+$(document).on('click','.verified-badge',function(e){
+	window.open("https://socialsurvey.zendesk.com/hc/en-us/articles/216454118-Added-Verified-Customer-badge");
+});
 
 /**
  * function for adding delay to a function call
