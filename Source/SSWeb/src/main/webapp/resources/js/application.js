@@ -4908,15 +4908,15 @@ $('body').click(function() {
 });
 
 //Linked In Import
-function authenticate(socialNetwork) {
-	openAuthPage(socialNetwork);
+function authenticate(event,socialNetwork) {
+	openAuthPage(event,socialNetwork);
 	payload = {
 		'socialNetwork' : socialNetwork
 	};
 }
 
-function authenticateZillow() {
-	openAuthPageZillow();
+function authenticateZillow(event) {
+	openAuthPageZillow(event);
 }
 
 // update yelp profile url
@@ -9995,6 +9995,7 @@ function saveZillowEmailAddress() {
 		if(data && data == "success") {
 			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
             loadSocialMediaUrlInSettingsPage();
+            loadSocialMediaUrlInPopup();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {

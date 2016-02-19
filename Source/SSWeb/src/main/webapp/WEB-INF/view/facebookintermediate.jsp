@@ -118,6 +118,7 @@ $(document).ready(function() {
 			complete :function(e){
 				enable(this);
 				parentWindow.loadSocialMediaUrlInSettingsPage();
+				parentWindow.loadSocialMediaUrlInPopup();
 				checkIfFacebookSet = true;
 				setTimeout(function() {
 					window.close();
