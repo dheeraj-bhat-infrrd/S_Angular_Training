@@ -10167,15 +10167,29 @@ function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 	
 	$('#overlay-header').html("Confirm user Authentication");
 	$("#overlay-text").html(message);
-	$('#overlay-continue').html("Ok").click(function() {
+	$('#overlay-continue').html("Ok");
+	$('#overlay-continue').attr("onclick", "");
+
+	$('#overlay-continue').click(function() {
 		if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
 			$('#overlay-main').hide();
+			$('#overlay-continue').unbind('click');
 			callBackFunction();
 		}
 	});
+	
+	
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-main').show();
 };
+
+
+function confirmSocialAuthOk(callBackFunction){
+	if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
+		$('#overlay-main').hide();
+		callBackFunction();
+	}
+}
 
 	/*
 	 * callAjaxGET("./sendsurveyinvitation.do", function(data) {
