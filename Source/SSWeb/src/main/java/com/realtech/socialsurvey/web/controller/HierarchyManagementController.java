@@ -552,27 +552,21 @@ public class HierarchyManagementController {
 
                     if ( invalidUserAssignList.size() < 2 ) {
                         invalidUserAssignMessage = "This email address " + emailaddressses
-                            + " is not available for account creation";
+                            + " is" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
                     } else {
                         invalidUserAssignMessage = invalidUserAssignMessage + emailaddressses
-                            + " are not available for account creation";
+                            + " are" +  CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
                     }
                 }
                 DisplayMessage message = messageUtils.getDisplayMessage( DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE );
 
-                if ( invalidMessage.endsWith( "are invalid" ) ) {
-                    message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
-                    message.setType( DisplayMessageType.ERROR_MESSAGE );
-                } else if ( invalidMessage.endsWith( "is invalid" ) ) {
+                if ( invalidMessage.endsWith( "invalid" ) ) {
                     message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
                     message.setType( DisplayMessageType.ERROR_MESSAGE );
                 }
 
-                if ( invalidUserAssignMessage.contains( "are not available" ) ) {
-                    message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
-                    message.setType( DisplayMessageType.ERROR_MESSAGE );
-                } else if ( invalidUserAssignMessage.contains( "is not available" ) ) {
+                if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
                     message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
                     message.setType( DisplayMessageType.ERROR_MESSAGE );
                 }
@@ -746,28 +740,22 @@ public class HierarchyManagementController {
 
                     if ( invalidUserAssignList.size() < 2 ) {
                         invalidUserAssignMessage = "This email address " + emailaddressses
-                            + " is not available for account creation";
+                            + " is" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
                     } else {
                         invalidUserAssignMessage = invalidUserAssignMessage + emailaddressses
-                            + " are not available for account creation";
+                            + " are" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
                     }
                 }
                 addOrUpdateBranchInSession( branch, session );
                 DisplayMessage message = messageUtils.getDisplayMessage( DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE );
 
-                if ( invalidMessage.endsWith( "are invalid" ) ) {
-                    message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
-                    message.setType( DisplayMessageType.ERROR_MESSAGE );
-                } else if ( invalidMessage.endsWith( "is invalid" ) ) {
+                if ( invalidMessage.endsWith( "invalid" ) ) {
                     message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
                     message.setType( DisplayMessageType.ERROR_MESSAGE );
                 }
 
-                if ( invalidUserAssignMessage.contains( "are not available" ) ) {
-                    message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
-                    message.setType( DisplayMessageType.ERROR_MESSAGE );
-                } else if ( invalidUserAssignMessage.contains( "is not available" ) ) {
+                if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
                     message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
                     message.setType( DisplayMessageType.ERROR_MESSAGE );
                 }
@@ -839,7 +827,12 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 
-			String[] assigneeEmailIds = validateAndParseIndividualDetails(user, selectedUserId, selectedUserEmail);
+            try {
+                validateAndParseIndividualDetails( user, selectedUserId, selectedUserEmail );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException while parsing email ids", DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+			String[] assigneeEmailIds = parseEmailIdsIntoArray( selectedUserEmail );
 
 			long regionId = 0l;
 			try {
@@ -914,10 +907,10 @@ public class HierarchyManagementController {
 
                     if ( invalidUserAssignList.size() < 2 ) {
                         invalidUserAssignMessage = "This email address " + emailaddressses
-                            + " is not available for account creation";
+                            + " is" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
                     } else {
                         invalidUserAssignMessage = invalidUserAssignMessage + emailaddressses
-                            + " are not available for account creation";
+                            + " are" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
                     }
                 }
                 LOG.debug( "Successfully executed service to add/assign an invidual(s)" );
@@ -927,38 +920,35 @@ public class HierarchyManagementController {
                     message = messageUtils.getDisplayMessage( DisplayMessageConstants.INDIVIDUAL_ADDITION_SUCCESSFUL,
                         DisplayMessageType.SUCCESS_MESSAGE );
                 } else {
-                    if ( invalidMessage.endsWith( "are invalid" ) ) {
-                        message = messageUtils
-                            .getDisplayMessage(
-                                ( invalidUserList != null && invalidUserList.size() < assigneeEmailIds.length ? DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_SUCCESSFUL
-                                    : "#" ), DisplayMessageType.ERROR_MESSAGE );
-                        message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
+                    int invalidAddressCount = 0;
+                    if ( invalidUserList != null && invalidUserList.size() > 0 ) {
+                        invalidAddressCount = invalidUserList.size();
                     }
-                    if ( invalidMessage.endsWith( "is invalid" ) ) {
-                        message = new DisplayMessage( invalidMessage, DisplayMessageType.ERROR_MESSAGE );
+                    if ( invalidUserAssignList != null && invalidUserAssignList.size() > 0 ) {
+                        invalidAddressCount += invalidUserAssignList.size();
                     }
-                    if ( invalidUserAssignMessage.contains( "are not available" ) ) {
-                        if ( message == null ) {
-                            message = messageUtils
-                                .getDisplayMessage(
-                                    ( invalidUserAssignList != null && invalidUserAssignList.size() < assigneeEmailIds.length ? DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_SUCCESSFUL
-                                        : "#" ), DisplayMessageType.ERROR_MESSAGE );
-                        }
-                        message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
-                        message.setType( DisplayMessageType.ERROR_MESSAGE );
-                    }
-                    if ( invalidUserAssignMessage.contains( "is not available" ) ) {
-                        if ( message == null ) {
-                            message = new DisplayMessage( invalidUserAssignMessage, DisplayMessageType.ERROR_MESSAGE );
-                        } else {
-                            message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
-                            message.setType( DisplayMessageType.ERROR_MESSAGE );
-                        }
-                    }
-                    if ( !invalidMessage.contains( "invalid" ) && !invalidUserAssignMessage.contains( "not available" ) ) {
+                    if ( invalidAddressCount < assigneeEmailIds.length ) {
                         message = messageUtils
                             .getDisplayMessage( DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_SUCCESSFUL,
                                 DisplayMessageType.SUCCESS_MESSAGE );
+                    } else {
+                        message = new DisplayMessage( "", DisplayMessageType.ERROR_MESSAGE );
+                    }
+                    if ( invalidMessage.endsWith( "invalid" ) ) {
+                        message.setType( DisplayMessageType.ERROR_MESSAGE );
+                        if ( !message.getMessage().trim().isEmpty() ) {
+                            message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
+                        } else {
+                            message.setMessage( invalidMessage );
+                        }
+                    }
+                    if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
+                        message.setType( DisplayMessageType.ERROR_MESSAGE );
+                        if ( !message.getMessage().trim().isEmpty() ) {
+                            message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
+                        } else {
+                            message.setMessage( invalidUserAssignMessage );
+                        }
                     }
                 }
 
@@ -977,7 +967,7 @@ public class HierarchyManagementController {
             sessionHelper.processAssignments( session, user );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding an individual. Reason : " + e.getMessage(), e );
-            model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message", new DisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Successfully completed controller to add an individual" );
@@ -2089,7 +2079,8 @@ public class HierarchyManagementController {
 
 			// Tokenizing the string input per individual
 			List<String> inputTokens = new ArrayList<String>();
-			StringTokenizer tokenizerIndiv = new StringTokenizer(selectedUserEmail, ",|;|\n");
+			selectedUserEmail = selectedUserEmail.replaceAll( ";|\\||\n|\r", "," ).replaceAll(",{2,}",",");
+			StringTokenizer tokenizerIndiv = new StringTokenizer(selectedUserEmail, ",");
 			while (tokenizerIndiv.hasMoreTokens()) {
 				String inputToken = tokenizerIndiv.nextToken();
 				if (tokenizerIndiv.countTokens() == 1 && (inputToken == null || inputToken.isEmpty())) {
