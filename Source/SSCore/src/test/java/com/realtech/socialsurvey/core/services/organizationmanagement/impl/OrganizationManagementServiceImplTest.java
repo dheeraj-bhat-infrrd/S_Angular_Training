@@ -7,8 +7,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -2318,5 +2320,57 @@ public class OrganizationManagementServiceImplTest
         userList.add( user );
         Mockito.when( userManagementService.getBranchById( Mockito.anyLong() ) ).thenReturn( new Branch() );
         organizationManagementServiceImpl.updateRegionIdForUsers( userList, 1l, 1l, 1l );
+    }
+
+
+    @Test
+    public void testValidateUserAssignmentWithNullAdminUser()
+    {
+        assertFalse( "User Assignment Validation result is not as expected",
+            organizationManagementServiceImpl.validateUserAssignment( null, null, new HashMap<String, List<User>>() ) );
+    }
+
+
+    @Test
+    public void testValidateUserAssignmentWithNullAssigneeUser()
+    {
+        assertFalse( "User Assignment Validation result is not as expected",
+            organizationManagementServiceImpl.validateUserAssignment( new User(), null, new HashMap<String, List<User>>() ) );
+    }
+
+
+    @Test
+    public void testValidateUserAssignmentWhenAdminUserAndAssigneeUserBelongToSameCompany()
+    {
+        User adminUser = new User();
+        User assigneeUser = new User();
+        Company company = new Company();
+        adminUser.setCompany( company );
+        assigneeUser.setCompany( company );
+        Map<String, List<User>> userMap = new HashMap<String, List<User>>();
+        assertTrue( "User assignment validation result is not as expected",
+            organizationManagementServiceImpl.validateUserAssignment( adminUser, assigneeUser, userMap ) );
+        assertTrue( "Invalid user assignment found", userMap.size() == 0 );
+    }
+
+
+    @Test
+    public void testValidateUserAssignmentWhenAdminUserAndAssigneeUserBelongToDifferentCompany()
+    {
+        User adminUser = new User();
+        User assigneeUser = new User();
+        Company company1 = new Company();
+        Company company2 = new Company();
+        company1.setCompanyId( 1 );
+        company2.setCompanyId( 2 );
+        adminUser.setCompany( company1 );
+        assigneeUser.setCompany( company2 );
+        assigneeUser.setEmailId( TestConstants.TEST_MAIL_ID_STRING );
+        Map<String, List<User>> userMap = new HashMap<String, List<User>>();
+        assertFalse( "User assignment validation result is not as expected",
+            organizationManagementServiceImpl.validateUserAssignment( adminUser, assigneeUser, userMap ) );
+        assertTrue( "Invalid user assignment not found", userMap.size() != 0 && !userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ).isEmpty() );
+        assertEquals( "Invalid user assignment email id is not same as assignee user email id passed as argument",
+            userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ).get( 0 ).getEmailId(), assigneeUser.getEmailId() );
     }
 }

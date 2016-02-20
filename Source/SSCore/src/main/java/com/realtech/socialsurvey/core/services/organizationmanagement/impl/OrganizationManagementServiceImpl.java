@@ -6427,12 +6427,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         boolean success = true;
         if ( adminUser == null ) {
             LOG.error( "adminUser passed in argument is empty, hence user assignment not possible" );
-            success = false;
+            return false;
         }
 
         if ( assigneeUser == null ) {
             LOG.error( "assigneeUser passed in argument is empty, hence user assignment not possible" );
-            success = false;
+            return false;
         }
         if ( adminUser.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId() ) {
             LOG.error( assigneeUser.getEmailId() + " already exist and belongs to a different company than the user in session" );
