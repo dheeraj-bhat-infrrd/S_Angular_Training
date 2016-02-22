@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -221,5 +223,10 @@ public class Utils
         }
         LOG.debug( "Encoding of text ended." );
         return text;
+    }
+    
+    public String generateRandomAlphaNumericString(){
+        SecureRandom random = new SecureRandom();
+        return new BigInteger(40, random).toString(20);
     }
 }

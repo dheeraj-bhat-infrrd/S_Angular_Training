@@ -159,6 +159,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		urlParams.put(CommonConstants.EMAIL_ID, loginName);
 		urlParams.put(CommonConstants.COMPANY, companyId + "");
 		urlParams.put(NAME, name);
+		urlParams.put( CommonConstants.URL_PARAM_RESET_PASSWORD, CommonConstants.URL_PARAM_RESETORSET_VALUE_RESET );
 
 		LOG.info("Generating URL");
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD);
