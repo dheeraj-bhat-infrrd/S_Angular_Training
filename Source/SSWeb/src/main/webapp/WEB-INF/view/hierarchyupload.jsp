@@ -71,41 +71,45 @@
 		</div>
 	</div>
 </div>
+<div id="no-data" style="width:120px;margin:auto;color:#009FE0;font-size: 30px;" class="hide">No Changes Made </div>
 
 <div class="container hide" id="summary" style="margin-top: 10px;">
 
 	<!-- Nav tabs -->
 	<ul class="nav nav-tabs" role="tablist">
-		<li class="active"><a href="#upload-summery-region"
+		<li id="region-sum-btn" class="active" style="display:none !important"><a href="#upload-summary-region"
 			data-toggle="tab"> Regions </a></li>
-		<li><a href="#upload-summery-branch" data-toggle="tab">
+		<li id="branch-sum-btn" style="display:none !important"><a href="#upload-summary-branch" data-toggle="tab">
 				Branches </a></li>
-		<li><a href="#upload-summery-user" data-toggle="tab"> Users
+		<li id="user-sum-btn" style="display:none !important"><a href="#upload-summary-user" data-toggle="tab"> Users
 		</a></li>
 
 	</ul>
-
+	
 	<!-- Tab panes -->
 	<div class="tab-content">
-		<div class="tab-pane fade active in" id="upload-summery-region"
+		<div class="tab-pane fade active in" id="upload-summary-region"
 			style="overflow: auto; max-height: 500px;">
 			<h2 style="color: #666;">Region Summary</h2>
 			<div class="clearfix">
-				<div id="region-summary" class="float-left"></div>
-				<div id="region-errors" class="float-left"></div>
-				<div id="region-warnings" class="float-left"></div>
+				<div id="region-added" class="float-left hide"></div>
+				<div id="region-modified" class="float-left hide"></div>
+				<div id="region-deleted" class="float-left hide"></div>
 			</div>
 			<table class="table">
 				<thead>
 					<tr>
 					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Serial No.
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Edit
+							</th>
+					<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Serial&nbsp;No.
 							</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Region
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Region
 							ID</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Region
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Region
 							Name</th>
 							
 					</tr>
@@ -113,88 +117,92 @@
 				<tbody id="region-upload"></tbody>
 			</table>
 		</div>
-		<div class="tab-pane fade" id="upload-summery-branch"
+		<div class="tab-pane fade" id="upload-summary-branch"
 			style="overflow: auto; max-height: 500px;">
 			<h2 style="color: #666;">Branch Summary</h2>
 			<div class="clearfix">
-				<div id="branch-summary" class="float-left"></div>
-				<div id="branch-errors" class="float-left"></div>
-				<div id="branch-warnings" class="float-left"></div>
+				<div id="branch-added" class="float-left"></div>
+				<div id="branch-modified" class="float-left"></div>
+				<div id="branch-deleted" class="float-left"></div>
 			</div>
 			<table class="table">
 				<thead>
 					<tr>
 					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Serial No.
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Edit
+							</th>
+					<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Serial&nbsp;No.
 							</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Branch
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Branch
 							ID</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Branch
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Branch
 							Name</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Region
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Region
 							ID</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Address
-							1</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Address&nbsp;1</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Address
-							2</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Address&nbsp;2</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">City</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">City</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">State</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">State</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Zip</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Zip</th>
 					</tr>
 				</thead>
 				<tbody id="branch-upload"></tbody>
 			</table>
 		</div>
-		<div class="tab-pane fade" id="upload-summery-user"
+		<div class="tab-pane fade" id="upload-summary-user"
 			style="overflow: auto; max-height: 500px;">
 			<h2 style="color: #666;">User Summary</h2>
 			<div class="clearfix">
-				<div id="user-summary" class="float-left"></div>
-				<div id="user-errors" class="float-left"></div>
-				<div id="user-warnings" class="float-left"></div>
+				<div id="user-added" class="float-left"></div>
+				<div id="user-modified" class="float-left"></div>
+				<div id="user-deleted" class="float-left"></div>
 			</div>
 			<table class="table">
 				<thead>
 					<tr>
 					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Serial No.
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Edit
+							</th>
+					<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Serial&nbsp;No.
 							</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">User
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">User
 							ID</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">First
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">First
 							Name</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Last
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Last
 							Name</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Title</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Title</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Office
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Office
 							Assignment(s)</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Region
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Region
 							Assignment(s)</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Office
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Office
 							Admin Privilege</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Email</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Email</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Phone</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Phone</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">Website</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Website</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;">License</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">License</th>
 					</tr>
 				</thead>
 				<tbody id="user-upload"></tbody>

@@ -5809,6 +5809,10 @@ tr.u-tbl-header td {
 	background: url('../images/edit-1.png') no-repeat center;
 	cursor: pointer;
 }
+.v-hiararchy-edit{
+	background: url('../images/edit-1.png') no-repeat center;
+	cursor: pointer;
+}
 
 .v-icn-wid {
 	background: url(../images/generate_widget.png) no-repeat center;
@@ -8278,4 +8282,10 @@ label.url-change-input-label {
     text-align: center;
     padding: 10px;
 }
-
+.hier-upload-td{
+	width: 80px;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+    margin: auto;
+}
