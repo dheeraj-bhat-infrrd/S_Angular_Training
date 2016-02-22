@@ -1951,215 +1951,381 @@ function initializeUserCompanyRegistrationPage() {
 		}
 	});
 }
-var hierarchyUpload={
-		verified:false,
-		
-		fileUpload:function(){
-			$('#com-file').change(
-		
-				function() {
-					var fileAdd = $(this).val().split('\\');
-					$('#com-xlsx-file').val(
-							fileAdd[fileAdd.length - 1]);
-					if (hierarchyUpload.fileValidate("#com-file")) {
-						hierarchyUpload.verified =true;
-					}
-					
-					if(hierarchyUpload.verified==false){
-						showError("Please upload xlsx file");
-					}
-					
-					if (hierarchyUpload.verified == true) {
-						var formData = new FormData();
-						formData.append("file", $('#com-file')
-								.prop("files")[0]);
-						formData
-								.append("filename", $(
-										'#com-file').prop(
-										"files")[0].name);
-						showOverlay();
-						callAjaxPOSTWithTextDataLogo("./savexlsxfile.do",
-								hierarchyUpload.saveXlxsSuccessCallback, true, formData); 
-						hierarchyUpload.verified=false;
-					}
-					
-					else{
-						showError("Please select a valid file");
-					}
-				});
-
-		
-				$('#xlsx-file-verify').click(
-						function() {
-							var url = $("#fileUrl").val();
-							if (url == undefined || url == '') {
-								showError("Please upload a valid file");
-							} else {
-								var formData = new FormData();
-								formData.append("fileUrl", url);
-								showOverlay();
-								callAjaxPOSTWithTextDataLogo("./verifyxlsxfile.do",
-										hierarchyUpload.uploadXlxsSuccessCallback, true, formData);
-								hierarchyUpload.verified=false;
-							}
-						});
-				$('#xlsx-file-upload').click(
-						function() {
-							/*if (hierarchyUpload.verified == true) {
-								var formData = new FormData();
-								formData.append("logo", $('#com-file')
-										.prop("files")[0]);
-								formData
-										.append("logo_name", $(
-												'#com-file').prop(
-												"files")[0].name);
-								callAjaxPOSTWithTextDataLogo("./uploadxlsxfile.do",
-										hierarchyUpload.uploadXlxsSuccessCallback, true, formData); 
-								hierarchyUpload.verified=false;
-							}
-							else{
-								showError("File is not verified");
-							}
-							*/
-						});
-				$('#icn-xlsxfile').click(function() {
-					$('#com-file').trigger('click');
-				});
-		},
-		fixStr:function (key) {
-		    var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
-		        if (offset == 0) {
-		            return(key.toUpperCase());
-		        } else {
-		            return(key.substr(0,1) + " " + key.substr(1).toUpperCase());
-		        }
-		    });
-		    return(out);
-		},
-		uploadXlxsSuccessCallback:function(response){
-        if (!response) {
-				$('#com-file').val('');
-				$('#com-xlsx-file').val('');
-				$('#fileUrl').val('');
-				showError(response);
-			} else {
-				$.each($.parseJSON(response),function(key,value){
-					if(key=='numberOfRegionsAdded'||key=='numberOfRegionsModified'||key=='numberOfRegionsDeleted'){
-						if(value!=0){
-							$('<div  style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#region-summary');
-						
-						}
-					}
-					else if(key=='numberOfBranchesAdded'||key=='numberOfBranchesModified'||key=='numberOfBranchesDeleted'){
-						if(value!=0){
-							$('<div  style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#branch-summary');
-						}
-					}
-					else if(key=='numberOfUsersAdded'||key=='numberOfUsersModified'||key=='numberOfUsersDeleted'){
-						if(value!=0){
-							$('<div  style="margin-left:10px;color:#009FE0;">'+hierarchyUpload.fixStr(key)+':'+value+'</div>').appendTo('#user-summary');
-						}
-					}
-					$('#summary').show();
-				});
-				
-					var regionerror=$.parseJSON(response).regionValidationErrors.length;
-					if(regionerror!=0){
-					for(var i=0;i<regionerror;i++){
-						$('<div  style="margin-left:10px;color:#FF3400;">'+$.parseJSON(response).regionValidationErrors[i]+'</div>').appendTo('#region-errors');
-					}
-					}
-					var brancherror=$.parseJSON(response).branchValidationErrors.length;
-					if(brancherror!=0){
-					for(var i=0;i<brancherror;i++){
-						$('<div  style="margin-left:10px;color:#FF3400;">'+$.parseJSON(response).branchValidationErrors[i]+'</div>').appendTo('#branch-errors');
-					}
-					}
-					var usererror=$.parseJSON(response).userValidationErrors.length;
-					if(usererror!=0){
-						for(var i=0;i<usererror;i++){
-							$('<div  style="margin-left:10px;color:#FF3400;">'+$.parseJSON(response).userValidationErrors[i]+'</div>').appendTo('#user-errors');
-						}
-				    }
-					/*var regionwarnings=$.parseJSON(response).regionValidationWarnings.length;
-					if(regionwarnings!=0){
-						for(var i=0;i<regionwarnings;i++){
-							$('<div class="float-left" style="margin-left:10px;color:#F9C42A;">'+$.parseJSON(response).regionValidationWarnings[i]+'</div>').appendTo('#branch-warnings');
-						}
-				    }*/
-					var branchwarnings=$.parseJSON(response).branchValidationWarnings.length;
-					if(branchwarnings!=0){
-						for(var i=0;i<branchwarnings;i++){
-							$('<div  style="margin-left:10px;color:#F9C42A;">'+$.parseJSON(response).branchValidationWarnings[i]+'</div>').appendTo('#branch-warnings');
-						}
-				    }
-					var userwarnings=$.parseJSON(response).userValidationWarnings.length;
-					if(userwarnings!=0){
-						for(var i=0;i<userwarnings;i++){
-							$('<div  style="margin-left:10px;color:#F9C42A;">'+$.parseJSON(response).userValidationWarnings[i]+'</div>').appendTo('#user-warnings');
-						}
-				    }
-				
-				var regionlength=$.parseJSON(response).upload.regions.length;
-				for(var i=0;i<regionlength;i++){
-					$('<tr><td>'+$.parseJSON(response).upload.regions[i].rowNum+'</td><td>'+$.parseJSON(response).upload.regions[i].sourceRegionId+'</td><td>'+$.parseJSON(response).upload.regions[i].regionName+'</td></tr>').appendTo('#region-upload');
-				}
-				var branchlength=$.parseJSON(response).upload.branches.length;
-				for(var i=0;i<branchlength;i++){
-					$('<tr><td>'+$.parseJSON(response).upload.branches[i].rowNum+'</td><td>'+$.parseJSON(response).upload.branches[i].sourceBranchId+'</td><td>'+$.parseJSON(response).upload.branches[i].branchName+'</td><td>'+$.parseJSON(response).upload.branches[i].sourceRegionId+'</td><td>'+$.parseJSON(response).upload.branches[i].branchAddress1+'</td><td>'+$.parseJSON(response).upload.branches[i].branchAddress2+'</td><td>'+$.parseJSON(response).upload.branches[i].branchState+'</td><td>'+$.parseJSON(response).upload.branches[i].branchCity+'</td><td>'+$.parseJSON(response).upload.branches[i].branchZipcode+'</td></tr>').appendTo('#branch-upload');
-				}
-				var userlength=$.parseJSON(response).upload.users.length;
-				for(var i=0;i<userlength;i++){
-					$('<tr><td>'+$.parseJSON(response).upload.users[i].rowNum+'</td><td>'+$.parseJSON(response).upload.users[i].sourceUserId+'</td><td>'+$.parseJSON(response).upload.users[i].firstName+'</td><td>'+$.parseJSON(response).upload.users[i].lastName+'</td><td>'+$.parseJSON(response).upload.users[i].title+'</td><td>'+$.parseJSON(response).upload.users[i].sourceBranchId+'</td><td>'+$.parseJSON(response).upload.users[i].sourceRegionId+'</td><td>'+$.parseJSON(response).upload.users[i].assignedBranchesAdmin+'</td><td>'+$.parseJSON(response).upload.users[i].emailId+'</td><td>'+$.parseJSON(response).upload.users[i].phoneNumber+'</td><td>'+$.parseJSON(response).upload.users[i].websiteUrl+'</td><td>'+$.parseJSON(response).upload.users[i].license+'</td><td></tr>').appendTo('#user-upload');
-				}
-				
-			
-				}
-			
-		},
-		
-		saveXlxsSuccessCallback:function(response){
-			if(!response){
-				$('#com-file').val('');
-				$('#com-xlsx-file').val('');
-				showError("Error saving the file");
-			} else {
-				var jsonResponse = $.parseJSON(response);
-				if(jsonResponse.status){
-					showInfo("Successfully saved the file");
-					$("#fileUrl").val(jsonResponse.response);
-				} else {
-					showError("Error : " + jsonResponse.response);
-				}
-			}
-			
-		},
-		fileValidate:function(fileformat){
-			var fileExtensions = ".xlsx";
-			if ($(fileformat).attr("type") == "file") {
-				var FileName = $(fileformat).val();
-				if (FileName.length > 0) {
-					var blnValid = false;
-					if (FileName.substr(
-							FileName.length
-									- fileExtensions.length,
-							fileExtensions.length)
-							.toLowerCase() == fileExtensions
-							.toLowerCase()) {
-						blnValid = true;
-					}
-				}
-				if (!blnValid) {
-					var msg = "Please upload xlsx file";
-					showErrorMobileAndWeb(msg);
-					$(fileformat).val = "";
-
-					return false;
-				}
-			}
-			return true;
+var hierarchyUpload = {
+	verified : false,
+	hierundefined : function(hierval) {
+		if (hierval == undefined) {
+			return "";
 		}
-		
+		return hierval;
+	},
+
+	fileUpload : function() {
+		$('#com-file')
+				.change(
+
+						function() {
+							var fileAdd = $(this).val().split('\\');
+							$('#com-xlsx-file')
+									.val(fileAdd[fileAdd.length - 1]);
+							if (hierarchyUpload.fileValidate("#com-file")) {
+								hierarchyUpload.verified = true;
+							}
+
+							if (hierarchyUpload.verified == false) {
+								showError("Please upload xlsx file");
+							}
+
+							if (hierarchyUpload.verified == true) {
+								var formData = new FormData();
+								formData.append("file", $('#com-file').prop(
+										"files")[0]);
+								formData.append("filename", $('#com-file')
+										.prop("files")[0].name);
+								showOverlay();
+								callAjaxPOSTWithTextDataLogo(
+										"./savexlsxfile.do",
+										hierarchyUpload.saveXlxsSuccessCallback,
+										true, formData);
+								hierarchyUpload.verified = false;
+							}
+
+							else {
+								showError("Please select a valid file");
+							}
+						});
+
+		$('#xlsx-file-verify').click(
+				function() {
+					var url = $("#fileUrl").val();
+					if (url == undefined || url == '') {
+						showError("Please upload a valid file");
+					} else {
+						var formData = new FormData();
+						formData.append("fileUrl", url);
+						showOverlay();
+						callAjaxPOSTWithTextDataLogo("./verifyxlsxfile.do",
+								hierarchyUpload.uploadXlxsSuccessCallback,
+								true, formData);
+						hierarchyUpload.verified = false;
+					}
+				});
+		$('#xlsx-file-upload').click(function() {
+			/*
+			 * if (hierarchyUpload.verified == true) { var formData = new
+			 * FormData(); formData.append("logo", $('#com-file')
+			 * .prop("files")[0]); formData .append("logo_name", $(
+			 * '#com-file').prop( "files")[0].name);
+			 * callAjaxPOSTWithTextDataLogo("./uploadxlsxfile.do",
+			 * hierarchyUpload.uploadXlxsSuccessCallback, true, formData);
+			 * hierarchyUpload.verified=false; } else{ showError("File is not
+			 * verified"); }
+			 */
+		});
+		$('#icn-xlsxfile').click(function() {
+			$('#com-file').trigger('click');
+		});
+	},
+	fixStr : function(key) {
+		var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
+			if (offset == 0) {
+				return (key.toUpperCase());
+			} else {
+				return (key.substr(0, 1) + " " + key.substr(1).toUpperCase());
+			}
+		});
+		return (out);
+	},
+	uploadXlxsSuccessCallback : function(response) {
+		if (!response) {
+			$('#com-file').val('');
+			$('#com-xlsx-file').val('');
+			$('#fileUrl').val('');
+			showError(response);
+		} else {
+			var hierarchyjson = $.parseJSON(response);
+
+			if (hierarchyjson.numberOfRegionsAdded != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of regions added:'
+								+ hierarchyjson.numberOfRegionsAdded + '</div>')
+						.appendTo('#region-added');
+				$('#region-added').show();
+			}
+			if (hierarchyjson.numberOfRegionsModified != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of regions modified:'
+								+ hierarchyjson.numberOfRegionsModified
+								+ '</div>').appendTo('#region-modified');
+				$('#region-modified').show();
+			}
+			if (hierarchyjson.numberOfRegionsDeleted != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of regions deleted:'
+								+ hierarchyjson.numberOfRegionsDeleted
+								+ '</div>').appendTo('#region-deleted');
+				$('#region-deleted').show();
+			}
+			if (hierarchyjson.numberOfBranchesAdded != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of branches added:'
+								+ hierarchyjson.numberOfBranchesAdded
+								+ '</div>').appendTo('#branch-added');
+				$('#region-deleted').show();
+			}
+			if (hierarchyjson.numberOfBranchesModified != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of branches modified:'
+								+ hierarchyjson.numberOfBranchesModified
+								+ '</div>').appendTo('#branch-modified');
+				$('#region-deleted').show();
+			}
+			if (hierarchyjson.numberOfBranchesDeleted != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of branches deleted:'
+								+ hierarchyjson.numberOfBranchesDeleted
+								+ '</div>').appendTo('#branch-deleted');
+				$('#region-deleted').show();
+			}
+			if (hierarchyjson.numberOfUsersAdded != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of users added:'
+								+ hierarchyjson.numberOfUsersAdded + '</div>')
+						.appendTo('#user-added');
+				$('#region-deleted').show();
+			}
+			if (hierarchyjson.numberOfUsersModified != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of users modified:'
+								+ hierarchyjson.numberOfUsersModified
+								+ '</div>').appendTo('#user-modified');
+				$('#region-deleted').show();
+			}
+			if (hierarchyjson.numberOfUsersDeleted != 0) {
+				$(
+						'<div style="color:#009FE0;">Number of users deleted:'
+								+ hierarchyjson.numberOfUsersDeleted + '</div>')
+						.appendTo('#user-deleted');
+				$('#region-deleted').show();
+			}
+			var regionlength = hierarchyjson.upload.regions.length;
+			if (regionlength != 0) {
+				for (var i = 0; i < regionlength; i++) {
+					if (hierarchyjson.upload.regions[i].isErrorRecord == true) {
+						var color = '#E57C66';
+
+					} else if (hierarchyjson.upload.regions[i].isWarningRecord == true) {
+						var color = '#EC971F';
+
+					} else if (hierarchyjson.upload.regions[i].isRegionAdded == true) {
+						var color = '#95E566';
+
+					} else if (hierarchyjson.upload.regions[i].isDeletedRecord == true) {
+						var color = '#F78181';
+
+					} else if (hierarchyjson.upload.regions[i].isRegionModified == true) {
+						var color = '#009FE0';
+
+					} else {
+						var color = '#666';
+					}
+					$(
+							'<tr style="color:'
+									+ color
+									+ ';height:35px;"><td class="v-hiararchy-edit" title="Edit"></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].rowNum)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].sourceRegionId)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionName)
+									+ '</div></td></tr>').appendTo(
+							'#region-upload');
+				}
+				$('#region-sum-btn').show();
+				$('#summary').show();
+			}
+			var branchlength = hierarchyjson.upload.branches.length;
+			if (branchlength != 0) {
+				for (var i = 0; i < branchlength; i++) {
+					if (hierarchyjson.upload.branches[i].isErrorRecord == true) {
+						var color = '#E57C66';
+
+					} else if (hierarchyjson.upload.branches[i].isWarningRecord == true) {
+						var color = '#EC971F';
+
+					} else if (hierarchyjson.upload.branches[i].isBranchAdded == true) {
+						var color = '#95E566';
+
+					} else if (hierarchyjson.upload.branches[i].isDeletedRecord == true) {
+						var color = '#F78181';
+
+					} else if (hierarchyjson.upload.branches[i].isBranchModified == true) {
+						var color = '#009FE0';
+
+					} else {
+						var color = '#666';
+					}
+					$(
+							'<tr style="color:'
+									+ color
+									+ ';height:35px;"><td class="v-hiararchy-edit" title="Edit"></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].rowNum)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].sourceBranchId)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].branchName)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].sourceRegionId)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].branchAddress1)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].branchAddress2)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].branchState)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].branchCity)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.branches[i].branchZipcode)
+									+ '</div></td></tr>').appendTo(
+							'#branch-upload');
+				}
+				$('#branch-sum-btn').show();
+				if (regionlength == 0) {
+					('#branch-sum-btn').addClass('active');
+					$('#summary').show();
+				}
+
+			}
+
+			var userlength = hierarchyjson.upload.users.length;
+			if (userlength != 0) {
+				var userlength = hierarchyjson.upload.users.length;
+				for (var i = 0; i < userlength; i++) {
+					if (hierarchyjson.upload.users[i].isErrorRecord == true) {
+						var color = '#FF3400';
+
+					} else if (hierarchyjson.upload.users[i].isWarningRecord == true) {
+						var color = '#F9C42A';
+
+					} else if (hierarchyjson.upload.users[i].isUserAdded == true) {
+						var color = '#95E566';
+
+					} else if (hierarchyjson.upload.users[i].isDeletedRecord == true) {
+						var color = '#F78181';
+
+					} else if (hierarchyjson.upload.users[i].isUserModified == true) {
+						var color = '#009FE0';
+
+					} else {
+						var color = '#666';
+					}
+					$(
+							'<tr style="color:'
+									+ color
+									+ ';height:35px;"><td class="v-hiararchy-edit" title="Edit"></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].rowNum)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].sourceUserId)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].firstName)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].lastName)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].title)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].sourceBranchId)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].sourceRegionId)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].assignedBranchesAdmin)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].emailId)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].phoneNumber)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].websiteUrl)
+									+ '</div></td><td><div class="hier-upload-td">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].license)
+									+ '</div></td><td></tr>').appendTo(
+							'#user-upload');
+				}
+				$('#user-sum-btn').show();
+				if (regionlength == 0 && branchlength == 0) {
+					('#user-sum-btn').addClass('active');
+					$('#summary').show();
+				}
+
+			}
+			if (regionlength == 0 && branchlength == 0 && userlength == 0) {
+				$('#no-data').show();
+			}
+
+		}
+
+	},
+
+	saveXlxsSuccessCallback : function(response) {
+		if (!response) {
+			$('#com-file').val('');
+			$('#com-xlsx-file').val('');
+			showError("Error saving the file");
+		} else {
+			var jsonResponse = $.parseJSON(response);
+			if (jsonResponse.status) {
+				showInfo("Successfully saved the file");
+				$("#fileUrl").val(jsonResponse.response);
+			} else {
+				showError("Error : " + jsonResponse.response);
+			}
+		}
+
+	},
+	fileValidate : function(fileformat) {
+		var fileExtensions = ".xlsx";
+		if ($(fileformat).attr("type") == "file") {
+			var FileName = $(fileformat).val();
+			if (FileName.length > 0) {
+				var blnValid = false;
+				if (FileName.substr(FileName.length - fileExtensions.length,
+						fileExtensions.length).toLowerCase() == fileExtensions
+						.toLowerCase()) {
+					blnValid = true;
+				}
+			}
+			if (!blnValid) {
+				var msg = "Please upload xlsx file";
+				showErrorMobileAndWeb(msg);
+				$(fileformat).val = "";
+
+				return false;
+			}
+		}
+		return true;
+	}
 
 };
 //Company registration variables
