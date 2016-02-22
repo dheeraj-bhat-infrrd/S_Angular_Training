@@ -17,7 +17,6 @@ import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
-import com.realtech.socialsurvey.core.utils.images.impl.ImageProcessingException;
 
 
 public class ImageProcessingStarter extends QuartzJobBean
@@ -54,8 +53,17 @@ public class ImageProcessingStarter extends QuartzJobBean
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
                         updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
-                    } catch ( ImageProcessingException | InvalidInputException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
                     }
                 }
             }
@@ -67,8 +75,17 @@ public class ImageProcessingStarter extends QuartzJobBean
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
                         updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
-                    } catch ( ImageProcessingException | InvalidInputException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
                     }
                 }
             }
@@ -80,8 +97,17 @@ public class ImageProcessingStarter extends QuartzJobBean
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
                         updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
-                    } catch ( ImageProcessingException | InvalidInputException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
                     }
                 }
             }
@@ -93,8 +119,17 @@ public class ImageProcessingStarter extends QuartzJobBean
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
                         updateImage( id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
-                    } catch ( ImageProcessingException | InvalidInputException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
                     }
                 }
             }
@@ -106,8 +141,17 @@ public class ImageProcessingStarter extends QuartzJobBean
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
                         updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
-                    } catch ( ImageProcessingException | InvalidInputException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
                     }
                 }
             }
@@ -118,8 +162,17 @@ public class ImageProcessingStarter extends QuartzJobBean
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
                         updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
-                    } catch ( ImageProcessingException | InvalidInputException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
                     }
                 }
             }
@@ -130,8 +183,17 @@ public class ImageProcessingStarter extends QuartzJobBean
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
                         updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
-                    } catch ( ImageProcessingException | InvalidInputException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
                     }
                 }
             }
@@ -143,8 +205,17 @@ public class ImageProcessingStarter extends QuartzJobBean
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
                         updateImage( id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
-                    } catch ( ImageProcessingException | InvalidInputException e ) {
+                    } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
                     }
                 }
             }
