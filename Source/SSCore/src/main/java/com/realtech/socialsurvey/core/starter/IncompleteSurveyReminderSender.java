@@ -304,7 +304,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
                 survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
                 survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-                fullAddress, "" );
+                fullAddress, "", user.getProfileName() );
             String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
@@ -312,7 +312,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
                 survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
                 survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-                fullAddress, "" );
+                fullAddress, "", user.getProfileName() );
             try {
                 emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
                     user.getEmailId() );
@@ -463,7 +463,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
                 survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
                 survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-                fullAddress, "" );
+                fullAddress, "", user.getProfileName() );
             String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
@@ -471,7 +471,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
                 survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
                 survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-                fullAddress, "" );
+                fullAddress, "", user.getProfileName() );
             try {
                 emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
                     user.getEmailId() );
