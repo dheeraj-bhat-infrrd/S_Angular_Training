@@ -98,7 +98,7 @@ public class EmailFormatHelper {
 
     public String replaceLegends( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
         String custFirstName, String custLastName, String agentName, String agentSignature, String recipientMailId,
-        String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links )
+        String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links, String agentProfileName )
         throws InvalidInputException
     {
         LOG.info( "Method to replace legends with values called, replaceLegends() started");
@@ -128,6 +128,7 @@ public class EmailFormatHelper {
         content = content.replaceAll( "\\[InitiatedDate\\]", "" + initiatedDate );
         content = content.replaceAll( "\\[CurrentYear\\]", "" + currentYear );
         content = content.replaceAll( "\\[FullAddress\\]", "" + fullAddress );
+        content = content.replaceAll( "\\[AgentProfileName\\]", "" + agentProfileName );
         content = content.replaceAll( "null", "" );
         LOG.info( "Method to replace legends with values called, replaceLegends() ended");
         return content;

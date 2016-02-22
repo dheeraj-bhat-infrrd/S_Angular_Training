@@ -846,7 +846,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyUrl,
                 custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "" );
+                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
 
             String mailSubject = restartSurvey.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -855,7 +855,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyUrl,
                 custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "" );
+                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
 
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
@@ -978,7 +978,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "" );
+                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
 
             String mailSubject = surveyCompletion.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -987,7 +987,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null,
                 custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "" );
+                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1116,7 +1116,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "" );
+                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1125,7 +1125,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null,
                 custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "" );
+                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1244,7 +1244,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
                 custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, links );
+                dateFormat.format( new Date() ), currentYear, fullAddress, links, user.getProfileName() );
 
             String mailSubject = socialPostReminder.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1253,7 +1253,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "",
                 custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, links );
+                dateFormat.format( new Date() ), currentYear, fullAddress, links, user.getProfileName() );
 
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
@@ -1567,7 +1567,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyUrl,
                 custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "" );
+                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
 
             // Adding mail subject
             String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
@@ -1577,7 +1577,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyUrl,
                 custFirstName, custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
-                dateFormat.format( new Date() ), currentYear, fullAddress, "" );
+                dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
             try {
                 emailServices.sendSurveyInvitationMail( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), user.getUserId() );
@@ -1613,12 +1613,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 takeSurveyCustomer.getParam_order() );
 
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, appLogoUrl, link, custFirstName,
-                custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null, "" );
+                custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null, "", user.getProfileName() );
 
             String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, appLogoUrl, link,
                 custFirstName, custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null,
-                null, null, "" );
+                null, null, "", user.getProfileName() );
             try {
                 emailServices.sendSurveyInvitationMailByCustomer( custEmail, mailSubject, mailBody, user.getEmailId(),
                     user.getFirstName(), user.getUserId() );
