@@ -129,6 +129,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		try {
 			criteria.add(Restrictions.eq(CommonConstants.COMPANY_ID_COLUMN, companyId));
 			criteria.add(Restrictions.le("lastReminderTime", new Timestamp(new Date().getTime() - surveyReminderInterval * 24 * 60 * 60 * 1000)));
+			criteria.add( Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ) );
 			if(maxReminders > 0)
 				criteria.add(Restrictions.lt("reminderCounts", maxReminders));
 			LOG.info("Method getIncompleteSurveyForReminder() finished.");
@@ -147,6 +148,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		List<SurveyPreInitiation> surveys = new ArrayList<>();
 		
 		Criteria criteria = getSession().createCriteria(SurveyPreInitiation.class);
+        criteria.add( Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ) );
 		try {
 			if (startDate != null && endDate != null) {
 				criteria.add(Restrictions.ge(CommonConstants.CREATED_ON, new Timestamp(startDate.getTime())));
@@ -189,7 +191,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 	public void deleteSurveysWithIds(Set<Long> incompleteSurveyIds) {
 		LOG.info("Method deleteSurveysWithIds() started");
 		//First get the list of surveys that will be deleted
-		String deleteQuery = "delete from SurveyPreInitiation where surveyPreIntitiationId in (:incompleteSurveyIds)";
+		String deleteQuery = "update SurveyPreInitiation set status=7 where surveyPreIntitiationId in (:incompleteSurveyIds)";
 		Query query = getSession().createQuery(deleteQuery);
 		query.setParameterList("incompleteSurveyIds", incompleteSurveyIds);
 		query.executeUpdate();
@@ -203,12 +205,14 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
      */
 	@SuppressWarnings ( "unchecked")
     @Override
-	public List<SurveyPreInitiation> fetchSurveysByIds(Set<Long> incompleteSurveyIds) {
-	    LOG.info( "Method fetchSurveysByIds() started" );
-	    Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
-	    criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, incompleteSurveyIds ) );
-	    return criteria.list();
-	}
+    public List<SurveyPreInitiation> fetchSurveysByIds( Set<Long> incompleteSurveyIds )
+    {
+        LOG.info( "Method fetchSurveysByIds() started" );
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+        criteria.add( Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ) );
+        criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, incompleteSurveyIds ) );
+        return criteria.list();
+    }
 	
 	@SuppressWarnings ( "unchecked")
     @Override
@@ -390,7 +394,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         if ( agentId <= 0l ) {
             throw new InvalidInputException( "Invalid agent ID : " + agentId );
         }
-        String deleteQuery = "delete from SurveyPreInitiation where agentId = (:deletedAgentId)";
+        String deleteQuery = "update SurveyPreInitiation set status=7 where agentId = (:deletedAgentId)";
         Query query = getSession().createQuery( deleteQuery );
         query.setParameter( "deletedAgentId", agentId );
         query.executeUpdate();

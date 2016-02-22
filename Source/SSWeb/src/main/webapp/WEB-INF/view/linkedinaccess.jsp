@@ -50,7 +50,8 @@
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script>
-	function openAuthPage(socialNetwork) {
+	function openAuthPage(event,socialNetwork) {
+		event.stopPropagation();
 		window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
 	}
 	

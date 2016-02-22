@@ -6737,6 +6737,7 @@ tr.u-tbl-header td {
 }
 .verified-badge{
     background: url(../images/ss-verified-customer-badge.png) no-repeat;
+        cursor: pointer;
 }
 .smiley-rat-5{
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;

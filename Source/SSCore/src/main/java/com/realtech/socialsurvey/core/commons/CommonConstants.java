@@ -121,6 +121,7 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_CORRUPT_RECORD = 3;
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
     public static final int STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD = 5;
+    public static final int STATUS_SURVEYPREINITIATION_COMPLETE = 7;
 
     /**
      * Hibernate entities and column name constants
