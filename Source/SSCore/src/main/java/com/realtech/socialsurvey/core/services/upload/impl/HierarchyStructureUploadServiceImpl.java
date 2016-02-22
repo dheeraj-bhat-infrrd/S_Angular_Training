@@ -49,7 +49,9 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 
 
@@ -81,6 +83,12 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
+    @Autowired
+    private SolrSearchService solrSearchService;
+
+    @Autowired
+    private SocialManagementService socialManagementService;
+
 
     @Override
     public void uploadHierarchy( HierarchyUpload upload, Company company, User user ) throws InvalidInputException
@@ -104,15 +112,137 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         LOG.info( "Uploading hierarchy for company " + upload.getCompanyId() );
         // start with addition and modification of each unit starting from the highest hierarchy and then deletion starting from the lowest hierarchy
-        // uploading new regions
+        // uploading regions
         uploadRegions( upload, user, company );
-        // Uploading new branches
+        // Uploading branches
         uploadBranches( upload, user, company );
-        //TODO:Upload users
+        // Uploading users
         uploadUsers( upload, user, company );
-        //TODO:Delete users
-        //TODO:Delete branches
-        //TODO:Delete regions
+        // Delete users
+        deleteUsers( upload, user, company );
+        // Delete branches
+        deleteBranches( upload, user, company );
+        // Delete regions
+        deleteRegions( upload, user, company );
+    }
+
+
+    @Transactional
+    void deleteUsers( HierarchyUpload upload, User adminUser, Company company )
+    {
+        LOG.debug( "Deleting removed users" );
+        List<UserUploadVO> userList = upload.getUsers();
+        if ( userList == null || userList.isEmpty() ) {
+            LOG.warn( "Empty userList" );
+            return;
+        }
+        for ( UserUploadVO user : userList ) {
+            if ( user.isDeletedRecord() ) {
+                // Delete the user
+                try {
+                    userManagementService.removeExistingUser( adminUser, user.getUserId() );
+                    // update the user count modificaiton notification
+                    userManagementService.updateUserCountModificationNotification( adminUser.getCompany() );
+                    LOG.debug( "Removing user {} from solr.", user.getUserId() );
+                    solrSearchService.removeUserFromSolr( user.getUserId() );
+                } catch ( Exception e ) {
+                    // TODO:process errors and return them to the user
+                }
+            }
+        }
+        LOG.debug( "Finished deleting removed users" );
+    }
+
+
+    void deleteBranches( HierarchyUpload upload, User adminUser, Company company )
+    {
+        LOG.info( "Deleting branches" );
+        List<BranchUploadVO> branches = upload.getBranches();
+        if ( branches == null || branches.isEmpty() ) {
+            LOG.warn( "Empty branch list" );
+            return;
+        }
+        for ( BranchUploadVO branch : branches ) {
+            if ( branch.isDeletedRecord() ) {
+                try {
+                    // Check if branch can be deleted
+                    LOG.debug( "Calling service to get the count of users in branch" );
+                    long usersCount = organizationManagementService.getCountUsersInBranch( branch.getBranchId() );
+                    LOG.debug( "Successfully executed service to get the count of users in branch : " + usersCount );
+
+                    if ( usersCount > 0l ) {
+                        LOG.error( "Cannot delete branch : " + branch.getBranchName()
+                            + ". There are active users in the branch." );
+                        throw new InvalidInputException( "Cannot delete branch : " + branch.getBranchName()
+                            + ". There are active users in the branch." );
+                    } else {
+                        //Delete the branch
+                        LOG.debug( "Calling service to deactivate branch" );
+                        organizationManagementService.updateBranchStatus( adminUser, branch.getBranchId(),
+                            CommonConstants.STATUS_INACTIVE );
+                        //TODO: Remove branch from session?
+                        //update profile name and url
+                        organizationManagementService.updateProfileUrlAndStatusForDeletedEntity(
+                            CommonConstants.BRANCH_ID_COLUMN, branch.getBranchId() );
+                        //remove social media connections
+                        socialManagementService.disconnectAllSocialConnections( CommonConstants.BRANCH_ID_COLUMN,
+                            branch.getBranchId() );
+                    }
+
+                } catch ( Exception e ) {
+                    //TODO: process errors and return them to the user
+                    e.printStackTrace();
+                }
+            }
+        }
+        LOG.info( "Finished deleting branches" );
+    }
+
+
+    void deleteRegions( HierarchyUpload upload, User adminUser, Company company )
+    {
+        LOG.info( "Deleting regions" );
+        List<RegionUploadVO> regions = upload.getRegions();
+        if ( regions == null || regions.isEmpty() ) {
+            LOG.warn( "Empty region list" );
+            return;
+        }
+        for ( RegionUploadVO region : regions ) {
+            if ( region.isDeletedRecord() ) {
+                try {
+
+                    //Check if the region can be deleted
+                    LOG.debug( "Calling service to get the count of branches in region" );
+                    long branchCount = organizationManagementService.getCountBranchesInRegion( region.getRegionId() );
+                    LOG.debug( "Successfully executed service to get the count of branches in region : " + branchCount );
+
+                    if ( branchCount > 0l ) {
+                        LOG.error( "Cannot delete region : " + region.getRegionName()
+                            + ". There are active branches in the region." );
+                        throw new InvalidInputException( "Cannot delete region: " + region.getRegionName()
+                            + ". There are active branches in the region." );
+                    } else {
+                        // Delete the region
+                        LOG.debug( "Calling service to deactivate region" );
+                        organizationManagementService.updateRegionStatus( adminUser, region.getRegionId(),
+                            CommonConstants.STATUS_INACTIVE );
+
+                        //TODO: Remove region from session?
+
+                        //update profile name and url
+                        organizationManagementService.updateProfileUrlAndStatusForDeletedEntity(
+                            CommonConstants.REGION_ID_COLUMN, region.getRegionId() );
+                        //remove social media connections
+                        socialManagementService.disconnectAllSocialConnections( CommonConstants.REGION_ID_COLUMN,
+                            region.getRegionId() );
+                    }
+
+                } catch ( Exception e ) {
+                    //TODO: process errors and return them to the user
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 
@@ -148,6 +278,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
         } catch ( Exception e ) {
             // TODO:process errors and return them to the user
+            e.printStackTrace();
         }
     }
 
