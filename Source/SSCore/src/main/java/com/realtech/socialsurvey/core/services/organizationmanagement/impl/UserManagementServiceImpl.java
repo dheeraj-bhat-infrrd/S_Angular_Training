@@ -3536,6 +3536,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method to deleteSSAdmin user " + ssAdminId + " called." );
         User userToBeDeactivated = userDao.findById( User.class, ssAdminId );
+        if ( admin == null ) {
+            throw new InvalidInputException( "Passed parameter admin is null" );
+        }
         if ( userToBeDeactivated == null ) {
             throw new InvalidInputException( "No user found in databse for user id : " + ssAdminId );
         }
