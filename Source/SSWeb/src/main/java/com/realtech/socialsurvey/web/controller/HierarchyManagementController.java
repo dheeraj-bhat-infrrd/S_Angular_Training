@@ -560,17 +560,19 @@ public class HierarchyManagementController {
                 }
                 DisplayMessage message = messageUtils.getDisplayMessage( DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE );
+                DisplayMessage invalidEmailAddressMessage = null;
+                DisplayMessage alreadyExistEmailAddress = null;
 
                 if ( invalidMessage.endsWith( "invalid" ) ) {
-                    message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
-                    message.setType( DisplayMessageType.ERROR_MESSAGE );
+                    invalidEmailAddressMessage = new DisplayMessage( invalidMessage,  DisplayMessageType.ERROR_MESSAGE  );
                 }
 
                 if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
-                    message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
-                    message.setType( DisplayMessageType.ERROR_MESSAGE );
+                    alreadyExistEmailAddress = new DisplayMessage( invalidUserAssignMessage,  DisplayMessageType.ERROR_MESSAGE  );
                 }
                 model.addAttribute( "message", message );
+                model.addAttribute( "invalidEmailAddressMessage", invalidEmailAddressMessage );
+                model.addAttribute( "alreadyExistEmailAddress", alreadyExistEmailAddress );
 			}
 			catch (UserAssignmentException e) {
 				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.REGION_USER_ASSIGNMENT_ERROR, e);
@@ -749,18 +751,20 @@ public class HierarchyManagementController {
                 addOrUpdateBranchInSession( branch, session );
                 DisplayMessage message = messageUtils.getDisplayMessage( DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE );
+                DisplayMessage invalidEmailAddressMessage = null;
+                DisplayMessage alreadyExistEmailAddress = null;
 
                 if ( invalidMessage.endsWith( "invalid" ) ) {
-                    message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
-                    message.setType( DisplayMessageType.ERROR_MESSAGE );
+                    invalidEmailAddressMessage = new DisplayMessage( invalidMessage, DisplayMessageType.ERROR_MESSAGE );
                 }
 
                 if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
-                    message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
-                    message.setType( DisplayMessageType.ERROR_MESSAGE );
+                    alreadyExistEmailAddress = new DisplayMessage( invalidUserAssignMessage, DisplayMessageType.ERROR_MESSAGE );
                 }
 
                 model.addAttribute( "message", message );
+                model.addAttribute( "invalidEmailAddressMessage", invalidEmailAddressMessage );
+                model.addAttribute( "alreadyExistEmailAddress", alreadyExistEmailAddress );
             }
 			catch (UserAssignmentException e) {
 				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.BRANCH_USER_ASSIGNMENT_ERROR, e);
@@ -927,17 +931,19 @@ public class HierarchyManagementController {
                     if ( invalidUserAssignList != null && invalidUserAssignList.size() > 0 ) {
                         invalidAddressCount += invalidUserAssignList.size();
                     }
-                    if ( invalidAddressCount < assigneeEmailIds.length ) {
+                    if ( invalidAddressCount == 0 ) {
                         message = messageUtils
                             .getDisplayMessage( DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_SUCCESSFUL,
                                 DisplayMessageType.SUCCESS_MESSAGE );
                     } else {
-                        message = new DisplayMessage( "", DisplayMessageType.ERROR_MESSAGE );
+                        message = messageUtils
+                            .getDisplayMessage( DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_UNSUCCESSFUL,
+                                DisplayMessageType.SUCCESS_MESSAGE );
                     }
                     if ( invalidMessage.endsWith( "invalid" ) ) {
                         message.setType( DisplayMessageType.ERROR_MESSAGE );
                         if ( !message.getMessage().trim().isEmpty() ) {
-                            message.setMessage( message.getMessage() + ".<br>" + invalidMessage );
+                            message.setMessage( message.getMessage() + "<br>" + invalidMessage );
                         } else {
                             message.setMessage( invalidMessage );
                         }
@@ -945,7 +951,7 @@ public class HierarchyManagementController {
                     if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
                         message.setType( DisplayMessageType.ERROR_MESSAGE );
                         if ( !message.getMessage().trim().isEmpty() ) {
-                            message.setMessage( message.getMessage() + ".<br>" + invalidUserAssignMessage );
+                            message.setMessage( message.getMessage() + "<br>" + invalidUserAssignMessage );
                         } else {
                             message.setMessage( invalidUserAssignMessage );
                         }
