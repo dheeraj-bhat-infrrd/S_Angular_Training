@@ -4507,7 +4507,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     User user = userDao.findById( User.class, iden );
                     long zillowReviewCount = 0;
                     long zillowTotalScore = 0;
-                    if ( user != null ) {
+                    if ( user != null &&  user.getIsZillowConnected() == CommonConstants.YES ) {
                         zillowReviewCount = user.getZillowReviewCount();
                         zillowTotalScore = (long) ( user.getZillowAverageScore() * zillowReviewCount );
                     }
