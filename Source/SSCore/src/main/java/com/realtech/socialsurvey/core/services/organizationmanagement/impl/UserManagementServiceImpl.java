@@ -88,6 +88,8 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 @Component
 public class UserManagementServiceImpl implements UserManagementService, InitializingBean
 {
+    
+    private static final String NAME = "name";
 
     private static final Logger LOG = LoggerFactory.getLogger( UserManagementServiceImpl.class );
     private static Map<Integer, ProfilesMaster> profileMasters = new HashMap<Integer, ProfilesMaster>();
@@ -3450,4 +3452,111 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return agentUserProfile;
     }
+    
+    
+    
+    /**
+     * Method to add a new user into a company. Admin sends the invite to user for registering.
+     * @throws UndeliveredEmailException 
+     */
+    @Transactional
+    @Override
+    public User createSocialSurveyAdmin( User admin, String firstName, String lastName, String emailId )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
+    {
+        if ( firstName == null || firstName.isEmpty() ) {
+            throw new InvalidInputException( "First name is either null or empty in inviteUserToRegister()." );
+        }
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email Id is either null or empty in inviteUserToRegister()." );
+        }
+        LOG.info( "Method to add a new user, inviteUserToRegister() called for email id : " + emailId );
+
+        if ( userExists( emailId ) ) {
+            throw new UserAlreadyExistsException( "User with User ID : " + emailId + " already exists" );
+        }
+
+        String password = utils.generateRandomAlphaNumericString();
+        String encryptedPassword = encryptionHelper.encryptSHA512(password);
+        User user = createUser( admin.getCompany(), encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
+            CommonConstants.STATUS_ACTIVE, CommonConstants.ADMIN_USER_NAME );
+        user = userDao.save( user );
+        
+        UserProfile userProfileNew = createUserProfile( user, admin.getCompany(),
+            user.getEmailId(), user.getUserId(), 0, 0, CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID,
+            CommonConstants.IS_PRIMARY_TRUE, CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
+            String.valueOf( admin.getUserId() ), String.valueOf( admin.getUserId() ) );
+        
+        userProfileDao.save( userProfileNew );
+        sendInviteMailToSocialSurveyAdmin(emailId , user.getFirstName() + " " + user.getLastName() , admin.getCompany().getCompanyId() );
+        
+       
+        LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
+        return user;
+    }
+    
+    
+    private void sendInviteMailToSocialSurveyAdmin(String emailId , String name , long companyId) throws InvalidInputException, UndeliveredEmailException{
+        Map<String, String> urlParams = new HashMap<String, String>();
+        urlParams.put(CommonConstants.EMAIL_ID, emailId);
+        urlParams.put(CommonConstants.COMPANY, companyId + "");
+        urlParams.put(NAME, name);
+        urlParams.put( CommonConstants.URL_PARAM_RESET_PASSWORD, CommonConstants.URL_PARAM_RESETORSET_VALUE_SET );
+
+        LOG.info("Generating URL");
+        String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD);
+        
+        emailServices.sendInvitationToSocialSurveyAdmin( url, emailId, name , emailId );
+
+    }
+    
+    
+    @Override
+    public List<User> getSocialSurveyAdmins(User admin)
+    {
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.COMPANY, admin.getCompany() );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<User> userList = userDao.findByKeyValue( User.class, queries );
+        List<User> ssAdminList = new ArrayList<User>();
+        for(User user : userList){
+            List<UserProfile> userProfiles = user.getUserProfiles();
+            for(UserProfile userProfile : userProfiles){
+                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID && userProfile.getStatus() == CommonConstants.STATUS_ACTIVE)
+                    ssAdminList.add( user );
+            }
+        }
+        return ssAdminList;
+    }
+    
+    
+    @Override
+    @Transactional
+    public void deleteSSAdmin(User admin , long ssAdminId) throws InvalidInputException{
+
+        LOG.info( "Method to deleteSSAdmin user " + ssAdminId + " called." );
+        User userToBeDeactivated = userDao.findById( User.class, ssAdminId );
+        if ( userToBeDeactivated == null ) {
+            throw new InvalidInputException( "No user found in databse for user id : " + ssAdminId );
+        }
+        
+        // Create an entry into the RemovedUser table for keeping historical records of users.
+        RemovedUser removedUser = new RemovedUser();
+        removedUser.setCompany( userToBeDeactivated.getCompany() );
+        removedUser.setUser( userToBeDeactivated );
+        removedUser.setCreatedBy( String.valueOf( admin.getUserId() ) );
+        removedUser.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        removedUserDao.save( removedUser );
+
+        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
+        
+        userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
+        userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
+        userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
+        userToBeDeactivated.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+
+        LOG.info( "Deactivating user " + userToBeDeactivated.getFirstName() );
+        userDao.update( userToBeDeactivated );
+    }
+
 }

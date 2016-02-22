@@ -83,6 +83,48 @@ public class EmailServicesImplTest
         emailServicesImpl.sendRegistrationInviteMail( "test", "test", "", "test" );
     }
 
+    // Tests for sendInvitationToSocialSurveyAdmin
+    @Test ( expected = InvalidInputException.class)
+    public void sendInvitationToSocialSurveyAdminTestUrlNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendInvitationToSocialSurveyAdmin( null, "test", "test", "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void sendInvitationToSocialSurveyAdminTestUrlEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendInvitationToSocialSurveyAdmin( "", "test", "test", "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void sendInvitationToSocialSurveyAdminTestRecipientMailIdNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendInvitationToSocialSurveyAdmin( "test", null, "test", "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void sendInvitationToSocialSurveyAdminTestRecipientMailIdEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendInvitationToSocialSurveyAdmin( "test", "", "test", "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void sendInvitationToSocialSurveyAdminTestFirstNameNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendInvitationToSocialSurveyAdmin( "test", "test", null, "test" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void sendInvitationToSocialSurveyAdminTestFirstNameEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendInvitationToSocialSurveyAdmin( "test", "test", "", "test" );
+    }
+
 
     //Tests for sendAgentSurveyReminderMail
     @Test ( expected = InvalidInputException.class)

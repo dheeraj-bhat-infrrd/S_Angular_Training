@@ -137,6 +137,10 @@ public interface JspResolver {
 	public static final String ADMIN_REGION_HIERARCHY = "admin/admin_region_hierarchy";
 	public static final String ADMIN_BRANCH_HIERARCHY = "admin/admin_branch_hierarchy";
 	public static final String ADMIN_COMPANY_NOT_REGISTERED = "admin/company_not_registered";
+	public static final String ADMIN_USER_MANAGEMENT = "admin/admin_user_management";
+	public static final String ADMIN_ADD_SS_ADMIN = "admin/admin_add_ss_admin";
+	public static final String ADMIN_SS_ADMIN_LIST = "admin/admin_ss_admin_list";
+	
 	
 	//config settngs
 	public static final String DRY_RUN = "dry_run";

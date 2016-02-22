@@ -216,6 +216,7 @@ public final class DisplayMessageConstants
 
     //Realtech admin module
     public static final String COMPANY_NOT_REGISTERD = "COMPANY_NOT_REGISTERD";
+    public static final String SS_ADMIN_DELETE_SUCCESSFUL = "SS_ADMIN_DELETE_SUCCESSFUL";
 
 
     public static final String TRY_AGAIN = "TRY_AGAIN";
@@ -227,4 +228,5 @@ public final class DisplayMessageConstants
     public static final String INVALID_AUTHORIZATION_HEADER = "INVALID_AUTHORIZATION_HEADER";
     
     public static final String INVALID_SOCIAL_POST_REMINDER_ERROR = "INVALID_SOCIAL_POST_REMINDER_ERROR";
+    public static final String SUCCESSFULLY_CREATED_SS_ADMIN = "SUCCESSFULLY_CREATED_SS_ADMIN";
 }

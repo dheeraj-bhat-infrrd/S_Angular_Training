@@ -668,6 +668,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 }
 
 
+.margin-left-125 {
+	margin-left: 125px;
+}
+
 /* 
 .helper {
     display: inline-block;
@@ -5803,6 +5807,11 @@ tr.u-tbl-header td {
 
 .v-icn-rem-userprofile {
 	background: url('../images/delete.png') no-repeat center;
+}
+
+.v-icn-rem-ssadmin {
+	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
 }
 
 .v-icn-edit-user {
