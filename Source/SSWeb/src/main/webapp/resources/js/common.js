@@ -4,6 +4,7 @@
  * application
  */
 
+var lastAjaxRequestToDelete = null;
 
 //Function to redirect to login page if session time out
 function redirectToLoginPageOnSessionTimeOut(status) {
@@ -165,6 +166,33 @@ function callAjaxPOSTWithTextDataLogo(url, callBackFunction, isAsync, formData) 
 			 * redirectToLoginPageOnSessionTimeOut(e.status); return; }
 			 * redirectErrorpage(); }
 			 */
+			});
+}
+
+function callAjaxPOSTWithTextDataUpload(url, callBackFunction, isAsync, formData) {
+
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+				url : url,
+				type : "POST",
+				dataType : "text",
+				contentType : false,
+				processData : false,
+				cache : false,
+				data : formData,
+				async : isAsync,
+				success : callBackFunction,
+				error : function(e) {
+					console.log(e);
+					if(e.status == 500) {
+						showError("Hierarchy upload failed. Please try again.");
+					}
+				},
+				complete : function() {
+					hideOverlay();
+				}
 			});
 }
 
@@ -627,6 +655,51 @@ function shareOnGooglePlus(agentId, location, googleElement){
 	});
 }
 
+
+
+function callAjaxGETAndAbortLastRequest(url,  callBackFunction, isAsync,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	
+	if (isAsync == "undefined") {
+		isAsync = true;
+	}
+	lastAjaxRequestToDelete = $.ajax({
+		url : url,
+		type : "GET",
+		dataType : "html",
+		async : isAsync,
+		cache : false,
+		beforeSend : function()    {           
+	        if(lastAjaxRequestToDelete != null) {
+	        	lastAjaxRequestToDelete.abort();
+	        }
+	    },
+		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+						/*$(document).data('requestRunning', false);
+			*/
+			enable(disableEle);
+			
+			
+		},
+
+		error : function(jqXHR , e) {
+			if (jqXHR.statusText == "abort" || e == "abort")
+                return;
+
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
+	});
+}
 // Function to open forgot password page
 function openForgotPasswordPage(){
 	window.location.href = "./forgotpassword.do";

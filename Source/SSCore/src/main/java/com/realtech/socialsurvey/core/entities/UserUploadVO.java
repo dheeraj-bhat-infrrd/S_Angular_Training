@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -95,6 +96,8 @@ public class UserUploadVO
     private boolean isDeletedRecord;
     private boolean isWarningRecord;
     private int rowNum;
+    private List<String> validationErrors = new ArrayList<String>();
+    private List<String> validationWarnings = new ArrayList<String>();
 
 
     public boolean isWarningRecord()
@@ -1139,6 +1142,30 @@ public class UserUploadVO
     public void setDeletedRecord( boolean isDeletedRecord )
     {
         this.isDeletedRecord = isDeletedRecord;
+    }
+
+
+    public List<String> getValidationErrors()
+    {
+        return validationErrors;
+    }
+
+
+    public void setValidationErrors( List<String> validationErrors )
+    {
+        this.validationErrors = validationErrors;
+    }
+
+
+    public List<String> getValidationWarnings()
+    {
+        return validationWarnings;
+    }
+
+
+    public void setValidationWarnings( List<String> validationWarnings )
+    {
+        this.validationWarnings = validationWarnings;
     }
 
 

@@ -93,10 +93,54 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         HierarchyUpload currentHierarchyUpload = generateCurrentHierarchyStructure( company, oldHierarchyUpload );
         if ( oldHierarchyUpload != null ) {
             currentHierarchyUpload = aggregateHierarchyStructure( oldHierarchyUpload, currentHierarchyUpload );
+        } else {
+            // set all source ids generated to true
+            currentHierarchyUpload = setSourceIdsGeneratedToTrue( currentHierarchyUpload );
         }
         hierarchyUploadDao.saveHierarchyUploadObject( currentHierarchyUpload );
         LOG.info( "Method updateHierarchyStructure finished for company : " + company.getCompany() );
         return currentHierarchyUpload;
+    }
+
+
+    /**
+     * Method to set source ids generated to true for newly generated records
+     * @param upload
+     * @return
+     */
+    HierarchyUpload setSourceIdsGeneratedToTrue( HierarchyUpload upload )
+    {
+        LOG.info( "Method setSourceIdsGeneratedToTrue() started." );
+
+        // set region source ids generated to true
+        List<RegionUploadVO> regions = upload.getRegions();
+        if ( regions != null && !regions.isEmpty() ) {
+            for ( RegionUploadVO region : regions ) {
+                region.setSourceRegionIdGenerated( true );
+            }
+        }
+        upload.setRegions( regions );
+
+        // set branch source ids generated to true
+        List<BranchUploadVO> branches = upload.getBranches();
+        if ( branches != null && !branches.isEmpty() ) {
+            for ( BranchUploadVO branch : branches ) {
+                branch.setSourceBranchIdGenerated( true );
+            }
+        }
+        upload.setBranches( branches );
+
+        // set user source ids generated to true
+        List<UserUploadVO> users = upload.getUsers();
+        if ( users != null && !users.isEmpty() ) {
+            for ( UserUploadVO user : users ) {
+                user.setSourceUserIdGenerated( true );
+            }
+        }
+        upload.setUsers( users );
+
+        LOG.info( "Method setSourceIdsGeneratedToTrue() finished." );
+        return upload;
     }
 
 
@@ -575,27 +619,42 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         for ( UserProfile userProfile : userProfiles ) {
             if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                 if ( branchMap.containsKey( userProfile.getBranchId() ) ) {
-                    //Add sourceId to list instead
-                    assignedBranchSourceIds.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                    BranchUploadVO branchUpload = branchMap.get( userProfile.getBranchId() );
+                    if ( !branchUpload.getBranchName().equalsIgnoreCase( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
+
+                        if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            userUploadVO.setAgent( true );
+
+                            //Add sourceId to list
+                            assignedBranchSourceIds.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                        }
 
 
-                    if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                        userUploadVO.setBranchAdmin( true );
-                        assignedBranchesAdmin.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                        if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                            userUploadVO.setBranchAdmin( true );
+                            assignedBranchesAdmin.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
+                        }
                     }
                 }
                 if ( regionMap.containsKey( userProfile.getRegionId() ) ) {
-                    //Add sourceID to list
-                    assignedRegionSourceIds.add( regionMap.get( userProfile.getRegionId() ).getSourceRegionId() );
+                    RegionUploadVO regionUpload = regionMap.get( userProfile.getRegionId() );
 
+                    if ( !regionUpload.getRegionName().equalsIgnoreCase( CommonConstants.DEFAULT_REGION_NAME ) ) {
+                        if ( !branchMap.containsKey( userProfile.getBranchId() ) ) {
 
-                    if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                        userUploadVO.setRegionAdmin( true );
-                        assignedRegionsAdmin.add( regionMap.get( userProfile.getRegionId() ).getSourceRegionId() );
+                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                                userUploadVO.setAgent( true );
+
+                                //Add sourceID to list
+                                assignedRegionSourceIds.add( regionUpload.getSourceRegionId() );
+                            }
+
+                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                                userUploadVO.setRegionAdmin( true );
+                                assignedRegionsAdmin.add( regionUpload.getSourceRegionId() );
+                            }
+                        }
                     }
-                }
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                    userUploadVO.setAgent( true );
                 }
             }
         }

@@ -1965,11 +1965,13 @@ var hierarchyUpload = {
 				.change(
 
 						function() {
+
 							var fileAdd = $(this).val().split('\\');
 							$('#com-xlsx-file')
 									.val(fileAdd[fileAdd.length - 1]);
 							if (hierarchyUpload.fileValidate("#com-file")) {
 								hierarchyUpload.verified = true;
+
 							}
 
 							if (hierarchyUpload.verified == false) {
