@@ -90,7 +90,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_POSTIONS = "positions";
 	public static final String KEY_STATUS = "status";
 	
-	@Value("${AMAZON_ENDPOINT}")
+	@Value("${CDN_PATH}")
 	private String amazonEndPoint;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
