@@ -1344,6 +1344,12 @@ function updatePaginationBtnsForProList() {
 	} else {
 		pageNo = start / batch;
 	}
+	var emptyPageNo= isNaN(pageNo);
+	if(emptyPageNo){
+		$('#pro-paginate-btn').attr("data-start",0);
+		$('#pro-prev').removeClass('paginate-button');
+		pageNo=1;
+	}
 	$('#sel-page-prolist').val(pageNo);
 }
 

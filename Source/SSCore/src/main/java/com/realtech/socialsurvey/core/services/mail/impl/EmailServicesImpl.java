@@ -214,6 +214,46 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sent reset password mail" );
     }
 
+    
+    
+    @Override
+    public void sendInvitationToSocialSurveyAdmin( String url, String recipientMailId, String name, String loginName )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method to send Email to social survey admin link with URL : " + url + "\t and Recipients Mail ID : "
+            + recipientMailId );
+        if ( url == null || url.isEmpty() ) {
+            LOG.error( "URL generated can not be null or empty" );
+            throw new InvalidInputException( "URL generated can not be null or empty" );
+        }
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipients Email Id can not be null or empty" );
+            throw new InvalidInputException( "Recipients Email Id can not be null or empty" );
+        }
+        if ( name == null || name.isEmpty() ) {
+            LOG.error( "Recipients name can not be null or empty" );
+            throw new InvalidInputException( "Recipients name can not be null or empty" );
+        }
+        
+        LOG.info( "Initiating URL Service to shorten the url " + url );
+        url = urlService.shortenUrl( url );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SS_ADMIN_INVITATION_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SS_ADMIN_INVITATION_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, loginName ,  url, url, url, appBaseUrl,
+            appBaseUrl ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+        LOG.info( "Successfully sent invitation to social survey admin " );
+    }
+
 
     /**
      * Sends a mail to the user when his subscription payment fails.

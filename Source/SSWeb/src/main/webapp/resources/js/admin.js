@@ -465,6 +465,18 @@ function showAbusiveReviews(startIndexCmp,batchSizeCmp) {
 	}, payload, true);
 }
 
+
+function getSocialSurveyAdminList(){
+	var payload = {};
+	callAjaxGetWithPayloadData("./getsocialsurveyadminlist.do", function(data) {
+	
+			$('#ss-admin-list-wrapper').html(data);
+		
+	}, payload, true);
+	
+}
+
+
 $(document).on('click', '.unmark-abusive-icn', function(e) {
 	e.stopPropagation();
 	var surveyMongoId = $(this).parent().parent().attr('data-iden');
@@ -510,3 +522,55 @@ function attachScrollEventOnAbuseReports(){
 		}
 	});
 }
+
+
+$(document).on('click','#add-ss-admin-form-submit',function(){
+	if(validateFirstName("add-ss-admin-fname") && validateLastName("add-ss-admin-lname") && validateEmailId("add-ss-admin-emailid", true)){
+		var formData = $('#add-ss-admin-form').serialize();
+		showOverlay();
+		callAjaxPostWithPayloadData("./createsocialsurveyadmin.do", function(data){
+			$('#overlay-toast').html(data);
+			$("#add-ss-admin-fname").val('');
+			$("#add-ss-admin-lname").val('');
+			$("#add-ss-admin-emailid").val('');
+			showToast();
+		}, formData, true);
+	}
+});
+
+$(document).on('keyup','#add-ss-admin-form',function(e){
+	if(e.which==13){
+		$('#add-ss-admin-form-submit').trigger('click');
+	}
+});
+
+
+$(document).on('click','.v-icn-rem-ssadmin',function(e){
+	var ssAdminId = $(this).attr('data-user-id');
+	e.stopPropagation();
+	if(ssAdminId > 0)
+		confirmDeleteSSAdmin(ssAdminId);
+})
+
+function confirmDeleteSSAdmin(ssAdminId){
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete Social Survey Admin");
+	$('#overlay-text').html("Are you sure you want to delete the Social Survey admin ?");
+	$('#overlay-continue').attr("onclick", "deleteSSAdmin('" + ssAdminId + "');");
+}
+
+function deleteSSAdmin(ssAdminId) {
+	var url = "./deletesocialsurveyadmin.do?userId=" + ssAdminId;
+	//close the popup
+	$('#overlay-cancel').click();
+	showOverlay();
+	callAjaxPOST(url, function(data){
+		displayMessage(data);
+		$("#user-row-"+ssAdminId).hide();
+	}, true);
+}
+
+

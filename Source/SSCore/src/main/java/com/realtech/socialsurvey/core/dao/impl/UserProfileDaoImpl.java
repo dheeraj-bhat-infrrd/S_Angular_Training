@@ -189,6 +189,15 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         LOG.info( "Method deleteUserProfilesByCompany() finished." );
     }
 
+    @Override
+    public void deleteUserProfilesByUser( long userId )
+    {
+        LOG.info( "Method deleteUserProfilesByUser() called to delete profiles of userId id : " + userId );
+        Query query = getSession().createQuery( "delete from UserProfile where user.userId=?" );
+        query.setParameter( 0, userId );
+        query.executeUpdate();
+        LOG.info( "Method deleteUserProfilesByUser() finished." );
+    }
 
     @SuppressWarnings ( "unchecked")
     @Override
