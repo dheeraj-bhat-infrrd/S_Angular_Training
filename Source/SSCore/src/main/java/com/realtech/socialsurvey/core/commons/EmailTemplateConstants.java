@@ -47,6 +47,9 @@ public final class EmailTemplateConstants {
 
 	public static final String RESET_PASSWORD_MAIL_BODY = "ResetPasswordMailBody.html";
 	public static final String RESET_PASSWORD_MAIL_SUBJECT = "ResetPasswordMailSubject.txt";
+	
+	public static final String SS_ADMIN_INVITATION_MAIL_BODY = "SocialSurveyAdminInvitationMailBody.html";
+	public static final String SS_ADMIN_INVITATION_MAIL_SUBJECT = "SocialSurveyAdminInvitationMailSubject.txt";
 
 	public static final String RETRIES_EXHAUSTED_MAIL_BODY = "RetriesExhaustedMailBody.html";
 	public static final String RETRIES_EXHAUSTED_MAIL_SUBJECT = "RetriesExhaustedMailSubject.txt";

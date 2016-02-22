@@ -75,6 +75,11 @@
 				<div class="header-links-item" onclick="javascript:showMainContent('./showchangepasswordpage.do')">
 					<spring:message code="label.changepassword.key"/>
 				</div>
+				<c:if test="${isSuperAdmin}">
+				<div class="header-links-item" onclick="javascript:showMainContent('./adminusermanagement.do')">
+					<spring:message code="label.usermanagement.header.key" />
+				</div>
+				</c:if>
 				<a href="j_spring_security_logout"><span class="header-links-item"><spring:message code="label.logout.key" /></span></a>
 			</div>
 		</div>
@@ -96,6 +101,11 @@
 				<div class="hdr-link-item hdr-link-active">
 					<a id="invite-link" href="javascript:showMainContent('./showabusereports.do')" onclick="showOverlay();"><spring:message code="label.abusereports.header.key" /></a>
 				</div>
+				<c:if test="${isSuperAdmin}">
+					<div class="hdr-link-item hdr-link-active">
+						<a id="invite-link" href="javascript:showMainContent('./adminusermanagement.do')" onclick="showOverlay();"><spring:message code="label.usermanagement.header.key" /></a>
+					</div>
+				</c:if>
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">

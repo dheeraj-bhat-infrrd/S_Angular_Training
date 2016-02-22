@@ -32,14 +32,24 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.resetpassword.key" /></div>
+			<div class="hm-header-row-left text-center lgn-adj">
+				<c:choose>
+    				<c:when test="${resetorset  eq 'set'}"><spring:message code="label.setpassword.key" /></c:when>    
+    				<c:otherwise><spring:message code="label.resetpassword.key" /></c:otherwise>
+				</c:choose>
+			</div>
 		</div>
 	</div>
 </div>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container reg_panel_container">
-		<div class="reg_header"><spring:message code="label.resetpassword.key" /></div>
+		<div class="reg_header">
+			<c:choose>
+    			<c:when test="${resetorset=='set'}"><spring:message code="label.setpassword.key" /></c:when>    
+    			<c:otherwise><spring:message code="label.resetpassword.key" /></c:otherwise>
+			</c:choose>
+		</div>
 		
 		<form id="reset-pwd-form" method="POST" action="./setnewpassword.do">
 			<div class="reg_form_wrapper_2">
