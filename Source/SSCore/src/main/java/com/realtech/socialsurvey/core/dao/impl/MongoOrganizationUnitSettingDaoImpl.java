@@ -568,6 +568,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         } else {
             throw new InvalidInputException( "Invalid encompass crm info state : " + state );
         }
+        
+        //Add criteria to make sure that it doesn't pick up companies that are deleted
+        query.addCriteria( Criteria.where( KEY_STATUS ).ne( CommonConstants.STATUS_DELETED_MONGO ) );
         organizationUnitsSettingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
             CommonConstants.COMPANY_SETTINGS_COLLECTION );
         if ( organizationUnitsSettingsList == null || organizationUnitsSettingsList.isEmpty() ) {
