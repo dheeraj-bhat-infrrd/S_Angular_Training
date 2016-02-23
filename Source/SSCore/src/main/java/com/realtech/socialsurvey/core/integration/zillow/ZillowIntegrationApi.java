@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.integration.zillow;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.Query;
@@ -17,7 +18,7 @@ public interface ZillowIntegrationApi
     public Response fetchZillowReviewsByScreenname( @Query ( "zws-id") String zwsId, @Query ( "screenname") String screenname );
 
 
-    @GET ( "/webservice/ProReviews.htm?output=json&count=10")
+    @GET ( "/" + CommonConstants.ZILLOW_CALL_REQUEST )
     public Response fetchZillowReviewsByScreennameWithMaxCount( @Query ( "zws-id") String zwsId,
         @Query ( "screenname") String screenname );
 
