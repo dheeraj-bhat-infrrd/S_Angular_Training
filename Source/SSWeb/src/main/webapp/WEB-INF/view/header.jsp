@@ -194,6 +194,11 @@
 									<spring:message code="label.emailsettings.key" />
 								</div>
 							</c:if>
+							<c:if test="false">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
+									<spring:message code="label.showwidget.key" />
+								</div>
+							</c:if>
 							<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showapps.do');">
 									<spring:message code="label.appsettings.key" />
