@@ -1606,7 +1606,7 @@ public class EmailServicesImpl implements EmailServices
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, surveyLink,
                 survey.getCustomerFirstName(), survey.getCustomerFirstName(), agentName, agentSignature,
                 survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-                fullAddress );
+                fullAddress, "", user.getProfileName() );
 
             String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT + agentName;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
@@ -1615,7 +1615,7 @@ public class EmailServicesImpl implements EmailServices
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, surveyLink,
                 survey.getCustomerFirstName(), survey.getCustomerFirstName(), agentName, agentSignature,
                 survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-                fullAddress );
+                fullAddress, "", user.getProfileName() );
             try {
                 sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {

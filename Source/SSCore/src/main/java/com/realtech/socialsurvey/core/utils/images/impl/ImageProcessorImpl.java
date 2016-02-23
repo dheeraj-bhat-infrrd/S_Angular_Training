@@ -4,7 +4,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+
 import javax.imageio.ImageIO;
+
 import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -135,10 +138,21 @@ public class ImageProcessorImpl implements ImageProcessor {
 		return cloudFrontUrl;
 	}
 
-	String getThumbnailImageName(String originalImageName, String extension) {
-		LOG.debug("Getting thumbnail name for " + originalImageName);
-		return originalImageName.substring(originalImageName.lastIndexOf("/")+1, originalImageName.lastIndexOf("." + extension)) + "-t." + extension;
-	}
+
+    String getThumbnailImageName( String originalImageName, String extension ) throws InvalidInputException
+    {
+        LOG.debug( "Getting thumbnail name for " + originalImageName );
+        String thumbnailImg = "";
+        try {
+            thumbnailImg = originalImageName.substring( originalImageName.lastIndexOf( "/" ) + 1,
+                originalImageName.lastIndexOf( "." + extension ) )
+                + "-t." + extension;
+        } catch ( StringIndexOutOfBoundsException e ) {
+            throw new InvalidInputException( "Error. Unable to generate thumbnail image name for fileName : "
+                + originalImageName + ".", e );
+        }
+        return thumbnailImg;
+    }
 
 	 void deleteTempFile(File file) {
 		LOG.debug("Deleting file: " + file.getAbsolutePath());
