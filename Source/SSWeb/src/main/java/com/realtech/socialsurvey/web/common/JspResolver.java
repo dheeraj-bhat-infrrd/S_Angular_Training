@@ -103,6 +103,7 @@ public interface JspResolver {
 	public static final String COMPLAINT_REGISTRATION_SETTINGS = "complaintregistrionsettings";
 	public static final String REVIEWS_UNDER_RESOLUTION_REPORTS = "reviewsunderresolution";
 	public static final String ABUSIVE_REVIEWS_REPORTS = "abusivereviewsreports";
+	public static final String SHOW_WIDGET = "show_widget";
 	
 	//Help Settings
 	public static final String HELP_EDIT="help";
