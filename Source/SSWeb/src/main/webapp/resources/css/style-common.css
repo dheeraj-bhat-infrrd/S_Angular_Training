@@ -668,6 +668,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 }
 
 
+.margin-left-125 {
+	margin-left: 125px;
+}
+
 /* 
 .helper {
     display: inline-block;
@@ -5805,7 +5809,16 @@ tr.u-tbl-header td {
 	background: url('../images/delete.png') no-repeat center;
 }
 
+.v-icn-rem-ssadmin {
+	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
+}
+
 .v-icn-edit-user {
+	background: url('../images/edit-1.png') no-repeat center;
+	cursor: pointer;
+}
+.v-hiararchy-edit{
 	background: url('../images/edit-1.png') no-repeat center;
 	cursor: pointer;
 }
@@ -8279,4 +8292,10 @@ label.url-change-input-label {
     text-align: center;
     padding: 10px;
 }
-
+.hier-upload-td{
+	width: 80px;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+    margin: auto;
+}
