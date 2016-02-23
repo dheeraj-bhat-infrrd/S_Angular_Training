@@ -81,4 +81,7 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     public void updateEmailIdForUserProfile( long userId, String emailId ) throws InvalidInputException;
+
+
+    void deleteUserProfilesByUser( long userId );
 }

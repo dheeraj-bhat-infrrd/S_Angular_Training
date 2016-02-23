@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -167,6 +167,16 @@ public class AdminController
         model.addAttribute("companyList", companies);*/
         return JspResolver.ADMIN_HIERARCHY_VIEW;
     }
+    
+    
+    @RequestMapping ( value = "/adminusermanagement")
+    public String adminUserManagementPage( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Inside adminUserManagementPage() method in admin controller" );
+        return JspResolver.ADMIN_USER_MANAGEMENT;
+    }
+
 
 
     @RequestMapping ( value = "/companyhierarchy")
@@ -271,15 +281,13 @@ public class AdminController
         List<OrganizationUnitSettings> unitSettings = null;
         int accountType = -1;
         int status = CommonConstants.STATUS_ACTIVE;
-        boolean canDelete = false; // to add attribute in model for providing company type
+        String companyStatus = filerValue; // to add attribute in model for providing company type
         boolean searchInCompleteCompany = false;
         // Check for company status filer
         if ( filerValue != null && filerValue.equals( "inactive" ) ) {
             status = CommonConstants.STATUS_INACTIVE;
-            canDelete = true;
         } else if ( filerValue.equals( "incomplete" ) ) {
             searchInCompleteCompany = true;
-            canDelete = true;
         }
 
         // Check for account type filter
@@ -295,7 +303,7 @@ public class AdminController
             searchInCompleteCompany );
 
         model.addAttribute( "companyList", unitSettings );
-        model.addAttribute( "canDelete", canDelete );
+        model.addAttribute( "companyStatus", companyStatus );
 
         return JspResolver.ADMIN_COMPANY_LIST;
     }
@@ -531,8 +539,17 @@ public class AdminController
 
         try {
             User adminUser = userManagementService.getUserObjByUserId( adminUserid );
+            
+            //check if user is social survey admin
+            boolean isSSAdmin = false;
+            List<UserProfile> userProfiles = adminUser.getUserProfiles();
+                for ( UserProfile userProfile : userProfiles ) {
+                    if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
+                        isSSAdmin = true;
+                    }
+                }
 
-            if ( !adminUser.isSuperAdmin() ) {
+            if ( !adminUser.isSuperAdmin() && ! isSSAdmin ) {
                 throw new InvalidInputException( "Admin user in session is not realtech admin" );
             }
             sessionHelper.loginAdminAs( adminUser.getLoginName(), CommonConstants.BYPASS_PWD );
@@ -552,6 +569,15 @@ public class AdminController
         return JspResolver.ADMIN_INVITE_VIEW;
     }
 
+    
+    
+    @RequestMapping ( value = "/showaddsocialsurveyadmin", method = RequestMethod.GET)
+    public String showAddSocialSurveyAdmin()
+    {
+        LOG.info( "Inside showSendInvition() method" );
+
+        return JspResolver.ADMIN_ADD_SS_ADMIN;
+    }
 
     @RequestMapping ( value = "/downloadcompanyregistrationreport")
     public void downloadCompanyRegistrationReport( HttpServletRequest request, HttpServletResponse response )
@@ -754,4 +780,111 @@ public class AdminController
         return message;
 
     }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/createsocialsurveyadmin", method = RequestMethod.POST)
+    public String createSocialSurveyAdmin( @RequestParam("firstName") String firstName,
+        @RequestParam("lastName") String lastName, @RequestParam("emailId") String emailId )
+    {
+        
+        try{
+            if(firstName == null || firstName.isEmpty()){
+                throw new InvalidInputException("First Name can't be empty");
+            }
+            
+            if(lastName == null || lastName.isEmpty()){
+                throw new InvalidInputException("Last Name can't be empty");
+            }
+            
+            if(emailId == null || emailId.isEmpty()){
+                throw new InvalidInputException("Email Id can't be empty");
+            }
+            
+            User admin = sessionHelper.getCurrentUser();
+            admin = userManagementService.getUserObjByUserId( admin.getUserId() );
+            
+            userManagementService.createSocialSurveyAdmin( admin, firstName, lastName, emailId );
+        }
+        catch (NonFatalException e) {
+            LOG.error("NonFatalException while adding a social survey admin. Reason : " + e.getMessage(), e);
+            return e.getMessage();
+        }
+
+        LOG.info("Successfully completed controller to add a social survey admin");
+        return messageUtils.getDisplayMessage(DisplayMessageConstants.SUCCESSFULLY_CREATED_SS_ADMIN, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+        
+    }
+    
+    
+    
+    @RequestMapping ( value = "/getsocialsurveyadminlist", method = RequestMethod.GET)
+    public String createSocialSurveyAdmin( Model model , HttpServletRequest request )
+    {
+        LOG.info( "Method to fetch user by user, findUserByUserId() started." );
+
+
+        try {
+
+            User admin = sessionHelper.getCurrentUser();
+            if ( admin == null ) {
+                LOG.error( "No user found in session" );
+                throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
+            }
+
+            admin = userManagementService.getUserObjByUserId( admin.getUserId() );
+            List<User> usersList = userManagementService.getSocialSurveyAdmins( admin );
+            model.addAttribute( "userslist", usersList );
+            model.addAttribute( "numFound", usersList.size() );
+            
+       
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
+                nonFatalException );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        LOG.info( "Method to fetch users by company , findUsersForCompany() finished." );
+        return JspResolver.ADMIN_SS_ADMIN_LIST;
+    }
+    
+    
+    @RequestMapping ( value = "/deletesocialsurveyadmin", method = RequestMethod.POST)
+    public String deleteSocialSurveyAdmin( Model model , HttpServletRequest request )
+    {
+        LOG.info( "Method to fetch user by user, findUserByUserId() started." );
+
+
+        try {
+            
+            String ssAdminIdStr = request.getParameter( "userId" );
+            long ssAdminId = 0l;
+            try {
+                ssAdminId = Long.parseLong( ssAdminIdStr );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "Invalid id was passed", e );
+            }
+            User admin = sessionHelper.getCurrentUser();
+            if ( admin == null ) {
+                LOG.error( "No user found in session" );
+                throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
+            }
+
+            userManagementService.deleteSSAdmin( admin, ssAdminId );
+            
+       
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
+                nonFatalException );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        LOG.info( "Method to delete SocialSurveyAdminfinished." );
+        model.addAttribute("message",messageUtils.getDisplayMessage(DisplayMessageConstants.SS_ADMIN_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+        return JspResolver.MESSAGE_HEADER;
+    }
+    
 }

@@ -6,14 +6,18 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.hibernate.criterion.Criterion;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -27,6 +31,7 @@ import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -123,6 +128,9 @@ public class SurveyHandlerImplTest
         user = new User();
         user.setEmailId( "test@test.com" );
         user2 = new User();
+        Company company = new Company();
+        company.setCompany( "company" );
+        user2.setCompany( company );
         user2.setEmailId( "abc@test.com" );
     }
 
@@ -271,7 +279,6 @@ public class SurveyHandlerImplTest
     }
 
 
-    @SuppressWarnings ( "unchecked")
     @Test ( expected = DuplicateSurveyRequestException.class)
     public void initiateSurveyRequestTestIncompleteSurveyCustomersExist() throws DuplicateSurveyRequestException,
         InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException,
@@ -279,8 +286,22 @@ public class SurveyHandlerImplTest
     {
         Mockito.when( userManagementService.getUserObjByUserId( Mockito.anyLong() ) ).thenReturn( user2 );
         Mockito.when( organizationManagementService.validateEmail( Mockito.anyString() ) ).thenReturn( true );
-        Mockito.when( surveyPreInitiationDao.findByKeyValue( Mockito.eq( SurveyPreInitiation.class ), Mockito.anyMap() ) )
-            .thenReturn( incompleteSurveyCustomers );
+        Mockito.when(
+            surveyPreInitiationDao.findByCriteria( Mockito.eq( SurveyPreInitiation.class ), Mockito.any( Criterion.class ),
+                Mockito.any( Criterion.class ), Mockito.any( Criterion.class ) ) ).thenReturn( incompleteSurveyCustomers );
+        Mockito
+            .doNothing()
+            .when( surveyHandlerImpl )
+            .preInitiateSurvey( Matchers.any( User.class ), Matchers.anyString(), Matchers.anyString(), Matchers.anyString(),
+                Matchers.anyInt(), Matchers.anyString(), Matchers.anyString() );
+        Mockito.when( organizationUnitSettingsDao.fetchAgentSettingsById( Mockito.anyLong() ) )
+            .thenReturn( new AgentSettings() );
+        Map<String, Long> map = new HashMap<String, Long>();
+        map.put( CommonConstants.COMPANY_ID_COLUMN, 0l );
+        map.put( CommonConstants.REGION_ID_COLUMN, 0l );
+        map.put( CommonConstants.BRANCH_ID_COLUMN, 0l );
+        Mockito.when( profileManagementService.getPrimaryHierarchyByAgentProfile( Mockito.any( AgentSettings.class ) ) )
+            .thenReturn( map );
         surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "test", "test", "test" );
     }
 

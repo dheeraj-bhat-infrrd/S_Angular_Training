@@ -668,6 +668,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 }
 
 
+.margin-left-125 {
+	margin-left: 125px;
+}
+
 /* 
 .helper {
     display: inline-block;
@@ -5805,6 +5809,11 @@ tr.u-tbl-header td {
 	background: url('../images/delete.png') no-repeat center;
 }
 
+.v-icn-rem-ssadmin {
+	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
+}
+
 .v-icn-edit-user {
 	background: url('../images/edit-1.png') no-repeat center;
 	cursor: pointer;
@@ -6741,6 +6750,7 @@ tr.u-tbl-header td {
 }
 .verified-badge{
     background: url(../images/ss-verified-customer-badge.png) no-repeat;
+        cursor: pointer;
 }
 .smiley-rat-5{
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;

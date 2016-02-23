@@ -199,8 +199,23 @@ public class LoginController {
 
 			// Check if super admin is logged in
 			if (user.isSuperAdmin()) {
+			    session.setAttribute("isSuperAdmin", true);
 				return JspResolver.ADMIN_LANDING;
+			}else{
+			    session.setAttribute("isSuperAdmin", false);
 			}
+			
+			user = userManagementService.getUserObjByUserId(user.getUserId());
+			
+			//get primary profile profile of user
+			List<UserProfile> userProfiles = user.getUserProfiles();
+	            for ( UserProfile userProfile : userProfiles ) {
+	                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
+	                    // social survey admin
+	                    model.addAttribute("isSuperAdmin", false);
+	                    return JspResolver.ADMIN_LANDING;
+	                }
+	            }
 			
 			try {
 				long realtechUserId = (long) session.getAttribute(CommonConstants.REALTECH_USER_ID);
@@ -213,7 +228,7 @@ public class LoginController {
 				LOG.error("Realtech User id not present in session, direct user login");
 			}
 			
-			user = userManagementService.getUserByUserId(user.getUserId());
+			
 			userManagementService.setProfilesOfUser(user);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
@@ -448,6 +463,7 @@ public class LoginController {
 			try {
 				Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
 				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
+				model.addAttribute( CommonConstants.URL_PARAM_RESET_PASSWORD , urlParams.get(CommonConstants.URL_PARAM_RESET_PASSWORD) );
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in decrypting url parameters. Reason " + e.getMessage(), e);
