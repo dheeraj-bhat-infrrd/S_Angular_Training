@@ -42,6 +42,7 @@ public interface CommonConstants
     public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 2;
     public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
     public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
+    public static final int PROFILES_MASTER_SS_ADMIN_PROFILE_ID = 5;
     public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 
     /**
@@ -121,6 +122,7 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_CORRUPT_RECORD = 3;
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
     public static final int STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD = 5;
+    public static final int STATUS_SURVEYPREINITIATION_COMPLETE = 7;
 
     /**
      * Hibernate entities and column name constants
@@ -873,6 +875,11 @@ public interface CommonConstants
     public static final String URL_DETAILS_ACCESS_DATES_COLUMN = "accessDates";
     public static final String URL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
     public static final String URL_DETAILS_QUERY_PARAMS_COLUMN = "queryParams";
+    
+    public static final String URL_PARAM_RESET_PASSWORD = "resetorset";
+    public static final String URL_PARAM_RESETORSET_VALUE_RESET = "reset";
+    public static final String URL_PARAM_RESETORSET_VALUE_SET = "set";
+    
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";

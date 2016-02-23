@@ -388,4 +388,8 @@ public interface EmailServices
 
     void sendBillingReportMail( String firstName, String lastName, String recipientMailId,
         Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    void sendInvitationToSocialSurveyAdmin( String url, String recipientMailId, String name, String loginName )
+        throws InvalidInputException, UndeliveredEmailException;
 }

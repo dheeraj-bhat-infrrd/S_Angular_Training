@@ -1085,4 +1085,18 @@ public class UserManagementServiceImplTest
         Mockito.when( userDao.getActiveUser( Mockito.anyString() ) ).thenThrow( NoRecordsFetchedException.class );
         userManagementServiceImpl.getUserByEmailAddress( TestConstants.TEST_MAIL_ID_STRING );
     }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testDeleteSSAdminForNullAdmin() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.deleteSSAdmin( null , 0l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testDeleteSSAdminForNoUserFound() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.deleteSSAdmin( new User() , 0l );
+    }
 }
