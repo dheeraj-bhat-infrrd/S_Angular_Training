@@ -39,9 +39,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
     {
         List<String> regionValidationErrors = new ArrayList<String>();
         for ( RegionUploadVO uploadedRegion : validationObject.getUpload().getRegions() ) {
-            if ( !uploadedRegion.isSourceRegionIdGenerated() ) {
-                validateRegionForErrors( uploadedRegion, regionValidationErrors );
-            }
+            validateRegionForErrors( uploadedRegion, regionValidationErrors );
         }
         validationObject.setRegionValidationErrors( regionValidationErrors );
     }
@@ -52,10 +50,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> branchValidationErrors = new ArrayList<String>();
         List<String> branchValidationWarnings = new ArrayList<String>();
         for ( BranchUploadVO uploadedBranch : validationObject.getUpload().getBranches() ) {
-            if ( !uploadedBranch.isSourceBranchIdGenerated() ) {
-                validateBranchForErrors( uploadedBranch, branchValidationErrors, validationObject.getUpload() );
-                validateBranchForWarnings( uploadedBranch, branchValidationWarnings );
-            }
+            validateBranchForErrors( uploadedBranch, branchValidationErrors, validationObject.getUpload() );
+            validateBranchForWarnings( uploadedBranch, branchValidationWarnings );
         }
         validationObject.setBranchValidationErrors( branchValidationErrors );
         validationObject.setBranchValidationWarnings( branchValidationWarnings );
@@ -67,10 +63,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> userValidationErrors = new ArrayList<String>();
         List<String> userValidationWarnings = new ArrayList<String>();
         for ( UserUploadVO uploadeduser : validationObject.getUpload().getUsers() ) {
-            if ( !uploadeduser.isSourceUserIdGenerated() ) {
-                validateUserForErrors( uploadeduser, userValidationErrors, validationObject.getUpload() );
-                validateUserForWarnings( uploadeduser, userValidationWarnings );
-            }
+            validateUserForErrors( uploadeduser, userValidationErrors, validationObject.getUpload() );
+            validateUserForWarnings( uploadeduser, userValidationWarnings );
         }
         validationObject.setUserValidationErrors( userValidationErrors );
         validationObject.setUserValidationWarnings( userValidationWarnings );
