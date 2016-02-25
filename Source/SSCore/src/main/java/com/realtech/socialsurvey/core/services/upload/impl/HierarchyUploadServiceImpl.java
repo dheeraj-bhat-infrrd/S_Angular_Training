@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -348,9 +347,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else if ( cellIndex == USER_TITLE_INDEX ) {
                         uploadedUser.setTitle( cell.getStringCellValue().trim() );
                     } else if ( cellIndex == USER_BRANCH_ID_INDEX ) {
+                        //TODO: set assigned branches instead
                         uploadedUser.setSourceBranchId( cell.getStringCellValue().trim() );
+                        uploadedUser.setAssignedBranches( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_REGION_ID_INDEX ) {
+                        //TODO: set assigned regions instead
                         uploadedUser.setSourceRegionId( cell.getStringCellValue().trim() );
+                        uploadedUser.setAssignedRegions( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX ) {
                         uploadedUser.setAssignedBranchesAdmin( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_REGION_ID_ADMIN_INDEX ) {
@@ -358,7 +361,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else if ( cellIndex == USER_EMAIL_INDEX ) {
                         String emailId = cell.getStringCellValue().trim();
                         if ( emailId != null && !emailId.isEmpty() ) {
-                            if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
+                            //Masking shouldn't happen at this stage
+                            /*if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
                                 emailId = utils.maskEmailAddress( emailId );
                                 if ( emailId != null ) {
                                     uploadedUser.setEmailId( uploadedUser.getFirstName()
@@ -369,7 +373,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                                 uploadedUser.setEmailId( uploadedUser.getFirstName()
                                     + ( uploadedUser.getLastName() != null ? " " + uploadedUser.getLastName() : "" ) + " <"
                                     + emailId + ">" );
-                            }
+                            }*/
+                            uploadedUser.setEmailId( emailId );
                         }
                     } else if ( cellIndex == USER_PHOTO_PROFILE_URL ) {
                         uploadedUser.setUserPhotoUrl( cell.getStringCellValue().trim() );
@@ -573,7 +578,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         || branch.isBranchAddress2Modified() || branch.isBranchCityModified() || branch.isBranchStateModified()
                         || branch.isBranchZipcodeModified() || branch.isSourceRegionIdModified() ) {
                         validationObject.setNumberOfBranchesModified( validationObject.getNumberOfBranchesModified() + 1 );
-                        uploadedBranch.setBranchModified( true );
+                        branch.setBranchModified( true );
                     }
                 }
             }
@@ -622,46 +627,48 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         user.setSourceBranchId( uploadedUser.getSourceBranchId() );
                         user.setSourceBranchIdModified( true );
                     }
-                    if ( ( user.getAssignedBranchesAdmin() != null && uploadedUser.getAssignedBranchesAdmin() == null )
-                        || ( user.getAssignedBranchesAdmin() == null && uploadedUser.getAssignedBranchesAdmin() != null )
+                    if ( ( ( user.getAssignedBranchesAdmin() != null && !user.getAssignedBranchesAdmin().isEmpty() ) && ( uploadedUser
+                        .getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
+                        || ( ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() ) && ( uploadedUser
+                            .getAssignedBranchesAdmin() != null && !uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
                         || ( user.getAssignedBranchesAdmin() != null && uploadedUser.getAssignedBranchesAdmin() != null && !user
                             .getAssignedBranchesAdmin().containsAll( uploadedUser.getAssignedBranchesAdmin() ) ) ) {
                         user.setAssignedBranchesAdmin( uploadedUser.getAssignedBranchesAdmin() );
                         user.setAssignedBrachesAdminModified( true );
                     }
-                    if ( ( user.getAssignedRegionsAdmin() != null && uploadedUser.getAssignedRegionsAdmin() == null )
-                        || ( user.getAssignedRegionsAdmin() == null && uploadedUser.getAssignedRegionsAdmin() != null )
+                    if ( ( ( user.getAssignedRegionsAdmin() != null && !user.getAssignedRegionsAdmin().isEmpty() ) && ( uploadedUser
+                        .getAssignedRegionsAdmin() == null || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
+                        || ( ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) && ( uploadedUser
+                            .getAssignedRegionsAdmin() != null && !uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
                         || ( user.getAssignedRegionsAdmin() != null && uploadedUser.getAssignedRegionsAdmin() != null && !user
                             .getAssignedRegionsAdmin().containsAll( uploadedUser.getAssignedRegionsAdmin() ) ) ) {
                         user.setAssignedRegionsAdmin( uploadedUser.getAssignedRegionsAdmin() );
                         user.setAssignedRegionsAdminModified( true );
                     }
-                    if ( ( user.getAssignedBranches() != null && uploadedUser.getAssignedBranches() == null )
-                        || ( user.getAssignedBranches() == null && uploadedUser.getAssignedBranches() != null )
+                    if ( ( ( user.getAssignedBranches() != null && !user.getAssignedBranches().isEmpty() ) && ( uploadedUser
+                        .getAssignedBranches() == null || uploadedUser.getAssignedBranches().isEmpty() ) )
+                        || ( ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() ) && ( uploadedUser
+                            .getAssignedBranches() != null && !uploadedUser.getAssignedBranches().isEmpty() ) )
                         || ( user.getAssignedBranches() != null && uploadedUser.getAssignedBranches() != null && !user
                             .getAssignedBranches().containsAll( uploadedUser.getAssignedBranches() ) ) ) {
                         user.setAssignedBranches( uploadedUser.getAssignedBranches() );
                         user.setAssignedBranchesModified( true );
                     }
-                    if ( ( user.getAssignedRegions() != null && uploadedUser.getAssignedRegions() == null )
-                        || ( user.getAssignedRegions() == null && uploadedUser.getAssignedRegions() != null )
+                    if ( ( ( user.getAssignedRegions() != null && !user.getAssignedRegions().isEmpty() ) && ( uploadedUser
+                        .getAssignedRegions() == null || uploadedUser.getAssignedRegions().isEmpty() ) )
+                        || ( ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() ) && ( uploadedUser
+                            .getAssignedRegions() != null && !uploadedUser.getAssignedRegions().isEmpty() ) )
                         || ( user.getAssignedRegions() != null && uploadedUser.getAssignedRegions() != null && !user
                             .getAssignedRegions().containsAll( uploadedUser.getAssignedRegions() ) ) ) {
                         user.setAssignedRegions( uploadedUser.getAssignedRegions() );
                         user.setAssignedRegionsModified( true );
                     }
                     if ( ( user.getEmailId() != null && uploadedUser.getEmailId() == null )
-                        || ( user.getEmailId() == null && uploadedUser.getEmailId() != null ) ) {
+                        || ( user.getEmailId() == null && uploadedUser.getEmailId() != null )
+                        || ( user.getEmailId() != null && uploadedUser.getEmailId() != null && !user.getEmailId()
+                            .equalsIgnoreCase( uploadedUser.getEmailId() ) ) ) {
                         user.setEmailId( uploadedUser.getEmailId() );
                         user.setEmailIdModified( true );
-                    } else if ( user.getEmailId() != null && uploadedUser.getEmailId() != null ) {
-                        uploadedUser.setEmailId( uploadedUser.getFirstName()
-                            + ( uploadedUser.getLastName() != null ? " " + uploadedUser.getLastName() : "" ) + " <"
-                            + uploadedUser.getEmailId() + ">" );
-                        if ( !user.getEmailId().equalsIgnoreCase( uploadedUser.getEmailId() ) ) {
-                            user.setEmailId( uploadedUser.getEmailId() );
-                            user.setEmailIdModified( true );
-                        }
                     }
                     if ( ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() == null )
                         || ( user.getPhoneNumber() == null && uploadedUser.getPhoneNumber() != null )
@@ -712,7 +719,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         || user.isLicenseModified() || user.isLegalDisclaimerModified() || user.isUserPhotoUrlModified()
                         || user.isAboutMeDescriptionModified() ) {
                         validationObject.setNumberOfUsersModified( validationObject.getNumberOfUsersModified() + 1 );
-                        uploadedUser.setUserModified( true );
+                        user.setUserModified( true );
                     }
                 }
             }
