@@ -1052,18 +1052,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
 
     /**
-     * Method to return records of billing report data based on start index and batch size
-     */
-    @Override
-    @Transactional
-    public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize )
-    {
-        LOG.info( "Method getBillingReportRecords started for startIndex : " + startIndex + " and batchSize : " + batchSize );
-        return companyDao.getAllUsersInCompanysForBillingReport( startIndex, batchSize );
-    }
-
-
-    /**
      * Method to check if billing report entries exist
      */
     @Override
