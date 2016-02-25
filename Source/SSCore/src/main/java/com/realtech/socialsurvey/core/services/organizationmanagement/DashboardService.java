@@ -82,10 +82,6 @@ public interface DashboardService
 
     public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
 
-    /**
-     * Method to return records of billing report data based on start index and batch size
-     */
-    public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize );
 
     public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException;
 
