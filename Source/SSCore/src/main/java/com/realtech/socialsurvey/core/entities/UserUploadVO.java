@@ -60,7 +60,7 @@ public class UserUploadVO
     private List<StringListUploadHistory> assignedRegionsHistory;
     private boolean isBranchAdmin;
     private boolean isBranchAdminModified;
-    private BooleanUploadHistory[] isBranchAdminHistory;
+    private List<BooleanUploadHistory> isBranchAdminHistory;
     private List<String> assignedBranchesAdmin;
     private boolean isAssignedBrachesAdminModified;
     private List<StringListUploadHistory> assignedBrachesAdminHistory;
@@ -436,6 +436,18 @@ public class UserUploadVO
     }
 
 
+    public List<BooleanUploadHistory> getIsBranchAdminHistory()
+    {
+        return isBranchAdminHistory;
+    }
+
+
+    public void setIsBranchAdminHistory( List<BooleanUploadHistory> isBranchAdminHistory )
+    {
+        this.isBranchAdminHistory = isBranchAdminHistory;
+    }
+
+
     public List<BooleanUploadHistory> getIsAgentHistory()
     {
         return isAgentHistory;
@@ -721,18 +733,6 @@ public class UserUploadVO
     public void setBranchAdminModified( boolean isBranchAdminModified )
     {
         this.isBranchAdminModified = isBranchAdminModified;
-    }
-
-
-    public BooleanUploadHistory[] getIsBranchAdminHistory()
-    {
-        return isBranchAdminHistory;
-    }
-
-
-    public void setIsBranchAdminHistory( BooleanUploadHistory[] isBranchAdminHistory )
-    {
-        this.isBranchAdminHistory = isBranchAdminHistory;
     }
 
 

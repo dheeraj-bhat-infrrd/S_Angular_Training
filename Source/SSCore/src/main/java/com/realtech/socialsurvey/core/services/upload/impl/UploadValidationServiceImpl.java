@@ -39,9 +39,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
     {
         List<String> regionValidationErrors = new ArrayList<String>();
         for ( RegionUploadVO uploadedRegion : validationObject.getUpload().getRegions() ) {
-            if ( !uploadedRegion.isSourceRegionIdGenerated() ) {
-                validateRegionForErrors( uploadedRegion, regionValidationErrors );
-            }
+            validateRegionForErrors( uploadedRegion, regionValidationErrors );
         }
         validationObject.setRegionValidationErrors( regionValidationErrors );
     }
@@ -52,10 +50,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> branchValidationErrors = new ArrayList<String>();
         List<String> branchValidationWarnings = new ArrayList<String>();
         for ( BranchUploadVO uploadedBranch : validationObject.getUpload().getBranches() ) {
-            if ( !uploadedBranch.isSourceBranchIdGenerated() ) {
-                validateBranchForErrors( uploadedBranch, branchValidationErrors, validationObject.getUpload() );
-                validateBranchForWarnings( uploadedBranch, branchValidationWarnings );
-            }
+            validateBranchForErrors( uploadedBranch, branchValidationErrors, validationObject.getUpload() );
+            validateBranchForWarnings( uploadedBranch, branchValidationWarnings );
         }
         validationObject.setBranchValidationErrors( branchValidationErrors );
         validationObject.setBranchValidationWarnings( branchValidationWarnings );
@@ -67,10 +63,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> userValidationErrors = new ArrayList<String>();
         List<String> userValidationWarnings = new ArrayList<String>();
         for ( UserUploadVO uploadeduser : validationObject.getUpload().getUsers() ) {
-            if ( !uploadeduser.isSourceUserIdGenerated() ) {
-                validateUserForErrors( uploadeduser, userValidationErrors, validationObject.getUpload() );
-                validateUserForWarnings( uploadeduser, userValidationWarnings );
-            }
+            validateUserForErrors( uploadeduser, userValidationErrors, validationObject.getUpload() );
+            validateUserForWarnings( uploadeduser, userValidationWarnings );
         }
         validationObject.setUserValidationErrors( userValidationErrors );
         validationObject.setUserValidationWarnings( userValidationWarnings );
@@ -337,6 +331,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
             uploadedUser.getValidationErrors().add( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             errorRecord = true;
         }
+        //TODO: Replace this check with that of assigned branches
         if ( uploadedUser.getSourceBranchId() != null && !uploadedUser.getSourceBranchId().isEmpty()
             && !isSourceBranchIdMappedToBranch( uploadedUser.getSourceBranchId(), upload ) ) {
             LOG.error( "The branch id at row: " + uploadedUser.getRowNum() + " is not valid" );
@@ -344,6 +339,16 @@ public class UploadValidationServiceImpl implements UploadValidationService
             uploadedUser.getValidationErrors().add( "The branchId at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
         }
+        
+        if ( uploadedUser.getAssignedBranches() != null && !uploadedUser.getAssignedBranches().isEmpty()
+            && !isSourceBranchIdMappedToBranch( uploadedUser.getAssignedBranches(), upload ) ) {
+            LOG.error( "An assigned branch at row: " + uploadedUser.getRowNum() + " is not valid" );
+            userValidationErrors.add( "An assigned branch at row: " + uploadedUser.getRowNum() + " is not valid" );
+            uploadedUser.getValidationErrors().add( "An assigned branch at row: " + uploadedUser.getRowNum() + " is not valid" );
+            errorRecord = true;
+        }
+        
+        //TODO: Replace this check with that of assigned regions
         if ( uploadedUser.getSourceRegionId() != null && !uploadedUser.getSourceRegionId().isEmpty()
             && !isSourceRegionIdMappedToRegion( uploadedUser.getSourceRegionId(), upload ) ) {
             LOG.error( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
@@ -351,6 +356,15 @@ public class UploadValidationServiceImpl implements UploadValidationService
             uploadedUser.getValidationErrors().add( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
         }
+        
+        if ( uploadedUser.getAssignedRegions() != null && !uploadedUser.getAssignedRegions().isEmpty()
+            && !isSourceRegionIdMappedToRegion( uploadedUser.getAssignedRegions(), upload ) ) {
+            LOG.error( "An assigned region at row: " + uploadedUser.getRowNum() + " is not valid" );
+            userValidationErrors.add( "An assigned region at row: " + uploadedUser.getRowNum() + " is not valid" );
+            uploadedUser.getValidationErrors().add( "An assigned region at row: " + uploadedUser.getRowNum() + " is not valid" );
+            errorRecord = true;
+        }
+        
         if ( uploadedUser.getAssignedBranchesAdmin() != null && !uploadedUser.getAssignedBranchesAdmin().isEmpty() ) {
             if ( isSourceBranchIdMappedToBranch( uploadedUser.getAssignedBranchesAdmin(), upload ) ) {
                 uploadedUser.setBranchAdmin( true );

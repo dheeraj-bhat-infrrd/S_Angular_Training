@@ -499,18 +499,19 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         List<RegionUploadVO> regions = generateRegionUploadVOsForCompany( company, oldHierarchyUpload, hierarchyUpload );
         hierarchyUpload.setRegions( regions );
 
-        //Set BranchVOs
-        List<BranchUploadVO> branches = generateBranchUploadVOsForCompany( company, oldHierarchyUpload, hierarchyUpload );
-        hierarchyUpload.setBranches( branches );
-
-        //Set UserVOs
-
-        //Generate maps of regionVOs and branchVOs
+        //Generate map of regionVOs
         Map<Long, RegionUploadVO> regionMap = new HashMap<Long, RegionUploadVO>();
         for ( RegionUploadVO regionUploadVO : regions ) {
             regionMap.put( regionUploadVO.getRegionId(), regionUploadVO );
         }
+        
+        //Set BranchVOs
+        List<BranchUploadVO> branches = generateBranchUploadVOsForCompany( company, oldHierarchyUpload, hierarchyUpload, regionMap );
+        hierarchyUpload.setBranches( branches );
 
+        //Set UserVOs
+
+        //Generate map of branchVOs
         Map<Long, BranchUploadVO> branchMap = new HashMap<Long, BranchUploadVO>();
         for ( BranchUploadVO branchUploadVO : branches ) {
             branchMap.put( branchUploadVO.getBranchId(), branchUploadVO );
@@ -719,7 +720,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
      * @throws InvalidInputException
      */
     public List<BranchUploadVO> generateBranchUploadVOsForCompany( Company company, HierarchyUpload oldHierarchyUpload,
-        HierarchyUpload currentHierarchyUpload ) throws InvalidInputException
+        HierarchyUpload currentHierarchyUpload, Map<Long, RegionUploadVO> regionMap ) throws InvalidInputException
     {
 
         LOG.info( "Method to generate branch upload VOs for company : " + company.getCompany() + " started" );
@@ -747,7 +748,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                     if ( branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
                         continue;
                     }
-                    BranchUploadVO branchUploadVO = generateBranchUploadVOForBranch( branch, oldSourceMap, newSourceMap );
+                    BranchUploadVO branchUploadVO = generateBranchUploadVOForBranch( branch, oldSourceMap, newSourceMap, regionMap );
                     branchVOs.add( branchUploadVO );
                 }
             start += BATCH_SIZE;
@@ -766,7 +767,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
      * @throws InvalidInputException
      */
     public BranchUploadVO generateBranchUploadVOForBranch( Branch branch, Map<Long, String> oldSourceMap,
-        Map<String, Long> newSourceMap ) throws InvalidInputException
+        Map<String, Long> newSourceMap, Map<Long, RegionUploadVO> regionMap ) throws InvalidInputException
     {
         if ( branch == null ) {
             throw new InvalidInputException( "Branch is null" );
@@ -823,6 +824,9 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 newSourceMap.put( sourceId, branchUploadVO.getBranchId() );
             } else {
                 branchUploadVO.setSourceBranchId( oldSourceMap.get( branchUploadVO.getBranchId() ) );
+            }
+            if ( regionMap != null && regionMap.containsKey( branchUploadVO.getRegionId() ) ) {
+                branchUploadVO.setSourceRegionId( regionMap.get( branchUploadVO.getRegionId() ).getSourceRegionId() );
             }
         }
 
@@ -1118,7 +1122,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
             for ( BranchUploadVO branch : branchList ) {
                 // col 0 office id
                 // col 1 office name
-                // col 2 region id
+                // col 2 source region id
                 // col 3 address 1
                 // col 4 address 2
                 // col 5 city
@@ -1127,7 +1131,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
                 branchesReportToPopulate.add( branch.getSourceBranchId() );
                 branchesReportToPopulate.add( branch.getBranchName() );
-                branchesReportToPopulate.add( branch.getRegionId() );
+                branchesReportToPopulate.add( branch.getSourceRegionId() );
                 branchesReportToPopulate.add( branch.getBranchAddress1() );
                 if ( branch.getBranchAddress2() != null && !( branch.getBranchAddress2().isEmpty() ) ) {
                     branchesReportToPopulate.add( branch.getBranchAddress2() );
