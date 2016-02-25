@@ -91,7 +91,7 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1 ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
@@ -111,9 +111,9 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( null, null, null, false, null, null, null, 1 ) );
-        branches.add( getBranch( "ABC", "ABC", "ABC", false, "ABC", "KA", "123456", 2 ) );
-        branches.add( getBranch( "ABC", "ABC", "sdf", true, "ABC", "KA", "123456", 3 ) );
+        branches.add( getBranch( null, null, null, null, null, null, null, 1 ) );
+        branches.add( getBranch( "ABC", "ABC", "ABC", null, "ABC", "KA", "123456", 2 ) );
+        branches.add( getBranch( "ABC", "ABC", "sdf", "assa sdvsd", "ABC", "KA", "123456", 3 ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
@@ -133,8 +133,8 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
-        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1 ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
@@ -164,8 +164,8 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
-        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1 ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
@@ -197,8 +197,8 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
-        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2 ) );
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 2 ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
@@ -228,8 +228,8 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1, true ) );
-        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2, true ) );
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1, true ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 2, true ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
@@ -258,8 +258,8 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1, true ) );
-        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2, true ) );
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1, true ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 2, true ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
@@ -290,8 +290,8 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1, true ) );
-        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2, true ) );
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1, true ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 2, true ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
@@ -321,9 +321,9 @@ public class UploadValidationServiceImplTest
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
-        branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1, true ) );
-        branches.add( getBranch( "DEF", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 2, true ) );
-        branches.add( getBranch( "DEF1", "abcdefh", "", true, "Bangalore", "KA", "123456", 3, true ) );
+        branches.add( getBranch( "ABC", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 1, true ) );
+        branches.add( getBranch( "DEF", "abcdefh", "ABC", "assa sdvsd", "Bangalore", "KA", "123456", 2, true ) );
+        branches.add( getBranch( "DEF1", "abcdefh", "", "assa sdvsd", "Bangalore", "KA", "123456", 3, true ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1, true ) );
@@ -372,13 +372,13 @@ public class UploadValidationServiceImplTest
     }
 
 
-    private BranchUploadVO getBranch( String branchId, String name, String regionId, boolean isAddressSet, String city,
-        String state, String zip, int rowNum )
+    private BranchUploadVO getBranch( String branchId, String name, String regionId, String address, String city, String state,
+        String zip, int rowNum )
     {
         BranchUploadVO branch = new BranchUploadVO();
         branch.setSourceBranchId( branchId );
         branch.setBranchName( name );
-        branch.setAddressSet( isAddressSet );
+        branch.setBranchAddress1( address );
         branch.setBranchCity( city );
         branch.setBranchState( state );
         branch.setBranchZipcode( zip );
@@ -388,10 +388,10 @@ public class UploadValidationServiceImplTest
     }
 
 
-    private BranchUploadVO getBranch( String branchId, String name, String regionId, boolean isAddressSet, String city,
-        String state, String zip, int rowNum, boolean isDeletedRecord )
+    private BranchUploadVO getBranch( String branchId, String name, String regionId, String address, String city, String state,
+        String zip, int rowNum, boolean isDeletedRecord )
     {
-        BranchUploadVO branch = getBranch( branchId, name, regionId, isAddressSet, city, state, zip, rowNum );
+        BranchUploadVO branch = getBranch( branchId, name, regionId, address, city, state, zip, rowNum );
         branch.setDeletedRecord( isDeletedRecord );
         return branch;
     }
