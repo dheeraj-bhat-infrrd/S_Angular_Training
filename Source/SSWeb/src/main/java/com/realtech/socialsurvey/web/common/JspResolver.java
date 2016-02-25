@@ -109,6 +109,7 @@ public interface JspResolver {
 	
 	//Hierarchy Upload
 	public static final String HIERARCHY_UPLOAD="hierarchyupload";
+	public static final String EDIT_REGION_POPUP="editregionpopup";
 	
 	// Profile Settings
 	public static final String PROFILE_EDIT = "profile_edit";
