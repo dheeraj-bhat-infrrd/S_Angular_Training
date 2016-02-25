@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.integration.zillow;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+
 import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.Query;
