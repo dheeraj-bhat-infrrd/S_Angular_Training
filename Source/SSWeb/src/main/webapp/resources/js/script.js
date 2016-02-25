@@ -2180,10 +2180,10 @@ var hierarchyUpload = {
 				$('#region-upload').empty();
 				for (var i = 0; i < regionlength; i++) {
 					if (hierarchyjson.upload.regions[i].isErrorRecord == true) {
-						var color = '#E57C66';
+						var color = '#FF3400';
 
 					} else if (hierarchyjson.upload.regions[i].isWarningRecord == true) {
-						var color = '#EC971F';
+						var color = '#F9C42A';
 
 					} else if (hierarchyjson.upload.regions[i].isRegionAdded == true) {
 						var color = '#95E566';
@@ -2200,7 +2200,7 @@ var hierarchyUpload = {
 					$(
 							'<tr style="color:'
 									+ color
-									+ ';height:35px;"><td class="v-hiararchy-edit" title="Edit"></td><td><div class="hier-upload-td">'
+									+ ';height:35px;"><td class="v-hiararchy-edit" title="Edit" onclick="hierarchyUpload.showEditRegionPopup()"></td><td><div class="hier-upload-td">'
 									+ hierarchyUpload
 											.hierundefined(hierarchyjson.upload.regions[i].rowNum)
 									+ hierarchyUpload
@@ -2217,6 +2217,36 @@ var hierarchyUpload = {
 									+ '">'
 									+ hierarchyUpload
 											.hierundefined(hierarchyjson.upload.regions[i].regionName)
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionAddress1)
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionAddress1)
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionAddress2)
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionAddress2)
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionCity)
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionCity)
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionState)
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionState)
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionZipcode)
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.regions[i].regionZipcode)
 									+ '</div></td></tr>').appendTo(
 							'#region-upload');
 				}
@@ -2228,10 +2258,10 @@ var hierarchyUpload = {
 				$('#branch-upload').empty();
 				for (var i = 0; i < branchlength; i++) {
 					if (hierarchyjson.upload.branches[i].isErrorRecord == true) {
-						var color = '#E57C66';
+						var color = '#FF3400';
 
 					} else if (hierarchyjson.upload.branches[i].isWarningRecord == true) {
-						var color = '#EC971F';
+						var color = '#F9C42A';
 
 					} else if (hierarchyjson.upload.branches[i].isBranchAdded == true) {
 						var color = '#95E566';
@@ -2387,6 +2417,12 @@ var hierarchyUpload = {
 											.hierundefined(hierarchyjson.upload.users[i].assignedBranchesAdmin)
 									+ '</div></td><td><div class="hier-upload-td" title="'
 									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].assignedRegionsAdmin)
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].assignedRegionsAdmin)
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ hierarchyUpload
 											.hierundefined(hierarchyjson.upload.users[i].emailId)
 									+ '">'
 									+ hierarchyUpload
@@ -2409,7 +2445,25 @@ var hierarchyUpload = {
 									+ '">'
 									+ hierarchyUpload
 											.hierundefined(hierarchyjson.upload.users[i].license)
-									+ '</div></td><td></tr>').appendTo(
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].legalDisclaimer)
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].legalDisclaimer)
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].userPhotoUrl)
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].userPhotoUrl)
+									+ '</div></td><td><div class="hier-upload-td" title="'
+									+ escapeHtml(hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].aboutMeDescription))
+									+ '">'
+									+ hierarchyUpload
+											.hierundefined(hierarchyjson.upload.users[i].aboutMeDescription)
+									+ '</div></td></tr>').appendTo(
 							'#user-upload');
 				}
 				$('#user-sum-btn').show();
@@ -2457,6 +2511,37 @@ var hierarchyUpload = {
 					+ '"><img src="resources/images/abuse.png"></span>';
 		}
 		return toolTip;
+	},
+
+	showEditRegionPopup : function(response, index) {
+		callAjaxGET("./fetchEditRegionPopupDetails.do",
+				hierarchyUpload.callBackEditRegionDetails, true);
+	},
+
+	callBackEditRegionDetails : function(data) {
+
+		var header = "Edit Region Detail";
+		hierarchyUpload.createEditRegionPopup(header, data);
+
+		// update events
+
+		$('#overlay-continue').click(function() {
+			var isFocussed = false;
+
+			$('#overlay-continue').unbind('click');
+		});
+
+		$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
+		disableBodyScroll();
+		$('body').scrollTop('0');
+	},
+
+	createEditRegionPopup : function(header, body) {
+		$('#overlay-header').html(header);
+		$('#overlay-text').html(body);
+		$('#overlay-continue').html("Ok");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-main').show();
 	},
 
 	saveXlxsSuccessCallback : function(response) {
@@ -2611,3 +2696,8 @@ var companyRegistration = {
 		}
 	}
 };
+
+function escapeHtml(unsafe) {
+	return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g,
+			"&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}

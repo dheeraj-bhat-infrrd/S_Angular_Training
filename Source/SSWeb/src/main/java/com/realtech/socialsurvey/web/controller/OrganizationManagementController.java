@@ -2664,6 +2664,13 @@ public class OrganizationManagementController
         LOG.info( "Showing the hierarchy page" );
         return JspResolver.HIERARCHY_UPLOAD;
     }
+    
+    @RequestMapping ( value = "/fetchEditRegionPopupDetails", method = RequestMethod.GET)
+    public String fetchEditRegionPopupDetails( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Showing Edit Region Popup" );
+        return JspResolver.EDIT_REGION_POPUP;
+    }
 
 
     @ResponseBody
