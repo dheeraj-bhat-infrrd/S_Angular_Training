@@ -1,18 +1,19 @@
+<%@page import="com.realtech.socialsurvey.core.commons.CommonConstants"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <div id="hm-header-main-wrapper" class="hm-header-main-wrapper">
-    <div class="container">
+	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left text-center">
 				<spring:message code="label.hierarchyupload.key" />
-			</div> 
+			</div>
 			<div class="float-right hm-header-right text-center"
-			 onclick="javascript:showMainContent('./hierarchyupload.do')">
-					<spring:message code="label.header.Hierarchyupload.key" />
-				</div>
+				onclick="javascript:showMainContent('./hierarchyupload.do')">
+				<spring:message code="label.header.Hierarchyupload.key" />
+			</div>
 			<div class="float-right hm-header-right text-center"
 				onclick="javascript:showMainContent('./viewhierarchy.do');">
 				<spring:message code="label.viewcompanyhierachy.key" />
@@ -25,7 +26,7 @@
 				onclick="javascript:showMainContent('./showbuildhierarchypage.do')">
 				<spring:message code="label.header.buildhierarchy.key" />
 			</div>
-			
+
 		</div>
 	</div>
 </div>
@@ -39,7 +40,7 @@
 	</div>
 </div> --%>
 <div class="clearfix">
-	<div class="float-left rfr_lbl" style="margin-top:10px;">
+	<div class="float-left rfr_lbl" style="margin-top: 10px;">
 		<spring:message code="label.xlsxfile.key" />
 	</div>
 	<div class="float-left rfr_txt" style="margin-top: 10px;">
@@ -53,39 +54,43 @@
 		</div>
 		<div>
 			<input type="file" class="rfr_input_fld com-logo-comp-info"
-				id="com-file" name="xlsxfile">
-			<input type="hidden" id="fileUrl" name="fileUrl">
+				id="com-file" name="xlsxfile"> <input type="hidden"
+				id="fileUrl" name="fileUrl">
 		</div>
 		<div
 			class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj"
 			id="icn-xlsxfile"></div>
 	</div>
-	<div class="reg_form_row clearfix hierarchy-btn" >
+	<div class="reg_form_row clearfix hierarchy-btn">
 		<div class="reg_btn" id="xlsx-file-verify">
 			<spring:message code="label.verify.key" />
 		</div>
 	</div>
-	<div id="hierarchy-upload" class="reg_form_row clearfix hierarchy-btn hide" >
+	<div id="hierarchy-upload"
+		class="reg_form_row clearfix hierarchy-btn hide">
 		<div class="reg_btn" id="xlsx-file-upload">
 			<spring:message code="label.upload.key" />
 		</div>
 	</div>
 </div>
-<div id="no-data" style="width:120px;margin:auto;color:#009FE0;font-size: 30px;" class="hide">No Changes Made </div>
+<div id="no-data"
+	style="width: 120px; margin: auto; color: #009FE0; font-size: 30px;"
+	class="hide">No Changes Made</div>
 
 <div class="container hide" id="summary" style="margin-top: 10px;">
 
 	<!-- Nav tabs -->
 	<ul class="nav nav-tabs" role="tablist">
-		<li id="region-sum-btn" class="active" style="display:none !important"><a href="#upload-summary-region"
-			data-toggle="tab"> Regions </a></li>
-		<li id="branch-sum-btn" style="display:none !important"><a href="#upload-summary-branch" data-toggle="tab">
-				Branches </a></li>
-		<li id="user-sum-btn" style="display:none !important"><a href="#upload-summary-user" data-toggle="tab"> Users
-		</a></li>
+		<li id="region-sum-btn" class="active"
+			style="display: none !important"><a
+			href="#upload-summary-region" data-toggle="tab"> Regions </a></li>
+		<li id="branch-sum-btn" style="display: none !important"><a
+			href="#upload-summary-branch" data-toggle="tab"> Branches </a></li>
+		<li id="user-sum-btn" style="display: none !important"><a
+			href="#upload-summary-user" data-toggle="tab"> Users </a></li>
 
 	</ul>
-	
+
 	<!-- Tab panes -->
 	<div class="tab-content">
 		<div class="tab-pane fade active in" id="upload-summary-region"
@@ -99,19 +104,34 @@
 			<table class="table">
 				<thead>
 					<tr>
-					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Edit
-							</th>
-					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Serial&nbsp;No.
-							</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Region
-							ID</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Edit</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Region
-							Name</th>
-							
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Serial No.</th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_REGION_REGION_ID%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_REGION_REGION_NAME%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_ADDRESS_1%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_ADDRESS_2%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_CITY%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_STATE%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_ZIP%></th>
+
 					</tr>
 				</thead>
 				<tbody id="region-upload"></tbody>
@@ -128,31 +148,36 @@
 			<table class="table">
 				<thead>
 					<tr>
-					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Edit
-							</th>
-					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Serial&nbsp;No.
-							</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Branch
-							ID</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Edit</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Branch
-							Name</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Serial No.</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Region
-							ID</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_BRANCH_BRANCH_ID%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Address&nbsp;1</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_BRANCH_BRANCH_NAME%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Address&nbsp;2</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_REGION_REGION_ID%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">City</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_ADDRESS_1%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">State</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_ADDRESS_2%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Zip</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_CITY%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_STATE%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_ZIP%></th>
 					</tr>
 				</thead>
 				<tbody id="branch-upload"></tbody>
@@ -169,40 +194,57 @@
 			<table class="table">
 				<thead>
 					<tr>
-					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Edit
-							</th>
-					<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Serial&nbsp;No.
-							</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">User
-							ID</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Edit</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">First
-							Name</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Serial No.</th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Last
-							Name</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_USER_ID%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Title</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_FIRST_NAME%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Office
-							Assignment(s)</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_LAST_NAME%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Region
-							Assignment(s)</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_TITLE%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Office
-							Admin Privilege</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_OFFICE_ASSIGNMENTS%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Email</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_REGION_ASSIGNMENTS%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Phone</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_OFFICE_ADMIN_PRIVILEGE%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">Website</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_REGION_ADMIN_PRIVILEGE%></th>
 						<th
-							style="text-align: center; font-weight: 600 !important; font-size: 14px;" class="hier-upload-td">License</th>
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_EMAIL%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_PHONE%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_WEBSITE%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_LICENSE%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_LEGAL_DISCLAIMER%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_PHOTO%></th>
+						<th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td"><%=CommonConstants.CHR_USERS_ABOUT_ME_DESCRIPTION%></th>
 					</tr>
 				</thead>
 				<tbody id="user-upload"></tbody>
@@ -210,7 +252,8 @@
 		</div>
 	</div>
 
- <div id="hierarchy-upload" class="reg_form_row clearfix hierarchy-btn" style="float:none !important;">
+	<div id="hierarchy-upload" class="reg_form_row clearfix hierarchy-btn"
+		style="float: none !important;">
 		<div class="reg_btn" id="xlsx-file-upload">
 			<spring:message code="label.upload.key" />
 		</div>
