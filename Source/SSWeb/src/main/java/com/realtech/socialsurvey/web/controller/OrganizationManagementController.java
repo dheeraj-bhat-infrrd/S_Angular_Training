@@ -184,7 +184,7 @@ public class OrganizationManagementController
      */
     @ResponseBody
     @RequestMapping ( value = "/uploadcompanylogo", method = RequestMethod.POST)
-    public String imageUpload( Model model, @RequestParam ( "logo" ) MultipartFile fileLocal, HttpServletRequest request)
+    public String imageUpload( Model model, @RequestParam ( "logo") MultipartFile fileLocal, HttpServletRequest request )
     {
         LOG.info( "Method imageUpload of OrganizationManagementController called" );
         String message = "";
@@ -2664,7 +2664,8 @@ public class OrganizationManagementController
         LOG.info( "Showing the hierarchy page" );
         return JspResolver.HIERARCHY_UPLOAD;
     }
-    
+
+
     @RequestMapping ( value = "/fetchEditRegionPopupDetails", method = RequestMethod.GET)
     public String fetchEditRegionPopupDetails( Model model, HttpServletRequest request )
     {
@@ -2675,7 +2676,7 @@ public class OrganizationManagementController
 
     @ResponseBody
     @RequestMapping ( value = "/savexlsxfile", method = RequestMethod.POST)
-    public String saveHierarchyFile( Model model, @RequestParam ( "file" ) MultipartFile fileLocal, HttpServletRequest request)
+    public String saveHierarchyFile( Model model, @RequestParam ( "file") MultipartFile fileLocal, HttpServletRequest request )
     {
         boolean status = true;
         String response = null;
@@ -2720,16 +2721,36 @@ public class OrganizationManagementController
     @RequestMapping ( value = "/verifyxlsxfile", method = RequestMethod.POST)
     public String validateHierarchyFile( Model model, HttpServletRequest request ) throws InvalidInputException
     {
-
+        boolean status = true;
+        Object response = null;
+        UploadValidation uploadValidation = null;
         LOG.info( "Validating the hierarchy file" );
         String fileUrl = request.getParameter( "fileUrl" );
-        if ( fileUrl == null || fileUrl.isEmpty() ) {
-            throw new InvalidInputException( "File URL cannot be empty" );
+        try {
+            if ( fileUrl == null || fileUrl.isEmpty() ) {
+                throw new InvalidInputException( "File URL cannot be empty" );
+            }
+            User user = sessionHelper.getCurrentUser();
+            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
+            response = uploadValidation;
+            LOG.debug( "Returning: " + new Gson().toJson( response ) );
+        } catch ( InvalidInputException ex ) {
+            status = false;
+            response = ex.getMessage();
         }
-        User user = sessionHelper.getCurrentUser();
-        UploadValidation uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
 
-        String json = new Gson().toJson( uploadValidation );
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "response", response );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @RequestMapping ( value = "/uploadxlsxfile", method = RequestMethod.POST)
+    public String saveHierarchyFileData( Model model, HttpServletRequest request ) throws InvalidInputException
+    {
+        LOG.info( "Saving the hierarchy file data" );
+        String json = new Gson().toJson( "Success" );
         LOG.debug( "Returning: " + json );
         return json;
     }
