@@ -2746,13 +2746,25 @@ public class OrganizationManagementController
     }
 
 
+    @ResponseBody
     @RequestMapping ( value = "/uploadxlsxfile", method = RequestMethod.POST)
     public String saveHierarchyFileData( Model model, HttpServletRequest request ) throws InvalidInputException
     {
         LOG.info( "Saving the hierarchy file data" );
-        String json = new Gson().toJson( "Success" );
-        LOG.debug( "Returning: " + json );
-        return json;
+        boolean status = true;
+        String response = null;
+        String hierarchyJson = request.getParameter( "hierarchyJson" );
+        UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        try {
+            response = "Data uploaded successfully.";
+        } catch ( Exception ex ) {
+            status = false;
+            response = ex.getMessage();
+        }
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "response", response );
+        return new Gson().toJson( responseMap );
     }
 
 
