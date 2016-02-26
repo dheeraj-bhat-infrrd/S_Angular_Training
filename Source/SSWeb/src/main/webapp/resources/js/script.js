@@ -2510,21 +2510,29 @@ $('.v-hiararchy-edit').click(function(e){
 
 
 				var userlength = hierarchyjson.upload.users.length;
-				for (var i = 0; i < userlength; i++) {
-					if(hierarchyjson.upload.users[i].isUserAdded == true) {
-						var color = '#95E566';
+		if (userlength != 0) {
+					$('#user-upload').empty();
+					var userlength = hierarchyjson.upload.users.length;
+					for (var i = 0; i < userlength; i++) {
+						if (hierarchyjson.upload.users[i].isErrorRecord == true) {
+							var color = '#FF3400';
 
-					} else if (hierarchyjson.upload.users[i].isDeletedRecord == true) {
-						var color = '#FF3400';
+						} else if (hierarchyjson.upload.users[i].isWarningRecord == true) {
+							var color = '#F9C42A';
 
-					} else if (hierarchyjson.upload.users[i].isUserModified == true) {
-						var color = '#009FE0';
+						} else if (hierarchyjson.upload.users[i].isUserAdded == true) {
+							var color = '#95E566';
 
-					} else {
-						var color = '#666';
-					}
-					
+						} else if (hierarchyjson.upload.users[i].isDeletedRecord == true) {
+							var color = '#F78181';
 
+						} else if (hierarchyjson.upload.users[i].isUserModified == true) {
+							var color = '#009FE0';
+
+						} else {
+							var color = '#666';
+						}
+			
 					var userEdit = '<div id="hier-user-detail-edit-container"'+
 					'	class="prof-user-address prof-edit-icn">'+
 					''+
@@ -2745,6 +2753,7 @@ $('.v-hiararchy-edit').click(function(e){
 				}
 
 			}
+		}
 $('.v-hiararchy-edit').click(function(e){
 				
 				$(this).parent().next('.hier-users-edit').slideToggle(200);
