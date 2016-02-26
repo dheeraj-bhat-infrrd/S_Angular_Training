@@ -158,6 +158,8 @@ public class OrganizationManagementController
     private String neutralTextComplete;
     @Value ( "${SAD_TEXT_COMPLETE}")
     private String sadTextComplete;
+    @Value ( "${APPLICATION_BASE_URL}")
+    private String applicationBaseUrl;
 
     @Autowired
     private SettingsManager settingsManager;
@@ -317,11 +319,11 @@ public class OrganizationManagementController
             // JIRA SS-536: Added for manual registration via invitation
             if ( strIsDirectRegistration.equalsIgnoreCase( "false" ) ) {
                 companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE );
-                /* redirectAttributes.addFlashAttribute( "skippayment", "true" ); */
+                /*redirectAttributes.addFlashAttribute( "skippayment", "true" );*/
                 session.setAttribute( "skippayment", "true" );
             } else {
                 companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO );
-                /* redirectAttributes.addFlashAttribute( "skippayment", "false" ); */
+                /*redirectAttributes.addFlashAttribute( "skippayment", "false" );*/
                 session.setAttribute( "skippayment", "false" );
             }
 
@@ -539,6 +541,15 @@ public class OrganizationManagementController
     }
 
 
+    @RequestMapping ( value = "/showwidget", method = RequestMethod.GET)
+    public String showWidget( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method showWidget of OrganizationManagementController called" );
+        model.addAttribute( "applicationBaseUrl", applicationBaseUrl );
+        return JspResolver.SHOW_WIDGET;
+    }
+
+
     /**
      * Method to load the app settings page
      * 
@@ -665,8 +676,7 @@ public class OrganizationManagementController
 
             SurveySettings surveySettings = null;
             AgentSettings agentSettings = null;
-            // In case of individual account, the survey settings should be taken from agent
-            // collection
+            // In case of individual account, the survey settings should be taken from agent collection
             if ( accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 agentSettings = userManagementService.getUserSettings( user.getUserId() );
                 surveySettings = agentSettings.getSurvey_settings();
@@ -1086,11 +1096,11 @@ public class OrganizationManagementController
                 }
 
                 mailBody = request.getParameter( "survey-completion-unpleasant-mailcontent" );
-                if ( mailBody == null || mailBody.isEmpty() ) {
-                    LOG.warn( "Survey Completion Unpleasant mail body is blank." );
-                    throw new InvalidInputException( "Survey completion Unpleasant mail body is blank.",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                }
+                //                if ( mailBody == null || mailBody.isEmpty() ) {
+                //                    LOG.warn( "Survey Completion Unpleasant mail body is blank." );
+                //                    throw new InvalidInputException( "Survey completion Unpleasant mail body is blank.",
+                //                        DisplayMessageConstants.GENERAL_ERROR );
+                //                }
 
                 updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody( companySettings,
                     mailSubject, mailBody, CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY );
@@ -1275,7 +1285,7 @@ public class OrganizationManagementController
                 mailBody = defaultMailContent.getMail_body();
                 mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, organizationManagementService
                     .getSurveyParamOrder( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) );
-                // mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+                //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
                 message = messageUtils
@@ -2357,7 +2367,7 @@ public class OrganizationManagementController
             if ( superAdminUserId != null )
                 newSession.setAttribute( CommonConstants.REALTECH_USER_ID, superAdminUserId );
 
-            // Set the autologin attribute as true
+            //Set the autologin attribute as true
             newSession.setAttribute( CommonConstants.IS_AUTO_LOGIN, "true" );
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
 
