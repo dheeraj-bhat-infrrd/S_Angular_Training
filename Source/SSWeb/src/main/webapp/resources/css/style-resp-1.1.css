@@ -528,6 +528,9 @@
 	.reg-cap-txt{
         width: 256px !important;
     }
+    #summary{
+       width: 100% !important;
+    }
 }
 
 

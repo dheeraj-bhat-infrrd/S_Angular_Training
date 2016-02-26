@@ -3925,6 +3925,14 @@ img.prof-image {
 	border-radius: 3px;
 	box-shadow: 0px 2px 2px 0px #e3e3e3;
 }
+.hier-edit-fields {
+	margin-bottom: 10px;
+	padding: 0 10px;
+	border: 1px solid #e3e3e3;
+	height: 40px;
+	border-radius: 3px;
+	box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
 
 .err-nw-wrapper {
 	display: none;
@@ -4623,6 +4631,15 @@ img.prof-image {
 
 .lgn-col-red {
 	background-color: rgb(255, 202, 145);
+}
+.hier-col-red {
+	background-color:#FF3400 ;
+}
+.hier-col-green {
+	background-color:#95E566 ;
+}
+.hier-col-blue {
+	background-color:#009FE0 ;
 }
 
 .dash-main-left {
@@ -8331,8 +8348,8 @@ label.url-change-input-label {
 
 /* Tab Content */
 .tab-pane {
-	box-shadow: 0 0 4px rgba(0, 0, 0, .4);
-	border-radius: 0;
+	/* box-shadow: 0 0 4px rgba(0, 0, 0, .4);
+	border-radius: 0; */
 	text-align: center;
 	padding: 10px;
 }
