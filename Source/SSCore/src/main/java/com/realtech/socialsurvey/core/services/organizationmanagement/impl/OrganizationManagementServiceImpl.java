@@ -2481,7 +2481,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail ) throws InvalidInputException
+    @Override
+    public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail ) throws InvalidInputException
     {
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();

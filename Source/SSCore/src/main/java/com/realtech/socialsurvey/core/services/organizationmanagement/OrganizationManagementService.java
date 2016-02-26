@@ -1277,4 +1277,8 @@ public interface OrganizationManagementService
 
     List<UserFromSearch> getUsersBySearchKey( String searchKey ) throws InvalidInputException, SolrException;
 
+
+    public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail )
+        throws InvalidInputException;
+
 }

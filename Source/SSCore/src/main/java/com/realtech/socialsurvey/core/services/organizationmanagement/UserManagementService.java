@@ -520,5 +520,8 @@ public interface UserManagementService
 
 
     void deleteSSAdmin( User admin, long ssAdminId ) throws InvalidInputException;
+
+
+    public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException;
 }
 // JIRA SS-34 BY RM02 BOC

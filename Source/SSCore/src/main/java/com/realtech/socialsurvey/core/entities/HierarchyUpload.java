@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class HierarchyUpload
 {
+    private String _id;
     private long companyId;
     private List<RegionUploadVO> regions;
     private List<BranchUploadVO> branches;
@@ -18,6 +19,18 @@ public class HierarchyUpload
     public List<RegionUploadVO> getRegions()
     {
         return regions;
+    }
+
+
+    public String get_id()
+    {
+        return _id;
+    }
+
+
+    public void set_id( String _id )
+    {
+        this._id = _id;
     }
 
 
