@@ -2425,16 +2425,16 @@ var hierarchyUpload = {
 												.hierundefined(hierarchyjson.upload.users[i].title)
 										+ '</div></td><td><div class="hier-upload-td" title="'
 										+ hierarchyUpload
-												.hierundefined(hierarchyjson.upload.users[i].sourceBranchId)
+												.hierundefined(hierarchyjson.upload.users[i].assignedBranches)
 										+ '">'
 										+ hierarchyUpload
-												.hierundefined(hierarchyjson.upload.users[i].sourceBranchId)
+												.hierundefined(hierarchyjson.upload.users[i].assignedBranches)
 										+ '</div></td><td><div class="hier-upload-td" title="'
 										+ hierarchyUpload
-												.hierundefined(hierarchyjson.upload.users[i].sourceRegionId)
+												.hierundefined(hierarchyjson.upload.users[i].assignedRegions)
 										+ '">'
 										+ hierarchyUpload
-												.hierundefined(hierarchyjson.upload.users[i].sourceRegionId)
+												.hierundefined(hierarchyjson.upload.users[i].assignedRegions)
 										+ '</div></td><td><div class="hier-upload-td" title="'
 										+ hierarchyUpload
 												.hierundefined(hierarchyjson.upload.users[i].assignedBranchesAdmin)
