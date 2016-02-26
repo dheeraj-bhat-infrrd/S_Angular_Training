@@ -62,7 +62,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -72,17 +71,15 @@ import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUns
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -104,9 +101,6 @@ public class OrganizationManagementController
     private OrganizationManagementService organizationManagementService;
 
     @Autowired
-    private ProfileManagementService profileManagementService;
-
-    @Autowired
     private UserManagementService userManagementService;
 
     @Autowired
@@ -114,9 +108,6 @@ public class OrganizationManagementController
 
     @Autowired
     private FileUploadService fileUploadService;
-
-    @Autowired
-    private EncryptionHelper encryptionHelper;
 
     @Autowired
     private SessionHelper sessionHelper;
@@ -136,6 +127,18 @@ public class OrganizationManagementController
     @Autowired
     private Payment payment;
 
+    @Autowired
+    private SurveyHandler surveyHandler;
+
+    @Autowired
+    private UrlService urlService;
+
+    @Autowired
+    private HierarchyUploadService hierarchyUploadService;
+
+    @Autowired
+    private HierarchyStructureUploadService hierarchyStructureUploadService;
+
     @Value ( "${CDN_PATH}")
     private String endpoint;
 
@@ -147,34 +150,23 @@ public class OrganizationManagementController
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
+
     @Value ( "${NEUTRAL_TEXT}")
     private String neutralText;
+
     @Value ( "${SAD_TEXT}")
     private String sadText;
 
     @Value ( "${HAPPY_TEXT_COMPLETE}")
     private String happyTextComplete;
+
     @Value ( "${NEUTRAL_TEXT_COMPLETE}")
     private String neutralTextComplete;
+
     @Value ( "${SAD_TEXT_COMPLETE}")
     private String sadTextComplete;
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
-
-    @Autowired
-    private SettingsManager settingsManager;
-
-    @Autowired
-    private SurveyHandler surveyHandler;
-
-    @Autowired
-    private UrlService urlService;
-
-    @Autowired
-    private CsvUploadService csvUploadService;
-
-    @Autowired
-    private HierarchyUploadService hierarchyUploadService;
 
 
     /**
@@ -2765,7 +2757,9 @@ public class OrganizationManagementController
         String response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        User user = sessionHelper.getCurrentUser();
         try {
+            hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user );
             response = "Data uploaded successfully.";
         } catch ( Exception ex ) {
             status = false;
