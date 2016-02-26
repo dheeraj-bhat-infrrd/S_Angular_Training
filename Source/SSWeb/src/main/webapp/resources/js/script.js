@@ -2006,6 +2006,7 @@ function initializeUserCompanyRegistrationPage() {
 
 var hierarchyUpload = {
 	verified : false,
+	hierarchyJson : {},
 	hierundefined : function(hierval) {
 		if (hierval == undefined) {
 			return "";
@@ -2032,6 +2033,7 @@ var hierarchyUpload = {
 							}
 
 							if (hierarchyUpload.verified == true) {
+								hierarchyUpload.verified = false;
 								$('#xlsx-file-verify').css("pointerEvents",
 										"auto");
 								var formData = new FormData();
@@ -2044,7 +2046,6 @@ var hierarchyUpload = {
 										"./savexlsxfile.do",
 										hierarchyUpload.saveXlxsSuccessCallback,
 										true, formData);
-								hierarchyUpload.verified = false;
 							}
 
 							else {
@@ -2056,8 +2057,8 @@ var hierarchyUpload = {
 
 		$('#xlsx-file-verify').click(
 				function() {
-					var url = $("#fileUrl").val();
 					$('#summary').hide();
+					var url = $("#fileUrl").val();
 					if (url == undefined || url == '') {
 						$('#xlsx-file-verify').css("pointerEvents", "none");
 						showError("Please upload a valid file");
@@ -2068,25 +2069,46 @@ var hierarchyUpload = {
 						callAjaxPOSTWithTextDataUpload("./verifyxlsxfile.do",
 								hierarchyUpload.uploadXlxsSuccessCallback,
 								true, formData);
-						hierarchyUpload.verified = false;
 					}
 				});
-		$('#xlsx-file-upload').click(function() {
-			/*
-			 * if (hierarchyUpload.verified == true) { var formData = new
-			 * FormData(); formData.append("logo", $('#com-file')
-			 * .prop("files")[0]); formData .append("logo_name", $(
-			 * '#com-file').prop( "files")[0].name);
-			 * callAjaxPOSTWithTextDataLogo("./uploadxlsxfile.do",
-			 * hierarchyUpload.uploadXlxsSuccessCallback, true, formData);
-			 * hierarchyUpload.verified=false; } else{ showError("File is not
-			 * verified"); }
-			 */
-		});
+		$('#xlsx-file-upload').click(
+				function() {
+					if (hierarchyUpload.verified == true) {
+						var formData = new FormData();
+						formData.append("hierarchyJson", JSON
+								.stringify(hierarchyUpload.hierarchyJson));
+						showOverlay();
+						callAjaxPOSTWithTextDataUpload("./uploadxlsxfile.do",
+								hierarchyUpload.saveXlxsDataSuccessCallback,
+								true, formData);
+						hierarchyUpload.verified = false;
+					} else {
+						showError("File is not verified");
+					}
+				});
 		$('#icn-xlsxfile').click(function() {
 			$('#com-file').trigger('click');
 		});
 	},
+
+	saveXlxsDataSuccessCallback : function(response) {
+		if (!response) {
+			showError(response);
+		} else {
+			var jsonResponse = $.parseJSON(response);
+			if (!jsonResponse.status) {
+				showError(jsonResponse.response);
+			} else {
+				showInfo(jsonResponse.response);
+			}
+		}
+		$('#com-file').val('');
+		$('#com-xlsx-file').val('');
+		$('#fileUrl').val('');
+		$('#summary').hide();
+		$('#xlsx-file-upload').css("pointerEvents", "none");
+	},
+
 	fixStr : function(key) {
 		var out = key.replace(/^[a-z]|[^\s][A-Z]/g, function(key, offset) {
 			if (offset == 0) {
@@ -2097,6 +2119,7 @@ var hierarchyUpload = {
 		});
 		return (out);
 	},
+
 	uploadXlxsSuccessCallback : function(response) {
 		if (!response) {
 			$('#com-file').val('');
@@ -2104,6 +2127,7 @@ var hierarchyUpload = {
 			$('#fileUrl').val('');
 			showError(response);
 		} else {
+
 			var hierarchyjson = $.parseJSON(response);
 
 			if (hierarchyjson.numberOfRegionsAdded != 0) {
@@ -2484,9 +2508,7 @@ $('.v-hiararchy-edit').click(function(e){
 				$(this).parent().next('.hier-branch-edit').slideToggle(200);
 			});
 
-			var userlength = hierarchyjson.upload.users.length;
-			if (userlength != 0) {
-				$('#user-upload').empty();
+
 				var userlength = hierarchyjson.upload.users.length;
 				for (var i = 0; i < userlength; i++) {
 					if(hierarchyjson.upload.users[i].isUserAdded == true) {
@@ -2729,11 +2751,10 @@ $('.v-hiararchy-edit').click(function(e){
 			});
 			if (regionlength == 0 && branchlength == 0 && userlength == 0) {
 				$('#no-data').show();
+
 			}
-
-		}
-
-	},
+		},
+	
 
 	addToolTip : function(data) {
 		var toolTipMsg = "";
@@ -2767,40 +2788,7 @@ $('.v-hiararchy-edit').click(function(e){
 		return toolTip;
 	},
 	
-	
-	getHierDetails : function() {
-		callAjaxGET("./fetchEditRegionPopupDetails.do",
-				hierarchyUpload.callBackEditRegionDetails, true);
-	},
-	callBackEditRegionDetails : function(data) {
-		$('.hier-reg-det').html(data);
-	},
 
-	/* callBackEditRegionDetails : function(data) {
-
-		var header = "Edit Region Detail";
-		hierarchyUpload.createEditRegionPopup(header, data);
-
-		// update events
-
-		$('#overlay-continue').click(function() {
-			var isFocussed = false;
-
-			$('#overlay-continue').unbind('click');
-		});
-
-		$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
-		disableBodyScroll();
-		$('body').scrollTop('0');
-	},
-
-	createEditRegionPopup : function(header, body) {
-		$('#overlay-header').html(header);
-		$('#overlay-text').html(body);
-		$('#overlay-continue').html("Ok");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-main').show();
-	},*/
 
 	saveXlxsSuccessCallback : function(response) {
 		if (!response) {

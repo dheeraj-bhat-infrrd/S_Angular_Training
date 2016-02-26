@@ -185,7 +185,6 @@ function callAjaxPOSTWithTextDataUpload(url, callBackFunction, isAsync, formData
 				async : isAsync,
 				success : callBackFunction,
 				error : function(e) {
-					console.log(e);
 					if(e.status == 500) {
 						showError("Hierarchy upload failed. Please try again.");
 					}

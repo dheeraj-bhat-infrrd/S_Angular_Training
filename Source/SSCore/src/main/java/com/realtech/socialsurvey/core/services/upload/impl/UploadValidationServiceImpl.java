@@ -39,7 +39,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
     {
         List<String> regionValidationErrors = new ArrayList<String>();
         for ( RegionUploadVO uploadedRegion : validationObject.getUpload().getRegions() ) {
-            if ( !uploadedRegion.isSourceRegionIdGenerated() ) {
+            if ( !uploadedRegion.isDeletedRecord() ) {
                 validateRegionForErrors( uploadedRegion, regionValidationErrors );
             }
         }
@@ -52,7 +52,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> branchValidationErrors = new ArrayList<String>();
         List<String> branchValidationWarnings = new ArrayList<String>();
         for ( BranchUploadVO uploadedBranch : validationObject.getUpload().getBranches() ) {
-            if ( !uploadedBranch.isSourceBranchIdGenerated() ) {
+            if ( !uploadedBranch.isDeletedRecord() ) {
                 validateBranchForErrors( uploadedBranch, branchValidationErrors, validationObject.getUpload() );
                 validateBranchForWarnings( uploadedBranch, branchValidationWarnings );
             }
@@ -67,7 +67,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> userValidationErrors = new ArrayList<String>();
         List<String> userValidationWarnings = new ArrayList<String>();
         for ( UserUploadVO uploadeduser : validationObject.getUpload().getUsers() ) {
-            if ( !uploadeduser.isSourceUserIdGenerated() ) {
+            if ( !uploadeduser.isDeletedRecord() ) {
                 validateUserForErrors( uploadeduser, userValidationErrors, validationObject.getUpload() );
                 validateUserForWarnings( uploadeduser, userValidationWarnings );
             }
@@ -141,7 +141,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
             if ( branch.isDeletedRecord() ) {
                 boolean errorRecordDueToActiveUser = false;
                 if ( usersLinkedToBranch.containsKey( branch.getSourceBranchId() ) ) {
-                    for ( UserUploadVO user : usersLinkedToBranch.get( branch.getSourceRegionId() ) ) {
+                    for ( UserUploadVO user : usersLinkedToBranch.get( branch.getSourceBranchId() ) ) {
                         if ( !user.isDeletedRecord() ) {
                             errorRecordDueToActiveUser = true;
                             break;
@@ -272,7 +272,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
                 .add( "Office name at row: " + uploadedBranch.getRowNum() + " is not provided" );
             errorRecord = true;
         }
-        if ( !uploadedBranch.isAddressSet() ) {
+        if ( ( uploadedBranch.getBranchAddress1() == null || uploadedBranch.getBranchAddress1().isEmpty() )
+            && ( uploadedBranch.getBranchAddress2() == null || uploadedBranch.getBranchAddress2().isEmpty() ) ) {
             LOG.error( "Office address at row: " + uploadedBranch.getRowNum() + " is not provided" );
             branchValidationErrors.add( "Office address at row: " + uploadedBranch.getRowNum() + " is not provided" );
             uploadedBranch.getValidationErrors()
@@ -337,6 +338,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
             uploadedUser.getValidationErrors().add( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             errorRecord = true;
         }
+        //TODO: Replace this check with that of assigned branches
         if ( uploadedUser.getSourceBranchId() != null && !uploadedUser.getSourceBranchId().isEmpty()
             && !isSourceBranchIdMappedToBranch( uploadedUser.getSourceBranchId(), upload ) ) {
             LOG.error( "The branch id at row: " + uploadedUser.getRowNum() + " is not valid" );
@@ -344,6 +346,17 @@ public class UploadValidationServiceImpl implements UploadValidationService
             uploadedUser.getValidationErrors().add( "The branchId at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
         }
+
+        if ( uploadedUser.getAssignedBranches() != null && !uploadedUser.getAssignedBranches().isEmpty()
+            && !isSourceBranchIdMappedToBranch( uploadedUser.getAssignedBranches(), upload ) ) {
+            LOG.error( "An assigned branch at row: " + uploadedUser.getRowNum() + " is not valid" );
+            userValidationErrors.add( "An assigned branch at row: " + uploadedUser.getRowNum() + " is not valid" );
+            uploadedUser.getValidationErrors()
+                .add( "An assigned branch at row: " + uploadedUser.getRowNum() + " is not valid" );
+            errorRecord = true;
+        }
+
+        //TODO: Replace this check with that of assigned regions
         if ( uploadedUser.getSourceRegionId() != null && !uploadedUser.getSourceRegionId().isEmpty()
             && !isSourceRegionIdMappedToRegion( uploadedUser.getSourceRegionId(), upload ) ) {
             LOG.error( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
@@ -351,6 +364,16 @@ public class UploadValidationServiceImpl implements UploadValidationService
             uploadedUser.getValidationErrors().add( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
         }
+
+        if ( uploadedUser.getAssignedRegions() != null && !uploadedUser.getAssignedRegions().isEmpty()
+            && !isSourceRegionIdMappedToRegion( uploadedUser.getAssignedRegions(), upload ) ) {
+            LOG.error( "An assigned region at row: " + uploadedUser.getRowNum() + " is not valid" );
+            userValidationErrors.add( "An assigned region at row: " + uploadedUser.getRowNum() + " is not valid" );
+            uploadedUser.getValidationErrors()
+                .add( "An assigned region at row: " + uploadedUser.getRowNum() + " is not valid" );
+            errorRecord = true;
+        }
+
         if ( uploadedUser.getAssignedBranchesAdmin() != null && !uploadedUser.getAssignedBranchesAdmin().isEmpty() ) {
             if ( isSourceBranchIdMappedToBranch( uploadedUser.getAssignedBranchesAdmin(), upload ) ) {
                 uploadedUser.setBranchAdmin( true );

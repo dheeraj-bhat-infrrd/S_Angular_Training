@@ -67,8 +67,8 @@
 		</div>
 	</div>
 	<div id="hierarchy-upload"
-		class="reg_form_row clearfix hierarchy-btn hide">
-		<div class="reg_btn" id="xlsx-file-upload">
+		class="reg_form_row clearfix hierarchy-btn">
+		<div class="reg_btn" id="xlsx-file-upload" style="pointer-events : none">
 			<spring:message code="label.upload.key" />
 		</div>
 	</div>
@@ -285,20 +285,7 @@
 			</table>
 		</div>
 	</div>
-
-	<div id="hierarchy-upload" class="reg_form_row clearfix hierarchy-btn"
-		style="float: none !important;">
-		<div class="reg_btn" id="xlsx-file-upload">
-			<spring:message code="label.upload.key" />
-		</div>
-	</div>
 </div>
-
-
-
-
-
-
 <script>
 	$(document).ready(function() {
 		hierarchyUpload.fileUpload();

@@ -24,4 +24,8 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 
     List<BillingReportData> getAllUsersInCompanysForBillingReport( int startIndex, int batchSize );
 
+    List<BillingReportData> getAllUsersInGivenCompaniesForBillingReport( int startIndex, int batchSize, Long companyId );
+
+    List<Company> getCompaniesWithExpiredInvoice();
+
 }
