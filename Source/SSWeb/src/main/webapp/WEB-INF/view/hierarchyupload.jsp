@@ -95,13 +95,25 @@
 	<div class="tab-content">
 		<div class="tab-pane fade active in" id="upload-summary-region"
 			style="overflow: auto; max-height: 500px;">
-			<h2 style="color: #666;">Region Summary</h2>
-			<div class="clearfix">
-				<div id="region-added" class="float-left hide"></div>
-				<div id="region-modified" class="float-left hide"></div>
-				<div id="region-deleted" class="float-left hide"></div>
+			<!-- <h2 style="color: #666;">Region Summary</h2> -->
+			<div class="clearfix" style="margin-top:30px;width: 425px;margin-left: auto;margin-right: auto;">
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-red"></span><span style="margin-left:5px;">Deleted Record</span>
+				</div>
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-green"></span><span style="margin-left:5px;">Added Record</span>
+				</div>
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-blue"></span><span style="margin-left:5px;">Modified Record</span>
+				</div>
 			</div>
-			<table class="table">
+			<div class="clearfix" style="margin-top:10px;">
+				<div id="region-added" class="float-left hide" style="margin-right: 20px;"></div>
+				<div id="region-modified" class="float-left hide" style="margin-right: 20px;"></div>
+				<div id="region-deleted" class="float-left hide" style="margin-right: 20px;"></div>
+			</div>
+			
+			<table class="table" style="margin-top:10px;">
 				<thead>
 					<tr>
 						<th
@@ -139,13 +151,24 @@
 		</div>
 		<div class="tab-pane fade" id="upload-summary-branch"
 			style="overflow: auto; max-height: 500px;">
-			<h2 style="color: #666;">Branch Summary</h2>
-			<div class="clearfix">
-				<div id="branch-added" class="float-left"></div>
-				<div id="branch-modified" class="float-left"></div>
-				<div id="branch-deleted" class="float-left"></div>
+			<!-- <h2 style="color: #666;">Branch Summary</h2> -->
+			<div class="clearfix" style="margin-top:30px;width: 425px;margin-left: auto;margin-right: auto;">
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-red"></span><span style="margin-left:5px;">Deleted Record</span>
+				</div>
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-green"></span><span style="margin-left:5px;">Added Record</span>
+				</div>
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-blue"></span><span style="margin-left:5px;">Modified Record</span>
+				</div>
 			</div>
-			<table class="table">
+			<div class="clearfix" style="margin-top:10px;">
+				<div id="branch-added" class="float-left" style="margin-right: 20px;"></div>
+				<div id="branch-modified" class="float-left" style="margin-right: 20px;"></div>
+				<div id="branch-deleted" class="float-left" style="margin-right: 20px;"></div>
+			</div>
+			<table class="table" style="margin-top:10px;">
 				<thead>
 					<tr>
 						<th
@@ -185,13 +208,24 @@
 		</div>
 		<div class="tab-pane fade" id="upload-summary-user"
 			style="overflow: auto; max-height: 500px;">
-			<h2 style="color: #666;">User Summary</h2>
-			<div class="clearfix">
-				<div id="user-added" class="float-left"></div>
-				<div id="user-modified" class="float-left"></div>
-				<div id="user-deleted" class="float-left"></div>
+			<!-- <h2 style="color: #666;">User Summary</h2> -->
+			<div class="clearfix" style="margin-top:30px;width: 425px;margin-left: auto;margin-right: auto;">
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-red"></span><span style="margin-left:5px;">Deleted Record</span>
+				</div>
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-green"></span><span style="margin-left:5px;">Added Record</span>
+				</div>
+				<div class="float-left" style="margin-right:20px;">
+					<span class="lgn-col-item hier-col-blue"></span><span style="margin-left:5px;">Modified Record</span>
+				</div>
 			</div>
-			<table class="table">
+			<div class="clearfix" style="margin-top:10px;">
+				<div id="user-added" class="float-left" style="margin-right: 20px;"></div>
+				<div id="user-modified" class="float-left" style="margin-right: 20px;"></div>
+				<div id="user-deleted" class="float-left" style="margin-right: 20px;"></div>
+			</div>
+			<table class="table" style="margin-top:10px;">
 				<thead>
 					<tr>
 						<th
