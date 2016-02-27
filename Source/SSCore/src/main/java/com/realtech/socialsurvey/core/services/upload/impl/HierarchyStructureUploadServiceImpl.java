@@ -1254,7 +1254,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         LOG.info( "Method assignBranchesToUser() for user : " + user.getEmailId() + " isAdmin : " + isAdmin
             + " started." );
         if ( ( !isAdmin && ( user.isSourceBranchIdModified() || user.isAssignedBranchesModified() ) )
-            || ( isAdmin && user.isAssignedBrachesAdminModified() ) ) {
+            || ( isAdmin && user.isAssignedBrachesAdminModified() ) || user.isUserAdded() ) {
             //Compare the current user assignments and the new assignments to find the changes
             /*
              * Cases to handle:
@@ -1377,7 +1377,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.info( "Method assignRegionsToUser started for user : " + user.getEmailId() );
         if ( ( !isAdmin && ( user.isSourceRegionIdModified() || user.isAssignedRegionsModified() ) )
-            || ( isAdmin && user.isAssignedRegionsAdminModified() ) ) {
+            || ( isAdmin && user.isAssignedRegionsAdminModified() || user.isUserAdded() ) ) {
             //Compare the current user assignments and the new assignments to find the changes
             /*
              * Cases to handle:
