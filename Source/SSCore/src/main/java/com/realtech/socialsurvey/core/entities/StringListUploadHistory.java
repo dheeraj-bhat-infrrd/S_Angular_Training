@@ -1,13 +1,13 @@
 package com.realtech.socialsurvey.core.entities;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 
 public class StringListUploadHistory
 {
     private List<String> value;
-    private Timestamp time;
+    private Date time;
 
 
     public List<String> getValue()
@@ -22,13 +22,13 @@ public class StringListUploadHistory
     }
 
 
-    public Timestamp getTime()
+    public Date getTime()
     {
         return time;
     }
 
 
-    public void setTime( Timestamp time )
+    public void setTime( Date time )
     {
         this.time = time;
     }

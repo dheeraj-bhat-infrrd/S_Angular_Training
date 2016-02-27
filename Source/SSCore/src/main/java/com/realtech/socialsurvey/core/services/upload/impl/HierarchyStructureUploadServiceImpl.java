@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -309,7 +310,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     }
 
                     // map the history records
-                    //mapBranchModificationHistory( branchUpload, branch );
+                    mapBranchModificationHistory( branchUpload, branch );
 
                     // map the id mapping
                     if ( branchUpload.getSourceRegionId() != null && !branchUpload.getSourceRegionId().isEmpty() ) {
@@ -454,7 +455,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         region = modifyRegion( user, regionUpload );
                     }
                     // map the history records
-                    //mapRegionModificationHistory( regionUpload, region );
+                    mapRegionModificationHistory( regionUpload, region );
                     // map the id mapping
                     if ( regionUpload.getSourceRegionId() != null && !regionUpload.getSourceRegionId().isEmpty() ) {
                         upload.getRegionSourceMapping().put( regionUpload.getSourceRegionId(), region.getRegionId() );
@@ -506,7 +507,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     RegionUploadVO mapRegionModificationHistory( RegionUploadVO regionUpload, Region region )
     {
         LOG.debug( "mapping region history" );
-        Timestamp currentTimestamp = new Timestamp( System.currentTimeMillis() );
+        Date currentDate = new Date( System.currentTimeMillis() );
         // map region id history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionIdModified() ) {
             List<LongUploadHistory> regionIdHistoryList = regionUpload.getRegionIdHistory();
@@ -515,7 +516,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             LongUploadHistory regionIdHistory = new LongUploadHistory();
             regionIdHistory.setValue( region.getRegionId() );
-            regionIdHistory.setTime( currentTimestamp );
+            regionIdHistory.setTime( currentDate );
             regionIdHistoryList.add( regionIdHistory );
             regionUpload.setRegionIdHistory( regionIdHistoryList );
             regionUpload.setRegionIdModified( false );
@@ -529,7 +530,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory sourceIdHistory = new StringUploadHistory();
             sourceIdHistory.setValue( regionUpload.getSourceRegionId() );
-            sourceIdHistory.setTime( currentTimestamp );
+            sourceIdHistory.setTime( currentDate );
             sourceIdHistoryList.add( sourceIdHistory );
             regionUpload.setSourceRegionIdHistory( sourceIdHistoryList );
             regionUpload.setSourceRegionIdModified( false );
@@ -543,7 +544,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionNameHistory = new StringUploadHistory();
             regionNameHistory.setValue( regionUpload.getRegionName() );
-            regionNameHistory.setTime( currentTimestamp );
+            regionNameHistory.setTime( currentDate );
             regionNameHistoryList.add( regionNameHistory );
             regionUpload.setRegionNameHistory( regionNameHistoryList );
             regionUpload.setRegionNameModified( false );
@@ -557,7 +558,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionAddress1History = new StringUploadHistory();
             regionAddress1History.setValue( regionUpload.getRegionAddress1() );
-            regionAddress1History.setTime( currentTimestamp );
+            regionAddress1History.setTime( currentDate );
             regionAddress1HistoryList.add( regionAddress1History );
             regionUpload.setRegionAddress1History( regionAddress1HistoryList );
             regionUpload.setRegionAddress1Modified( false );
@@ -571,7 +572,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionAddress2History = new StringUploadHistory();
             regionAddress2History.setValue( regionUpload.getRegionAddress2() );
-            regionAddress2History.setTime( currentTimestamp );
+            regionAddress2History.setTime( currentDate );
             regionAddress2HistoryList.add( regionAddress2History );
             regionUpload.setRegionAddress2History( regionAddress2HistoryList );
             regionUpload.setRegionAddress2Modified( false );
@@ -585,7 +586,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionCityHistory = new StringUploadHistory();
             regionCityHistory.setValue( regionUpload.getRegionCity() );
-            regionCityHistory.setTime( currentTimestamp );
+            regionCityHistory.setTime( currentDate );
             regionCityHistoryList.add( regionCityHistory );
             regionUpload.setRegionCityHistory( regionCityHistoryList );
             regionUpload.setRegionCityModified( false );
@@ -599,7 +600,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionStateHistory = new StringUploadHistory();
             regionStateHistory.setValue( regionUpload.getRegionState() );
-            regionStateHistory.setTime( currentTimestamp );
+            regionStateHistory.setTime( currentDate );
             regionStateHistoryList.add( regionStateHistory );
             regionUpload.setRegionStateHistory( regionStateHistoryList );
             regionUpload.setRegionStateModified( false );
@@ -613,7 +614,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionZipCodeHistory = new StringUploadHistory();
             regionZipCodeHistory.setValue( regionUpload.getRegionZipcode() );
-            regionZipCodeHistory.setTime( currentTimestamp );
+            regionZipCodeHistory.setTime( currentDate );
             regionZipCodeHistoryList.add( regionZipCodeHistory );
             regionUpload.setRegionZipcodeHistory( regionZipCodeHistoryList );
             regionUpload.setRegionZipcodeModified( false );
@@ -626,7 +627,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 regionCountryHistoryList = new ArrayList<StringUploadHistory>();
             }
             StringUploadHistory regionCountryHistory = new StringUploadHistory();
-            regionCountryHistory.setTime( currentTimestamp );
+            regionCountryHistory.setTime( currentDate );
             regionCountryHistory.setValue( regionUpload.getRegionCountry() );
             regionCountryHistoryList.add( regionCountryHistory );
             regionUpload.setRegionCountryHistory( regionCountryHistoryList );
@@ -1252,7 +1253,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.info( "Method assignBranchesToUser() for user : " + user.getEmailId() + " isAdmin : " + isAdmin
             + " started." );
-        if ( user.isSourceBranchIdModified() || user.isAssignedBranchesModified() ) {
+        if ( ( !isAdmin && ( user.isSourceBranchIdModified() || user.isAssignedBranchesModified() ) )
+            || ( isAdmin && user.isAssignedBrachesAdminModified() ) ) {
             //Compare the current user assignments and the new assignments to find the changes
             /*
              * Cases to handle:
@@ -1265,14 +1267,14 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
             if ( currentUserMap.containsKey( user.getSourceUserId() ) ) {
                 //Existing user
-                List<String> oldAssignments;
-                List<String> newAssignments;
+                List<String> oldAssignments = new ArrayList<String>();
+                List<String> newAssignments = new ArrayList<String>();
                 if ( isAdmin ) {
-                    oldAssignments = currentUserMap.get( user.getSourceBranchId() ).getAssignedBranchesAdmin();
-                    newAssignments = user.getAssignedBranchesAdmin();
+                    oldAssignments.addAll( currentUserMap.get( user.getSourceUserId() ).getAssignedBranchesAdmin() );
+                    newAssignments.addAll( user.getAssignedBranchesAdmin() );
                 } else {
-                    oldAssignments = currentUserMap.get( user.getSourceUserId() ).getAssignedBranches();
-                    newAssignments = user.getAssignedBranches();
+                    oldAssignments.addAll( currentUserMap.get( user.getSourceUserId() ).getAssignedBranches() );
+                    newAssignments.addAll( user.getAssignedBranches() );
                 }
 
                 if ( oldAssignments == null || oldAssignments.isEmpty() ) {
@@ -1374,7 +1376,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         NoRecordsFetchedException, SolrException, UserAdditionException
     {
         LOG.info( "Method assignRegionsToUser started for user : " + user.getEmailId() );
-        if ( user.isSourceRegionIdModified() || user.isAssignedRegionsModified() ) {
+        if ( ( !isAdmin && ( user.isSourceRegionIdModified() || user.isAssignedRegionsModified() ) )
+            || ( isAdmin && user.isAssignedRegionsAdminModified() ) ) {
             //Compare the current user assignments and the new assignments to find the changes
             /*
              * Cases to handle:
@@ -1390,7 +1393,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 List<String> oldAssignments;
                 List<String> newAssignments;
                 if ( isAdmin ) {
-                    oldAssignments = currentUserMap.get( user.getSourceRegionId() ).getAssignedRegionsAdmin();
+                    oldAssignments = currentUserMap.get( user.getSourceUserId() ).getAssignedRegionsAdmin();
                     newAssignments = user.getAssignedRegionsAdmin();
                 } else {
                     oldAssignments = currentUserMap.get( user.getSourceUserId() ).getAssignedRegions();
@@ -1718,7 +1721,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 userToBeUploaded.setUserId( user.getUserId() );
                 updateUserSettingsInMongo( user, userToBeUploaded );
                 //map the history records
-                //mapUserModificationHistory( userToBeUploaded, user );
+                mapUserModificationHistory( userToBeUploaded, user );
                 //map the id mapping
                 if ( userToBeUploaded.getSourceRegionId() != null && !userToBeUploaded.getSourceRegionId().isEmpty() ) {
                     upload.getRegionSourceMapping().put( userToBeUploaded.getSourceRegionId(), userToBeUploaded.getRegionId() );
