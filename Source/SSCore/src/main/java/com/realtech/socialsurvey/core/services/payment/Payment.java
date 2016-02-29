@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.payment;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 import com.braintreegateway.BraintreeGateway;
@@ -254,5 +255,14 @@ public interface Payment {
 
 
     void deleteCustomer( String customerId ) throws CustomerDeletionUnsuccessfulException, InvalidInputException;
+
+
+    Subscription getSubscriptionDetailFromBrainTree( String subscriptionId ) throws InvalidInputException;
+
+
+    List<Transaction> getTransactionListFromBrainTree( String subscriptionId ) throws InvalidInputException;
+
+
+    List<Subscription> getActiveSubscriptionsListFromBrainTree() throws InvalidInputException;
 		
 }
