@@ -1,12 +1,12 @@
 package com.realtech.socialsurvey.core.entities;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 
 public class BooleanUploadHistory
 {
     private boolean value;
-    private Timestamp time;
+    private Date time;
 
 
     public boolean isValue()
@@ -21,13 +21,13 @@ public class BooleanUploadHistory
     }
 
 
-    public Timestamp getTime()
+    public Date getTime()
     {
         return time;
     }
 
 
-    public void setTime( Timestamp time )
+    public void setTime( Date time )
     {
         this.time = time;
     }

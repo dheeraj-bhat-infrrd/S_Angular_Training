@@ -1,6 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Holds the upload history for long variables
@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 public class LongUploadHistory
 {
     private long value;
-    private Timestamp time;
+    private Date time;
     public long getValue()
     {
         return value;
@@ -18,11 +18,11 @@ public class LongUploadHistory
     {
         this.value = value;
     }
-    public Timestamp getTime()
+    public Date getTime()
     {
         return time;
     }
-    public void setTime( Timestamp time )
+    public void setTime( Date time )
     {
         this.time = time;
     }

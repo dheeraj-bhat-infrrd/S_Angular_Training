@@ -72,6 +72,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -1381,6 +1382,37 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     }
 
+
+    /**
+     * 
+     * @param user
+     * @param adminUser
+     * @param profileId
+     * @throws UserAssignmentException
+     */
+    @Transactional
+    @Override
+    public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException
+    {
+        try {
+            List<UserProfile> userprofileList = getAllUserProfilesForUser( user );
+            if ( userprofileList.size() == 1 && userprofileList.get( 0 ).getUserProfileId() == profileId ) {
+                throw new UserAssignmentException( "Cannot remove last user assignment." );
+            }
+
+            updateUserProfile( user, profileId, CommonConstants.STATUS_INACTIVE );
+            updateUserProfilesStatus( user, profileId );
+            removeUserProfile( profileId );
+
+            updatePrimaryProfileOfUser( user );
+            user = getUserByUserId( user.getUserId() );
+            updateUserInSolr( user );
+        } catch ( InvalidInputException | SolrException e ) {
+            LOG.error( "An exception occured while removing user assignment. Reason : ", e );
+            throw new UserAssignmentException( "An exception occured while removing user assignment. Reason : ", e );
+        }
+    }
+    
 
     /*
      * Method to update the given user as active or inactive.

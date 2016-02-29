@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,14 +15,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BooleanUploadHistory;
@@ -40,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.StringListUploadHistory;
 import com.realtech.socialsurvey.core.entities.StringUploadHistory;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.exception.BranchAdditionException;
@@ -55,6 +61,7 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 
 
 @Component
@@ -90,6 +97,18 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
     @Autowired
     private SocialManagementService socialManagementService;
+    
+    @Value ( "${MASK_EMAIL_ADDRESS}")
+    private String maskEmail;
+    
+    @Autowired
+    private Utils utils;
+    
+    @Autowired
+    private UserProfileDao userProfileDao;
+    
+    @Autowired
+    private HierarchyUploadDao hierarchyUploadDao;
 
 
     @Override
@@ -119,13 +138,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         // Uploading branches
         uploadBranches( upload, user, company );
         // Uploading users
-        uploadUsers( upload, user, company );
+        uploadUsers( upload, user );
         // Delete users
         deleteUsers( upload, user, company );
         // Delete branches
         deleteBranches( upload, user, company );
         // Delete regions
         deleteRegions( upload, user, company );
+        
+        hierarchyUploadDao.saveHierarchyUploadObject( upload );
     }
 
 
@@ -254,50 +275,6 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
-    @SuppressWarnings ( { "unchecked", "rawtypes" })
-    @Transactional
-    void uploadUsers( HierarchyUpload upload, User adminUser, Company company )
-    {
-        LOG.debug( "Uploading new users" );
-        List<UserUploadVO> usersToBeUploaded = upload.getUsers();
-        Map<Object, Object> userMap = new HashMap<Object, Object>();
-        Map<UserUploadVO, User> map = new HashMap<UserUploadVO, User>();
-        List<String> userErrors = new ArrayList<String>();
-        try {
-            if ( usersToBeUploaded != null && !usersToBeUploaded.isEmpty() ) {
-                LOG.info( "Uploading users to database." );
-                userMap = uploadUsers( usersToBeUploaded, adminUser, userErrors, upload );
-                map = (HashMap) userMap.get( "ValidUser" );
-                userErrors = (List) userMap.get( "InvalidUser" );
-                if ( map != null && !map.isEmpty() ) {
-                    LOG.debug( "Adding extra user details " );
-                    for ( Map.Entry<UserUploadVO, User> entry : map.entrySet() ) {
-                        UserUploadVO userUploadVO = entry.getKey();
-                        User uploadedUser = entry.getValue();
-                        try {
-                            updateUserSettingsInMongo( uploadedUser, userUploadVO, userErrors );
-                            //map the history records
-                            mapUserModificationHistory( userUploadVO, uploadedUser );
-                            //map the id mapping
-                            upload.getRegionSourceMapping().put( userUploadVO.getSourceRegionId(), userUploadVO.getRegionId() );
-                            upload.getBranchSourceMapping().put( userUploadVO.getSourceBranchId(), userUploadVO.getBranchId() );
-                            upload.getUserSourceMapping().put( userUploadVO.getSourceUserId(), userUploadVO.getUserId() );
-                        } catch ( Exception e ) {
-                            //TODO: process errors and return them to the user
-                            userErrors.add( "Exception caught for user " + uploadedUser.getUsername() + " "
-                                + uploadedUser.getUserId() );
-                            //TODO: What about the flags of these records? Do I leave them as it is?
-                        }
-                    }
-                }
-            }
-        } catch ( Exception e ) {
-            // TODO:process errors and return them to the user
-            e.printStackTrace();
-        }
-    }
-
-
     @Transactional
     void uploadBranches( HierarchyUpload upload, User user, Company company )
     {
@@ -324,7 +301,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
                     if ( branchUpload.isBranchAdded() ) {
                         // Add branch
-                        branch = createBranch( user, branchUpload );
+                        branch = createBranch( user, branchUpload, upload );
                         branchUpload.setBranchId( branch.getBranchId() );
                     } else if ( branchUpload.isBranchModified() ) {
                         // Modify branch
@@ -336,8 +313,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     mapBranchModificationHistory( branchUpload, branch );
 
                     // map the id mapping
-                    upload.getRegionSourceMapping().put( branchUpload.getSourceRegionId(), branch.getRegion().getRegionId() );
-                    upload.getBranchSourceMapping().put( branchUpload.getSourceBranchId(), branch.getBranchId() );
+                    if ( branchUpload.getSourceRegionId() != null && !branchUpload.getSourceRegionId().isEmpty() ) {
+                        upload.getRegionSourceMapping().put( branchUpload.getSourceRegionId(), branch.getRegion().getRegionId() );
+                    }
+                    if ( branchUpload.getSourceBranchId() != null && !branchUpload.getSourceBranchId().isEmpty() ) {
+                        upload.getBranchSourceMapping().put( branchUpload.getSourceBranchId(), branch.getBranchId() );
+                    }
+                    
                     upload.setBranches( branchesToBeUploaded );
 
                 } catch ( InvalidInputException | BranchAdditionException | SolrException | NoRecordsFetchedException
@@ -400,7 +382,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @throws NoRecordsFetchedException
      */
     @Transactional
-    Branch createBranch( User adminUser, BranchUploadVO branch ) throws InvalidInputException, BranchAdditionException,
+    Branch createBranch( User adminUser, BranchUploadVO branch, HierarchyUpload upload ) throws InvalidInputException, BranchAdditionException,
         SolrException
     {
         Branch newBranch = null;
@@ -422,6 +404,22 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( adminUser );
             country = companySettings.getContact_details().getCountry();
             countryCode = companySettings.getContact_details().getCountryCode();
+        }
+        //Default region
+        if ( branch.getSourceRegionId() == null || branch.getSourceRegionId().isEmpty() ) {
+            try {
+                Region region = organizationManagementService.getDefaultRegionForCompany( adminUser.getCompany() );
+                branch.setRegionId( region.getRegionId() );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+        } else {
+            //Resolve region Id
+            if ( upload.getRegionSourceMapping().containsKey( branch.getSourceRegionId() ) ) {
+                branch.setRegionId( upload.getRegionSourceMapping().get( branch.getSourceRegionId() ) );
+            }
         }
 
         newBranch = organizationManagementService.addNewBranch( adminUser, branch.getRegionId(), CommonConstants.NO,
@@ -459,7 +457,10 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     // map the history records
                     mapRegionModificationHistory( regionUpload, region );
                     // map the id mapping
-                    upload.getRegionSourceMapping().put( regionUpload.getSourceRegionId(), region.getRegionId() );
+                    if ( regionUpload.getSourceRegionId() != null && !regionUpload.getSourceRegionId().isEmpty() ) {
+                        upload.getRegionSourceMapping().put( regionUpload.getSourceRegionId(), region.getRegionId() );
+                    }
+                    
                     //Store the updated regionUploads in upload
                     upload.setRegions( regionsToBeUploaded );
                 } catch ( InvalidInputException | SolrException | NoRecordsFetchedException | UserAssignmentException e ) {
@@ -506,7 +507,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     RegionUploadVO mapRegionModificationHistory( RegionUploadVO regionUpload, Region region )
     {
         LOG.debug( "mapping region history" );
-        Timestamp currentTimestamp = new Timestamp( System.currentTimeMillis() );
+        Date currentDate = new Date( System.currentTimeMillis() );
         // map region id history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionIdModified() ) {
             List<LongUploadHistory> regionIdHistoryList = regionUpload.getRegionIdHistory();
@@ -515,7 +516,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             LongUploadHistory regionIdHistory = new LongUploadHistory();
             regionIdHistory.setValue( region.getRegionId() );
-            regionIdHistory.setTime( currentTimestamp );
+            regionIdHistory.setTime( currentDate );
             regionIdHistoryList.add( regionIdHistory );
             regionUpload.setRegionIdHistory( regionIdHistoryList );
             regionUpload.setRegionIdModified( false );
@@ -529,7 +530,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory sourceIdHistory = new StringUploadHistory();
             sourceIdHistory.setValue( regionUpload.getSourceRegionId() );
-            sourceIdHistory.setTime( currentTimestamp );
+            sourceIdHistory.setTime( currentDate );
             sourceIdHistoryList.add( sourceIdHistory );
             regionUpload.setSourceRegionIdHistory( sourceIdHistoryList );
             regionUpload.setSourceRegionIdModified( false );
@@ -543,7 +544,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionNameHistory = new StringUploadHistory();
             regionNameHistory.setValue( regionUpload.getRegionName() );
-            regionNameHistory.setTime( currentTimestamp );
+            regionNameHistory.setTime( currentDate );
             regionNameHistoryList.add( regionNameHistory );
             regionUpload.setRegionNameHistory( regionNameHistoryList );
             regionUpload.setRegionNameModified( false );
@@ -557,7 +558,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionAddress1History = new StringUploadHistory();
             regionAddress1History.setValue( regionUpload.getRegionAddress1() );
-            regionAddress1History.setTime( currentTimestamp );
+            regionAddress1History.setTime( currentDate );
             regionAddress1HistoryList.add( regionAddress1History );
             regionUpload.setRegionAddress1History( regionAddress1HistoryList );
             regionUpload.setRegionAddress1Modified( false );
@@ -571,7 +572,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionAddress2History = new StringUploadHistory();
             regionAddress2History.setValue( regionUpload.getRegionAddress2() );
-            regionAddress2History.setTime( currentTimestamp );
+            regionAddress2History.setTime( currentDate );
             regionAddress2HistoryList.add( regionAddress2History );
             regionUpload.setRegionAddress2History( regionAddress2HistoryList );
             regionUpload.setRegionAddress2Modified( false );
@@ -585,7 +586,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionCityHistory = new StringUploadHistory();
             regionCityHistory.setValue( regionUpload.getRegionCity() );
-            regionCityHistory.setTime( currentTimestamp );
+            regionCityHistory.setTime( currentDate );
             regionCityHistoryList.add( regionCityHistory );
             regionUpload.setRegionCityHistory( regionCityHistoryList );
             regionUpload.setRegionCityModified( false );
@@ -599,7 +600,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionStateHistory = new StringUploadHistory();
             regionStateHistory.setValue( regionUpload.getRegionState() );
-            regionStateHistory.setTime( currentTimestamp );
+            regionStateHistory.setTime( currentDate );
             regionStateHistoryList.add( regionStateHistory );
             regionUpload.setRegionStateHistory( regionStateHistoryList );
             regionUpload.setRegionStateModified( false );
@@ -613,7 +614,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             StringUploadHistory regionZipCodeHistory = new StringUploadHistory();
             regionZipCodeHistory.setValue( regionUpload.getRegionZipcode() );
-            regionZipCodeHistory.setTime( currentTimestamp );
+            regionZipCodeHistory.setTime( currentDate );
             regionZipCodeHistoryList.add( regionZipCodeHistory );
             regionUpload.setRegionZipcodeHistory( regionZipCodeHistoryList );
             regionUpload.setRegionZipcodeModified( false );
@@ -626,7 +627,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 regionCountryHistoryList = new ArrayList<StringUploadHistory>();
             }
             StringUploadHistory regionCountryHistory = new StringUploadHistory();
-            regionCountryHistory.setTime( currentTimestamp );
+            regionCountryHistory.setTime( currentDate );
             regionCountryHistory.setValue( regionUpload.getRegionCountry() );
             regionCountryHistoryList.add( regionCountryHistory );
             regionUpload.setRegionCountryHistory( regionCountryHistoryList );
@@ -1232,64 +1233,296 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         return companyLicenseDetail;
     }
 
-
-    User assignUser( UserUploadVO user, User adminUser ) throws UserAdditionException, InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+    /**
+     * Method to assign/unassign branches to user
+     * @param user
+     * @param adminUser
+     * @param assigneeUser
+     * @param currentUserMap
+     * @param upload
+     * @return
+     * @throws UserAssignmentException
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     * @throws UserAdditionException
+     */
+    User assignBranchesToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
+        HierarchyUpload upload, boolean isAdmin ) throws UserAssignmentException, InvalidInputException,
+        NoRecordsFetchedException, SolrException, UserAdditionException
     {
+        LOG.info( "Method assignBranchesToUser() for user : " + user.getEmailId() + " isAdmin : " + isAdmin
+            + " started." );
+        if ( ( !isAdmin && ( user.isSourceBranchIdModified() || user.isAssignedBranchesModified() ) )
+            || ( isAdmin && user.isAssignedBrachesAdminModified() ) || user.isUserAdded() ) {
+            //Compare the current user assignments and the new assignments to find the changes
+            /*
+             * Cases to handle:
+             * 1. All new assignments
+             * 2. Delete all assignments
+             * 3. add some, delete some assignments
+             */
+            List<String> addedAssignments = new ArrayList<String>();
+            List<String> deletedAssignments = new ArrayList<String>();
 
-        LOG.info( "User already exists so assigning user to approprite place" );
+            if ( currentUserMap.containsKey( user.getSourceUserId() ) ) {
+                //Existing user
+                List<String> oldAssignments = new ArrayList<String>();
+                List<String> newAssignments = new ArrayList<String>();
+                if ( isAdmin ) {
+                    oldAssignments.addAll( currentUserMap.get( user.getSourceUserId() ).getAssignedBranchesAdmin() );
+                    newAssignments.addAll( user.getAssignedBranchesAdmin() );
+                } else {
+                    oldAssignments.addAll( currentUserMap.get( user.getSourceUserId() ).getAssignedBranches() );
+                    newAssignments.addAll( user.getAssignedBranches() );
+                }
+
+                if ( oldAssignments == null || oldAssignments.isEmpty() ) {
+                    //All assignments are new
+                    addedAssignments.addAll( newAssignments );
+                } else if ( newAssignments == null || newAssignments.isEmpty() ) {
+                    //Delete all assignments
+                    deletedAssignments.addAll( oldAssignments );
+                } else {
+                    //find added and deleted assignments
+                    List<String> tempOldAssignments = new ArrayList<String>();
+                    tempOldAssignments.addAll( oldAssignments );
+                    List<String> tempNewAssignments = new ArrayList<String>();
+                    tempNewAssignments.addAll( newAssignments );
+
+                    tempOldAssignments.removeAll( newAssignments );
+                    deletedAssignments.addAll( tempOldAssignments );
+
+                    tempNewAssignments.removeAll( oldAssignments );
+                    addedAssignments.addAll( tempNewAssignments );
+                }
+            } else {
+                //All assignments are new
+                if ( isAdmin ) {
+                    if ( user.getAssignedBranchesAdmin() != null ) {
+                        addedAssignments.addAll( user.getAssignedBranchesAdmin() );
+                    }
+                } else {
+                    if ( user.getAssignedBranches() != null ) {
+                        addedAssignments.addAll( user.getAssignedBranches() );
+                    }
+                }
+            }
+            //Add branch assignments
+            for ( String sourceBranchId : addedAssignments ) {
+                if ( upload.getBranchSourceMapping().containsKey( sourceBranchId ) ) {
+                    long branchId = upload.getBranchSourceMapping().get( sourceBranchId );
+                    Branch branch = userManagementService.getBranchById( branchId );
+                    if ( branch == null ) {
+                        throw new UserAssignmentException( "unable to find branch with branchId : " + branchId
+                            + " and sourceId : " + sourceBranchId );
+                    }
+                    long regionId = branch.getRegion().getRegionId();
+                    organizationManagementService.assignBranchToUser( adminUser, branchId, regionId, assigneeUser, isAdmin );
+                } else {
+                    throw new UserAssignmentException( "unable to resolve sourceBranchId : " + sourceBranchId );
+                }
+            }
+            //Remove branch assignments
+            for ( String sourceBranchId : deletedAssignments ) {
+                if ( upload.getBranchSourceMapping().containsKey( sourceBranchId ) ) {
+                    long branchId = upload.getBranchSourceMapping().get( sourceBranchId );
+                    Branch branch = userManagementService.getBranchById( branchId );
+                    if ( branch == null ) {
+                        throw new UserAdditionException( "unable to find branch with branchId : " + branchId
+                            + " and sourceId : " + sourceBranchId );
+                    }
+                    long regionId = branch.getRegion().getRegionId();
+                    try {
+                        int profilesMaster;
+                        if ( isAdmin ) {
+                            profilesMaster = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
+                        } else {
+                            profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+                        }
+                        UserProfile profile = userProfileDao.findUserProfile( assigneeUser.getUserId(), branchId, regionId,
+                            profilesMaster );
+                        userManagementService.removeUserProfile( assigneeUser, adminUser, profile.getUserProfileId() );
+                    } catch ( NoRecordsFetchedException e ) {
+                        throw new UserAssignmentException( "Unable to fetch userProfile for user. Reason: ", e );
+                    }
+                } else {
+                    throw new UserAssignmentException( "unable to resolve sourceBranchId : " + sourceBranchId );
+                }
+            }
+        }
+        LOG.info( "Method assignBranchesToUser() for user : " + user.getEmailId() + " isAdmin : " + isAdmin
+            + " finished." );
+        return assigneeUser;
+    }
+    
+
+    /**
+     * Method to assign/unassign regions to user
+     * @param user
+     * @param adminUser
+     * @param assigneeUser
+     * @param currentUserMap
+     * @param upload
+     * @return
+     * @throws UserAssignmentException
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     * @throws UserAdditionException
+     */
+    User assignRegionsToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
+        HierarchyUpload upload, boolean isAdmin ) throws UserAssignmentException, InvalidInputException,
+        NoRecordsFetchedException, SolrException, UserAdditionException
+    {
+        LOG.info( "Method assignRegionsToUser started for user : " + user.getEmailId() );
+        if ( ( !isAdmin && ( user.isSourceRegionIdModified() || user.isAssignedRegionsModified() ) )
+            || ( isAdmin && user.isAssignedRegionsAdminModified() || user.isUserAdded() ) ) {
+            //Compare the current user assignments and the new assignments to find the changes
+            /*
+             * Cases to handle:
+             * 1. All new assignments
+             * 2. Delete all assignments
+             * 3. add some, delete some assignments
+             */
+            List<String> addedAssignments = new ArrayList<String>();
+            List<String> deletedAssignments = new ArrayList<String>();
+
+            if ( currentUserMap.containsKey( user.getSourceUserId() ) ) {
+                //Existing user
+                List<String> oldAssignments;
+                List<String> newAssignments;
+                if ( isAdmin ) {
+                    oldAssignments = currentUserMap.get( user.getSourceUserId() ).getAssignedRegionsAdmin();
+                    newAssignments = user.getAssignedRegionsAdmin();
+                } else {
+                    oldAssignments = currentUserMap.get( user.getSourceUserId() ).getAssignedRegions();
+                    newAssignments = user.getAssignedRegions();
+                }
+
+                if ( oldAssignments == null || oldAssignments.isEmpty() ) {
+                    //All assignments are new
+                    addedAssignments.addAll( newAssignments );
+                } else if ( newAssignments == null || newAssignments.isEmpty() ) {
+                    //Delete all assignments
+                    deletedAssignments.addAll( oldAssignments );
+                } else {
+                    //find added and deleted assignments
+                    List<String> tempOldAssignments = new ArrayList<String>();
+                    tempOldAssignments.addAll( oldAssignments );
+                    List<String> tempNewAssignments = new ArrayList<String>();
+                    tempNewAssignments.addAll( newAssignments );
+
+                    tempOldAssignments.removeAll( newAssignments );
+                    deletedAssignments.addAll( tempOldAssignments );
+
+                    tempNewAssignments.removeAll( oldAssignments );
+                    addedAssignments.addAll( tempNewAssignments );
+                }
+            } else {
+                //All assignments are new
+                if ( isAdmin ) {
+                    if ( user.getAssignedRegionsAdmin() != null ) {
+                        addedAssignments.addAll( user.getAssignedRegionsAdmin() );
+                    }
+                } else {
+                    if ( user.getAssignedRegions() != null ) {
+                        addedAssignments.addAll( user.getAssignedRegions() );
+                    }
+                }
+            }
+            //Add region assignments
+            for ( String sourceRegionId : addedAssignments ) {
+                if ( upload.getRegionSourceMapping().containsKey( sourceRegionId ) ) {
+                    long regionId = upload.getRegionSourceMapping().get( sourceRegionId );
+                    organizationManagementService.assignRegionToUser( adminUser, regionId, assigneeUser, isAdmin );
+                } else {
+                    throw new UserAssignmentException( "unable to resolve sourceRegionId : " + sourceRegionId );
+                }
+            }
+            //Remove region assignments
+            for ( String sourceRegionId : deletedAssignments ) {
+                if ( upload.getRegionSourceMapping().containsKey( sourceRegionId ) ) {
+                    long regionId = upload.getRegionSourceMapping().get( sourceRegionId );
+                    Branch branch = organizationManagementService.getDefaultBranchForRegion( regionId );
+                    if ( branch == null ) {
+                        throw new UserAdditionException( "unable to find default branch for regionId : " + regionId
+                            + " and sourceId : " + sourceRegionId );
+                    }
+                    try {
+                        int profilesMaster;
+                        if ( isAdmin ) {
+                            profilesMaster = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
+                        } else {
+                            profilesMaster = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+                        }
+                        UserProfile profile = userProfileDao.findUserProfile( assigneeUser.getUserId(), branch.getBranchId(),
+                            regionId, profilesMaster );
+                        userManagementService.removeUserProfile( assigneeUser, adminUser, profile.getUserProfileId() );
+                    } catch ( NoRecordsFetchedException e ) {
+                        throw new UserAssignmentException( "Unable to fetch userProfile for user. Reason: ", e );
+                    }
+                } else {
+                    throw new UserAssignmentException( "unable to resolve sourceRegionId : " + sourceRegionId );
+                }
+            }
+        }
+        LOG.info( "Method assignRegionsToUser finished for user : " + user.getEmailId() );
+        return assigneeUser;
+    }
+    
+
+    /**
+     * Method to assign/unassign user to regions and branches
+     * @param user
+     * @param adminUser
+     * @param currentUserMap
+     * @param upload
+     * @return
+     * @throws UserAdditionException
+     * @throws InvalidInputException
+     * @throws SolrException
+     * @throws NoRecordsFetchedException
+     * @throws UserAssignmentException
+     */
+    User assignUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
+        throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
+    {
+        LOG.info( "Method assignUser() started for user : " + user.getEmailId() );
         if ( !( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) {
             throw new UserAdditionException( "User : " + user.getEmailId() + " belongs to a different company" );
         }
         User assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
-
-        if ( user.isBelongsToCompany() ) {
-            LOG.debug( "Assigning user id : " + assigneeUser.getUserId() );
-            organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, 0, null, false, true );
-        } else if ( user.getBranchId() > 0l ) {
-            // User belongs to a branch
-            LOG.debug( "Assigning user : " + user.getEmailId() + " belongs to branch : " + user.getBranchId() );
-            Branch branch = branchDao.findById( Branch.class, user.getBranchId() );
-            if ( user.isBranchAdmin() ) {
-                LOG.debug( "User is the branch admin" );
-                organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), branch.getBranchId(), branch
-                    .getRegion().getRegionId(), null, true, true );
-                if ( user.isAgent() ) {
-                    organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), branch.getBranchId(),
-                        branch.getRegion().getRegionId(), null, false, true );
-                }
-                LOG.debug( "Added user : " + user.getEmailId() );
+        try {
+            if ( ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() )
+                && ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() )
+                && ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() )
+                && ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) ) {
+                //TODO: Assign user to company
+                Region region = organizationManagementService.getDefaultRegionForCompany( adminUser.getCompany() );
+                userManagementService.assignUserToRegion( adminUser, assigneeUser.getUserId(), region.getRegionId() );
             } else {
-                LOG.debug( "User is not the branch admin" );
-                organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), branch.getBranchId(), branch
-                    .getRegion().getRegionId(), null, false, true );
-                LOG.debug( "Added user : " + user.getEmailId() );
+                //Agent assignments
+                assigneeUser = assignBranchesToUser( user, adminUser, assigneeUser, currentUserMap, upload, false );
+                assigneeUser = assignRegionsToUser( user, adminUser, assigneeUser, currentUserMap, upload, false );
+                //Admin assignments
+                assigneeUser = assignBranchesToUser( user, adminUser, assigneeUser, currentUserMap, upload, true );
+                assigneeUser = assignRegionsToUser( user, adminUser, assigneeUser, currentUserMap, upload, true );
             }
-        } else if ( user.getRegionId() > 0l ) {
-            // He belongs to the region
-            LOG.debug( "Assigning user : " + user.getEmailId() + " belongs to region : " + user.getRegionId() );
-            Region region = regionDao.findById( Region.class, user.getRegionId() );
-            if ( user.isRegionAdmin() ) {
-                LOG.debug( "User is the region admin." );
-                organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(),
-                    null, true, true );
-                LOG.debug( "Added user : " + user.getEmailId() );
-                if ( user.isAgent() ) {
-                    organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(),
-                        null, false, true );
-                }
-
+        } catch ( InvalidInputException e ) {
+            //If it's because the user already exists, don't throw the exception
+            if ( e.getMessage() == DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS ) {
+                LOG.debug( "User assignment already exists" );
             } else {
-                LOG.debug( "User is not the admin of the region" );
-                organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(),
-                    null, false, true );
-                LOG.debug( "Added user : " + user.getEmailId() );
+                throw e;
             }
         }
-
+        LOG.info( "Method assignUser() finished for user : " + user.getEmailId() );
         return assigneeUser;
-
     }
+    
+    
+    
 
 
     boolean checkIfEmailIdExists( String emailId, Company company ) throws InvalidInputException
@@ -1451,185 +1684,139 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
-    // modifies the list of branchesToUpload with the actual branch id
-    private Map<Object, Object> uploadUsers( List<UserUploadVO> usersToUpload, User adminUser, List<String> userErrors,
-        HierarchyUpload upload )
+
+    /**
+     * Method to upload users from hierarchy upload object
+     * @param upload
+     * @param adminUser
+     */
+    @Transactional
+    void uploadUsers( HierarchyUpload upload, User adminUser )
     {
         LOG.debug( "Uploading users to database" );
-        Map<Object, Object> userMap = new HashMap<Object, Object>();
-        Map<UserUploadVO, User> map = new HashMap<UserUploadVO, User>();
-        for ( UserUploadVO userToBeUploaded : usersToUpload ) {
-            try {
+        Map<String, UserUploadVO> currentUserMap = new HashMap<String, UserUploadVO>();
+        try {
+                HierarchyUpload currentUpload = hierarchyUploadDao.getHierarchyUploadByCompany( adminUser.getCompany()
+                    .getCompanyId() );
+                if ( currentUpload != null && currentUpload.getUsers() != null ) {
+                    for ( UserUploadVO user : currentUpload.getUsers() ) {
+                        currentUserMap.put( user.getSourceUserId(), user );
+                    }
+                }
+            List<UserUploadVO> usersToUpload = upload.getUsers();
+            if ( usersToUpload == null || usersToUpload.isEmpty() ) {
+                return;
+            }
+            for ( UserUploadVO userToBeUploaded : usersToUpload ) {
+                User user = null;
                 if ( !userToBeUploaded.isUserAdded() && !userToBeUploaded.isUserModified() ) {
                     continue;
                 }
-                if ( userToBeUploaded.getSourceRegionId() == null ) {
-                    //Default region of company
-                    //userToBeUploaded.setRegionId( organizationManagementService.getDefaultRegionForCompany( adminUser.getCompany() ).getRegionId() );
-                }
-                userToBeUploaded.setRegionId( upload.getRegionSourceMapping().get( userToBeUploaded.getSourceRegionId() ) );
-                userToBeUploaded.setBranchId( upload.getBranchSourceMapping().get( userToBeUploaded.getSourceBranchId() ) );
                 if ( checkIfEmailIdExists( userToBeUploaded.getEmailId(), adminUser.getCompany() ) ) {
-                    try {
-                        User user = assignUser( userToBeUploaded, adminUser );
-                        if ( user != null ) {
-                            map.put( userToBeUploaded, user );
-                        }
-                    } catch ( UserAdditionException e ) {
-                        LOG.error( "UserAdditionException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "UserAdditionException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    } catch ( InvalidInputException e ) {
-                        LOG.error( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    } catch ( SolrException e ) {
-                        LOG.error( "SolrException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "SolrException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    } catch ( NoRecordsFetchedException e ) {
-                        LOG.error( "NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    } catch ( UserAssignmentException e ) {
-                        LOG.error( "UserAssignmentException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "UserAssignmentException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    }
+                    user = assignUser( userToBeUploaded, adminUser, currentUserMap, upload );
                 } else {
                     // add user
-                    try {
-                        User user = addUser( userToBeUploaded, adminUser );
-                        if ( user != null ) {
-                            map.put( userToBeUploaded, user );
-                        }
-                    } catch ( InvalidInputException e ) {
-                        LOG.error( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    } catch ( NoRecordsFetchedException e ) {
-                        LOG.error( "NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "NoRecordsFetchedException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    } catch ( SolrException e ) {
-                        LOG.error( "SolrException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "SolrException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    } catch ( UserAssignmentException e ) {
-                        LOG.error( "UserAssignmentException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "UserAssignmentException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    } catch ( UserAdditionException e ) {
-                        LOG.error( "UserAdditionException while adding user: " + userToBeUploaded.getEmailId() );
-                        userErrors.add( "UserAdditionException while adding user: " + userToBeUploaded.getEmailId()
-                            + " Exception is : " + e.getMessage() );
-                    }
+                    user = addUser( userToBeUploaded, adminUser, currentUserMap, upload );
                 }
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId() );
-                userErrors.add( "InvalidInputException while adding user: " + userToBeUploaded.getEmailId()
-                    + " Exception is : " + e.getMessage() );
+                userToBeUploaded.setUserId( user.getUserId() );
+                updateUserSettingsInMongo( user, userToBeUploaded );
+                //map the history records
+                mapUserModificationHistory( userToBeUploaded, user );
+                //map the id mapping
+                if ( userToBeUploaded.getSourceRegionId() != null && !userToBeUploaded.getSourceRegionId().isEmpty() ) {
+                    upload.getRegionSourceMapping().put( userToBeUploaded.getSourceRegionId(), userToBeUploaded.getRegionId() );
+                }
+                if ( userToBeUploaded.getSourceBranchId() != null && !userToBeUploaded.getSourceBranchId().isEmpty() ) {
+                    upload.getBranchSourceMapping().put( userToBeUploaded.getSourceBranchId(), userToBeUploaded.getBranchId() );
+                }
+                if ( userToBeUploaded.getSourceUserId() != null && !userToBeUploaded.getSourceUserId().isEmpty() ) {
+                    upload.getUserSourceMapping().put( userToBeUploaded.getSourceUserId(), userToBeUploaded.getUserId() );
+                }
+                
+                //Store the updated userUploads in upload
+                upload.setUsers( usersToUpload );
             }
-
+        } catch ( Exception e ) {
+            // TODO: Add error records
+            e.printStackTrace();
         }
-        upload.setUsers( usersToUpload );
-        userMap.put( "ValidUser", map );
-        userMap.put( "InvalidUser", userErrors );
-        return userMap;
-
+        LOG.debug( "Finished uploading users to the database" );
     }
 
 
-    @SuppressWarnings ( "unchecked")
-    User addUser( UserUploadVO user, User adminUser ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
+    /**
+     * Method to add user to MySQL
+     * @param user
+     * @param adminUser
+     * @param currentUserMap
+     * @param upload
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     * @throws UserAssignmentException
+     * @throws UserAdditionException
+     */
+    User addUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
         UserAssignmentException, UserAdditionException
     {
+        LOG.info( "Method addUser() started for user : " + user.getEmailId() ); 
         User uploadedUser = null;
-        Map<String, Object> map = new HashMap<String, Object>();
         List<User> userList = new ArrayList<User>();
         if ( checkIfEmailIdExists( user.getEmailId(), adminUser.getCompany() ) ) {
             throw new UserAdditionException( "The user already exists" );
         }
-        if ( user.isBelongsToCompany() ) {
-            // He belongs to the company
-            LOG.debug( "Adding user : " + user.getEmailId() + " belongs to company" );
-            map = organizationManagementService.addIndividual( adminUser, 0, 0, 0, new String[] { user.getEmailId() }, false,
-                true );
-            if ( map != null ) {
-                userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
-            }
-        } else if ( user.getBranchId() > 0l ) {
-            // He belongs to a branch
-            LOG.debug( "Adding user : " + user.getEmailId() + " belongs to branch : " + user.getBranchId() );
-            Branch branch = branchDao.findById( Branch.class, user.getBranchId() );
-
-            if ( user.isBranchAdmin() ) {
-                LOG.debug( "User is the branch admin" );
-                map = organizationManagementService.addIndividual( adminUser, 0, branch.getBranchId(), branch.getRegion()
-                    .getRegionId(), new String[] { user.getEmailId() }, true, true );
-                if ( user.isAgent() ) {
-                    organizationManagementService.addIndividual( adminUser, 0, branch.getBranchId(), branch.getRegion()
-                        .getRegionId(), new String[] { user.getEmailId() }, false, true );
-                }
-                if ( map != null ) {
-                    userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
-                }
-                LOG.debug( "Added user : " + user.getEmailId() );
-            } else {
-                LOG.debug( "User is not the branch admin" );
-                map = organizationManagementService.addIndividual( adminUser, 0, branch.getBranchId(), branch.getRegion()
-                    .getRegionId(), new String[] { user.getEmailId() }, false, true );
-                if ( map != null ) {
-                    userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
-                }
-                LOG.debug( "Added user : " + user.getEmailId() );
-            }
-        } else if ( user.getRegionId() > 0l ) {
-            // He belongs to the region
-            LOG.debug( "Adding user : " + user.getEmailId() + " belongs to region : " + user.getRegionId() );
-            Region region = regionDao.findById( Region.class, user.getRegionId() );
-            if ( user.isRegionAdmin() ) {
-                LOG.debug( "User is the region admin." );
-                map = organizationManagementService.addIndividual( adminUser, 0, 0, region.getRegionId(),
-                    new String[] { user.getEmailId() }, true, true );
-                if ( user.isAgent() ) {
-                    organizationManagementService.addIndividual( adminUser, 0, 0, region.getRegionId(),
-                        new String[] { user.getEmailId() }, false, true );
-                }
-                if ( map != null ) {
-                    userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
-                }
-                LOG.debug( "Added user : " + user.getEmailId() );
-            } else {
-                LOG.debug( "User is not the admin of the region" );
-                map = organizationManagementService.addIndividual( adminUser, 0, 0, region.getRegionId(),
-                    new String[] { user.getEmailId() }, false, true );
-                if ( map != null ) {
-                    userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
-                }
-                LOG.debug( "Added user : " + user.getEmailId() );
+        //Mask email address if needed
+        String emailId = user.getEmailId();
+        if ( user.getEmailId() == null || user.getEmailId().isEmpty() ) {
+            throw new InvalidInputException( "User email ID cannot be null" );
+        }
+        if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
+            emailId = utils.maskEmailAddress( emailId );
+            if ( emailId != null ) {
+                user.setEmailId( user.getFirstName()
+                    + ( user.getLastName() != null ? " " + user.getLastName() : "" ) + " <"
+                    + emailId + ">" );
             }
         } else {
-            LOG.error( "Please specifiy where the user belongs!" );
-            throw new UserAdditionException( "Please specifiy where the user belongs!" );
+            user.setEmailId( user.getFirstName()
+                + ( user.getLastName() != null ? " " + user.getLastName() : "" ) + " <"
+                + emailId + ">" );
         }
-
-        if ( userList != null && !userList.isEmpty() ) {
-            uploadedUser = userList.get( 0 );
+        
+        //Add user and call assignUser method
+        //Add user
+        Map<String, List<User>>resultMap = organizationManagementService.getUsersFromEmailIdsAndInvite( new String[] { user.getEmailId() }, adminUser, true );
+        if ( resultMap != null ) {
+            userList = (List<User>) resultMap.get( CommonConstants.VALID_USERS_LIST );
+            if ( userList != null && !userList.isEmpty() ) {
+                uploadedUser = userList.get( 0 );
+            } else {
+                throw new UserAdditionException( "Unable to add user with emailID : " + user.getEmailId() );
+            }
         }
+        LOG.debug( "Added user with email : " + user.getEmailId() );
+        //Assign user
+        assignUser( user, adminUser, currentUserMap, upload );
+        
+        LOG.info( "Method addUser() finished for user : " + user.getEmailId() ); 
         return uploadedUser;
-
     }
 
 
-    private void updateUserSettingsInMongo( User user, UserUploadVO userUploadVO, List<String> userErrors )
-        throws InvalidInputException
+    /**
+     * Method to update agentSettings of user in mongo
+     * @param user
+     * @param userUploadVO
+     * @throws InvalidInputException
+     */
+    private void updateUserSettingsInMongo( User user, UserUploadVO userUploadVO ) throws InvalidInputException
     {
         LOG.debug( "Inside method updateUserSettingsInMongo " );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
         if ( agentSettings == null ) {
-            userErrors.add( "No company settings found for user " + user.getUsername() + " " + user.getUserId() );
-
+            throw new InvalidInputException( "No company settings found for user " + user.getUsername() + " "
+                + user.getUserId() );
         } else {
             ContactDetailsSettings contactDetailsSettings = agentSettings.getContact_details();
             if ( contactDetailsSettings == null ) {

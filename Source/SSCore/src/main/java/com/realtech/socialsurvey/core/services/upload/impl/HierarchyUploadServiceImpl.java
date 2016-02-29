@@ -347,11 +347,11 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else if ( cellIndex == USER_TITLE_INDEX ) {
                         uploadedUser.setTitle( cell.getStringCellValue().trim() );
                     } else if ( cellIndex == USER_BRANCH_ID_INDEX ) {
-                        //TODO: set assigned branches instead
+                        //set assigned branches instead
                         uploadedUser.setSourceBranchId( cell.getStringCellValue().trim() );
                         uploadedUser.setAssignedBranches( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_REGION_ID_INDEX ) {
-                        //TODO: set assigned regions instead
+                        //set assigned regions instead
                         uploadedUser.setSourceRegionId( cell.getStringCellValue().trim() );
                         uploadedUser.setAssignedRegions( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX ) {
@@ -672,42 +672,42 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() == null )
                         || ( user.getPhoneNumber() == null && uploadedUser.getPhoneNumber() != null )
-                        || ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() != null && user.getPhoneNumber()
+                        || ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() != null && !user.getPhoneNumber()
                             .equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) ) {
                         user.setPhoneNumber( uploadedUser.getPhoneNumber() );
                         user.setPhoneNumberModified( true );
                     }
                     if ( ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() == null )
                         || ( user.getWebsiteUrl() == null && uploadedUser.getWebsiteUrl() != null )
-                        || ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() != null && user.getWebsiteUrl()
+                        || ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() != null && !user.getWebsiteUrl()
                             .equalsIgnoreCase( uploadedUser.getWebsiteUrl() ) ) ) {
                         user.setWebsiteUrl( uploadedUser.getWebsiteUrl() );
                         user.setWebsiteUrlModified( true );
                     }
                     if ( ( user.getLicense() != null && uploadedUser.getLicense() == null )
                         || ( user.getLicense() == null && uploadedUser.getLicense() != null )
-                        || ( user.getLicense() != null && uploadedUser.getLicense() != null && user.getLicense()
+                        || ( user.getLicense() != null && uploadedUser.getLicense() != null && !user.getLicense()
                             .equalsIgnoreCase( uploadedUser.getLicense() ) ) ) {
                         user.setLicense( uploadedUser.getLicense() );
                         user.setLicenseModified( true );
                     }
                     if ( ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() == null )
                         || ( user.getLegalDisclaimer() == null && uploadedUser.getLegalDisclaimer() != null )
-                        || ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() != null && user
+                        || ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() != null && !user
                             .getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() ) ) ) {
                         user.setLegalDisclaimer( uploadedUser.getLegalDisclaimer() );
                         user.setLegalDisclaimerModified( true );
                     }
                     if ( ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() == null )
                         || ( user.getUserPhotoUrl() == null && uploadedUser.getUserPhotoUrl() != null )
-                        || ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() != null && user.getUserPhotoUrl()
+                        || ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() != null && !user.getUserPhotoUrl()
                             .equalsIgnoreCase( uploadedUser.getUserPhotoUrl() ) ) ) {
                         user.setUserPhotoUrl( uploadedUser.getUserPhotoUrl() );
                         user.setUserPhotoUrlModified( true );
                     }
                     if ( ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() == null )
                         || ( user.getAboutMeDescription() == null && uploadedUser.getAboutMeDescription() != null )
-                        || ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() != null && user
+                        || ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() != null && !user
                             .getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() ) ) ) {
                         user.setAboutMeDescription( uploadedUser.getAboutMeDescription() );
                         user.setAboutMeDescriptionModified( true );

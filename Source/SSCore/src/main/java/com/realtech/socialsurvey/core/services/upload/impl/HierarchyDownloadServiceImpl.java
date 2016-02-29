@@ -17,10 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
@@ -69,6 +71,12 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
     @Autowired
     private UserDao userDao;
+    
+    @Value ( "${MASK_EMAIL_ADDRESS}")
+    private String maskEmail;
+    
+    @Autowired
+    private Utils utils;
 
 
     /**
@@ -666,11 +674,13 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 && !( agentSettings.getContact_details().getTitle().isEmpty() ) ) {
                 userUploadVO.setTitle( agentSettings.getContact_details().getTitle() );
             }
-            if ( agentSettings.getContact_details().getMail_ids() != null
-                && agentSettings.getContact_details().getMail_ids().getWork() != null
-                && !( agentSettings.getContact_details().getMail_ids().getWork().isEmpty() ) ) {
-                userUploadVO.setEmailId( agentSettings.getContact_details().getMail_ids().getWork() );
+            
+            if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
+                userUploadVO.setEmailId( utils.unmaskEmailAddress( user.getEmailId() ) );
+            } else {
+                userUploadVO.setEmailId( user.getEmailId() );
             }
+            
             if ( agentSettings.getContact_details().getContact_numbers() != null
                 && agentSettings.getContact_details().getContact_numbers().getWork() != null
                 && !( agentSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) ) {
