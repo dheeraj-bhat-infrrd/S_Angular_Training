@@ -63,8 +63,6 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.core.vo.SubscriptionVO;
-import com.realtech.socialsurvey.core.vo.TransactionVO;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
@@ -893,104 +891,4 @@ public class AdminController
         return JspResolver.MESSAGE_HEADER;
     }
 
-
-    @ResponseBody
-    @RequestMapping ( value = "/getsubscriptiondetailBysubscriptionid", method = RequestMethod.GET)
-    public SubscriptionVO getSubscriptionDetailBySubscriptionId( @RequestParam String subscriptionId )
-    {
-        LOG.info( "Method to getSubscriptionDetailBySubscriptionId started." );
-        SubscriptionVO subscription = null;
-
-        try {
-
-            User user = sessionHelper.getCurrentUser();
-            if ( !user.isSuperAdmin() ) {
-                throw new NonFatalException( "Insufficient permissions" );
-            }
-            subscription = adminService.getSubscriptionVOBySubscriptionId( subscriptionId );
-
-        } catch ( NonFatalException nonFatalException ) {
-            LOG.error(
-                "NonFatalException while getting Subscription by subscription id . Reason : "
-                    + nonFatalException.getStackTrace(), nonFatalException );
-        }
-
-        return subscription;
-
-    }
-
-
-    @ResponseBody
-    @RequestMapping ( value = "/gettransactionbysubscriptionid", method = RequestMethod.GET)
-    public List<TransactionVO> getTransactionBySubscriptionId( @RequestParam String subscriptionId )
-    {
-        LOG.info( "Method to getSubscriptionDetailBySubscriptionId started." );
-        List<TransactionVO> transactions = null;
-
-        try {
-
-            User user = sessionHelper.getCurrentUser();
-            if ( !user.isSuperAdmin() ) {
-                throw new NonFatalException( "Insufficient permissions" );
-            }
-
-            transactions = adminService.getTransactionListBySubscriptionIs( subscriptionId );
-
-        } catch ( NonFatalException nonFatalException ) {
-            LOG.error(
-                "NonFatalException while getting Transactions by subscription id . Reason : "
-                    + nonFatalException.getStackTrace(), nonFatalException );
-        }
-
-        return transactions;
-
-    }
-
-
-    @ResponseBody
-    @RequestMapping ( value = "/getallactivesubscriptions", method = RequestMethod.GET)
-    public List<SubscriptionVO> getAllActiveSubscriptions()
-    {
-        LOG.info( "Method to getAllActiveSubscriptions started." );
-        List<SubscriptionVO> subscriptions = null;
-
-        try {
-            User user = sessionHelper.getCurrentUser();
-            if ( !user.isSuperAdmin() ) {
-                throw new NonFatalException( "Insufficient permissions" );
-            }
-            subscriptions = adminService.getActiveSubscriptionsList();
-
-        } catch ( NonFatalException nonFatalException ) {
-            LOG.error(
-                "NonFatalException while getting All active susbscriptions . Reason : " + nonFatalException.getStackTrace(),
-                nonFatalException );
-        }
-
-        return subscriptions;
-    }
-    
-    
-    @ResponseBody
-    @RequestMapping ( value = "/getbillingmodeautocompanies", method = RequestMethod.GET)
-    public List<Company> getBillingModeAutoCompanies()
-    {
-        LOG.info( "Method to getBillingModeAutoCompanies started." );
-        List<Company> companies = null;
-
-        try {
-            User user = sessionHelper.getCurrentUser();
-            if ( !user.isSuperAdmin() ) {
-                throw new NonFatalException( "Insufficient permissions" );
-            }
-            companies = adminService.getAllAutoBillingModeCompanies();
-
-        } catch ( NonFatalException nonFatalException ) {
-            LOG.error(
-                "NonFatalException while getting All auto billing mode companies . Reason : " + nonFatalException.getStackTrace(),
-                nonFatalException );
-        }
-
-        return companies;
-    }
 }
