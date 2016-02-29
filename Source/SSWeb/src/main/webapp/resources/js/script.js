@@ -2006,6 +2006,7 @@ function initializeUserCompanyRegistrationPage() {
 
 var hierarchyUpload = {
 	verified : false,
+	canUpload:false,
 	hierarchyJson : {},
 	hierundefined : function(hierval) {
 		if (hierval == undefined) {
@@ -2033,9 +2034,9 @@ var hierarchyUpload = {
 							}
 
 							if (hierarchyUpload.verified == true) {
+								hierarchyUpload.canUpload=true;
 								hierarchyUpload.verified = false;
-								$('#xlsx-file-verify').css("pointerEvents",
-										"auto");
+								$('#xlsx-file-verify').css("pointerEvents","auto");
 								var formData = new FormData();
 								formData.append("file", $('#com-file').prop(
 										"files")[0]);
@@ -2073,15 +2074,14 @@ var hierarchyUpload = {
 				});
 		$('#xlsx-file-upload').click(
 				function() {
-					if (hierarchyUpload.verified == true) {
+					if (hierarchyUpload.canUpload == true) {
 						var formData = new FormData();
-						formData.append("hierarchyJson", JSON
-								.stringify(hierarchyUpload.hierarchyJson));
+						formData.append("hierarchyJson", JSON.stringify(hierarchyUpload.hierarchyJson));
 						showOverlay();
 						callAjaxPOSTWithTextDataUpload("./uploadxlsxfile.do",
 								hierarchyUpload.saveXlxsDataSuccessCallback,
 								true, formData);
-						hierarchyUpload.verified = false;
+						hierarchyUpload.canUpload = false;
 					} else {
 						showError("File is not verified");
 					}
@@ -2127,8 +2127,11 @@ var hierarchyUpload = {
 			$('#fileUrl').val('');
 			showError(response);
 		} else {
-
+			
+			
+			$('#xlsx-file-upload').css("pointerEvents", "auto");
 			var hierarchyjson = $.parseJSON(response);
+			hierarchyUpload.hierarchyJson = $.parseJSON(response);
 
 			if (hierarchyjson.response.numberOfRegionsAdded != 0) {
 				$('#region-added').empty();
