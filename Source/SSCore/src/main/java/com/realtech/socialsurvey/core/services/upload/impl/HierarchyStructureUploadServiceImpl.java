@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -112,6 +113,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Override
+    @Transactional
     public void uploadHierarchy( HierarchyUpload upload, Company company, User user ) throws InvalidInputException
     {
         // the upload object should have the current value as well the changes made by the user in the sheet/ UI
@@ -150,7 +152,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
-    @Transactional
+    @Transactional ( propagation = Propagation.REQUIRES_NEW )
     void deleteUsers( HierarchyUpload upload, User adminUser, Company company )
     {
         LOG.debug( "Deleting removed users" );
@@ -179,6 +181,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
+    @Transactional ( propagation = Propagation.REQUIRES_NEW )
     void deleteBranches( HierarchyUpload upload, User adminUser, Company company )
     {
         LOG.info( "Deleting branches" );
@@ -226,6 +229,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
+    @Transactional ( propagation = Propagation.REQUIRES_NEW )
     void deleteRegions( HierarchyUpload upload, User adminUser, Company company )
     {
         LOG.info( "Deleting regions" );
@@ -275,7 +279,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
-    @Transactional
+    @Transactional ( propagation = Propagation.REQUIRES_NEW )
     void uploadBranches( HierarchyUpload upload, User user, Company company )
     {
         LOG.debug( "Uploading new branches" );
@@ -313,9 +317,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     mapBranchModificationHistory( branchUpload, branch );
 
                     // map the id mapping
-                    if ( branchUpload.getSourceRegionId() != null && !branchUpload.getSourceRegionId().isEmpty() ) {
+                    /*if ( branchUpload.getSourceRegionId() != null && !branchUpload.getSourceRegionId().isEmpty() ) {
                         upload.getRegionSourceMapping().put( branchUpload.getSourceRegionId(), branch.getRegion().getRegionId() );
-                    }
+                    }*/
                     if ( branchUpload.getSourceBranchId() != null && !branchUpload.getSourceBranchId().isEmpty() ) {
                         upload.getBranchSourceMapping().put( branchUpload.getSourceBranchId(), branch.getBranchId() );
                     }
@@ -431,7 +435,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
-    @Transactional
+    @Transactional ( propagation = Propagation.REQUIRES_NEW )
     void uploadRegions( HierarchyUpload upload, User user, Company company )
     {
         LOG.debug( "Uploading new regions." );
@@ -472,6 +476,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
+    @Transactional
     Region modifyRegion( User adminUser, RegionUploadVO region ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UserAssignmentException
     {
@@ -636,6 +641,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
         regionUpload.setRegionAdded( false );
         regionUpload.setRegionModified( false );
+        regionUpload.setErrorRecord( false );
+        regionUpload.setWarningRecord( false );
+        regionUpload.setDeletedRecord( false );
         return regionUpload;
     }
 
@@ -1026,7 +1034,11 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             userUpload.setLegalDisclaimerHistory( photoHistoryList );
             userUpload.setUserPhotoUrlModified( false );
         }
-
+        userUpload.setUserAdded( false );
+        userUpload.setUserModified( false );
+        userUpload.setWarningRecord( false );
+        userUpload.setErrorRecord( false );
+        userUpload.setDeletedRecord( false );
         return userUpload;
 
     }
@@ -1205,6 +1217,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         branchUpload.setBranchAdded( false );
         branchUpload.setBranchModified( false );
+        branchUpload.setErrorRecord( false );
+        branchUpload.setWarningRecord( false );
+        branchUpload.setDeletedRecord( false );
         return branchUpload;
     }
 
@@ -1247,6 +1262,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @throws SolrException
      * @throws UserAdditionException
      */
+    @Transactional
     User assignBranchesToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
         HierarchyUpload upload, boolean isAdmin ) throws UserAssignmentException, InvalidInputException,
         NoRecordsFetchedException, SolrException, UserAdditionException
@@ -1371,6 +1387,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @throws SolrException
      * @throws UserAdditionException
      */
+    @Transactional
     User assignRegionsToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
         HierarchyUpload upload, boolean isAdmin ) throws UserAssignmentException, InvalidInputException,
         NoRecordsFetchedException, SolrException, UserAdditionException
@@ -1485,6 +1502,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @throws NoRecordsFetchedException
      * @throws UserAssignmentException
      */
+    @Transactional
     User assignUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
@@ -1690,7 +1708,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param upload
      * @param adminUser
      */
-    @Transactional
+    @Transactional ( propagation = Propagation.REQUIRES_NEW )
     void uploadUsers( HierarchyUpload upload, User adminUser )
     {
         LOG.debug( "Uploading users to database" );
@@ -1723,12 +1741,12 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 //map the history records
                 mapUserModificationHistory( userToBeUploaded, user );
                 //map the id mapping
-                if ( userToBeUploaded.getSourceRegionId() != null && !userToBeUploaded.getSourceRegionId().isEmpty() ) {
+                /*if ( userToBeUploaded.getSourceRegionId() != null && !userToBeUploaded.getSourceRegionId().isEmpty() ) {
                     upload.getRegionSourceMapping().put( userToBeUploaded.getSourceRegionId(), userToBeUploaded.getRegionId() );
                 }
                 if ( userToBeUploaded.getSourceBranchId() != null && !userToBeUploaded.getSourceBranchId().isEmpty() ) {
                     upload.getBranchSourceMapping().put( userToBeUploaded.getSourceBranchId(), userToBeUploaded.getBranchId() );
-                }
+                }*/
                 if ( userToBeUploaded.getSourceUserId() != null && !userToBeUploaded.getSourceUserId().isEmpty() ) {
                     upload.getUserSourceMapping().put( userToBeUploaded.getSourceUserId(), userToBeUploaded.getUserId() );
                 }
@@ -1757,6 +1775,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @throws UserAssignmentException
      * @throws UserAdditionException
      */
+    @Transactional
     User addUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
         UserAssignmentException, UserAdditionException
     {

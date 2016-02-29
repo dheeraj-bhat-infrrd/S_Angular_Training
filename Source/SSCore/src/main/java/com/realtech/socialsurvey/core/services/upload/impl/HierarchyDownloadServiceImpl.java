@@ -335,7 +335,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         Map<Long, BranchUploadVO> oldBranchesMap = new HashMap<Long, BranchUploadVO>();
         //Get map from BranchUploadVO
         for ( BranchUploadVO branchUploadVO : oldBranches ) {
-            oldBranchesMap.put( branchUploadVO.getRegionId(), branchUploadVO );
+            oldBranchesMap.put( branchUploadVO.getBranchId(), branchUploadVO );
         }
 
         Map<Long, String> revMap = new HashMap<Long, String>();

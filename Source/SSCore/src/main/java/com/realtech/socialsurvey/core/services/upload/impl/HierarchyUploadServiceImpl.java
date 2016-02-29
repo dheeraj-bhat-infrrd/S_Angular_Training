@@ -348,11 +348,11 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         uploadedUser.setTitle( cell.getStringCellValue().trim() );
                     } else if ( cellIndex == USER_BRANCH_ID_INDEX ) {
                         //set assigned branches instead
-                        uploadedUser.setSourceBranchId( cell.getStringCellValue().trim() );
+                        //uploadedUser.setSourceBranchId( cell.getStringCellValue().trim() );
                         uploadedUser.setAssignedBranches( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_REGION_ID_INDEX ) {
                         //set assigned regions instead
-                        uploadedUser.setSourceRegionId( cell.getStringCellValue().trim() );
+                        //uploadedUser.setSourceRegionId( cell.getStringCellValue().trim() );
                         uploadedUser.setAssignedRegions( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX ) {
                         uploadedUser.setAssignedBranchesAdmin( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
@@ -613,7 +613,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         user.setTitle( uploadedUser.getTitle() );
                         user.setTitleModified( true );
                     }
-                    if ( ( user.getSourceRegionId() == null && uploadedUser.getSourceRegionId() != null )
+                    /*if ( ( user.getSourceRegionId() == null && uploadedUser.getSourceRegionId() != null )
                         || ( user.getSourceRegionId() != null && uploadedUser.getSourceRegionId() == null )
                         || ( user.getSourceRegionId() != null && uploadedUser.getSourceRegionId() != null && !user
                             .getSourceRegionId().equalsIgnoreCase( uploadedUser.getSourceRegionId() ) ) ) {
@@ -626,7 +626,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                             .getSourceBranchId().equalsIgnoreCase( uploadedUser.getSourceBranchId() ) ) ) {
                         user.setSourceBranchId( uploadedUser.getSourceBranchId() );
                         user.setSourceBranchIdModified( true );
-                    }
+                    }*/
                     if ( ( ( user.getAssignedBranchesAdmin() != null && !user.getAssignedBranchesAdmin().isEmpty() ) && ( uploadedUser
                         .getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
                         || ( ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() ) && ( uploadedUser
@@ -713,7 +713,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         user.setAboutMeDescriptionModified( true );
                     }
                     if ( user.isFirstNameModified() || user.isLastNameModified() || user.isTitleModified()
-                        || user.isSourceRegionIdModified() || user.isSourceBranchIdModified()
+                        || user.isAssignedBranchesModified() || user.isAssignedRegionsModified()
                         || user.isAssignedBrachesAdminModified() || user.isAssignedRegionsAdminModified()
                         || user.isEmailIdModified() || user.isPhoneNumberModified() || user.isWebsiteUrlModified()
                         || user.isLicenseModified() || user.isLegalDisclaimerModified() || user.isUserPhotoUrlModified()
