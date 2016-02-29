@@ -319,7 +319,7 @@ function validateLastName(elementId) {
 
 /**
  * Function to validate a password in form
- * 
+ *
  * @param elementId
  * @returns {Boolean}
  */
@@ -336,7 +336,7 @@ function validatePassword(elementId) {
 }
 /**
  * Function to match password and confirm password
- * 
+ *
  * @param pwdId
  * @param confirmPwdId
  * @returns {Boolean}
@@ -1285,7 +1285,7 @@ function initializeFindAProPage() {
 /**
  * Method to fetch users list based on the criteria i.e if profile level is
  * specified, bring all users of that level else search based on first/last name
- * 
+ *
  * @param newIndex
  */
 function fetchUsers(newIndex) {
@@ -1496,7 +1496,7 @@ function paintProList(usersList) {
 
 /**
  * Function to fetch the users by profile level in pro list page
- * 
+ *
  * @param iden
  * @param profileLevel -
  *            office/region/company
@@ -2127,11 +2127,11 @@ var hierarchyUpload = {
 			$('#fileUrl').val('');
 			showError(response);
 		} else {
-			
-			
+
+
 			$('#xlsx-file-upload').css("pointerEvents", "auto");
 			var hierarchyjson = $.parseJSON(response);
-			hierarchyUpload.hierarchyJson = $.parseJSON(response);
+			hierarchyUpload.hierarchyJson = $.parseJSON(response).response;
 
 			if (hierarchyjson.response.numberOfRegionsAdded != 0) {
 				$('#region-added').empty();
@@ -2288,7 +2288,7 @@ var hierarchyUpload = {
 					'	</form>'+
 					''+
 					'</div>';
-						
+
 
 					$(
 							'<tr style="color:'
@@ -2347,7 +2347,7 @@ var hierarchyUpload = {
 				$('#summary').show();
 			}
 			$('.v-hiararchy-edit').click(function(e){
-				
+
 				$(this).parent().next('.hier-region-edit').slideToggle(200);
 			});
 
@@ -2367,7 +2367,7 @@ var hierarchyUpload = {
 					} else {
 						var color = '#666';
 					}
-					 
+
 
 					 var branchEdit = '<div id="hier-branch-address-edit-container"'+
 					 '	class="prof-user-address prof-edit-icn">'+
@@ -2436,7 +2436,7 @@ var hierarchyUpload = {
 					 '	</form>'+
 					 ''+
 					 '</div>';
-					 	
+
 
 					$(
 							'<tr style="color:'
@@ -2504,10 +2504,10 @@ var hierarchyUpload = {
 					$('#upload-summary-branch').addClass('active in');
 					$('#summary').show();
 				}
-				
+
 			}
 $('.v-hiararchy-edit').click(function(e){
-				
+
 				$(this).parent().next('.hier-branch-edit').slideToggle(200);
 			});
 
@@ -2535,7 +2535,7 @@ $('.v-hiararchy-edit').click(function(e){
 						} else {
 							var color = '#666';
 						}
-			
+
 					var userEdit = '<div id="hier-user-detail-edit-container"'+
 					'	class="prof-user-address prof-edit-icn">'+
 					''+
@@ -2566,14 +2566,14 @@ $('.v-hiararchy-edit').click(function(e){
 					'			<div class="float-left bd-frm-left">Office Assignment(s)</div>'+
 					'			<div class="float-left bd-frm-right">'+
 					'				<input class="bd-frm-rt-txt" id="user-banch-assignment"'+
-					'					name="userBranchAssignment" value="'+hierarchyUpload.hierundefined(hierarchyjson.response.upload.users[i].sourceBranchId)+'">'+
+					'					name="userBranchAssignment" value="'+hierarchyUpload.hierundefined(hierarchyjson.response.upload.users[i].assignedBranches)+'">'+
 					'			</div>'+
 					'		</div>'+
 					'		<div class="bd-hr-form-item clearfix">'+
 					'			<div class="float-left bd-frm-left">Region Assignment(s)</div>'+
 					'			<div class="float-left bd-frm-right">'+
 					'				<input class="bd-frm-rt-txt" id="user-region-assignment"'+
-					'					name="userRegionAssignment" value="'+hierarchyUpload.hierundefined(hierarchyjson.response.upload.users[i].sourceRegionId)+'">'+
+					'					name="userRegionAssignment" value="'+hierarchyUpload.hierundefined(hierarchyjson.response.upload.users[i].assignedRegions)+'">'+
 					'			</div>'+
 					'		</div>'+
 					'		<div class="bd-hr-form-item clearfix">'+
@@ -2643,7 +2643,7 @@ $('.v-hiararchy-edit').click(function(e){
 					'	</form>'+
 					''+
 					'</div>';
-						
+
 
 					$(
 							'<tr style="color:'
@@ -2679,16 +2679,16 @@ $('.v-hiararchy-edit').click(function(e){
 											.hierundefined(hierarchyjson.response.upload.users[i].title)
 									+ '</div></td><td><div class="hier-upload-td" title="'
 									+ hierarchyUpload
-											.hierundefined(hierarchyjson.response.upload.users[i].sourceBranchId)
+											.hierundefined(hierarchyjson.response.upload.users[i].assignedBranches)
 									+ '">'
 									+ hierarchyUpload
-											.hierundefined(hierarchyjson.response.upload.users[i].sourceBranchId)
+											.hierundefined(hierarchyjson.response.upload.users[i].assignedBranches)
 									+ '</div></td><td><div class="hier-upload-td" title="'
 									+ hierarchyUpload
-											.hierundefined(hierarchyjson.response.upload.users[i].sourceRegionId)
+											.hierundefined(hierarchyjson.response.upload.users[i].assignedRegions)
 									+ '">'
 									+ hierarchyUpload
-											.hierundefined(hierarchyjson.response.upload.users[i].sourceRegionId)
+											.hierundefined(hierarchyjson.response.upload.users[i].assignedRegions)
 									+ '</div></td><td><div class="hier-upload-td" title="'
 									+ hierarchyUpload
 											.hierundefined(hierarchyjson.response.upload.users[i].assignedBranchesAdmin)
@@ -2758,7 +2758,7 @@ $('.v-hiararchy-edit').click(function(e){
 			}
 		}
 $('.v-hiararchy-edit').click(function(e){
-				
+
 				$(this).parent().next('.hier-users-edit').slideToggle(200);
 			});
 			if (regionlength == 0 && branchlength == 0 && userlength == 0) {
@@ -2766,7 +2766,7 @@ $('.v-hiararchy-edit').click(function(e){
 
 			}
 		},
-	
+
 
 	addToolTip : function(data) {
 		var toolTipMsg = "";
@@ -2799,7 +2799,7 @@ $('.v-hiararchy-edit').click(function(e){
 		}*/
 		return toolTip;
 	},
-	
+
 
 
 	saveXlxsSuccessCallback : function(response) {
