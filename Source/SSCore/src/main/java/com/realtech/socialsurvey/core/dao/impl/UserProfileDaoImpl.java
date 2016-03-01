@@ -600,10 +600,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     {
         LOG.info( "Method to find userProfile for userId: " + userId + " branchId: " + branchId + " regionId : " + regionId + " started." );
         Criteria criteria = getSession().createCriteria( UserProfile.class );
-        criteria.add( Restrictions.eq( CommonConstants.USER_ID, userId ) );
+        criteria.add( Restrictions.eq( CommonConstants.USER_COLUMN + "." + CommonConstants.USER_ID, userId ) );
         criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
         criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
-        criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN, profilesMasterId ) );
+        criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN + "." + "profileId", profilesMasterId ) );
         @SuppressWarnings ( "unchecked")
         List<UserProfile> userProfiles = criteria.list();
         if ( userProfiles == null || userProfiles.isEmpty() ) {
