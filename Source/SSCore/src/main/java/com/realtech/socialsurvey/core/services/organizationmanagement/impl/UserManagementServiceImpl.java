@@ -1654,23 +1654,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started." );
         if(user != null){
             List<UserProfile> userProfiles = user.getUserProfiles();
-            for ( UserProfile userProfile : userProfiles ) {
-                if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                    switch ( userProfile.getProfilesMaster().getProfileId() ) {
-                        case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-                            user.setCompanyAdmin( true );
-                            continue;
-                        case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-                            user.setRegionAdmin( true );
-                            continue;
-                        case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-                            user.setBranchAdmin( true );
-                            continue;
-                        case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-                            user.setAgent( true );
-                            continue;
-                        default:
-                            LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName() );
+            if ( userProfiles != null ) {
+                for ( UserProfile userProfile : userProfiles ) {
+                    if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                        switch ( userProfile.getProfilesMaster().getProfileId() ) {
+                            case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+                                user.setCompanyAdmin( true );
+                                continue;
+                            case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                                user.setRegionAdmin( true );
+                                continue;
+                            case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                                user.setBranchAdmin( true );
+                                continue;
+                            case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                                user.setAgent( true );
+                                continue;
+                            default:
+                                LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName() );
+                        }
                     }
                 }
             }
