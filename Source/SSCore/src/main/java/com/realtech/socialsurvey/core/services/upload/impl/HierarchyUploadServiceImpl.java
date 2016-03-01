@@ -5,8 +5,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -99,6 +102,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             LOG.error( "Invalid company details" );
             throw new InvalidInputException( "Invalid company details" );
         }
+        InvalidInputException potentialException = null;
         InvalidInputException xlsxException = null;
         LOG.info( "Validating the file for " + company.getCompany() + " and file " + fileName );
         UploadValidation validationObject = new UploadValidation();
@@ -124,6 +128,12 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             e.printStackTrace();
         } catch ( Exception e ) {
             e.printStackTrace();
+            String message = e.getMessage();
+            if ( message.equals( CommonConstants.HIERARCHY_REGION_HEADERS_INVALID )
+                || message.equals( CommonConstants.HIERARCHY_BRANCH_HEADERS_INVALID )
+                || message.equals( CommonConstants.HIERARCHY_USER_HEADERS_INVALID ) ) {
+                potentialException = new InvalidInputException( e.getMessage() );
+            }
         } finally {
             if ( fileStream != null ) {
                 try {
@@ -136,6 +146,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         if ( xlsxException != null ) {
             throw xlsxException;
         }
+        if ( potentialException != null ) {
+            throw potentialException;
+        }
         return validationObject;
     }
 
@@ -145,8 +158,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * 
      * @param workBook
      * @param validationObject
+     * @throws InvalidInputException 
      */
-    void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject )
+    void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject ) throws InvalidInputException
     {
         // Parse the list of regions from the sheet. Parse each row. Check for validation errors. If validation is successful, check if region is modified or added. If modified then add to the modified count or to the addition count. Then map and check if there are any regions that were deleted
         // Possible errors in regions
@@ -161,10 +175,25 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         XSSFCell cell = null;
         RegionUploadVO uploadedRegion = null;
         List<RegionUploadVO> uploadedRegions = new ArrayList<RegionUploadVO>();
+        
+        //Create header map
+        Map<Integer, String> headerMap = new HashMap<Integer, String>();
+        headerMap.put( 1, CommonConstants.CHR_REGION_REGION_ID );
+        headerMap.put( 2, CommonConstants.CHR_REGION_REGION_NAME );
+        headerMap.put( 3, CommonConstants.CHR_ADDRESS_1 );
+        headerMap.put( 4, CommonConstants.CHR_ADDRESS_2 );
+        headerMap.put( 5, CommonConstants.CHR_CITY );
+        headerMap.put( 6, CommonConstants.CHR_STATE );
+        headerMap.put( 7, CommonConstants.CHR_ZIP );
+        
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
             // skip the first 1st row. first row is the header
             if ( row.getRowNum() < 1 ) {
+                //Validate column headings
+                if ( !isHeaderValid( row, headerMap ) ) {
+                    throw new InvalidInputException( CommonConstants.HIERARCHY_REGION_HEADERS_INVALID );
+                }
                 continue;
             }
             cells = row.cellIterator();
@@ -221,7 +250,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
 
-    void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject )
+    void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject ) throws InvalidInputException
     {
         // Parse each row for branches and then check for valid branches. On successful validation, check if the branch is a new, modified or deleted branch.
         // Possible reasons for errors
@@ -240,10 +269,26 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         XSSFCell cell = null;
         BranchUploadVO uploadedBranch = null;
         List<BranchUploadVO> uploadedBranches = new ArrayList<BranchUploadVO>();
+        
+        //Create header map
+        Map<Integer, String> headerMap = new HashMap<Integer, String>();
+        headerMap.put( 1, CommonConstants.CHR_BRANCH_BRANCH_ID );
+        headerMap.put( 2, CommonConstants.CHR_BRANCH_BRANCH_NAME );
+        headerMap.put( 3, CommonConstants.CHR_REGION_REGION_ID );
+        headerMap.put( 4, CommonConstants.CHR_ADDRESS_1 );
+        headerMap.put( 5, CommonConstants.CHR_ADDRESS_2 );
+        headerMap.put( 6, CommonConstants.CHR_CITY );
+        headerMap.put( 7, CommonConstants.CHR_STATE );
+        headerMap.put( 8, CommonConstants.CHR_ZIP );
+        
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
             // skip the first 1 row. first row is the schema and second is the header
             if ( row.getRowNum() < 1 ) {
+                //Validate column headings
+                if ( !isHeaderValid( row, headerMap ) ) {
+                    throw new InvalidInputException( CommonConstants.HIERARCHY_BRANCH_HEADERS_INVALID );
+                }
                 continue;
             }
             cells = row.cellIterator();
@@ -308,7 +353,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
 
-    void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject )
+    void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject ) throws InvalidInputException
     {
         // Parse each row for users and then check for valid users. On successful validation, check if the user is a new, modified or deleted user.
         // Possible reasons for errors
@@ -330,10 +375,33 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         XSSFCell cell = null;
         UserUploadVO uploadedUser = null;
         List<UserUploadVO> uploadedUsers = new ArrayList<UserUploadVO>();
+        
+        //Create header map
+        Map<Integer, String> headerMap = new HashMap<Integer, String>();
+        headerMap.put( 1, CommonConstants.CHR_USERS_USER_ID );
+        headerMap.put( 2, CommonConstants.CHR_USERS_FIRST_NAME );
+        headerMap.put( 3, CommonConstants.CHR_USERS_LAST_NAME );
+        headerMap.put( 4, CommonConstants.CHR_USERS_TITLE );
+        headerMap.put( 5, CommonConstants.CHR_USERS_OFFICE_ASSIGNMENTS );
+        headerMap.put( 6, CommonConstants.CHR_USERS_REGION_ASSIGNMENTS );
+        headerMap.put( 7, CommonConstants.CHR_USERS_OFFICE_ADMIN_PRIVILEGE );
+        headerMap.put( 8, CommonConstants.CHR_USERS_REGION_ADMIN_PRIVILEGE );
+        headerMap.put( 9, CommonConstants.CHR_USERS_EMAIL );
+        headerMap.put( 10, CommonConstants.CHR_USERS_PHONE );
+        headerMap.put( 11, CommonConstants.CHR_USERS_WEBSITE );
+        headerMap.put( 12, CommonConstants.CHR_USERS_LICENSE );
+        headerMap.put( 13, CommonConstants.CHR_USERS_LEGAL_DISCLAIMER );
+        headerMap.put( 14, CommonConstants.CHR_USERS_PHOTO );
+        headerMap.put( 15, CommonConstants.CHR_USERS_ABOUT_ME_DESCRIPTION );
+        
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
             // skip the first 1 rows. first row is the schema and second is the header
             if ( row.getRowNum() < 1 ) {
+                //Validate column headings
+                if ( !isHeaderValid( row, headerMap ) ) {
+                    throw new InvalidInputException( CommonConstants.HIERARCHY_USER_HEADERS_INVALID );
+                }
                 continue;
             }
             cells = row.cellIterator();
@@ -431,6 +499,28 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         markDeletedUsers( uploadedUsers, validationObject );
     }
 
+    boolean isHeaderValid( XSSFRow row, Map<Integer, String> headerMap )
+    {
+        if ( row == null ) {
+            return false;
+        }
+        Iterator<Cell> cells = row.cellIterator();
+        int cellNo = 0;
+        if ( !cells.hasNext() ) {
+           return false;
+        }
+        while(cells.hasNext()){
+            cellNo += 1;
+            Cell cell = cells.next();
+            if ( !cell.getStringCellValue().equalsIgnoreCase( headerMap.get( cellNo ) ) ) {
+                return false;
+            }
+        }
+        if ( cellNo != headerMap.size() ) {
+            return false;
+        }
+        return true;
+    }
 
     boolean isNewRegion( RegionUploadVO uploadedRegion, List<RegionUploadVO> uploadedRegions )
     {

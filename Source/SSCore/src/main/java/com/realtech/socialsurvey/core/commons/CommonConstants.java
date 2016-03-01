@@ -1018,4 +1018,10 @@ public interface CommonConstants
     public static final String HIERARCHY_UPLOAD_COLLECTION = "HIERARCHY_UPLOAD";
     
     public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&returncompletecontent=true&count=50";
+    
+    public static final String HIERARCHY_REGION_HEADERS_INVALID = "Invalid headers in the Regions sheet";
+    
+    public static final String HIERARCHY_BRANCH_HEADERS_INVALID = "Invalid headers in the Offices sheet";
+    
+    public static final String HIERARCHY_USER_HEADERS_INVALID = "Invalid headers in the Users sheet";
 }
