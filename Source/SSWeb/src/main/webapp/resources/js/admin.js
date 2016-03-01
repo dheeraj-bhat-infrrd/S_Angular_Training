@@ -168,7 +168,7 @@ function searchAndDisplayBranches(key) {
 function searchAndDisplayUsers(key) {
 	
 	showOverlay();
-	callAjaxGETAndAbortLastRequest("/fetchusersbykey.do?searchKey="+key, function(data) {
+	callAjaxGETAndAbortLastRequest("/fetchusersbykey.do?searchKey="+encodeURIComponent(key), function(data) {
 		
 		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
 		
