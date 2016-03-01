@@ -161,6 +161,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             LOG.warn( "Empty userList" );
             return;
         }
+        List<UserUploadVO> deletedUsers = new ArrayList<UserUploadVO>();
         for ( UserUploadVO user : userList ) {
             if ( user.isDeletedRecord() ) {
                 // Delete the user
@@ -170,13 +171,14 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     userManagementService.updateUserCountModificationNotification( adminUser.getCompany() );
                     LOG.debug( "Removing user {} from solr.", user.getUserId() );
                     solrSearchService.removeUserFromSolr( user.getUserId() );
-                    upload.getUsers().remove( user );
+                    deletedUsers.add( user );
                     upload.getUserSourceMapping().remove( user.getSourceUserId() );
                 } catch ( Exception e ) {
                     // TODO:process errors and return them to the user
                 }
             }
         }
+        upload.getUsers().removeAll( deletedUsers );
         LOG.debug( "Finished deleting removed users" );
     }
 
@@ -190,6 +192,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             LOG.warn( "Empty branch list" );
             return;
         }
+        List<BranchUploadVO> deletedBranches = new ArrayList<BranchUploadVO>();
+        
         for ( BranchUploadVO branch : branches ) {
             if ( branch.isDeletedRecord() ) {
                 try {
@@ -215,7 +219,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         //remove social media connections
                         socialManagementService.disconnectAllSocialConnections( CommonConstants.BRANCH_ID_COLUMN,
                             branch.getBranchId() );
-                        upload.getBranches().remove( branch );
+                        deletedBranches.add( branch );
                         upload.getBranchSourceMapping().remove( branch.getSourceBranchId() );
                     }
 
@@ -225,6 +229,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 }
             }
         }
+        upload.getBranches().removeAll( deletedBranches );
         LOG.info( "Finished deleting branches" );
     }
 
@@ -238,6 +243,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             LOG.warn( "Empty region list" );
             return;
         }
+        List<RegionUploadVO> deletedRegions = new ArrayList<RegionUploadVO>();
+        
         for ( RegionUploadVO region : regions ) {
             if ( region.isDeletedRecord() ) {
                 try {
@@ -266,7 +273,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         //remove social media connections
                         socialManagementService.disconnectAllSocialConnections( CommonConstants.REGION_ID_COLUMN,
                             region.getRegionId() );
-                        upload.getRegions().remove( region );
+                        deletedRegions.add( region );
                         upload.getRegionSourceMapping().remove( region.getSourceRegionId() );
                     }
 
@@ -276,6 +283,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 }
             }
         }
+        upload.getRegions().removeAll( deletedRegions );
     }
 
 

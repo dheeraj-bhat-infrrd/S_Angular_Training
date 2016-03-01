@@ -186,7 +186,7 @@ public class UploadValidationServiceImplTest
         uploadValidationServiceImpl.validateUsers( validation );
         LOG.info( "Errors: " + validation.getUserValidationErrors() );
         LOG.info( "Warnings: " + validation.getUserValidationWarnings() );
-        Assert.assertEquals( 9, validation.getUserValidationErrors().size() );
+        Assert.assertEquals( 11, validation.getUserValidationErrors().size() );
         Assert.assertEquals( 4, validation.getUserValidationWarnings().size() );
     }
 
@@ -355,7 +355,17 @@ public class UploadValidationServiceImplTest
         user.setFirstName( name );
         user.setEmailId( email );
         user.setSourceRegionId( regionId );
+        if ( regionId != null && !regionId.isEmpty() ) {
+            List<String> assignedRegions = new ArrayList<String>();
+            assignedRegions.add( regionId );
+            user.setAssignedRegions( assignedRegions );
+        }
         user.setSourceBranchId( branchId );
+        if ( branchId != null && !branchId.isEmpty() ) {
+            List<String> assignedBranches = new ArrayList<String>();
+            assignedBranches.add( branchId );
+            user.setAssignedBranches( assignedBranches );
+        }
         user.setAssignedBranchesAdmin( branchAdmin );
         user.setAssignedRegionsAdmin( regionAdmin );
         user.setRowNum( rowNum );

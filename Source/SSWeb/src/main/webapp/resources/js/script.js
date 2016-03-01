@@ -2517,17 +2517,11 @@ $('.v-hiararchy-edit').click(function(e){
 					$('#user-upload').empty();
 					var userlength = hierarchyjson.response.upload.users.length;
 					for (var i = 0; i < userlength; i++) {
-						if (hierarchyjson.response.upload.users[i].isErrorRecord == true) {
-							var color = '#FF3400';
-
-						} else if (hierarchyjson.response.upload.users[i].isWarningRecord == true) {
-							var color = '#F9C42A';
-
-						} else if (hierarchyjson.response.upload.users[i].isUserAdded == true) {
+						if (hierarchyjson.response.upload.users[i].isUserAdded == true) {
 							var color = '#95E566';
 
 						} else if (hierarchyjson.response.upload.users[i].isDeletedRecord == true) {
-							var color = '#F78181';
+							var color = '#FF3400';
 
 						} else if (hierarchyjson.response.upload.users[i].isUserModified == true) {
 							var color = '#009FE0';
