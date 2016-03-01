@@ -2055,22 +2055,42 @@ var hierarchyUpload = {
 							}
 						});
 
-		$('#xlsx-file-verify').click(
-				function() {
-					$('#summary').hide();
-					var url = $("#fileUrl").val();
-					if (url == undefined || url == '') {
-						$('#xlsx-file-verify').css("pointerEvents", "none");
-						showError("Please upload a valid file");
-					} else {
-						var formData = new FormData();
-						formData.append("fileUrl", url);
-						showOverlay();
-						callAjaxPOSTWithTextDataUpload("./verifyxlsxfile.do",
-								hierarchyUpload.uploadXlxsSuccessCallback,
-								true, formData);
-					}
-				});
+		$('#xlsx-file-verify')
+				.click(
+						function() {
+							$('#summary').hide();
+							if (hierarchyUpload.hierarchyJson.upload != null
+									&& hierarchyUpload.hierarchyJson.upload.isModifiedFromUI) {
+								var formData = new FormData();
+								formData
+										.append(
+												"hierarchyJson",
+												JSON
+														.stringify(hierarchyUpload.hierarchyJson));
+								// showOverlay();
+								// callAjaxPOSTWithTextDataUpload(
+								// "./verifyxlsxfile.do",
+								// hierarchyUpload.uploadXlxsSuccessCallback,
+								// true, formData);
+								showInfo("Development for this is in progress. Sorry for the inconvenience.");
+							} else {
+								var url = $("#fileUrl").val();
+								if (url == undefined || url == '') {
+									$('#xlsx-file-verify').css("pointerEvents",
+											"none");
+									showError("Please upload a valid file");
+								} else {
+									var formData = new FormData();
+									formData.append("fileUrl", url);
+									showOverlay();
+									callAjaxPOSTWithTextDataUpload(
+											"./verifyxlsxfile.do",
+											hierarchyUpload.uploadXlxsSuccessCallback,
+											true, formData);
+								}
+							}
+						});
+
 		$('#xlsx-file-upload').click(
 				function() {
 					if (hierarchyUpload.canUpload == true) {
@@ -3083,7 +3103,7 @@ var hierarchyUpload = {
 				200);
 
 		$('#xlsx-file-upload').css("pointerEvents", "none");
-		showError("Hierarchy upload modified. Please verify it again!!");
+		showInfo("Successfully modified the region. Please click on 'Verify' button to validate the data!!");
 	},
 
 	editRegion : function(i) {
@@ -3130,7 +3150,7 @@ var hierarchyUpload = {
 				200);
 
 		$('#xlsx-file-upload').css("pointerEvents", "none");
-		showError("Hierarchy upload modified. Please verify it again!!");
+		showInfo("Successfully modified the branch. Please click on 'Verify' button to validate the data!!");
 	},
 
 	editBranch : function(i) {
@@ -3204,7 +3224,7 @@ var hierarchyUpload = {
 		$('#editUser-' + i).parent().next('.hier-users-edit').slideToggle(200);
 
 		$('#xlsx-file-upload').css("pointerEvents", "none");
-		showError("Hierarchy upload modified. Please verify it again!!");
+		showInfo("Successfully modified the user. Please click on 'Verify' button to validate the data!!");
 	},
 
 	editUser : function(i) {
