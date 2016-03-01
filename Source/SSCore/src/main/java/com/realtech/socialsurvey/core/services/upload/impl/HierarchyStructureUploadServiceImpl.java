@@ -1515,7 +1515,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 && ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() )
                 && ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() )
                 && ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) ) {
-                //TODO: Assign user to company
+                //Assign user to company
                 Region region = organizationManagementService.getDefaultRegionForCompany( adminUser.getCompany() );
                 userManagementService.assignUserToRegion( adminUser, assigneeUser.getUserId(), region.getRegionId() );
             } else {
