@@ -73,6 +73,7 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
             crmBatchTracker.setSource( source );
             crmBatchTracker.setLastRunEndDate( new Timestamp( CommonConstants.EPOCH_TIME_IN_MILLIS ) );
             crmBatchTracker.setCreatedOn( new Timestamp( currentTime ) );
+            crmBatchTracker.setRecentRecordFetchedDate( new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS ) );
             lastEndTime = CommonConstants.EPOCH_TIME_IN_MILLIS;
         } else {
             crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
