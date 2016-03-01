@@ -355,7 +355,13 @@ public class UploadValidationServiceImplTest
         user.setFirstName( name );
         user.setEmailId( email );
         user.setSourceRegionId( regionId );
+        List<String> assignedRegions = new ArrayList<String>();
+        assignedRegions.add( regionId );
+        user.setAssignedRegions( assignedRegions );
         user.setSourceBranchId( branchId );
+        List<String> assignedBranches = new ArrayList<String>();
+        assignedBranches.add( branchId );
+        user.setAssignedBranches( assignedBranches );
         user.setAssignedBranchesAdmin( branchAdmin );
         user.setAssignedRegionsAdmin( regionAdmin );
         user.setRowNum( rowNum );

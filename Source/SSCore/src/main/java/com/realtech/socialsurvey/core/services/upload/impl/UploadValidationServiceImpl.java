@@ -405,14 +405,14 @@ public class UploadValidationServiceImpl implements UploadValidationService
     private void validateUserForWarnings( UserUploadVO uploadedUser, List<String> userValidationWarnings )
     {
         boolean isWarningRecord = false;
-        if ( uploadedUser.getSourceRegionId() == null || uploadedUser.getSourceRegionId().isEmpty() ) {
+        if ( uploadedUser.getAssignedRegions() == null || uploadedUser.getAssignedRegions().isEmpty() ) {
             LOG.error( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             userValidationWarnings.add( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             uploadedUser.getValidationWarnings()
                 .add( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             isWarningRecord = true;
         }
-        if ( uploadedUser.getSourceBranchId() == null || uploadedUser.getSourceBranchId().isEmpty() ) {
+        if ( uploadedUser.getAssignedBranches() == null || uploadedUser.getAssignedBranches().isEmpty() ) {
             LOG.error( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             userValidationWarnings.add( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             uploadedUser.getValidationWarnings()
