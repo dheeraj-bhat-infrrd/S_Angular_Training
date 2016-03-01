@@ -2128,9 +2128,9 @@ var hierarchyUpload = {
 			showError(response);
 		} else {
 
-
 			$('#xlsx-file-upload').css("pointerEvents", "auto");
 			var hierarchyjson = $.parseJSON(response);
+			if (hierarchyjson.status) {
 			hierarchyUpload.hierarchyJson = $.parseJSON(response).response;
 
 			if (hierarchyjson.response.numberOfRegionsAdded != 0) {
@@ -2750,6 +2750,9 @@ $('.v-hiararchy-edit').click(function(e){
 				}
 
 			}
+		} else {
+			showError(hierarchyjson.response);
+		}
 		}
 $('.v-hiararchy-edit').click(function(e){
 
