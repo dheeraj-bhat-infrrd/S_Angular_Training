@@ -40,6 +40,9 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> regionValidationErrors = new ArrayList<String>();
         for ( RegionUploadVO uploadedRegion : validationObject.getUpload().getRegions() ) {
             if ( !uploadedRegion.isDeletedRecord() ) {
+                if ( uploadedRegion.getValidationErrors() != null ) {
+                    uploadedRegion.getValidationErrors().clear();
+                }
                 validateRegionForErrors( uploadedRegion, regionValidationErrors );
             }
         }
@@ -53,6 +56,12 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> branchValidationWarnings = new ArrayList<String>();
         for ( BranchUploadVO uploadedBranch : validationObject.getUpload().getBranches() ) {
             if ( !uploadedBranch.isDeletedRecord() ) {
+                if ( uploadedBranch.getValidationWarnings() != null ) {
+                    uploadedBranch.getValidationWarnings().clear();
+                }
+                if ( uploadedBranch.getValidationErrors() != null ) {
+                    uploadedBranch.getValidationErrors().clear();
+                }
                 validateBranchForErrors( uploadedBranch, branchValidationErrors, validationObject.getUpload() );
                 validateBranchForWarnings( uploadedBranch, branchValidationWarnings );
             }
@@ -68,6 +77,12 @@ public class UploadValidationServiceImpl implements UploadValidationService
         List<String> userValidationWarnings = new ArrayList<String>();
         for ( UserUploadVO uploadeduser : validationObject.getUpload().getUsers() ) {
             if ( !uploadeduser.isDeletedRecord() ) {
+                if ( uploadeduser.getValidationErrors() != null ) {
+                    uploadeduser.getValidationErrors().clear();
+                }
+                if ( uploadeduser.getValidationWarnings() != null ) {
+                    uploadeduser.getValidationWarnings().clear();
+                }
                 validateUserForErrors( uploadeduser, userValidationErrors, validationObject.getUpload() );
                 validateUserForWarnings( uploadeduser, userValidationWarnings );
             }
@@ -405,34 +420,53 @@ public class UploadValidationServiceImpl implements UploadValidationService
     private void validateUserForWarnings( UserUploadVO uploadedUser, List<String> userValidationWarnings )
     {
         boolean isWarningRecord = false;
+        boolean isAssignedToBranch = true;
+        boolean isAssignedToRegion = true;
+        boolean isAssignedToBranchAdmin = true;
+        boolean isAssignedToRegionAdmin = true;
         if ( uploadedUser.getAssignedRegions() == null || uploadedUser.getAssignedRegions().isEmpty() ) {
-            LOG.error( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
+            isAssignedToRegion = false;
+            /*LOG.error( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             userValidationWarnings.add( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             uploadedUser.getValidationWarnings()
                 .add( "Region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
-            isWarningRecord = true;
+            isWarningRecord = true;*/
         }
         if ( uploadedUser.getAssignedBranches() == null || uploadedUser.getAssignedBranches().isEmpty() ) {
-            LOG.error( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
+            isAssignedToBranch = false;
+            /*LOG.error( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             userValidationWarnings.add( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             uploadedUser.getValidationWarnings()
                 .add( "Branch Id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
-            isWarningRecord = true;
+            isWarningRecord = true;*/
         }
         if ( uploadedUser.getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) {
-            LOG.error( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
+            isAssignedToBranchAdmin = false;
+            /*LOG.error( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             userValidationWarnings
                 .add( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
             uploadedUser.getValidationWarnings()
                 .add( "admin region Id of user at " + uploadedUser.getRowNum() + " is not linked to any region" );
-            isWarningRecord = true;
+            isWarningRecord = true;*/
         }
         if ( uploadedUser.getAssignedRegionsAdmin() == null || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) {
-            LOG.error( "admin branch id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
+            isAssignedToRegionAdmin = false;
+            /*LOG.error( "admin branch id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             userValidationWarnings
                 .add( "admin branch id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
             uploadedUser.getValidationWarnings()
                 .add( "admin branch id of user at " + uploadedUser.getRowNum() + " is not linked to any branch" );
+            isWarningRecord = true;*/
+        }
+
+        if ( !isAssignedToBranch && !isAssignedToRegion && !isAssignedToBranchAdmin && !isAssignedToRegionAdmin ) {
+            LOG.error( "The user at " + uploadedUser.getRowNum()
+                + " is not assigned to any region or branch. The user will be assigned to the company." );
+            userValidationWarnings.add( "The user at " + uploadedUser.getRowNum()
+                + " is not assigned to any region or branch. The user will be assigned to the company." );
+            uploadedUser.getValidationWarnings().add(
+                "The user at " + uploadedUser.getRowNum()
+                    + " is not assigned to any region or branch. The user will be assigned to the company." );
             isWarningRecord = true;
         }
 
