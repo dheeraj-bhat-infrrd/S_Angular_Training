@@ -187,7 +187,7 @@ public class UploadValidationServiceImplTest
         LOG.info( "Errors: " + validation.getUserValidationErrors() );
         LOG.info( "Warnings: " + validation.getUserValidationWarnings() );
         Assert.assertEquals( 11, validation.getUserValidationErrors().size() );
-        Assert.assertEquals( 4, validation.getUserValidationWarnings().size() );
+        Assert.assertEquals( 1, validation.getUserValidationWarnings().size() );
     }
 
 

@@ -423,6 +423,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 uploadedUser.setUserAdded( true );
                 validationObject.getUpload().getUsers().add( uploadedUser );
             } else {
+                
                 updateUploadValidationWithModifiedUser( uploadedUser, validationObject );
             }
             uploadedUsers.add( uploadedUser );
@@ -522,6 +523,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         validationObject.setNumberOfRegionsModified( validationObject.getNumberOfRegionsModified() + 1 );
                         region.setRegionModified( true );
                     }
+                    //Set new row number for the region
+                    region.setRowNum( uploadedRegion.getRowNum() );
                 }
             }
         }
@@ -593,6 +596,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         validationObject.setNumberOfBranchesModified( validationObject.getNumberOfBranchesModified() + 1 );
                         branch.setBranchModified( true );
                     }
+                    //Set new row number for the branch
+                    branch.setRowNum( uploadedBranch.getRowNum() );
                 }
             }
         }
@@ -738,6 +743,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         validationObject.setNumberOfUsersModified( validationObject.getNumberOfUsersModified() + 1 );
                         user.setUserModified( true );
                     }
+                    //Set new row number for the user
+                    user.setRowNum( uploadedUser.getRowNum() );
                 }
             }
         }
