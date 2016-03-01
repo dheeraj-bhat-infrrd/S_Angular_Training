@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.slf4j.Logger;
@@ -20,6 +22,9 @@ import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 
 public class UploadValidationServiceImplTest
@@ -29,6 +34,9 @@ public class UploadValidationServiceImplTest
     @Spy
     @InjectMocks
     private UploadValidationServiceImpl uploadValidationServiceImpl;
+    
+    @Mock
+    private UserManagementService userManagementService;
 
 
     @BeforeClass
@@ -128,7 +136,7 @@ public class UploadValidationServiceImplTest
 
 
     @Test
-    public void testUserValidationsWithNoErrors()
+    public void testUserValidationsWithNoErrors() throws InvalidInputException, NoRecordsFetchedException
     {
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
@@ -150,6 +158,8 @@ public class UploadValidationServiceImplTest
         users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
         upload.setUsers( users );
         validation.setUpload( upload );
+        Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenThrow(
+            NoRecordsFetchedException.class );
         uploadValidationServiceImpl.validateUsers( validation );
         LOG.info( "Errors: " + validation.getUserValidationErrors() );
         LOG.info( "Warnings: " + validation.getUserValidationWarnings() );
@@ -186,13 +196,14 @@ public class UploadValidationServiceImplTest
         uploadValidationServiceImpl.validateUsers( validation );
         LOG.info( "Errors: " + validation.getUserValidationErrors() );
         LOG.info( "Warnings: " + validation.getUserValidationWarnings() );
-        Assert.assertEquals( 11, validation.getUserValidationErrors().size() );
+        Assert.assertEquals( 9, validation.getUserValidationErrors().size() );
         Assert.assertEquals( 1, validation.getUserValidationWarnings().size() );
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Test
-    public void testDeletedRegionValidationsWithActiveBranchAndUsers()
+    public void testDeletedRegionValidationsWithActiveBranchAndUsers() throws InvalidInputException, NoRecordsFetchedException
     {
         UploadValidation validation = new UploadValidation();
         HierarchyUpload upload = new HierarchyUpload();
@@ -215,6 +226,8 @@ public class UploadValidationServiceImplTest
 
         upload.setUsers( users );
         validation.setUpload( upload );
+        Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenThrow(
+            NoRecordsFetchedException.class );
         uploadValidationServiceImpl.validateHeirarchyUpload( validation );
         Assert.assertEquals( 1, validation.getRegionValidationErrors().size() );
         Assert.assertEquals( 0, validation.getNumberOfRegionsDeleted() );
