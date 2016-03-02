@@ -2067,12 +2067,11 @@ var hierarchyUpload = {
 												"hierarchyJson",
 												JSON
 														.stringify(hierarchyUpload.hierarchyJson));
-								// showOverlay();
-								// callAjaxPOSTWithTextDataUpload(
-								// "./verifyxlsxfile.do",
-								// hierarchyUpload.uploadXlxsSuccessCallback,
-								// true, formData);
-								showInfo("Development for this is in progress. Sorry for the inconvenience.");
+								showOverlay();
+								callAjaxPOSTWithTextDataUpload(
+										"./verifyxHierarchyUpload.do",
+										hierarchyUpload.uploadXlxsSuccessCallback,
+										true, formData);
 							} else {
 								var url = $("#fileUrl").val();
 								if (url == undefined || url == '') {
@@ -2287,10 +2286,11 @@ var hierarchyUpload = {
 								+ '					<select class="bd-frm-rt-txt" id="hier-state-txt-'
 								+ i
 								+ '"'
-								+ '						name="regionState" data-value="">'
-								+ '						<option disabled="" selected="">Select State</option>'
-								+ '						<option data-stateid="32">AL</option>'
-								+ '						<option data-stateid="30">AK</option>'
+								+ '						name="regionState" data-value="'
+								+ hierarchyUpload
+										.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
+								+ '">'
+								+ '						<option disabled selected>Select State</option>'
 								+ '					</select>'
 								+ '				</div>'
 								+ '			</div>'
@@ -2341,11 +2341,12 @@ var hierarchyUpload = {
 										+ i
 										+ '"  class="v-hiararchy-edit" title="Edit" onClick="hierarchyUpload.editRegion('
 										+ i
-										+ ')"></td><td><div class="hier-upload-td">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].rowNum)
+										+ ')"></td><td>'
 										+ hierarchyUpload
 												.addToolTip(hierarchyUpload.hierarchyJson.upload.regions[i])
+										+ '</td><td><div class="hier-upload-td">'
+										+ hierarchyUpload
+												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].rowNum)
 										+ '</div></td><td><div class="hier-upload-td" title="'
 										+ hierarchyUpload
 												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].sourceRegionId)
@@ -2487,10 +2488,11 @@ var hierarchyUpload = {
 								+ '					<select class="bd-frm-rt-txt" id="hier-branch-state-txt-'
 								+ i
 								+ '"'
-								+ '						name="branchState" data-value="">'
-								+ '						<option disabled="" selected="">Select State</option>'
-								+ '						<option data-stateid="32">AL</option>'
-								+ '						<option data-stateid="30">AK</option>'
+								+ '						name="branchState" data-value="'
+								+ hierarchyUpload
+										.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
+								+ '">'
+								+ '						<option disabled selected>Select State</option>'
 								+ '					</select>'
 								+ '				</div>'
 								+ '			</div>'
@@ -2539,11 +2541,12 @@ var hierarchyUpload = {
 										+ i
 										+ '" onClick="hierarchyUpload.editBranch('
 										+ i
-										+ ')"></td><td><div class="hier-upload-td">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].rowNum)
+										+ ')"></td><td>'
 										+ hierarchyUpload
 												.addToolTip(hierarchyUpload.hierarchyJson.upload.branches[i])
+										+ '</td><td><div class="hier-upload-td">'
+										+ hierarchyUpload
+												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].rowNum)
 										+ '</div></td><td><div class="hier-upload-td" title="'
 										+ hierarchyUpload
 												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceBranchId)
@@ -2582,14 +2585,6 @@ var hierarchyUpload = {
 										+ '">'
 										+ hierarchyUpload
 												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
-										+ '</div></td><td><div id="branchState-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
 										+ '</div></td><td><div id="branchCity-'
 										+ i
 										+ '" class="hier-upload-td" title="'
@@ -2598,6 +2593,14 @@ var hierarchyUpload = {
 										+ '">'
 										+ hierarchyUpload
 												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
+										+ '</div></td><td><div id="branchState-'
+										+ i
+										+ '" class="hier-upload-td" title="'
+										+ hierarchyUpload
+												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
+										+ '">'
+										+ hierarchyUpload
+												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
 										+ '</div></td><td><div id="branchZipcode-'
 										+ i
 										+ '" class="hier-upload-td" title="'
@@ -2806,13 +2809,12 @@ var hierarchyUpload = {
 								+ '		<div class="bd-hr-form-item clearfix">'
 								+ '			<div class="float-left bd-frm-left">About Me Description</div>'
 								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-aboutMeDescription-txt-'
+								+ '				<textarea class="hier-upload-txt-area" id="hier-user-aboutMeDescription-txt-'
 								+ i
-								+ '"'
-								+ '					name="userAboutMeDescription" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription)
-								+ '">'
+								+ '" name="userAboutMeDescription">'
+								+ escapeHtml(hierarchyUpload
+										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription))
+								+ '</textarea>'
 								+ '			</div>'
 								+ '		</div>'
 								+ ''
@@ -2834,11 +2836,12 @@ var hierarchyUpload = {
 										+ i
 										+ '" class="v-hiararchy-edit" title="Edit" onClick="hierarchyUpload.editUser('
 										+ i
-										+ ')"></td><td><div class="hier-upload-td">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].rowNum)
+										+ ')"></td><td>'
 										+ hierarchyUpload
 												.addToolTip(hierarchyUpload.hierarchyJson.upload.users[i])
+										+ '</td><td><div class="hier-upload-td">'
+										+ hierarchyUpload
+												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].rowNum)
 										+ '</div></td><td><div class="hier-upload-td" title="'
 										+ hierarchyUpload
 												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].sourceUserId)
@@ -2971,13 +2974,13 @@ var hierarchyUpload = {
 					}
 				}
 
-				if (hierarchyUpload.hierarchyJson.regionValidationErrors != null
-						&& hierarchyUpload.hierarchyJson.regionValidationErrors.length == 0
-						&& hierarchyUpload.hierarchyJson.branchValidationErrors != null
-						&& hierarchyUpload.hierarchyJson.branchValidationErrors.length == 0
-						&& hierarchyUpload.hierarchyJson.userValidationErrors != null
-						&& hierarchyUpload.hierarchyJson.userValidationErrors.length == 0) {
+				if ((hierarchyUpload.hierarchyJson.regionValidationErrors == null || hierarchyUpload.hierarchyJson.regionValidationErrors.length == 0)
+						&& (hierarchyUpload.hierarchyJson.branchValidationErrors == null || hierarchyUpload.hierarchyJson.branchValidationErrors.length == 0)
+						&& (hierarchyUpload.hierarchyJson.userValidationErrors == null || hierarchyUpload.hierarchyJson.userValidationErrors.length == 0)) {
 					$('#xlsx-file-upload').css("pointerEvents", "auto");
+					showInfo("Data verified sucessfully with no validation errors.");
+				} else {
+					showError("There are some validation errors which need to be resolved before uploading the data.");
 				}
 
 				if (regionlength == 0 && branchlength == 0 && userlength == 0) {
@@ -3054,20 +3057,15 @@ var hierarchyUpload = {
 						+ "\n";
 			}
 		}
-		if (data.validationErrors.length != 0
-				|| data.validationWarnings.length != 0) {
-			toolTip = '&nbsp;<span title="' + toolTipMsg
-					+ '"><img src="resources/images/abuse.png"></span>';
-		} /*
-			 * else if (data.validationErrors.length == 0 &&
-			 * data.validationWarnings.length > 0) { toolTip = '&nbsp;<span
-			 * title="' + toolTipMsg + '"><img
-			 * src="resources/images/abuse.png"></span>'; } else if
-			 * (data.validationErrors.length > 0 &&
-			 * data.validationWarnings.length == 0) { toolTip = '&nbsp;<span
-			 * title="' + toolTipMsg + '"><img
-			 * src="resources/images/abuse.png"></span>'; }
-			 */
+		if (data.validationErrors.length > 0) {
+			toolTip = '&nbsp;<span title="'
+					+ toolTipMsg
+					+ '"><img src="resources/images/icn-err-msg.png" style="width: 15px"></span>';
+		} else if (data.validationWarnings.length > 0) {
+			toolTip = '&nbsp;<span title="'
+					+ toolTipMsg
+					+ '"><img src="resources/images/icn-neutral-mood.png" style="width: 15px"></span>';
+		}
 		return toolTip;
 	},
 
@@ -3079,9 +3077,9 @@ var hierarchyUpload = {
 		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2 = $(
 				'#hier-address2-txt-' + i).val();
 		hierarchyUpload.hierarchyJson.upload.regions[i].regionCity = $(
-				'#hier-state-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionState = $(
 				'#hier-city-txt-' + i).val();
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionState = $(
+				'#hier-state-txt-' + i).val();
 		hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode = $(
 				'#hier-zipcode-txt-' + i).val();
 		hierarchyUpload.hierarchyJson.upload.isModifiedFromUI = true;
@@ -3109,6 +3107,8 @@ var hierarchyUpload = {
 	editRegion : function(i) {
 		$('#editRegion-' + i).parent().next('.hier-region-edit').slideToggle(
 				200);
+		showStateCityRow('hier-state-txt-' + i, 'hier-state-txt-' + i,
+				'hier-city-txt-' + i);
 	},
 
 	saveEdittedBranch : function(i) {
@@ -3121,9 +3121,9 @@ var hierarchyUpload = {
 		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2 = $(
 				'#hier-branch-address2-txt-' + i).val();
 		hierarchyUpload.hierarchyJson.upload.branches[i].branchCity = $(
-				'#hier-branch-state-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchState = $(
 				'#hier-branch-city-txt-' + i).val();
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchState = $(
+				'#hier-branch-state-txt-' + i).val();
 		hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode = $(
 				'#hier-branch-zipcode-txt-' + i).val();
 		hierarchyUpload.hierarchyJson.upload.isModifiedFromUI = true;
@@ -3156,6 +3156,8 @@ var hierarchyUpload = {
 	editBranch : function(i) {
 		$('#editBranch-' + i).parent().next('.hier-branch-edit').slideToggle(
 				200);
+		showStateCityRow('hier-branch-state-txt-' + i, 'hier-branch-state-txt-'
+				+ i, 'hier-branch-city-txt-' + i);
 	},
 
 	saveEdittedUser : function(i) {
