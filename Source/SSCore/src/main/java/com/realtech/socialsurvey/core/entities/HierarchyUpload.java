@@ -14,6 +14,19 @@ public class HierarchyUpload
     private Map<String, Long> regionSourceMapping;
     private Map<String, Long> branchSourceMapping;
     private Map<String, Long> userSourceMapping;
+    private boolean isModifiedFromUI;
+
+
+    public boolean isModifiedFromUI()
+    {
+        return isModifiedFromUI;
+    }
+
+
+    public void setModifiedFromUI( boolean isModifiedFromUI )
+    {
+        this.isModifiedFromUI = isModifiedFromUI;
+    }
 
 
     public List<RegionUploadVO> getRegions()
