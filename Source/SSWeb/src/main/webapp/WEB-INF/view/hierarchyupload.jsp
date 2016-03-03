@@ -85,7 +85,7 @@
 			style="display: none !important"><a
 			href="#upload-summary-region" data-toggle="tab"> Regions </a></li>
 		<li id="branch-sum-btn" style="display: none !important"><a
-			href="#upload-summary-branch" data-toggle="tab"> Branches </a></li>
+			href="#upload-summary-branch" data-toggle="tab"> Offices </a></li>
 		<li id="user-sum-btn" style="display: none !important"><a
 			href="#upload-summary-user" data-toggle="tab"> Users </a></li>
 
