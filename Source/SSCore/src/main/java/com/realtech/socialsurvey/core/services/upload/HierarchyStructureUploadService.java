@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.core.services.upload;
 
+import java.util.List;
+import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.User;
@@ -16,7 +19,8 @@ public interface HierarchyStructureUploadService
      * @param upload
      * @param company
      * @param user
+     * @return 
      * @throws InvalidInputException
      */
-    public void uploadHierarchy(HierarchyUpload upload, Company company, User user) throws InvalidInputException;
+    public Map<String, List<String>> uploadHierarchy(HierarchyUpload upload, Company company, User user) throws InvalidInputException;
 }

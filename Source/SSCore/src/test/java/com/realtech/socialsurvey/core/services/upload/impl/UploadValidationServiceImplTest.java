@@ -158,8 +158,8 @@ public class UploadValidationServiceImplTest
         users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
         upload.setUsers( users );
         validation.setUpload( upload );
-        Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenThrow(
-            NoRecordsFetchedException.class );
+        /*Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenThrow(
+            NoRecordsFetchedException.class );*/
         uploadValidationServiceImpl.validateUsers( validation );
         LOG.info( "Errors: " + validation.getUserValidationErrors() );
         LOG.info( "Warnings: " + validation.getUserValidationWarnings() );

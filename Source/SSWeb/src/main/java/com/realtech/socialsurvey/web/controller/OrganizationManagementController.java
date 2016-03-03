@@ -2789,8 +2789,14 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         User user = sessionHelper.getCurrentUser();
         try {
-            hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user );
-            response = "Data uploaded successfully.";
+            Map<String, List<String>> errorMap = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(),
+                user.getCompany(), user );
+            if ( errorMap == null || errorMap.isEmpty() ) {
+                response = "Data uploaded successfully.";
+            } else {
+                status = false;
+                response = new Gson().toJson( errorMap );
+            }
         } catch ( Exception ex ) {
             status = false;
             response = ex.getMessage();

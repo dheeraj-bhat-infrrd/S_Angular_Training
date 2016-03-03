@@ -11,15 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 
@@ -367,7 +364,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
             userValidationErrors.add( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             uploadedUser.getValidationErrors().add( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             errorRecord = true;
-        } else if ( uploadedUser.isUserAdded() ) {
+        } /*else if ( uploadedUser.isUserAdded() ) {
             //Check if the user is new and emailId already exists
             String emailId = uploadedUser.getEmailId();
             if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
@@ -385,7 +382,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }
+        }*/
         
         
         /*if ( uploadedUser.getSourceBranchId() != null && !uploadedUser.getSourceBranchId().isEmpty()
