@@ -319,7 +319,7 @@ function validateLastName(elementId) {
 
 /**
  * Function to validate a password in form
- * 
+ *
  * @param elementId
  * @returns {Boolean}
  */
@@ -336,7 +336,7 @@ function validatePassword(elementId) {
 }
 /**
  * Function to match password and confirm password
- * 
+ *
  * @param pwdId
  * @param confirmPwdId
  * @returns {Boolean}
@@ -1285,7 +1285,7 @@ function initializeFindAProPage() {
 /**
  * Method to fetch users list based on the criteria i.e if profile level is
  * specified, bring all users of that level else search based on first/last name
- * 
+ *
  * @param newIndex
  */
 function fetchUsers(newIndex) {
@@ -1496,7 +1496,7 @@ function paintProList(usersList) {
 
 /**
  * Function to fetch the users by profile level in pro list page
- * 
+ *
  * @param iden
  * @param profileLevel -
  *            office/region/company
@@ -2642,6 +2642,19 @@ var hierarchyUpload = {
 							var color = '#666';
 						}
 
+						var sendMailCode = "";
+
+						if ( !hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified ||
+								hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded ) {
+							// Add checkbox only for users who aren't verified
+							// and new users
+							var sendMailCode = "<div id ='send-mail-" + i + "' class='send-mail-check-img ";
+							if (!hierarchyUpload.hierarchyJson.upload.users[i].sendMail) {
+								sendMailCode += "bd-check-img-checked"
+							}
+							sendMailCode += "'onClick='hierarchyUpload.toggleSendMail(" + i + ")'></div>";
+						}
+
 						var userEdit = '<div id="hier-user-detail-edit-container"'
 								+ '	class="prof-user-address prof-edit-icn">'
 								+ ''
@@ -2837,7 +2850,9 @@ var hierarchyUpload = {
 										+ i
 										+ '" class="v-hiararchy-edit" title="Edit" onClick="hierarchyUpload.editUser('
 										+ i
-										+ ')"></td><td>'
+										+ ')"></td><td><div class="hier-upload-td">'
+										+ sendMailCode
+										+ '</div></td><td>'
 										+ hierarchyUpload
 												.addToolTip(hierarchyUpload.hierarchyJson.upload.users[i])
 										+ '</td><td><div class="hier-upload-td">'
@@ -3006,6 +3021,17 @@ var hierarchyUpload = {
 			}
 		}
 
+	},
+
+
+	toggleSendMail : function(iden) {
+		if ($('#send-mail-' + iden).hasClass('bd-check-img-checked')) {
+			$('#send-mail-' + iden).removeClass('bd-check-img-checked');
+			hierarchyUpload.hierarchyJson.upload.users[iden].sendMail = true;
+		} else {
+			$('#send-mail-' + iden).addClass('bd-check-img-checked');
+			hierarchyUpload.hierarchyJson.upload.users[iden].sendMail = false;
+		}
 	},
 
 	fileValidate : function(fileformat) {

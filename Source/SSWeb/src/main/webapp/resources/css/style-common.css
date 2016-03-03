@@ -5237,6 +5237,15 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	cursor: pointer;
 }
 
+.send-mail-check-img {
+	width: 20px;
+	height: 20px;
+	margin-left: 25px;
+	background: url(../images/checks.png) no-repeat;
+	background-position: left center;
+	cursor: pointer;
+}
+
 .bd-frm-check-wrapper {
 	width: 270px;
 }
