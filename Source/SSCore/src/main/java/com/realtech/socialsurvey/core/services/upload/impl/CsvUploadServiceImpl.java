@@ -1212,7 +1212,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
             // He belongs to the company
             LOG.debug( "Adding user : " + user.getEmailId() + " belongs to company" );
             map = organizationManagementService.addIndividual( adminUser, 0, 0, 0, new String[] { user.getEmailId() }, false,
-                true );
+                true, true );
             if ( map != null ) {
                 userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
             }
@@ -1224,10 +1224,10 @@ public class CsvUploadServiceImpl implements CsvUploadService
             if ( user.isBranchAdmin() ) {
                 LOG.debug( "User is the branch admin" );
                 map = organizationManagementService.addIndividual( adminUser, 0, branch.getBranchId(),
-                    branch.getRegion().getRegionId(), new String[] { user.getEmailId() }, true, true );
+                    branch.getRegion().getRegionId(), new String[] { user.getEmailId() }, true, true, true );
                 if ( user.isAgent() ) {
                     organizationManagementService.addIndividual( adminUser, 0, branch.getBranchId(),
-                        branch.getRegion().getRegionId(), new String[] { user.getEmailId() }, false, true );
+                        branch.getRegion().getRegionId(), new String[] { user.getEmailId() }, false, true, true );
                 }
                 if ( map != null ) {
                     userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
@@ -1236,7 +1236,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
             } else {
                 LOG.debug( "User is not the branch admin" );
                 map = organizationManagementService.addIndividual( adminUser, 0, branch.getBranchId(),
-                    branch.getRegion().getRegionId(), new String[] { user.getEmailId() }, false, true );
+                    branch.getRegion().getRegionId(), new String[] { user.getEmailId() }, false, true, true );
                 if ( map != null ) {
                     userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
                 }
@@ -1249,10 +1249,10 @@ public class CsvUploadServiceImpl implements CsvUploadService
             if ( user.isRegionAdmin() ) {
                 LOG.debug( "User is the region admin." );
                 map = organizationManagementService.addIndividual( adminUser, 0, 0, region.getRegionId(),
-                    new String[] { user.getEmailId() }, true, true );
+                    new String[] { user.getEmailId() }, true, true, true );
                 if ( user.isAgent() ) {
                     organizationManagementService.addIndividual( adminUser, 0, 0, region.getRegionId(),
-                        new String[] { user.getEmailId() }, false, true );
+                        new String[] { user.getEmailId() }, false, true, true );
                 }
                 if ( map != null ) {
                     userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
@@ -1261,7 +1261,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
             } else {
                 LOG.debug( "User is not the admin of the region" );
                 map = organizationManagementService.addIndividual( adminUser, 0, 0, region.getRegionId(),
-                    new String[] { user.getEmailId() }, false, true );
+                    new String[] { user.getEmailId() }, false, true, true );
                 if ( map != null ) {
                     userList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
                 }
@@ -1292,7 +1292,7 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
         if ( user.isBelongsToCompany() ) {
             LOG.debug( "Assigning user id : " + assigneeUser.getUserId() );
-            organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, 0, null, false, true );
+            organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, 0, null, false, true, true );
         } else if ( user.getBranchId() > 0l ) {
             // User belongs to a branch
             LOG.debug( "Assigning user : " + user.getEmailId() + " belongs to branch : " + user.getBranchId() );
@@ -1300,16 +1300,16 @@ public class CsvUploadServiceImpl implements CsvUploadService
             if ( user.isBranchAdmin() ) {
                 LOG.debug( "User is the branch admin" );
                 organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), branch.getBranchId(),
-                    branch.getRegion().getRegionId(), null, true, true );
+                    branch.getRegion().getRegionId(), null, true, true, true );
                 if ( user.isAgent() ) {
                     organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), branch.getBranchId(),
-                        branch.getRegion().getRegionId(), null, false, true );
+                        branch.getRegion().getRegionId(), null, false, true, true );
                 }
                 LOG.debug( "Added user : " + user.getEmailId() );
             } else {
                 LOG.debug( "User is not the branch admin" );
                 organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), branch.getBranchId(),
-                    branch.getRegion().getRegionId(), null, false, true );
+                    branch.getRegion().getRegionId(), null, false, true, true );
                 LOG.debug( "Added user : " + user.getEmailId() );
             }
         } else if ( user.getRegionId() > 0l ) {
@@ -1319,17 +1319,17 @@ public class CsvUploadServiceImpl implements CsvUploadService
             if ( user.isRegionAdmin() ) {
                 LOG.debug( "User is the region admin." );
                 organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null,
-                    true, true );
+                    true, true, true );
                 LOG.debug( "Added user : " + user.getEmailId() );
                 if ( user.isAgent() ) {
                     organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(),
-                        null, false, true );
+                        null, false, true, true );
                 }
 
             } else {
                 LOG.debug( "User is not the admin of the region" );
                 organizationManagementService.addIndividual( adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null,
-                    false, true );
+                    false, true, true );
                 LOG.debug( "Added user : " + user.getEmailId() );
             }
         }

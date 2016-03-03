@@ -1076,6 +1076,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         userUpload.setWarningRecord( false );
         userUpload.setErrorRecord( false );
         userUpload.setDeletedRecord( false );
+        userUpload.setSendMail( false );
         return userUpload;
 
     }
@@ -1860,21 +1861,18 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         if ( user.getEmailId() == null || user.getEmailId().isEmpty() ) {
             throw new InvalidInputException( "User email ID cannot be null" );
         }
-        if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
-            emailId = utils.maskEmailAddress( emailId );
-            if ( emailId != null ) {
-                user.setEmailId( user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) + " <"
-                    + emailId + ">" );
-            }
-        } else {
-            user.setEmailId(
-                user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) + " <" + emailId + ">" );
-        }
+
+        user.setEmailId( user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) + " <" + emailId
+            + ">" );
 
         //Add user and call assignUser method
         //Add user
+        //If sendMail = true, then you need to send the mail. So holdSendingMail should be false.
         Map<String, List<User>> resultMap = organizationManagementService
-            .getUsersFromEmailIdsAndInvite( new String[] { user.getEmailId() }, adminUser, true );
+            .getUsersFromEmailIdsAndInvite( new String[] { user.getEmailId() }, adminUser, false, user.isSendMail() );
+        //Reset sendMail to false
+        user.setSendMail( false );
+        
         if ( resultMap != null ) {
             userList = (List<User>) resultMap.get( CommonConstants.VALID_USERS_LIST );
             if ( userList != null && !userList.isEmpty() ) {
