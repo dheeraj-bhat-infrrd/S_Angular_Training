@@ -1024,4 +1024,14 @@ public interface CommonConstants
     public static final String HIERARCHY_BRANCH_HEADERS_INVALID = "Invalid headers in the Offices sheet";
     
     public static final String HIERARCHY_USER_HEADERS_INVALID = "Invalid headers in the Users sheet";
+    
+    //Hierarchy upload error constants
+    public static final String USER_UPLOAD_ERROR_LIST = "USER_UPLOAD";
+    public static final String BRANCH_UPLOAD_ERROR_LIST = "BRANCH_UPLOAD";
+    public static final String REGION_UPLOAD_ERROR_LIST = "REGION_UPLOAD";
+    public static final String USER_DELETE_ERROR_LIST = "USER_DELETE";
+    public static final String BRANCH_DELETE_ERROR_LIST = "BRANCH_DELETE";
+    public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
+    
+    
 }

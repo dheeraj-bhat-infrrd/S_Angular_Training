@@ -33,7 +33,6 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
-import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
@@ -696,16 +695,9 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 userUploadVO.setAboutMeDescription( agentSettings.getContact_details().getAbout_me() );
             }
         }
-        if ( agentSettings.getLicenses() != null ) {
-            Licenses licenses = agentSettings.getLicenses();
-            List<String> authorizedInList = licenses.getAuthorized_in();
-            String authorizedIns = "";
-            if ( authorizedInList != null && authorizedInList.size() > 0 ) {
-                for ( String authorizedIn : authorizedInList ) {
-                    authorizedIns += authorizedIn + ",";
-                }
-            }
-            userUploadVO.setLicense( authorizedIns );
+        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null
+            && !agentSettings.getLicenses().getAuthorized_in().isEmpty() ) {
+            userUploadVO.setLicense( agentSettings.getLicenses().getAuthorized_in().get( 0 ) );
         }
         if ( agentSettings.getDisclaimer() != null && !( agentSettings.getDisclaimer().isEmpty() ) ) {
             userUploadVO.setLegalDisclaimer( agentSettings.getDisclaimer() );

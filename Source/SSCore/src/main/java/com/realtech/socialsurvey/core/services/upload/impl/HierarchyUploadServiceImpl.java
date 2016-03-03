@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
@@ -85,6 +86,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
+    
+    @Autowired
+    private Utils utils;
 
 
     @Override
@@ -459,9 +463,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else if ( cellIndex == USER_PHONE_NUMBER ) {
                         if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
                             && !String.valueOf( (long) cell.getNumericCellValue() ).isEmpty() ) {
-                            uploadedUser.setPhoneNumber( String.valueOf( (long) cell.getNumericCellValue() ) );
+                                uploadedUser.setPhoneNumber( String.valueOf( (long) cell.getNumericCellValue() ).trim().replaceAll( "[^0-9a-zA-Z\\(\\)\\-]", "" ) );
                         } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
-                            uploadedUser.setPhoneNumber( cell.getStringCellValue().trim() );
+                            uploadedUser.setPhoneNumber( cell.getStringCellValue().trim().replaceAll( "[^0-9a-zA-Z\\(\\)\\-\\s]", "" ) );
                         }
                     } else if ( cellIndex == USER_WEBSITE && !cell.getStringCellValue().trim().isEmpty() ) {
                         uploadedUser.setWebsiteUrl( cell.getStringCellValue().trim() );
@@ -781,16 +785,23 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         user.setAssignedRegionsModified( true );
                     }
                     if ( ( user.getEmailId() != null && uploadedUser.getEmailId() == null )
-                        || ( user.getEmailId() == null && uploadedUser.getEmailId() != null )
-                        || ( user.getEmailId() != null && uploadedUser.getEmailId() != null
-                            && !user.getEmailId().equalsIgnoreCase( uploadedUser.getEmailId() ) ) ) {
+                        || ( user.getEmailId() == null && uploadedUser.getEmailId() != null ) ) {
                         user.setEmailId( uploadedUser.getEmailId() );
                         user.setEmailIdModified( true );
+                    } else {
+                        String emailId = uploadedUser.getEmailId();
+                        if ( CommonConstants.YES_STRING.equals( maskEmail ) && !user.isSourceUserIdGenerated() ) {
+                            emailId = utils.maskEmailAddress( emailId );
+                        }
+                        if ( ( user.getEmailId() != null && emailId != null && !user.getEmailId().equalsIgnoreCase( emailId ) ) ) {
+                            user.setEmailId( uploadedUser.getEmailId() );
+                            user.setEmailIdModified( true );
+                        }
                     }
                     if ( ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() == null )
                         || ( user.getPhoneNumber() == null && uploadedUser.getPhoneNumber() != null )
-                        || ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() != null
-                            && !user.getPhoneNumber().equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) ) {
+                        || ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() != null && !user.getPhoneNumber()
+                            .equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) ) {
                         user.setPhoneNumber( uploadedUser.getPhoneNumber() );
                         user.setPhoneNumberModified( true );
                     }

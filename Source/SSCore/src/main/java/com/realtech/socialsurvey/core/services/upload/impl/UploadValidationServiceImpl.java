@@ -7,13 +7,17 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 
 
@@ -22,7 +26,15 @@ public class UploadValidationServiceImpl implements UploadValidationService
 {
 
     private static Logger LOG = LoggerFactory.getLogger( UploadValidationServiceImpl.class );
+    
+    @Autowired
+    private UserManagementService userManagementService;
 
+    @Value ( "${MASK_EMAIL_ADDRESS}")
+    private String maskEmail;
+    
+    @Autowired
+    private Utils utils;
 
     @Override
     public void validateHeirarchyUpload( UploadValidation validationObject )
@@ -352,15 +364,34 @@ public class UploadValidationServiceImpl implements UploadValidationService
             userValidationErrors.add( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             uploadedUser.getValidationErrors().add( "Email Id at row: " + uploadedUser.getRowNum() + " is not provided" );
             errorRecord = true;
-        }
-        //TODO: Replace this check with that of assigned branches
-        if ( uploadedUser.getSourceBranchId() != null && !uploadedUser.getSourceBranchId().isEmpty()
+        } /*else if ( uploadedUser.isUserAdded() ) {
+            //Check if the user is new and emailId already exists
+            String emailId = uploadedUser.getEmailId();
+            if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
+                emailId = utils.maskEmailAddress( uploadedUser.getEmailId() );
+            }
+            try {
+                userManagementService.getUserByEmailAddress( emailId );
+                LOG.error( "Email Id at row: " + uploadedUser.getRowNum() + " already exists" );
+                userValidationErrors.add( "Email Id at row: " + uploadedUser.getRowNum() + " already exists" );
+                uploadedUser.getValidationErrors().add( "Email Id at row: " + uploadedUser.getRowNum() + " already exists" );
+                errorRecord = true;
+            } catch ( NoRecordsFetchedException e ) {
+                //Do nothing.
+            } catch ( InvalidInputException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }*/
+        
+        
+        /*if ( uploadedUser.getSourceBranchId() != null && !uploadedUser.getSourceBranchId().isEmpty()
             && !isSourceBranchIdMappedToBranch( uploadedUser.getSourceBranchId(), upload ) ) {
             LOG.error( "The branch id at row: " + uploadedUser.getRowNum() + " is not valid" );
             userValidationErrors.add( "The branchId at row: " + uploadedUser.getRowNum() + " is not valid" );
             uploadedUser.getValidationErrors().add( "The branchId at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
-        }
+        }*/
 
         if ( uploadedUser.getAssignedBranches() != null && !uploadedUser.getAssignedBranches().isEmpty()
             && !isSourceBranchIdMappedToBranch( uploadedUser.getAssignedBranches(), upload ) ) {
@@ -371,14 +402,13 @@ public class UploadValidationServiceImpl implements UploadValidationService
             errorRecord = true;
         }
 
-        //TODO: Replace this check with that of assigned regions
-        if ( uploadedUser.getSourceRegionId() != null && !uploadedUser.getSourceRegionId().isEmpty()
+        /*if ( uploadedUser.getSourceRegionId() != null && !uploadedUser.getSourceRegionId().isEmpty()
             && !isSourceRegionIdMappedToRegion( uploadedUser.getSourceRegionId(), upload ) ) {
             LOG.error( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
             userValidationErrors.add( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
             uploadedUser.getValidationErrors().add( "The region id at row: " + uploadedUser.getRowNum() + " is not valid" );
             errorRecord = true;
-        }
+        }*/
 
         if ( uploadedUser.getAssignedRegions() != null && !uploadedUser.getAssignedRegions().isEmpty()
             && !isSourceRegionIdMappedToRegion( uploadedUser.getAssignedRegions(), upload ) ) {

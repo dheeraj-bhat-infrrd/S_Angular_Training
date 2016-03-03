@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -102,11 +103,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
     @Autowired
     private HierarchyUploadDao hierarchyUploadDao;
+    
+    @Resource
+    @Qualifier ( "user")
+    private UserDao userDao;
 
 
     @Override
     @Transactional
-    public void uploadHierarchy( HierarchyUpload upload, Company company, User user ) throws InvalidInputException
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user ) throws InvalidInputException
     {
         // the upload object should have the current value as well the changes made by the user in the sheet/ UI
         if ( upload == null ) {
@@ -126,26 +131,53 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             throw new InvalidInputException( "User is not authorized to upload hierarchy." );
         }
         LOG.info( "Uploading hierarchy for company " + upload.getCompanyId() );
+        List<String> regionUploadErrors = new ArrayList<String>();
+        List<String> branchUploadErrors = new ArrayList<String>();
+        List<String> userUploadErrors = new ArrayList<String>();
+        List<String> userDeleteErrors = new ArrayList<String>();
+        List<String> branchDeleteErrors = new ArrayList<String>();
+        List<String> regionDeleteErrors = new ArrayList<String>();
         // start with addition and modification of each unit starting from the highest hierarchy and then deletion starting from the lowest hierarchy
         // uploading regions
-        uploadRegions( upload, user, company );
+        uploadRegions( upload, user, company, regionUploadErrors );
         // Uploading branches
-        uploadBranches( upload, user, company );
+        uploadBranches( upload, user, company, branchUploadErrors );
         // Uploading users
-        uploadUsers( upload, user );
+        uploadUsers( upload, user, userUploadErrors );
         // Delete users
-        deleteUsers( upload, user, company );
+        deleteUsers( upload, user, company, userDeleteErrors );
         // Delete branches
-        deleteBranches( upload, user, company );
+        deleteBranches( upload, user, company, branchDeleteErrors );
         // Delete regions
-        deleteRegions( upload, user, company );
+        deleteRegions( upload, user, company, regionDeleteErrors );
 
         hierarchyUploadDao.saveHierarchyUploadObject( upload );
+        
+        Map<String, List<String>> errorMap = new HashMap<String, List<String>>();
+        if ( !userUploadErrors.isEmpty() ) {
+            errorMap.put( CommonConstants.USER_UPLOAD_ERROR_LIST, userUploadErrors );
+        }
+        if ( !branchUploadErrors.isEmpty() ) {
+            errorMap.put( CommonConstants.BRANCH_UPLOAD_ERROR_LIST, branchUploadErrors );
+        }
+        if ( !regionUploadErrors.isEmpty() ) {
+            errorMap.put( CommonConstants.REGION_UPLOAD_ERROR_LIST, regionUploadErrors );
+        }
+        if ( !userDeleteErrors.isEmpty() ) {
+            errorMap.put( CommonConstants.USER_DELETE_ERROR_LIST, userDeleteErrors );
+        }
+        if ( !branchDeleteErrors.isEmpty() ) {
+            errorMap.put( CommonConstants.BRANCH_DELETE_ERROR_LIST, branchDeleteErrors );
+        }
+        if ( !regionDeleteErrors.isEmpty() ) {
+            errorMap.put( CommonConstants.REGION_DELETE_ERROR_LIST, regionDeleteErrors );
+        }
+        return errorMap;
     }
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void deleteUsers( HierarchyUpload upload, User adminUser, Company company )
+    void deleteUsers( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.debug( "Deleting removed users" );
         List<UserUploadVO> userList = upload.getUsers();
@@ -166,7 +198,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     deletedUsers.add( user );
                     upload.getUserSourceMapping().remove( user.getSourceUserId() );
                 } catch ( Exception e ) {
-                    // TODO:process errors and return them to the user
+                    // process errors and return them to the user
+                    errorList.add( e.getMessage() );
                 }
             }
         }
@@ -176,7 +209,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void deleteBranches( HierarchyUpload upload, User adminUser, Company company )
+    void deleteBranches( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.info( "Deleting branches" );
         List<BranchUploadVO> branches = upload.getBranches();
@@ -216,8 +249,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     }
 
                 } catch ( Exception e ) {
-                    //TODO: process errors and return them to the user
+                    //process errors and return them to the user
                     e.printStackTrace();
+                    errorList.add( e.getMessage() );
                 }
             }
         }
@@ -227,7 +261,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void deleteRegions( HierarchyUpload upload, User adminUser, Company company )
+    void deleteRegions( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.info( "Deleting regions" );
         List<RegionUploadVO> regions = upload.getRegions();
@@ -270,8 +304,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     }
 
                 } catch ( Exception e ) {
-                    //TODO: process errors and return them to the user
+                    //process errors and return them to the user
                     e.printStackTrace();
+                    errorList.add( e.getMessage() );
                 }
             }
         }
@@ -280,7 +315,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void uploadBranches( HierarchyUpload upload, User user, Company company )
+    void uploadBranches( HierarchyUpload upload, User user, Company company, List<String> errorList )
     {
         LOG.debug( "Uploading new branches" );
         List<BranchUploadVO> branchesToBeUploaded = upload.getBranches();
@@ -328,7 +363,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
                 } catch ( InvalidInputException | BranchAdditionException | SolrException | NoRecordsFetchedException
                     | UserAssignmentException e ) {
-                    //TODO: Add error records
+                    //Add error records
+                    errorList.add( e.getMessage() );
                     e.printStackTrace();
                 }
             }
@@ -436,7 +472,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void uploadRegions( HierarchyUpload upload, User user, Company company )
+    void uploadRegions( HierarchyUpload upload, User user, Company company, List<String> errorList )
     {
         LOG.debug( "Uploading new regions." );
         List<RegionUploadVO> regionsToBeUploaded = upload.getRegions();
@@ -468,7 +504,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     //Store the updated regionUploads in upload
                     upload.setRegions( regionsToBeUploaded );
                 } catch ( InvalidInputException | SolrException | NoRecordsFetchedException | UserAssignmentException e ) {
-                    // TODO: Add error records
+                    // Add error records
+                    errorList.add( e.getMessage() );
                     e.printStackTrace();
                 }
             }
@@ -1487,6 +1524,34 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         return assigneeUser;
     }
 
+    
+    User modifyUser(  UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload  )
+        throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
+    {
+        LOG.info( "Method modifyUser() started for user : " + user.getEmailId() );
+        if ( !( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) {
+            throw new UserAdditionException( "User : " + user.getEmailId() + " belongs to a different company" );
+        }
+        User assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
+        
+        //check and modify user object
+        if ( user.isEmailIdModified() ) {
+            assigneeUser.setEmailId( user.getEmailId() );
+        }
+        if ( user.isFirstNameModified() ) {
+            assigneeUser.setFirstName( user.getFirstName() );
+        }
+        if ( user.isLastNameModified() ) {
+            assigneeUser.setLastName( user.getLastName() );
+        }
+        
+        userDao.update( assigneeUser );
+        
+        
+        assignUser( user, adminUser, currentUserMap, upload );
+        return assigneeUser;
+    }
+    
 
     /**
      * Method to assign/unassign user to regions and branches
@@ -1506,6 +1571,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         LOG.info( "Method assignUser() started for user : " + user.getEmailId() );
+        LOG.info( "Method modifyUser() started for user : " + user.getEmailId() );
         if ( !( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) {
             throw new UserAdditionException( "User : " + user.getEmailId() + " belongs to a different company" );
         }
@@ -1517,7 +1583,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 && ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) ) {
                 //Assign user to company
                 Region region = organizationManagementService.getDefaultRegionForCompany( adminUser.getCompany() );
-                userManagementService.assignUserToRegion( adminUser, assigneeUser.getUserId(), region.getRegionId() );
+                Branch branch = organizationManagementService.getDefaultBranchForRegion( region.getRegionId() );
+                //userManagementService.assignUserToRegion( adminUser, assigneeUser.getUserId(), region.getRegionId() );
+                userManagementService.assignUserToBranch( adminUser, assigneeUser.getUserId(), branch.getBranchId() );
             } else {
                 //Agent assignments
                 assigneeUser = assignBranchesToUser( user, adminUser, assigneeUser, currentUserMap, upload, false );
@@ -1704,7 +1772,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param adminUser
      */
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void uploadUsers( HierarchyUpload upload, User adminUser )
+    void uploadUsers( HierarchyUpload upload, User adminUser, List<String> errorList )
     {
         LOG.debug( "Uploading users to database" );
         Map<String, UserUploadVO> currentUserMap = new HashMap<String, UserUploadVO>();
@@ -1725,8 +1793,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 if ( !userToBeUploaded.isUserAdded() && !userToBeUploaded.isUserModified() ) {
                     continue;
                 }
-                if ( checkIfEmailIdExists( userToBeUploaded.getEmailId(), adminUser.getCompany() ) ) {
-                    user = assignUser( userToBeUploaded, adminUser, currentUserMap, upload );
+                String emailId = userToBeUploaded.getEmailId();
+                if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
+                    emailId = utils.maskEmailAddress( emailId );
+                }
+                userToBeUploaded.setEmailId( emailId );
+                if ( checkIfEmailIdExists( emailId, adminUser.getCompany() ) ) {
+                    user = modifyUser( userToBeUploaded, adminUser, currentUserMap, currentUpload );
                 } else {
                     // add user
                     user = addUser( userToBeUploaded, adminUser, currentUserMap, upload );
@@ -1750,8 +1823,10 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 upload.setUsers( usersToUpload );
             }
         } catch ( Exception e ) {
-            // TODO: Add error records
+            // Add error records
             e.printStackTrace();
+            errorList.add( e.getMessage() );
+            
         }
         LOG.debug( "Finished uploading users to the database" );
     }
@@ -1856,11 +1931,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 if ( licenses == null ) {
                     licenses = new Licenses();
                 }
-                List<String> authorizedIn = licenses.getAuthorized_in();
-                if ( authorizedIn == null ) {
-                    authorizedIn = new ArrayList<String>();
-                }
-                licenses.setAuthorized_in( getAllStateLicenses( userUploadVO.getLicense(), authorizedIn ) );
+                licenses.setAuthorized_in( getAllStateLicenses( userUploadVO.getLicense() ) );
                 agentSettings.setLicenses( licenses );
                 if ( licenses != null && licenses.getAuthorized_in() != null && !licenses.getAuthorized_in().isEmpty() ) {
                     organizationUnitSettingsDao.updateParticularKeyAgentSettings(
@@ -1891,9 +1962,10 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
-    private List<String> getAllStateLicenses( String licenses, List<String> authorizedIn )
+    private List<String> getAllStateLicenses( String licenses )
     {
         String toRemove = "Licensed State(s):";
+        List<String> authorizedIn = new ArrayList<String>();
         if ( licenses.indexOf( toRemove ) != -1 ) {
             licenses = licenses.substring( licenses.indexOf( "Licensed State(s):" ) + toRemove.length(), licenses.length() );
         }
