@@ -295,6 +295,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 amalgamatedUser.setAssignedBranchesAdmin( currentUser.getAssignedBranchesAdmin() );
                 amalgamatedUser.setAssignedRegions( currentUser.getAssignedRegions() );
                 amalgamatedUser.setAssignedRegionsAdmin( currentUser.getAssignedRegionsAdmin() );
+                amalgamatedUser.setUserVerified( currentUser.isUserVerified() );
                 newUsers.add( amalgamatedUser );
 
                 //Delete object entry from oldUsers
@@ -709,6 +710,13 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         userUploadVO.setAssignedRegions( assignedRegionSourceIds );
         userUploadVO.setAssignedBranchesAdmin( assignedBranchesAdmin );
         userUploadVO.setAssignedRegionsAdmin( assignedRegionsAdmin );
+        
+        //set the is verified column
+        if ( user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED ) {
+            userUploadVO.setUserVerified( false );
+        } else {
+            userUploadVO.setUserVerified( true );
+        }
 
         LOG.info( "Method to get user upload VO for user : " + user.getUsername() + " finished" );
         return userUploadVO;

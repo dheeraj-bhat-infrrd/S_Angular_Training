@@ -99,6 +99,7 @@ public class UserUploadVO
     private List<String> validationErrors = new ArrayList<String>();
     private List<String> validationWarnings = new ArrayList<String>();
     private boolean sendMail;
+    private boolean isUserVerified;
 
 
     public boolean isWarningRecord()
@@ -1179,6 +1180,18 @@ public class UserUploadVO
     public void setSendMail( boolean sendMail )
     {
         this.sendMail = sendMail;
+    }
+
+
+    public boolean isUserVerified()
+    {
+        return isUserVerified;
+    }
+
+
+    public void setUserVerified( boolean isUserVerified )
+    {
+        this.isUserVerified = isUserVerified;
     }
 
 
