@@ -790,9 +790,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         user.setEmailIdModified( true );
                     } else {
                         String emailId = uploadedUser.getEmailId();
-                        if ( CommonConstants.YES_STRING.equals( maskEmail ) && !user.isSourceUserIdGenerated() ) {
+                        /*if ( CommonConstants.YES_STRING.equals( maskEmail ) && !user.isSourceUserIdGenerated() ) {
                             emailId = utils.maskEmailAddress( emailId );
-                        }
+                        }*/
                         if ( ( user.getEmailId() != null && emailId != null && !user.getEmailId().equalsIgnoreCase( emailId ) ) ) {
                             user.setEmailId( uploadedUser.getEmailId() );
                             user.setEmailIdModified( true );
