@@ -78,6 +78,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
+import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -138,6 +139,9 @@ public class OrganizationManagementController
 
     @Autowired
     private HierarchyStructureUploadService hierarchyStructureUploadService;
+
+    @Autowired
+    private UploadValidationService uploadValidationService;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -2737,6 +2741,32 @@ public class OrganizationManagementController
             response = uploadValidation;
             LOG.debug( "Returning: " + new Gson().toJson( response ) );
         } catch ( InvalidInputException ex ) {
+            status = false;
+            response = ex.getMessage();
+        }
+
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "response", response );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/verifyxHierarchyUpload", method = RequestMethod.POST)
+    public String validateHierarchyUpload( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Validating the hierarchy upload data" );
+        boolean status = true;
+        Object response = null;
+        String hierarchyJson = request.getParameter( "hierarchyJson" );
+        LOG.info( hierarchyJson );
+        UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        try {
+            uploadValidationService.validateHeirarchyUpload( uploadValidation );
+            response = uploadValidation;
+            LOG.debug( "Returning: " + new Gson().toJson( response ) );
+        } catch ( Exception ex ) {
             status = false;
             response = ex.getMessage();
         }
