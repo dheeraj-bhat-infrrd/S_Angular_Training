@@ -58,7 +58,7 @@ public interface UserManagementService
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
      */
-    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail )
+    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail, boolean sendMail )
         throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
 
 

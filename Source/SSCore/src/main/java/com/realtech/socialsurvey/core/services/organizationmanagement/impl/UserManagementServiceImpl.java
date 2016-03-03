@@ -441,7 +441,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail )
+    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail, boolean sendMail )
         throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
     {
         if ( firstName == null || firstName.isEmpty() ) {
@@ -464,8 +464,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         insertAgentSettings( user );
 
         String profileName = getUserSettings( user.getUserId() ).getProfileName();
-        sendRegistrationCompletionLink( emailId, firstName, lastName, admin.getCompany().getCompanyId(), profileName,
-            user.getLoginName(), holdSendingMail );
+        if ( sendMail ) {
+            sendRegistrationCompletionLink( emailId, firstName, lastName, admin.getCompany().getCompanyId(), profileName,
+                user.getLoginName(), holdSendingMail );
+        }
         LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
         return user;
     }

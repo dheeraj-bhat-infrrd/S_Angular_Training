@@ -98,6 +98,7 @@ public class UserUploadVO
     private int rowNum;
     private List<String> validationErrors = new ArrayList<String>();
     private List<String> validationWarnings = new ArrayList<String>();
+    private boolean sendMail;
 
 
     public boolean isWarningRecord()
@@ -1166,6 +1167,18 @@ public class UserUploadVO
     public void setValidationWarnings( List<String> validationWarnings )
     {
         this.validationWarnings = validationWarnings;
+    }
+
+
+    public boolean isSendMail()
+    {
+        return sendMail;
+    }
+
+
+    public void setSendMail( boolean sendMail )
+    {
+        this.sendMail = sendMail;
     }
 
 
