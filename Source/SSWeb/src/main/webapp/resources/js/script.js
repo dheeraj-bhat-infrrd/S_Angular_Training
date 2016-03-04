@@ -3093,11 +3093,11 @@ var hierarchyUpload = {
 		if (data.validationErrors.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '" class="ui-icon ui-icon-flag"><img src="resources/images/icn-err-msg.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/abuse.png" style="width: 15px"></span>';
 		} else if (data.validationWarnings.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '" class="ui-icon ui-icon-flag"><img src="resources/images/icn-neutral-mood.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/icn-neutral-mood.png" style="width: 15px"></span>';
 		}
 		return toolTip;
 	},

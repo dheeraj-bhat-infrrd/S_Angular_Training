@@ -295,5 +295,6 @@
 <script>
 	$(document).ready(function() {
 		hierarchyUpload.fileUpload();
+		hierarchyUpload.hierarchyJson = {};
 	});
 </script>
