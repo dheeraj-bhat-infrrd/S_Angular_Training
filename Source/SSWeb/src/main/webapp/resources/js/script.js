@@ -2012,6 +2012,12 @@ var hierarchyUpload = {
 		}
 		return hierval;
 	},
+	reverseUndef : function(hierval) {
+		if (hierval == '') {
+			return undefined;
+		}
+		return hierval;
+	},
 
 	fileUpload : function() {
 		$('#com-file')
@@ -3097,32 +3103,32 @@ var hierarchyUpload = {
 	},
 
 	saveEdittedRegion : function(i) {
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionName = $(
-				'#hier-name-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1 = $(
-				'#hier-address1-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2 = $(
-				'#hier-address2-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionCity = $(
-				'#hier-city-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionState = $(
-				'#hier-state-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode = $(
-				'#hier-zipcode-txt-' + i).val();
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionName = hierarchyUpload.reverseUndef( $(
+				'#hier-name-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1 = hierarchyUpload.reverseUndef( $(
+				'#hier-address1-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2 = hierarchyUpload.reverseUndef( $(
+				'#hier-address2-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionCity = hierarchyUpload.reverseUndef( $(
+				'#hier-city-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionState = hierarchyUpload.reverseUndef( $(
+				'#hier-state-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode = hierarchyUpload.reverseUndef( $(
+				'#hier-zipcode-txt-' + i).val() );
 		hierarchyUpload.hierarchyJson.upload.isModifiedFromUI = true;
 
 		$('#regionName-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.regions[i].regionName);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionName) );
 		$('#regionAddress1-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1) );
 		$('#regionAddress2-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2) );
 		$('#regionCity-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.regions[i].regionCity);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionCity) );
 		$('#regionZipcode-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode) );
 		$('#regionState-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.regions[i].regionState);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionState) );
 
 		$('#editRegion-' + i).parent().next('.hier-region-edit').slideToggle(
 				200);
@@ -3139,39 +3145,39 @@ var hierarchyUpload = {
 	},
 
 	saveEdittedBranch : function(i) {
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchName = $(
-				'#hier-branch-name-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId = $(
-				'#hier-branch-sourceRegionId-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1 = $(
-				'#hier-branch-address1-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2 = $(
-				'#hier-branch-address2-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchCity = $(
-				'#hier-branch-city-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchState = $(
-				'#hier-branch-state-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode = $(
-				'#hier-branch-zipcode-txt-' + i).val();
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchName = hierarchyUpload.reverseUndef( $(
+				'#hier-branch-name-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId = hierarchyUpload.reverseUndef( $(
+				'#hier-branch-sourceRegionId-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1 = hierarchyUpload.reverseUndef( $(
+				'#hier-branch-address1-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2 = hierarchyUpload.reverseUndef( $(
+				'#hier-branch-address2-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchCity = hierarchyUpload.reverseUndef( $(
+				'#hier-branch-city-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchState = hierarchyUpload.reverseUndef( $(
+				'#hier-branch-state-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode = hierarchyUpload.reverseUndef( $(
+				'#hier-branch-zipcode-txt-' + i).val() );
 		hierarchyUpload.hierarchyJson.upload.isModifiedFromUI = true;
 
 		$('#branchName-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.branches[i].branchName);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchName) );
 		$('#sourceRegionId-' + i)
 				.text(
-						hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId);
+						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId) );
 		$('#branchAddress1-' + i)
 				.text(
-						hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1);
+						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1) );
 		$('#branchAddress2-' + i)
 				.text(
-						hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2);
+						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2) );
 		$('#branchCity-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.branches[i].branchCity);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchCity) );
 		$('#branchZipcode-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode) );
 		$('#branchState-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.branches[i].branchState);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchState) );
 
 		$('#editBranch-' + i).parent().next('.hier-branch-edit').slideToggle(
 				200);
@@ -3188,67 +3194,99 @@ var hierarchyUpload = {
 	},
 
 	saveEdittedUser : function(i) {
-		hierarchyUpload.hierarchyJson.upload.users[i].firstName = $(
-				'#hier-user-firstName-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].lastName = $(
-				'#hier-user-lastName-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].title = $(
-				'#hier-user-title-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches = $(
-				'#hier-user-assignedBranches-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions = $(
-				'#hier-user-assignedRegions-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin = $(
-				'#hier-user-assignedBranchesAdmin-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin = $(
-				'#hier-user-assignedRegionsAdmin-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].emailId = $(
-				'#hier-user-emailId-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber = $(
-				'#hier-user-phoneNumber-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl = $(
-				'#hier-user-websiteUrl-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].license = $(
-				'#hier-user-license-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer = $(
-				'#hier-user-legalDisclaimer-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl = $(
-				'#hier-user-userPhotoUrl-txt-' + i).val();
-		hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription = $(
-				'#hier-user-aboutMeDescription-txt-' + i).val();
+		hierarchyUpload.hierarchyJson.upload.users[i].firstName = hierarchyUpload.reverseUndef( $(
+				'#hier-user-firstName-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.users[i].lastName = hierarchyUpload.reverseUndef( $(
+				'#hier-user-lastName-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.users[i].title = hierarchyUpload.reverseUndef( $(
+				'#hier-user-title-txt-' + i).val() );
+		
+		//These are arrays, so process the string into an array
+		var tempAssignedBranch = $('#hier-user-assignedBranches-txt-' + i).val();
+		if (tempAssignedBranch == undefined || tempAssignedBranch == '') {
+			tempAssignedBranch = [];
+		} else {
+			tempAssignedBranch = tempAssignedBranch.replace(/ /g,'').split(',');
+		}
+		hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches = tempAssignedBranch;
+		
+		
+		var tempAssignedRegion = $('#hier-user-assignedRegions-txt-' + i).val();
+		if (tempAssignedRegion == undefined || tempAssignedRegion == '') {
+			tempAssignedRegion = [];
+		} else {
+			tempAssignedRegion = tempAssignedRegion.replace(/ /g,'').split(',');
+		}
+		
+		hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions = tempAssignedRegion;
+		
+		
+		var tempAssignedBranchesAdmin = $('#hier-user-assignedBranchesAdmin-txt-' + i).val();
+		if (tempAssignedBranchesAdmin == undefined || tempAssignedBranchesAdmin == '') {
+			tempAssignedBranchesAdmin = [];
+		} else {
+			tempAssignedBranchesAdmin = tempAssignedBranchesAdmin.replace(/ /g,'').split(',');
+		}
+		
+		hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin = tempAssignedBranchesAdmin;
+
+		var tempAssignedRegionsAdmin = $('#hier-user-assignedRegionsAdmin-txt-' + i).val();
+		if (tempAssignedRegionsAdmin == undefined || tempAssignedRegionsAdmin == '') {
+			tempAssignedRegionsAdmin = [];
+		} else {
+			tempAssignedRegionsAdmin = tempAssignedRegionsAdmin.replace(/ /g,'').split(',');
+		}
+		
+		
+		hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin = tempAssignedRegionsAdmin;
+		
+		hierarchyUpload.hierarchyJson.upload.users[i].emailId = hierarchyUpload.reverseUndef( $(
+				'#hier-user-emailId-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber = hierarchyUpload.reverseUndef( $(
+				'#hier-user-phoneNumber-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl = hierarchyUpload.reverseUndef( $(
+				'#hier-user-websiteUrl-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.users[i].license = hierarchyUpload.reverseUndef( $(
+				'#hier-user-license-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer = hierarchyUpload.reverseUndef( $(
+				'#hier-user-legalDisclaimer-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl = hierarchyUpload.reverseUndef( $(
+				'#hier-user-userPhotoUrl-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription = hierarchyUpload.reverseUndef( $(
+				'#hier-user-aboutMeDescription-txt-' + i).val() );
 		hierarchyUpload.hierarchyJson.upload.isModifiedFromUI = true;
 
 		$('#firstName-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].firstName);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].firstName) );
 		$('#lastName-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].lastName);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].lastName) );
 		$('#title-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].title);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].title) );
 		$('#assignedBranches-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches) );
 		$('#assignedRegions-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions) );
 		$('#assignedBranchesAdmin-' + i)
 				.text(
-						hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin);
+						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin) );
 		$('#assignedRegionsAdmin-' + i)
 				.text(
-						hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin);
+						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin) );
 		$('#emailId-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].emailId);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].emailId) );
 		$('#phoneNumber-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber) );
 		$('#websiteUrl-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl) );
 		$('#license-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].license);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].license) );
 		$('#legalDisclaimer-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer) );
 		$('#userPhotoUrl-' + i).text(
-				hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl);
+				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl) );
 		$('#aboutMeDescription-' + i)
 				.text(
-						hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription);
+						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription) );
 
 		$('#editUser-' + i).parent().next('.hier-users-edit').slideToggle(200);
 
