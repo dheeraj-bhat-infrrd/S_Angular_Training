@@ -975,9 +975,17 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     {
         if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null
             && !validationObject.getUpload().getRegions().isEmpty() ) {
+            Map<String, RegionUploadVO> uploadedRegionMap = new HashMap<String, RegionUploadVO>();
+            if ( uploadedRegions != null && !uploadedRegions.isEmpty() ) {
+                for ( RegionUploadVO uploadedRegion : uploadedRegions ) {
+                    uploadedRegionMap.put( uploadedRegion.getSourceRegionId(), uploadedRegion );
+                }
+            }
             for ( RegionUploadVO region : validationObject.getUpload().getRegions() ) {
-                if ( region.getSourceRegionId() != null && !region.getSourceRegionId().isEmpty()
-                    && !uploadedRegions.contains( region ) ) {
+                if ( region.getSourceRegionId() != null
+                    && !region.getSourceRegionId().isEmpty()
+                    && ( !uploadedRegions.contains( region ) || uploadedRegionMap.get( region.getSourceRegionId() )
+                        .isDeletedRecord() ) ) {
                     region.setDeletedRecord( true );
                 }
             }
@@ -989,9 +997,17 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     {
         if ( validationObject.getUpload() != null && validationObject.getUpload().getBranches() != null
             && !validationObject.getUpload().getBranches().isEmpty() ) {
+            Map<String, BranchUploadVO> uploadedBranchMap = new HashMap<String, BranchUploadVO>();
+            if ( uploadedBranches != null && !uploadedBranches.isEmpty() ) {
+                for ( BranchUploadVO uploadedBranch : uploadedBranches ) {
+                    uploadedBranchMap.put( uploadedBranch.getSourceBranchId(), uploadedBranch );
+                }
+            }
             for ( BranchUploadVO branch : validationObject.getUpload().getBranches() ) {
-                if ( branch.getSourceBranchId() != null && !branch.getSourceBranchId().isEmpty()
-                    && !uploadedBranches.contains( branch ) ) {
+                if ( branch.getSourceBranchId() != null
+                    && !branch.getSourceBranchId().isEmpty()
+                    && ( !uploadedBranches.contains( branch ) || uploadedBranchMap.get( branch.getSourceBranchId() )
+                        .isDeletedRecord() ) ) {
                     branch.setDeletedRecord( true );
                 }
             }
@@ -1003,8 +1019,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     {
         if ( validationObject.getUpload() != null && validationObject.getUpload().getUsers() != null
             && !validationObject.getUpload().getUsers().isEmpty() ) {
+            Map<String, UserUploadVO> uploadedUserMap = new HashMap<String, UserUploadVO>();
+            if ( uploadeUsers != null && !uploadeUsers.isEmpty() ) {
+                for ( UserUploadVO uploadedUser : uploadeUsers ) {
+                    uploadedUserMap.put( uploadedUser.getSourceUserId(), uploadedUser );
+                }
+            }
             for ( UserUploadVO user : validationObject.getUpload().getUsers() ) {
-                if ( user.getSourceUserId() != null && !user.getSourceUserId().isEmpty() && !uploadeUsers.contains( user ) ) {
+                if ( user.getSourceUserId() != null && !user.getSourceUserId().isEmpty()
+                    && ( !uploadeUsers.contains( user ) || uploadedUserMap.get( user.getSourceUserId() ).isDeletedRecord() ) ) {
                     user.setDeletedRecord( true );
                     validationObject.setNumberOfUsersDeleted( validationObject.getNumberOfUsersDeleted() + 1 );
                 }

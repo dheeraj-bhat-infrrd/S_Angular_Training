@@ -2013,10 +2013,10 @@ var hierarchyUpload = {
 		return hierval;
 	},
 	reverseUndef : function(hierval) {
-		if (hierval == '') {
+		if (hierval == '' || hierval.trim() == '') {
 			return undefined;
 		}
-		return hierval;
+		return hierval.trim();
 	},
 
 	fileUpload : function() {
@@ -2147,8 +2147,9 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				hierarchyUpload.hierarchyJson = jsonResponse.response;
+				$('#region-added').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfRegionsAdded != 0) {
-					$('#region-added').empty();
+					//$('#region-added').empty();
 					$(
 							'<div style="color:#009FE0;">Regions added:'
 									+ hierarchyUpload
@@ -2156,8 +2157,9 @@ var hierarchyUpload = {
 									+ '</div>').appendTo('#region-added');
 					$('#region-added').show();
 				}
+				$('#region-modified').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfRegionsModified != 0) {
-					$('#region-modified').empty();
+					//$('#region-modified').empty();
 					$(
 							'<div style="color:#009FE0;">Regions modified:'
 									+ hierarchyUpload
@@ -2165,8 +2167,9 @@ var hierarchyUpload = {
 									+ '</div>').appendTo('#region-modified');
 					$('#region-modified').show();
 				}
+				$('#region-deleted').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfRegionsDeleted != 0) {
-					$('#region-deleted').empty();
+					//$('#region-deleted').empty();
 					$(
 							'<div style="color:#009FE0;">Regions deleted:'
 									+ hierarchyUpload
@@ -2174,8 +2177,9 @@ var hierarchyUpload = {
 									+ '</div>').appendTo('#region-deleted');
 					$('#region-deleted').show();
 				}
+				$('#branch-added').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfBranchesAdded != 0) {
-					$('#branch-added').empty();
+					//$('#branch-added').empty();
 					$(
 							'<div style="color:#009FE0;">Branches added:'
 									+ hierarchyUpload
@@ -2183,8 +2187,9 @@ var hierarchyUpload = {
 									+ '</div>').appendTo('#branch-added');
 					$('#branch-added').show();
 				}
+				$('#branch-modified').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfBranchesModified != 0) {
-					$('#branch-modified').empty();
+					//$('#branch-modified').empty();
 					$(
 							'<div style="color:#009FE0;">Branches modified:'
 									+ hierarchyUpload
@@ -2192,8 +2197,9 @@ var hierarchyUpload = {
 									+ '</div>').appendTo('#branch-modified');
 					$('#branch-modified').show();
 				}
+				$('#branch-deleted').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfBranchesDeleted != 0) {
-					$('#branch-deleted').empty();
+					//$('#branch-deleted').empty();
 					$(
 							'<div style="color:#009FE0;">Branches deleted:'
 									+ hierarchyUpload
@@ -2201,8 +2207,9 @@ var hierarchyUpload = {
 									+ '</div>').appendTo('#branch-deleted');
 					$('#branch-deleted').show();
 				}
+				$('#user-added').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfUsersAdded != 0) {
-					$('#user-added').empty();
+					//$('#user-added').empty();
 					$(
 							'<div style="color:#009FE0;">Users added:'
 									+ hierarchyUpload
@@ -2210,8 +2217,9 @@ var hierarchyUpload = {
 									+ '</div>').appendTo('#user-added');
 					$('#user-added').show();
 				}
+				$('#user-modified').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfUsersModified != 0) {
-					$('#user-modified').empty();
+					//$('#user-modified').empty();
 					$(
 							'<div style="color:#009FE0;">Users modified:'
 									+ hierarchyUpload
@@ -2219,8 +2227,9 @@ var hierarchyUpload = {
 									+ '</div>').appendTo('#user-modified');
 					$('#user-modified').show();
 				}
+				$('#user-deleted').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfUsersDeleted != 0) {
-					$('#user-deleted').empty();
+					//$('#user-deleted').empty();
 					$(
 							'<div style="color:#009FE0;">Users deleted:'
 									+ hierarchyUpload
