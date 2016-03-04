@@ -1931,7 +1931,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param userUploadVO
      * @throws InvalidInputException
      */
-    private void updateUserSettingsInMongo( User user, UserUploadVO userUploadVO ) throws InvalidInputException
+    void updateUserSettingsInMongo( User user, UserUploadVO userUploadVO ) throws InvalidInputException
     {
         LOG.debug( "Inside method updateUserSettingsInMongo " );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
