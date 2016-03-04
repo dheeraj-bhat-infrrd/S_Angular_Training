@@ -151,6 +151,120 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         }
         return validationObject;
     }
+    
+    
+    
+    /**
+     * Validate hierarchy upload when modified in the UI
+     * @param company
+     * @param newUploadValidation
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    public UploadValidation validateHierarchyUploadJson( Company company, UploadValidation newUploadValidation )
+        throws InvalidInputException
+    {
+        LOG.info( "Method validateHierarchyUploadJson() started" );
+        if ( newUploadValidation == null || newUploadValidation.getUpload() == null ) {
+            throw new InvalidInputException( "Invalid upload details" );
+        }
+
+        UploadValidation validationObject = new UploadValidation();
+        // get current hierarchy upload
+        validationObject.setUpload( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) );
+
+        parseRegions( newUploadValidation.getUpload().getRegions(), validationObject );
+        parseBranches( newUploadValidation.getUpload().getBranches(), validationObject );
+        parseUsers( newUploadValidation.getUpload().getUsers(), validationObject );
+        uploadValidationService.validateHeirarchyUpload( validationObject );
+        LOG.info( "Method validateHierarchyUploadJson() finished" );
+        return validationObject;
+    }
+    
+    
+    /**
+     * Validates regions modified in the UI
+     * @param uploadedRegions
+     * @param validationObject
+     */
+    void parseRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject )
+    {
+        if ( uploadedRegions == null ) {
+            uploadedRegions = new ArrayList<RegionUploadVO>();
+        }
+        for ( RegionUploadVO uploadedRegion : uploadedRegions ) {
+            if ( isRegionUploadEmpty( uploadedRegion ) ) {
+                continue;
+            }
+
+            // check if region is added or modified
+            if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions() ) ) {
+                validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
+                uploadedRegion.setRegionAdded( true );
+                validationObject.getUpload().getRegions().add( uploadedRegion );
+            } else {
+                updateUploadValidationWithModifiedRegion( uploadedRegion, validationObject );
+            }
+        }
+        markDeletedRegions( uploadedRegions, validationObject );
+    }
+
+
+    /**
+     * Validates branches modified in the UI
+     * @param uploadedBranches
+     * @param validationObject
+     */
+    void parseBranches( List<BranchUploadVO> uploadedBranches, UploadValidation validationObject )
+    {
+        if ( uploadedBranches == null ) {
+            uploadedBranches = new ArrayList<BranchUploadVO>();
+        }
+        for ( BranchUploadVO uploadedBranch : uploadedBranches ) {
+            if ( isBranchUploadEmpty( uploadedBranch ) ) {
+                continue;
+            }
+            // check if branch is added or modified
+            if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches() ) ) {
+                validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
+                uploadedBranch.setBranchAdded( true );
+                validationObject.getUpload().getBranches().add( uploadedBranch );
+            } else {
+                updateUploadValidationWithModifiedBranch( uploadedBranch, validationObject );
+            }
+        }
+        markDeletedBranches( uploadedBranches, validationObject );
+    }
+    
+    
+    void parseUsers( List<UserUploadVO> uploadedUsers, UploadValidation validationObject )
+    {
+        if ( uploadedUsers == null ) {
+            uploadedUsers = new ArrayList<UserUploadVO>();
+        }
+        for ( UserUploadVO uploadedUser : uploadedUsers ) {
+            if ( isUserUploadEmpty( uploadedUser ) ) {
+                continue;
+            }
+            if ( uploadedUser.getSourceBranchId() == null && uploadedUser.getSourceRegionId() == null
+                && ( uploadedUser.getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() )
+                && ( uploadedUser.getAssignedRegionsAdmin() == null || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) ) {
+                uploadedUser.setBelongsToCompany( true );
+            }
+
+            // check if user is added or modified
+            if ( isNewUser( uploadedUser, validationObject.getUpload().getUsers() ) ) {
+                validationObject.setNumberOfUsersAdded( validationObject.getNumberOfUsersAdded() + 1 );
+                uploadedUser.setUserAdded( true );
+                validationObject.getUpload().getUsers().add( uploadedUser );
+            } else {
+
+                updateUploadValidationWithModifiedUser( uploadedUser, validationObject );
+            }
+        }
+        markDeletedUsers( uploadedUsers, validationObject );
+    }
 
 
     /**

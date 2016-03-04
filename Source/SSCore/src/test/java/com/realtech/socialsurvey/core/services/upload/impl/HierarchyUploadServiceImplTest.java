@@ -232,5 +232,12 @@ public class HierarchyUploadServiceImplTest
         region.setRowNum( rowNum );
         return region;
     }
+    
+
+    @Test ( expected = InvalidInputException.class)
+    public void validateHierarchyUploadJsonTestInvalidNewUpload() throws InvalidInputException
+    {
+        hierarchyUploadServiceImpl.validateHierarchyUploadJson( new Company(), null );
+    }
 
 }

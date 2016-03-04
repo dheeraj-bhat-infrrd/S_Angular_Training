@@ -2763,7 +2763,8 @@ public class OrganizationManagementController
         LOG.info( hierarchyJson );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
-            uploadValidationService.validateHeirarchyUpload( uploadValidation );
+            User user = sessionHelper.getCurrentUser();
+            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
             response = uploadValidation;
             LOG.debug( "Returning: " + new Gson().toJson( response ) );
         } catch ( Exception ex ) {
