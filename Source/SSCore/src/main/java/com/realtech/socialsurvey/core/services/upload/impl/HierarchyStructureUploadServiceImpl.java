@@ -53,6 +53,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.RegionAdditionException;
 import com.realtech.socialsurvey.core.exception.UserAdditionException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
@@ -154,22 +155,22 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         hierarchyUploadDao.saveHierarchyUploadObject( upload );
         
         Map<String, List<String>> errorMap = new HashMap<String, List<String>>();
-        if ( !userUploadErrors.isEmpty() ) {
+        if ( userUploadErrors != null && !userUploadErrors.isEmpty() ) {
             errorMap.put( CommonConstants.USER_UPLOAD_ERROR_LIST, userUploadErrors );
         }
-        if ( !branchUploadErrors.isEmpty() ) {
+        if ( branchUploadErrors != null && !branchUploadErrors.isEmpty() ) {
             errorMap.put( CommonConstants.BRANCH_UPLOAD_ERROR_LIST, branchUploadErrors );
         }
-        if ( !regionUploadErrors.isEmpty() ) {
+        if ( regionUploadErrors != null && !regionUploadErrors.isEmpty() ) {
             errorMap.put( CommonConstants.REGION_UPLOAD_ERROR_LIST, regionUploadErrors );
         }
-        if ( !userDeleteErrors.isEmpty() ) {
+        if ( userDeleteErrors != null && !userDeleteErrors.isEmpty() ) {
             errorMap.put( CommonConstants.USER_DELETE_ERROR_LIST, userDeleteErrors );
         }
-        if ( !branchDeleteErrors.isEmpty() ) {
+        if ( branchDeleteErrors != null && !branchDeleteErrors.isEmpty() ) {
             errorMap.put( CommonConstants.BRANCH_DELETE_ERROR_LIST, branchDeleteErrors );
         }
-        if ( !regionDeleteErrors.isEmpty() ) {
+        if ( regionDeleteErrors != null && !regionDeleteErrors.isEmpty() ) {
             errorMap.put( CommonConstants.REGION_DELETE_ERROR_LIST, regionDeleteErrors );
         }
         return errorMap;
@@ -1526,15 +1527,16 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
     
-    User modifyUser(  UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload  )
-        throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
+    User modifyUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
+        throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException,
+        UndeliveredEmailException
     {
         LOG.info( "Method modifyUser() started for user : " + user.getEmailId() );
         if ( !( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) {
             throw new UserAdditionException( "User : " + user.getEmailId() + " belongs to a different company" );
         }
         User assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
-        
+
         //check and modify user object
         if ( user.isEmailIdModified() ) {
             assigneeUser.setEmailId( user.getEmailId() );
@@ -1545,12 +1547,42 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         if ( user.isLastNameModified() ) {
             assigneeUser.setLastName( user.getLastName() );
         }
-        
+
         userDao.update( assigneeUser );
-        
-        
+
+
         assignUser( user, adminUser, currentUserMap, upload );
+        
+        //send verification mail if needed
+        if ( user.isSendMail() ) {
+            resendVerificationMail( user );
+        }
+
         return assigneeUser;
+    }
+    
+
+    /**
+     * Method to send/resend user verification mail
+     * @param user
+     * @param userUpload
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     * @throws NoRecordsFetchedException 
+     */
+    @Transactional
+    void resendVerificationMail( UserUploadVO userUpload ) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+    {
+        LOG.info( "Method to resend verification mail started for user : " + userUpload.getSourceUserId() );
+        //Resend verification mail if sendMail is true
+        User user = userManagementService.getUserByEmailAddress( extractEmailId( userUpload.getEmailId() ) );
+        if ( userUpload.isSendMail() ) {
+            String profileName = userManagementService.getUserSettings( user.getUserId() ).getProfileName();
+            userManagementService.sendRegistrationCompletionLink( user.getEmailId(), user.getFirstName(), user.getLastName(),
+                user.getCompany().getCompanyId(), profileName, user.getLoginName(), false );
+            userUpload.setSendMail( false );
+        }
+        LOG.info( "Method to resend verification mail finished for user : " + userUpload.getSourceUserId() );
     }
     
 
@@ -1791,17 +1823,21 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
             for ( UserUploadVO userToBeUploaded : usersToUpload ) {
                 User user = null;
-                if ( !userToBeUploaded.isUserAdded() && !userToBeUploaded.isUserModified() ) {
-                    continue;
-                }
+                //Mask email ID if necessary
                 String emailId = userToBeUploaded.getEmailId();
                 if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
                     emailId = utils.maskEmailAddress( emailId );
                 }
                 userToBeUploaded.setEmailId( emailId );
-                if ( checkIfEmailIdExists( emailId, adminUser.getCompany() ) ) {
+                if ( !userToBeUploaded.isUserAdded() && !userToBeUploaded.isUserModified() ) {
+                    if ( userToBeUploaded.isSendMail() ) {
+                        resendVerificationMail( userToBeUploaded );
+                    }
+                    continue;
+                }
+                if ( checkIfEmailIdExists( emailId, adminUser.getCompany() ) && userToBeUploaded.isUserModified() ) {
                     user = modifyUser( userToBeUploaded, adminUser, currentUserMap, currentUpload );
-                } else {
+                } else if ( userToBeUploaded.isUserAdded() ) {
                     // add user
                     user = addUser( userToBeUploaded, adminUser, currentUserMap, upload );
                 }
@@ -1819,7 +1855,6 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 if ( userToBeUploaded.getSourceUserId() != null && !userToBeUploaded.getSourceUserId().isEmpty() ) {
                     upload.getUserSourceMapping().put( userToBeUploaded.getSourceUserId(), userToBeUploaded.getUserId() );
                 }
-
                 //Store the updated userUploads in upload
                 upload.setUsers( usersToUpload );
             }
@@ -1896,7 +1931,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param userUploadVO
      * @throws InvalidInputException
      */
-    private void updateUserSettingsInMongo( User user, UserUploadVO userUploadVO ) throws InvalidInputException
+    void updateUserSettingsInMongo( User user, UserUploadVO userUploadVO ) throws InvalidInputException
     {
         LOG.debug( "Inside method updateUserSettingsInMongo " );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );

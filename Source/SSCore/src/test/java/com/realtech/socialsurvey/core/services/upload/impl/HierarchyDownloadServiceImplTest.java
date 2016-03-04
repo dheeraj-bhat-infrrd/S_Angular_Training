@@ -125,4 +125,12 @@ public class HierarchyDownloadServiceImplTest
         hierarchyDownloadServiceImpl
             .getRegionUploadVOForRegion( null, new HashMap<Long, String>(), new HashMap<String, Long>() );
     }
+    
+
+    @Test ( expected = InvalidInputException.class)
+    public void generateBranchUploadVOForBranchTestBranchNull() throws InvalidInputException
+    {
+        hierarchyDownloadServiceImpl.generateBranchUploadVOForBranch( null, new HashMap<Long, String>(),
+            new HashMap<String, Long>(), new HashMap<Long, RegionUploadVO>() );
+    }
 }
