@@ -10,9 +10,11 @@
 				<div class="float-left hm-header-row-left text-center">
 					<spring:message code="label.header.usermanagement.key" />
 				</div>
-				<div class="float-right hm-header-right text-center" onclick="javascript:showMainContent('./hierarchyupload.do')">
-					<spring:message code="label.header.Hierarchyupload.key" />
-				</div>
+				<c:if test="${not empty realTechAdminId && entityType == 'companyId' }">
+					<div class="float-right hm-header-right text-center" onclick="javascript:showMainContent('./hierarchyupload.do')">
+						<spring:message code="label.header.Hierarchyupload.key" />
+					</div>
+				</c:if>
 				<div class="float-right hm-header-right text-center" onclick="javascript:showMainContent('./viewhierarchy.do');">
 					<spring:message code="label.viewcompanyhierachy.key" />
 				</div>
