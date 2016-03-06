@@ -163,12 +163,6 @@ public interface SurveyDetailsDao
 
     void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName );
 
-    // Commented as Zillow surveys are not stored in database, SS-1276
-    // void removeZillowSurveysByEntity( String entityType, long entityId );
-
-    // Commented as Zillow surveys are not stored in database, SS-1276
-    // void removeExcessZillowSurveysByEntity( String entityType, long entityId );
-
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows );
 
@@ -232,4 +226,8 @@ public interface SurveyDetailsDao
 
 
     public void updateAgentInfoInSurveys( long fromUserId, User toUser, UserProfile toUserProfile ) throws InvalidInputException;
+
+
+    public void removeExistingZillowSurveysByEntity( String entityType, long entityId );
+
 }

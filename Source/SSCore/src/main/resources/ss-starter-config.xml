@@ -359,6 +359,32 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<!-- Setting zillow review process and auto post detail -->
+	<bean id="zillowreviewprocessandautopostjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.ZillowReviewProcessorAndAutoPoster" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="urlGenerator" value-ref="urlGenerator" />
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="socialManagementService" value-ref="socialManagementService" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="profileManagementService" value-ref="profileManagementService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="utils" value-ref="utils" />
+				<entry key="fbAppId" value="${FB_CLIENT_ID}" />
+				<entry key="applicationBaseUrl" value="${APPLICATION_BASE_URL}" />
+				<entry key="zillowAutoPostThreshold" value="${ZILLOW_AUTO_POST_THRESHOLD}" />
+				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
+				<entry key="emailServices" value-ref="emailServices" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -514,6 +540,12 @@
 		<property name="cronExpression" value="0 0 8 * * ?" />
 	</bean>
 
+	<bean id="zillowreviewprocessandautopostcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="zillowreviewprocessandautopostjobdetail" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
@@ -535,8 +567,9 @@
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
 				<ref bean="imageprocessingjobdetail" />
-				<ref bean="companiesbillingreportjobdetail" /> 
+				<ref bean="companiesbillingreportjobdetail" />
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
+				<ref bean="zillowreviewprocessandautopostjobdetail" />
 			</list>
 		</property>
 
@@ -562,6 +595,7 @@
 				<ref bean="imageprocessingcron" />
 				<ref bean="companiesbillingreportcron" />
 				<!-- <ref bean="hierarchysettingscron" /> -->
+				<ref bean="zillowreviewprocessandautopostcron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

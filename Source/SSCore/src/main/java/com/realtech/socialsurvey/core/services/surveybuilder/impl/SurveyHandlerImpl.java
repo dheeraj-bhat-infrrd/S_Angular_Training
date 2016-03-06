@@ -1790,22 +1790,36 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     //        LOG.info( "Method deleteZillowSurveysByEntity() finished" );
     //    }
 
-    //  Commented as Zillow surveys are not stored in database, SS-1276
+    //    Commented as Zillow surveys are not stored in database, SS-1276
     //    @Override
     //    @Transactional
     //    public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     //    {
-    //        LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
-    //        if ( entityType == null || entityType.isEmpty() ) {
-    //            throw new InvalidInputException( "Entity Type is invalid" );
-    //        }
-    //        if ( entityId <= 0 ) {
-    //            throw new InvalidInputException( "Entity ID is invalid" );
-    //        }
-    //        surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
-    //        LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
+    //         LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
+    //         if ( entityType == null || entityType.isEmpty() ) {
+    //             throw new InvalidInputException( "Entity Type is invalid" );
+    //         }
+    //         if ( entityId <= 0 ) {
+    //             throw new InvalidInputException( "Entity ID is invalid" );
+    //         }
+    //         surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
+    //         LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
     //    }
 
+    @Override
+    @Transactional
+    public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
+    {
+        LOG.info( "Method deleteExistingZillowSurveysByEntity() started" );
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Entity Type is invalid" );
+        }
+        if ( entityId <= 0 ) {
+            throw new InvalidInputException( "Entity ID is invalid" );
+        }
+        surveyDetailsDao.removeExistingZillowSurveysByEntity( entityType, entityId );
+        LOG.info( "Method deleteExistingZillowSurveysByEntity() finished" );
+    }
 
     @Override
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows )

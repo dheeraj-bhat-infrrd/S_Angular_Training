@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.social.impl;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,11 +37,13 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.AutoPostTrackerDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostResponseDetails;
@@ -63,6 +66,7 @@ import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -175,6 +179,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private SocialPostDao socialPostDao;
+
+    @Autowired
+    private ZillowTempPostDao zillowTempPostDao;
+
+    @Autowired
+    private AutoPostTrackerDao autoPostTrackerDao;
 
 
     /**
@@ -739,7 +749,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param regionId
      * @return
      */
-    private RegionMediaPostResponseDetails getRMPRDFromRMPRDList(List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList , long regionId)
+    @Override
+    public RegionMediaPostResponseDetails getRMPRDFromRMPRDList(List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList , long regionId)
     {
         LOG.debug( "Inside method getRMPRDFromRMPRDList()" );
         if(regionMediaPostResponseDetailsList == null || regionMediaPostResponseDetailsList.isEmpty()){
@@ -759,7 +770,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param branchId
      * @return
      */
-    private BranchMediaPostResponseDetails getBMPRDFromBMPRDList(List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList , long branchId)
+    @Override
+    public BranchMediaPostResponseDetails getBMPRDFromBMPRDList(List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList , long branchId)
     {
         LOG.debug( "Inside method getBMPRDFromBMPRDList()" );
         if(branchMediaPostResponseDetailsList == null || branchMediaPostResponseDetailsList.isEmpty()){
@@ -1969,5 +1981,35 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException occured while setting values for company. Reason : ", e );
         }
+    }
+
+
+    @Override
+    public List<ZillowTempPost> getAllZillowTempPosts()
+    {
+        return zillowTempPostDao.findAll( ZillowTempPost.class );
+    }
+
+
+    @Override
+    public boolean checkAutoPostTrackerExist( String entityColumnName, long entityId, String source, String reviewUrl,
+        Timestamp reviewDate )
+    {
+        return autoPostTrackerDao.checkAutoPostTrackerDetailsExist( entityColumnName, entityId, source, reviewUrl, reviewDate );
+    }
+
+
+    @Override
+    public void saveAutoPostTracker( String entityColumnName, long entityId, String source, String sourceLink,
+        String reviewUrl, double rating, Timestamp reviewDate )
+    {
+        autoPostTrackerDao.saveAutoPostTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating, reviewDate );
+    }
+
+
+    @Override
+    public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds )
+    {
+        zillowTempPostDao.removeProcessedZillowTempPosts( processedZillowTempPostIds );
     }
 }

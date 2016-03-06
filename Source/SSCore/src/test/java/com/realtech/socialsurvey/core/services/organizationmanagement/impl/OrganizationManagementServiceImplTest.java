@@ -2319,4 +2319,25 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( userManagementService.getBranchById( Mockito.anyLong() ) ).thenReturn( new Branch() );
         organizationManagementServiceImpl.updateRegionIdForUsers( userList, 1l, 1l, 1l );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetRegionIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getRegionIdsUnderCompany( 0, 0, 50 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getBranchIdsUnderCompany( 0, 0, 50 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getAgentIdsUnderCompany( 0, 0, 50 );
+    }
 }

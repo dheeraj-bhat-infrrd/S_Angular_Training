@@ -193,7 +193,7 @@ public interface SurveyHandler
 //    Commented as Zillow surveys are not stored in database, SS-1276
 //    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
-//    Commented as Zillow surveys are not stored in database, SS-1276
+//  Commented as Zillow surveys are not stored in database, SS-1276
 //    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 
 
@@ -271,4 +271,7 @@ public interface SurveyHandler
 
 
     public void moveSurveysToAnotherUser( long fromUserId, long toUserId ) throws InvalidInputException, NoRecordsFetchedException, SolrException;
+
+
+    public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
 }
