@@ -42,6 +42,7 @@ public interface CommonConstants
     public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 2;
     public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
     public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
+    public static final int PROFILES_MASTER_SS_ADMIN_PROFILE_ID = 5;
     public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 
     /**
@@ -121,6 +122,7 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_CORRUPT_RECORD = 3;
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
     public static final int STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD = 5;
+    public static final int STATUS_SURVEYPREINITIATION_COMPLETE = 7;
 
     /**
      * Hibernate entities and column name constants
@@ -208,6 +210,8 @@ public interface CommonConstants
     public static final String BATCH_NAME_SET_COMPANY_ID_IN_SOCIAL_POSTS = "Set Company Id In Social Posts Stored In Database";
     public static final String BATCH_NAME_IMAGE_PROCESSING_STARTER = "Image Processing Starter";
     public static final String BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR = "Hierarchy Settings Corrector For Old Records";
+    public static final String BILLING_REPORT_GENERATOR = "Billing Report Generator";
+    public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
     
     /**
      * Mongo entities and column name constants
@@ -873,6 +877,11 @@ public interface CommonConstants
     public static final String URL_DETAILS_ACCESS_DATES_COLUMN = "accessDates";
     public static final String URL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
     public static final String URL_DETAILS_QUERY_PARAMS_COLUMN = "queryParams";
+    
+    public static final String URL_PARAM_RESET_PASSWORD = "resetorset";
+    public static final String URL_PARAM_RESETORSET_VALUE_RESET = "reset";
+    public static final String URL_PARAM_RESETORSET_VALUE_SET = "set";
+    
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";
@@ -1004,5 +1013,5 @@ public interface CommonConstants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
-    public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&count=10";
+    public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&returncompletecontent=true&count=50";
 }

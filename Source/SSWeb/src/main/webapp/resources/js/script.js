@@ -736,8 +736,26 @@ function validateTextArea(elementId) {
 function validateCountryZipcode(elementId, isOnlyShowToast) {
 	
 	if (selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/') {
+	
+		var countryCode =$('#country-code').val();	
+		var flag=false;
+		
+		for (var i = 0; i < postCodeRegex.length; i++) {
+			
+			 if (postCodeRegex[i].code == countryCode) {
+				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+				flag=true;
+				break;
+			}	
+		}
+		
+		if (!flag) {
+			
 		selectedCountryRegEx = ".*";
 		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+		
+		}
 	}
 
 	var zipcode = $('#' + elementId).val();
@@ -1343,6 +1361,12 @@ function updatePaginationBtnsForProList() {
 		pageNo = start / batch + 1;	
 	} else {
 		pageNo = start / batch;
+	}
+	var emptyPageNo= isNaN(pageNo);
+	if(emptyPageNo){
+		$('#pro-paginate-btn').attr("data-start",0);
+		$('#pro-prev').removeClass('paginate-button');
+		pageNo=1;
 	}
 	$('#sel-page-prolist').val(pageNo);
 }

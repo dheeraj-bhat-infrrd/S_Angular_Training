@@ -80,7 +80,7 @@ function callAjaxPOST(url, callBackFunction, isAsync,disableEle) {
 		async : isAsync,
 		success : callBackFunction,
 		complete: function(){
-			
+			hideOverlay();
 			enable(disableEle);
 		
 		},

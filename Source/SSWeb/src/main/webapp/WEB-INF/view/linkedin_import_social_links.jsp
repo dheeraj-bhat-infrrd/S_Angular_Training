@@ -4,27 +4,27 @@
 
 <div class="wc-social-icn-row clearfix">
 	<div class="wc-social-icn float-left icn-wide-fb"
-		onclick="authenticate('facebook');"></div>
+		onclick="authenticate(event,'facebook');"></div>
 	<div id="fb-profile-url" class="wc-icn-txt float-left">${facebookProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
 	<div class="wc-social-icn float-left icn-wide-twitter"
-		onclick="authenticate('twitter');"></div>
+		onclick="authenticate(event,'twitter');"></div>
 	<div id="twitter-profile-url" class="wc-icn-txt float-left">${twitterProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
 	<div class="wc-social-icn float-left icn-wide-linkedin"
-		onclick="authenticate('linkedin');"></div>
+		onclick="authenticate(event,'linkedin');"></div>
 	<div id="linkedin-profile-url" class="wc-icn-txt float-left">${linkedinProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
 	<div class="wc-social-icn float-left icn-wide-gplus"
-		onclick="authenticate('google');"></div>
+		onclick="authenticate(event,'google');"></div>
 	<div id="ggl-profile-url" class="wc-icn-txt float-left">${googleProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
 	<div class="wc-social-icn float-left icn-wide-zillow"
-		onclick="authenticateZillow();"></div>
+		onclick="authenticateZillow(event);"></div>
 	<div id="zillow-profile-url" class="wc-icn-txt float-left">${zillowProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">

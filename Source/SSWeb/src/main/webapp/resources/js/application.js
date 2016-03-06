@@ -4908,15 +4908,15 @@ $('body').click(function() {
 });
 
 //Linked In Import
-function authenticate(socialNetwork) {
-	openAuthPage(socialNetwork);
+function authenticate(event,socialNetwork) {
+	openAuthPage(event,socialNetwork);
 	payload = {
 		'socialNetwork' : socialNetwork
 	};
 }
 
-function authenticateZillow() {
-	openAuthPageZillow();
+function authenticateZillow(event) {
+	openAuthPageZillow(event);
 }
 
 // update yelp profile url
@@ -9997,6 +9997,7 @@ function saveZillowEmailAddress() {
 		if(data && data == "success") {
 			showProfileLinkInEditProfilePage("zillow", $('input[name="zillowProfileName"]').val());
             loadSocialMediaUrlInSettingsPage();
+            loadSocialMediaUrlInPopup();
 			$('#overlay-toast').text("Zillow update successful");
 			showToast();
 		} else {
@@ -10168,15 +10169,29 @@ function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 	
 	$('#overlay-header').html("Confirm user Authentication");
 	$("#overlay-text").html(message);
-	$('#overlay-continue').html("Ok").click(function() {
+	$('#overlay-continue').html("Ok");
+	$('#overlay-continue').attr("onclick", "");
+
+	$('#overlay-continue').click(function() {
 		if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
 			$('#overlay-main').hide();
+			$('#overlay-continue').unbind('click');
 			callBackFunction();
 		}
 	});
+	
+	
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-main').show();
 };
+
+
+function confirmSocialAuthOk(callBackFunction){
+	if(callBackFunction != undefined && typeof(callBackFunction) == "function" ) {
+		$('#overlay-main').hide();
+		callBackFunction();
+	}
+}
 
 	/*
 	 * callAjaxGET("./sendsurveyinvitation.do", function(data) {

@@ -90,7 +90,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_POSTIONS = "positions";
 	public static final String KEY_STATUS = "status";
 	
-	@Value("${AMAZON_ENDPOINT}")
+	@Value("${CDN_PATH}")
 	private String amazonEndPoint;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
@@ -460,7 +460,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     	Query query = new Query();
     	query.addCriteria(Criteria.where(KEY_IDENTIFIER).in(companyIds));
     	query.fields().include(KEY_CONTACT_DETAILS).include(KEY_PROFILE_NAME).include(KEY_VERTICAL).include(KEY_IDEN).include(KEY_PROFILE_IMAGE).exclude("_id");
-        query.with( new Sort( Sort.Direction.ASC, KEY_PROFILE_NAME ) );
     	
     	unitSettings = mongoTemplate.find(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
     	
@@ -569,6 +568,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         } else {
             throw new InvalidInputException( "Invalid encompass crm info state : " + state );
         }
+        
+        //Add criteria to make sure that it doesn't pick up companies that are deleted
+        query.addCriteria( Criteria.where( KEY_STATUS ).ne( CommonConstants.STATUS_DELETED_MONGO ) );
         organizationUnitsSettingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
             CommonConstants.COMPANY_SETTINGS_COLLECTION );
         if ( organizationUnitsSettingsList == null || organizationUnitsSettingsList.isEmpty() ) {

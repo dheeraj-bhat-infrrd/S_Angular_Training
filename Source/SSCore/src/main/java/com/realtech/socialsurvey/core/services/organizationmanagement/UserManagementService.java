@@ -510,5 +510,15 @@ public interface UserManagementService
 
 
     public User getUserByEmailAddress( String emailId ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    User createSocialSurveyAdmin( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
+        UserAlreadyExistsException, UndeliveredEmailException;
+
+
+    List<User> getSocialSurveyAdmins( User admin );
+
+
+    void deleteSSAdmin( User admin, long ssAdminId ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

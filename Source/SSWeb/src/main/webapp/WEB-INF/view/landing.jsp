@@ -39,6 +39,7 @@ function landingFlow() {
 		if ($(this).closest('.welcome-popup-wrapper').attr('data-page') == 'one') {
 			callAjaxGET("./showlinkedindatacompare.do", function(data) {
 				$('#welocome-step2').html(data);
+				 loadSocialMediaUrlInPopup();
 			}, false);
 		}
 		
