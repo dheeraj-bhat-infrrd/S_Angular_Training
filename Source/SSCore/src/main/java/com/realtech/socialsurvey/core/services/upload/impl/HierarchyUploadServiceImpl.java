@@ -300,6 +300,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         headerMap.put( 6, CommonConstants.CHR_STATE );
         headerMap.put( 7, CommonConstants.CHR_ZIP );
 
+        if ( !rows.hasNext() ) {
+            throw new InvalidInputException( CommonConstants.HIERARCHY_REGION_HEADERS_INVALID );
+        }
+        
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
             // skip the first 1st row. first row is the header
@@ -395,6 +399,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         headerMap.put( 7, CommonConstants.CHR_STATE );
         headerMap.put( 8, CommonConstants.CHR_ZIP );
 
+        if ( !rows.hasNext() ) {
+            throw new InvalidInputException( CommonConstants.HIERARCHY_BRANCH_HEADERS_INVALID );
+        }
+        
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
             // skip the first 1 row. first row is the schema and second is the header
@@ -508,6 +516,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         headerMap.put( 14, CommonConstants.CHR_USERS_PHOTO );
         headerMap.put( 15, CommonConstants.CHR_USERS_ABOUT_ME_DESCRIPTION );
 
+        if ( !rows.hasNext() ) {
+            throw new InvalidInputException( CommonConstants.HIERARCHY_USER_HEADERS_INVALID );
+        }
+        
         while ( rows.hasNext() ) {
             row = (XSSFRow) rows.next();
             // skip the first 1 rows. first row is the schema and second is the header
