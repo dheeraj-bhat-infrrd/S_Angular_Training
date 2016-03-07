@@ -77,6 +77,7 @@
 				<value>com.realtech.socialsurvey.core.entities.BatchTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.CrmBatchTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.UserEmailMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping</value>
 			</list>
 		</property>
 	</bean>

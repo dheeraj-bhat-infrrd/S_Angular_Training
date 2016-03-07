@@ -12,6 +12,8 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -160,6 +162,19 @@ public interface SocialManagementService
 
     public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( long agentId )
         throws InvalidInputException;
+
+
+    List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize ) throws InvalidInputException;
+
+
+    List<SurveyPreInitiation> getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException;
+
+
+    void updateAgentIdOfSurveyPreinitiationRecordsForEmail( User user, String emailAddress ) throws InvalidInputException;
+
+
+    void updateSurveyPreinitiationRecordsAsIgnored( String emailAddress ) throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC

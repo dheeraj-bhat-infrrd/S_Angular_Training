@@ -26,6 +26,7 @@
 <c:if test="${appSettings != null && appSettings.crm_info != null}">
 	<input type="hidden" id="crm-source" value="${appSettings.crm_info.crm_source}"/>
 </c:if>
+<input type="hidden" id="cur-company-id" value="${user.company.companyId}"/>
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -76,12 +77,17 @@
 				</c:forEach>
 			</div>
 		</c:if>
+		<c:if test="${user.isOwner == 1}">
+<jsp:include page="untracked_user.jsp"></jsp:include>
+</c:if>
 	</div>
+	
 </div>
+
+
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Apps");
-
 		updateViewAsScroll();
 
 		//Remove the dropdown icon if only one option for app available
