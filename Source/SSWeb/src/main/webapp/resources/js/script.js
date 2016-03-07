@@ -2177,7 +2177,7 @@ var hierarchyUpload = {
 				$('#branch-added').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfBranchesAdded != 0) {
 					$(
-							'<div style="color:#009FE0;">Branches added:'
+							'<div style="color:#009FE0;">Offices added:'
 									+ hierarchyUpload
 											.hierundefined(hierarchyUpload.hierarchyJson.numberOfBranchesAdded)
 									+ '</div>').appendTo('#branch-added');
@@ -2186,7 +2186,7 @@ var hierarchyUpload = {
 				$('#branch-modified').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfBranchesModified != 0) {
 					$(
-							'<div style="color:#009FE0;">Branches modified:'
+							'<div style="color:#009FE0;">Offices modified:'
 									+ hierarchyUpload
 											.hierundefined(hierarchyUpload.hierarchyJson.numberOfBranchesModified)
 									+ '</div>').appendTo('#branch-modified');
@@ -2195,7 +2195,7 @@ var hierarchyUpload = {
 				$('#branch-deleted').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfBranchesDeleted != 0) {
 					$(
-							'<div style="color:#009FE0;">Branches deleted:'
+							'<div style="color:#009FE0;">Offices deleted:'
 									+ hierarchyUpload
 											.hierundefined(hierarchyUpload.hierarchyJson.numberOfBranchesDeleted)
 									+ '</div>').appendTo('#branch-deleted');
