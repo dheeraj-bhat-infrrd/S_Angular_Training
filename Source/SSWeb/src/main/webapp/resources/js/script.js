@@ -2031,7 +2031,7 @@ var hierarchyUpload = {
 		return hierval;
 	},
 	reverseUndef : function(hierval) {
-		if (hierval == '' || hierval.trim() == '') {
+		if (hierval == null || hierval == '' || hierval.trim() == '') {
 			return undefined;
 		}
 		return hierval.trim();
