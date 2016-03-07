@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -2789,19 +2790,22 @@ public class OrganizationManagementController
         String hierarchyJson = request.getParameter( "hierarchyJson" );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         User user = sessionHelper.getCurrentUser();
+        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        List<String> value = new ArrayList<String>();
         try {
-            Map<String, List<String>> errorMap = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(),
-                user.getCompany(), user );
-            if ( errorMap == null || errorMap.isEmpty() ) {
-                response = "Data uploaded successfully.";
+            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user );
+            if ( map == null || map.isEmpty() ) {
+                value.add( "Data uploaded successfully." );
+                map.put( "UPLOAD_SUCCESS", value );
             } else {
                 status = false;
-                response = new Gson().toJson( errorMap );
             }
         } catch ( Exception ex ) {
             status = false;
-            response = ex.getMessage();
+            value.add( ex.getMessage() );
+            map.put( "UPLOAD_FAILED", value );
         }
+        response = new Gson().toJson( map );
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
         responseMap.put( "response", response );
