@@ -195,6 +195,18 @@ public class Utils
     {
         String unmaskedEmailAddress = null;
         LOG.debug( "Unmasking email address: " + emailAddress );
+        if ( maskingPrefix == null || maskingPrefix.isEmpty() ) {
+            if ( maskingSuffix == null || maskingSuffix.isEmpty() ) {
+                return emailAddress;
+            }
+            int lastPlus = emailAddress.lastIndexOf( '+' );
+            String unmaskedemailAddress = new StringBuilder(emailAddress).replace( lastPlus, lastPlus + 1, "@" ).toString();
+            unmaskedemailAddress = unmaskedemailAddress.replace( maskingSuffix, "" );
+            if ( validateEmail( unmaskedemailAddress ) ) {
+                return unmaskedemailAddress;
+            }
+            return emailAddress;
+        }
         String pattern = "^" + maskingPrefix + "\\+(.+)" + maskingSuffix + "$";
 
         Pattern unmaskRegex = Pattern.compile( pattern );
