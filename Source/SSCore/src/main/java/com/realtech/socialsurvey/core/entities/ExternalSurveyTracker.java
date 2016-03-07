@@ -12,12 +12,12 @@ import javax.persistence.Table;
 
 
 /**
- * The persistent class for the AUTO_POST_TRACKER database table.
+ * The persistent class for the EXTERNAL_SURVEY_TRACKER database table.
  */
 @Entity
-@Table ( name = "AUTO_POST_TRACKER")
-@NamedQuery ( name = "AutoPostTracker.findAll", query = "SELECT s FROM AutoPostTracker s")
-public class AutoPostTracker
+@Table ( name = "EXTERNAL_SURVEY_TRACKER")
+@NamedQuery ( name = "ExternalSurveyTracker.findAll", query = "SELECT s FROM ExternalSurveyTracker s")
+public class ExternalSurveyTracker
 {
 
     private static final long serialVersionUID = 1L;
@@ -44,6 +44,9 @@ public class AutoPostTracker
 
     @Column ( name = "REVIEW_RATING")
     private double reviewRating;
+
+    @Column ( name = "COMPLAINT_RES_STATUS")
+    private int complaintResolutionStatus;
 
     @Column ( name = "REVIEW_DATE")
     private Timestamp reviewDate;
@@ -184,6 +187,24 @@ public class AutoPostTracker
     public void setReviewRating( double reviewRating )
     {
         this.reviewRating = reviewRating;
+    }
+
+
+    /**
+     * @return the complaintResolutionStatus
+     */
+    public int getComplaintResolutionStatus()
+    {
+        return complaintResolutionStatus;
+    }
+
+
+    /**
+     * @param complaintResolutionStatus the complaintResolutionStatus to set
+     */
+    public void setComplaintResolutionStatus( int complaintResolutionStatus )
+    {
+        this.complaintResolutionStatus = complaintResolutionStatus;
     }
 
 

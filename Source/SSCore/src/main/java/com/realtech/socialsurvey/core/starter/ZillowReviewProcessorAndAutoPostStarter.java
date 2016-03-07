@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.starter;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
@@ -49,9 +49,9 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 
-public class ZillowReviewProcessorAndAutoPoster extends QuartzJobBean
+public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 {
-    public static final Logger LOG = LoggerFactory.getLogger( ZillowReviewProcessorAndAutoPoster.class );
+    public static final Logger LOG = LoggerFactory.getLogger( ZillowReviewProcessorAndAutoPostStarter.class );
     private UserManagementService userManagementService;
     private SurveyHandler surveyHandler;
     private OrganizationManagementService organizationManagementService;
@@ -59,8 +59,6 @@ public class ZillowReviewProcessorAndAutoPoster extends QuartzJobBean
     private SocialManagementService socialManagementService;
     private BatchTrackerService batchTrackerService;
     private Utils utils;
-    private String fbAppId;
-    private String applicationBaseUrl;
     private final int batchSize = 50;
     private int zillowAutoPostThreshold;
     private EmailFormatHelper emailFormatHelper;
@@ -204,12 +202,18 @@ public class ZillowReviewProcessorAndAutoPoster extends QuartzJobBean
                                         // post the zillow review to social media
                                         postToSocialMedia( zillowTempPost, agentSetting, surveyDetails );
 
-                                        // add to auto post tracker
-                                        socialManagementService.saveAutoPostTracker( zillowTempPost.getEntityColumnName(),
-                                            zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW, agentSetting
-                                                .getSocialMediaTokens().getZillowToken().getZillowProfileLink(),
-                                            zillowTempPost.getZillowReviewUrl(), zillowTempPost.getZillowReviewRating(),
-                                            zillowTempPost.getZillowReviewDate() );
+                                        // check review for complaint resolution
+                                        boolean complaintResStatus = triggerComplaintResolutionWorkflowForZillowReview(
+                                            companySettings, zillowTempPost, surveyDetails, agentSetting );
+
+                                        if ( !complaintResStatus ) {// add to external survey tracker
+                                            socialManagementService.saveExternalSurveyTracker(
+                                                zillowTempPost.getEntityColumnName(), zillowTempPost.getEntityId(),
+                                                CommonConstants.SURVEY_SOURCE_ZILLOW, agentSetting.getSocialMediaTokens()
+                                                    .getZillowToken().getZillowProfileLink(),
+                                                zillowTempPost.getZillowReviewUrl(), zillowTempPost.getZillowReviewRating(),
+                                                CommonConstants.NO, zillowTempPost.getZillowReviewDate() );
+                                        }
                                     }
                                     // add to zillow temp post id to processed list
                                     processedZillowTempPostIds.add( zillowTempPost.getId() );
@@ -264,6 +268,10 @@ public class ZillowReviewProcessorAndAutoPoster extends QuartzJobBean
             LOG.error( "unitSettings passed cannot be null" );
             return false;
         }
+        if ( survey == null ) {
+            LOG.error( "survey passed cannot be null" );
+            return false;
+        }
 
         Calendar cal = Calendar.getInstance();
         cal.add( Calendar.DATE, -zillowAutoPostThreshold );
@@ -272,38 +280,13 @@ public class ZillowReviewProcessorAndAutoPoster extends QuartzJobBean
         cal.set( Calendar.SECOND, 0 );
         cal.set( Calendar.MILLISECOND, 0 );
 
-        if ( !socialManagementService.checkAutoPostTrackerExist( zillowTempPost.getEntityColumnName(),
+        if ( socialManagementService.checkExternalSurveyTrackerExist( zillowTempPost.getEntityColumnName(),
             zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW, zillowTempPost.getZillowReviewUrl(),
-            zillowTempPost.getZillowReviewDate() )
+            zillowTempPost.getZillowReviewDate() ) == null
             && unitSettings.getSurvey_settings() != null
             && !utils.checkReviewForSwearWords( zillowTempPost.getZillowReviewDescription(), surveyHandler.getSwearList() )
             && zillowTempPost.getZillowReviewDate().after( cal.getTime() ) ) {
-            double autoPostLimit = new Double( unitSettings.getSurvey_settings().getShow_survey_above_score() ).doubleValue();
-            if ( autoPostLimit <= zillowTempPost.getZillowReviewRating() )
-                return true;
-            else {
-                // trigger complaint resolution workflow if configured
-                if ( companySettings.getSurvey_settings() != null
-                    && companySettings.getSurvey_settings().getComplaint_res_settings() != null ) {
-                    ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
-                        .getComplaint_res_settings();
-                    if ( complaintRegistrationSettings.isEnabled()
-                        && ( ( zillowTempPost.getZillowReviewRating() > 0d && complaintRegistrationSettings.getRating() > 0d && zillowTempPost
-                            .getZillowReviewRating() < complaintRegistrationSettings.getRating() ) ) ) {
-                        try {
-                            survey.setUnderResolution( true );
-                            surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
-                            emailServices.sendZillowReviewComplaintHandleMail( complaintRegistrationSettings.getMailId(),
-                                zillowTempPost.getZillowReviewerName(),
-                                String.valueOf( zillowTempPost.getZillowReviewRating() ), zillowTempPost.getZillowReviewUrl() );
-                        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                            LOG.error( "Error while sending complaint resolution mail to admins. Reason :", e );
-                        }
-                    }
-
-                }
-                return false;
-            }
+            return true;
         }
 
         return false;
@@ -444,14 +427,24 @@ public class ZillowReviewProcessorAndAutoPoster extends QuartzJobBean
                 socialMediaPostResponseDetails.setBranchMediaPostResponseDetailsList( branchMediaPostResponseDetailsList );
                 socialMediaPostResponseDetails.setRegionMediaPostResponseDetailsList( regionMediaPostResponseDetailsList );
 
+                if ( !agentSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                    agentSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+
+                if ( !companySocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                    companySocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+
                 for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                     List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
+                    if ( !regionSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                        regionSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
                     regionMediaPostDetails.setSharedOn( regionSocialList );
 
 
                 }
                 for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                    if ( !branchSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                        branchSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
                     branchMediaPostDetails.setSharedOn( branchSocialList );
                 }
 
@@ -510,6 +503,46 @@ public class ZillowReviewProcessorAndAutoPoster extends QuartzJobBean
     }
 
 
+    private boolean triggerComplaintResolutionWorkflowForZillowReview( OrganizationUnitSettings companySettings,
+        ZillowTempPost zillowTempPost, SurveyDetails survey, OrganizationUnitSettings unitSettings )
+    {
+        LOG.info( "Method to trigger complaint resolution workflow for a review, triggerComplaintResolutionWorkflowForZillowReview started." );
+        // trigger complaint resolution workflow if configured
+        if ( companySettings.getSurvey_settings() != null
+            && companySettings.getSurvey_settings().getComplaint_res_settings() != null ) {
+            ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
+                .getComplaint_res_settings();
+            ExternalSurveyTracker externalSurveyTracker = socialManagementService.checkExternalSurveyTrackerExist(
+                zillowTempPost.getEntityColumnName(), zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW,
+                zillowTempPost.getZillowReviewUrl(), zillowTempPost.getZillowReviewDate() );
+            if ( complaintRegistrationSettings.isEnabled()
+                && ( ( zillowTempPost.getZillowReviewRating() > 0d && complaintRegistrationSettings.getRating() > 0d && zillowTempPost
+                    .getZillowReviewRating() <= complaintRegistrationSettings.getRating() ) )
+                && ( externalSurveyTracker == null || externalSurveyTracker.getComplaintResolutionStatus() == CommonConstants.NO ) ) {
+                try {
+                    survey.setUnderResolution( true );
+                    surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
+                    emailServices.sendZillowReviewComplaintHandleMail( complaintRegistrationSettings.getMailId(),
+                        zillowTempPost.getZillowReviewerName(), String.valueOf( zillowTempPost.getZillowReviewRating() ),
+                        zillowTempPost.getZillowReviewUrl() );
+
+                    // add complaint resolution status in External Survey Tracker
+                    socialManagementService.saveExternalSurveyTracker( zillowTempPost.getEntityColumnName(),
+                        zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW, unitSettings.getSocialMediaTokens()
+                            .getZillowToken().getZillowProfileLink(), zillowTempPost.getZillowReviewUrl(),
+                        zillowTempPost.getZillowReviewRating(), CommonConstants.YES, zillowTempPost.getZillowReviewDate() );
+                    return true;
+                } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                    LOG.error( "Error while sending complaint resolution mail to admins. Reason :", e );
+                    return true;
+                }
+            }
+        }
+        LOG.info( "Method to trigger complaint resolution workflow for a review, triggerComplaintResolutionWorkflowForZillowReview finished." );
+        return false;
+    }
+
+
     private void initializeDependencies( JobDataMap jobMap )
     {
         surveyHandler = (SurveyHandler) jobMap.get( "surveyHandler" );
@@ -518,7 +551,6 @@ public class ZillowReviewProcessorAndAutoPoster extends QuartzJobBean
         organizationManagementService = (OrganizationManagementService) jobMap.get( "organizationManagementService" );
         profileManagementService = (ProfileManagementService) jobMap.get( "profileManagementService" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
-        fbAppId = (String) jobMap.get( "fbAppId" );
         zillowAutoPostThreshold = Integer.parseInt( (String) jobMap.get( "zillowAutoPostThreshold" ) );
         utils = (Utils) jobMap.get( "utils" );
         emailFormatHelper = (EmailFormatHelper) jobMap.get( "emailFormatHelper" );

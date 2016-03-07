@@ -78,7 +78,7 @@
 				<value>com.realtech.socialsurvey.core.entities.CrmBatchTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.UserEmailMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.ZillowTempPost</value>
-				<value>com.realtech.socialsurvey.core.entities.AutoPostTracker</value>
+				<value>com.realtech.socialsurvey.core.entities.ExternalSurveyTracker</value>
 			</list>
 		</property>
 	</bean>

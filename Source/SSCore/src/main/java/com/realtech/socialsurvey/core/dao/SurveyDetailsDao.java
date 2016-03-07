@@ -230,4 +230,10 @@ public interface SurveyDetailsDao
 
     public void removeExistingZillowSurveysByEntity( String entityType, long entityId );
 
+
+    public SurveyDetails getZillowReviewByQueryMap( Map<String, Object> queries ) throws InvalidInputException;
+
+
+    public void resetShowSurveyOnUIPropertyForNonLatestReviews( String columnName, long id, List<String> latestSurveyIdList );
+
 }

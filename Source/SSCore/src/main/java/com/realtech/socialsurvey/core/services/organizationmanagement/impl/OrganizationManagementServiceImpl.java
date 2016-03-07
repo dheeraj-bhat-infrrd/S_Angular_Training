@@ -6414,7 +6414,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public List<Long> getRegionIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException
     {
-        if ( companyId < 0l )
+        if ( companyId <= 0l )
             throw new InvalidInputException( "Invalid company id passed as argument " );
         LOG.info( "Method getRegionIdsUnderCompany called for companyId:" + companyId );
         List<Long> regionIds = regionDao.getRegionIdsUnderCompany( companyId, start, batchSize );
@@ -6434,7 +6434,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public List<Long> getBranchIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException
     {
-        if ( companyId < 0l )
+        if ( companyId <= 0l )
             throw new InvalidInputException( "Invalid company id passed as argument " );
         LOG.info( "Method getBranchIdsUnderCompany called for companyId:" + companyId );
         List<Long> branchIds = branchDao.getBranchIdsUnderCompany( companyId, start, batchSize );
@@ -6454,7 +6454,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public List<Long> getAgentIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException
     {
-        if ( companyId < 0l )
+        if ( companyId <= 0l )
             throw new InvalidInputException( "Invalid company id passed as argument " );
         LOG.info( "Method getAgentIdsUnderCompany called for companyId:" + companyId );
         List<Long> userIds = userDao.getUserIdsUnderCompanyBasedOnProfileMasterId( companyId,

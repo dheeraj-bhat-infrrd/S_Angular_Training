@@ -10,6 +10,7 @@ import twitter4j.auth.RequestToken;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
@@ -177,12 +178,12 @@ public interface SocialManagementService
         List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList, long branchId );
 
 
-    boolean checkAutoPostTrackerExist( String entityColumnName, long entityId, String source, String reviewUrl,
+    ExternalSurveyTracker checkExternalSurveyTrackerExist( String entityColumnName, long entityId, String source, String reviewUrl,
         Timestamp reviewDate );
 
 
-    public void saveAutoPostTracker( String entityColumnName, long entityId, String source, String sourceLink, String reviewUrl,
-        double rating, Timestamp reviewDate );
+    public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
+        String reviewUrl, double rating, int complaintResolutionStatus, Timestamp reviewDate );
 
 
     public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds );

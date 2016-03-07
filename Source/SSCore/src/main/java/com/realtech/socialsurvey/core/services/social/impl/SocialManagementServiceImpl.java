@@ -37,7 +37,7 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.AutoPostTrackerDao;
+import com.realtech.socialsurvey.core.dao.ExternalSurveyTrackerDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -53,6 +53,7 @@ import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -184,7 +185,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private ZillowTempPostDao zillowTempPostDao;
 
     @Autowired
-    private AutoPostTrackerDao autoPostTrackerDao;
+    private ExternalSurveyTrackerDao externalSurveyTrackerDao;
 
 
     /**
@@ -1992,18 +1993,19 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public boolean checkAutoPostTrackerExist( String entityColumnName, long entityId, String source, String reviewUrl,
+    public ExternalSurveyTracker checkExternalSurveyTrackerExist( String entityColumnName, long entityId, String source, String reviewUrl,
         Timestamp reviewDate )
     {
-        return autoPostTrackerDao.checkAutoPostTrackerDetailsExist( entityColumnName, entityId, source, reviewUrl, reviewDate );
+        return externalSurveyTrackerDao.checkExternalSurveyTrackerDetailsExist( entityColumnName, entityId, source, reviewUrl, reviewDate );
     }
 
 
     @Override
-    public void saveAutoPostTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, Timestamp reviewDate )
+    public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
+        String reviewUrl, double rating, int complaintResolutionStatus, Timestamp reviewDate )
     {
-        autoPostTrackerDao.saveAutoPostTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating, reviewDate );
+        externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating,
+            complaintResolutionStatus, reviewDate );
     }
 
 

@@ -209,6 +209,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setUrl( surveyUrl );
         surveyDetails.setEditable( true );
         surveyDetails.setSource( source );
+        surveyDetails.setShowSurveyOnUI( true );
 
         SurveyDetails survey = surveyDetailsDao
             .getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );

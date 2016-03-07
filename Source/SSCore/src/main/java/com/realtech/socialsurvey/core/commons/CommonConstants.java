@@ -260,6 +260,7 @@ public interface CommonConstants
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN ="isLogoImageProcessed";
     public static final String IS_UNMARKED_ABUSIVE_COLUMN ="isUnmarkedAbusive";
     public static final String DELETED_SOCIAL_MEDIA_TOKENS_COLUMN = "deletedSocialTokens";
+    public static final String SHOW_SURVEY_ON_UI_COLUMN = "showSurveyOnUI";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
