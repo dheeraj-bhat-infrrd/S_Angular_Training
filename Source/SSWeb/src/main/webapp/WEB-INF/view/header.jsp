@@ -17,6 +17,7 @@
 	<title><spring:message code="label.login.title.key" /></title>
 
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/datepicker3.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.css">
@@ -219,7 +220,6 @@
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showhelppage.do')" onclick="showOverlay();"><spring:message code="label.help.key" /></a>
 				</div>
-				
 				
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>

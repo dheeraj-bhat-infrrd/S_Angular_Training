@@ -169,6 +169,32 @@ function callAjaxPOSTWithTextDataLogo(url, callBackFunction, isAsync, formData) 
 			});
 }
 
+function callAjaxPOSTWithTextDataUpload(url, callBackFunction, isAsync, formData) {
+
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+				url : url,
+				type : "POST",
+				dataType : "text",
+				contentType : false,
+				processData : false,
+				cache : false,
+				data : formData,
+				async : isAsync,
+				success : callBackFunction,
+				error : function(e) {
+					if(e.status == 500) {
+						showError("Hierarchy upload failed. Please try again.");
+					}
+				},
+				complete : function() {
+					hideOverlay();
+				}
+			});
+}
+
 
 /**
  * Generic function to be used for making ajax get calls with datatype text and formdata
@@ -1219,6 +1245,27 @@ function logoValidate(logo) {
     return true;
     
 }
+/*var fileExtensions=".xlsx";
+function fileValidate(fileformat){
+	if($(fileformat).attr("type")=="file"){
+		var FileName=$(fileFormat).val();
+		if(FileName.length>0){
+			var blnValid= false;
+			if (FileName.substr(FileName.length - fileExtensions.length, fileExtensions.length).toLowerCase() == fileExtensions.toLowerCase()) {
+                blnValid = true;
+                break;
+            }
+		}
+		 if (!blnValid) {
+         	var msg="Please upload xlsx file";
+         	showErrorMobileAndWeb(msg);
+             $(logo).val="";
+             
+             return false;
+         }
+	}
+	return true;
+}*/
 
 
 //update GA tracking Id

@@ -192,6 +192,56 @@ public class Utils
 		return maskedEmailAddress;
 	}
     
+
+    public String unmaskEmailAddress( String emailAddress )
+    {
+        String unmaskedEmailAddress = null;
+        LOG.debug( "Unmasking email address: " + emailAddress );
+        if ( maskingPrefix == null || maskingPrefix.isEmpty() ) {
+            if ( maskingSuffix == null || maskingSuffix.isEmpty() ) {
+                return emailAddress;
+            }
+            int lastPlus = emailAddress.lastIndexOf( '+' );
+            String unmaskedemailAddress = new StringBuilder(emailAddress).replace( lastPlus, lastPlus + 1, "@" ).toString();
+            unmaskedemailAddress = unmaskedemailAddress.replace( maskingSuffix, "" );
+            if ( validateEmail( unmaskedemailAddress ) ) {
+                return unmaskedemailAddress;
+            }
+            return emailAddress;
+        }
+        String pattern = "^" + maskingPrefix + "\\+(.+)" + maskingSuffix + "$";
+
+        Pattern unmaskRegex = Pattern.compile( pattern );
+
+        Matcher matcher = unmaskRegex.matcher( emailAddress );
+        if ( matcher.find() ) {
+            unmaskedEmailAddress = matcher.group( 1 );
+            //Replace last + with @
+            int lastPlus = unmaskedEmailAddress.lastIndexOf( '+' );
+            if ( lastPlus > 0 ) {
+                unmaskedEmailAddress = new StringBuilder( unmaskedEmailAddress ).replace( lastPlus, lastPlus + 1, "@" )
+                    .toString();
+                if ( validateEmail( unmaskedEmailAddress ) ) {
+                    return unmaskedEmailAddress;
+                }
+            }
+
+        }
+        return emailAddress;
+    }
+    
+    
+    public Boolean validateEmail( String emailId )
+    {
+        boolean validEmail = true;
+        LOG.info( "Method validateAndParseEmailIds called" );
+        Pattern pattern = Pattern.compile( CommonConstants.EMAIL_REGEX, Pattern.CASE_INSENSITIVE );
+        Matcher matcher = pattern.matcher( emailId );
+        validEmail = matcher.matches();
+        return validEmail;
+    }
+    
+    
     /**
      * @return
      */

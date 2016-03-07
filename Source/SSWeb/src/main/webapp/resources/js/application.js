@@ -2343,11 +2343,24 @@ function bindAdminCheckBoxClick(){
 		 if($(this).hasClass('bd-check-img-checked') ){
 			$(this).removeClass('bd-check-img-checked');
 			$(this).next("#is-admin-chk").val("true");
+			$(this).next("#is-ignore").val("true");
 		 }
 		 else {
 			$(this).addClass('bd-check-img-checked');
 			$(this).next("#is-admin-chk").val("false");
+			$(this).next("#is-ignore").val("false");
 		 }
+		 if($('#is-ignore').val()=="true"){
+			if($('#match-user-email').val()!=""){
+				$('#match-user-email').val('');
+				$('#match-user-email').attr('agent-id' , 0);
+			$('#match-user-email').attr("disabled",true);
+			}
+		}else if($('#is-ignore').val()=="false"){
+			
+			$('#match-user-email').removeAttr("disabled");
+		}
+		 
 	});
 }
 
@@ -7602,6 +7615,7 @@ function bindClickForIndividuals(elementClass) {
 
 //Bind scroll event for public posts on edit profile page
 function attachPostsScrollEvent() {
+	console.log("scroll function called");
 	$('#prof-posts').off('scroll');
 	$('#prof-posts').on('scroll',function(){
 		var scrollContainer = this;
@@ -7614,7 +7628,31 @@ function attachPostsScrollEvent() {
 		}
 	});
 }
-
+function attachUntrackUserScrollEvent() {
+	$('#new').off('scroll');
+	$('#new').on('scroll',function(){
+		var scrollContainer = this;
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
+				- (scrollContainer.clientHeight / 0.75))) {
+				if (!doStopPostPaginationUnmatchedUser || UnmatchedUserPostsBatch.length > 0) {
+					fetchUntrackedUser(false);
+				}
+					
+		}
+	});
+}function attachMatchedUserScrollEvent() {
+	$('#processed').off('scroll');
+	$('#processed').on('scroll',function(){
+		var scrollContainer = this;
+		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
+				- (scrollContainer.clientHeight / 0.75))) {
+				if (!doStopPostPaginationProcessedUser || UnProcessedUserPostsBatch.length > 0) {
+					fetchProcessedUser(false);
+				}
+					
+		}
+	});
+}
 var doStopPostPaginationEditProfile = false; 
 var isAjaxRequestRunningEditProfile = false;
 var isLoaderRunningEditProfile = false;
@@ -7712,6 +7750,393 @@ function fetchPublicPostEditProfile(isNextBatch) {
 	}, payload, true);
 }
 
+
+var doStopPostPaginationUnmatchedUser = false; 
+var isAjaxRequestRunningUnmatchedUser = false;
+var isLoaderRunningUnmatchedUser = false;
+var UnmatchedUserPostsBatch = [];
+
+function fetchUntrackedUser(isNextBatch) {
+
+	
+	if(proPostStartIndex == 0) {
+		doStopPostPaginationUnmatchedUser = false;
+		UnmatchedUserPostsBatch = [];
+		$('#new').html('');
+		
+	}
+	
+	//Show from existing batch if the data is present
+	if (!isNextBatch && UnmatchedUserPostsBatch.length > 0) {
+		var posts = UnmatchedUserPostsBatch.slice(0, proPostBatchSize);
+		if (UnmatchedUserPostsBatch.length > proPostBatchSize) {
+			UnmatchedUserPostsBatch = UnmatchedUserPostsBatch.slice(proPostBatchSize);
+		} else {
+			UnmatchedUserPostsBatch = [];
+		}
+		
+		if(isLoaderRunningUnmatchedUser) {
+			hideLoaderOnPagination($('#new'));
+		}
+		showLoaderOnPagination($('#new'));
+		isLoaderRunningUnmatchedUser = true;
+		//paint the posts
+		setTimeout(function() {
+			paintUnmatchedUser(posts);
+			/*paintPosts(posts);*/
+			isLoaderRunningUnmatchedUser = false;
+			//Fetch the next batch
+			if(!doStopPostPaginationUnmatchedUser && UnmatchedUserPostsBatch.length <= proPostBatchSize) {
+				fetchUntrackedUser(true);
+			}
+		}, 500);
+		
+		return;
+	} 
+	
+	if (!isNextBatch) {
+		showLoaderOnPagination($('#new'));
+	}
+	
+	if(isAjaxRequestRunningUnmatchedUser) return; //Return if ajax request running to fetch the social posts
+	
+	var payload = {
+		"batchSize" : proPostBatchSize,
+		"startIndex" : proPostStartIndex,
+	
+	};
+	
+	isAjaxRequestRunningUnmatchedUser = true;
+	callAjaxGetWithPayloadData("./getunmatchedpreinitiatedsurveys.do", function(data) {  
+		isAjaxRequestRunningUnmatchedUser = false;
+		if (data.errCode == undefined) {
+			if(data != "") {
+				
+				
+				var posts = JSON.parse(data);
+				if(posts.length <= 0 && proPostStartIndex == 0) {
+					doStopPostPaginationUnmatchedUser = true;
+					hideLoaderOnPagination($('#new'));
+					return;
+				}
+				if(posts.length < proPostBatchSize) {
+					doStopPostPaginationUnmatchedUser = true;
+				}
+				
+				//update start index
+				proPostStartIndex += proPostBatchSize;	
+				
+				//update the batch
+				UnmatchedUserPostsBatch = UnmatchedUserPostsBatch.concat(posts);
+				
+				if(isNextBatch) {
+					//Fetch the next batch
+					if(!doStopPostPaginationUnmatchedUser && UnmatchedUserPostsBatch.length <= proPostBatchSize) {
+						fetchUntrackedUser(true);
+					}
+				} else {
+					if(posts && posts.length > 0)
+						fetchUntrackedUser(false);
+				}
+					
+			}
+		}
+	}, payload, true);
+}
+
+var doStopPostPaginationProcessedUser = false; 
+var isAjaxRequestRunningProcessedUser = false;
+var isLoaderRunningProcessedUser = false;
+var UnProcessedUserPostsBatch = [];
+
+function fetchProcessedUser(isNextBatch) {
+
+	
+	if(proPostStartIndex == 0) {
+		doStopPostPaginationProcessedUser = false;
+		UnProcessedUserPostsBatch = [];
+		$('#processed').html('');
+		
+	}
+	
+	//Show from existing batch if the data is present
+	if (!isNextBatch && UnProcessedUserPostsBatch.length > 0) {
+		var posts = UnProcessedUserPostsBatch.slice(0, proPostBatchSize);
+		if (UnProcessedUserPostsBatch.length > proPostBatchSize) {
+			UnProcessedUserPostsBatch = UnProcessedUserPostsBatch.slice(proPostBatchSize);
+		} else {
+			UnProcessedUserPostsBatch = [];
+		}
+		
+		if(isLoaderRunningProcessedUser) {
+			hideLoaderOnPagination($('#processed'));
+		}
+		showLoaderOnPagination($('#processed'));
+		isLoaderRunningProcessedUser = true;
+		//paint the posts
+		setTimeout(function() {
+			paintProcessedUser(posts);
+			/*paintPosts(posts);*/
+			isLoaderRunningProcessedUser = false;
+			//Fetch the next batch
+			if(!doStopPostPaginationProcessedUser && UnProcessedUserPostsBatch.length <= proPostBatchSize) {
+				fetchProcessedUser(true);
+			}
+		}, 500);
+		
+		return;
+	} 
+	
+	if (!isNextBatch) {
+		showLoaderOnPagination($('#processed'));
+	}
+	
+	if(isAjaxRequestRunningProcessedUser) return; //Return if ajax request running to fetch the social posts
+	
+	var payload = {
+		"batchSize" : proPostBatchSize,
+		"startIndex" : proPostStartIndex,
+	
+	};
+	
+	isAjaxRequestRunningProcessedUser = true;
+	callAjaxGetWithPayloadData("./getprocessedpreinitiatedsurveys.do", function(data) {  
+		isAjaxRequestRunningProcessedUser = false;
+		if (data.errCode == undefined) {
+			if(data != "") {
+				
+				
+				var posts = JSON.parse(data);
+				if(posts.length <= 0 && proPostStartIndex == 0) {
+					doStopPostPaginationProcessedUser = true;
+					hideLoaderOnPagination($('#processed'));
+					return;
+				}
+				if(posts.length < proPostBatchSize) {
+					doStopPostPaginationProcessedUser = true;
+				}
+				
+				//update start index
+				proPostStartIndex += proPostBatchSize;	
+				
+				//update the batch
+				UnProcessedUserPostsBatch = UnProcessedUserPostsBatch.concat(posts);
+				
+				if(isNextBatch) {
+					//Fetch the next batch
+					if(!doStopPostPaginationProcessedUser && UnProcessedUserPostsBatch.length <= proPostBatchSize) {
+						fetchProcessedUser(true);
+					}
+				} else {
+					if(posts && posts.length > 0)
+						fetchProcessedUser(false);
+				}
+					
+			}
+		}
+	}, payload, true);
+}
+function undefinedval(hierval) {
+	  if (hierval == undefined) {
+	   return "";
+	  }
+	  return hierval;
+	 }
+function paintUnmatchedUser(posts) {
+	var untrack="";
+	
+	posts.forEach(function(arrayItem) {
+
+		 untrack += '<div class="un-row">'+
+		'						<div style="width:10%" class="float-left unmatchtab ss-id">'+undefinedval(arrayItem.surveySourceId)+'</div>'+
+		'						<div style="width:20%" class="float-left unmatchtab ss-eid">'+undefinedval(arrayItem.agentEmailId)+'</div>'+
+		'						<div style="width:40%" class="float-left unmatchtab ss-cname">'+undefinedval(arrayItem.customerFirstName)+'<span style="margin-left:2px;">'+ undefinedval(arrayItem.customerLastName)+'</span><span style="margin-left:2px;"> < '+undefinedval(arrayItem.customerEmailId)+' > </span></div>'+
+		'						<div style="width:20%" class="float-left unmatchtab ss-date">'+undefinedval(arrayItem.createdOn)+'</div>'+
+		'						<div style="width:10%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'+
+		'						</div>';
+			
+
+	/*untrack += '<tr class="un-row"><div><td scope="row"><div>'+arrayItem.surveySourceId+'</div></td><td><div>'+arrayItem.agentEmailId+'</div></td><td><div>'+arrayItem.customerFirstName+'</div></td><td><div>'+arrayItem.createdOn+'<div></td></tr>';*/
+		
+		
+	});
+	
+	if ($('#new').children('.un-row').length == 0){
+		$('#new').html(untrack);
+		$('#new').perfectScrollbar({
+			suppressScrollX : true
+		});
+		$('#new').perfectScrollbar('update');
+	}
+	else{
+		$('#new').append(untrack);
+		$('#new').perfectScrollbar('update');
+	}
+	hideLoaderOnPagination($('#new'));
+	
+	 bindClickEventForProcessButton();
+}
+function paintProcessedUser(posts) {
+	var untrack="";
+	
+	posts.forEach(function(arrayItem) {
+if(undefinedval(arrayItem.status)==9){
+	var action="Always Ignore";
+}else{
+	var action="Aliased";
+}
+		 untrack += '<div class="un-row">'+
+		'						<div style="width:10%" class="float-left unmatchtab ss-id">'+undefinedval(arrayItem.surveySourceId)+'</div>'+
+		'						<div style="width:20%" class="float-left unmatchtab ss-eid">'+undefinedval(arrayItem.agentEmailId)+'</div>'+
+		'						<div style="width:40%" class="float-left unmatchtab ss-cname">'+undefinedval(arrayItem.customerFirstName)+'<span style="margin-left:2px;">'+ undefinedval(arrayItem.customerLastName)+'</span><span style="margin-left:2px;"> < '+undefinedval(arrayItem.customerEmailId)+' > </span></div>'+
+		'						<div style="width:20%" class="float-left unmatchtab ss-date">'+undefinedval(arrayItem.createdOn)+'</div>'+
+		'						<div style="width:10%" class="float-left unmatchtab" >'+action+'</div>'+
+		'						</div>';
+			
+
+	/*untrack += '<tr class="un-row"><div><td scope="row"><div>'+arrayItem.surveySourceId+'</div></td><td><div>'+arrayItem.agentEmailId+'</div></td><td><div>'+arrayItem.customerFirstName+'</div></td><td><div>'+arrayItem.createdOn+'<div></td></tr>';*/
+		
+		
+	});
+	
+	if ($('#processed').children('.un-row').length == 0){
+		$('#processed').html(untrack);
+		$('#processed').perfectScrollbar({
+			suppressScrollX : true
+		});
+		$('#processed').perfectScrollbar('update');
+	}
+	else{
+		$('#processed').append(untrack);
+		$('#processed').perfectScrollbar('update');
+	}
+	hideLoaderOnPagination($('#processed'));
+	
+	 bindClickEventForProcessButton();
+}
+
+function bindClickEventForProcessButton(){
+	
+	$('.ss-process').click(function(e){
+		var id=$(this).parent().find(".ss-id").text();
+		var user=$(this).parent().find(".ss-eid").text();
+		var customer=$(this).parent().find(".ss-cname").text();
+
+
+		var popup = '<div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">ID</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+id+'</div>'+
+		'	 </div>'+
+		'	 <div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">User</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+user+'</div>'+
+		'	 </div>'+
+		'<div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">Customer</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+customer+'</div>'+
+		'	 </div><div class="bd-hr-form-item clearfix" id="ignore">'+
+		'	     <div class="float-left bd-frm-left-un"></div>'+
+		'	     <div class="float-left bd-frm-right">'+
+		'	         <div class="bd-frm-check-wrapper clearfix bd-check-wrp">'+
+		'	             <div class="float-left bd-check-img bd-check-img-checked"></div>'+
+		'	             <input type="hidden" name="isIgnore" value="false" id="is-ignore" class="ignore-clear">'+
+		'	             <div class="float-left bd-check-txt bd-check-sm">Always Ignore</div>'+
+		'	         </div>'+
+		'	     </div>'+
+		'	 </div>'+
+		'<div id="bd-single" class="bd-hr-form-item clearfix">'+
+		'	    <div class="float-left bd-frm-left-un">Alias</div>'+
+		'	    <div class="float-left bd-frm-left-un pos-relative">'+
+		'	        <input id="match-user-email" class="bd-frm-rt-txt bd-dd-img">'+
+		'	    </div>'+
+		'	</div>';
+			
+
+	/*var popup='<div>ID<span>'+ <div class="float-left bd-frm-left">ID</div>+'</span></div><div>User<span>'+user+'</span></div><div>Customer<span>'+customer+'</span></div>'*/
+		e.stopPropagation();
+		$('#overlay-continue').html("Save");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-header').html("Match User");
+		$('#overlay-text').html(popup);
+		
+		
+		$('#overlay-continue').click(function(){
+			saveUserMap(user );
+			$('#overlay-continue').unbind('click');
+		});
+		$('#overlay-main').show();
+		bindAdminCheckBoxClick();
+		attachAutocompleteAliasDropdown();
+	});
+	/*if($('#is-ignore').val()==true){
+	if($('#match-user-email').val()!=""){
+		$('#match-user-email').val('');
+		$('#match-user-email').attr('agent-id' , 0);
+	$('#match-user-email').attr("disabled");
+	}
+}*/
+	
+
+}
+function saveUserMap(aliasMail){
+	var isIgnore=$('#is-ignore').val();
+	var agentId=$('#match-user-email').attr('agent-id');
+	
+	if(isIgnore == 'true'){
+		agentId = 0;
+	}else{
+		if(agentId == undefined || agentId <=0){
+			$('#overlay-toast').html('Please enter valid alias!');
+			showToast();			
+			return;
+		}
+			
+	}
+	
+	var payload = {
+			"emailAddress" : aliasMail,
+			"agentId" : agentId,
+			"ignoredEmail" : isIgnore
+		
+		};
+		console.log("emailAddress :" + aliasMail);
+		console.log("agentId :" +agentId);
+		console.log("ignoredEmail :" +isIgnore);
+		isAjaxRequestRunningProcessedUser = true;
+		callAjaxGetWithPayloadData('./saveemailmapping.do', function(data){
+			$('#overlay-main').hide();
+			$('#overlay-toast').html(data);
+			showToast();
+			
+				$('#new').html('');
+				newUnmatched();
+			
+			
+		}, payload, true);
+	
+}
+function newUnmatched(){
+	proPostStartIndex=0;
+	proPostBatchSize = 10;
+	doStopPostPaginationUnmatchedUser = false; 
+	isAjaxRequestRunningUnmatchedUser = false;
+	isLoaderRunningUnmatchedUser = false;
+	UnmatchedUserPostsBatch = [];
+	fetchUntrackedUser();
+	attachUntrackUserScrollEvent(); 
+}
+
+function unmatchProcess(){
+	$('#processed').html('');
+	proPostStartIndex=0;
+	proPostBatchSize = 10;
+	isAjaxRequestRunningProcessedUser = false;
+	isLoaderRunningProcessedUser = false;
+	doStopPostPaginationProcessedUser = false; 
+	UnProcessedUserPostsBatch = [];
+	fetchProcessedUser();
+	attachMatchedUserScrollEvent();
+}
 function paintPosts(posts) {
 	var divToPopulate = "";
 	var postsLength = posts.length;
@@ -9894,6 +10319,58 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 	});
 }
 
+function attachAutocompleteAliasDropdown(){
+	var companyId=$('#cur-company-id').val();
+	$('#match-user-email').autocomplete({
+		source : function(request, response) {
+			callAjaxGetWithPayloadData("/fetchagentsforadmin.do", function(data) {
+					var responseData = JSON.parse(data);
+					response($.map(responseData, function(item) {
+		 	    	  return {
+		 	    		   label:item.displayName + " <"  + item.emailId + ">",
+		 	    		   value:item.displayName + " <"  + item.emailId + ">",
+		 	    		   userId:item.userId,
+		 	    		   emailId:item.emailId	   
+						};
+		 	       }));
+				}, {
+					"searchKey" : request.term,
+					"columnName" : "companyId",
+					"columnValue" : companyId
+				}, true);
+		},
+		minLength : 1,
+		select : function (event, ui) {
+			event.stopPropagation();
+			var element = event.target;
+			$(element).attr('agent-id', ui.item.userId);
+			$(element).attr('column-name', colName);
+			$(element).attr('email-id', ui.item.emailId);
+			$(element).attr('val', ui.item.value);
+		},
+		close: function(event, ui) {},
+		create: function(event, ui) {
+	        $('.ui-helper-hidden-accessible').remove();
+		},
+		open: function() {
+			$('.ui-autocomplete').addClass('ui-hdr-agent-dropdown').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	});
+	
+	$('#match-user-email').keyup(function(e) {
+		var oldVal = $(this).attr('val');
+		var cuurentVal = $(this).val();
+		if(oldVal == cuurentVal) {
+			return;
+		}
+		$(this).attr('agent-id', "");
+		$(this).attr('column-name', "");
+		$(this).attr('email-id', "");
+	});
+}
 
 //send survey popup admin events
 function attachAutocompleteUserListDropdown(){

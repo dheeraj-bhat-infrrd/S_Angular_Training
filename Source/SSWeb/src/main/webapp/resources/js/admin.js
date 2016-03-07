@@ -334,6 +334,7 @@ $(document).on('click', '.comp-row', function(e) {
 function bindUserLoginEvent() {
 	console.log("inside admin");
 	$('.user-login-icn').on('click', function(e) {
+		$( '.user-login-icn').unbind( "click" );
 		e.stopImmediatePropagation();
 		var payload = {
 			"colName" : "userId",

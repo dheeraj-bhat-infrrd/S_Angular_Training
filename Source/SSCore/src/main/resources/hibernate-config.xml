@@ -79,6 +79,7 @@
 				<value>com.realtech.socialsurvey.core.entities.UserEmailMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.ZillowTempPost</value>
 				<value>com.realtech.socialsurvey.core.entities.ExternalSurveyTracker</value>
+				<value>com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping</value>
 			</list>
 		</property>
 	</bean>

@@ -148,4 +148,30 @@ public class UtilsTest {
     {
         assertTrue( "Review is not considered abusive", utils.checkReviewForSwearWords( "you sir are an ass", swearWords ) );
     }
+
+    @Test
+    public void testUnmaskEmailAddressActuallyMasked()
+    {
+        Whitebox.setInternalState( utils, "maskingPrefix", "" );
+        Whitebox.setInternalState( utils, "maskingSuffix", "@xyz.com" );
+        assertEquals( "Unmask successful", "test@abc.com", utils.unmaskEmailAddress( "test+abc.com@xyz.com" ) );
+    }
+    
+    
+    @Test
+    public void testUnmaskEmailAddressNotMasked()
+    {
+        Whitebox.setInternalState( utils, "maskingPrefix", "" );
+        Whitebox.setInternalState( utils, "maskingSuffix", "@abc.com" );
+        assertEquals( "Unmask successful", "test+xy@abc.com", utils.unmaskEmailAddress( "test+xy@abc.com" ) );
+    }
+    
+    
+    @Test
+    public void testUnmaskEmailAddressWithPlusNotMasked()
+    {
+        Whitebox.setInternalState( utils, "maskingPrefix", "test" );
+        Whitebox.setInternalState( utils, "maskingSuffix", "@abc.com" );
+        assertEquals( "Unmask successful", "test+1@abc.com", utils.unmaskEmailAddress( "test+1@abc.com" ) );
+    }
 }

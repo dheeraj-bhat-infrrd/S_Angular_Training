@@ -78,6 +78,7 @@ import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.controller.SessionHelper;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
 import facebook4j.FacebookException;
@@ -129,6 +130,9 @@ public class SurveyManagementController
 
     @Autowired
     private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private SessionHelper sessionHelper;
 
     @Resource
     @Qualifier ( "nocaptcha")
@@ -284,7 +288,7 @@ public class SurveyManagementController
                 String surveyScore = String.valueOf( survey.getScore() );
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
-                        customerName, surveyScore , logoUrl );
+                        customerName, surveyScore, logoUrl );
                 }
 
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
@@ -304,7 +308,7 @@ public class SurveyManagementController
                             .getMoodList().contains( mood.toLowerCase() ) ) ) ) {
                         survey.setUnderResolution( true );
                         surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
-                        
+
                         //SS-1435: Send survey details too.
                         emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), customerName,
                             customerEmail, mood, surveyScore, surveyDetail );
@@ -1120,7 +1124,8 @@ public class SurveyManagementController
         try {
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
             if ( agentSettings != null ) {
-                if ( agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
+                if ( agentSettings.getProfileImageUrlThumbnail() != null
+                    && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
                     picLocation = agentSettings.getProfileImageUrlThumbnail();
                 }
             }
@@ -1577,12 +1582,7 @@ public class SurveyManagementController
         }
 
         //Flags to check if any particular text is not set in the companySettings
-        boolean isHappyTextSet = false, 
-            isNeutralTextSet = false, 
-            isSadTextSet = false,
-            isHappyTextCompleteSet = false, 
-            isNeutralTextCompleteSet = false, 
-            isSadTextCompleteSet = false;
+        boolean isHappyTextSet = false, isNeutralTextSet = false, isSadTextSet = false, isHappyTextCompleteSet = false, isNeutralTextCompleteSet = false, isSadTextCompleteSet = false;
 
         if ( unitSettings != null ) {
             SurveySettings surveySettings = unitSettings.getSurvey_settings();
@@ -1621,10 +1621,9 @@ public class SurveyManagementController
                 }
             }
         }
-        
+
         //If any of the texts are not set by the company, store default values for them.
-        if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet 
-            && isSadTextCompleteSet ) ) {
+        if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet ) ) {
             SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
             if ( !isHappyTextSet ) {
                 surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
@@ -1645,7 +1644,7 @@ public class SurveyManagementController
                 surveyAndStage.put( "sadTextComplete", defaultSurveySettings.getSadTextComplete() );
             }
         }
-        
+
         AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
 
         // Fetching Yelp Url
@@ -1657,7 +1656,8 @@ public class SurveyManagementController
                 surveyAndStage.put( "yelpLink", agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
             } else {
                 // Adding Yelp Url of the closest in hierarchy connected with Yelp.
-                if ( branchSettings != null && branchSettings.getOrganizationUnitSettings() != null
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
@@ -1915,5 +1915,6 @@ public class SurveyManagementController
         }
         return phrase;
     }
+
 }
 // JIRA SS-119 by RM-05 : EOC

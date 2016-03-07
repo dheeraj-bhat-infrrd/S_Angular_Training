@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -44,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -158,6 +160,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Autowired
     private UrlService urlService;
 
+    @Autowired
+    private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
     /**
      * Method to store question and answer format into mongo.
@@ -1389,6 +1393,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> invalidAgents = new ArrayList<>();
         List<SurveyPreInitiation> customersWithoutName = new ArrayList<>();
         List<SurveyPreInitiation> customersWithoutEmailId = new ArrayList<>();
+        List<SurveyPreInitiation> ignoredEmailRecords = new ArrayList<>();
+        List<SurveyPreInitiation> oldRecords = new ArrayList<>();
+        
         Set<Long> companies = new HashSet<>();
         for ( SurveyPreInitiation survey : surveys ) {
             int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
@@ -1432,7 +1439,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 }
 
             }
-            if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
+            Timestamp engagementClosedTime = survey.getEngagementClosedTime();
+            Calendar calendar = Calendar.getInstance();
+            calendar.add( Calendar.DATE, - validSurveyInterval );
+            Date date = calendar.getTime();
+            
+             if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
                 LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 unavailableAgents.add( survey );
@@ -1448,7 +1460,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 customersWithoutEmailId.add( survey );
                 companies.add( survey.getCompanyId() );
-            } else if ( user == null ) {
+            } else if ( user == null && isEmailIsIgnoredEmail(survey.getAgentEmailId() , survey.getCompanyId() ) ) {
+                LOG.error( "no agent found with this email id and its an ignored record" );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD;
+                ignoredEmailRecords.add( survey );
+                companies.add( survey.getCompanyId() );
+            } else if(engagementClosedTime.before( date )){
+                LOG.info( "An old record found : " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
+                oldRecords.add( survey );
+                companies.add( survey.getCompanyId() );
+            }else if ( user == null ) {
                 LOG.error( "no agent found with this email id" );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 invalidAgents.add( survey );
@@ -1482,11 +1504,35 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         corruptRecords.put( "customersWithoutName", customersWithoutName );
         corruptRecords.put( "customersWithoutEmailId", customersWithoutEmailId );
         corruptRecords.put( "invalidAgents", invalidAgents );
+        corruptRecords.put( "ignoredEmailRecords", ignoredEmailRecords );
+        corruptRecords.put( "oldRecords", oldRecords );
         corruptRecords.put( "companies", companies );
         return corruptRecords;
     }
 
-
+    /**
+     * 
+     * @param emailId
+     * @return
+     */
+    boolean isEmailIsIgnoredEmail(String emailId , long companyId){
+        LOG.debug( "Inside method isEmailIsIgnoredEmail for email : " + emailId );
+        Map<String, Object> queries = new  HashMap<String, Object>();
+        queries.put( "emailId", emailId );
+        queries.put( "company.companyId", companyId );
+        List<CompanyIgnoredEmailMapping> companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.findByKeyValue( CompanyIgnoredEmailMapping.class, queries );
+        if(companyIgnoredEmailMapping == null || companyIgnoredEmailMapping.size() == 0)
+            return false;
+        else
+            return true;
+    }
+    
+    /**
+     * 
+     * @param user
+     * @param surveyPreInitiation
+     * @return
+     */
     int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
     {
         LOG.info( "Inside method validateUnitSettingsForDotloop " );
