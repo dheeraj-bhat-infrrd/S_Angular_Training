@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.vo;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.List;
 
 import com.braintreegateway.CreditCard;
@@ -13,7 +12,7 @@ public class TransactionVO
     private String id;
     
     private BigDecimal amount;
-    private Calendar createdAt;
+    private String createdAt;
     private CreditCard creditCard;
     
     private Status status;
@@ -43,11 +42,11 @@ public class TransactionVO
     {
         this.amount = amount;
     }
-    public Calendar getCreatedAt()
+    public String getCreatedAt()
     {
         return createdAt;
     }
-    public void setCreatedAt( Calendar createdAt )
+    public void setCreatedAt( String createdAt )
     {
         this.createdAt = createdAt;
     }

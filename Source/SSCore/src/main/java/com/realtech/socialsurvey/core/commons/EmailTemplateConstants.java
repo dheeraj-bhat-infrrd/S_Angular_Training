@@ -129,4 +129,7 @@ public final class EmailTemplateConstants {
     
     public static final String BILLING_REPORT_MAIL_SUBJECT = "BillingReportMailSubject.txt";
     public static final String BILLING_REPORT_MAIL_BODY = "BillingReportMailBody.html";
+    
+    public static final String SEND_REPORT_MAIL_SUBJECT = "sendReportMailSubject.txt";
+    public static final String SEND_REPORT_MAIL_BODY = "sendReportMailBody.html";
 }

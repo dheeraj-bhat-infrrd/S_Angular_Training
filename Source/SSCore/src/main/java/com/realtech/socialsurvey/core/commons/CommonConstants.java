@@ -421,6 +421,11 @@ public interface CommonConstants
     public static final String TEMP_FOLDER = "Temp";
     public static final String LINKEDIN_URL_PART = "licdn";
     public static final String FILE_SEPARATOR = "/";
+    
+    public static final String ACTIVE_SUBSCRIPTION_MAIL_SUBJECT = "Active Subscription List in Braintree";
+    public static final String TRANSACTION_LIST_MAIL_SUBJECT = "Transaction list for Subscription ";
+    
+    public static final String ADMIN_RECEPIENT_DISPLAY_NAME = "Admin";
 
     /**
      * Email templates config

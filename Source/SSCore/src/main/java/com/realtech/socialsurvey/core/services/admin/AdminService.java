@@ -17,4 +17,8 @@ public interface AdminService
 
     List<Company> getAllAutoBillingModeCompanies();
 
+    boolean generateTransactionListExcelAndMail( List<TransactionVO> transactionVOs, List<String> recipientMailIds , String subscriptionId );
+
+    boolean generateSubscriptionListExcelAndMail( List<SubscriptionVO> subscriptionVOs, List<String> recipientMailIds );
+
 }
