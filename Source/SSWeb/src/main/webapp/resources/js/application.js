@@ -7765,7 +7765,7 @@ function fetchUntrackedUser(isNextBatch) {
 	};
 	
 	isAjaxRequestRunningUnmatchedUser = true;
-	callAjaxGetWithPayloadData("./survey/getunmatchedpreinitiatedsurveys.do", function(data) {  
+	callAjaxGetWithPayloadData("./getunmatchedpreinitiatedsurveys.do", function(data) {  
 		isAjaxRequestRunningUnmatchedUser = false;
 		if (data.errCode == undefined) {
 			if(data != "") {
@@ -7858,7 +7858,7 @@ function fetchProcessedUser(isNextBatch) {
 	};
 	
 	isAjaxRequestRunningProcessedUser = true;
-	callAjaxGetWithPayloadData("./survey/getprocessedpreinitiatedsurveys.do", function(data) {  
+	callAjaxGetWithPayloadData("./getprocessedpreinitiatedsurveys.do", function(data) {  
 		isAjaxRequestRunningProcessedUser = false;
 		if (data.errCode == undefined) {
 			if(data != "") {
@@ -8061,7 +8061,7 @@ function saveUserMap(aliasMail){
 		console.log("agentId :" +agentId);
 		console.log("ignoredEmail :" +isIgnore);
 		isAjaxRequestRunningProcessedUser = true;
-		callAjaxGetWithPayloadData('./survey/saveemailmapping.do', function(data){
+		callAjaxGetWithPayloadData('./saveemailmapping.do', function(data){
 			$('#overlay-main').hide();
 			$('#overlay-toast').html(data);
 			showToast();
