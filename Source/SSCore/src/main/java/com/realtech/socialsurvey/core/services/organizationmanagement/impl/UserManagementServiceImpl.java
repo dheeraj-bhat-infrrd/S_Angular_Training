@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
@@ -191,6 +192,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     
     @Autowired
     private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
+    
+    @Autowired
+    private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -3598,4 +3602,62 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userDao.update( userToBeDeactivated );
     }
 
+    
+    
+    @Transactional
+    @Override
+    public User saveEmailUserMapping( String emailId , long userId ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method to saveEmailUserMapping for : " + emailId + " started." );
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty" );
+        }
+        User user = userDao.findById( User.class, userId );
+        
+        if(user == null){
+            throw new InvalidInputException( "No user found for agent id : " + userId );
+        }
+        
+        UserEmailMapping userEmailMapping = new UserEmailMapping();
+        userEmailMapping.setCompany( user.getCompany() );
+        userEmailMapping.setEmailId( emailId );
+        userEmailMapping.setUser( user );
+        userEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
+        
+        userEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        userEmailMapping.setCreatedBy( "ADMIN" );
+        userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        userEmailMapping.setModifiedBy( "ADMIN" );
+        
+        userEmailMappingDao.save( userEmailMapping );
+        return  user;
+    }
+    
+    
+    @Transactional
+    @Override
+    public CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId , long companyId ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method to saveIgnoredEmailCompanyMapping for  : " + emailId + " started." );
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty" );
+        }
+        Company company = companyDao.findById( Company.class, companyId );
+        
+        if(company == null){
+            throw new InvalidInputException( "No company found for company id : " + companyId );
+        }
+        
+        CompanyIgnoredEmailMapping companyIgnoredEmailMapping = new CompanyIgnoredEmailMapping();
+        companyIgnoredEmailMapping.setCompany( company );
+        companyIgnoredEmailMapping.setEmailId( emailId );
+        
+        companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
+        companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        companyIgnoredEmailMapping.setModifiedBy( "ADMIN" );
+        
+        companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.save( companyIgnoredEmailMapping );
+        return  companyIgnoredEmailMapping;
+    }
 }

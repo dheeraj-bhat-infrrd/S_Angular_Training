@@ -33,6 +33,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyPreInitiationDaoImpl.class);
 
+	private static final String proceesedCurruptedSurvey = "select SURVEY_PRE_INITIATION_ID ,  SURVEY_SOURCE_ID  , COMPANY_ID , AGENT_EMAILID , "
+        + "CUSTOMER_FIRST_NAME  , CUSTOMER_LAST_NAME , CUSTOMER_EMAIL_ID , AGENT_ID , STATUS , CREATED_ON , ENGAGEMENT_CLOSED_TIME  from " + "SURVEY_PRE_INITIATION "
+        + " where COMPANY_ID= :companyId AND ( (AGENT_EMAILID IN " 
+        + " (select EMAIL_ID from USER_EMAIL_MAPPING where COMPANY_ID=:companyId) ) OR  ( AGENT_EMAILID IN " 
+        + " (select EMAIL_ID from COMPANY_IGNORED_EMAIL_MAPPING where COMPANY_ID=:companyId) ) )";
+	
 	@Override
 	public Timestamp getLastRunTime(String source) throws InvalidInputException {
 		LOG.info("Get the max created time for source " + source);
@@ -428,5 +434,113 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         query.executeUpdate();
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " ended." );
+    }
+    
+    
+    
+ // Method to get incomplete survey list for sending reminder mail.
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys(long companyId, int start, int batch) {
+        LOG.info("Method getUnmatchedPreInitiatedSurveys() started.");
+        Criteria criteria = getSession().createCriteria(SurveyPreInitiation.class);
+        try {
+            criteria.add(Restrictions.eq(CommonConstants.COMPANY_ID_COLUMN, companyId));
+            criteria.add(Restrictions.eq(CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID));
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
+
+            criteria.addOrder( Order.desc( "createdOn" ) );
+            
+            if ( start > -1 )
+                criteria.setFirstResult( start );
+            if ( batch > -1 )
+                criteria.setMaxResults( batch );
+            LOG.info("Method getUnmatchedPreInitiatedSurveys() finished.");
+            return criteria.list();
+        }
+        catch (HibernateException e) {
+            LOG.error("Exception caught in getUnmatchedPreInitiatedSurveys() ", e);
+            throw new DatabaseException("Exception caught in getUnmatchedPreInitiatedSurveys() ", e);
+        }
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<SurveyPreInitiation> getProcessedPreInitiatedSurveys(long companyId, int start, int batch) {
+        LOG.info("Method getUnmatchedPreInitiatedSurveys() started.");
+        
+        Query query = getSession().createSQLQuery( proceesedCurruptedSurvey );
+        query.setParameter( "companyId", companyId );
+        if ( start > -1 ) {
+            query.setFirstResult( start );
+        }
+        if ( batch > -1 ) {
+            query.setMaxResults( batch );
+        }
+        
+        LOG.debug( "QUERY : " + query.getQueryString() );
+        List<Object[]> rows = (List<Object[]>) query.list();
+        List<SurveyPreInitiation> surveyPreInitiations = new ArrayList<SurveyPreInitiation>();
+        for ( Object[] row : rows ) {
+            SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+            surveyPreInitiation.setSurveyPreIntitiationId( Long.parseLong( String.valueOf( row[0] ) ) );
+            surveyPreInitiation.setSurveySourceId( String.valueOf( row[1] ) );
+            surveyPreInitiation.setCompanyId( Long.parseLong( String.valueOf( row[2] ) ) );
+            surveyPreInitiation.setAgentEmailId( String.valueOf( row[3] ) );
+            surveyPreInitiation.setCustomerFirstName( String.valueOf( row[4] ) );
+            surveyPreInitiation.setCustomerLastName( String.valueOf( row[5] ) );
+            surveyPreInitiation.setCustomerEmailId( String.valueOf( row[6] ) );
+            surveyPreInitiation.setAgentId( Long.valueOf(String.valueOf( row[7] ) ) );
+            surveyPreInitiation.setStatus( Integer.valueOf(String.valueOf( row[8] ) ) );
+            surveyPreInitiation.setCreatedOn( Timestamp.valueOf( String.valueOf( row[9] ) ) );
+            surveyPreInitiation.setEngagementClosedTime( Timestamp.valueOf( String.valueOf( row[10] ) ) );
+            surveyPreInitiations.add( surveyPreInitiation );
+            
+        }
+        
+        
+        return surveyPreInitiations;      
+    }
+    
+    
+    
+    /**
+     * Method to update agent info when survey moved from one user to another
+     * @throws InvalidInputException
+     * */
+    @Override
+    public void updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( User agent, String agentEmailAddress ) throws InvalidInputException
+    {
+        if ( agent == null ) {
+            throw new InvalidInputException( "Null parameter user passed " );
+        }
+
+        if ( agentEmailAddress == null ) {
+            throw new InvalidInputException( "agentEmailAddress passed cannot be null" );
+        }
+        LOG.info( "Method to update updateAgentIdOfPreInitiatedSurveys started." );
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET STATUS = "+ CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED +"  WHERE AGENT_EMAILID = ? AND STATUS = " + CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameter( 0, agentEmailAddress );
+        
+        query.executeUpdate();
+        LOG.info( "Method updateAgentIdOfPreInitiatedSurveys  ended." );
+    }
+    
+    
+    @Override
+    public void updateSurveyPreinitiationRecordsAsIgnored( String agentEmailAddress ) throws InvalidInputException
+    {
+        if ( agentEmailAddress == null ) {
+            throw new InvalidInputException( "agentEmailAddress passed cannot be null" );
+        }
+        LOG.info( "Method to update updateSurveyPreinitiationRecordsAsIgnored started." );
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET  STATUS = "+ CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD +"  WHERE AGENT_EMAILID = ? AND STATUS = " + CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameter( 0 , agentEmailAddress );
+        
+        query.executeUpdate();
+        LOG.info( "Method updateSurveyPreinitiationRecordsAsIgnored  ended." );
     }
 }

@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.entities;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -118,8 +119,28 @@ public class Company implements Serializable {
 
     @Column ( name = "ZILLOW_AVERAGE_SCORE")
     private double zillowAverageScore;
+    
+    
+    // bi-directional many-to-one association to UserEmailMapping
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    private List<UserEmailMapping> userEmailMappings;
+    
+    // bi-directional many-to-one association to UserEmailMapping
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    private List<CompanyIgnoredEmailMapping> companyIgnoredEmailMappingList;
+    
 
-	public Company() {}
+	public List<UserEmailMapping> getUserEmailMappings()
+    {
+        return userEmailMappings;
+    }
+
+    public void setUserEmailMappings( List<UserEmailMapping> userEmailMappings )
+    {
+        this.userEmailMappings = userEmailMappings;
+    }
+
+    public Company() {}
 
 	public long getCompanyId() {
 		return this.companyId;
@@ -514,5 +535,15 @@ public class Company implements Serializable {
     public void setZillowAverageScore( double zillowAverageScore )
     {
         this.zillowAverageScore = zillowAverageScore;
+    }
+
+    public List<CompanyIgnoredEmailMapping> getCompanyIgnoredEmailMappingList()
+    {
+        return companyIgnoredEmailMappingList;
+    }
+
+    public void setCompanyIgnoredEmailMappingList( List<CompanyIgnoredEmailMapping> companyIgnoredEmailMappingList )
+    {
+        this.companyIgnoredEmailMappingList = companyIgnoredEmailMappingList;
     }
 }

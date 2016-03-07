@@ -7,6 +7,7 @@ import java.util.Set;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -521,6 +522,13 @@ public interface UserManagementService
 
     void deleteSSAdmin( User admin, long ssAdminId ) throws InvalidInputException;
 
+
+    User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException,
+        NoRecordsFetchedException;
+
+
+    CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId ) throws InvalidInputException,
+        NoRecordsFetchedException;
 
     public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException;
 }

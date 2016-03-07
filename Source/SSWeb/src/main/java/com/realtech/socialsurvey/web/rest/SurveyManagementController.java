@@ -56,6 +56,7 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -78,6 +79,7 @@ import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.controller.SessionHelper;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
 import facebook4j.FacebookException;
@@ -129,6 +131,9 @@ public class SurveyManagementController
 
     @Autowired
     private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private SessionHelper sessionHelper;
 
     @Resource
     @Qualifier ( "nocaptcha")
@@ -284,7 +289,7 @@ public class SurveyManagementController
                 String surveyScore = String.valueOf( survey.getScore() );
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
-                        customerName, surveyScore , logoUrl );
+                        customerName, surveyScore, logoUrl );
                 }
 
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey
@@ -304,7 +309,7 @@ public class SurveyManagementController
                             .getMoodList().contains( mood.toLowerCase() ) ) ) ) {
                         survey.setUnderResolution( true );
                         surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
-                        
+
                         //SS-1435: Send survey details too.
                         emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), customerName,
                             customerEmail, mood, surveyScore, surveyDetail );
@@ -1120,7 +1125,8 @@ public class SurveyManagementController
         try {
             AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
             if ( agentSettings != null ) {
-                if ( agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
+                if ( agentSettings.getProfileImageUrlThumbnail() != null
+                    && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
                     picLocation = agentSettings.getProfileImageUrlThumbnail();
                 }
             }
@@ -1577,12 +1583,7 @@ public class SurveyManagementController
         }
 
         //Flags to check if any particular text is not set in the companySettings
-        boolean isHappyTextSet = false, 
-            isNeutralTextSet = false, 
-            isSadTextSet = false,
-            isHappyTextCompleteSet = false, 
-            isNeutralTextCompleteSet = false, 
-            isSadTextCompleteSet = false;
+        boolean isHappyTextSet = false, isNeutralTextSet = false, isSadTextSet = false, isHappyTextCompleteSet = false, isNeutralTextCompleteSet = false, isSadTextCompleteSet = false;
 
         if ( unitSettings != null ) {
             SurveySettings surveySettings = unitSettings.getSurvey_settings();
@@ -1621,10 +1622,9 @@ public class SurveyManagementController
                 }
             }
         }
-        
+
         //If any of the texts are not set by the company, store default values for them.
-        if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet 
-            && isSadTextCompleteSet ) ) {
+        if ( !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet ) ) {
             SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
             if ( !isHappyTextSet ) {
                 surveyAndStage.put( "happyText", defaultSurveySettings.getHappyText() );
@@ -1645,7 +1645,7 @@ public class SurveyManagementController
                 surveyAndStage.put( "sadTextComplete", defaultSurveySettings.getSadTextComplete() );
             }
         }
-        
+
         AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
 
         // Fetching Yelp Url
@@ -1657,7 +1657,8 @@ public class SurveyManagementController
                 surveyAndStage.put( "yelpLink", agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
             } else {
                 // Adding Yelp Url of the closest in hierarchy connected with Yelp.
-                if ( branchSettings != null && branchSettings.getOrganizationUnitSettings() != null
+                if ( branchSettings != null
+                    && branchSettings.getOrganizationUnitSettings() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken() != null
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getYelpToken().getYelpPageLink() != null ) {
@@ -1914,6 +1915,154 @@ public class SurveyManagementController
             }
         }
         return phrase;
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/getunmatchedpreinitiatedsurveys", method = RequestMethod.GET)
+    public String getUnmatchedPreinitiatedSurveys( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to get getUnmatchedPreinitiatedSurveys started" );
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+
+        if ( startIndexStr == null || batchSizeStr == null ) {
+            LOG.error( "Null value found for startIndex or batch size." );
+            return "Null value found for startIndex or batch size.";
+        }
+
+        List<SurveyPreInitiation> surveyPreInitiations = null;
+        int startIndex;
+        int batchSize;
+        try {
+
+            User user = sessionHelper.getCurrentUser();
+            if ( user == null || user.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
+
+            try {
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while trying to convert startIndex or batchSize or companyId  Nested exception is ",
+                    e );
+                throw e;
+            }
+
+
+            surveyPreInitiations = socialManagementService.getUnmatchedPreInitiatedSurveys( user.getCompany().getCompanyId(),
+                startIndex, batchSize );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+        }
+        LOG.info( "Method to get posts for the user, getUnmatchedPreinitiatedSurveys() finished" );
+        return new Gson().toJson( surveyPreInitiations );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/getprocessedpreinitiatedsurveys", method = RequestMethod.GET)
+    public String getProcessedPreInitiatedSurveys( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to get getProcessedPreInitiatedSurveys started" );
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+        List<SurveyPreInitiation> surveyPreInitiations = null;
+        int startIndex;
+        int batchSize;
+
+        if ( startIndexStr == null || batchSizeStr == null ) {
+            LOG.error( "Null value found for startIndex or batch size." );
+            return "Null value found for startIndex or batch size.";
+        }
+        try {
+
+            User user = sessionHelper.getCurrentUser();
+            if ( user == null || user.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
+            try {
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while trying to convert startIndex or batchSize or companyId  Nested exception is ",
+                    e );
+                throw e;
+            }
+
+            surveyPreInitiations = socialManagementService.getProcessedPreInitiatedSurveys( user.getCompany().getCompanyId(),
+                startIndex, batchSize );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+        }
+        LOG.info( "Method to get posts for the user, getProcessedPreInitiatedSurveys() finished" );
+        return new Gson().toJson( surveyPreInitiations );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/saveemailmapping", method = RequestMethod.GET)
+    public String saveUserEmailMapping( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to get saveUserEmailMapping started" );
+        String emailAddress = request.getParameter( "emailAddress" );
+        String agentIdStr = request.getParameter( "agentId" );
+        String ignoredEmailStr = request.getParameter( "ignoredEmail" );
+
+        try {
+            boolean ignoredEmail;
+            long agentId;
+
+            try {
+                agentId = Integer.parseInt( agentIdStr );
+                ignoredEmail = Boolean.parseBoolean( ignoredEmailStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException caught while trying to convert agentId Nested exception is ", e );
+                throw e;
+            }
+            if ( emailAddress == null || emailAddress.isEmpty() ) {
+                throw new InvalidInputException( "Email Id can't be null or empty" );
+            }
+            
+            User loggedInUser = sessionHelper.getCurrentUser();
+            if ( loggedInUser == null || loggedInUser.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
+            
+            
+
+            try {
+                User existingUser = userManagementService.getUserByEmailAddress( emailAddress );
+                if ( existingUser != null )
+                    throw new UserAlreadyExistsException( "The email addresss " +emailAddress+ " is already present in our database." );
+            } catch ( NoRecordsFetchedException e ) {
+                if ( ignoredEmail ) {
+                    userManagementService.saveIgnoredEmailCompanyMapping( emailAddress, loggedInUser.getCompany().getCompanyId() );
+                    socialManagementService.updateSurveyPreinitiationRecordsAsIgnored( emailAddress );
+                } else {
+                    User user = userManagementService.saveEmailUserMapping( emailAddress, agentId );
+                    socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailAddress );
+                }
+            }
+
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            if(nonFatalException.getMessage() != null && !nonFatalException.getMessage().isEmpty()){
+                return nonFatalException.getMessage();
+            }
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        LOG.info( "Method to get posts for the user, saveUserEmailMapping() finished" );
+        return messageUtils.getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL,
+            DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
     }
 }
 // JIRA SS-119 by RM-05 : EOC

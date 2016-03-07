@@ -5141,6 +5141,26 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	font-family: opensanslight;
 	font-weight: bold !important;
 }
+.bd-frm-left-un { 
+	line-height: 40px;
+	margin-right: 20px;
+	width: 25%;
+	min-width: 96px;
+	min-height: 10px;
+	text-align: right;
+	font-family: opensanslight;
+	font-weight: bold !important;
+}
+.bd-frm-right-un{
+	line-height: 40px;
+	margin-right: 20px;
+	width: 60%;
+	min-width: 96px;
+	min-height: 10px;
+	text-align: right;
+	font-family: opensanslight;
+	text-align: left;
+}
 
 .bd-frm-right {
 	width: 50%;
@@ -8361,6 +8381,29 @@ label.url-change-input-label {
 	border-radius: 0; */
 	text-align: center;
 	padding: 10px;
+}
+/* untracked user */
+
+.unmatchtab{
+	padding: 10px 0px;
+    margin: 0px 0px;
+        text-align: center;
+        overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.unhr-row{
+	font-weight:600 !important;
+}
+.un-row{
+	border-bottom:1px solid #dcdcdc;
+	    height: 40px;
+}
+.un-heading{
+	border-top: #d2dedf 1px solid;
+    font-weight: 600 !important;
+    margin-top: 30px;
+    padding: 10px;
 }
 
 .hier-upload-td {
