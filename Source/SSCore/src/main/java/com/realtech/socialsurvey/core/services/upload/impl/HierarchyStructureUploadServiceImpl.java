@@ -1563,10 +1563,14 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             || ( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) ) {
             throw new UserAdditionException( "User : " + user.getEmailId() + "either belongs to a different company or doesn't exist" );
         }
-        
-        User assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
+        User assigneeUser = null;
+        try {
+            assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
+        } catch ( InvalidInputException e ){
+            LOG.warn( e.getMessage() );
+        }
         if ( assigneeUser == null ) {
-            assigneeUser = userManagementService.getUserByEmailAddress( user.getEmailId() );
+            assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
         }
         if ( assigneeUser == null ) {
             throw new InvalidInputException( "Couldn't find user : " + user.getSourceUserId() );
@@ -1677,10 +1681,14 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             || ( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) ) {
             throw new UserAdditionException( "User : " + user.getEmailId() + " belongs to a different company" );
         }
-        
-        User assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
+        User assigneeUser = null;
+        try {
+        assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
+        } catch ( InvalidInputException e ) {
+            LOG.warn( e.getMessage() );
+        }
         if ( assigneeUser == null ) {
-            assigneeUser = userManagementService.getUserByEmailAddress( user.getEmailId() );
+            assigneeUser = userManagementService.getUserByEmailAddress(  extractEmailId( user.getEmailId() )  );
         }
         if ( assigneeUser == null ) {
             throw new InvalidInputException( "Couldn't find user : " + user.getSourceUserId() );
