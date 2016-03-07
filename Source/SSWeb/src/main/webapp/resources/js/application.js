@@ -7963,12 +7963,14 @@ function userSwitchToCompAdmin() {
 function bindAppUserLoginEvent() {
 	$('.user-login-icn').off('click');
 	$('.user-login-icn').on('click', function(e) {
+		$( '.user-login-icn').unbind( "click" );
 		e.stopImmediatePropagation();
 		var payload = {
 			"colName" : "userId",
 			"colValue" : $(this).attr('data-iden')
 		};
 		callAjaxGETWithTextData("/logincompanyadminas.do", function(data) {
+			
 			window.location = getLocationOrigin() + '/userlogin.do';
 		}, true, payload,'.user-login-icn');
 	});
