@@ -810,7 +810,7 @@ public class HierarchyManagementController {
 			try {
 				LOG.debug("Calling service to add/assign invidual(s)");
 				Map<String, Object> map = organizationManagementService.addIndividual(user, selectedUserId, branchId, regionId, assigneeEmailIds,
-						isAdmin, false);
+						isAdmin, false, true);
 				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
 				LOG.debug("Successfully executed service to add a new branch");
 				String invalidMessage = "These email address ";
@@ -2033,7 +2033,7 @@ public class HierarchyManagementController {
 								String firstName = (userEntity.getFirstName() != null) ? userEntity.getFirstName() : userEntity.getEmailId()
 										.substring(0, userEntity.getEmailId().indexOf("@"));
 								String lastName = (userEntity.getLastName() != null) ? userEntity.getLastName() : null;
-								userManagementService.inviteUserToRegister(admin, firstName, lastName, userEntity.getEmailId(), false);
+								userManagementService.inviteUserToRegister(admin, firstName, lastName, userEntity.getEmailId(), false, true);
 
 								userEntity = new UserFromSearch();
 							}

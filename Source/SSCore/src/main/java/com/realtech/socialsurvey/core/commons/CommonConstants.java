@@ -123,6 +123,8 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
     public static final int STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD = 5;
     public static final int STATUS_SURVEYPREINITIATION_COMPLETE = 7;
+    public static final int STATUS_SURVEYPREINITIATION_OLD_RECORD = 8;
+    public static final int STATUS_SURVEYPREINITIATION_IGNORED_RECORD = 9;
 
     /**
      * Hibernate entities and column name constants
@@ -1013,5 +1015,25 @@ public interface CommonConstants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
+    
+    //Hierarchy Upload constants
+    public static final String HIERARCHY_UPLOAD_COLLECTION = "HIERARCHY_UPLOAD";
+    
     public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&returncompletecontent=true&count=50";
+    
+    public static final String HIERARCHY_REGION_HEADERS_INVALID = "Invalid headers in the Regions sheet";
+    
+    public static final String HIERARCHY_BRANCH_HEADERS_INVALID = "Invalid headers in the Offices sheet";
+    
+    public static final String HIERARCHY_USER_HEADERS_INVALID = "Invalid headers in the Users sheet";
+    
+    //Hierarchy upload error constants
+    public static final String USER_UPLOAD_ERROR_LIST = "USER_UPLOAD";
+    public static final String BRANCH_UPLOAD_ERROR_LIST = "BRANCH_UPLOAD";
+    public static final String REGION_UPLOAD_ERROR_LIST = "REGION_UPLOAD";
+    public static final String USER_DELETE_ERROR_LIST = "USER_DELETE";
+    public static final String BRANCH_DELETE_ERROR_LIST = "BRANCH_DELETE";
+    public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
+    
+    
 }

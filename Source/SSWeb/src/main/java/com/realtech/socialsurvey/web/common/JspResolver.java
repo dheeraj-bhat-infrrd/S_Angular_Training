@@ -108,6 +108,10 @@ public interface JspResolver {
 	//Help Settings
 	public static final String HELP_EDIT="help";
 	
+	//Hierarchy Upload
+	public static final String HIERARCHY_UPLOAD="hierarchyupload";
+	public static final String EDIT_REGION_POPUP="editregionpopup";
+	
 	// Profile Settings
 	public static final String PROFILE_EDIT = "profile_edit";
 	public static final String PROFILE_CONTACT_DETAILS = "profile_contactdetails";

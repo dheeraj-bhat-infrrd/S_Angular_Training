@@ -326,6 +326,10 @@
 	.btn-wid-sm{
 	width:330px !important;
 	}
+	.hierarchy-btn{
+	float:none;
+	margin-top:10px;
+	}
 }
 
 
@@ -523,6 +527,9 @@
 	}
 	.reg-cap-txt{
         width: 256px !important;
+    }
+    #summary{
+       width: 100% !important;
     }
 }
 
