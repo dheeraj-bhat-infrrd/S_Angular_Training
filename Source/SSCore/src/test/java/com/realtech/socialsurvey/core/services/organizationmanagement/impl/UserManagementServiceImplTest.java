@@ -168,7 +168,7 @@ public class UserManagementServiceImplTest
     public void testinviteUserToRegisterForNullFirstName() throws InvalidInputException, SolrException,
         UserAlreadyExistsException, UndeliveredEmailException
     {
-        userManagementServiceImpl.inviteUserToRegister( new User(), null, "test", "test2", false );
+        userManagementServiceImpl.inviteUserToRegister( new User(), null, "test", "test2", false, true );
     }
 
 
@@ -176,7 +176,7 @@ public class UserManagementServiceImplTest
     public void testinviteUserToRegisterForNullEmail() throws InvalidInputException, SolrException, UserAlreadyExistsException,
         UndeliveredEmailException
     {
-        userManagementServiceImpl.inviteUserToRegister( new User(), "test", "test2", null, false );
+        userManagementServiceImpl.inviteUserToRegister( new User(), "test", "test2", null, false, true );
     }
 
 

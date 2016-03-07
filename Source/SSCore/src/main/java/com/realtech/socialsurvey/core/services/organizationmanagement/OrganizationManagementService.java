@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -527,8 +528,8 @@ public interface OrganizationManagementService
      * @throws UserAssignmentException
      */
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
-        UserAssignmentException;
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail ) throws InvalidInputException,
+        NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 
     /**
@@ -1259,6 +1260,13 @@ public interface OrganizationManagementService
      * @return
      */
     public List<HierarchySettingsCompare> mismatchRegionHierarchySettings(List<Region> regions);
+    
+    /**
+     * Validates the upload file
+     * @param uploadFileName
+     * @return
+     */
+    public UploadValidation validateUserUploadSheet(String uploadFileName) throws InvalidInputException;
 
 
     List<Region> getRegionsBySearchKey( String searchKey ) throws InvalidInputException, SolrException;
@@ -1268,5 +1276,9 @@ public interface OrganizationManagementService
 
 
     List<UserFromSearch> getUsersBySearchKey( String searchKey ) throws InvalidInputException, SolrException;
+
+
+    public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,
+        boolean holdSendingMail, boolean sendMail ) throws InvalidInputException;
 
 }

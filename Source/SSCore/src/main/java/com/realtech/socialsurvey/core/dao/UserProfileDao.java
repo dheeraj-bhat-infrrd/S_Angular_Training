@@ -9,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
 /*
@@ -84,4 +85,8 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     void deleteUserProfilesByUser( long userId );
+
+
+    public UserProfile findUserProfile( long userId, long branchId, long regionId, int profilesMasterId )
+        throws InvalidInputException, NoRecordsFetchedException;
 }

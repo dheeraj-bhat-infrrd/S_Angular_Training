@@ -59,7 +59,7 @@ public interface UserManagementService
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
      */
-    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail )
+    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail, boolean sendMail )
         throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
 
 
@@ -529,5 +529,7 @@ public interface UserManagementService
 
     CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId ) throws InvalidInputException,
         NoRecordsFetchedException;
+
+    public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException;
 }
 // JIRA SS-34 BY RM02 BOC
