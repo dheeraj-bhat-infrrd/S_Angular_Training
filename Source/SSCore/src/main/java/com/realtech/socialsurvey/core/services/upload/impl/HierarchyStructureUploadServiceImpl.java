@@ -1326,10 +1326,14 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 List<String> newAssignments = new ArrayList<String>();
                 if ( isAdmin ) {
                     oldAssignments.addAll( currentUserMap.get( user.getSourceUserId() ).getAssignedBranchesAdmin() );
-                    newAssignments.addAll( user.getAssignedBranchesAdmin() );
+                    if ( user.getAssignedBranchesAdmin() != null ) {
+                        newAssignments.addAll( user.getAssignedBranchesAdmin() );
+                    }
                 } else {
                     oldAssignments.addAll( currentUserMap.get( user.getSourceUserId() ).getAssignedBranches() );
-                    newAssignments.addAll( user.getAssignedBranches() );
+                    if ( user.getAssignedBranches() != null ) {
+                        newAssignments.addAll( user.getAssignedBranches() );
+                    }
                 }
 
                 if ( oldAssignments == null || oldAssignments.isEmpty() ) {
@@ -1376,6 +1380,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     organizationManagementService.assignBranchToUser( adminUser, branchId, regionId, assigneeUser, isAdmin );
                 } else {
                     throw new UserAssignmentException( "unable to resolve sourceBranchId : " + sourceBranchId );
+                }
+            }
+            if ( !addedAssignments.isEmpty() ) {
+                if ( isAdmin ) {
+                    assigneeUser.setBranchAdmin( true );
+                    user.setBranchAdmin( true );
+                } else {
+                    assigneeUser.setAgent( true );
+                    user.setAgent( true );
                 }
             }
             //Remove branch assignments
@@ -1445,14 +1458,18 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
             if ( currentUserMap.containsKey( user.getSourceUserId() ) ) {
                 //Existing user
-                List<String> oldAssignments;
-                List<String> newAssignments;
+                List<String> oldAssignments = new ArrayList<String>();
+                List<String> newAssignments = new ArrayList<String>();
                 if ( isAdmin ) {
                     oldAssignments = currentUserMap.get( user.getSourceUserId() ).getAssignedRegionsAdmin();
-                    newAssignments = user.getAssignedRegionsAdmin();
+                    if ( user.getAssignedRegionsAdmin() != null ) {
+                        newAssignments = user.getAssignedRegionsAdmin();
+                    }
                 } else {
                     oldAssignments = currentUserMap.get( user.getSourceUserId() ).getAssignedRegions();
-                    newAssignments = user.getAssignedRegions();
+                    if ( user.getAssignedRegions() != null ) {
+                        newAssignments = user.getAssignedRegions();
+                    }
                 }
 
                 if ( oldAssignments == null || oldAssignments.isEmpty() ) {
@@ -1493,6 +1510,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     organizationManagementService.assignRegionToUser( adminUser, regionId, assigneeUser, isAdmin );
                 } else {
                     throw new UserAssignmentException( "unable to resolve sourceRegionId : " + sourceRegionId );
+                }
+            }
+            if ( !addedAssignments.isEmpty() ) {
+                if ( isAdmin ) {
+                    assigneeUser.setRegionAdmin( true );
+                    user.setRegionAdmin( true );
+                } else {
+                    assigneeUser.setAgent( true );
+                    user.setAgent( true );
                 }
             }
             //Remove region assignments
@@ -1557,6 +1583,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         if ( user.isSendMail() ) {
             resendVerificationMail( user );
         }
+        
+        //Add user to Solr
+        solrSearchService.addUserToSolr( assigneeUser );
 
         return assigneeUser;
     }
@@ -1604,36 +1633,49 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         LOG.info( "Method assignUser() started for user : " + user.getEmailId() );
-        LOG.info( "Method modifyUser() started for user : " + user.getEmailId() );
         if ( !( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) {
             throw new UserAdditionException( "User : " + user.getEmailId() + " belongs to a different company" );
         }
         User assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
-        try {
-            if ( ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() )
-                && ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() )
-                && ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() )
-                && ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) ) {
-                //Assign user to company
+        if ( ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() )
+            && ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() )
+            && ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() )
+            && ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) ) {
+            //Assign user to company
+            try {
                 Region region = organizationManagementService.getDefaultRegionForCompany( adminUser.getCompany() );
                 Branch branch = organizationManagementService.getDefaultBranchForRegion( region.getRegionId() );
                 //userManagementService.assignUserToRegion( adminUser, assigneeUser.getUserId(), region.getRegionId() );
-                userManagementService.assignUserToBranch( adminUser, assigneeUser.getUserId(), branch.getBranchId() );
-            } else {
-                //Agent assignments
-                assigneeUser = assignBranchesToUser( user, adminUser, assigneeUser, currentUserMap, upload, false );
-                assigneeUser = assignRegionsToUser( user, adminUser, assigneeUser, currentUserMap, upload, false );
-                //Admin assignments
-                assigneeUser = assignBranchesToUser( user, adminUser, assigneeUser, currentUserMap, upload, true );
-                assigneeUser = assignRegionsToUser( user, adminUser, assigneeUser, currentUserMap, upload, true );
+                //userManagementService.assignUserToBranch( adminUser, assigneeUser.getUserId(), branch.getBranchId() );
+                organizationManagementService.assignBranchToUser( adminUser, branch.getBranchId(), region.getRegionId(),
+                    assigneeUser, false );
+                assigneeUser.setAgent( true );
+                user.setAgent( true );
+                user.setAssignToCompany( true );
+                user.setBranchAdmin( false );
+                user.setRegionAdmin( false );
+                assigneeUser.setBranchAdmin( false );
+                assigneeUser.setRegionAdmin( false );
+            } catch ( InvalidInputException e ) {
+                if ( e.getMessage() == DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS ) {
+                    LOG.debug( "User assignment already exists" );
+                }
             }
-        } catch ( InvalidInputException e ) {
-            //If it's because the user already exists, don't throw the exception
-            if ( e.getMessage() == DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS ) {
-                LOG.debug( "User assignment already exists" );
-            } else {
-                throw e;
-            }
+        }
+        //Agent assignments
+        assigneeUser = assignBranchesToUser( user, adminUser, assigneeUser, currentUserMap, upload, false );
+        assigneeUser = assignRegionsToUser( user, adminUser, assigneeUser, currentUserMap, upload, false );
+        //Admin assignments
+        assigneeUser = assignBranchesToUser( user, adminUser, assigneeUser, currentUserMap, upload, true );
+        assigneeUser = assignRegionsToUser( user, adminUser, assigneeUser, currentUserMap, upload, true );
+
+        if ( ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() ) ) {
+            assigneeUser.setBranchAdmin( false );
+            user.setBranchAdmin( false );
+        }
+        if ( ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) ) {
+            assigneeUser.setRegionAdmin( false );
+            user.setRegionAdmin( false );
         }
         LOG.info( "Method assignUser() finished for user : " + user.getEmailId() );
         return assigneeUser;
@@ -1935,6 +1977,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.debug( "Inside method updateUserSettingsInMongo " );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
+        //TODO : Add other modifiable fields as well
         if ( agentSettings == null ) {
             throw new InvalidInputException(
                 "No company settings found for user " + user.getUsername() + " " + user.getUserId() );
@@ -1951,6 +1994,18 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             contactDetailsSettings.setContact_numbers( contactNumberSettings );
             contactDetailsSettings.setAbout_me( userUploadVO.getAboutMeDescription() );
             contactDetailsSettings.setTitle( userUploadVO.getTitle() );
+            String fullName = "";
+            if ( userUploadVO.getFirstName() != null && !userUploadVO.getFirstName().isEmpty() ) {
+                contactDetailsSettings.setFirstName( userUploadVO.getFirstName() );
+                fullName = userUploadVO.getFirstName();
+            }
+            if ( userUploadVO.getLastName() != null && !userUploadVO.getLastName().isEmpty() ) {
+                contactDetailsSettings.setLastName( userUploadVO.getLastName() );
+                fullName += " " + userUploadVO.getLastName();
+            }
+            if ( !fullName.isEmpty() ) {
+                contactDetailsSettings.setName( fullName );
+            }
             WebAddressSettings webAddressSettings = contactDetailsSettings.getWeb_addresses();
             if ( webAddressSettings == null ) {
                 webAddressSettings = new WebAddressSettings();
