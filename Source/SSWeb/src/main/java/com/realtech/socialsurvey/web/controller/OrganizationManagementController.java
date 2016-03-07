@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +47,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -57,7 +62,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -67,15 +71,16 @@ import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUns
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
+import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
+import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -97,9 +102,6 @@ public class OrganizationManagementController
     private OrganizationManagementService organizationManagementService;
 
     @Autowired
-    private ProfileManagementService profileManagementService;
-
-    @Autowired
     private UserManagementService userManagementService;
 
     @Autowired
@@ -107,9 +109,6 @@ public class OrganizationManagementController
 
     @Autowired
     private FileUploadService fileUploadService;
-
-    @Autowired
-    private EncryptionHelper encryptionHelper;
 
     @Autowired
     private SessionHelper sessionHelper;
@@ -129,6 +128,21 @@ public class OrganizationManagementController
     @Autowired
     private Payment payment;
 
+    @Autowired
+    private SurveyHandler surveyHandler;
+
+    @Autowired
+    private UrlService urlService;
+
+    @Autowired
+    private HierarchyUploadService hierarchyUploadService;
+
+    @Autowired
+    private HierarchyStructureUploadService hierarchyStructureUploadService;
+
+    @Autowired
+    private UploadValidationService uploadValidationService;
+
     @Value ( "${CDN_PATH}")
     private String endpoint;
 
@@ -140,28 +154,23 @@ public class OrganizationManagementController
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
+
     @Value ( "${NEUTRAL_TEXT}")
     private String neutralText;
+
     @Value ( "${SAD_TEXT}")
     private String sadText;
 
     @Value ( "${HAPPY_TEXT_COMPLETE}")
     private String happyTextComplete;
+
     @Value ( "${NEUTRAL_TEXT_COMPLETE}")
     private String neutralTextComplete;
+
     @Value ( "${SAD_TEXT_COMPLETE}")
     private String sadTextComplete;
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
-
-    @Autowired
-    private SettingsManager settingsManager;
-
-    @Autowired
-    private SurveyHandler surveyHandler;
-
-    @Autowired
-    private UrlService urlService;
 
 
     /**
@@ -574,7 +583,7 @@ public class OrganizationManagementController
                 }
             }
 
-            //Set the app settings in model
+            // Set the app settings in model
             AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
             OrganizationUnitSettings unitSettings = null;
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
@@ -800,6 +809,7 @@ public class OrganizationManagementController
 
     /**
      * Method to enable an encompass connection
+     * 
      * @param model
      * @param request
      * @return
@@ -835,6 +845,7 @@ public class OrganizationManagementController
 
     /**
      * Method to disable an encompass connection
+     * 
      * @param model
      * @param request
      * @return
@@ -867,6 +878,7 @@ public class OrganizationManagementController
 
     /**
      * Method to enable report generation for encompass
+     * 
      * @param model
      * @param request
      * @return
@@ -909,8 +921,8 @@ public class OrganizationManagementController
 
 
     /**
-     * Method to test encompass details / CRM info
-     * NO LONGER USED
+     * Method to test encompass details / CRM info NO LONGER USED
+     * 
      * @param model
      * @param request
      * @return
@@ -941,8 +953,8 @@ public class OrganizationManagementController
 
 
     /**
-     * Method to validate encompass details / CRM info
-     * NO LONGER USED
+     * Method to validate encompass details / CRM info NO LONGER USED
+     * 
      * @param request
      * @return
      */
@@ -1195,7 +1207,7 @@ public class OrganizationManagementController
                 mailBody = defaultMailContent.getMail_body();
                 mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                     organizationManagementService.getSurveyParamOrder( CommonConstants.SURVEY_MAIL_BODY_CATEGORY ) );
-                //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+                // mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
                 message = messageUtils
@@ -1214,7 +1226,7 @@ public class OrganizationManagementController
                 mailBody = defaultMailContent.getMail_body();
                 mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                     organizationManagementService.getSurveyParamOrder( CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY ) );
-                //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+                // mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
                 message = messageUtils
@@ -1233,7 +1245,7 @@ public class OrganizationManagementController
                 mailBody = defaultMailContent.getMail_body();
                 mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                     organizationManagementService.getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_CATEGORY ) );
-                //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+                // mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_MAILBODY_UPDATE_SUCCESSFUL,
@@ -1250,7 +1262,7 @@ public class OrganizationManagementController
                 mailBody = defaultMailContent.getMail_body();
                 mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, organizationManagementService
                     .getSurveyParamOrder( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_CATEGORY ) );
-                //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+                // mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
                 message = messageUtils
@@ -1288,7 +1300,7 @@ public class OrganizationManagementController
                 mailBody = defaultMailContent.getMail_body();
                 mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
                     organizationManagementService.getSurveyParamOrder( CommonConstants.RESTART_SURVEY_MAIL_BODY_CATEGORY ) );
-                //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
+                // mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.RESTART_SURVEY_MAILBODY_UPDATE_SUCCESSFUL,
@@ -1348,7 +1360,6 @@ public class OrganizationManagementController
             } else {
                 throw new InvalidInputException( "Invalid Collection Type" );
             }
-
 
             if ( ratingCategory != null && ratingCategory.equals( "rating-auto-post" ) ) {
                 double autopostRating = Double.parseDouble( request.getParameter( "rating-auto-post" ) );
@@ -1429,12 +1440,14 @@ public class OrganizationManagementController
                 isAutoPostEnabled = Boolean.parseBoolean( autopost );
 
                 OrganizationUnitSettings unitSettings = null;
-                /*OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                    .getCompanyId() );*/
+                /*
+                 * OrganizationUnitSettings companySettings =
+                 * organizationManagementService.getCompanySettings( user.getCompany()
+                 * .getCompanyId() );
+                 */
                 if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                     unitSettings = organizationManagementService.getCompanySettings( entityId );
-
 
                 } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
                     collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
@@ -2263,7 +2276,6 @@ public class OrganizationManagementController
                     throw new InvalidInputException( "Invalid entity type" );
                 }
 
-
                 organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, dotLoopCrmInfo,
                     "com.realtech.socialsurvey.core.entities.DotLoopCrmInfo" );
 
@@ -2380,10 +2392,10 @@ public class OrganizationManagementController
         try {
             User adminUser = userManagementService.getUserByUserId( adminUserid );
 
-            //This method did not set the profile levels as required
-            //userManagementService.setProfilesOfUser(adminUser);
+            // This method did not set the profile levels as required
+            // userManagementService.setProfilesOfUser(adminUser);
 
-            //Added this code to find the highest profile level for the user
+            // Added this code to find the highest profile level for the user
             int profileMasterId = CommonConstants.PROFILES_MASTER_NO_PROFILE_ID;
             for ( UserProfile userProfile : adminUser.getUserProfiles() ) {
                 switch ( userProfile.getProfilesMaster().getProfileId() ) {
@@ -2486,7 +2498,6 @@ public class OrganizationManagementController
 
         String message = "";
         String mailIDStr = new String();
-        HttpSession session = request.getSession();
         User user = sessionHelper.getCurrentUser();
         OrganizationUnitSettings unitSettings = null;
         ComplaintResolutionSettings originalComplaintRegSettings = new ComplaintResolutionSettings();
@@ -2651,6 +2662,176 @@ public class OrganizationManagementController
         // Redirect to complete url found based on the ID.
         return "redirect:" + completeUrl;
     }
+
+
+    @RequestMapping ( value = "/hierarchyupload", method = RequestMethod.GET)
+    public String showUploadHierarchy( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Showing the hierarchy page" );
+        return JspResolver.HIERARCHY_UPLOAD;
+    }
+
+
+    @RequestMapping ( value = "/fetchEditRegionPopupDetails", method = RequestMethod.GET)
+    public String fetchEditRegionPopupDetails( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Showing Edit Region Popup" );
+        return JspResolver.EDIT_REGION_POPUP;
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/savexlsxfile", method = RequestMethod.POST)
+    public String saveHierarchyFile( Model model, @RequestParam ( "file") MultipartFile fileLocal, HttpServletRequest request )
+    {
+        boolean status = true;
+        String response = null;
+        try {
+            if ( fileLocal == null ) {
+                throw new InvalidInputException( "file is empty" );
+            }
+            LOG.info( "Saving the hierarchy file" );
+            String fileLocalName = request.getParameter( "filename" );
+
+            if ( fileLocalName == null || fileLocalName.isEmpty() ) {
+                throw new InvalidInputException( "filename is empty" );
+            }
+
+            File convFile = new File( fileLocalName );
+            try {
+                fileLocal.transferTo( convFile );
+
+                // Set the new filename
+                User user = sessionHelper.getCurrentUser();
+                fileLocalName = "COMPANY_HIERARCHY_UPLOAD_" + user.getCompany().getCompany() + "_"
+                    + new DateTime( System.currentTimeMillis() ).toString() + ".xlsx";
+                fileUploadService.uploadFileAtDefautBucket( convFile, fileLocalName );
+                String fileName = endpoint + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileLocalName, "UTF-8" );
+                response = fileName;
+            } catch ( Exception e ) {
+                LOG.error( "An exception occured during the file upload. Reason : ", e );
+                throw new InvalidInputException( "An error occured during the file upload. Reason : ", e );
+            }
+        } catch ( InvalidInputException ex ) {
+            status = false;
+            response = ex.getMessage();
+        }
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "response", response );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/verifyxlsxfile", method = RequestMethod.POST)
+    public String validateHierarchyFile( Model model, HttpServletRequest request ) throws InvalidInputException
+    {
+        boolean status = true;
+        Object response = null;
+        UploadValidation uploadValidation = null;
+        LOG.info( "Validating the hierarchy file" );
+        String fileUrl = request.getParameter( "fileUrl" );
+        try {
+            if ( fileUrl == null || fileUrl.isEmpty() ) {
+                throw new InvalidInputException( "File URL cannot be empty" );
+            }
+            User user = sessionHelper.getCurrentUser();
+            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
+            response = uploadValidation;
+            LOG.debug( "Returning: " + new Gson().toJson( response ) );
+        } catch ( InvalidInputException ex ) {
+            status = false;
+            response = ex.getMessage();
+        }
+
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "response", response );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/verifyxHierarchyUpload", method = RequestMethod.POST)
+    public String validateHierarchyUpload( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Validating the hierarchy upload data" );
+        boolean status = true;
+        Object response = null;
+        String hierarchyJson = request.getParameter( "hierarchyJson" );
+        LOG.info( hierarchyJson );
+        UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        try {
+            User user = sessionHelper.getCurrentUser();
+            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
+            response = uploadValidation;
+            LOG.debug( "Returning: " + new Gson().toJson( response ) );
+        } catch ( Exception ex ) {
+            status = false;
+            response = ex.getMessage();
+        }
+
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "response", response );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/uploadxlsxfile", method = RequestMethod.POST)
+    public String saveHierarchyFileData( Model model, HttpServletRequest request ) throws InvalidInputException
+    {
+        LOG.info( "Saving the hierarchy file data" );
+        boolean status = true;
+        String response = null;
+        String hierarchyJson = request.getParameter( "hierarchyJson" );
+        UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        User user = sessionHelper.getCurrentUser();
+        try {
+            Map<String, List<String>> errorMap = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(),
+                user.getCompany(), user );
+            if ( errorMap == null || errorMap.isEmpty() ) {
+                response = "Data uploaded successfully.";
+            } else {
+                status = false;
+                response = new Gson().toJson( errorMap );
+            }
+        } catch ( Exception ex ) {
+            status = false;
+            response = ex.getMessage();
+        }
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "response", response );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @SuppressWarnings ( "unused")
+    private UploadValidation prepareDummyValidation()
+    {
+        UploadValidation validation = new UploadValidation();
+        validation.setNumberOfRegionsAdded( 3 );
+        validation.setNumberOfRegionsModified( 5 );
+        validation.setNumberOfBranchesAdded( 10 );
+        validation.setNumberOfBranchesModified( 25 );
+        validation.setNumberOfUsersModified( 10 );
+
+        validation.setRegionValidationErrors(
+            Arrays.asList( new String[] { "Region ABC does not look good.", "What is wrong with the region below abc?" } ) );
+        validation.setBranchValidationErrors( Arrays.asList( new String[] { "Branch B does not have a region." } ) );
+        validation.setUserValidationErrors(
+            Arrays.asList( new String[] { "User A has no assignments.", "Are you kidding me with that?" } ) );
+
+        validation.setRegionValidationWarnings( Arrays.asList( new String[] { "Region names are funny." } ) );
+        validation.setBranchValidationWarnings( Arrays
+            .asList( new String[] { "Branches all around, but no tree to support them.", "That was a very bad joke." } ) );
+
+        return validation;
+    }
+
 
 }
 // JIRA: SS-24 BY RM02 EOC

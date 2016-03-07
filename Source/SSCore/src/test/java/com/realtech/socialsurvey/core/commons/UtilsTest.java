@@ -67,4 +67,31 @@ public class UtilsTest {
 		Whitebox.setInternalState(utils, "maskingSuffix", "@abc.com");
 		assertEquals("Masked email address does not match expected", "test+my+example.com@abc.com", utils.maskEmailAddress("my@example.com"));
 	}
+	
+
+    @Test
+    public void testUnmaskEmailAddressActuallyMasked()
+    {
+        Whitebox.setInternalState( utils, "maskingPrefix", "test" );
+        Whitebox.setInternalState( utils, "maskingSuffix", "@abc.com" );
+        assertEquals( "Unmask successful", "test@abc.com", utils.unmaskEmailAddress( "test+test+abc.com@abc.com" ) );
+    }
+    
+    
+    @Test
+    public void testUnmaskEmailAddressNotMasked()
+    {
+        Whitebox.setInternalState( utils, "maskingPrefix", "test" );
+        Whitebox.setInternalState( utils, "maskingSuffix", "@abc.com" );
+        assertEquals( "Unmask successful", "test@abc.com", utils.unmaskEmailAddress( "test@abc.com" ) );
+    }
+    
+    
+    @Test
+    public void testUnmaskEmailAddressWithPlusNotMasked()
+    {
+        Whitebox.setInternalState( utils, "maskingPrefix", "test" );
+        Whitebox.setInternalState( utils, "maskingSuffix", "@abc.com" );
+        assertEquals( "Unmask successful", "test+1@abc.com", utils.unmaskEmailAddress( "test+1@abc.com" ) );
+    }
 }
