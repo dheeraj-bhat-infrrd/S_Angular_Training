@@ -815,6 +815,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
         boolean isRegionAdmin = false;
         if ( user.getUserProfiles() != null )
             for ( UserProfile userProfile : user.getUserProfiles() ) {
+                if ( userProfile.getStatus() != CommonConstants.STATUS_ACTIVE ) {
+                    continue;
+                }
                 if ( userProfile.getRegionId() != 0 ) {
                     regions.add( userProfile.getRegionId() );
                 }
