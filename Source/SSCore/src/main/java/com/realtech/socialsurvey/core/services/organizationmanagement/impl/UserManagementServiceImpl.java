@@ -72,6 +72,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -440,7 +441,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail )
+    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail, boolean sendMail )
         throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
     {
         if ( firstName == null || firstName.isEmpty() ) {
@@ -463,8 +464,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         insertAgentSettings( user );
 
         String profileName = getUserSettings( user.getUserId() ).getProfileName();
-        sendRegistrationCompletionLink( emailId, firstName, lastName, admin.getCompany().getCompanyId(), profileName,
-            user.getLoginName(), holdSendingMail );
+        if ( sendMail ) {
+            sendRegistrationCompletionLink( emailId, firstName, lastName, admin.getCompany().getCompanyId(), profileName,
+                user.getLoginName(), holdSendingMail );
+        }
         LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
         return user;
     }
@@ -1382,6 +1385,37 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    /**
+     * 
+     * @param user
+     * @param adminUser
+     * @param profileId
+     * @throws UserAssignmentException
+     */
+    @Transactional
+    @Override
+    public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException
+    {
+        try {
+            List<UserProfile> userprofileList = getAllUserProfilesForUser( user );
+            if ( userprofileList.size() == 1 && userprofileList.get( 0 ).getUserProfileId() == profileId ) {
+                throw new UserAssignmentException( "Cannot remove last user assignment." );
+            }
+
+            updateUserProfile( user, profileId, CommonConstants.STATUS_INACTIVE );
+            updateUserProfilesStatus( user, profileId );
+            removeUserProfile( profileId );
+
+            updatePrimaryProfileOfUser( user );
+            user = getUserByUserId( user.getUserId() );
+            updateUserInSolr( user );
+        } catch ( InvalidInputException | SolrException e ) {
+            LOG.error( "An exception occured while removing user assignment. Reason : ", e );
+            throw new UserAssignmentException( "An exception occured while removing user assignment. Reason : ", e );
+        }
+    }
+    
+
     /*
      * Method to update the given user as active or inactive.
      */
@@ -1622,23 +1656,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started." );
         if(user != null){
             List<UserProfile> userProfiles = user.getUserProfiles();
-            for ( UserProfile userProfile : userProfiles ) {
-                if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                    switch ( userProfile.getProfilesMaster().getProfileId() ) {
-                        case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-                            user.setCompanyAdmin( true );
-                            continue;
-                        case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-                            user.setRegionAdmin( true );
-                            continue;
-                        case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-                            user.setBranchAdmin( true );
-                            continue;
-                        case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-                            user.setAgent( true );
-                            continue;
-                        default:
-                            LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName() );
+            if ( userProfiles != null ) {
+                for ( UserProfile userProfile : userProfiles ) {
+                    if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                        switch ( userProfile.getProfilesMaster().getProfileId() ) {
+                            case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+                                user.setCompanyAdmin( true );
+                                continue;
+                            case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                                user.setRegionAdmin( true );
+                                continue;
+                            case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                                user.setBranchAdmin( true );
+                                continue;
+                            case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                                user.setAgent( true );
+                                continue;
+                            default:
+                                LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName() );
+                        }
                     }
                 }
             }
