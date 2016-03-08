@@ -8078,8 +8078,11 @@ function bindClickEventForProcessButton(){
 	
 
 }
-
+var insaved= false;
 function saveUserMap(aliasMail){
+	if(insaved==true){
+		return;
+	}
 	var isIgnore=$('#is-ignore').val();
 	var agentId=$('#match-user-email').attr('agent-id');
 	
@@ -8093,7 +8096,7 @@ function saveUserMap(aliasMail){
 		}
 			
 	}
-	
+	insaved==true;
 	var payload = {
 			"emailAddress" : aliasMail,
 			"agentId" : agentId,
@@ -8104,8 +8107,8 @@ function saveUserMap(aliasMail){
 		console.log("agentId :" +agentId);
 		console.log("ignoredEmail :" +isIgnore);
 		isAjaxRequestRunningProcessedUser = true;
-		callAjaxGetWithPayloadData('./survey/saveemailmapping.do', function(data){
-			
+		callAjaxGetWithPayloadData('./saveemailmapping.do', function(data){
+			insaved==false;
 			$('#overlay-main').hide();
 			$('#overlay-toast').html(data);
 			showToast();
