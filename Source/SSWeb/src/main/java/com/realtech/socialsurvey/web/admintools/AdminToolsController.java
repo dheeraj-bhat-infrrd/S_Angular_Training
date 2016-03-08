@@ -377,23 +377,24 @@ public class AdminToolsController
 
     @ResponseBody
     @RequestMapping ( value = "/gettransactions", method = RequestMethod.GET)
-    public Response getTransactionBySubscriptionId( @RequestParam String subscriptionId , HttpServletRequest request )
+    public Response getTransactionBySubscriptionId( @RequestParam String subscriptionId, HttpServletRequest request )
     {
         LOG.info( "Method to getSubscriptionDetailBySubscriptionId started." );
         List<TransactionVO> transactions = null;
         String recipientMailId = request.getParameter( "recipientMailId" );
         Response response = null;
+        List<String> emailIdList = new ArrayList<String>();
         try {
             try {
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
-                
-                if(recipientMailId != null && ! recipientMailId.isEmpty()){
-                    List<String> emailIdList = new ArrayList<String>();
+
+                if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
+
                     if ( !recipientMailId.contains( "," ) ) {
                         if ( !organizationManagementService.validateEmail( recipientMailId ) )
-                            throw new InvalidInputException( "Mail id - " + recipientMailId + " entered as send alert to input is invalid",
-                                DisplayMessageConstants.GENERAL_ERROR );
+                            throw new InvalidInputException( "Mail id - " + recipientMailId
+                                + " entered as send alert to input is invalid", DisplayMessageConstants.GENERAL_ERROR );
                         else
                             emailIdList.add( recipientMailId );
                     } else {
@@ -401,17 +402,22 @@ public class AdminToolsController
 
                         for ( String mailID : mailIds ) {
                             if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                                throw new InvalidInputException(
-                                    "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                throw new InvalidInputException( "Mail id - " + mailID
+                                    + " entered amongst the mail ids as send alert to input is invalid",
                                     DisplayMessageConstants.GENERAL_ERROR );
                             else
                                 emailIdList.add( mailID.trim() );
                         }
                     }
-                    transactions = adminService.getTransactionListBySubscriptionIs( subscriptionId );
-                    adminService.generateTransactionListExcelAndMail( transactions, emailIdList , subscriptionId );
+
                 }
-                    
+                transactions = adminService.getTransactionListBySubscriptionIs( subscriptionId );
+
+                if ( emailIdList != null && !emailIdList.isEmpty() ) {
+                    LOG.debug( "Generating excel and sending mail to user" );
+                    adminService.generateTransactionListExcelAndMail( transactions, emailIdList, subscriptionId );
+                }
+
                 response = Response.ok( transactions ).build();
             } catch ( Exception e ) {
                 LOG.error( "Exception occured while getting transactions for subscriptionId : " + subscriptionId
@@ -436,17 +442,17 @@ public class AdminToolsController
         List<SubscriptionVO> subscriptions = null;
         Response response = null;
         String recipientMailId = request.getParameter( "recipientMailId" );
-
+        List<String> emailIdList = new ArrayList<String>();
         try {
             try {
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
-                if(recipientMailId != null && ! recipientMailId.isEmpty()){
-                    List<String> emailIdList = new ArrayList<String>();
+                if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
+
                     if ( !recipientMailId.contains( "," ) ) {
                         if ( !organizationManagementService.validateEmail( recipientMailId ) )
-                            throw new InvalidInputException( "Mail id - " + recipientMailId + " entered as send alert to input is invalid",
-                                DisplayMessageConstants.GENERAL_ERROR );
+                            throw new InvalidInputException( "Mail id - " + recipientMailId
+                                + " entered as send alert to input is invalid", DisplayMessageConstants.GENERAL_ERROR );
                         else
                             emailIdList.add( recipientMailId );
                     } else {
@@ -454,16 +460,21 @@ public class AdminToolsController
 
                         for ( String mailID : mailIds ) {
                             if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                                throw new InvalidInputException(
-                                    "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                throw new InvalidInputException( "Mail id - " + mailID
+                                    + " entered amongst the mail ids as send alert to input is invalid",
                                     DisplayMessageConstants.GENERAL_ERROR );
                             else
                                 emailIdList.add( mailID.trim() );
                         }
                     }
-                    subscriptions = adminService.getActiveSubscriptionsList();
+
+                }
+                subscriptions = adminService.getActiveSubscriptionsList();
+                if ( emailIdList != null && !emailIdList.isEmpty() ) {
+                    LOG.debug( "Generating excel and sending mail to user" );
                     adminService.generateSubscriptionListExcelAndMail( subscriptions, emailIdList );
                 }
+
                 response = Response.ok( subscriptions ).build();
             } catch ( Exception e ) {
                 LOG.error( "Exception occured while getting active subscriptions. Reason : " + e.getStackTrace() );
