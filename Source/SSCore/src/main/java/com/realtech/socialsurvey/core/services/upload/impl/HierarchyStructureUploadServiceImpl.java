@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LongUploadHistory;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
@@ -1558,14 +1559,31 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         UndeliveredEmailException
     {
         LOG.info( "Method modifyUser() started for user : " + user.getEmailId() );
-        if ( !( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) {
-            throw new UserAdditionException( "User : " + user.getEmailId() + " belongs to a different company" );
+        if ( !( ( checkIfUserExistsWithinCompany( user, adminUser.getCompany() ) )
+            || ( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) ) {
+            throw new UserAdditionException( "User : " + user.getEmailId() + "either belongs to a different company or doesn't exist" );
         }
-        User assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
-
+        User assigneeUser = null;
+        try {
+            assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
+        } catch ( InvalidInputException e ){
+            LOG.warn( e.getMessage() );
+        }
+        if ( assigneeUser == null ) {
+            assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
+        }
+        if ( assigneeUser == null ) {
+            throw new InvalidInputException( "Couldn't find user : " + user.getSourceUserId() );
+        }
+        boolean isEmailModified = false;
         //check and modify user object
-        if ( user.isEmailIdModified() ) {
+        if ( user.isEmailIdModified() && !user.isUserVerified() ) {
             assigneeUser.setEmailId( user.getEmailId() );
+            assigneeUser.setLoginName( user.getEmailId() );
+            isEmailModified = true;
+        } else if ( user.isEmailIdModified() && user.isUserVerified() ) {
+            throw new InvalidInputException( "User : " + user.getSourceUserId()
+                + " is already verified. Email Addresses of verified users cannot be changed." );
         }
         if ( user.isFirstNameModified() ) {
             assigneeUser.setFirstName( user.getFirstName() );
@@ -1576,7 +1594,12 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
         userDao.update( assigneeUser );
 
+        if ( isEmailModified ) {
+            // Modify email Ids in userprofile
+            userProfileDao.updateEmailIdForUserProfile( assigneeUser.getUserId(), user.getEmailId() );
+        }
 
+        
         assignUser( user, adminUser, currentUserMap, upload );
         
         //send verification mail if needed
@@ -1588,6 +1611,27 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         solrSearchService.addUserToSolr( assigneeUser );
 
         return assigneeUser;
+    }
+    
+    
+    /**
+     * Method to check if a user exists within a company
+     * @param user
+     * @param company
+     * @return
+     * @throws InvalidInputException
+     */
+    boolean checkIfUserExistsWithinCompany( UserUploadVO user, Company company ) throws InvalidInputException
+    {
+        if ( user.getUserId() > 0l ) {
+            User foundUser = userManagementService.getUserByUserId( user.getUserId() );
+            if ( foundUser == null ) {
+                return false;
+            } else if ( foundUser.getCompany().getCompanyId() == company.getCompanyId() ) {
+                return true;
+            }
+        }
+        return false;
     }
     
 
@@ -1633,10 +1677,22 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         LOG.info( "Method assignUser() started for user : " + user.getEmailId() );
-        if ( !( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) {
+        if ( !( ( checkIfUserExistsWithinCompany( user, adminUser.getCompany() ) )
+            || ( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) ) {
             throw new UserAdditionException( "User : " + user.getEmailId() + " belongs to a different company" );
         }
-        User assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
+        User assigneeUser = null;
+        try {
+        assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
+        } catch ( InvalidInputException e ) {
+            LOG.warn( e.getMessage() );
+        }
+        if ( assigneeUser == null ) {
+            assigneeUser = userManagementService.getUserByEmailAddress(  extractEmailId( user.getEmailId() )  );
+        }
+        if ( assigneeUser == null ) {
+            throw new InvalidInputException( "Couldn't find user : " + user.getSourceUserId() );
+        }
         if ( ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() )
             && ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() )
             && ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() )
@@ -1877,7 +1933,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     }
                     continue;
                 }
-                if ( checkIfEmailIdExists( emailId, adminUser.getCompany() ) && userToBeUploaded.isUserModified() ) {
+                
+                if ( userToBeUploaded.isUserModified() ) {
                     user = modifyUser( userToBeUploaded, adminUser, currentUserMap, currentUpload );
                 } else if ( userToBeUploaded.isUserAdded() ) {
                     // add user
@@ -1977,7 +2034,6 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.debug( "Inside method updateUserSettingsInMongo " );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
-        //TODO : Add other modifiable fields as well
         if ( agentSettings == null ) {
             throw new InvalidInputException(
                 "No company settings found for user " + user.getUsername() + " " + user.getUserId() );
@@ -1990,6 +2046,16 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             if ( contactNumberSettings == null ) {
                 contactNumberSettings = new ContactNumberSettings();
             }
+            
+            //Change email if user is not verified
+            if ( userUploadVO.isEmailIdModified() && !userUploadVO.isUserVerified() ) {
+                MailIdSettings mail_ids = contactDetailsSettings.getMail_ids();
+                if ( mail_ids == null ) {
+                    mail_ids = new MailIdSettings();
+                }
+                mail_ids.setWork( userUploadVO.getEmailId() );
+            }
+            
             contactNumberSettings.setWork( userUploadVO.getPhoneNumber() );
             contactDetailsSettings.setContact_numbers( contactNumberSettings );
             contactDetailsSettings.setAbout_me( userUploadVO.getAboutMeDescription() );

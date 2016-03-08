@@ -1747,6 +1747,55 @@ public class EmailServicesImpl implements EmailServices
 
 
     /**
+     * Method to send complaint handle mail to the admin's for zillow reviews
+     * @param recipientMailId
+     * @param customerName
+     * @param rating
+     * @param reviewSummary
+     * @param reviewDescription
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     * */
+    @Async
+    @Override
+    public void sendZillowReviewComplaintHandleMail( String recipientMailId, String customerName, String rating,
+        String reviewUrl ) throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey complaint handler mail " );
+        }
+
+        if ( customerName == null || customerName.isEmpty() ) {
+            LOG.error( "Customer name is empty or null " );
+            throw new InvalidInputException( "Customer name is empty or null " );
+        }
+
+        String[] mailIds = recipientMailId.split( "," );
+        List<String> mailIdList = new ArrayList<String>();
+
+        for ( String mailId : mailIds ) {
+            mailIdList.add( mailId.trim() );
+        }
+
+        LOG.info( "Sending complaint handle email to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( mailIdList );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_BODY );
+
+        //SS-1435: Send survey details too.
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, customerName, rating,
+            reviewUrl ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_SUBJECT, messageBodyReplacements, false, false );
+        LOG.info( "Successfully sent survey completion mail" );
+    }
+
+    /**
      * Method to forward customer reply to recipient
      *
      * @param recipientMailId
@@ -1852,6 +1901,39 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
 
         LOG.info( "Method sendBillingReportMail() finished." );
+    }
+    
+    
+    /**
+     * Method to send the billing report in a mail to the social survey admin
+     */
+    @Override
+    public void sendCustomReportMail( String recipientName, String recipientMailId, String subject,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendCustomReportMail() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending billing report mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending billing report mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setAttachmentDetail( attachmentsDetails );
+        
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SEND_REPORT_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( subject ) );
+        
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SEND_REPORT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, true, false );
+
+        LOG.info( "Method sendCustomReportMail() finished." );
     }
 }
 // JIRA: SS-7: By RM02: EOC

@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.services.admin.AdminService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.vo.SubscriptionVO;
@@ -376,17 +377,41 @@ public class AdminToolsController
 
     @ResponseBody
     @RequestMapping ( value = "/gettransactions", method = RequestMethod.GET)
-    public Response getTransactionBySubscriptionId( @RequestParam String subscriptionId, HttpServletRequest request )
+    public Response getTransactionBySubscriptionId( @RequestParam String subscriptionId , HttpServletRequest request )
     {
         LOG.info( "Method to getSubscriptionDetailBySubscriptionId started." );
         List<TransactionVO> transactions = null;
-
+        String recipientMailId = request.getParameter( "recipientMailId" );
         Response response = null;
         try {
             try {
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
-                transactions = adminService.getTransactionListBySubscriptionIs( subscriptionId );
+                
+                if(recipientMailId != null && ! recipientMailId.isEmpty()){
+                    List<String> emailIdList = new ArrayList<String>();
+                    if ( !recipientMailId.contains( "," ) ) {
+                        if ( !organizationManagementService.validateEmail( recipientMailId ) )
+                            throw new InvalidInputException( "Mail id - " + recipientMailId + " entered as send alert to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else
+                            emailIdList.add( recipientMailId );
+                    } else {
+                        String mailIds[] = recipientMailId.split( "," );
+
+                        for ( String mailID : mailIds ) {
+                            if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                                throw new InvalidInputException(
+                                    "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                    DisplayMessageConstants.GENERAL_ERROR );
+                            else
+                                emailIdList.add( mailID.trim() );
+                        }
+                    }
+                    transactions = adminService.getTransactionListBySubscriptionIs( subscriptionId );
+                    adminService.generateTransactionListExcelAndMail( transactions, emailIdList , subscriptionId );
+                }
+                    
                 response = Response.ok( transactions ).build();
             } catch ( Exception e ) {
                 LOG.error( "Exception occured while getting transactions for subscriptionId : " + subscriptionId
@@ -410,12 +435,35 @@ public class AdminToolsController
         LOG.info( "Method to getAllActiveSubscriptions started." );
         List<SubscriptionVO> subscriptions = null;
         Response response = null;
+        String recipientMailId = request.getParameter( "recipientMailId" );
 
         try {
             try {
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
-                subscriptions = adminService.getActiveSubscriptionsList();
+                if(recipientMailId != null && ! recipientMailId.isEmpty()){
+                    List<String> emailIdList = new ArrayList<String>();
+                    if ( !recipientMailId.contains( "," ) ) {
+                        if ( !organizationManagementService.validateEmail( recipientMailId ) )
+                            throw new InvalidInputException( "Mail id - " + recipientMailId + " entered as send alert to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else
+                            emailIdList.add( recipientMailId );
+                    } else {
+                        String mailIds[] = recipientMailId.split( "," );
+
+                        for ( String mailID : mailIds ) {
+                            if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                                throw new InvalidInputException(
+                                    "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                    DisplayMessageConstants.GENERAL_ERROR );
+                            else
+                                emailIdList.add( mailID.trim() );
+                        }
+                    }
+                    subscriptions = adminService.getActiveSubscriptionsList();
+                    adminService.generateSubscriptionListExcelAndMail( subscriptions, emailIdList );
+                }
                 response = Response.ok( subscriptions ).build();
             } catch ( Exception e ) {
                 LOG.error( "Exception occured while getting active subscriptions. Reason : " + e.getStackTrace() );

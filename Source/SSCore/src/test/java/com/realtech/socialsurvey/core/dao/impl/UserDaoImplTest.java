@@ -54,4 +54,11 @@ public class UserDaoImplTest
     {
         userDaoImpl.getUsersForCompany( null, 0, 50 );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testgetUserIdsUnderCompanyBasedOnProfileMasterIdWithInvalidCompanyId() throws InvalidInputException
+    {
+        userDaoImpl.getUserIdsUnderCompanyBasedOnProfileMasterId( 0, 4, 0, 50 );
+    }
 }

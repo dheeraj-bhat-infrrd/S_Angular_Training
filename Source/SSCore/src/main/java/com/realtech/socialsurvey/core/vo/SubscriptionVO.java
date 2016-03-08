@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.vo;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 
 
 public class SubscriptionVO
@@ -10,16 +9,16 @@ public class SubscriptionVO
 
     private BigDecimal balance;
     private Integer billingDayOfMonth;
-    private Calendar billingPeriodEndDate;
-    private Calendar billingPeriodStartDate;
+    private String billingPeriodEndDate;
+    private String billingPeriodStartDate;
     private Integer currentBillingCycle;
 
-    private Calendar createdAt;
-    private Calendar updatedAt;
-    private Calendar firstBillingDate;
+    private String createdAt;
+    private String updatedAt;
+    private String firstBillingDate;
 
     private BigDecimal nextBillAmount;
-    private Calendar nextBillingDate;
+    private String nextBillingDate;
     private BigDecimal nextBillingPeriodAmount;
 
     private long companyId;
@@ -65,25 +64,25 @@ public class SubscriptionVO
     }
 
 
-    public Calendar getBillingPeriodEndDate()
+    public String getBillingPeriodEndDate()
     {
         return billingPeriodEndDate;
     }
 
 
-    public void setBillingPeriodEndDate( Calendar billingPeriodEndDate )
+    public void setBillingPeriodEndDate( String billingPeriodEndDate )
     {
         this.billingPeriodEndDate = billingPeriodEndDate;
     }
 
 
-    public Calendar getBillingPeriodStartDate()
+    public String getBillingPeriodStartDate()
     {
         return billingPeriodStartDate;
     }
 
 
-    public void setBillingPeriodStartDate( Calendar billingPeriodStartDate )
+    public void setBillingPeriodStartDate( String billingPeriodStartDate )
     {
         this.billingPeriodStartDate = billingPeriodStartDate;
     }
@@ -101,37 +100,37 @@ public class SubscriptionVO
     }
 
 
-    public Calendar getCreatedAt()
+    public String getCreatedAt()
     {
         return createdAt;
     }
 
 
-    public void setCreatedAt( Calendar createdAt )
+    public void setCreatedAt( String createdAt )
     {
         this.createdAt = createdAt;
     }
 
 
-    public Calendar getUpdatedAt()
+    public String getUpdatedAt()
     {
         return updatedAt;
     }
 
 
-    public void setUpdatedAt( Calendar updatedAt )
+    public void setUpdatedAt( String updatedAt )
     {
         this.updatedAt = updatedAt;
     }
 
 
-    public Calendar getFirstBillingDate()
+    public String getFirstBillingDate()
     {
         return firstBillingDate;
     }
 
 
-    public void setFirstBillingDate( Calendar firstBillingDate )
+    public void setFirstBillingDate( String firstBillingDate )
     {
         this.firstBillingDate = firstBillingDate;
     }
@@ -149,13 +148,13 @@ public class SubscriptionVO
     }
 
 
-    public Calendar getNextBillingDate()
+    public String getNextBillingDate()
     {
         return nextBillingDate;
     }
 
 
-    public void setNextBillingDate( Calendar nextBillingDate )
+    public void setNextBillingDate( String nextBillingDate )
     {
         this.nextBillingDate = nextBillingDate;
     }

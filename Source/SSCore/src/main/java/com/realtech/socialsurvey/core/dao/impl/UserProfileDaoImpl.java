@@ -230,6 +230,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
 
     @Override
+    @Transactional
     public Map<String, Long> findPrimaryUserProfileByAgentId( long entityId )
     {
         LOG.info( "Method findPrimaryUserProfileByAgentId() called for agent id : " + entityId );

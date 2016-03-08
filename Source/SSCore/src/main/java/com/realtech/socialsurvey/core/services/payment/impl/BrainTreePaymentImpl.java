@@ -1930,23 +1930,20 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
 
     @Override
     @Transactional
-    public List<Subscription> getActiveSubscriptionsListFromBrainTree( ) throws InvalidInputException
+    public ResourceCollection<Subscription> getActiveSubscriptionsListFromBrainTree( ) throws InvalidInputException
     {
         LOG.info( "Method getActiveSubscriptionsListFromBrainTree started " );
-        List<Subscription> subscriptions = new ArrayList<Subscription>( );
+        ResourceCollection<Subscription> collection;
         SubscriptionSearchRequest request = new SubscriptionSearchRequest().status().is( Subscription.Status.ACTIVE );
         try{
-            ResourceCollection<Subscription> collection = gateway.subscription().search( request );
-            for (Subscription subscription : collection) {
-                subscriptions.add( subscription );
-            }
+            collection = gateway.subscription().search( request );     
         }catch(NotFoundException e){
             LOG.error( "No active subscription found ");
             return null;
         }
         
         LOG.info( "Method getActiveSubscriptionsListFromBrainTree ended " );
-        return subscriptions;
+        return collection;
     }
 
 }

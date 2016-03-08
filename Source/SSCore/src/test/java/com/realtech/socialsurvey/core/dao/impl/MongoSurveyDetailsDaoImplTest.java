@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
@@ -132,6 +133,7 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetFeedBacksCountWithIncludeZillowReviewsAsTrueAndNotRecommendedTrue()
     {
+        Whitebox.setInternalState( mongoSurveyDetailsDaoImpl, "considerOnlyLatestSurveys", "N" );
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
         long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( TestConstants.TEST_STRING, 2, 3.5, 3.5, false, true, true, 2 );
         assertEquals( "FeedBack count does not match expected", 10, count );
@@ -141,6 +143,7 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetFeedBacksCountWithIncludeZillowReviewsAsTrueAndNotRecommendedFalse()
     {
+        Whitebox.setInternalState( mongoSurveyDetailsDaoImpl, "considerOnlyLatestSurveys", "N" );
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
         long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 3.5, 3.5, false, false,
             true, 2 );
@@ -151,6 +154,7 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetFeedBacksCountWithIncludeZillowReviewsAsFalseAndNotRecommendedFalse()
     {
+        Whitebox.setInternalState( mongoSurveyDetailsDaoImpl, "considerOnlyLatestSurveys", "N" );
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 10l );
         long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 3.5, 3.5, false, false,
             false, 2 );
@@ -161,6 +165,7 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetFeedBacksCountWithIncludeZillowReviewsAsFalseAndNotRecommendedTrue()
     {
+        Whitebox.setInternalState( mongoSurveyDetailsDaoImpl, "considerOnlyLatestSurveys", "N" );
         Mockito.when( mongoTemplate.count( (Query) Mockito.any(), Mockito.anyString() ) ).thenReturn( 2l );
         long count = mongoSurveyDetailsDaoImpl.getFeedBacksCount( CommonConstants.COMPANY_ID_COLUMN, 2, 0, 3.0, false, true,
             false, 2 );
@@ -172,6 +177,7 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetRatingForPastNdaysWithIncludeZillowReviewsAsTrueWhenReviewCountIsZero()
     {
+        Whitebox.setInternalState( mongoSurveyDetailsDaoImpl, "considerOnlyLatestSurveys", "N" );
         Mockito.when(
             mongoTemplate.aggregate( (TypedAggregation<SurveyDetails>) Mockito.any(), Mockito.anyString(),
                 Mockito.eq( SurveyDetails.class ) ) ).thenReturn(
@@ -187,6 +193,7 @@ public class MongoSurveyDetailsDaoImplTest
     @Test
     public void testGetRatingForPastNdaysWithIncludeZillowReviewsAsTrueWhenResultsIsNull()
     {
+        Whitebox.setInternalState( mongoSurveyDetailsDaoImpl, "considerOnlyLatestSurveys", "N" );
         Mockito.when(
             mongoTemplate.aggregate( (TypedAggregation<SurveyDetails>) Mockito.any(), Mockito.anyString(),
                 Mockito.eq( SurveyDetails.class ) ) ).thenReturn( null );
