@@ -43,7 +43,7 @@
 					<div class="rfr_icn icn-email"></div>
 					<div class="rfr_txt_fld">
 						<input type="email" class="rfr_input_fld" data-non-empty="true" id="add-ss-admin-emailid"
-							name="emailId" placeholder='<spring:message code="label.customeremail.key"/>'>
+							name="emailId" placeholder='<spring:message code="label.adminemail.key"/>'>
 					</div>
 				</div>
 			</div>
