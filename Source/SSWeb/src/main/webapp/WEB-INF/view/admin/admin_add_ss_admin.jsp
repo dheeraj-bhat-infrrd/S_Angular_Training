@@ -21,7 +21,7 @@
 	<form id="add-ss-admin-form">
 		<div class="reg_form_wrapper_2">
 			<div class="reg_form_row clearfix">
-				<div class="float-left rfr_lbl"><spring:message code="label.customername.key" /></div>
+				<div class="float-left rfr_lbl"><spring:message code="label.adminname.key" /></div>
 				<div class="float-left rfr_txt">
 					<div class="rfr_icn icn-name"></div>
 					<div class="rfr_txt_fld">
@@ -38,7 +38,7 @@
 				</div>
 			</div>
 			<div class="reg_form_row clearfix">
-				<div class="float-left rfr_lbl"><spring:message code="label.customeremail.key" /></div>
+				<div class="float-left rfr_lbl"><spring:message code="label.adminemail.key" /></div>
 				<div class="float-left rfr_txt">
 					<div class="rfr_icn icn-email"></div>
 					<div class="rfr_txt_fld">
