@@ -8061,7 +8061,7 @@ function bindClickEventForProcessButton(){
 		
 		
 		$('#overlay-continue').click(function(){
-			saveUserMap(user );
+			saveUserMap(user);
 			$('#overlay-continue').unbind('click');
 		});
 		$('#overlay-main').show();
@@ -8078,11 +8078,8 @@ function bindClickEventForProcessButton(){
 	
 
 }
-var isUnmatchedSaved=false;
+
 function saveUserMap(aliasMail){
-	if(isUnmatchedSaved== true){
-		return;
-	}
 	var isIgnore=$('#is-ignore').val();
 	var agentId=$('#match-user-email').attr('agent-id');
 	
@@ -8096,7 +8093,7 @@ function saveUserMap(aliasMail){
 		}
 			
 	}
-	isUnmatchedSaved=true;
+	
 	var payload = {
 			"emailAddress" : aliasMail,
 			"agentId" : agentId,
@@ -8108,7 +8105,7 @@ function saveUserMap(aliasMail){
 		console.log("ignoredEmail :" +isIgnore);
 		isAjaxRequestRunningProcessedUser = true;
 		callAjaxGetWithPayloadData('./survey/saveemailmapping.do', function(data){
-			isUnmatchedSaved=false;
+			
 			$('#overlay-main').hide();
 			$('#overlay-toast').html(data);
 			showToast();
