@@ -68,7 +68,7 @@
 	</div>
 	<div id="hierarchy-upload"
 		class="reg_form_row clearfix hierarchy-btn">
-		<div class="reg_btn" id="xlsx-file-upload" style="pointer-events : none">
+		<div class="reg_btn" id="xlsx-file-upload" style="pointer-events : none; background : #BBB;">
 			<spring:message code="label.upload.key" />
 		</div>
 	</div>
