@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -91,15 +92,20 @@ public class AdminServiceImpl implements AdminService
         subscriptionVO.setId( subscription.getId() );
         subscriptionVO.setBalance( subscription.getBalance() );
         subscriptionVO.setBillingDayOfMonth( subscription.getBillingDayOfMonth() );
-        subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
-        subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime().toLocaleString() );
+        if ( subscription.getBillingPeriodEndDate() != null )
+            subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
+        if ( subscription.getBillingPeriodStartDate() != null )
+            subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime().toLocaleString() );
         subscriptionVO.setCurrentBillingCycle( subscription.getCurrentBillingCycle() );
-        subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
-        subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
-        subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
-        subscriptionVO.getNextBillAmount();
+        if ( subscription.getCreatedAt() != null )
+            subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
+        if ( subscription.getUpdatedAt() != null )
+            subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
+        if ( subscription.getFirstBillingDate() != null )
+            subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
         subscriptionVO.setNextBillAmount( subscription.getNextBillAmount() );
-        subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
+        if ( subscription.getNextBillingDate() != null )
+            subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
         subscriptionVO.setNextBillingPeriodAmount( subscription.getNextBillingPeriodAmount() );
 
         Company company = companyDao.getCompanyByBraintreeSubscriptionId( subscription.getId() );
@@ -107,9 +113,12 @@ public class AdminServiceImpl implements AdminService
             subscriptionVO.setCompanyId( company.getCompanyId() );
             subscriptionVO.setCompanyName( company.getCompany() );
             User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
-            subscriptionVO.setCompanyAdminId( user.getUserId() );
-            subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
-            subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+            if ( user != null ) {
+                subscriptionVO.setCompanyAdminId( user.getUserId() );
+                subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
+                subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+            }
+
         }
 
         return subscriptionVO;
@@ -142,9 +151,11 @@ public class AdminServiceImpl implements AdminService
                 transactionVO.setCompanyId( company.getCompanyId() );
                 transactionVO.setCompanyName( company.getCompany() );
                 User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
-                transactionVO.setCompanyAdminId( user.getUserId() );
-                transactionVO.setCompanyAdminFirstName( user.getFirstName() );
-                transactionVO.setCompanyAdminLastName( user.getLastName() );
+                if ( user != null ) {
+                    transactionVO.setCompanyAdminId( user.getUserId() );
+                    transactionVO.setCompanyAdminFirstName( user.getFirstName() );
+                    transactionVO.setCompanyAdminLastName( user.getLastName() );
+                }
             }
 
             transactionVOs.add( transactionVO );
@@ -291,46 +302,48 @@ public class AdminServiceImpl implements AdminService
             return subscriptionVOs;
         }
         for ( Subscription subscription : collection ) {
-            
+
             SubscriptionVO subscriptionVO = new SubscriptionVO();
 
-            try{
-            subscriptionVO.setId( subscription.getId() );
-            subscriptionVO.setBalance( subscription.getBalance() );
-            subscriptionVO.setBillingDayOfMonth( subscription.getBillingDayOfMonth() );
-            if ( subscription.getBillingPeriodEndDate().getTime() != null )
-                subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
-            if ( subscription.getBillingPeriodStartDate().getTime() != null )
-                subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime().toLocaleString() );
-            subscriptionVO.setCurrentBillingCycle( subscription.getCurrentBillingCycle() );
-            if ( subscription.getCreatedAt().getTime() != null )
-                subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
-            if ( subscription.getUpdatedAt().getTime() != null )
-                subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
-            if ( subscription.getFirstBillingDate().getTime() != null )
-                subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
-            subscriptionVO.getNextBillAmount();
-            subscriptionVO.setNextBillAmount( subscription.getNextBillAmount() );
-            if ( subscription.getNextBillingDate().getTime() != null )
-                subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
-            subscriptionVO.setNextBillingPeriodAmount( subscription.getNextBillingPeriodAmount() );
+            try {
+                subscriptionVO.setId( subscription.getId() );
+                subscriptionVO.setBalance( subscription.getBalance() );
+                subscriptionVO.setBillingDayOfMonth( subscription.getBillingDayOfMonth() );
+                if ( subscription.getBillingPeriodEndDate() != null )
+                    subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
+                if ( subscription.getBillingPeriodStartDate() != null )
+                    subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime()
+                        .toLocaleString() );
+                subscriptionVO.setCurrentBillingCycle( subscription.getCurrentBillingCycle() );
+                if ( subscription.getCreatedAt() != null )
+                    subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
+                if ( subscription.getUpdatedAt() != null )
+                    subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
+                if ( subscription.getFirstBillingDate() != null )
+                    subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
+                subscriptionVO.getNextBillAmount();
+                subscriptionVO.setNextBillAmount( subscription.getNextBillAmount() );
+                if ( subscription.getNextBillingDate() != null )
+                    subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
+                subscriptionVO.setNextBillingPeriodAmount( subscription.getNextBillingPeriodAmount() );
 
-            Company company = companyDao.getCompanyByBraintreeSubscriptionId( subscription.getId() );
-            if ( company != null ) {
-                subscriptionVO.setCompanyId( company.getCompanyId() );
-                subscriptionVO.setCompanyName( company.getCompany() );
-                User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
-                if ( user != null ) {
-                    subscriptionVO.setCompanyAdminId( user.getUserId() );
-                    subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
-                    subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+                Company company = companyDao.getCompanyByBraintreeSubscriptionId( subscription.getId() );
+                if ( company != null ) {
+                    subscriptionVO.setCompanyId( company.getCompanyId() );
+                    subscriptionVO.setCompanyName( company.getCompany() );
+                    User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
+                    if ( user != null ) {
+                        subscriptionVO.setCompanyAdminId( user.getUserId() );
+                        subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
+                        subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+                    }
+
                 }
 
-            }
-
-            subscriptionVOs.add( subscriptionVO );
-            }catch(Exception e){
-                LOG.error( "Error while parsing rescord" );
+                subscriptionVOs.add( subscriptionVO );
+            } catch ( Exception e ) {
+                LOG.error( "Error while parsing rescord with Susbcruption Id :" + subscriptionVO.getId(), e );
+                LOG.error( "Stack trace is :" + e.getStackTrace().toString() );
             }
         }
 
