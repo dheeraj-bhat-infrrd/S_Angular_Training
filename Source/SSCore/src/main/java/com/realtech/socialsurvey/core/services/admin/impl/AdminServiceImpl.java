@@ -156,7 +156,8 @@ public class AdminServiceImpl implements AdminService
 
 
     @Override
-    public boolean generateTransactionListExcelAndMail( List<TransactionVO> transactionVOs, List<String> recipientMailIds , String subscriptionId )
+    public boolean generateTransactionListExcelAndMail( List<TransactionVO> transactionVOs, List<String> recipientMailIds,
+        String subscriptionId )
     {
         LOG.info( "method generateTransactionListExcelAndMail started" );
         // Iterate over data and write to sheet
@@ -265,8 +266,8 @@ public class AdminServiceImpl implements AdminService
                 String name = adminName;
                 LOG.debug( "sending mail to : " + name + " at : " + recipientMailId );
                 try {
-                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId, CommonConstants.TRANSACTION_LIST_MAIL_SUBJECT + subscriptionId ,
-                        attachmentsDetails );
+                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId,
+                        CommonConstants.TRANSACTION_LIST_MAIL_SUBJECT + subscriptionId, attachmentsDetails );
                 } catch ( InvalidInputException | UndeliveredEmailException e ) {
                     LOG.error( "Error while sending mail to ; " + recipientMailId, e );
                 }
@@ -290,20 +291,28 @@ public class AdminServiceImpl implements AdminService
             return subscriptionVOs;
         }
         for ( Subscription subscription : collection ) {
+            
             SubscriptionVO subscriptionVO = new SubscriptionVO();
 
+            try{
             subscriptionVO.setId( subscription.getId() );
             subscriptionVO.setBalance( subscription.getBalance() );
             subscriptionVO.setBillingDayOfMonth( subscription.getBillingDayOfMonth() );
-            subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
-            subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime().toLocaleString() );
+            if ( subscription.getBillingPeriodEndDate().getTime() != null )
+                subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
+            if ( subscription.getBillingPeriodStartDate().getTime() != null )
+                subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime().toLocaleString() );
             subscriptionVO.setCurrentBillingCycle( subscription.getCurrentBillingCycle() );
-            subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
-            subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
-            subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
+            if ( subscription.getCreatedAt().getTime() != null )
+                subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
+            if ( subscription.getUpdatedAt().getTime() != null )
+                subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
+            if ( subscription.getFirstBillingDate().getTime() != null )
+                subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
             subscriptionVO.getNextBillAmount();
             subscriptionVO.setNextBillAmount( subscription.getNextBillAmount() );
-            subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
+            if ( subscription.getNextBillingDate().getTime() != null )
+                subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
             subscriptionVO.setNextBillingPeriodAmount( subscription.getNextBillingPeriodAmount() );
 
             Company company = companyDao.getCompanyByBraintreeSubscriptionId( subscription.getId() );
@@ -311,12 +320,18 @@ public class AdminServiceImpl implements AdminService
                 subscriptionVO.setCompanyId( company.getCompanyId() );
                 subscriptionVO.setCompanyName( company.getCompany() );
                 User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
-                subscriptionVO.setCompanyAdminId( user.getUserId() );
-                subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
-                subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+                if ( user != null ) {
+                    subscriptionVO.setCompanyAdminId( user.getUserId() );
+                    subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
+                    subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+                }
+
             }
 
             subscriptionVOs.add( subscriptionVO );
+            }catch(Exception e){
+                LOG.error( "Error while parsing rescord" );
+            }
         }
 
         LOG.info( "Method getActiveSubscriptionsList ended " );
@@ -446,8 +461,8 @@ public class AdminServiceImpl implements AdminService
                 String name = adminName;
                 LOG.debug( "sending mail to : " + name + " at : " + recipientMailId );
                 try {
-                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId, CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT,
-                        attachmentsDetails );
+                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId,
+                        CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
                 } catch ( InvalidInputException | UndeliveredEmailException e ) {
                     LOG.error( "Error while sending mail to ; " + recipientMailId, e );
                 }

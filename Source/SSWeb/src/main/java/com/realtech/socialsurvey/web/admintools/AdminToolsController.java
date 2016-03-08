@@ -477,7 +477,7 @@ public class AdminToolsController
 
                 response = Response.ok( subscriptions ).build();
             } catch ( Exception e ) {
-                LOG.error( "Exception occured while getting active subscriptions. Reason : " + e.getStackTrace() );
+                LOG.error( "Exception occured while getting active subscriptions. Reason : " + e.getMessage());
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while getting all active subscriptions" ),
                     e.getMessage() );
