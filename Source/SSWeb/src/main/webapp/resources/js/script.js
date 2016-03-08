@@ -2052,6 +2052,7 @@ var hierarchyUpload = {
 							if (hierarchyUpload.verified == false) {
 								$('#xlsx-file-verify').css("pointerEvents",
 										"none");
+								$('#xlsx-file-verify').css("background", "#BBB");
 								showError("Please upload xlsx file");
 							}
 
@@ -2060,6 +2061,8 @@ var hierarchyUpload = {
 								hierarchyUpload.verified = false;
 								$('#xlsx-file-verify').css("pointerEvents",
 										"auto");
+								$('#xlsx-file-verify').css("background", "#009FE0");
+								
 								var formData = new FormData();
 								formData.append("file", $('#com-file').prop(
 										"files")[0]);
@@ -2075,6 +2078,7 @@ var hierarchyUpload = {
 							else {
 								$('#xlsx-file-verify').css("pointerEvents",
 										"none");
+								$('#xlsx-file-verify').css("background", "#BBB");
 								showError("Please select a valid file");
 							}
 						});
@@ -2101,6 +2105,7 @@ var hierarchyUpload = {
 								if (url == undefined || url == '') {
 									$('#xlsx-file-verify').css("pointerEvents",
 											"none");
+									$('#xlsx-file-verify').css("background", "#BBB");
 									showError("Please upload a valid file");
 								} else {
 									var formData = new FormData();
@@ -2182,6 +2187,7 @@ var hierarchyUpload = {
 		$('#fileUrl').val('');
 		$('#summary').hide();
 		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').css("background", "#BBB");
 	},
 
 	uploadXlxsSuccessCallback : function(response) {
@@ -3051,6 +3057,7 @@ var hierarchyUpload = {
 						&& (hierarchyUpload.hierarchyJson.branchValidationErrors == null || hierarchyUpload.hierarchyJson.branchValidationErrors.length == 0)
 						&& (hierarchyUpload.hierarchyJson.userValidationErrors == null || hierarchyUpload.hierarchyJson.userValidationErrors.length == 0)) {
 					$('#xlsx-file-upload').css("pointerEvents", "auto");
+					$('#xlsx-file-upload').css("background", "#009FE0");
 					showInfo("Data verified sucessfully with no validation errors.");
 				} else {
 					showError("There are some validation errors which need to be resolved before uploading the data.");
@@ -3196,6 +3203,7 @@ var hierarchyUpload = {
 				200);
 
 		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').css("background", "#BBB");
 		showInfo("Successfully modified the region. Please click on 'Verify' button to validate the data!!");
 	},
 
@@ -3256,6 +3264,7 @@ var hierarchyUpload = {
 				200);
 
 		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').css("background", "#BBB");
 		showInfo("Successfully modified the branch. Please click on 'Verify' button to validate the data!!");
 	},
 
@@ -3395,6 +3404,7 @@ var hierarchyUpload = {
 		$('#editUser-' + i).parent().next('.hier-users-edit').slideToggle(200);
 
 		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').css("background", "#BBB");
 		showInfo("Successfully modified the user. Please click on 'Verify' button to validate the data!!");
 	},
 
