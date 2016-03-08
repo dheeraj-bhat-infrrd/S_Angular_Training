@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.social.impl;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,12 +37,14 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.ExternalSurveyTrackerDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostResponseDetails;
@@ -51,6 +54,7 @@ import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -65,6 +69,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -180,6 +185,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private SocialPostDao socialPostDao;
+
+    @Autowired
+    private ZillowTempPostDao zillowTempPostDao;
+
+    @Autowired
+    private ExternalSurveyTrackerDao externalSurveyTrackerDao;
 
 
     /**
@@ -745,8 +756,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param regionId
      * @return
      */
-    private RegionMediaPostResponseDetails getRMPRDFromRMPRDList(
-        List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList, long regionId )
+    @Override
+    public RegionMediaPostResponseDetails getRMPRDFromRMPRDList(List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList , long regionId)
     {
         LOG.debug( "Inside method getRMPRDFromRMPRDList()" );
         if ( regionMediaPostResponseDetailsList == null || regionMediaPostResponseDetailsList.isEmpty() ) {
@@ -767,8 +778,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param branchId
      * @return
      */
-    private BranchMediaPostResponseDetails getBMPRDFromBMPRDList(
-        List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList, long branchId )
+    @Override
+    public BranchMediaPostResponseDetails getBMPRDFromBMPRDList(List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList , long branchId)
     {
         LOG.debug( "Inside method getBMPRDFromBMPRDList()" );
         if ( branchMediaPostResponseDetailsList == null || branchMediaPostResponseDetailsList.isEmpty() ) {
@@ -2010,6 +2021,38 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
+    @Override
+    public List<ZillowTempPost> getAllZillowTempPosts()
+    {
+        return zillowTempPostDao.findAll( ZillowTempPost.class );
+    }
+
+
+    @Override
+    public ExternalSurveyTracker checkExternalSurveyTrackerExist( String entityColumnName, long entityId, String source,
+        String reviewUrl, Timestamp reviewDate )
+    {
+        return externalSurveyTrackerDao.checkExternalSurveyTrackerDetailsExist( entityColumnName, entityId, source, reviewUrl,
+            reviewDate );
+    }
+
+
+    @Override
+    public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
+        String reviewUrl, double rating, int complaintResolutionStatus, Timestamp reviewDate )
+    {
+        externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating,
+            complaintResolutionStatus, reviewDate );
+    }
+
+
+    @Override
+    public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds )
+    {
+        zillowTempPostDao.removeProcessedZillowTempPosts( processedZillowTempPostIds );
+    }
+
+
     @Transactional
     @Override
     public List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
@@ -2056,7 +2099,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         LOG.debug( "method getProcessedPreInitiatedSurveys called for agentId id : " + user.getUserId() );
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, emailAddress );
     }
-    
+
+
     @Transactional
     @Override
     public void updateSurveyPreinitiationRecordsAsIgnored( String emailAddress ) throws InvalidInputException
@@ -2064,7 +2108,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         if ( emailAddress == null || emailAddress.isEmpty() ) {
             throw new InvalidInputException( " Wrong parameter passed : emailAddress is null oe empty " );
         }
-        LOG.debug( "method getProcessedPreInitiatedSurveys called for email id : " + emailAddress);
+        LOG.debug( "method getProcessedPreInitiatedSurveys called for email id : " + emailAddress );
         surveyPreInitiationDao.updateSurveyPreinitiationRecordsAsIgnored( emailAddress );
     }
 }

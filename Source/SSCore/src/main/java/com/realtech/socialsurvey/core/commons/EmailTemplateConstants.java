@@ -132,4 +132,8 @@ public final class EmailTemplateConstants {
     
     public static final String SEND_REPORT_MAIL_SUBJECT = "sendReportMailSubject.txt";
     public static final String SEND_REPORT_MAIL_BODY = "sendReportMailBody.html";
+
+    public static final String ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_SUBJECT = "ZillowReviewComplaintHandlerMailSubject.txt";
+    public static final String ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_BODY = "ZillowReviewComplaintHandlerMailBody.html";
+
 }

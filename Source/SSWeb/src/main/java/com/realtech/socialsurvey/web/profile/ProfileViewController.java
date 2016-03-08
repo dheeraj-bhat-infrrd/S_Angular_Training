@@ -136,7 +136,8 @@ public class ProfileViewController
             model.addAttribute( "profileJson", json );
 
             Long companyId = companyProfile.getIden();
-            Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
+            // Commented as now Zillow reviews are saved in Social Survey, SS-307
+            /*Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
                 .getZillowTotalScoreAndReviewCountForProfileLevel( CommonConstants.PROFILE_LEVEL_COMPANY, companyId );
             long zillowReviewCount = 0;
             long zillowTotalScore = 0;
@@ -144,14 +145,14 @@ public class ProfileViewController
             if ( zillowTotalScoreAndAverage != null && !zillowTotalScoreAndAverage.isEmpty() ) {
                 zillowReviewCount = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
                 zillowTotalScore = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-            }
+            }*/
             double averageRating = profileManagementService.getAverageRatings( companyId,
-                CommonConstants.PROFILE_LEVEL_COMPANY, false, true, zillowTotalScore, zillowReviewCount );
+                CommonConstants.PROFILE_LEVEL_COMPANY, false, false, 0, 0 );
             model.addAttribute( "averageRating", averageRating );
 
             // should show all review count
             long reviewsCount = profileManagementService.getReviewsCount( companyId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_COMPANY, false, false, true, zillowReviewCount );
+                -1, CommonConstants.PROFILE_LEVEL_COMPANY, false, false, false, 0 );
             
             model.addAttribute( "reviewsCount", reviewsCount );
 
@@ -273,7 +274,8 @@ public class ProfileViewController
             model.addAttribute( "profileJson", json );
 
             Long regionId = regionProfile.getIden();
-            Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
+            // Commented as Zillow reviews are stored in Social Survey, SS-307
+            /*Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
                 .getZillowTotalScoreAndReviewCountForProfileLevel( CommonConstants.PROFILE_LEVEL_REGION, regionId );
             long zillowReviewCount = 0;
             long zillowTotalScore = 0;
@@ -281,13 +283,13 @@ public class ProfileViewController
             if ( zillowTotalScoreAndAverage != null && !zillowTotalScoreAndAverage.isEmpty() ) {
                 zillowReviewCount = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
                 zillowTotalScore = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-            }
+            }*/
             double averageRating = profileManagementService.getAverageRatings( regionId, CommonConstants.PROFILE_LEVEL_REGION,
-                false, true, zillowTotalScore, zillowReviewCount );
+                false, false, 0, 0 );
             model.addAttribute( "averageRating", averageRating );
 
             long reviewsCount = profileManagementService.getReviewsCount( regionId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_REGION, false, false, true, zillowReviewCount );
+                -1, CommonConstants.PROFILE_LEVEL_REGION, false, false, false, 0 );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -408,7 +410,8 @@ public class ProfileViewController
 
             Long branchId = branchProfile.getIden();
 
-            Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
+            // Commented as Zillow reviews are stored in Social Survey, SS-307
+            /*Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
                 .getZillowTotalScoreAndReviewCountForProfileLevel( CommonConstants.PROFILE_LEVEL_BRANCH, branchId );
             long zillowReviewCount = 0;
             long zillowTotalScore = 0;
@@ -416,14 +419,14 @@ public class ProfileViewController
             if ( zillowTotalScoreAndAverage != null && !zillowTotalScoreAndAverage.isEmpty() ) {
                 zillowReviewCount = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
                 zillowTotalScore = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-            }
+            }*/
 
             double averageRating = profileManagementService.getAverageRatings( branchId, CommonConstants.PROFILE_LEVEL_BRANCH,
-                false, true, zillowTotalScore, zillowReviewCount );
+                false, false, 0, 0 );
             model.addAttribute( "averageRating", averageRating );
 
             long reviewsCount = profileManagementService.getReviewsCount( branchId, -1,
-                -1, CommonConstants.PROFILE_LEVEL_BRANCH, false, false, true, zillowReviewCount );
+                -1, CommonConstants.PROFILE_LEVEL_BRANCH, false, false, false, 0 );
             model.addAttribute( "reviewsCount", reviewsCount );
 
             if ( isBotRequest ) {
@@ -599,8 +602,9 @@ public class ProfileViewController
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
 
+                // Commented as Zillow reviews are stored in Social Survey, SS-307
                 long agentId = user.getUserId();
-                Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
+                /*Map<String, Long> zillowTotalScoreAndAverage = profileManagementService
                     .getZillowTotalScoreAndReviewCountForProfileLevel( CommonConstants.PROFILE_LEVEL_INDIVIDUAL, agentId );
                 long zillowReviewCount = 0;
                 long zillowTotalScore = 0;
@@ -608,13 +612,13 @@ public class ProfileViewController
                 if ( zillowTotalScoreAndAverage != null && !zillowTotalScoreAndAverage.isEmpty() ) {
                     zillowReviewCount = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_REVIEW_COUNT_COLUMN );
                     zillowTotalScore = zillowTotalScoreAndAverage.get( CommonConstants.ZILLOW_TOTAL_SCORE );
-                }
+                }*/
                 double averageRating = profileManagementService.getAverageRatings( agentId,
-                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, true, zillowTotalScore, zillowReviewCount );
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, 0, 0 );
                 model.addAttribute( "averageRating", averageRating );
 
                 long reviewsCount = profileManagementService.getReviewsCount( agentId, -1,
-                    -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, true, zillowReviewCount );
+                    -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false, false, 0 );
                 model.addAttribute( "reviewsCount", reviewsCount );
 
                 if ( isBotRequest ) {

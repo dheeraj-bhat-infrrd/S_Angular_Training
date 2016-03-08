@@ -49,4 +49,11 @@ public class BranchDaoImplTest
     public void testGetBranchesForCompanyWithInvalidCompanyId() throws InvalidInputException{
         branchDaoImpl.getBranchesForCompany( 0, 0, 0, 50 );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        branchDaoImpl.getBranchIdsUnderCompany( 0, 0, 50 );
+    }
 }

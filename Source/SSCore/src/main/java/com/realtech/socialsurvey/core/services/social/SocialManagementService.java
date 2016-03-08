@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.social;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -8,10 +9,14 @@ import twitter4j.TwitterException;
 import twitter4j.auth.RequestToken;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -164,7 +169,30 @@ public interface SocialManagementService
         throws InvalidInputException;
 
 
-    List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize ) throws InvalidInputException;
+    public List<ZillowTempPost> getAllZillowTempPosts();
+
+
+    public RegionMediaPostResponseDetails getRMPRDFromRMPRDList(
+        List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList, long regionId );
+
+
+    public BranchMediaPostResponseDetails getBMPRDFromBMPRDList(
+        List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList, long branchId );
+
+
+    ExternalSurveyTracker checkExternalSurveyTrackerExist( String entityColumnName, long entityId, String source,
+        String reviewUrl, Timestamp reviewDate );
+
+
+    public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
+        String reviewUrl, double rating, int complaintResolutionStatus, Timestamp reviewDate );
+
+
+    public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds );
+
+
+    List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException;
 
 
     List<SurveyPreInitiation> getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
@@ -175,6 +203,5 @@ public interface SocialManagementService
 
 
     void updateSurveyPreinitiationRecordsAsIgnored( String emailAddress ) throws InvalidInputException;
-
 }
 // JIRA SS-34 BY RM02 BOC

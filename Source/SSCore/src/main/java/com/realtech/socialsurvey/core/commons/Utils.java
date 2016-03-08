@@ -13,8 +13,10 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -278,5 +280,35 @@ public class Utils
     public String generateRandomAlphaNumericString(){
         SecureRandom random = new SecureRandom();
         return new BigInteger(40, random).toString(20);
+    }
+
+
+    /**
+     * Method to check whether review has abusive words
+     * @param review
+     * @return
+     */
+    public boolean checkReviewForSwearWords( String review, String swearWords[] )
+    {
+        if ( review == null || review.isEmpty() ) {
+            LOG.error( "review passed as argument is null or empty" );
+            return false;
+        }
+
+        if ( swearWords == null || swearWords.length == 0 ) {
+            LOG.error( "swearWords passed as argument cannot be null or empty" );
+            return false;
+        }
+        LOG.info( "Method to check review for abusive words, checkReviewForSwearWords called" );
+        List<String> swearList = Arrays.asList( swearWords );
+        String reviewParts[] = review.split( " " );
+        for ( String reviewWord : reviewParts ) {
+            if ( swearList.contains( reviewWord.trim().toLowerCase() ) ) {
+                LOG.info( "Method to check review for abusive words, checkReviewForSwearWords ended" );
+                return true;
+            }
+        }
+        LOG.info( "Method to check review for abusive words, checkReviewForSwearWords ended" );
+        return false;
     }
 }

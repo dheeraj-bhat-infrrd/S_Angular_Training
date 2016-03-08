@@ -192,6 +192,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_SET_COMPANY_ID_IN_SOCIAL_POSTS = "SetCompanyIdInSocialPosts";
     public static final String BATCH_TYPE_IMAGE_PROCESSING_STARTER = "ImageProcessingStarter";
     public static final String BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR = "HierarchySettingsCorrector";
+    public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
     
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -214,6 +215,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR = "Hierarchy Settings Corrector For Old Records";
     public static final String BILLING_REPORT_GENERATOR = "Billing Report Generator";
     public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
+    public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
     
     /**
      * Mongo entities and column name constants
@@ -260,6 +262,7 @@ public interface CommonConstants
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN ="isLogoImageProcessed";
     public static final String IS_UNMARKED_ABUSIVE_COLUMN ="isUnmarkedAbusive";
     public static final String DELETED_SOCIAL_MEDIA_TOKENS_COLUMN = "deletedSocialTokens";
+    public static final String SHOW_SURVEY_ON_UI_COLUMN = "showSurveyOnUI";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -833,6 +836,7 @@ public interface CommonConstants
     public static final DecimalFormat SOCIAL_RANKING_WHOLE_FORMAT = new DecimalFormat( "#" );
 
     public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
+    public static final String ZILLOW_TWITTER_MESSAGE = "%s Star response from %s for %s on %s ";
 
     // file upload types
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
@@ -1020,18 +1024,29 @@ public interface CommonConstants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
-    
+
     //Hierarchy Upload constants
     public static final String HIERARCHY_UPLOAD_COLLECTION = "HIERARCHY_UPLOAD";
-    
+
     public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&returncompletecontent=true&count=50";
-    
+
+    // Zillow Temp Post Table column names
+    public static final String ZILLOW_REVIEW_URL_COLUMN = "zillowReviewUrl";
+    public static final String ENTITY_COLUMN_NAME_COLUMN = "entityColumnName";
+    public static final String ZILLOW_ENTITY_ID_COLUMN = "entityId";
+    public static final String ZILLOW_REVIEW_DATE_COLUMN = "zillowReviewDate";
+
+    // Auto Post Tracker Table column names
+    public static final String REVIEW_SOURCE_COLUMN = "reviewSource";
+    public static final String REVIEW_SOURCE_URL_COLUMN = "reviewSourceUrl";
+    public static final String REVIEW_DATE_COLUMN = "reviewDate";
+
     public static final String HIERARCHY_REGION_HEADERS_INVALID = "Invalid headers in the Regions sheet";
-    
+
     public static final String HIERARCHY_BRANCH_HEADERS_INVALID = "Invalid headers in the Offices sheet";
-    
+
     public static final String HIERARCHY_USER_HEADERS_INVALID = "Invalid headers in the Users sheet";
-    
+
     //Hierarchy upload error constants
     public static final String USER_UPLOAD_ERROR_LIST = "USER_UPLOAD";
     public static final String BRANCH_UPLOAD_ERROR_LIST = "BRANCH_UPLOAD";
@@ -1039,6 +1054,4 @@ public interface CommonConstants
     public static final String USER_DELETE_ERROR_LIST = "USER_DELETE";
     public static final String BRANCH_DELETE_ERROR_LIST = "BRANCH_DELETE";
     public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
-    
-    
 }

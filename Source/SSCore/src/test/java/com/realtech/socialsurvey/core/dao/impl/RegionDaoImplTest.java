@@ -49,4 +49,11 @@ public class RegionDaoImplTest
     public void testGetRegionsForCompanyWithInvalidCompanyId() throws InvalidInputException{
         regionDaoImpl.getRegionsForCompany( 0, 1, 50 );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetRegionIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        regionDaoImpl.getRegionIdsUnderCompany( 0, 1, 50 );
+    }
 }

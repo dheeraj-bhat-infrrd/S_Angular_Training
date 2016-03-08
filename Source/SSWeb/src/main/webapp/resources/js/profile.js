@@ -1055,11 +1055,14 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	}
 	var url = "/rest/profile/";
 	if (profileLevel == 'COMPANY') {
-		url += "company/";
+		// url += "company/";
+		return;
 	} else if (profileLevel == 'REGION') {
-		url += "region/";
+		// url += "region/";
+		return;
 	} else if (profileLevel == 'BRANCH') {
-		url += "branch/";
+		// url += "branch/";
+		return;
 	} else if (profileLevel == 'INDIVIDUAL') {
 		url += "individual/";
 	}
@@ -1691,14 +1694,17 @@ function fetchHeirarchyIdsConectedToZillow(profileLevel, iden, isNextBatch) {
 	var newHierarchyLevel = "";
 	var url = "/rest/profile/";
 	if (profileLevel == 'COMPANY') {
-		url += "company/";
-		newHierarchyLevel = "REGION";
+		// url += "company/";
+		// newHierarchyLevel = "REGION";
+		return;
 	} else if (profileLevel == 'REGION') {
-		url += "region/";
-		newHierarchyLevel = "BRANCH";
+		// url += "region/";
+		// newHierarchyLevel = "BRANCH";
+		return;
 	} else if (profileLevel == 'BRANCH') {
-		url += "branch/";
-		newHierarchyLevel = "INDIVIDUAL";
+		// url += "branch/";
+		// newHierarchyLevel = "INDIVIDUAL";
+		return;
 	} else if (profileLevel == 'INDIVIDUAL') {
 		return;
 	}
