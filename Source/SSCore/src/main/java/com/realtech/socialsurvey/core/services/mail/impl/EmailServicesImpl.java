@@ -1902,5 +1902,38 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.info( "Method sendBillingReportMail() finished." );
     }
+    
+    
+    /**
+     * Method to send the billing report in a mail to the social survey admin
+     */
+    @Override
+    public void sendCustomReportMail( String recipientName, String recipientMailId, String subject,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendCustomReportMail() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending billing report mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending billing report mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setAttachmentDetail( attachmentsDetails );
+        
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SEND_REPORT_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( subject ) );
+        
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SEND_REPORT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, true, false );
+
+        LOG.info( "Method sendCustomReportMail() finished." );
+    }
 }
 // JIRA: SS-7: By RM02: EOC

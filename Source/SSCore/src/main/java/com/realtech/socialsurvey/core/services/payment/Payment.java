@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.braintreegateway.BraintreeGateway;
+import com.braintreegateway.ResourceCollection;
 import com.braintreegateway.Subscription;
 import com.braintreegateway.Transaction;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -263,6 +264,6 @@ public interface Payment {
     List<Transaction> getTransactionListFromBrainTree( String subscriptionId ) throws InvalidInputException;
 
 
-    List<Subscription> getActiveSubscriptionsListFromBrainTree() throws InvalidInputException;
+    ResourceCollection<Subscription> getActiveSubscriptionsListFromBrainTree() throws InvalidInputException;
 		
 }

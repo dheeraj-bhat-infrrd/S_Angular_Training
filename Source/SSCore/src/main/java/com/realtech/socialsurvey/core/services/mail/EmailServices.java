@@ -393,6 +393,8 @@ public interface EmailServices
     void sendInvitationToSocialSurveyAdmin( String url, String recipientMailId, String name, String loginName )
         throws InvalidInputException, UndeliveredEmailException;
 
+    void sendCustomReportMail( String recipientName, String recipientMailId, String subject,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
 
     public void sendZillowReviewComplaintHandleMail( String recipientMailId, String customerName, String rating, String reviewUrl )
         throws InvalidInputException, UndeliveredEmailException;
