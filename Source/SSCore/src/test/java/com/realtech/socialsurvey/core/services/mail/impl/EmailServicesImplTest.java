@@ -1468,4 +1468,34 @@ public class EmailServicesImplTest
     {
         emailServicesImpl.sendBillingReportMail( "abc", "xyz", "", new HashMap<String, String>() );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSendZillowReviewComplaintHandleMailWithRecipientMailIdNull() throws InvalidInputException,
+        UndeliveredEmailException
+    {
+        emailServicesImpl.sendZillowReviewComplaintHandleMail( null, null, "" + 0, "http://www.test.com" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testSendZillowReviewComplaintHandleMailWithRecipientMailIdEmpty() throws InvalidInputException,
+        UndeliveredEmailException
+    {
+        emailServicesImpl.sendZillowReviewComplaintHandleMail( "", null, "" + 0, "http://www.test.com" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void sendComplaintHandleMailTestCustomerNameIsNull() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendZillowReviewComplaintHandleMail( "test", null, "" + 0, "http://www.test.com" );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void sendComplaintHandleMailTestCustomerNameIsEmpty() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendZillowReviewComplaintHandleMail( "test", "", "" + 0, "http://www.test.com" );
+    }
 }

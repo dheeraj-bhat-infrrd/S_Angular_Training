@@ -115,6 +115,8 @@ var defaultCountry = "United States";
 
 var fb_app_id;
 var google_plus_app_id;
+var isZillowReviewsCallRunning = false;
+var zillowCallBreak = false
 
 /**
  * js functions for landing page
@@ -7471,7 +7473,47 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		isReviewsRequestRunningEditProfile = false;
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
+		} else {
+			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning);
 		}
+	}, true);
+}
+
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch){
+	if (currentProfileIden == undefined || currentProfileIden == "" || isZillowReviewsCallRunning) {
+		return; //Return if profile id is undefined
+	}
+	var url = "/rest/profile/";
+	if (profileLevel == 'companyId') {
+		// url += "company/";
+		return;
+	} else if (profileLevel == 'regionId') {
+		// url += "region/";
+		return;
+	} else if (profileLevel == 'branchId') {
+		// url += "branch/";
+		return;
+	} else if (profileLevel == 'agentId') {
+		url += "individual/";
+	}
+	url += currentProfileIden + "/zillowreviews";
+	isZillowReviewsCallRunning = true;
+	callAjaxGET(url, function(data) {
+		isZillowReviewsCallRunning = false;
+	    if (data != undefined && data != "") {
+	        var responseJson = $.parseJSON(data);
+	        if (responseJson != undefined) {
+	            var result = $.parseJSON(responseJson.entity);
+	            zillowCallBreak = result.zillowCallBreak;
+	            if (!zillowCallBreak) {
+	                stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
+	                if (result != undefined && result.length > 0) {
+						// build zillow reviews html here
+						paintReviews(result);
+	                }
+	            }
+	        }
+	    }
 	}, true);
 }
 
@@ -10842,6 +10884,101 @@ function encompassCretentials(){
 
 };
 
+function paintReviews(result){
+	//Check if there are more reviews left
+	var resultSize = result.length;
+	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 
+	var reviewsHtml = "";
+	$.each(result, function(i, reviewItem) {
+		var scoreFixVal = 1;
+		var date = Date.parse(reviewItem.modifiedOn);
+		var lastItemClass = "ppl-review-item";
+		if (i == resultSize - 1) {
+			lastItemClass = "ppl-review-item-last";
+        }
+		var custName = reviewItem.customerFirstName;
+		if(reviewItem.customerLastName != undefined){
+			custName += ' ' + reviewItem.customerLastName;
+		}
+		custName = custName || "";
+		var custNameArray = custName.split(' ');
+		var custDispName = custNameArray[0];
+		if(custNameArray[1] != undefined && custNameArray[1].trim() != ""){
+			custDispName += ' '+custNameArray[1].substr(0,1).toUpperCase()+'.';
+		}
+		reviewsHtml = reviewsHtml +
+			'<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName)
+				+ ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName)
+				+ ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="'
+				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
+		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
+		reviewsHtml += '		<div class="float-left ppl-header-left">';
+		reviewsHtml += '			<div class="ppl-head-1">'+custDispName+'</div>';
+		if (date != null) {
+			date = convertUserDateToLocale(date);
+			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
+		}
 
+		reviewsHtml += '		</div>';
+		reviewsHtml += '    	<div class="float-right ppl-header-right">';
+		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
+		reviewsHtml += '		</div>';
+		reviewsHtml += '	</div>';
 
+		if (reviewItem.review.length > 250) {
+			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
+		} else {
+			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
+		}
+		if(reviewItem.source == "Zillow") {
+			reviewsHtml += '<a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
+		}
+		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
+			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";
+		else
+			reviewItem.customerLastName = "";
+		if(reviewItem.agentName == undefined || reviewItem.agentName == null)
+			reviewItem.agentName = "us";
+
+		reviewsHtml += '	</div>';
+
+		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height">';
+		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
+		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
+		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' +reviewItem.completeProfileUrl.replace("localhost","127.0.0.1")+ '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
+		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		reviewsHtml += '		</div>';
+		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
+		if(reviewItem.source != "Zillow")
+			reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
+		reviewsHtml += '		</div>';
+		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
+		reviewsHtml += '	</div>';
+		reviewsHtml += '</div>';
+	});
+
+	if(result.length > 0){
+		$('#reviews-container').show();
+	}
+
+	hideLoaderOnPagination($('#prof-review-item'));
+	/*if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
+		$("#prof-review-item").html('');
+	}*/
+
+	$("#prof-review-item").append(reviewsHtml);
+
+	$("#prof-reviews-header").parent().show();
+	$(".review-ratings").each(function() {
+		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
+	});
+
+	setTimeout(function() {
+		$(window).trigger('scroll');
+	}, 100);
+}
