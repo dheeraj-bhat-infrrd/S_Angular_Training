@@ -742,25 +742,25 @@ function validateTextArea(elementId) {
 function validateCountryZipcode(elementId, isOnlyShowToast) {
 
 	if (selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/') {
-	
-		var countryCode =$('#country-code').val();	
-		var flag=false;
-		
+
+		var countryCode = $('#country-code').val();
+		var flag = false;
+
 		for (var i = 0; i < postCodeRegex.length; i++) {
-			
-			 if (postCodeRegex[i].code == countryCode) {
+
+			if (postCodeRegex[i].code == countryCode) {
 				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
 				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
-				flag=true;
+				flag = true;
 				break;
-			}	
+			}
 		}
-		
+
 		if (!flag) {
-			
-		selectedCountryRegEx = ".*";
-		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
-		
+
+			selectedCountryRegEx = ".*";
+			selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+
 		}
 	}
 
@@ -2052,7 +2052,8 @@ var hierarchyUpload = {
 							if (hierarchyUpload.verified == false) {
 								$('#xlsx-file-verify').css("pointerEvents",
 										"none");
-								$('#xlsx-file-verify').css("background", "#BBB");
+								$('#xlsx-file-verify')
+										.css("background", "#BBB");
 								showError("Please upload xlsx file");
 							}
 
@@ -2061,8 +2062,9 @@ var hierarchyUpload = {
 								hierarchyUpload.verified = false;
 								$('#xlsx-file-verify').css("pointerEvents",
 										"auto");
-								$('#xlsx-file-verify').css("background", "#009FE0");
-								
+								$('#xlsx-file-verify').css("background",
+										"#009FE0");
+
 								var formData = new FormData();
 								formData.append("file", $('#com-file').prop(
 										"files")[0]);
@@ -2078,7 +2080,8 @@ var hierarchyUpload = {
 							else {
 								$('#xlsx-file-verify').css("pointerEvents",
 										"none");
-								$('#xlsx-file-verify').css("background", "#BBB");
+								$('#xlsx-file-verify')
+										.css("background", "#BBB");
 								showError("Please select a valid file");
 							}
 						});
@@ -2105,7 +2108,8 @@ var hierarchyUpload = {
 								if (url == undefined || url == '') {
 									$('#xlsx-file-verify').css("pointerEvents",
 											"none");
-									$('#xlsx-file-verify').css("background", "#BBB");
+									$('#xlsx-file-verify').css("background",
+											"#BBB");
 									showError("Please upload a valid file");
 								} else {
 									var formData = new FormData();
@@ -3150,7 +3154,7 @@ var hierarchyUpload = {
 		if (data.validationErrors.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/abuse.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/abuse.png" style="width: 18px; height: 18px"></span>';
 		} else if (data.validationWarnings.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
