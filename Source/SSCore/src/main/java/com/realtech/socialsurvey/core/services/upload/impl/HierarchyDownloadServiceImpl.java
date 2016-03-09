@@ -76,6 +76,10 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     
     @Autowired
     private Utils utils;
+    
+    private static char TYPE_USER = 'U';
+    private static char TYPE_BRANCH = 'O';
+    private static char TYPE_REGION = 'R';
 
 
     /**
@@ -481,7 +485,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     }
 
 
-    public String generateSourceId( String entityType )
+    public String generateSourceId( char entityType )
     {
         return entityType + Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() );
     }
@@ -619,7 +623,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         List<String> assignedRegionsAdmin = new ArrayList<String>();
 
         if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( userUploadVO.getUserId() ) ) ) {
-            String sourceId = generateSourceId( CommonConstants.USER_COLUMN );
+            String sourceId = generateSourceId( TYPE_USER );
             userUploadVO.setSourceUserId( sourceId );
             newSourceMap.put( sourceId, userUploadVO.getUserId() );
         } else {
@@ -829,7 +833,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 branchUploadVO.setBranchZipcode( branchSettings.getContact_details().getZipcode() );
             }
             if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( branchUploadVO.getBranchId() ) ) ) {
-                String sourceId = generateSourceId( CommonConstants.BRANCH_NAME_COLUMN );
+                String sourceId = generateSourceId( TYPE_BRANCH );
                 branchUploadVO.setSourceBranchId( sourceId );
                 newSourceMap.put( sourceId, branchUploadVO.getBranchId() );
             } else {
@@ -958,7 +962,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 regionUploadVO.setRegionZipcode( regionSettings.getContact_details().getZipcode() );
             }
             if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( regionUploadVO.getRegionId() ) ) ) {
-                String sourceId = generateSourceId( CommonConstants.REGION_COLUMN );
+                String sourceId = generateSourceId( TYPE_REGION );
                 regionUploadVO.setSourceRegionId( sourceId );
                 newSourceMap.put( sourceId, regionUploadVO.getRegionId() );
             } else {
