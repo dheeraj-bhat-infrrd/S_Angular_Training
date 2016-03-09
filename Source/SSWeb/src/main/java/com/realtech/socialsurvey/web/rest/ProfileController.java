@@ -1870,7 +1870,7 @@ public class ProfileController
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for agent id: " + iden );
                     List<SurveyDetails> surveyDetailsList = profileManagementService.fetchAndSaveZillowData( individualProfile,
-                        CommonConstants.AGENT_SETTINGS_COLLECTION, user.getCompany().getCompanyId() );
+                        CommonConstants.AGENT_SETTINGS_COLLECTION, user.getCompany().getCompanyId(), false, true );
                     LOG.info( "Done fetching zillow reviews for agent id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();

@@ -608,8 +608,8 @@ public interface ProfileManagementService
         String profileLevel, Date startDate, Date endDate ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<SurveyDetails> fetchAndSaveZillowData( OrganizationUnitSettings profile, String collection, long companyId )
-        throws InvalidInputException, UnavailableException;
+    public List<SurveyDetails> fetchAndSaveZillowData( OrganizationUnitSettings profile, String collection, long companyId,
+        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException;
 
 
     public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow, long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException;
@@ -627,5 +627,10 @@ public interface ProfileManagementService
 
 
     public List<SurveyDetails> buildSurveyDetailsFromReviewMap( List<HashMap<String, Object>> reviews, String collectionName,
-        OrganizationUnitSettings profile, long companyId ) throws InvalidInputException;
+        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException;
+
+
+    public List<SurveyDetails> getReviewsForReports( long iden, double startScore, double limitScore, int startIndex, int numOfRows,
+        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+        throws InvalidInputException;
 }
