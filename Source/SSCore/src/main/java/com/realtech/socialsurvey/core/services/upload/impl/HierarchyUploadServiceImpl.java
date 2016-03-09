@@ -1045,6 +1045,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     && ( !uploadedRegions.contains( region )
                         || uploadedRegionMap.get( region.getSourceRegionId() ).isDeletedRecord() ) ) {
                     region.setDeletedRecord( true );
+                    validationObject.setNumberOfRegionsDeleted( validationObject.getNumberOfRegionsDeleted() + 1 );
                 }
             }
         }
@@ -1066,6 +1067,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     && ( !uploadedBranches.contains( branch )
                         || uploadedBranchMap.get( branch.getSourceBranchId() ).isDeletedRecord() ) ) {
                     branch.setDeletedRecord( true );
+                    validationObject.setNumberOfBranchesDeleted( validationObject.getNumberOfBranchesDeleted() + 1 );
                 }
             }
         }
