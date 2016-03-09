@@ -8342,6 +8342,29 @@ label.url-change-input-label {
 	height: 250px;
 	margin: auto;
 }
+/* untracked user */
+
+.unmatchtab{
+	padding: 10px 0px;
+    margin: 0px 0px;
+        text-align: center;
+        overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.unhr-row{
+	font-weight:600 !important;
+}
+.un-row{
+	border-bottom:1px solid #dcdcdc;
+	    height: 40px;
+}
+.un-heading{
+	border-top: #d2dedf 1px solid;
+    font-weight: 600 !important;
+    margin-top: 30px;
+    padding: 10px;
+}
 
 .hierarchy-btn {
 	float: left;
