@@ -680,7 +680,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue, boolean fetchAbusive )
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue, boolean fetchAbusive, boolean forStatistics )
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
@@ -703,6 +703,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
+        }
+        
+        if ( forStatistics ) {
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
         }
 
         if ( columnName == null ) {
@@ -995,6 +999,70 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return surveysWithReviews;
     }
 
+    @Override
+    public List<SurveyDetails> getFeedbacksForReports( String columnName, long columnValue, int start, int rows, double startScore,
+        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+    {
+        LOG.info( "Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started." );
+
+        Query query = new Query();
+        if ( columnName != null ) {
+            query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
+        }
+
+        /**
+         * fetching only completed surveys
+         */
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
+        }
+        // query.fields().exclude( "surveyResponse" );
+        if ( startDate != null && endDate != null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
+                .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+        } else if ( startDate != null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+        } else if ( endDate != null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+        }
+
+        /**
+         * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+         * are to be fetched else fetch all the records
+         */
+        if ( !fetchAbusive ) {
+            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
+        }
+
+        if ( startScore > -1 && limitScore > -1 ) {
+            query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
+                Criteria.where( CommonConstants.SCORE_COLUMN ).lte( limitScore ) ) );
+        }
+
+        if ( start > -1 ) {
+            query.skip( start );
+        }
+        if ( rows > -1 ) {
+            query.limit( rows );
+        }
+
+        query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
+
+        /*if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) )
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
+        else if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE ) ) {
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SCORE_COLUMN ) );
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
+        } else {
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SCORE_COLUMN ) );
+        }*/
+        List<SurveyDetails> surveysWithReviews = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+
+        LOG.info( "Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() finished." );
+        return surveysWithReviews;
+    }
 
     @Override
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
@@ -1121,6 +1189,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( organizationUnitColumn ).is( organizationUnitColumnValue ) );
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
@@ -1143,6 +1212,88 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return count;
     }
 
+
+    @Override
+    public long getCompletedSurveyCountForStatistics( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
+        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
+    {
+        LOG.info( "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
+        if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
+            LOG.warn( "organizationUnitColumn is empty" );
+            throw new InvalidInputException( "organizationUnitColumn is empty" );
+        }
+        if ( organizationUnitColumnValue <= 0l ) {
+            LOG.warn( "organizationUnitColumnValue is invalid" );
+            throw new InvalidInputException( "organizationUnitColumnValue is invalid" );
+        }
+        Query query = new Query();
+        query.addCriteria( Criteria.where( organizationUnitColumn ).is( organizationUnitColumnValue ) );
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+
+        // Do not show zillow review in statistics completed count, SS-307
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+        if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
+        }
+        if ( filterAbusive ) {
+            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
+        }
+        if ( startDate != null && endDate == null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+        }
+        if ( endDate != null && startDate == null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+        }
+        if ( startDate != null && endDate != null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
+                .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+        }
+        LOG.debug( "Query: " + query.toString() );
+        long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Found " + count + " completed surveys" );
+        return count;
+    }
+
+    @Override
+    public long getZillowImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
+        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
+    {
+        LOG.info( "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
+        if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
+            LOG.warn( "organizationUnitColumn is empty" );
+            throw new InvalidInputException( "organizationUnitColumn is empty" );
+        }
+        if ( organizationUnitColumnValue <= 0l ) {
+            LOG.warn( "organizationUnitColumnValue is invalid" );
+            throw new InvalidInputException( "organizationUnitColumnValue is invalid" );
+        }
+        Query query = new Query();
+        query.addCriteria( Criteria.where( organizationUnitColumn ).is( organizationUnitColumnValue ) );
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+
+        // Do not show zillow review in statistics completed count, SS-307
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+        if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
+        }
+        if ( filterAbusive ) {
+            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
+        }
+        if ( startDate != null && endDate == null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+        }
+        if ( endDate != null && startDate == null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+        }
+        if ( startDate != null && endDate != null ) {
+            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
+                .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+        }
+        LOG.debug( "Query: " + query.toString() );
+        long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Found " + count + " completed surveys" );
+        return count;
+    }
 
     @SuppressWarnings ( "unchecked")
     @Override
@@ -1173,6 +1324,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN, true ) ) );
         }
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject(
+            "$ne", CommonConstants.SURVEY_SOURCE_ZILLOW ) ) ) );
         // match non abusive survey
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN, false ) ) );
         // match start date
@@ -1260,7 +1413,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         // Commented as Zillow surveys are not stored in database, SS-1276
         // match non zillow survey
-        // pipeline.add(new BasicDBObject("$match", new BasicDBObject(CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject("$ne",CommonConstants.SURVEY_SOURCE_ZILLOW))));
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject(
+            "$ne", CommonConstants.SURVEY_SOURCE_ZILLOW ) ) ) );
         // match start date
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.CREATED_ON, new BasicDBObject( "$gte",
             new Date( startDate.getTime() ) ) ) ) );
@@ -1342,6 +1496,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN, true ) ) );
         }
+        
+        // exclude zillow surveys
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject(
+            "$ne", CommonConstants.SURVEY_SOURCE_ZILLOW ) ) ) );
         // match the survey stage should be complete
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN,
             CommonConstants.SURVEY_STAGE_COMPLETE ) ) );

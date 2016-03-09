@@ -97,7 +97,7 @@ public interface SurveyDetailsDao
      * @return
      * @throws InvalidInputException
      */
-    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive) throws InvalidInputException;
+    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
     /**
      * Gets an aggregated count for completed survey
      * @param organizationUnitColumn
@@ -185,7 +185,7 @@ public interface SurveyDetailsDao
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
 
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId  , boolean fetchAbusive );
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId  , boolean fetchAbusive, boolean forStatistics );
 
 
     public void updateSurveyAsUnderResolution( String surveyId );
@@ -236,4 +236,15 @@ public interface SurveyDetailsDao
 
     public void resetShowSurveyOnUIPropertyForNonLatestReviews( String columnName, long id, List<String> latestSurveyIdList );
 
+
+    public long getCompletedSurveyCountForStatistics( String organizationUnitColumn, long organizationUnitColumnValue,
+        Timestamp startDate, Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
+
+
+    public long getZillowImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
+        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
+
+
+    public List<SurveyDetails> getFeedbacksForReports( String columnName, long columnValue, int start, int rows, double startScore,
+        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria );
 }

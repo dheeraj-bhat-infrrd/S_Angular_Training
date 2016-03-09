@@ -963,6 +963,8 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		isDashboardReviewRequestRunning = false;
 		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 			fetchReviewsOnDashboard(true);
+		} else {
+			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true);
 		}
 	}, payload, true);
 }
@@ -7474,12 +7476,12 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
 		} else {
-			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning);
+			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false);
 		}
 	}, true);
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard){
 	if (currentProfileIden == undefined || currentProfileIden == "" || isZillowReviewsCallRunning) {
 		return; //Return if profile id is undefined
 	}
@@ -7509,7 +7511,7 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	                stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
 	                if (result != undefined && result.length > 0) {
 						// build zillow reviews html here
-						paintReviews(result);
+						paintReviews(result,isFromDashBoard);
 	                }
 	            }
 	        }
@@ -10889,7 +10891,7 @@ function encompassCretentials(){
 
 };
 
-function paintReviews(result){
+function paintReviews(result, isRequestFromDashBoard){
 	//Check if there are more reviews left
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
@@ -10926,18 +10928,28 @@ function paintReviews(result){
 		}
 
 		reviewsHtml += '		</div>';
-		reviewsHtml += '    	<div class="float-right ppl-header-right">';
-		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
-		reviewsHtml += '		</div>';
-		reviewsHtml += '	</div>';
-
+		if(isRequestFromDashBoard) {
+			reviewsHtml += '<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="'+reviewItem.source+'" data-source="'+reviewItem.score+'">';
+			if(reviewItem.source == "Zillow"){
+				reviewsHtml += '<div class="rating-image float-left icn-zillow" title="Zillow"></div>';
+				reviewsHtml += '<div class="rating-rounded float-left">'+Number.parseFloat(reviewItem.score).toFixed(1)+'</div>';
+			}
+			reviewsHtml += '</div>';
+			reviewsHtml += '</div>';
+		} else {
+			reviewsHtml += '    	<div class="float-right ppl-header-right">';
+			reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
+			reviewsHtml += '		</div>';
+			reviewsHtml += '	</div>';
+		}
+		
 		if (reviewItem.review.length > 250) {
 			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
 		} else {
 			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
 		}
 		if(reviewItem.source == "Zillow") {
-			reviewsHtml += '<a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
+			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
 		}
 		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
 			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";
@@ -10975,14 +10987,18 @@ function paintReviews(result){
 	/*if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
 		$("#prof-review-item").html('');
 	}*/
+	if (isRequestFromDashBoard) {
+		$('#review-details').append(reviewsHtml);
+	} else {
+		$("#prof-review-item").append(reviewsHtml);
 
-	$("#prof-review-item").append(reviewsHtml);
-
-	$("#prof-reviews-header").parent().show();
-	$(".review-ratings").each(function() {
-		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
-	});
-
+		$("#prof-reviews-header").parent().show();
+		$(".review-ratings").each(
+				function() {
+					changeRatingPattern($(this).data("rating"), $(this), false,
+							$(this).data("source"));
+				});
+	}
 	setTimeout(function() {
 		$(window).trigger('scroll');
 	}, 100);

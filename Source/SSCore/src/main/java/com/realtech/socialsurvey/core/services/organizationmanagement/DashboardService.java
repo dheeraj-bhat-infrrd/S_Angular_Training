@@ -33,7 +33,8 @@ public interface DashboardService
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public long getAllSurveyCount(String columnName, long columnValue, int numberOfDays) throws InvalidInputException;
+    public long getAllSurveyCount( String columnName, long columnValue, int numberOfDays )
+        throws InvalidInputException;
 	
 	/**
 	 * Gets completed survey count
@@ -69,7 +70,7 @@ public interface DashboardService
     public XSSFWorkbook downloadSocialMonitorData( List<SocialPost> socialPosts, String fileName ) throws InvalidInputException;
 
 
-    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileName )
+    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileName, String profileLevel, long companyId )
         throws IOException, InvalidInputException;
 
 
@@ -92,5 +93,16 @@ public interface DashboardService
     void deleteSurveyDetailsByPreInitiation( List<SurveyPreInitiation> surveys );
 
     public XSSFWorkbook downloadCompanyHierarchyReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public long getZillowImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException;
+
+
+    public long getAllSurveyCountForStatistics( String columnName, long columnValue, int numberOfDays )
+        throws InvalidInputException;
+
+
+    public long getSocialPostsForPastNdaysWithHierarchyForStatistics( String columnName, long columnValue, int numberOfDays )
+        throws InvalidInputException;
 }
 // JIRA SS-137 BY RM05:EOC

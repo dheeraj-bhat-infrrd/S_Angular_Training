@@ -151,7 +151,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                             agentIdSettingsMap.put( agentSetting.getIden(), agentSetting );
                             LOG.debug( "Fetching and saving zillow reviews for agent id : " + agentSetting.getIden() );
                             profileManagementService.fetchAndSaveZillowData( agentSetting,
-                                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyId );
+                                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyId, true, false );
                             LOG.debug( "Fetched and saved zillow reviews for agent id : " + agentSetting.getIden() );
                         }
                     }
@@ -161,7 +161,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                         for ( OrganizationUnitSettings branchSetting : branchSettings ) {
                             LOG.debug( "Fetching and saving zillow reviews for branch id : " + branchSetting.getIden() );
                             profileManagementService.fetchAndSaveZillowData( branchSetting,
-                                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyId );
+                                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyId, true, false );
                             LOG.debug( "Fetched and saved zillow reviews for branch id : " + branchSetting.getIden() );
                         }
                     }
@@ -171,7 +171,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                         for ( OrganizationUnitSettings regionSetting : regionSettings ) {
                             LOG.debug( "Fetching and saving zillow reviews for region id : " + regionSetting.getIden() );
                             profileManagementService.fetchAndSaveZillowData( regionSetting,
-                                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyId );
+                                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyId, true, false );
                             LOG.debug( "Fetched and saved zillow reviews for region id : " + regionSetting.getIden() );
                         }
                     }
@@ -181,7 +181,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                         && companySettings.getSocialMediaTokens().getZillowToken() != null ) {
                         LOG.debug( "Fetching and saving zillow reviews for company id : " + companyId );
                         profileManagementService.fetchAndSaveZillowData( companySettings,
-                            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companyId );
+                            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companyId, true, false );
                         LOG.debug( "Fetched and saved zillow reviews for company id : " + companyId );
                     }
 
@@ -200,11 +200,20 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                                     if ( checkReviewCanBePostedToSocialMedia( zillowTempPost, agentSetting, companySettings,
                                         surveyDetails ) ) {
                                         // post the zillow review to social media
-                                        postToSocialMedia( zillowTempPost, agentSetting, surveyDetails );
-
+                                        boolean autoPostSuccess = false;
+                                        try {
+                                            autoPostSuccess = postToSocialMedia( zillowTempPost, agentSetting, surveyDetails );
+                                        } catch ( Exception e ) {
+                                            LOG.error( "Error occurred while posting to social media. Reason", e );
+                                        }
+                                        int postToSocialMedia = 0;
+                                        if ( autoPostSuccess ) {
+                                            postToSocialMedia = CommonConstants.YES;
+                                        }
+                                        
                                         // check review for complaint resolution
                                         boolean complaintResStatus = triggerComplaintResolutionWorkflowForZillowReview(
-                                            companySettings, zillowTempPost, surveyDetails, agentSetting );
+                                            companySettings, zillowTempPost, surveyDetails, agentSetting, postToSocialMedia );
 
                                         if ( !complaintResStatus ) {// add to external survey tracker
                                             socialManagementService.saveExternalSurveyTracker(
@@ -212,7 +221,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                                                 CommonConstants.SURVEY_SOURCE_ZILLOW, agentSetting.getSocialMediaTokens()
                                                     .getZillowToken().getZillowProfileLink(),
                                                 zillowTempPost.getZillowReviewUrl(), zillowTempPost.getZillowReviewRating(),
-                                                CommonConstants.NO, zillowTempPost.getZillowReviewDate() );
+                                                postToSocialMedia, CommonConstants.NO, zillowTempPost.getZillowReviewDate() );
                                         }
                                     }
                                     // add to zillow temp post id to processed list
@@ -489,6 +498,28 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                 surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
                 surveyHandler.updateSurveyDetails( surveyDetails );
 
+                // check if auto post triggered anywhere in hierarchy
+                if ( agentSocialList != null && agentSocialList.size() > 0 ) {
+                    return true;
+                } else if ( companySocialList != null && companySocialList.size() > 0 ) {
+                    return true;
+                } else if ( socialMediaPostDetails != null && socialMediaPostDetails.getRegionMediaPostDetailsList() != null ) {
+                    for ( RegionMediaPostDetails regionMediaPostDetailsList : socialMediaPostDetails
+                        .getRegionMediaPostDetailsList() ) {
+                        if ( regionMediaPostDetailsList != null && regionMediaPostDetailsList.getSharedOn() != null
+                            && regionMediaPostDetailsList.getSharedOn().size() > 0 )
+                            return true;
+                    }
+                } else if ( socialMediaPostDetails != null && socialMediaPostDetails.getBranchMediaPostDetailsList() != null ) {
+                    for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
+                        .getBranchMediaPostDetailsList() ) {
+                        if ( branchMediaPostDetails != null && branchMediaPostDetails.getSharedOn() != null
+                            && branchMediaPostDetails.getSharedOn().size() > 0 )
+                            return true;
+                    }
+                } else {
+                    return false;
+                }
             }
         } catch ( NonFatalException e ) {
             LOG.error(
@@ -504,7 +535,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 
 
     private boolean triggerComplaintResolutionWorkflowForZillowReview( OrganizationUnitSettings companySettings,
-        ZillowTempPost zillowTempPost, SurveyDetails survey, OrganizationUnitSettings unitSettings )
+        ZillowTempPost zillowTempPost, SurveyDetails survey, OrganizationUnitSettings unitSettings, int autoPostSuccess )
     {
         LOG.info( "Method to trigger complaint resolution workflow for a review, triggerComplaintResolutionWorkflowForZillowReview started." );
         // trigger complaint resolution workflow if configured
@@ -530,7 +561,8 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                     socialManagementService.saveExternalSurveyTracker( zillowTempPost.getEntityColumnName(),
                         zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW, unitSettings.getSocialMediaTokens()
                             .getZillowToken().getZillowProfileLink(), zillowTempPost.getZillowReviewUrl(),
-                        zillowTempPost.getZillowReviewRating(), CommonConstants.YES, zillowTempPost.getZillowReviewDate() );
+                        zillowTempPost.getZillowReviewRating(), autoPostSuccess, CommonConstants.YES,
+                        zillowTempPost.getZillowReviewDate() );
                     return true;
                 } catch ( InvalidInputException | UndeliveredEmailException e ) {
                     LOG.error( "Error while sending complaint resolution mail to admins. Reason :", e );
