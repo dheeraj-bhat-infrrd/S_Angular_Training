@@ -31,6 +31,7 @@ import com.braintreegateway.Transaction;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.admin.AdminService;
@@ -495,5 +496,113 @@ public class AdminServiceImpl implements AdminService
         List<Company> CompanyList = companyDao.getCompaniesByBillingModeAuto();
         LOG.info( "Method getAllAutoBillingModeCompanies ended " );
         return CompanyList;
+    }
+    
+    
+    @Override
+    public boolean generateAutoBillingCompanyListExcelAndMail( List<Company> CompanyList, List<String> recipientMailIds )
+    {
+        LOG.info( "method generateAutoBillingCompanyListExcelAndMail started" );
+        // Iterate over data and write to sheet
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+
+        int rownum = 0;
+        int cellnum = 0;
+        Row row = sheet.createRow( rownum++ );
+        Cell cell1 = row.createCell( cellnum++ );
+        cell1.setCellValue( "Company Id" );
+        Cell cell2 = row.createCell( cellnum++ );
+        cell2.setCellValue( "Company Name" );
+        Cell cell3 = row.createCell( cellnum++ );
+        cell3.setCellValue( "Company Created On" );
+        Cell cell4 = row.createCell( cellnum++ );
+        cell4.setCellValue( "Subscription id" );
+        Cell cell5 = row.createCell( cellnum++ );
+        cell5.setCellValue( "Subscription Start Date" );
+        Cell cell6 = row.createCell( cellnum++ );
+        cell6.setCellValue( "Subscription Payment Retries" );
+
+        for ( Company company : CompanyList ) {
+
+            row = sheet.createRow( rownum++ );
+            cellnum = 0;
+            Cell cell = row.createCell( cellnum++ );
+            cell.setCellValue( company.getCompanyId() );
+
+            cell = row.createCell( cellnum++ );
+            cell.setCellValue( company.getCompany() );
+
+            cell = row.createCell( cellnum++ );
+            cell.setCellValue( company.getCreatedOn() );
+
+            if(company.getLicenseDetails() !=  null && !company.getLicenseDetails().isEmpty()){
+                LicenseDetail licenseDetail = company.getLicenseDetails().get( 0 );
+                if(licenseDetail != null){
+                    cell = row.createCell( cellnum++ );
+                    cell.setCellValue( licenseDetail.getSubscriptionId() );
+
+                    cell = row.createCell( cellnum++ );
+                    cell.setCellValue( licenseDetail.getLicenseStartDate() );
+
+                    cell = row.createCell( cellnum++ );
+                    cell.setCellValue( licenseDetail.getPaymentRetries() );
+                }
+            }
+            
+        }
+        // Create file and write report into it
+        boolean excelCreated = false;
+        String fileName = "Auto_Billing_Company_List-" + ( new Timestamp( new Date().getTime() ) );
+        FileOutputStream fileOutput = null;
+        InputStream inputStream = null;
+        File file = null;
+        String filePath = null;
+        try {
+            file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+            fileOutput = new FileOutputStream( file );
+            file.createNewFile();
+            workbook.write( fileOutput );
+            filePath = file.getPath();
+            excelCreated = true;
+        } catch ( FileNotFoundException fe ) {
+            LOG.error( "Exception caught while generating Auto Billing Company List Reprot" + fe.getMessage() );
+            excelCreated = false;
+        } catch ( IOException e ) {
+            LOG.error( "Exception caught  while generating Auto Billing Company List report " + e.getMessage() );
+            excelCreated = false;
+        } finally {
+            try {
+                fileOutput.close();
+                if ( inputStream != null ) {
+                    inputStream.close();
+                }
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught  while generating Auto Billing Company List report " + e.getMessage() );
+                excelCreated = false;
+            }
+        }
+
+        // Mail the report to the email
+        if ( excelCreated ) {
+            Map<String, String> attachmentsDetails = new HashMap<String, String>();
+            attachmentsDetails.put( fileName + ".xls", filePath );
+
+            for ( String recipientMailId : recipientMailIds ) {
+                String name = adminName;
+                LOG.debug( "sending mail to : " + name + " at : " + recipientMailId );
+                try {
+                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId,
+                        CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
+                } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                    LOG.error( "Error while sending mail to ; " + recipientMailId, e );
+                }
+            }
+        }
+
+        LOG.info( "method generateAutoBillingCompanyListExcelAndMail ended" );
+        return excelCreated;
     }
 }

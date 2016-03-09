@@ -21,4 +21,6 @@ public interface AdminService
 
     boolean generateSubscriptionListExcelAndMail( List<SubscriptionVO> subscriptionVOs, List<String> recipientMailIds );
 
+    boolean generateAutoBillingCompanyListExcelAndMail( List<Company> CompanyList, List<String> recipientMailIds );
+
 }
