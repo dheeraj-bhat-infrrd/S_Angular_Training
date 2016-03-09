@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import com.braintreegateway.Transaction;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.admin.AdminService;
@@ -91,15 +93,20 @@ public class AdminServiceImpl implements AdminService
         subscriptionVO.setId( subscription.getId() );
         subscriptionVO.setBalance( subscription.getBalance() );
         subscriptionVO.setBillingDayOfMonth( subscription.getBillingDayOfMonth() );
-        subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
-        subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime().toLocaleString() );
+        if ( subscription.getBillingPeriodEndDate() != null )
+            subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
+        if ( subscription.getBillingPeriodStartDate() != null )
+            subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime().toLocaleString() );
         subscriptionVO.setCurrentBillingCycle( subscription.getCurrentBillingCycle() );
-        subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
-        subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
-        subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
-        subscriptionVO.getNextBillAmount();
+        if ( subscription.getCreatedAt() != null )
+            subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
+        if ( subscription.getUpdatedAt() != null )
+            subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
+        if ( subscription.getFirstBillingDate() != null )
+            subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
         subscriptionVO.setNextBillAmount( subscription.getNextBillAmount() );
-        subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
+        if ( subscription.getNextBillingDate() != null )
+            subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
         subscriptionVO.setNextBillingPeriodAmount( subscription.getNextBillingPeriodAmount() );
 
         Company company = companyDao.getCompanyByBraintreeSubscriptionId( subscription.getId() );
@@ -107,9 +114,12 @@ public class AdminServiceImpl implements AdminService
             subscriptionVO.setCompanyId( company.getCompanyId() );
             subscriptionVO.setCompanyName( company.getCompany() );
             User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
-            subscriptionVO.setCompanyAdminId( user.getUserId() );
-            subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
-            subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+            if ( user != null ) {
+                subscriptionVO.setCompanyAdminId( user.getUserId() );
+                subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
+                subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+            }
+
         }
 
         return subscriptionVO;
@@ -142,9 +152,11 @@ public class AdminServiceImpl implements AdminService
                 transactionVO.setCompanyId( company.getCompanyId() );
                 transactionVO.setCompanyName( company.getCompany() );
                 User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
-                transactionVO.setCompanyAdminId( user.getUserId() );
-                transactionVO.setCompanyAdminFirstName( user.getFirstName() );
-                transactionVO.setCompanyAdminLastName( user.getLastName() );
+                if ( user != null ) {
+                    transactionVO.setCompanyAdminId( user.getUserId() );
+                    transactionVO.setCompanyAdminFirstName( user.getFirstName() );
+                    transactionVO.setCompanyAdminLastName( user.getLastName() );
+                }
             }
 
             transactionVOs.add( transactionVO );
@@ -262,16 +274,15 @@ public class AdminServiceImpl implements AdminService
             Map<String, String> attachmentsDetails = new HashMap<String, String>();
             attachmentsDetails.put( fileName + ".xls", filePath );
 
-            for ( String recipientMailId : recipientMailIds ) {
-                String name = adminName;
-                LOG.debug( "sending mail to : " + name + " at : " + recipientMailId );
-                try {
-                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId,
-                        CommonConstants.TRANSACTION_LIST_MAIL_SUBJECT + subscriptionId, attachmentsDetails );
-                } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                    LOG.error( "Error while sending mail to ; " + recipientMailId, e );
-                }
+            String name = adminName;
+            LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
+            try {
+                emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
+                    CommonConstants.TRANSACTION_LIST_MAIL_SUBJECT + subscriptionId, attachmentsDetails );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
             }
+
         }
 
         LOG.info( "method generateTransactionListExcelAndMail ended" );
@@ -291,46 +302,48 @@ public class AdminServiceImpl implements AdminService
             return subscriptionVOs;
         }
         for ( Subscription subscription : collection ) {
-            
+
             SubscriptionVO subscriptionVO = new SubscriptionVO();
 
-            try{
-            subscriptionVO.setId( subscription.getId() );
-            subscriptionVO.setBalance( subscription.getBalance() );
-            subscriptionVO.setBillingDayOfMonth( subscription.getBillingDayOfMonth() );
-            if ( subscription.getBillingPeriodEndDate().getTime() != null )
-                subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
-            if ( subscription.getBillingPeriodStartDate().getTime() != null )
-                subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime().toLocaleString() );
-            subscriptionVO.setCurrentBillingCycle( subscription.getCurrentBillingCycle() );
-            if ( subscription.getCreatedAt().getTime() != null )
-                subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
-            if ( subscription.getUpdatedAt().getTime() != null )
-                subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
-            if ( subscription.getFirstBillingDate().getTime() != null )
-                subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
-            subscriptionVO.getNextBillAmount();
-            subscriptionVO.setNextBillAmount( subscription.getNextBillAmount() );
-            if ( subscription.getNextBillingDate().getTime() != null )
-                subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
-            subscriptionVO.setNextBillingPeriodAmount( subscription.getNextBillingPeriodAmount() );
+            try {
+                subscriptionVO.setId( subscription.getId() );
+                subscriptionVO.setBalance( subscription.getBalance() );
+                subscriptionVO.setBillingDayOfMonth( subscription.getBillingDayOfMonth() );
+                if ( subscription.getBillingPeriodEndDate() != null )
+                    subscriptionVO.setBillingPeriodEndDate( subscription.getBillingPeriodEndDate().getTime().toLocaleString() );
+                if ( subscription.getBillingPeriodStartDate() != null )
+                    subscriptionVO.setBillingPeriodStartDate( subscription.getBillingPeriodStartDate().getTime()
+                        .toLocaleString() );
+                subscriptionVO.setCurrentBillingCycle( subscription.getCurrentBillingCycle() );
+                if ( subscription.getCreatedAt() != null )
+                    subscriptionVO.setCreatedAt( subscription.getCreatedAt().getTime().toLocaleString() );
+                if ( subscription.getUpdatedAt() != null )
+                    subscriptionVO.setUpdatedAt( subscription.getUpdatedAt().getTime().toLocaleString() );
+                if ( subscription.getFirstBillingDate() != null )
+                    subscriptionVO.setFirstBillingDate( subscription.getFirstBillingDate().getTime().toLocaleString() );
+                subscriptionVO.getNextBillAmount();
+                subscriptionVO.setNextBillAmount( subscription.getNextBillAmount() );
+                if ( subscription.getNextBillingDate() != null )
+                    subscriptionVO.setNextBillingDate( subscription.getNextBillingDate().getTime().toLocaleString() );
+                subscriptionVO.setNextBillingPeriodAmount( subscription.getNextBillingPeriodAmount() );
 
-            Company company = companyDao.getCompanyByBraintreeSubscriptionId( subscription.getId() );
-            if ( company != null ) {
-                subscriptionVO.setCompanyId( company.getCompanyId() );
-                subscriptionVO.setCompanyName( company.getCompany() );
-                User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
-                if ( user != null ) {
-                    subscriptionVO.setCompanyAdminId( user.getUserId() );
-                    subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
-                    subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+                Company company = companyDao.getCompanyByBraintreeSubscriptionId( subscription.getId() );
+                if ( company != null ) {
+                    subscriptionVO.setCompanyId( company.getCompanyId() );
+                    subscriptionVO.setCompanyName( company.getCompany() );
+                    User user = userManagementService.getCompanyAdmin( company.getCompanyId() );
+                    if ( user != null ) {
+                        subscriptionVO.setCompanyAdminId( user.getUserId() );
+                        subscriptionVO.setCompanyAdminFirstName( user.getFirstName() );
+                        subscriptionVO.setCompanyAdminLastName( user.getLastName() );
+                    }
+
                 }
 
-            }
-
-            subscriptionVOs.add( subscriptionVO );
-            }catch(Exception e){
-                LOG.error( "Error while parsing rescord" );
+                subscriptionVOs.add( subscriptionVO );
+            } catch ( Exception e ) {
+                LOG.error( "Error while parsing rescord with Susbcruption Id :" + subscriptionVO.getId(), e );
+                LOG.error( "Stack trace is :" + e.getStackTrace().toString() );
             }
         }
 
@@ -457,16 +470,15 @@ public class AdminServiceImpl implements AdminService
             Map<String, String> attachmentsDetails = new HashMap<String, String>();
             attachmentsDetails.put( fileName + ".xls", filePath );
 
-            for ( String recipientMailId : recipientMailIds ) {
-                String name = adminName;
-                LOG.debug( "sending mail to : " + name + " at : " + recipientMailId );
-                try {
-                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId,
-                        CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
-                } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                    LOG.error( "Error while sending mail to ; " + recipientMailId, e );
-                }
+            String name = adminName;
+            LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
+            try {
+                emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
+                    CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
             }
+
         }
 
         LOG.info( "method generateTransactionListExcelAndMail ended" );
@@ -482,5 +494,115 @@ public class AdminServiceImpl implements AdminService
         List<Company> CompanyList = companyDao.getCompaniesByBillingModeAuto();
         LOG.info( "Method getAllAutoBillingModeCompanies ended " );
         return CompanyList;
+    }
+
+
+    @Override
+    public boolean generateAutoBillingCompanyListExcelAndMail( List<Company> CompanyList, List<String> recipientMailIds )
+    {
+        LOG.info( "method generateAutoBillingCompanyListExcelAndMail started" );
+        // Iterate over data and write to sheet
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+
+        int rownum = 0;
+        int cellnum = 0;
+        Row row = sheet.createRow( rownum++ );
+        Cell cell1 = row.createCell( cellnum++ );
+        cell1.setCellValue( "Company Id" );
+        Cell cell2 = row.createCell( cellnum++ );
+        cell2.setCellValue( "Company Name" );
+        Cell cell3 = row.createCell( cellnum++ );
+        cell3.setCellValue( "Company Created On" );
+        Cell cell4 = row.createCell( cellnum++ );
+        cell4.setCellValue( "Subscription id" );
+        Cell cell5 = row.createCell( cellnum++ );
+        cell5.setCellValue( "Subscription Start Date" );
+        Cell cell6 = row.createCell( cellnum++ );
+        cell6.setCellValue( "Subscription Payment Retries" );
+
+        for ( Company company : CompanyList ) {
+
+            row = sheet.createRow( rownum++ );
+            cellnum = 0;
+            Cell cell = row.createCell( cellnum++ );
+            cell.setCellValue( company.getCompanyId() );
+
+            cell = row.createCell( cellnum++ );
+            cell.setCellValue( company.getCompany() );
+
+            cell = row.createCell( cellnum++ );
+            if ( company.getCreatedOn() != null )
+                cell.setCellValue( company.getCreatedOn().toLocaleString() );
+
+            if ( company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() ) {
+                LicenseDetail licenseDetail = company.getLicenseDetails().get( 0 );
+                if ( licenseDetail != null ) {
+                    cell = row.createCell( cellnum++ );
+                    cell.setCellValue( licenseDetail.getSubscriptionId() );
+
+                    cell = row.createCell( cellnum++ );
+                    if ( licenseDetail.getLicenseStartDate() != null )
+                        cell.setCellValue( licenseDetail.getLicenseStartDate().toLocaleString() );
+
+                    cell = row.createCell( cellnum++ );
+                    cell.setCellValue( licenseDetail.getPaymentRetries() );
+                }
+            }
+
+        }
+        // Create file and write report into it
+        boolean excelCreated = false;
+        String fileName = "Auto_Billing_Company_List-" + ( new Timestamp( new Date().getTime() ) );
+        FileOutputStream fileOutput = null;
+        InputStream inputStream = null;
+        File file = null;
+        String filePath = null;
+        try {
+            file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+            fileOutput = new FileOutputStream( file );
+            file.createNewFile();
+            workbook.write( fileOutput );
+            filePath = file.getPath();
+            excelCreated = true;
+        } catch ( FileNotFoundException fe ) {
+            LOG.error( "Exception caught while generating Auto Billing Company List Reprot" + fe.getMessage() );
+            excelCreated = false;
+        } catch ( IOException e ) {
+            LOG.error( "Exception caught  while generating Auto Billing Company List report " + e.getMessage() );
+            excelCreated = false;
+        } finally {
+            try {
+                fileOutput.close();
+                if ( inputStream != null ) {
+                    inputStream.close();
+                }
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught  while generating Auto Billing Company List report " + e.getMessage() );
+                excelCreated = false;
+            }
+        }
+
+        // Mail the report to the email
+        if ( excelCreated ) {
+            Map<String, String> attachmentsDetails = new HashMap<String, String>();
+            attachmentsDetails.put( fileName + ".xls", filePath );
+
+
+            String name = adminName;
+            LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
+            try {
+                emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
+                    CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
+            }
+
+        }
+
+        LOG.info( "method generateAutoBillingCompanyListExcelAndMail ended" );
+        return excelCreated;
     }
 }

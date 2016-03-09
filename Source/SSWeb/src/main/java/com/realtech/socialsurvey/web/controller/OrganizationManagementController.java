@@ -47,7 +47,6 @@ import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -87,6 +86,7 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
+import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 
@@ -2852,8 +2852,8 @@ public class OrganizationManagementController
             LOG.error( "Null value found for startIndex or batch size." );
             return "Null value found for startIndex or batch size.";
         }
-
-        List<SurveyPreInitiation> surveyPreInitiations = null;
+        
+        SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
         int startIndex;
         int batchSize;
         try {
@@ -2874,7 +2874,7 @@ public class OrganizationManagementController
             }
 
 
-            surveyPreInitiations = socialManagementService.getUnmatchedPreInitiatedSurveys( user.getCompany().getCompanyId(),
+            surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveys( user.getCompany().getCompanyId(),
                 startIndex, batchSize );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
@@ -2882,7 +2882,7 @@ public class OrganizationManagementController
                 DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Method to get posts for the user, getUnmatchedPreinitiatedSurveys() finished" );
-        return new Gson().toJson( surveyPreInitiations );
+        return new Gson().toJson( surveyPreInitiationList );
     }
 
 
@@ -2893,7 +2893,7 @@ public class OrganizationManagementController
         LOG.info( "Method to get getProcessedPreInitiatedSurveys started" );
         String startIndexStr = request.getParameter( "startIndex" );
         String batchSizeStr = request.getParameter( "batchSize" );
-        List<SurveyPreInitiation> surveyPreInitiations = null;
+        SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
         int startIndex;
         int batchSize;
 
@@ -2917,7 +2917,7 @@ public class OrganizationManagementController
                 throw e;
             }
 
-            surveyPreInitiations = socialManagementService.getProcessedPreInitiatedSurveys( user.getCompany().getCompanyId(),
+            surveyPreInitiationList = socialManagementService.getProcessedPreInitiatedSurveys( user.getCompany().getCompanyId(),
                 startIndex, batchSize );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
@@ -2925,7 +2925,7 @@ public class OrganizationManagementController
                 DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Method to get posts for the user, getProcessedPreInitiatedSurveys() finished" );
-        return new Gson().toJson( surveyPreInitiations );
+        return new Gson().toJson( surveyPreInitiationList );
     }
 
 

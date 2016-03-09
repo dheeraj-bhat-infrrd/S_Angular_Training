@@ -92,4 +92,8 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
         throws InvalidInputException;
 
     void updateSurveyPreinitiationRecordsAsIgnored( String agentEmailAddress ) throws InvalidInputException;
+
+    long getUnmatchedPreInitiatedSurveyCount( long companyId );
+
+    long getProcessedPreInitiatedSurveyCount( long companyId );
 }
