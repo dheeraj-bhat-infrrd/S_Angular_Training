@@ -244,7 +244,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 
             //Update last build time in batch tracker table
             batchTrackerService
-                .updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
+                .updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER );
         } catch ( Exception e ) {
             LOG.error( "Error in ZillowReviewFetchAndAutoPoster", e );
             try {

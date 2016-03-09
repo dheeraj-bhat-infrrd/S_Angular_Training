@@ -4489,19 +4489,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setShowSurveyOnUI( true );
                 surveyHandler.insertSurveyDetails( surveyDetails );
 
-                if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
-                    && !isAbusive && fromBatch ) {
-                    try {
-                        pushToZillowPostTemp( profile, collectionName, surveyDetails, review );
-                    } catch ( Exception e ) {
-                        LOG.error( "Exception occurred while pushing Zillow review into temp table. Reason :", e );
-                    }
-                }
                 // Commented as Zillow reviews are saved in Social Survey, SS-307
                 // if ( zillowReviewScoreTotal == -1 )
                 //    zillowReviewScoreTotal = surveyDetails.getScore();
                 // else
                 //    zillowReviewScoreTotal += surveyDetails.getScore();
+            }
+            
+            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
+                && fromBatch ) {
+                try {
+                    pushToZillowPostTemp( profile, collectionName, surveyDetails, review );
+                } catch ( Exception e ) {
+                    LOG.error( "Exception occurred while pushing Zillow review into temp table. Reason :", e );
+                }
             }
             if ( fromPublicPage ) {
                 String reviewDesc = surveyDetails.getReview();
