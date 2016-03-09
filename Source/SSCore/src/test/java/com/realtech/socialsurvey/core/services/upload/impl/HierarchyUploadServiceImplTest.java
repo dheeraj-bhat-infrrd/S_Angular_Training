@@ -113,10 +113,10 @@ public class HierarchyUploadServiceImplTest
             "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx" );
         Assert.assertNotNull( validationObj );
         Assert.assertEquals( 76, validationObj.getNumberOfBranchesAdded() );
-        Assert.assertEquals( 0, validationObj.getNumberOfBranchesDeleted() );
+        Assert.assertEquals( 1, validationObj.getNumberOfBranchesDeleted() );
         Assert.assertEquals( 1, validationObj.getNumberOfBranchesModified() );
         Assert.assertEquals( 9, validationObj.getNumberOfRegionsAdded() );
-        Assert.assertEquals( 0, validationObj.getNumberOfRegionsDeleted() );
+        Assert.assertEquals( 1, validationObj.getNumberOfRegionsDeleted() );
         Assert.assertEquals( 1, validationObj.getNumberOfRegionsModified() );
         Assert.assertEquals( 48, validationObj.getNumberOfUsersAdded() );
         Assert.assertEquals( 1, validationObj.getNumberOfUsersDeleted() );

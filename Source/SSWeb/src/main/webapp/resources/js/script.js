@@ -3156,7 +3156,7 @@ var hierarchyUpload = {
 		} else if (data.validationWarnings.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/warning.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/warning.png" style="width: 18px; height: 18px"></span>';
 		}
 		return toolTip;
 	},
