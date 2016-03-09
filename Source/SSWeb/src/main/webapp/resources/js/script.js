@@ -742,25 +742,25 @@ function validateTextArea(elementId) {
 function validateCountryZipcode(elementId, isOnlyShowToast) {
 
 	if (selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/') {
-	
-		var countryCode =$('#country-code').val();	
-		var flag=false;
-		
+
+		var countryCode = $('#country-code').val();
+		var flag = false;
+
 		for (var i = 0; i < postCodeRegex.length; i++) {
-			
-			 if (postCodeRegex[i].code == countryCode) {
+
+			if (postCodeRegex[i].code == countryCode) {
 				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
 				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
-				flag=true;
+				flag = true;
 				break;
-			}	
+			}
 		}
-		
+
 		if (!flag) {
-			
-		selectedCountryRegEx = ".*";
-		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
-		
+
+			selectedCountryRegEx = ".*";
+			selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+
 		}
 	}
 
@@ -2042,6 +2042,7 @@ var hierarchyUpload = {
 				.change(
 						function() {
 							$('#summary').hide();
+							$('#xlsx-file-upload').addClass('disable');
 							var fileAdd = $(this).val().split('\\');
 							$('#com-xlsx-file')
 									.val(fileAdd[fileAdd.length - 1]);
@@ -2050,16 +2051,15 @@ var hierarchyUpload = {
 							}
 
 							if (hierarchyUpload.verified == false) {
-								$('#xlsx-file-verify').css("pointerEvents",
-										"none");
+								$('#xlsx-file-verify').addClass('disable');
 								showError("Please upload xlsx file");
 							}
 
 							if (hierarchyUpload.verified == true) {
 								hierarchyUpload.canUpload = true;
 								hierarchyUpload.verified = false;
-								$('#xlsx-file-verify').css("pointerEvents",
-										"auto");
+								$('#xlsx-file-verify').removeClass('disable');
+
 								var formData = new FormData();
 								formData.append("file", $('#com-file').prop(
 										"files")[0]);
@@ -2073,8 +2073,7 @@ var hierarchyUpload = {
 							}
 
 							else {
-								$('#xlsx-file-verify').css("pointerEvents",
-										"none");
+								$('#xlsx-file-verify').addClass('disable');
 								showError("Please select a valid file");
 							}
 						});
@@ -2099,8 +2098,7 @@ var hierarchyUpload = {
 							} else {
 								var url = $("#fileUrl").val();
 								if (url == undefined || url == '') {
-									$('#xlsx-file-verify').css("pointerEvents",
-											"none");
+									$('#xlsx-file-verify').addClass('disable');
 									showError("Please upload a valid file");
 								} else {
 									var formData = new FormData();
@@ -2181,7 +2179,7 @@ var hierarchyUpload = {
 		$('#com-xlsx-file').val('');
 		$('#fileUrl').val('');
 		$('#summary').hide();
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 	},
 
 	uploadXlxsSuccessCallback : function(response) {
@@ -2286,7 +2284,6 @@ var hierarchyUpload = {
 
 						} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
 							var color = '#FF3400';
-
 						} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isRegionModified == true) {
 							var color = '#009FE0';
 
@@ -2460,6 +2457,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-region-edit" style="background-color: #F9F9FB;" ><td colspan="9">'
 										+ regionEdit + '</td></tr>').appendTo(
 								'#region-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
+							$('#editRegion-' + i).addClass('disable');
+						}
 					}
 					$('#region-sum-btn').show();
 					$('#summary').show();
@@ -2668,6 +2669,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-branch-edit" style="background-color: #F9F9FB;" ><td colspan="10">'
 										+ branchEdit + '</td></tr>').appendTo(
 								'#branch-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.branches[i].isDeletedRecord == true) {
+							$('#editBranch-' + i).addClass('disable');
+						}
 					}
 					$('#branch-sum-btn').show();
 					if (regionlength == 0) {
@@ -2699,7 +2704,7 @@ var hierarchyUpload = {
 
 						var sendMailCode = "";
 
-						if (!hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified
+						if ((!hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified && !hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord)
 								|| hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded) {
 							// Add checkbox only for users who aren't verified
 							// and new users
@@ -3036,6 +3041,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-users-edit" style="background-color: #F9F9FB;" ><td colspan="17">'
 										+ userEdit + '</td></tr>').appendTo(
 								'#user-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord == true) {
+							$('#editUser-' + i).addClass('disable');
+						}
 					}
 					$('#user-sum-btn').show();
 					if (regionlength == 0 && branchlength == 0) {
@@ -3050,7 +3059,7 @@ var hierarchyUpload = {
 				if ((hierarchyUpload.hierarchyJson.regionValidationErrors == null || hierarchyUpload.hierarchyJson.regionValidationErrors.length == 0)
 						&& (hierarchyUpload.hierarchyJson.branchValidationErrors == null || hierarchyUpload.hierarchyJson.branchValidationErrors.length == 0)
 						&& (hierarchyUpload.hierarchyJson.userValidationErrors == null || hierarchyUpload.hierarchyJson.userValidationErrors.length == 0)) {
-					$('#xlsx-file-upload').css("pointerEvents", "auto");
+					$('#xlsx-file-upload').removeClass('disable');
 					showInfo("Data verified sucessfully with no validation errors.");
 				} else {
 					showError("There are some validation errors which need to be resolved before uploading the data.");
@@ -3143,11 +3152,11 @@ var hierarchyUpload = {
 		if (data.validationErrors.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/abuse.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/abuse.png" style="width: 18px; height: 18px"></span>';
 		} else if (data.validationWarnings.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/icn-neutral-mood.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/warning.png" style="width: 15px"></span>';
 		}
 		return toolTip;
 	},
@@ -3195,7 +3204,7 @@ var hierarchyUpload = {
 		$('#editRegion-' + i).parent().next('.hier-region-edit').slideToggle(
 				200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the region. Please click on 'Verify' button to validate the data!!");
 	},
 
@@ -3255,7 +3264,7 @@ var hierarchyUpload = {
 		$('#editBranch-' + i).parent().next('.hier-branch-edit').slideToggle(
 				200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the branch. Please click on 'Verify' button to validate the data!!");
 	},
 
@@ -3394,7 +3403,7 @@ var hierarchyUpload = {
 
 		$('#editUser-' + i).parent().next('.hier-users-edit').slideToggle(200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the user. Please click on 'Verify' button to validate the data!!");
 	},
 
