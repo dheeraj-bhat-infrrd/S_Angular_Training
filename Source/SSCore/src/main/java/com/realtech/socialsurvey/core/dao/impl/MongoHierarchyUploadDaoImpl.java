@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
@@ -35,7 +34,6 @@ public class MongoHierarchyUploadDaoImpl implements HierarchyUploadDao
     {
         LOG.info( "Method to save hierarchy upload object started" );
         //Null check
-        LOG.info( new Gson().toJson( hierarchyUpload ) );
         if ( hierarchyUpload == null ) {
             LOG.error( "The hierarchy upload object is null" );
             throw new InvalidInputException( "The hierarchy upload object is null" );

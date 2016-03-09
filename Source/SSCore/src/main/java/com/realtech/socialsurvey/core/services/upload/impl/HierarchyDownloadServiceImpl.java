@@ -575,7 +575,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 }
             }
             start += BATCH_SIZE;
-        } while ( batchUserList != null && batchUserList.size() > 0 );
+        } while ( batchUserList != null && batchUserList.size() == BATCH_SIZE  );
         currentHierarchyUpload.setUserSourceMapping( newSourceMap );
 
         LOG.info( "Method to generate user upload VOs for company : " + company.getCompany() + " finished" );
