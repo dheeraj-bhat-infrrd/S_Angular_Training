@@ -497,8 +497,8 @@ public interface CommonConstants
     public static final String EMAIL_REGEX = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     public static final String FIRST_NAME_REGEX = "[a-zA-Z ]+";
     public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
-    public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z]{2,}$";
-    public static final String FINDAPRO_LAST_NAME_REGEX = "^[a-zA-Z]{2,}$";
+    public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z][a-zA-Z\\s]{2,}$";
+    public static final String FINDAPRO_LAST_NAME_REGEX = "^[a-zA-Z][a-zA-Z\\s]{2,}$";
     public static final String URL_REGEX = "^(http(s)?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
 
     /**

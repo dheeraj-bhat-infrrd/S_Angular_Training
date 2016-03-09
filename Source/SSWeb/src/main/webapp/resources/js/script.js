@@ -13,8 +13,8 @@ var companyNameRegEx = /^[a-zA-Z0-9\\/ ]*$/;
 var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
-var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
-var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
+var firstNamePatternRegex =/^[a-zA-Z][a-zA-Z\s]{2,}$/;
+var lastNamePatternRegEx = /^[a-zA-Z][a-zA-Z\s]{2,}$/;
 var pageInitialized = false;
 var currentPhoneRegEx; // Vary the phone regex according to masking
 var stateList; // usStateList
