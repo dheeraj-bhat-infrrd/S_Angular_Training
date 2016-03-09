@@ -70,7 +70,7 @@ public class UploadValidationServiceImplTest
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
         upload.setRegions( regions );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateRegions( validation );
+        uploadValidationServiceImpl.validateRegions( validation, null );
         Assert.assertEquals( 0, validation.getRegionValidationErrors().size() );
         LOG.info( "Errors: " + validation.getRegionValidationErrors() );
     }
@@ -87,7 +87,7 @@ public class UploadValidationServiceImplTest
         regions.add( getRegion( null, "acc", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 3 ) );
         upload.setRegions( regions );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateRegions( validation );
+        uploadValidationServiceImpl.validateRegions( validation, null );
         Assert.assertEquals( 4, validation.getRegionValidationErrors().size() );
         LOG.info( "Errors: " + validation.getRegionValidationErrors() );
     }
@@ -105,7 +105,7 @@ public class UploadValidationServiceImplTest
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
         upload.setRegions( regions );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateBranches( validation );
+        uploadValidationServiceImpl.validateBranches( validation, null );
         LOG.info( "Errors: " + validation.getBranchValidationErrors() );
         LOG.info( "Warnings: " + validation.getBranchValidationWarnings() );
         Assert.assertEquals( 0, validation.getBranchValidationErrors().size() );
@@ -127,7 +127,7 @@ public class UploadValidationServiceImplTest
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
         upload.setRegions( regions );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateBranches( validation );
+        uploadValidationServiceImpl.validateBranches( validation, null );
         LOG.info( "Errors: " + validation.getBranchValidationErrors() );
         LOG.info( "Warnings: " + validation.getBranchValidationWarnings() );
         Assert.assertEquals( 6, validation.getBranchValidationErrors().size() );
@@ -160,7 +160,7 @@ public class UploadValidationServiceImplTest
         validation.setUpload( upload );
         /*Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenThrow(
             NoRecordsFetchedException.class );*/
-        uploadValidationServiceImpl.validateUsers( validation );
+        uploadValidationServiceImpl.validateUsers( validation, null );
         LOG.info( "Errors: " + validation.getUserValidationErrors() );
         LOG.info( "Warnings: " + validation.getUserValidationWarnings() );
         Assert.assertEquals( 0, validation.getUserValidationErrors().size() );
@@ -193,7 +193,7 @@ public class UploadValidationServiceImplTest
         users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "xdc", "cdf", branchAdmins, regionAdmins, 3 ) );
         upload.setUsers( users );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateUsers( validation );
+        uploadValidationServiceImpl.validateUsers( validation, null );
         LOG.info( "Errors: " + validation.getUserValidationErrors() );
         LOG.info( "Warnings: " + validation.getUserValidationWarnings() );
         Assert.assertEquals( 9, validation.getUserValidationErrors().size() );
@@ -228,7 +228,7 @@ public class UploadValidationServiceImplTest
         validation.setUpload( upload );
         Mockito.when( userManagementService.getUserByEmailAddress( Mockito.anyString() ) ).thenThrow(
             NoRecordsFetchedException.class );
-        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation, null, null, null );
         Assert.assertEquals( 1, validation.getRegionValidationErrors().size() );
         Assert.assertEquals( 0, validation.getNumberOfRegionsDeleted() );
         LOG.info( "Errors: " + validation.getRegionValidationErrors() );
@@ -258,7 +258,7 @@ public class UploadValidationServiceImplTest
         users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
         upload.setUsers( users );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation, null, null, null );
         Assert.assertEquals( 1, validation.getRegionValidationErrors().size() );
         Assert.assertEquals( 0, validation.getNumberOfRegionsDeleted() );
         LOG.info( "Errors: " + validation.getRegionValidationErrors() );
@@ -290,7 +290,7 @@ public class UploadValidationServiceImplTest
         users.add( getUser( "XYZ1", "cdcdvd", "asncj@dmck.com", null, null, null, null, 2, true ) );
         upload.setUsers( users );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation, null, null, null );
         Assert.assertEquals( 0, validation.getRegionValidationErrors().size() );
         Assert.assertEquals( 2, validation.getNumberOfRegionsDeleted() );
         LOG.info( "Errors: " + validation.getRegionValidationErrors() );
@@ -321,7 +321,7 @@ public class UploadValidationServiceImplTest
         users.add( getUser( "XYZ1", "cdcdvd", "asncj@dmck.com", "DEF", "ABC", branchAdmins, regionAdmins, 2 ) );
         upload.setUsers( users );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation, null, null, null );
         Assert.assertEquals( 2, validation.getBranchValidationErrors().size() );
         Assert.assertEquals( 0, validation.getNumberOfBranchesDeleted() );
         LOG.info( "Errors: " + validation.getBranchValidationErrors() );
@@ -353,7 +353,7 @@ public class UploadValidationServiceImplTest
         users.add( getUser( "XYZ1", "cdcdvd", "asncj@dmck.com", null, null, null, null, 2, true ) );
         upload.setUsers( users );
         validation.setUpload( upload );
-        uploadValidationServiceImpl.validateHeirarchyUpload( validation );
+        uploadValidationServiceImpl.validateHeirarchyUpload( validation, null, null, null );
         Assert.assertEquals( 0, validation.getBranchValidationErrors().size() );
         Assert.assertEquals( 3, validation.getNumberOfBranchesDeleted() );
         LOG.info( "Errors: " + validation.getBranchValidationErrors() );
