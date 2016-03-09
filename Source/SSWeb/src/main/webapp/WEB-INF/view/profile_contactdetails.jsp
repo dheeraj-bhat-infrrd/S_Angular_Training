@@ -209,5 +209,8 @@ $(document).ready(function() {
 		phoneFormat = phoneFormatList[countryCode];		
 	}
 	$('#phone-number-work').mask(phoneFormat, {'translation': {d: {pattern: /[0-9*]/}}});
+	if($('#phone-number-work').val() == '('){
+		$('#phone-number-work').val('');
+	}
 });
 </script>

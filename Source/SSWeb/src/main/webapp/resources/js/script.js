@@ -2042,6 +2042,7 @@ var hierarchyUpload = {
 				.change(
 						function() {
 							$('#summary').hide();
+							$('#xlsx-file-upload').addClass('disable');
 							var fileAdd = $(this).val().split('\\');
 							$('#com-xlsx-file')
 									.val(fileAdd[fileAdd.length - 1]);
