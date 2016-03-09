@@ -33,7 +33,6 @@ public class MongoHierarchyUploadDaoImpl implements HierarchyUploadDao
     public void saveHierarchyUploadObject( HierarchyUpload hierarchyUpload ) throws InvalidInputException
     {
         LOG.info( "Method to save hierarchy upload object started" );
-        //Null check
         if ( hierarchyUpload == null ) {
             LOG.error( "The hierarchy upload object is null" );
             throw new InvalidInputException( "The hierarchy upload object is null" );
@@ -42,10 +41,6 @@ public class MongoHierarchyUploadDaoImpl implements HierarchyUploadDao
         //Delete previous instance
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( hierarchyUpload.getCompanyId() ) );
-/*        HierarchyUpload upload = mongoTemplate.findOne( query, HierarchyUpload.class, CommonConstants.HIERARCHY_UPLOAD_COLLECTION );
-        if ( upload != null ) {
-            hierarchyUpload.set_id( upload.get_id() );
-        }*/
         mongoTemplate.remove( query, HierarchyUpload.class, CommonConstants.HIERARCHY_UPLOAD_COLLECTION );
         mongoTemplate.insert( hierarchyUpload, CommonConstants.HIERARCHY_UPLOAD_COLLECTION );
 

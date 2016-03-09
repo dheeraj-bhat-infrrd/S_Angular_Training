@@ -392,13 +392,15 @@ public class DashboardController
         }
 
         try {
-            model.addAttribute( "allSurveySent", dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "allSurveySent", dashboardService.getAllSurveyCountForStatistics( columnName, columnValue, numberOfDays ) );
             model.addAttribute( "completedSurvey",
                 dashboardService.getCompleteSurveyCount( columnName, columnValue, numberOfDays ) );
             model.addAttribute( "clickedSurvey",
                 dashboardService.getClickedSurveyCountForPastNdays( columnName, columnValue, numberOfDays ) );
             model.addAttribute( "socialPosts",
-                dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue, numberOfDays ) );
+                dashboardService.getSocialPostsForPastNdaysWithHierarchyForStatistics( columnName, columnValue, numberOfDays ) );
+            model.addAttribute( "importedFromZillow",
+                dashboardService.getZillowImportCount( columnName, columnValue, numberOfDays ) );
         } catch ( InvalidInputException e ) {
             LOG.error( "Error: " + e.getMessage(), e );
 
@@ -1521,11 +1523,12 @@ public class DashboardController
 
             try {
                 Date date = new Date();
-                surveyDetails = profileManagementService.getReviews( iden, -1, -1, -1, -1, profileLevel, fetchAbusive,
+                long companyId = user.getCompany().getCompanyId();
+                surveyDetails = profileManagementService.getReviewsForReports( iden, -1, -1, -1, -1, profileLevel, fetchAbusive,
                     startDate, endDate, null );
                 String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
                     + ( new Timestamp( date.getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName );
+                XSSFWorkbook workbook = dashboardService.downloadCustomerSurveyResultsData( surveyDetails, fileName, profileLevel, companyId );
                 response.setContentType( EXCEL_FORMAT );
                 String headerKey = CONTENT_DISPOSITION_HEADER;
                 String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );

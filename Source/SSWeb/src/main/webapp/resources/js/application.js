@@ -963,6 +963,8 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		isDashboardReviewRequestRunning = false;
 		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 			fetchReviewsOnDashboard(true);
+		} else {
+			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true);
 		}
 	}, payload, true);
 }
@@ -7474,12 +7476,12 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
 		} else {
-			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning);
+			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false);
 		}
 	}, true);
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard){
 	if (currentProfileIden == undefined || currentProfileIden == "" || isZillowReviewsCallRunning) {
 		return; //Return if profile id is undefined
 	}
@@ -7509,7 +7511,7 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	                stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
 	                if (result != undefined && result.length > 0) {
 						// build zillow reviews html here
-						paintReviews(result);
+						paintReviews(result,isFromDashBoard);
 	                }
 	            }
 	        }
@@ -7628,31 +7630,7 @@ function attachPostsScrollEvent() {
 		}
 	});
 }
-function attachUntrackUserScrollEvent() {
-	$('#new').off('scroll');
-	$('#new').on('scroll',function(){
-		var scrollContainer = this;
-		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
-				- (scrollContainer.clientHeight / 0.75))) {
-				if (!doStopPostPaginationUnmatchedUser || UnmatchedUserPostsBatch.length > 0) {
-					fetchUntrackedUser(false);
-				}
-					
-		}
-	});
-}function attachMatchedUserScrollEvent() {
-	$('#processed').off('scroll');
-	$('#processed').on('scroll',function(){
-		var scrollContainer = this;
-		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight) 
-				- (scrollContainer.clientHeight / 0.75))) {
-				if (!doStopPostPaginationProcessedUser || UnProcessedUserPostsBatch.length > 0) {
-					fetchProcessedUser(false);
-				}
-					
-		}
-	});
-}
+
 var doStopPostPaginationEditProfile = false; 
 var isAjaxRequestRunningEditProfile = false;
 var isLoaderRunningEditProfile = false;
@@ -7750,398 +7728,6 @@ function fetchPublicPostEditProfile(isNextBatch) {
 	}, payload, true);
 }
 
-
-var doStopPostPaginationUnmatchedUser = false; 
-var isAjaxRequestRunningUnmatchedUser = false;
-var isLoaderRunningUnmatchedUser = false;
-var UnmatchedUserPostsBatch = [];
-
-function fetchUntrackedUser(isNextBatch) {
-
-	
-	if(proPostStartIndex == 0) {
-		doStopPostPaginationUnmatchedUser = false;
-		UnmatchedUserPostsBatch = [];
-		$('#new').html('');
-		
-	}
-	
-	//Show from existing batch if the data is present
-	if (!isNextBatch && UnmatchedUserPostsBatch.length > 0) {
-		var posts = UnmatchedUserPostsBatch.slice(0, proPostBatchSize);
-		if (UnmatchedUserPostsBatch.length > proPostBatchSize) {
-			UnmatchedUserPostsBatch = UnmatchedUserPostsBatch.slice(proPostBatchSize);
-		} else {
-			UnmatchedUserPostsBatch = [];
-		}
-		
-		if(isLoaderRunningUnmatchedUser) {
-			hideLoaderOnPagination($('#new'));
-		}
-		showLoaderOnPagination($('#new'));
-		isLoaderRunningUnmatchedUser = true;
-		//paint the posts
-		setTimeout(function() {
-			paintUnmatchedUser(posts);
-			/*paintPosts(posts);*/
-			isLoaderRunningUnmatchedUser = false;
-			//Fetch the next batch
-			if(!doStopPostPaginationUnmatchedUser && UnmatchedUserPostsBatch.length <= proPostBatchSize) {
-				fetchUntrackedUser(true);
-			}
-		}, 500);
-		
-		return;
-	} 
-	
-	if (!isNextBatch) {
-		showLoaderOnPagination($('#new'));
-	}
-	
-	if(isAjaxRequestRunningUnmatchedUser) return; //Return if ajax request running to fetch the social posts
-	
-	var payload = {
-		"batchSize" : proPostBatchSize,
-		"startIndex" : proPostStartIndex,
-	
-	};
-	
-	isAjaxRequestRunningUnmatchedUser = true;
-	callAjaxGetWithPayloadData("./getunmatchedpreinitiatedsurveys.do", function(data) {  
-		isAjaxRequestRunningUnmatchedUser = false;
-		if (data.errCode == undefined) {
-			if(data != "") {
-				
-				
-				var posts = JSON.parse(data);
-				if(posts.length <= 0 && proPostStartIndex == 0) {
-					doStopPostPaginationUnmatchedUser = true;
-					hideLoaderOnPagination($('#new'));
-					return;
-				}
-				if(posts.length < proPostBatchSize) {
-					doStopPostPaginationUnmatchedUser = true;
-				}
-				
-				//update start index
-				proPostStartIndex += proPostBatchSize;	
-				
-				//update the batch
-				UnmatchedUserPostsBatch = UnmatchedUserPostsBatch.concat(posts);
-				
-				if(isNextBatch) {
-					//Fetch the next batch
-					if(!doStopPostPaginationUnmatchedUser && UnmatchedUserPostsBatch.length <= proPostBatchSize) {
-						fetchUntrackedUser(true);
-					}
-				} else {
-					if(posts && posts.length > 0)
-						fetchUntrackedUser(false);
-				}
-					
-			}
-		}
-	}, payload, true);
-}
-
-var doStopPostPaginationProcessedUser = false; 
-var isAjaxRequestRunningProcessedUser = false;
-var isLoaderRunningProcessedUser = false;
-var UnProcessedUserPostsBatch = [];
-
-function fetchProcessedUser(isNextBatch) {
-
-	
-	if(proPostStartIndex == 0) {
-		doStopPostPaginationProcessedUser = false;
-		UnProcessedUserPostsBatch = [];
-		$('#processed').html('');
-		
-	}
-	
-	//Show from existing batch if the data is present
-	if (!isNextBatch && UnProcessedUserPostsBatch.length > 0) {
-		var posts = UnProcessedUserPostsBatch.slice(0, proPostBatchSize);
-		if (UnProcessedUserPostsBatch.length > proPostBatchSize) {
-			UnProcessedUserPostsBatch = UnProcessedUserPostsBatch.slice(proPostBatchSize);
-		} else {
-			UnProcessedUserPostsBatch = [];
-		}
-		
-		if(isLoaderRunningProcessedUser) {
-			hideLoaderOnPagination($('#processed'));
-		}
-		showLoaderOnPagination($('#processed'));
-		isLoaderRunningProcessedUser = true;
-		//paint the posts
-		setTimeout(function() {
-			paintProcessedUser(posts);
-			/*paintPosts(posts);*/
-			isLoaderRunningProcessedUser = false;
-			//Fetch the next batch
-			if(!doStopPostPaginationProcessedUser && UnProcessedUserPostsBatch.length <= proPostBatchSize) {
-				fetchProcessedUser(true);
-			}
-		}, 500);
-		
-		return;
-	} 
-	
-	if (!isNextBatch) {
-		showLoaderOnPagination($('#processed'));
-	}
-	
-	if(isAjaxRequestRunningProcessedUser) return; //Return if ajax request running to fetch the social posts
-	
-	var payload = {
-		"batchSize" : proPostBatchSize,
-		"startIndex" : proPostStartIndex,
-	
-	};
-	
-	isAjaxRequestRunningProcessedUser = true;
-	callAjaxGetWithPayloadData("./getprocessedpreinitiatedsurveys.do", function(data) {  
-		isAjaxRequestRunningProcessedUser = false;
-		if (data.errCode == undefined) {
-			if(data != "") {
-				
-				
-				var posts = JSON.parse(data);
-				if(posts.length <= 0 && proPostStartIndex == 0) {
-					doStopPostPaginationProcessedUser = true;
-					hideLoaderOnPagination($('#processed'));
-					return;
-				}
-				if(posts.length < proPostBatchSize) {
-					doStopPostPaginationProcessedUser = true;
-				}
-				
-				//update start index
-				proPostStartIndex += proPostBatchSize;	
-				
-				//update the batch
-				UnProcessedUserPostsBatch = UnProcessedUserPostsBatch.concat(posts);
-				
-				if(isNextBatch) {
-					//Fetch the next batch
-					if(!doStopPostPaginationProcessedUser && UnProcessedUserPostsBatch.length <= proPostBatchSize) {
-						fetchProcessedUser(true);
-					}
-				} else {
-					if(posts && posts.length > 0)
-						fetchProcessedUser(false);
-				}
-					
-			}
-		}
-	}, payload, true);
-}
-function undefinedval(hierval) {
-	  if (hierval == undefined) {
-	   return "";
-	  }
-	  return hierval;
-	 }
-function paintUnmatchedUser(posts) {
-	var untrack="";
-	
-	posts.forEach(function(arrayItem) {
-
-		 untrack += '<div class="un-row">'+
-		'						<div style="width:10%" class="float-left unmatchtab ss-id">'+undefinedval(arrayItem.surveySourceId)+'</div>'+
-		'						<div style="width:20%" class="float-left unmatchtab ss-eid">'+undefinedval(arrayItem.agentEmailId)+'</div>'+
-		'						<div style="width:40%" class="float-left unmatchtab ss-cname">'+undefinedval(arrayItem.customerFirstName)+'<span style="margin-left:2px;">'+ undefinedval(arrayItem.customerLastName)+'</span><span style="margin-left:2px;"> < '+undefinedval(arrayItem.customerEmailId)+' > </span></div>'+
-		'						<div style="width:20%" class="float-left unmatchtab ss-date">'+undefinedval(arrayItem.createdOn)+'</div>'+
-		'						<div style="width:10%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'+
-		'						</div>';
-			
-
-	/*untrack += '<tr class="un-row"><div><td scope="row"><div>'+arrayItem.surveySourceId+'</div></td><td><div>'+arrayItem.agentEmailId+'</div></td><td><div>'+arrayItem.customerFirstName+'</div></td><td><div>'+arrayItem.createdOn+'<div></td></tr>';*/
-		
-		
-	});
-	
-	if ($('#new').children('.un-row').length == 0){
-		$('#new').html(untrack);
-		$('#new').perfectScrollbar({
-			suppressScrollX : true
-		});
-		$('#new').perfectScrollbar('update');
-	}
-	else{
-		$('#new').append(untrack);
-		$('#new').perfectScrollbar('update');
-	}
-	hideLoaderOnPagination($('#new'));
-	
-	 bindClickEventForProcessButton();
-}
-function paintProcessedUser(posts) {
-	var untrack="";
-	
-	posts.forEach(function(arrayItem) {
-if(undefinedval(arrayItem.status)==9){
-	var action="Always Ignore";
-}else{
-	var action="Aliased";
-}
-		 untrack += '<div class="un-row">'+
-		'						<div style="width:10%" class="float-left unmatchtab ss-id">'+undefinedval(arrayItem.surveySourceId)+'</div>'+
-		'						<div style="width:20%" class="float-left unmatchtab ss-eid">'+undefinedval(arrayItem.agentEmailId)+'</div>'+
-		'						<div style="width:40%" class="float-left unmatchtab ss-cname">'+undefinedval(arrayItem.customerFirstName)+'<span style="margin-left:2px;">'+ undefinedval(arrayItem.customerLastName)+'</span><span style="margin-left:2px;"> < '+undefinedval(arrayItem.customerEmailId)+' > </span></div>'+
-		'						<div style="width:20%" class="float-left unmatchtab ss-date">'+undefinedval(arrayItem.createdOn)+'</div>'+
-		'						<div style="width:10%" class="float-left unmatchtab" >'+action+'</div>'+
-		'						</div>';
-			
-
-	/*untrack += '<tr class="un-row"><div><td scope="row"><div>'+arrayItem.surveySourceId+'</div></td><td><div>'+arrayItem.agentEmailId+'</div></td><td><div>'+arrayItem.customerFirstName+'</div></td><td><div>'+arrayItem.createdOn+'<div></td></tr>';*/
-		
-		
-	});
-	
-	if ($('#processed').children('.un-row').length == 0){
-		$('#processed').html(untrack);
-		$('#processed').perfectScrollbar({
-			suppressScrollX : true
-		});
-		$('#processed').perfectScrollbar('update');
-	}
-	else{
-		$('#processed').append(untrack);
-		$('#processed').perfectScrollbar('update');
-	}
-	hideLoaderOnPagination($('#processed'));
-	
-	 bindClickEventForProcessButton();
-}
-
-function bindClickEventForProcessButton(){
-	
-	$('.ss-process').click(function(e){
-		var id=$(this).parent().find(".ss-id").text();
-		var user=$(this).parent().find(".ss-eid").text();
-		var customer=$(this).parent().find(".ss-cname").text();
-
-
-		var popup = '<div class="bd-hr-form-item clearfix">'+
-		'	     <div class="float-left bd-frm-left-un">ID</div>'+
-		'	      <div class="float-left bd-frm-right-un">'+id+'</div>'+
-		'	 </div>'+
-		'	 <div class="bd-hr-form-item clearfix">'+
-		'	     <div class="float-left bd-frm-left-un">User</div>'+
-		'	      <div class="float-left bd-frm-right-un">'+user+'</div>'+
-		'	 </div>'+
-		'<div class="bd-hr-form-item clearfix">'+
-		'	     <div class="float-left bd-frm-left-un">Customer</div>'+
-		'	      <div class="float-left bd-frm-right-un">'+customer+'</div>'+
-		'	 </div><div class="bd-hr-form-item clearfix" id="ignore">'+
-		'	     <div class="float-left bd-frm-left-un"></div>'+
-		'	     <div class="float-left bd-frm-right">'+
-		'	         <div class="bd-frm-check-wrapper clearfix bd-check-wrp">'+
-		'	             <div class="float-left bd-check-img bd-check-img-checked"></div>'+
-		'	             <input type="hidden" name="isIgnore" value="false" id="is-ignore" class="ignore-clear">'+
-		'	             <div class="float-left bd-check-txt bd-check-sm">Always Ignore</div>'+
-		'	         </div>'+
-		'	     </div>'+
-		'	 </div>'+
-		'<div id="bd-single" class="bd-hr-form-item clearfix">'+
-		'	    <div class="float-left bd-frm-left-un">Alias</div>'+
-		'	    <div class="float-left bd-frm-left-un pos-relative">'+
-		'	        <input id="match-user-email" class="bd-frm-rt-txt bd-dd-img">'+
-		'	    </div>'+
-		'	</div>';
-			
-
-	/*var popup='<div>ID<span>'+ <div class="float-left bd-frm-left">ID</div>+'</span></div><div>User<span>'+user+'</span></div><div>Customer<span>'+customer+'</span></div>'*/
-		e.stopPropagation();
-		$('#overlay-continue').html("Save");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Match User");
-		$('#overlay-text').html(popup);
-		
-		
-		$('#overlay-continue').click(function(){
-			saveUserMap(user);
-			$('#overlay-continue').unbind('click');
-		});
-		$('#overlay-main').show();
-		bindAdminCheckBoxClick();
-		attachAutocompleteAliasDropdown();
-	});
-	/*if($('#is-ignore').val()==true){
-	if($('#match-user-email').val()!=""){
-		$('#match-user-email').val('');
-		$('#match-user-email').attr('agent-id' , 0);
-	$('#match-user-email').attr("disabled");
-	}
-}*/
-	
-
-}
-var insaved= false;
-function saveUserMap(aliasMail){
-	if(insaved==true){
-		return;
-	}
-	var isIgnore=$('#is-ignore').val();
-	var agentId=$('#match-user-email').attr('agent-id');
-	
-	if(isIgnore == 'true'){
-		agentId = 0;
-	}else{
-		if(agentId == undefined || agentId <=0){
-			$('#overlay-toast').html('Please enter valid alias!');
-			showToast();			
-			return;
-		}
-			
-	}
-	insaved==true;
-	var payload = {
-			"emailAddress" : aliasMail,
-			"agentId" : agentId,
-			"ignoredEmail" : isIgnore
-		
-		};
-		console.log("emailAddress :" + aliasMail);
-		console.log("agentId :" +agentId);
-		console.log("ignoredEmail :" +isIgnore);
-		isAjaxRequestRunningProcessedUser = true;
-		callAjaxGetWithPayloadData('./saveemailmapping.do', function(data){
-			insaved==false;
-			$('#overlay-main').hide();
-			$('#overlay-toast').html(data);
-			showToast();
-			
-				$('#new').html('');
-				newUnmatched();
-			
-			
-		}, payload, true);
-	
-}
-function newUnmatched(){
-	proPostStartIndex=0;
-	proPostBatchSize = 10;
-	doStopPostPaginationUnmatchedUser = false; 
-	isAjaxRequestRunningUnmatchedUser = false;
-	isLoaderRunningUnmatchedUser = false;
-	UnmatchedUserPostsBatch = [];
-	fetchUntrackedUser();
-	attachUntrackUserScrollEvent(); 
-}
-
-function unmatchProcess(){
-	$('#processed').html('');
-	proPostStartIndex=0;
-	proPostBatchSize = 10;
-	isAjaxRequestRunningProcessedUser = false;
-	isLoaderRunningProcessedUser = false;
-	doStopPostPaginationProcessedUser = false; 
-	UnProcessedUserPostsBatch = [];
-	fetchProcessedUser();
-	attachMatchedUserScrollEvent();
-}
 function paintPosts(posts) {
 	var divToPopulate = "";
 	var postsLength = posts.length;
@@ -10889,7 +10475,7 @@ function encompassCretentials(){
 
 };
 
-function paintReviews(result){
+function paintReviews(result, isRequestFromDashBoard){
 	//Check if there are more reviews left
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
@@ -10926,18 +10512,28 @@ function paintReviews(result){
 		}
 
 		reviewsHtml += '		</div>';
-		reviewsHtml += '    	<div class="float-right ppl-header-right">';
-		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
-		reviewsHtml += '		</div>';
-		reviewsHtml += '	</div>';
-
+		if(isRequestFromDashBoard) {
+			reviewsHtml += '<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="'+reviewItem.source+'" data-source="'+reviewItem.score+'">';
+			if(reviewItem.source == "Zillow"){
+				reviewsHtml += '<div class="rating-image float-left icn-zillow" title="Zillow"></div>';
+				reviewsHtml += '<div class="rating-rounded float-left">'+Number.parseFloat(reviewItem.score).toFixed(1)+'</div>';
+			}
+			reviewsHtml += '</div>';
+			reviewsHtml += '</div>';
+		} else {
+			reviewsHtml += '    	<div class="float-right ppl-header-right">';
+			reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
+			reviewsHtml += '		</div>';
+			reviewsHtml += '	</div>';
+		}
+		
 		if (reviewItem.review.length > 250) {
 			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
 		} else {
 			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
 		}
 		if(reviewItem.source == "Zillow") {
-			reviewsHtml += '<a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
+			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
 		}
 		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
 			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";
@@ -10975,14 +10571,18 @@ function paintReviews(result){
 	/*if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
 		$("#prof-review-item").html('');
 	}*/
+	if (isRequestFromDashBoard) {
+		$('#review-details').append(reviewsHtml);
+	} else {
+		$("#prof-review-item").append(reviewsHtml);
 
-	$("#prof-review-item").append(reviewsHtml);
-
-	$("#prof-reviews-header").parent().show();
-	$(".review-ratings").each(function() {
-		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
-	});
-
+		$("#prof-reviews-header").parent().show();
+		$(".review-ratings").each(
+				function() {
+					changeRatingPattern($(this).data("rating"), $(this), false,
+							$(this).data("source"));
+				});
+	}
 	setTimeout(function() {
 		$(window).trigger('scroll');
 	}, 100);

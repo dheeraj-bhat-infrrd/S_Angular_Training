@@ -87,9 +87,6 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
 
-    @Autowired
-    private Utils utils;
-
 
     @Override
     public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException
@@ -731,7 +728,6 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 uploadedUser.setUserAdded( true );
                 validationObject.getUpload().getUsers().add( uploadedUser );
             } else {
-
                 updateUploadValidationWithModifiedUser( uploadedUser, validationObject, userMap );
             }
             uploadedUsers.add( uploadedUser );
@@ -1162,6 +1158,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     && ( !uploadedRegions.contains( region )
                         || uploadedRegionMap.get( region.getSourceRegionId() ).isDeletedRecord() ) ) {
                     region.setDeletedRecord( true );
+                    region.setRowNum( 0 );
                     validationObject.setNumberOfRegionsDeleted( validationObject.getNumberOfRegionsDeleted() + 1 );
                 }
             }
@@ -1184,6 +1181,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     && ( !uploadedBranches.contains( branch )
                         || uploadedBranchMap.get( branch.getSourceBranchId() ).isDeletedRecord() ) ) {
                     branch.setDeletedRecord( true );
+                    branch.setRowNum( 0 );
                     validationObject.setNumberOfBranchesDeleted( validationObject.getNumberOfBranchesDeleted() + 1 );
                 }
             }
@@ -1205,6 +1203,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( user.getSourceUserId() != null && !user.getSourceUserId().isEmpty()
                     && ( !uploadeUsers.contains( user ) || uploadedUserMap.get( user.getSourceUserId() ).isDeletedRecord() ) ) {
                     user.setDeletedRecord( true );
+                    user.setRowNum( 0 );
                     validationObject.setNumberOfUsersDeleted( validationObject.getNumberOfUsersDeleted() + 1 );
                 }
             }

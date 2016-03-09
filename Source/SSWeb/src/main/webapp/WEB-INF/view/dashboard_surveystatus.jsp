@@ -76,4 +76,22 @@
 			</c:choose>
 		</div>
 	</div>
+	
+	<div class="clearfix stat-icns-wrapper">
+		<div class="float-left stat-icn-lbl"><spring:message code="label.importedfromzillow.key" /></div>
+		<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix">
+			<c:choose>
+				<c:when test="${not empty importedFromZillow && importedFromZillow != 0 }">
+					<fmt:formatNumber type="number" var="importedFromZillowCount" value="${importedFromZillow}" maxFractionDigits="0"/>
+					<c:forEach begin="1" end="${importedFromZillow<20?importedFromZillow:20}" var="counttwo">
+						<div class='float-left stat-icn-img stat-icn-img-blue'></div>
+					</c:forEach>
+					<div id='survey-zillow' class='float-left stat-icn-txt-rt'>${importedFromZillow}</div>
+				</c:when>
+				<c:otherwise>
+					<div id='survey-zillow' class='float-left stat-icn-txt-rt'>0</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</div>
 </div>
