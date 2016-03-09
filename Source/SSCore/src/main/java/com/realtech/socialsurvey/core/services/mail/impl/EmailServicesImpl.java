@@ -1908,16 +1908,16 @@ public class EmailServicesImpl implements EmailServices
      * Method to send the billing report in a mail to the social survey admin
      */
     @Override
-    public void sendCustomReportMail( String recipientName, String recipientMailId, String subject,
+    public void sendCustomReportMail( String recipientName, List<String> recipientMailIds, String subject,
         Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method sendCustomReportMail() started." );
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+        if ( recipientMailIds == null || recipientMailIds.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sending billing report mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending billing report mail " );
         }
 
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailIds );
         emailEntity.setAttachmentDetail( attachmentsDetails );
         
         FileContentReplacements messageSubjectReplacements = new FileContentReplacements();

@@ -392,11 +392,11 @@ public class AdminToolsController
                 if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
 
                     if ( !recipientMailId.contains( "," ) ) {
-                        if ( !organizationManagementService.validateEmail( recipientMailId ) )
+                        if ( !organizationManagementService.validateEmail( recipientMailId.trim() ) )
                             throw new InvalidInputException( "Mail id - " + recipientMailId
                                 + " entered as send alert to input is invalid", DisplayMessageConstants.GENERAL_ERROR );
                         else
-                            emailIdList.add( recipientMailId );
+                            emailIdList.add( recipientMailId.trim() );
                     } else {
                         String mailIds[] = recipientMailId.split( "," );
 
@@ -450,11 +450,11 @@ public class AdminToolsController
                 if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
 
                     if ( !recipientMailId.contains( "," ) ) {
-                        if ( !organizationManagementService.validateEmail( recipientMailId ) )
+                        if ( !organizationManagementService.validateEmail( recipientMailId.trim() ) )
                             throw new InvalidInputException( "Mail id - " + recipientMailId
                                 + " entered as send alert to input is invalid", DisplayMessageConstants.GENERAL_ERROR );
                         else
-                            emailIdList.add( recipientMailId );
+                            emailIdList.add( recipientMailId.trim() );
                     } else {
                         String mailIds[] = recipientMailId.split( "," );
 
@@ -507,11 +507,11 @@ public class AdminToolsController
                 if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
 
                     if ( !recipientMailId.contains( "," ) ) {
-                        if ( !organizationManagementService.validateEmail( recipientMailId ) )
+                        if ( !organizationManagementService.validateEmail( recipientMailId.trim() ) )
                             throw new InvalidInputException( "Mail id - " + recipientMailId
                                 + " entered as send alert to input is invalid", DisplayMessageConstants.GENERAL_ERROR );
                         else
-                            emailIdList.add( recipientMailId );
+                            emailIdList.add( recipientMailId.trim() );
                     } else {
                         String mailIds[] = recipientMailId.split( "," );
 
@@ -527,7 +527,10 @@ public class AdminToolsController
 
                 }
                 companies = adminService.getAllAutoBillingModeCompanies();
-                adminService.generateAutoBillingCompanyListExcelAndMail( companies, emailIdList );
+                if ( emailIdList != null && !emailIdList.isEmpty() ) {
+                    LOG.debug( "Generating excel and sending mail to user" );
+                    adminService.generateAutoBillingCompanyListExcelAndMail( companies, emailIdList );
+                }
                 response = Response.ok( companies ).build();
             } catch ( Exception e ) {
                 LOG.error( "Exception occured while getting auto billing mode companies. Reason : " + e.getStackTrace() );

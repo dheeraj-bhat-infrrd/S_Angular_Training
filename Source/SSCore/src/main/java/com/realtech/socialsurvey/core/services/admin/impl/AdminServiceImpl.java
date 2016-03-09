@@ -274,16 +274,15 @@ public class AdminServiceImpl implements AdminService
             Map<String, String> attachmentsDetails = new HashMap<String, String>();
             attachmentsDetails.put( fileName + ".xls", filePath );
 
-            for ( String recipientMailId : recipientMailIds ) {
-                String name = adminName;
-                LOG.debug( "sending mail to : " + name + " at : " + recipientMailId );
-                try {
-                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId,
-                        CommonConstants.TRANSACTION_LIST_MAIL_SUBJECT + subscriptionId, attachmentsDetails );
-                } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                    LOG.error( "Error while sending mail to ; " + recipientMailId, e );
-                }
+            String name = adminName;
+            LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
+            try {
+                emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
+                    CommonConstants.TRANSACTION_LIST_MAIL_SUBJECT + subscriptionId, attachmentsDetails );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
             }
+
         }
 
         LOG.info( "method generateTransactionListExcelAndMail ended" );
@@ -471,16 +470,15 @@ public class AdminServiceImpl implements AdminService
             Map<String, String> attachmentsDetails = new HashMap<String, String>();
             attachmentsDetails.put( fileName + ".xls", filePath );
 
-            for ( String recipientMailId : recipientMailIds ) {
-                String name = adminName;
-                LOG.debug( "sending mail to : " + name + " at : " + recipientMailId );
-                try {
-                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId,
-                        CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
-                } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                    LOG.error( "Error while sending mail to ; " + recipientMailId, e );
-                }
+            String name = adminName;
+            LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
+            try {
+                emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
+                    CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
             }
+
         }
 
         LOG.info( "method generateTransactionListExcelAndMail ended" );
@@ -497,8 +495,8 @@ public class AdminServiceImpl implements AdminService
         LOG.info( "Method getAllAutoBillingModeCompanies ended " );
         return CompanyList;
     }
-    
-    
+
+
     @Override
     public boolean generateAutoBillingCompanyListExcelAndMail( List<Company> CompanyList, List<String> recipientMailIds )
     {
@@ -536,22 +534,24 @@ public class AdminServiceImpl implements AdminService
             cell.setCellValue( company.getCompany() );
 
             cell = row.createCell( cellnum++ );
-            cell.setCellValue( company.getCreatedOn() );
+            if ( company.getCreatedOn() != null )
+                cell.setCellValue( company.getCreatedOn().toLocaleString() );
 
-            if(company.getLicenseDetails() !=  null && !company.getLicenseDetails().isEmpty()){
+            if ( company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() ) {
                 LicenseDetail licenseDetail = company.getLicenseDetails().get( 0 );
-                if(licenseDetail != null){
+                if ( licenseDetail != null ) {
                     cell = row.createCell( cellnum++ );
                     cell.setCellValue( licenseDetail.getSubscriptionId() );
 
                     cell = row.createCell( cellnum++ );
-                    cell.setCellValue( licenseDetail.getLicenseStartDate() );
+                    if ( licenseDetail.getLicenseStartDate() != null )
+                        cell.setCellValue( licenseDetail.getLicenseStartDate().toLocaleString() );
 
                     cell = row.createCell( cellnum++ );
                     cell.setCellValue( licenseDetail.getPaymentRetries() );
                 }
             }
-            
+
         }
         // Create file and write report into it
         boolean excelCreated = false;
@@ -590,16 +590,16 @@ public class AdminServiceImpl implements AdminService
             Map<String, String> attachmentsDetails = new HashMap<String, String>();
             attachmentsDetails.put( fileName + ".xls", filePath );
 
-            for ( String recipientMailId : recipientMailIds ) {
-                String name = adminName;
-                LOG.debug( "sending mail to : " + name + " at : " + recipientMailId );
-                try {
-                    emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailId,
-                        CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
-                } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                    LOG.error( "Error while sending mail to ; " + recipientMailId, e );
-                }
+
+            String name = adminName;
+            LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
+            try {
+                emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
+                    CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
             }
+
         }
 
         LOG.info( "method generateAutoBillingCompanyListExcelAndMail ended" );
