@@ -185,7 +185,7 @@ public interface SocialManagementService
 
 
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int complaintResolutionStatus, Timestamp reviewDate );
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate );
 
 
     public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds );

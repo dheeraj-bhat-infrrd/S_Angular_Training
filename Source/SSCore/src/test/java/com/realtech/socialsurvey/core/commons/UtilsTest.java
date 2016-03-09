@@ -153,8 +153,8 @@ public class UtilsTest {
     public void testUnmaskEmailAddressActuallyMasked()
     {
         Whitebox.setInternalState( utils, "maskingPrefix", "" );
-        Whitebox.setInternalState( utils, "maskingSuffix", "@xyz.com" );
-        assertEquals( "Unmask successful", "test@abc.com", utils.unmaskEmailAddress( "test+abc.com@xyz.com" ) );
+        Whitebox.setInternalState( utils, "maskingSuffix", "@vfgllc.com" );
+        assertEquals( "Unmask successful", "bhayes+bhhspro.com@vfgllc.com", utils.unmaskEmailAddress( "bhayes+bhhspro.com+vfgllc.com@vfgllc.com" ) );
     }
     
     

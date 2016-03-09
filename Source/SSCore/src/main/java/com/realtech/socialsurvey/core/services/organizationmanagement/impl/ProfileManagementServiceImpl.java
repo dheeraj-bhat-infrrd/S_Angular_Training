@@ -1819,6 +1819,37 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         return surveyDetails;
     }
 
+    
+    @Override
+    public List<SurveyDetails> getReviewsForReports( long iden, double startScore, double limitScore, int startIndex, int numOfRows,
+        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+        throws InvalidInputException
+    {
+        LOG.info( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
+            + " startIndex:" + startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel );
+        List<SurveyDetails> surveyDetails = null;
+        if ( iden <= 0l ) {
+            throw new InvalidInputException( "iden is invalid while fetching reviews" );
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        if ( startDate != null ) {
+            calendar.setTime( startDate );
+            calendar.add( Calendar.DATE, 0 );
+            startDate = calendar.getTime();
+        }
+        if ( endDate != null ) {
+            calendar.setTime( endDate );
+            calendar.add( Calendar.DATE, 1 );
+            endDate = calendar.getTime();
+        }
+
+        String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
+        surveyDetails = surveyDetailsDao.getFeedbacksForReports( idenColumnName, iden, startIndex, numOfRows, startScore, limitScore,
+            fetchAbusive, startDate, endDate, sortCriteria );
+
+        return surveyDetails;
+    }
 
     /**
      * Method to get average ratings based on the profile level specified, iden is one of
@@ -3951,8 +3982,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @SuppressWarnings ( "unchecked")
-    List<SurveyDetails> fetchAndSaveZillowFeeds( OrganizationUnitSettings profile, String collectionName, long companyId )
-        throws InvalidInputException, UnavailableException
+    List<SurveyDetails> fetchAndSaveZillowFeeds( OrganizationUnitSettings profile, String collectionName, long companyId,
+        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException
     {
         if ( profile == null )
             throw new InvalidInputException( "Profile setting passed cannot be null" );
@@ -4056,7 +4087,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                             reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
                                             if ( reviews != null ) {
                                                 surveyDetailsList = buildSurveyDetailsFromReviewMap( reviews, collectionName,
-                                                    profile, companyId );
+                                                    profile, companyId, fromBatch, fromPublicPage );
                                             }
                                         }
                                     }
@@ -4268,8 +4299,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @throws UnavailableException
      * */
     @Override
-    public List<SurveyDetails> fetchAndSaveZillowData( OrganizationUnitSettings profile, String collection, long companyId )
-        throws InvalidInputException, UnavailableException
+    public List<SurveyDetails> fetchAndSaveZillowData( OrganizationUnitSettings profile, String collection, long companyId,
+        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException
     {
 
         if ( profile == null || collection == null || collection.isEmpty() ) {
@@ -4280,7 +4311,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null ) {
             // fetching zillow feed
             LOG.debug( "Fetching zillow feed for " + profile.getId() + " from " + collection );
-            List<SurveyDetails> surveyDetailsList = fetchAndSaveZillowFeeds( profile, collection, companyId );
+            List<SurveyDetails> surveyDetailsList = fetchAndSaveZillowFeeds( profile, collection, companyId, fromBatch, fromPublicPage );
             LOG.info( "Method to fetch zillow feed finished." );
             return surveyDetailsList;
         } else {
@@ -4377,7 +4408,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     @Transactional
     public List<SurveyDetails> buildSurveyDetailsFromReviewMap( List<HashMap<String, Object>> reviews, String collectionName,
-        OrganizationUnitSettings profile, long companyId ) throws InvalidInputException
+        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException
     {
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
         String idenColumnName = "";
@@ -4401,7 +4432,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             String sourceId = (String) review.get( "reviewURL" );
             String reviewDescription = (String) review.get( "description" );
             queries.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, sourceId );
-            boolean isAbusive = utils.checkReviewForSwearWords( reviewDescription, surveyHandler.getSwearList() );
+            boolean isAbusive = false;
+            if ( fromBatch ) {
+                utils.checkReviewForSwearWords( reviewDescription, surveyHandler.getSwearList() );
+            }
             SurveyDetails surveyDetails = surveyDetailsDao.getZillowReviewByQueryMap( queries );
             if ( surveyDetails == null ) {
                 surveyDetails = new SurveyDetails();
@@ -4432,6 +4466,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         LOG.error( "Could not find by agent hierarchy details for id : " + profile.getIden(), e );
                     }
                     surveyDetails.setAgentId( profile.getIden() );
+                    if ( profile.getContact_details() != null && profile.getContact_details().getName() != null
+                        && profile.getContact_details().getName().trim().length() > 0 ) {
+                        surveyDetails.setAgentName(profile.getContact_details().getName());
+                    }
                     surveyDetails.setCompanyId( companyId );
                 }
                 String createdDate = (String) review.get( "reviewDate" );
@@ -4452,7 +4490,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyHandler.insertSurveyDetails( surveyDetails );
 
                 if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
-                    && !isAbusive ) {
+                    && !isAbusive && fromBatch ) {
                     try {
                         pushToZillowPostTemp( profile, collectionName, surveyDetails, review );
                     } catch ( Exception e ) {
@@ -4464,6 +4502,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 //    zillowReviewScoreTotal = surveyDetails.getScore();
                 // else
                 //    zillowReviewScoreTotal += surveyDetails.getScore();
+            }
+            if ( fromPublicPage ) {
+                String reviewDesc = surveyDetails.getReview();
+                if ( reviewDescription != null && !reviewDescription.isEmpty() ) {
+                    reviewDesc = reviewDesc + "<br>" + reviewDescription;
+                    surveyDetails.setReview( reviewDesc );
+                }
             }
             surveyDetailsList.add( surveyDetails );
             latestSurveyIdList.add( surveyDetails.get_id() );

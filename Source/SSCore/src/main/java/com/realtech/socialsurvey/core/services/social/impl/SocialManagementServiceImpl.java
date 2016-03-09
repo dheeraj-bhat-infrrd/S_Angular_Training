@@ -2039,9 +2039,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int complaintResolutionStatus, Timestamp reviewDate )
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate )
     {
-        externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating,
+        externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating, autoPostStatus,
             complaintResolutionStatus, reviewDate );
     }
 

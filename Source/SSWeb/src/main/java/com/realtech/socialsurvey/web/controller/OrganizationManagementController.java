@@ -2746,7 +2746,6 @@ public class OrganizationManagementController
             User user = sessionHelper.getCurrentUser();
             uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
             response = uploadValidation;
-            LOG.debug( "Returning: " + new Gson().toJson( response ) );
         } catch ( InvalidInputException ex ) {
             status = false;
             response = ex.getMessage();
@@ -2773,7 +2772,6 @@ public class OrganizationManagementController
             User user = sessionHelper.getCurrentUser();
             uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
             response = uploadValidation;
-            LOG.debug( "Returning: " + new Gson().toJson( response ) );
         } catch ( Exception ex ) {
             status = false;
             response = ex.getMessage();
