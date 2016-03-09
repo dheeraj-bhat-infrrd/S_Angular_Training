@@ -87,9 +87,6 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
 
-    @Autowired
-    private Utils utils;
-
 
     @Override
     public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException
