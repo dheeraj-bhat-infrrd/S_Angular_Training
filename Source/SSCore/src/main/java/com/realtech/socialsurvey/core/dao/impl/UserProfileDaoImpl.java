@@ -43,6 +43,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     private final String companyUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ? ) AS subQuery_UP ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
 
 
+    private static final String getUserProfileByUserIdsQuery = "select UP.USER_PROFILE_ID , UP.STATUS  , UP.AGENT_ID , UP.BRANCH_ID , UP.REGION_ID ,  "
+        + " UP.PROFILES_MASTER_ID  from " + "USER_PROFILE UP where UP.AGENT_ID IN (:userIds)";
+
+
     /*
      * Method to deactivate all the user profiles for a given user.
      */
@@ -62,9 +66,8 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         LOG.info( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
 
     }
-    
-    
-    
+
+
     /*
      * Method to activate all the user profiles for a given user.
      */
@@ -430,6 +433,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         return userList;
     }
 
+
     private String getCustomerDisplayName( String firstName, String lastName )
     {
         String displayName = firstName;
@@ -574,4 +578,48 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.executeUpdate();
         LOG.info( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " finished." );
     }
- }
+
+
+    @Override
+    public Map<Long, List<UserProfile>> getUserProfilesForUsers( List<Long> userIds )
+    {
+        LOG.debug( "Method getUserProfilesForUsers started for user ids : " + userIds );
+        Query query = getSession().createSQLQuery( getUserProfileByUserIdsQuery );
+        query.setParameterList( "userIds", userIds );
+
+
+        Map<Long, List<UserProfile>> userUserProfileMap = new HashMap<Long, List<UserProfile>>();
+        LOG.debug( "QUERY : " + query.getQueryString() );
+        List<Object[]> rows = (List<Object[]>) query.list();
+ 
+        for ( Long userId : userIds ) {
+            userUserProfileMap.put( userId, new ArrayList<UserProfile>() );
+        }
+
+        for ( Object[] row : rows ) {
+            Long userId = Long.parseLong( String.valueOf( row[2] ) );
+            UserProfile userProfile = new UserProfile();
+
+            userProfile.setUserProfileId( Long.parseLong( String.valueOf( row[0] ) ) );
+            userProfile.setStatus( Integer.parseInt( String.valueOf( row[1] ) ) );
+            userProfile.setAgentId( Long.parseLong( String.valueOf( row[2] ) ) );
+            userProfile.setBranchId( Long.parseLong( String.valueOf( row[3] ) ) );
+            userProfile.setRegionId( Long.parseLong( String.valueOf( row[4] ) ) );
+
+            ProfilesMaster profilesMaster = new ProfilesMaster();
+            profilesMaster.setProfileId( Integer.parseInt( String.valueOf( row[5] ) ) );
+            userProfile.setProfilesMaster( profilesMaster );
+
+            List<UserProfile> profileListForUser = userUserProfileMap.get( userId );
+
+            //add profile to the particular user's profile list
+            profileListForUser.add( userProfile );
+            //update profile list in map
+            userUserProfileMap.put( userId, profileListForUser );
+        }
+
+        LOG.debug( "Method getUserProfilesForUsers ended for user ids : " + userIds );
+        return userUserProfileMap;
+
+    }
+}
