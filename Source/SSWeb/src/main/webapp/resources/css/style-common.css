@@ -8424,3 +8424,6 @@ label.url-change-input-label {
 	border: 1px solid #dcdcdc;
 	min-width: 180px;
 }
+.empty-field{
+	border:1px solid #D0021B;
+}
