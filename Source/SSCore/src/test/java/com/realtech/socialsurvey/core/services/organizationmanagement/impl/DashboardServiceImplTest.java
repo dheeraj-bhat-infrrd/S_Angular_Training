@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
+import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -315,23 +316,48 @@ public class DashboardServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testDownloadCustomerSurveyResultsDataForNullFileName() throws InvalidInputException, IOException
     {
-        dashboardServiceImpl.downloadCustomerSurveyResultsData( new ArrayList<SurveyDetails>(), null );
+        dashboardServiceImpl.downloadCustomerSurveyResultsData( new ArrayList<SurveyDetails>(), null,
+            TestConstants.TEST_EMPTY_STRING, 0l );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testDownloadCustomerSurveyResultsDataForEmptyFileName() throws InvalidInputException, IOException
     {
-        dashboardServiceImpl.downloadCustomerSurveyResultsData( new ArrayList<SurveyDetails>(), "" );
+        dashboardServiceImpl.downloadCustomerSurveyResultsData( new ArrayList<SurveyDetails>(), "",
+            TestConstants.TEST_EMPTY_STRING, 0l );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testDownloadCustomerSurveyResultsDataForNullSocialPosts() throws InvalidInputException, IOException
+    public void testDownloadCustomerSurveyResultsDataForNullSurveyDetails() throws InvalidInputException, IOException
     {
-        dashboardServiceImpl.downloadCustomerSurveyResultsData( null, "test" );
+        dashboardServiceImpl.downloadCustomerSurveyResultsData( null, "test", TestConstants.TEST_EMPTY_STRING, 0l );
     }
 
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadCustomerSurveyResultsDataForNullProfileLevel() throws InvalidInputException, IOException
+    {
+        dashboardServiceImpl.downloadCustomerSurveyResultsData( new ArrayList<SurveyDetails>(), TestConstants.TEST_STRING,
+            null, 0l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadCustomerSurveyResultsDataForEmptyProfileLevel() throws InvalidInputException, IOException
+    {
+        dashboardServiceImpl.downloadCustomerSurveyResultsData( new ArrayList<SurveyDetails>(), TestConstants.TEST_STRING,
+            TestConstants.TEST_EMPTY_STRING, 0l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testDownloadCustomerSurveyResultsDataForInvalidCompanyId() throws InvalidInputException, IOException
+    {
+        dashboardServiceImpl.downloadCustomerSurveyResultsData( new ArrayList<SurveyDetails>(), TestConstants.TEST_STRING,
+            TestConstants.TEST_STRING, 0l );
+    }
 
     @Test ( expected = InvalidInputException.class)
     public void testDownloadAgentRankingDataForNullFileName() throws InvalidInputException, IOException

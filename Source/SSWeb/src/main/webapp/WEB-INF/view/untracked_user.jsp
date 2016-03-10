@@ -9,9 +9,9 @@
 <div class="un-heading">Unmatched/Processed Transactions</div>
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
-			<li class="active" ><a href="#new-tab" role="tab" data-toggle="tab" onclick="newUnmatched();" >
+			<li class="active" ><a href="#new-tab" role="tab" data-toggle="tab" onclick="initializeUnmatchedUserPage();" >
 					New <i class="fa fa-folder-open-o"></i></a></li>
-			<li><a href="#processed-tab" role="tab" data-toggle="tab" onclick="unmatchProcess();">
+			<li><a href="#processed-tab" role="tab" data-toggle="tab" onclick="initializeProcesedUserPage();">
 					Processed <i class="fa fa-folder-o"></i></a></li>
 
 		</ul>
@@ -28,9 +28,18 @@
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Date</div>
 						<div style="width:10%" class="float-left unmatchtab unhr-row">Action</div>
 					</div>
-					<div id="new" style="height:100px;overflow:hidden;position: relative;">
+					<div id="new" ></div>
 					
-					</div>
+												
+						<div id="un-new-paginate-btn" class="paginate-buttons-survey clearfix hide" data-start="0" data-total="0" data-batch="10">
+							<div id="un-new-prev" class="float-left sur-paginate-btn">&lt; Prev</div>
+							<div class="paginate-sel-box float-left">
+								<input id="sel-page-un-new-list" type="text" pattern="[0-9]*" class="sel-page" value="0"/>
+								<span class="paginate-divider">/</span>
+								<span id="un-new-total-pages" class="paginate-total-pages">0</span>
+							</div>
+							<div id="un-new-next" class="float-right sur-paginate-btn">Next &gt;</div>
+						</div>
 				</div>
 
 			</div>
@@ -44,9 +53,16 @@
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Date</div>
 						<div style="width:10%" class="float-left unmatchtab unhr-row">Action</div>
 					</div>
-					<div id="processed" style="height:100px;overflow:hidden;position: relative;">
-					
-					</div>
+					<div id="processed"></div>
+					<div id="un-processed-paginate-btn" class="paginate-buttons-survey clearfix hide" data-start="0" data-total="0" data-batch="10">
+							<div id="un-processed-prev" class="float-left sur-paginate-btn">&lt; Prev</div>
+							<div class="paginate-sel-box float-left">
+								<input id="sel-page-un-processed-list" type="text" pattern="[0-9]*" class="sel-page" value="0"/>
+								<span class="paginate-divider">/</span>
+								<span id="un-processed-total-pages" class="paginate-total-pages">0</span>
+							</div>
+							<div id="un-processed-next" class="float-right sur-paginate-btn">Next &gt;</div>
+						</div>
 				</div>
 
 			</div>
@@ -57,8 +73,9 @@
 	</div>
 	<script>
 $(document).ready(function(){
-	newUnmatched();
-	
-	
+	bindEventForUnmatchedUserPage();
+	bindEventsForProcessUserPage();
+	initializeUnmatchedUserPage();
+	initializeProcesedUserPage();
 }); 
 </script>

@@ -86,6 +86,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -2039,9 +2040,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int complaintResolutionStatus, Timestamp reviewDate )
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate )
     {
-        externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating,
+        externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating, autoPostStatus,
             complaintResolutionStatus, reviewDate );
     }
 
@@ -2055,33 +2056,39 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Transactional
     @Override
-    public List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    public SurveyPreInitiationList getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
         throws InvalidInputException
     {
         LOG.debug( "method getUnmatchedPreInitiatedSurveys called for company id : " + companyId );
+        SurveyPreInitiationList surveyPreInitiationListVO = new SurveyPreInitiationList();
         if ( companyId <= 0 ) {
             throw new InvalidInputException( " Wrong parameter passed : companyId is invalid " );
         }
 
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getUnmatchedPreInitiatedSurveys( companyId,
             startIndex, batchSize );
-        return surveyPreInitiations;
+        surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
+        surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getUnmatchedPreInitiatedSurveyCount( companyId ) );
+        return surveyPreInitiationListVO;
     }
 
 
     @Transactional
     @Override
-    public List<SurveyPreInitiation> getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    public SurveyPreInitiationList getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
         throws InvalidInputException
     {
         LOG.debug( "method getProcessedPreInitiatedSurveys called for company id : " + companyId );
+        SurveyPreInitiationList surveyPreInitiationListVO = new SurveyPreInitiationList();
         if ( companyId <= 0 ) {
             throw new InvalidInputException( " Wrong parameter passed : companyId is invalid " );
         }
 
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getProcessedPreInitiatedSurveys( companyId,
             startIndex, batchSize );
-        return surveyPreInitiations;
+        surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
+        surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getProcessedPreInitiatedSurveyCount( companyId ) );
+        return surveyPreInitiationListVO;
     }
 
 
@@ -2108,6 +2115,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         if ( emailAddress == null || emailAddress.isEmpty() ) {
             throw new InvalidInputException( " Wrong parameter passed : emailAddress is null oe empty " );
         }
+
         LOG.debug( "method getProcessedPreInitiatedSurveys called for email id : " + emailAddress );
         surveyPreInitiationDao.updateSurveyPreinitiationRecordsAsIgnored( emailAddress );
     }

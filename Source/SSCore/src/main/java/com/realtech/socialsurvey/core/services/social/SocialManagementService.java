@@ -16,13 +16,13 @@ import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.ZillowTempPost;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -185,17 +185,17 @@ public interface SocialManagementService
 
 
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int complaintResolutionStatus, Timestamp reviewDate );
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate );
 
 
     public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds );
 
 
-    List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    SurveyPreInitiationList getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
         throws InvalidInputException;
 
 
-    List<SurveyPreInitiation> getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+    SurveyPreInitiationList getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
         throws InvalidInputException;
 
 

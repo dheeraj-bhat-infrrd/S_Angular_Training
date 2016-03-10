@@ -292,7 +292,6 @@ public class UploadValidationServiceImplTest
         validation.setUpload( upload );
         uploadValidationServiceImpl.validateHeirarchyUpload( validation, null, null, null );
         Assert.assertEquals( 0, validation.getRegionValidationErrors().size() );
-        Assert.assertEquals( 2, validation.getNumberOfRegionsDeleted() );
         LOG.info( "Errors: " + validation.getRegionValidationErrors() );
     }
 
@@ -355,7 +354,6 @@ public class UploadValidationServiceImplTest
         validation.setUpload( upload );
         uploadValidationServiceImpl.validateHeirarchyUpload( validation, null, null, null );
         Assert.assertEquals( 0, validation.getBranchValidationErrors().size() );
-        Assert.assertEquals( 3, validation.getNumberOfBranchesDeleted() );
         LOG.info( "Errors: " + validation.getBranchValidationErrors() );
     }
 

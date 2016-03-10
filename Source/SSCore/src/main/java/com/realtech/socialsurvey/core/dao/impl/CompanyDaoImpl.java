@@ -57,8 +57,8 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         + "outer_up.USER_ID = subquery_Data.USER_ID where C.COMPANY_ID = subquery_Data.COMPANY_ID "
         + "group by outer_up.USER_ID order by subquery_Data.COMPANY_ID, outer_up.REGION_ID, outer_up.BRANCH_ID";
 
-    private static final String companyDetailByBillingMode = "select C.COMPANY_ID ,  C.COMPANY  , C.STATUS , C.BILLING_MODE , "
-        + " L.SUBSCRIPTION_ID  , L.PAYMENT_MODE  from " + "COMPANY C JOIN LICENSE_DETAILS L "
+    private static final String companyDetailByBillingMode = "select C.COMPANY_ID ,  C.COMPANY  , C.STATUS , C.BILLING_MODE , C.CREATED_ON ,  "
+        + " L.SUBSCRIPTION_ID  , L.LICENSE_START_DATE , L.PAYMENT_RETRIES  from " + "COMPANY C JOIN LICENSE_DETAILS L "
         + "ON L.COMPANY_ID = C.COMPANY_ID where L.PAYMENT_MODE= 'A'";
 
 
@@ -348,10 +348,13 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
             company.setCompany( String.valueOf( row[1] ) );
             company.setStatus( Integer.parseInt( String.valueOf( row[2] ) ) );
             company.setBillingMode( String.valueOf( row[3] ) );
+            company.setCreatedOn( Timestamp.valueOf( String.valueOf( row[4] ) ) );
 
             LicenseDetail licenseDetail = new LicenseDetail();
-            licenseDetail.setSubscriptionId( String.valueOf( row[4] ) );
-            licenseDetail.setPaymentMode( String.valueOf( row[5] ) );
+            licenseDetail.setSubscriptionId( String.valueOf( row[5] ) );
+            if(String.valueOf( row[6] ) != null)
+                licenseDetail.setLicenseStartDate( Timestamp.valueOf( String.valueOf( row[6] ) ) );
+            licenseDetail.setPaymentRetries( Integer.parseInt( String.valueOf( row[7] ) )  );
 
             List<LicenseDetail> licenseDetails = new ArrayList<LicenseDetail>();
             licenseDetails.add( licenseDetail );
