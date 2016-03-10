@@ -330,6 +330,13 @@
 	float:none;
 	margin-top:10px;
 	}
+	.widget-code{
+    float:none !important;
+    width: auto !important;
+    }
+    .widget-copy{
+    padding:0px !important;
+    }
 }
 
 
@@ -448,6 +455,10 @@
     }
     .wc-form-input {
     	width:  210px;
+    }
+    .widget-code{
+    float:none !important;
+    width: auto !important;
     }
 }
 
