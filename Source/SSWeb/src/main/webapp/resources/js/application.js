@@ -956,14 +956,15 @@ function fetchReviewsOnDashboard(isNextBatch) {
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
 		var tempDiv = $('<div>').html(data);
 		var reviewsCount = tempDiv.children('div.dsh-review-cont').length;
-		
+		var ssReviewsPresent = true;
 		//check if no reviews found
 		if(startIndexCmp == 0) {
 			var name = $('#review-desc').attr('data-profile-name');
 			if (reviewsCount == 0) {
 				$("#review-desc").html("No reviews found for " + name);
 				$("#review-details").html('');
-				return;
+//				return;
+				ssReviewsPresent = false;
 			} else {
 				$("#review-desc").html("What people say about " + name);
 			}
@@ -973,13 +974,15 @@ function fetchReviewsOnDashboard(isNextBatch) {
 			doStopPaginationDashboard = true;
 		}
 		
-		if (startIndexCmp == 0)
-			$('#review-details').html(data);
-		else
-			$('#review-details').append(data);
+		if(ssReviewsPresent){
+			if (startIndexCmp == 0)
+				$('#review-details').html(data);
+			else
+				$('#review-details').append(data);
 		
-		//Update events
-		updateEventOnDashboardPageForReviews();
+			//Update events
+			updateEventOnDashboardPageForReviews();
+		}
 		startIndexCmp += batchSizeCmp;
 		
 		if(!isNextBatch) {
@@ -989,7 +992,7 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 			fetchReviewsOnDashboard(true);
 		} else {
-			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true);
+			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp);
 		}
 	}, payload, true);
 }
@@ -7502,12 +7505,12 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
 		} else {
-			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false);
+			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false, countOfReviewsFetched, numOfRows);
 		}
 	}, true);
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard, start, batchSize){
 	if (currentProfileIden == undefined || currentProfileIden == "" || isZillowReviewsCallRunning) {
 		return; //Return if profile id is undefined
 	}
@@ -7537,6 +7540,13 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	                stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
 	                if (result != undefined && result.length > 0) {
 						// build zillow reviews html here
+	                	var lastIndex = start - batchSize;
+						// remove the No Reviews Found
+						if (isFromDashBoard && lastIndex <= 0) {
+							$("#review-desc").html("");
+						} else if (!isFromDashBoard && start <= 0) {
+							$("#prof-review-item").html("");
+						}
 						paintReviews(result,isFromDashBoard);
 	                }
 	            }

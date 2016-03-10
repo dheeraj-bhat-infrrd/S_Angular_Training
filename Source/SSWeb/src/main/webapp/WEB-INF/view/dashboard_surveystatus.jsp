@@ -78,7 +78,7 @@
 	</div>
 	
 	<div class="clearfix stat-icns-wrapper">
-		<div class="float-left stat-icn-lbl"><spring:message code="label.importedfromzillow.key" /></div>
+		<div class="float-left stat-icn-lbl"><spring:message code="label.zillowreviews.key" /></div>
 		<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix">
 			<c:choose>
 				<c:when test="${not empty importedFromZillow && importedFromZillow != 0 }">
