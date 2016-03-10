@@ -2230,4 +2230,10 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         User user = userDao.findById( User.class, userId );
         return user;
     }
+
+    @Override
+    public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException
+    {
+        hierarchyUploadDao.saveHierarchyUploadObject( upload );
+    }
 }

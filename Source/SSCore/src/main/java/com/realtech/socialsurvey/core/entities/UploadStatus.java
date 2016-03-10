@@ -23,8 +23,22 @@ public class UploadStatus
     @GeneratedValue ( strategy = GenerationType.IDENTITY)
     @Column ( name = "UPLOAD_STATUS_ID")
     private long uploadStatusId;
+
     @Column ( name = "MESSAGE")
     private String message;
+
+    @Column ( name = "STATUS")
+    private int status;
+
+    @Column ( name = "CREATED_ON")
+    private Timestamp createdOn;
+
+    @Column ( name = "MODIFIED_ON")
+    private Timestamp modifiedOn;
+
+    @ManyToOne ( fetch = FetchType.LAZY)
+    @JoinColumn ( name = "COMPANY_ID")
+    private Company company;
 
 
     /**
@@ -133,15 +147,4 @@ public class UploadStatus
     {
         this.company = company;
     }
-
-    @Column ( name = "STATUS")
-    private int status;
-    @Column ( name = "CREATED_ON")
-    private Timestamp createdOn;
-    @Column ( name = "MODIFIED_ON")
-    private Timestamp modifiedOn;
-
-    @ManyToOne ( fetch = FetchType.LAZY)
-    @JoinColumn ( name = "COMPANY_ID")
-    private Company company;
 }

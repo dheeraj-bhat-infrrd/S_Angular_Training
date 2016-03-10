@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
+
 /**
  * Uploads hierarchy for a company
  *
@@ -24,7 +25,8 @@ public interface HierarchyStructureUploadService
      * @return 
      * @throws InvalidInputException
      */
-    public Map<String, List<String>> uploadHierarchy(HierarchyUpload upload, Company company, User user) throws InvalidInputException;
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user )
+        throws InvalidInputException;
 
     public List<UploadStatus> findInitiatedHierarchyUploads() throws NoRecordsFetchedException;
 
@@ -35,4 +37,12 @@ public interface HierarchyStructureUploadService
     public User getUser( long userId );
 
     public void addUploadStatusEntry( UploadStatus uploadStatus );
+
+
+    /**
+     * Saves the hierarchy upload object in mongo db
+     * @param upload
+     * @throws InvalidInputException
+     */
+    public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException;
 }
