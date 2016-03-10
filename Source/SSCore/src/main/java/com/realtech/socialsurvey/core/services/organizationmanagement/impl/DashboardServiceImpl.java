@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -50,7 +51,6 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -73,7 +73,6 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
@@ -128,6 +127,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Resource
     @Qualifier ( "branch")
     private BranchDao branchDao;
+
 
     @Transactional
     @Override
@@ -1071,12 +1071,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException
     {
         LOG.info( "Check if billing report entries exist" );
-        Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+        Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN,
+            CommonConstants.FILE_UPLOAD_BILLING_REPORT );
         List<Integer> statusList = new ArrayList<Integer>();
         statusList.add( CommonConstants.STATUS_ACTIVE );
         statusList.add( CommonConstants.STATUS_UNDER_PROCESSING );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN, statusList );
-        List<FileUpload> filesToBeUploaded = fileUploadDao.findByCriteria( FileUpload.class, fileUploadTypeCriteria, statusCriteria );
+        List<FileUpload> filesToBeUploaded = fileUploadDao.findByCriteria( FileUpload.class, fileUploadTypeCriteria,
+            statusCriteria );
         if ( filesToBeUploaded == null || filesToBeUploaded.isEmpty() ) {
             throw new NoRecordsFetchedException( "No billing report entries exist" );
         }
@@ -1117,9 +1119,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         List<Branch> branchList = new ArrayList<Branch>();
         List<Branch> defaultBranchList = new ArrayList<Branch>();
         List<User> userList = new ArrayList<User>();
+        Map<Long, List<UserProfile>> userAndProfileMap = new HashMap<Long, List<UserProfile>>();
 
 
-        int batch = 50;
+        final int batch = 100;
         try {
             int start = 0;
             List<Region> batchRegionList = new ArrayList<Region>();
@@ -1150,15 +1153,30 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
             start = 0;
             List<User> batchUserList = new ArrayList<User>();
+            Map<Long, List<UserProfile>> batchUserAndProfileMap;
+            List<Long> batchUserIds;
             do {
+                batchUserIds = new ArrayList<Long>();
                 batchUserList = userDao.getUsersForCompany( company, start, batch );
-                if ( batchUserList != null && batchUserList.size() > 0 )
+                if ( batchUserList != null && batchUserList.size() > 0 ) {
+                    
+                    for ( User user : batchUserList ) {
+                        batchUserIds.add( user.getUserId() );
+                    }
+                    //get profiles for users
+                    batchUserAndProfileMap = userProfileDao.getUserProfilesForUsers( batchUserIds );
+                    //add batch profiles to profile list
+                    userAndProfileMap.putAll( batchUserAndProfileMap );
+                    //add batch user to the user list
                     userList.addAll( batchUserList );
+                }
                 start += batch;
             } while ( batchUserList != null && batchUserList.size() == batch );
+
         } catch ( Exception e ) {
             LOG.error( "Exception occurred while fetching region or branches or users for company. Reason : ", e );
         }
+
 
         List<Long> defaultBranchIdList = new ArrayList<Long>();
         if ( defaultBranchList != null && defaultBranchList.size() > 0 ) {
@@ -1183,7 +1201,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 String branchIdAsAdmin = "";
                 boolean isCompanyAdminHasAnotherRole = false;
                 boolean isCompanyAdmin = user.getIsOwner() == CommonConstants.YES;
-                List<UserProfile> userProfileList = user.getUserProfiles();
+                //get user profiles for user from map
+                List<UserProfile> userProfileList = userAndProfileMap.get( user.getUserId() );
                 if ( userProfileList != null && userProfileList.size() > 0 ) {
                     for ( UserProfile userProfile : userProfileList ) {
                         if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
