@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
@@ -219,20 +218,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
             
             //check for duplicate source ids
-            if ( sourceRegionIdErrors.containsKey( uploadedRegion.getSourceRegionId() ) ) {
-                if ( sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ) == null
-                    || sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ).isEmpty() ) {
-                    sourceRegionIdErrors.put(
-                        uploadedRegion.getSourceRegionId(),
-                        "The Region ID : " + uploadedRegion.getSourceRegionId() + " is duplicated at row : "
-                            + uploadedRegion.getRowNum() );
-                } else {
-                    sourceRegionIdErrors.put( uploadedRegion.getSourceRegionId(),
-                        sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ) + ", " + uploadedRegion.getRowNum() );
-                }
-            } else {
-                sourceRegionIdErrors.put( uploadedRegion.getSourceRegionId(), null );
-            }
+            checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
         }
         markDeletedRegions( uploadedRegions, validationObject );
         List<String> errors = new ArrayList<String>();
@@ -339,20 +325,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 updateUploadValidationWithModifiedBranch( uploadedBranch, validationObject, branchMap );
             }
             //check for duplicate source ids
-            if ( sourceBranchIdErrors.containsKey( uploadedBranch.getSourceBranchId() ) ) {
-                if ( sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ) == null
-                    || sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ).isEmpty() ) {
-                    sourceBranchIdErrors.put(
-                        uploadedBranch.getSourceBranchId(),
-                        "The Office ID : " + uploadedBranch.getSourceBranchId() + " is duplicated at row : "
-                            + uploadedBranch.getRowNum() );
-                } else {
-                    sourceBranchIdErrors.put( uploadedBranch.getSourceBranchId(),
-                        sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ) + ", " + uploadedBranch.getRowNum() );
-                }
-            } else {
-                sourceBranchIdErrors.put( uploadedBranch.getSourceBranchId(), null );
-            }
+            checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
         }
         markDeletedBranches( uploadedBranches, validationObject );
         List<String> errors = new ArrayList<String>();
@@ -402,20 +375,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 updateUploadValidationWithModifiedUser( uploadedUser, validationObject, userMap );
             }
             //check for duplicate source ids
-            if ( sourceUserIdErrors.containsKey( uploadedUser.getSourceUserId() ) ) {
-                if ( sourceUserIdErrors.get( uploadedUser.getSourceUserId() ) == null
-                    || sourceUserIdErrors.get( uploadedUser.getSourceUserId() ).isEmpty() ) {
-                    sourceUserIdErrors.put(
-                        uploadedUser.getSourceUserId(),
-                        "The User ID : " + uploadedUser.getSourceUserId() + " is duplicated at row : "
-                            + uploadedUser.getRowNum() );
-                } else {
-                    sourceUserIdErrors.put( uploadedUser.getSourceUserId(),
-                        sourceUserIdErrors.get( uploadedUser.getSourceUserId() ) + ", " + uploadedUser.getRowNum() );
-                }
-            } else {
-                sourceUserIdErrors.put( uploadedUser.getSourceUserId(), null );
-            }
+            checkForDuplicateSourceUserIds( sourceUserIdErrors, uploadedUser );
         }
         markDeletedUsers( uploadedUsers, validationObject );
         List<String> errors = new ArrayList<String>();
@@ -535,20 +495,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
             uploadedRegions.add( uploadedRegion );
             //check for duplicate source ids
-            if ( sourceRegionIdErrors.containsKey( uploadedRegion.getSourceRegionId() ) ) {
-                if ( sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ) == null
-                    || sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ).isEmpty() ) {
-                    sourceRegionIdErrors.put(
-                        uploadedRegion.getSourceRegionId(),
-                        "The Region ID : " + uploadedRegion.getSourceRegionId() + " is duplicated at row : "
-                            + uploadedRegion.getRowNum() );
-                } else {
-                    sourceRegionIdErrors.put( uploadedRegion.getSourceRegionId(),
-                        sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ) + ", " + uploadedRegion.getRowNum() );
-                }
-            } else {
-                sourceRegionIdErrors.put( uploadedRegion.getSourceRegionId(), null );
-            }
+            checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
         }
         List<String> errors = new ArrayList<String>();
         if ( !sourceRegionIdErrors.isEmpty() ) {
@@ -674,20 +621,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
             uploadedBranches.add( uploadedBranch );
             //check for duplicate source ids
-            if ( sourceBranchIdErrors.containsKey( uploadedBranch.getSourceBranchId() ) ) {
-                if ( sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ) == null
-                    || sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ).isEmpty() ) {
-                    sourceBranchIdErrors.put(
-                        uploadedBranch.getSourceBranchId(),
-                        "The Office ID : " + uploadedBranch.getSourceBranchId() + " is duplicated at row : "
-                            + uploadedBranch.getRowNum() );
-                } else {
-                    sourceBranchIdErrors.put( uploadedBranch.getSourceBranchId(),
-                        sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ) + ", " + uploadedBranch.getRowNum() );
-                }
-            } else {
-                sourceBranchIdErrors.put( uploadedBranch.getSourceBranchId(), null );
-            }
+            checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
         }
         List<String> errors = new ArrayList<String>();
         if ( !sourceBranchIdErrors.isEmpty() ) {
@@ -862,20 +796,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             uploadedUsers.add( uploadedUser );
             
             //check for duplicate source ids
-            if ( sourceUserIdErrors.containsKey( uploadedUser.getSourceUserId() ) ) {
-                if ( sourceUserIdErrors.get( uploadedUser.getSourceUserId() ) == null
-                    || sourceUserIdErrors.get( uploadedUser.getSourceUserId() ).isEmpty() ) {
-                    sourceUserIdErrors.put(
-                        uploadedUser.getSourceUserId(),
-                        "The User ID : " + uploadedUser.getSourceUserId() + " is duplicated at row : "
-                            + uploadedUser.getRowNum() );
-                } else {
-                    sourceUserIdErrors.put( uploadedUser.getSourceUserId(),
-                        sourceUserIdErrors.get( uploadedUser.getSourceUserId() ) + ", " + uploadedUser.getRowNum() );
-                }
-            } else {
-                sourceUserIdErrors.put( uploadedUser.getSourceUserId(), null );
-            }
+            checkForDuplicateSourceUserIds( sourceUserIdErrors, uploadedUser );
         }
         List<String> errors = new ArrayList<String>();
         if ( !sourceUserIdErrors.isEmpty() ) {
@@ -1439,5 +1360,77 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             return true;
         }
         return false;
+    }
+    
+    
+    /**
+     * Method to check for duplicate sourceRegionIds
+     * @param sourceRegionIdErrors
+     * @param uploadedRegion
+     */
+    void checkForDuplicateSourceRegionIds( Map<String, String> sourceRegionIdErrors, RegionUploadVO uploadedRegion )
+    {
+        //check for duplicate source ids
+        if ( sourceRegionIdErrors.containsKey( uploadedRegion.getSourceRegionId() ) ) {
+            if ( sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ) == null
+                || sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ).isEmpty() ) {
+                sourceRegionIdErrors.put(
+                    uploadedRegion.getSourceRegionId(),
+                    "The Region ID : " + uploadedRegion.getSourceRegionId() + " is duplicated at row : "
+                        + uploadedRegion.getRowNum() );
+            } else {
+                sourceRegionIdErrors.put( uploadedRegion.getSourceRegionId(),
+                    sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ) + ", " + uploadedRegion.getRowNum() );
+            }
+        } else {
+            sourceRegionIdErrors.put( uploadedRegion.getSourceRegionId(), null );
+        }
+    }
+    
+    
+    /**
+     * Method to check for duplicate sourceBranchIds
+     * @param sourceBranchIdErrors
+     * @param uploadedBranch
+     */
+    void checkForDuplicateSourceBranchIds( Map<String, String> sourceBranchIdErrors, BranchUploadVO uploadedBranch )
+    {
+        if ( sourceBranchIdErrors.containsKey( uploadedBranch.getSourceBranchId() ) ) {
+            if ( sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ) == null
+                || sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ).isEmpty() ) {
+                sourceBranchIdErrors.put(
+                    uploadedBranch.getSourceBranchId(),
+                    "The Office ID : " + uploadedBranch.getSourceBranchId() + " is duplicated at row : "
+                        + uploadedBranch.getRowNum() );
+            } else {
+                sourceBranchIdErrors.put( uploadedBranch.getSourceBranchId(),
+                    sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ) + ", " + uploadedBranch.getRowNum() );
+            }
+        } else {
+            sourceBranchIdErrors.put( uploadedBranch.getSourceBranchId(), null );
+        }
+    }
+    
+    
+    
+    /**
+     * Method to check for duplicate sourceUserIds
+     * @param sourceUserIdErrors
+     * @param uploadedUser
+     */
+    void checkForDuplicateSourceUserIds( Map<String, String> sourceUserIdErrors, UserUploadVO uploadedUser )
+    {
+        if ( sourceUserIdErrors.containsKey( uploadedUser.getSourceUserId() ) ) {
+            if ( sourceUserIdErrors.get( uploadedUser.getSourceUserId() ) == null
+                || sourceUserIdErrors.get( uploadedUser.getSourceUserId() ).isEmpty() ) {
+                sourceUserIdErrors.put( uploadedUser.getSourceUserId(), "The User ID : " + uploadedUser.getSourceUserId()
+                    + " is duplicated at row : " + uploadedUser.getRowNum() );
+            } else {
+                sourceUserIdErrors.put( uploadedUser.getSourceUserId(), sourceUserIdErrors.get( uploadedUser.getSourceUserId() )
+                    + ", " + uploadedUser.getRowNum() );
+            }
+        } else {
+            sourceUserIdErrors.put( uploadedUser.getSourceUserId(), null );
+        }
     }
 }
