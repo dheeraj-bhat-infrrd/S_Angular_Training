@@ -66,6 +66,10 @@
 	style="width: 120px; margin: auto; color: #009FE0; font-size: 30px;"
 	class="hide">No Changes Made</div>
 
+<div id="lastUploadRunTimestamp" class="clearfix hide"
+	style="font-size: 14px; margin-right: 30px; margin-left: 45px; margin-bottom: 20px;">
+</div>
+
 <div id="uploadBatchStatus" class="hide"
 	style="font-size: 14px; margin-right: 30px; margin-left: 45px; margin-bottom: 20px;"></div>
 
