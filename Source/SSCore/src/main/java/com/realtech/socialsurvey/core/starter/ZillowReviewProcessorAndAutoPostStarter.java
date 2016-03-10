@@ -239,6 +239,12 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 
                 } catch ( Exception e ) {
                     LOG.error( "Exception occurred while processing zillow for company id : " + company.getCompanyId() );
+                  //update batch tracker with error message
+                    batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                        CommonConstants.BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER, e.getMessage() );
+                    //send report bug mail to admin
+                    batchTrackerService.sendMailToAdminRegardingBatchError(
+                        CommonConstants.BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER, System.currentTimeMillis(), e );
                 }
             }
 
