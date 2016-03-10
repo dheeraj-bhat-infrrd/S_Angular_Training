@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
+
 /**
  * Uploads hierarchy for a company
  *
@@ -22,5 +23,14 @@ public interface HierarchyStructureUploadService
      * @return 
      * @throws InvalidInputException
      */
-    public Map<String, List<String>> uploadHierarchy(HierarchyUpload upload, Company company, User user) throws InvalidInputException;
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user )
+        throws InvalidInputException;
+
+
+    /**
+     * Saves the hierarchy upload object in mongo db
+     * @param upload
+     * @throws InvalidInputException
+     */
+    public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException;
 }

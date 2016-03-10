@@ -2149,4 +2149,10 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             agentSettings, userPhotoUrl );
     }
 
+
+    @Override
+    public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException
+    {
+        hierarchyUploadDao.saveHierarchyUploadObject( upload );
+    }
 }
