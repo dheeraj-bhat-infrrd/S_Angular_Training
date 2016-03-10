@@ -10,11 +10,13 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
@@ -127,6 +129,41 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
                 return branchList;
         } else
             return branchList;
+    }
+
+
+    /**
+     * Method to fetch all branch ids under company
+     * @param companyId
+     * @throws InvalidInputException
+     * */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<Long> getBranchIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( "Invalid company id passed in getBranchIdsUnderCompany method" );
+        }
+        LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() started." );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( Branch.class );
+            criteria.setProjection( Projections.property( CommonConstants.BRANCH_ID_COLUMN ).as(
+                CommonConstants.BRANCH_ID_COLUMN ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
+            criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+            if ( start > 0 )
+                criteria.setFirstResult( start );
+            if ( batchSize > 0 )
+                criteria.setMaxResults( batchSize );
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getBranchIdsUnderCompany(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getBranchIdsUnderCompany().", e );
+        }
+        LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() ended." );
+        return criteria.list();
     }
 }
 // JIRA SS-42 By RM-05 EOC

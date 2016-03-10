@@ -3925,6 +3925,7 @@ img.prof-image {
 	border-radius: 3px;
 	box-shadow: 0px 2px 2px 0px #e3e3e3;
 }
+
 .hier-edit-fields {
 	margin-bottom: 10px;
 	padding: 0 10px;
@@ -4632,14 +4633,17 @@ img.prof-image {
 .lgn-col-red {
 	background-color: rgb(255, 202, 145);
 }
+
 .hier-col-red {
-	background-color:#FF3400 ;
+	background-color: #FF3400;
 }
+
 .hier-col-green {
-	background-color:#95E566 ;
+	background-color: #95E566;
 }
+
 .hier-col-blue {
-	background-color:#009FE0 ;
+	background-color: #009FE0;
 }
 
 .dash-main-left {
@@ -5140,6 +5144,28 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	text-align: right;
 	font-family: opensanslight;
 	font-weight: bold !important;
+}
+
+.bd-frm-left-un {
+	line-height: 40px;
+	margin-right: 20px;
+	width: 25%;
+	min-width: 96px;
+	min-height: 10px;
+	text-align: right;
+	font-family: opensanslight;
+	font-weight: bold !important;
+}
+
+.bd-frm-right-un {
+	line-height: 40px;
+	margin-right: 20px;
+	width: 60%;
+	min-width: 96px;
+	min-height: 10px;
+	text-align: right;
+	font-family: opensanslight;
+	text-align: left;
 }
 
 .bd-frm-right {
@@ -8316,6 +8342,29 @@ label.url-change-input-label {
 	height: 250px;
 	margin: auto;
 }
+/* untracked user */
+
+.unmatchtab{
+	padding: 10px 0px;
+    margin: 0px 0px;
+        text-align: center;
+        overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.unhr-row{
+	font-weight:600 !important;
+}
+.un-row{
+	border-bottom:1px solid #dcdcdc;
+	    height: 40px;
+}
+.un-heading{
+	border-top: #d2dedf 1px solid;
+    font-weight: 600 !important;
+    margin-top: 30px;
+    padding: 10px;
+}
 
 .hierarchy-btn {
 	float: left;
@@ -8362,6 +8411,31 @@ label.url-change-input-label {
 	text-align: center;
 	padding: 10px;
 }
+/* untracked user */
+.unmatchtab {
+	padding: 10px 0px;
+	margin: 0px 0px;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.unhr-row {
+	font-weight: 600 !important;
+}
+
+.un-row {
+	border-bottom: 1px solid #dcdcdc;
+	height: 40px;
+}
+
+.un-heading {
+	border-top: #d2dedf 1px solid;
+	font-weight: 600 !important;
+	margin-top: 30px;
+	padding: 10px;
+}
 
 .hier-upload-td {
 	width: 80px;
@@ -8380,4 +8454,9 @@ label.url-change-input-label {
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
 	min-width: 180px;
+}
+
+.disable {
+	opacity: 0.4;
+	pointer-events: none;
 }

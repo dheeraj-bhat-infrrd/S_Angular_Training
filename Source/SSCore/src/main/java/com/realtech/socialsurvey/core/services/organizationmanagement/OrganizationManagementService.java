@@ -1278,7 +1278,18 @@ public interface OrganizationManagementService
     List<UserFromSearch> getUsersBySearchKey( String searchKey ) throws InvalidInputException, SolrException;
 
 
+    public List<Long> getRegionIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
+
+
+    public List<Long> getBranchIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
+
+
+    public List<Long> getAgentIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
+
+
+    public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> ids );
+
+
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,
         boolean holdSendingMail, boolean sendMail ) throws InvalidInputException;
-
 }

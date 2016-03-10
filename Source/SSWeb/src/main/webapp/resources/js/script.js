@@ -13,8 +13,8 @@ var companyNameRegEx = /^[a-zA-Z0-9\\/ ]*$/;
 var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
-var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
-var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
+var firstNamePatternRegex =/^[a-zA-Z][a-zA-Z\s]{2,}$/;
+var lastNamePatternRegEx = /^[a-zA-Z][a-zA-Z\s]{2,}$/;
 var pageInitialized = false;
 var currentPhoneRegEx; // Vary the phone regex according to masking
 var stateList; // usStateList
@@ -319,7 +319,7 @@ function validateLastName(elementId) {
 
 /**
  * Function to validate a password in form
- *
+ * 
  * @param elementId
  * @returns {Boolean}
  */
@@ -336,7 +336,7 @@ function validatePassword(elementId) {
 }
 /**
  * Function to match password and confirm password
- *
+ * 
  * @param pwdId
  * @param confirmPwdId
  * @returns {Boolean}
@@ -742,8 +742,26 @@ function validateTextArea(elementId) {
 function validateCountryZipcode(elementId, isOnlyShowToast) {
 
 	if (selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/') {
-		selectedCountryRegEx = ".*";
-		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+
+		var countryCode = $('#country-code').val();
+		var flag = false;
+
+		for (var i = 0; i < postCodeRegex.length; i++) {
+
+			if (postCodeRegex[i].code == countryCode) {
+				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+				flag = true;
+				break;
+			}
+		}
+
+		if (!flag) {
+
+			selectedCountryRegEx = ".*";
+			selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+
+		}
 	}
 
 	var zipcode = $('#' + elementId).val();
@@ -1281,11 +1299,175 @@ function initializeFindAProPage() {
 		fetchUsers(start);
 	});
 }
+var UnmatchedUserSize = 10;
+var UnmatchedUserStartIndex = 0;
+function initializeUnmatchedUserPage() {
+	$('#new').html('');
+	$('#un-new-paginate-btn').attr("data-start", 0);
+	UnmatchedUserStartIndex = 0;
+	fetchUnmatchedUsers(UnmatchedUserStartIndex);
+	/*adjustTextContainerWidthOnResize();
+
+	$(window).resize(function() {
+		if ($(window).width() < 768) {
+			adjustTextContainerWidthOnResize();
+		}
+	});
+*/
+	
+}
+
+function bindEventForUnmatchedUserPage(){
+	
+	// Click events proList pagination buttons
+	$('#un-new-paginate-btn')
+			.on(
+					'click',
+					'#un-new-next.paginate-button',
+					function(e) {
+						var start = parseInt($('#un-new-paginate-btn').attr(
+								"data-start"));
+						var batch = parseInt($('#un-new-paginate-btn').attr(
+								"data-batch"));
+
+						start += batch;
+						$('#un-new-paginate-btn').attr("data-start", start);
+						fetchUnmatchedUsers(start);
+					});
+
+	$('#un-new-paginate-btn')
+			.on(
+					'click',
+					'#un-new-prev.paginate-button',
+					function(e) {
+						var start = parseInt($('#un-new-paginate-btn').attr(
+								"data-start"));
+						var batch = parseInt($('#un-new-paginate-btn').attr(
+								"data-batch"));
+
+						start -= batch;
+						$('#un-new-paginate-btn').attr("data-start", start);
+						fetchUnmatchedUsers(start);
+					});
+
+	$('#un-new-paginate-btn').on('keypress', '#sel-page-un-new-list', function(e) {
+		// if the letter is not digit then don't type anything
+		if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+			return false;
+		}
+		var totalPage = parseInt($('#un-new-total-pages').text());
+		var prevPageNoVal = parseInt($('#sel-page-un-new-list').val());
+		if (prevPageNoVal == NaN) {
+			prevPageNoVal = 0;
+		}
+		var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+		pageNo = parseInt(pageNo);
+		if (pageNo >= totalPage || pageNo <= 0) {
+			return false;
+		}
+	});
+
+	$('#un-new-paginate-btn').on('keyup', '#sel-page-un-new-list', function(e) {
+		if (e.which == 13) {
+			$(this).trigger('blur');
+		}
+	});
+
+	$('#un-new-paginate-btn').on('blur', '#sel-page-un-new-list', function(e) {
+		var batch = parseInt($('#un-new-paginate-btn').attr("data-batch"));
+		var pageNoVal = parseInt($('#sel-page-un-new-list').val());
+		UnmatchedUserStartIndex = (pageNoVal - 1) * batch;
+		$('#un-new-paginate-btn').attr("data-start", UnmatchedUserStartIndex);
+		fetchUnmatchedUsers(UnmatchedUserStartIndex);
+	});
+}
+
+var ProcessedUserSize = 10;
+var ProcessedUserStartIndex = 0;
+function initializeProcesedUserPage(){
+	$('#processed').html('');
+	$('#un-processed-paginate-btn').attr("data-start", 0);
+	ProcessedUserStartIndex = 0;
+	fetchProcessedUsers(ProcessedUserStartIndex);
+	/*adjustTextContainerWidthOnResize();
+
+	$(window).resize(function() {
+		if ($(window).width() < 768) {
+			adjustTextContainerWidthOnResize();
+		}
+	});
+*/
+	// Click events proList pagination buttons
+	
+}
+
+function bindEventsForProcessUserPage(){
+	$('#un-processed-paginate-btn')
+	.on(
+			'click',
+			'#un-processed-next.paginate-button',
+			function(e) {
+				var start = parseInt($('#un-processed-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#un-processed-paginate-btn').attr(
+						"data-batch"));
+
+				start += batch;
+				$('#un-processed-paginate-btn').attr("data-start", start);
+				fetchProcessedUsers(start);
+			});
+
+$('#un-processed-paginate-btn')
+	.on(
+			'click',
+			'#un-processed-prev.paginate-button',
+			function(e) {
+				var start = parseInt($('#un-processed-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#un-processed-paginate-btn').attr(
+						"data-batch"));
+
+				start -= batch;
+				$('#un-processed-paginate-btn').attr("data-start", start);
+				fetchProcessedUsers(start);
+			});
+
+$('#un-processed-paginate-btn').on('keypress', '#sel-page-un-processed-list', function(e) {
+// if the letter is not digit then don't type anything
+if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+	return false;
+}
+var totalPage = parseInt($('#un-processed-total-pages').text());
+var prevPageNoVal = parseInt($('#sel-page-un-processed-list').val());
+if (prevPageNoVal == NaN) {
+	prevPageNoVal = 0;
+}
+var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+pageNo = parseInt(pageNo);
+if (pageNo >= totalPage || pageNo <= 0) {
+	return false;
+}
+});
+
+$('#un-processed-paginate-btn').on('keyup', '#sel-page-un-processed-list', function(e) {
+if (e.which == 13) {
+	$(this).trigger('blur');
+}
+});
+
+$('#un-processed-paginate-btn').on('blur', '#sel-page-un-processed-list', function(e) {
+var batch = parseInt($('#un-processed-paginate-btn').attr("data-batch"));
+var pageNoVal = parseInt($('#sel-page-un-processed-list').val());
+ProcessedUserStartIndex= (pageNoVal - 1) * batch;
+$('#un-processed-paginate-btn').attr("data-start", ProcessedUserStartIndex);
+fetchProcessedUsers(ProcessedUserStartIndex);
+});
+}
 
 /**
  * Method to fetch users list based on the criteria i.e if profile level is
  * specified, bring all users of that level else search based on first/last name
- *
+ * 
  * @param newIndex
  */
 function fetchUsers(newIndex) {
@@ -1312,6 +1494,27 @@ function fetchUsers(newIndex) {
 	}
 }
 
+function fetchUnmatchedUsers(newIndex) {
+	showOverlay();
+	var payload = {
+			"batchSize" : UnmatchedUserSize,
+			"startIndex" : newIndex
+		
+		};
+
+	callAjaxGetWithPayloadData("./getunmatchedpreinitiatedsurveys.do", paginateUnmatchedUser,payload, true);
+		
+}
+function fetchProcessedUsers(newIndex){
+	showOverlay();
+	var payload = {
+			"batchSize" : ProcessedUserSize,
+			"startIndex" : newIndex
+		
+		};
+
+	callAjaxGetWithPayloadData("./getprocessedpreinitiatedsurveys.do", paginateProcessedUser,payload, true);
+}
 // Function to validate registration form
 function validateFindProForm() {
 	$("#serverSideerror").hide();
@@ -1369,7 +1572,74 @@ function updatePaginationBtnsForProList() {
 	}
 	$('#sel-page-prolist').val(pageNo);
 }
+function updatePaginationBtnsForUnmatchedUser() {
+	var start = parseInt($('#un-new-paginate-btn').attr("data-start"));
+	var total = parseInt($('#un-new-paginate-btn').attr("data-total"));
+	var batch = parseInt($('#un-new-paginate-btn').attr("data-batch"));
 
+	// update previous button
+	if (start == 0) {
+		$('#un-new-prev').removeClass('paginate-button');
+	} else {
+		$('#un-new-prev').addClass('paginate-button');
+	}
+
+	// update next button
+	if (start + batch >= total) {
+		$('#un-new-next').removeClass('paginate-button');
+	} else {
+		$('#un-new-next').addClass('paginate-button');
+	}
+
+	// update page no
+	var pageNo = 0;
+	if (start < total) {
+		pageNo = (start / batch) + 1;
+	} else {
+		pageNo = start / batch;
+	}
+	var emptyPageNo = isNaN(pageNo);
+	if (emptyPageNo) {
+		$('#un-new-paginate-btn').attr("data-start", 0);
+		$('#un-new-prev').removeClass('paginate-button');
+		pageNo = 1;
+	}
+	$('#sel-page-un-new-list').val(pageNo);
+}
+function updatePaginationBtnsForProcessedUser(){
+	var startProcess = parseInt($('#un-processed-paginate-btn').attr("data-start"));
+	var totalProcess = parseInt($('#un-processed-paginate-btn').attr("data-total"));
+	var batchProcess = parseInt($('#un-processed-paginate-btn').attr("data-batch"));
+
+	// update previous button
+	if (startProcess == 0) {
+		$('#un-processed-prev').removeClass('paginate-button');
+	} else {
+		$('#un-processed-prev').addClass('paginate-button');
+	}
+
+	// update next button
+	if (startProcess + batchProcess >= totalProcess) {
+		$('#un-processed-next').removeClass('paginate-button');
+	} else {
+		$('#un-processed-next').addClass('paginate-button');
+	}
+
+	// update page no
+	var pageNoProcess = 0;
+	if (startProcess < totalProcess) {
+		pageNoProcess = startProcess / batchProcess + 1;
+	} else {
+		pageNoProcess = startProcess / batchProcess;
+	}
+	var emptyPageNo = isNaN(pageNoProcess);
+	if (emptyPageNo) {
+		$('#un-processed-paginate-btn').attr("data-start", 0);
+		$('#un-processed-prev').removeClass('paginate-button');
+		pageNoProcess = 1;
+	}
+	$('#sel-page-un-processed-list').val(pageNoProcess);
+}
 function paginateUsersProList(response) {
 	var reponseJson = $.parseJSON(response);
 	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
@@ -1402,7 +1672,66 @@ function paginateUsersProList(response) {
 	scrollToTop();
 	hideOverlay();
 }
+function paginateUnmatchedUser(response) {
+	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#un-new-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#un-new-paginate-btn').attr("data-batch"));
 
+	// error message
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#new').append("No Data found");
+	} else {
+		if (start == 0) {
+			var usersSize = reponseJson.totalRecord;
+			if (usersSize > 0) {
+				$('#un-new-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+
+				$('#un-new-total-pages').text(totalPage);
+			}
+			
+		}
+		paintUnmatchedUser(reponseJson);
+	}
+	updatePaginationBtnsForUnmatchedUser();
+	hideOverlay();
+}
+function paginateProcessedUser(response){
+	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#un-processed-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#un-processed-paginate-btn').attr("data-batch"));
+
+	// error message
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#processed').append("No Data found");
+	} else {
+		if (start == 0) {
+			var usersSize = reponseJson.totalRecord;
+			if (usersSize > 0) {
+				$('#un-processed-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+
+				$('#un-processed-total-pages').text(totalPage);
+			}
+			
+		}
+		paintProcessedUser(reponseJson);
+	}
+	updatePaginationBtnsForProcessedUser();
+	hideOverlay();
+}
 function paintProList(usersList) {
 	if (usersList != undefined) {
 		var usersSize = usersList.length;
@@ -1493,10 +1822,178 @@ function paintProList(usersList) {
 		}
 	}
 }
+function undefinedval(hierval) {
+	  if (hierval == undefined) {
+	   return "";
+	  }else if(hierval == "null"){
+		  return "";
+	  }
+	  return hierval;
+	 }
+
+function paintUnmatchedUser(usersList) {
+	if (usersList != undefined) {
+		var usersSize = usersList.surveyPreInitiationList.length;
+
+		var untrack = "";
+		if (usersSize > 0) {
+			usersList.surveyPreInitiationList.forEach(function(arrayItem) {
+
+				 untrack += '<div class="un-row">'+
+				'						<div style="width:10%" class="float-left unmatchtab ss-id">'+undefinedval(arrayItem.surveySourceId)+'</div>'+
+				'						<div style="width:20%" class="float-left unmatchtab ss-eid">'+undefinedval(arrayItem.agentEmailId)+'</div>'+
+				'						<div style="width:40%" class="float-left unmatchtab ss-cname">'+undefinedval(arrayItem.customerFirstName)+'<span style="margin-left:2px;">'+ undefinedval(arrayItem.customerLastName)+'</span><span style="margin-left:2px;"> < '+undefinedval(arrayItem.customerEmailId)+' > </span></div>'+
+				'						<div style="width:20%" class="float-left unmatchtab ss-date">'+undefinedval(arrayItem.createdOn)+'</div>'+
+				'						<div style="width:10%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'+
+				'						</div>';
+					
+			});
+			
+			$('#new').html(untrack);
+			 bindClickEventForProcessButton();
+
+		}
+	}
+}
+function paintProcessedUser(usersList){
+	if (usersList != undefined) {
+		var usersSize = usersList.surveyPreInitiationList.length;
+
+		var unprocess = "";
+		if (usersSize > 0) {
+			usersList.surveyPreInitiationList.forEach(function(arrayItem) {
+				if(undefinedval(arrayItem.status)==9){
+					var action="Always Ignore";
+				}else{
+
+					var action="Aliased";
+				}
+				unprocess += '<div class="un-row">'+
+						'						<div style="width:10%" class="float-left unmatchtab ss-id">'+undefinedval(arrayItem.surveySourceId)+'</div>'+
+						'						<div style="width:20%" class="float-left unmatchtab ss-eid">'+undefinedval(arrayItem.agentEmailId)+'</div>'+
+						'						<div style="width:40%" class="float-left unmatchtab ss-cname">'+undefinedval(arrayItem.customerFirstName)+'<span style="margin-left:2px;">'+ undefinedval(arrayItem.customerLastName)+'</span><span style="margin-left:2px;"> < '+undefinedval(arrayItem.customerEmailId)+' > </span></div>'+
+						'						<div style="width:20%" class="float-left unmatchtab ss-date">'+undefinedval(arrayItem.createdOn)+'</div>'+
+						'						<div style="width:10%" class="float-left unmatchtab" >'+action+'</div>'+
+						'						</div>';
+							
+					});
+			
+			$('#processed').html(unprocess);
+
+		}
+	}
+}
+
+function bindClickEventForProcessButton(){
+	
+	$('.ss-process').click(function(e){
+		var id=$(this).parent().find(".ss-id").text();
+		var user=$(this).parent().find(".ss-eid").text();
+		var customer=$(this).parent().find(".ss-cname").text();
+
+
+		var popup = '<div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">ID</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+id+'</div>'+
+		'	 </div>'+
+		'	 <div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">User</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+user+'</div>'+
+		'	 </div>'+
+		'<div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">Customer</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+customer+'</div>'+
+		'	 </div><div class="bd-hr-form-item clearfix" id="ignore">'+
+		'	     <div class="float-left bd-frm-left-un"></div>'+
+		'	     <div class="float-left bd-frm-right">'+
+		'	         <div class="bd-frm-check-wrapper clearfix bd-check-wrp">'+
+		'	             <div class="float-left bd-check-img bd-check-img-checked"></div>'+
+		'	             <input type="hidden" name="isIgnore" value="false" id="is-ignore" class="ignore-clear">'+
+		'	             <div class="float-left bd-check-txt bd-check-sm">Always Ignore</div>'+
+		'	         </div>'+
+		'	     </div>'+
+		'	 </div>'+
+		'<div id="bd-single" class="bd-hr-form-item clearfix">'+
+		'	    <div class="float-left bd-frm-left-un">Alias</div>'+
+		'	    <div class="float-left bd-frm-left-un pos-relative">'+
+		'	        <input id="match-user-email" class="bd-frm-rt-txt bd-dd-img">'+
+		'	    </div>'+
+		'	</div>';
+			
+
+	
+		e.stopPropagation();
+		$('#overlay-continue').html("Save");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-header').html("Match User");
+		$('#overlay-text').html(popup);
+		
+		
+		$('#overlay-continue').click(function(){
+			saveUserMap(user);
+			$('#overlay-continue').unbind('click');
+		});
+		$('#overlay-main').show();
+		bindAdminCheckBoxClick();
+		attachAutocompleteAliasDropdown();
+	});
+	if($('#is-ignore').val()==true){
+	if($('#match-user-email').val()!=""){
+		$('#match-user-email').val('');
+		$('#match-user-email').attr('agent-id' , 0);
+	$('#match-user-email').attr("disabled");
+	}
+}
+	
+
+}
+
+var insaved= false;
+function saveUserMap(aliasMail){
+	if(insaved==true){
+		return;
+	}
+	var isIgnore=$('#is-ignore').val();
+	var agentId=$('#match-user-email').attr('agent-id');
+	
+	if(isIgnore == 'true'){
+		agentId = 0;
+	}else{
+		if(agentId == undefined || agentId <=0){
+			$('#overlay-toast').html('Please enter valid alias!');
+			showToast();			
+			return;
+		}
+			
+	}
+
+	insaved==true;
+	var payload = {
+			"emailAddress" : aliasMail,
+			"agentId" : agentId,
+			"ignoredEmail" : isIgnore
+		
+		};
+		
+		isAjaxRequestRunningProcessedUser = true;
+
+		callAjaxGetWithPayloadData('./saveemailmapping.do', function(data){
+			insaved==false;
+			$('#overlay-main').hide();
+			$('#overlay-toast').html(data);
+			showToast();
+			
+			initializeUnmatchedUserPage();
+			initializeProcesedUserPage();
+			
+			
+		}, payload, true);
+	
+}
 
 /**
  * Function to fetch the users by profile level in pro list page
- *
+ * 
  * @param iden
  * @param profileLevel -
  *            office/region/company
@@ -2013,7 +2510,7 @@ var hierarchyUpload = {
 		return hierval;
 	},
 	reverseUndef : function(hierval) {
-		if (hierval == '' || hierval.trim() == '') {
+		if (hierval == null || hierval == '' || hierval.trim() == '') {
 			return undefined;
 		}
 		return hierval.trim();
@@ -2024,6 +2521,7 @@ var hierarchyUpload = {
 				.change(
 						function() {
 							$('#summary').hide();
+							$('#xlsx-file-upload').addClass('disable');
 							var fileAdd = $(this).val().split('\\');
 							$('#com-xlsx-file')
 									.val(fileAdd[fileAdd.length - 1]);
@@ -2032,16 +2530,15 @@ var hierarchyUpload = {
 							}
 
 							if (hierarchyUpload.verified == false) {
-								$('#xlsx-file-verify').css("pointerEvents",
-										"none");
+								$('#xlsx-file-verify').addClass('disable');
 								showError("Please upload xlsx file");
 							}
 
 							if (hierarchyUpload.verified == true) {
 								hierarchyUpload.canUpload = true;
 								hierarchyUpload.verified = false;
-								$('#xlsx-file-verify').css("pointerEvents",
-										"auto");
+								$('#xlsx-file-verify').removeClass('disable');
+
 								var formData = new FormData();
 								formData.append("file", $('#com-file').prop(
 										"files")[0]);
@@ -2055,8 +2552,7 @@ var hierarchyUpload = {
 							}
 
 							else {
-								$('#xlsx-file-verify').css("pointerEvents",
-										"none");
+								$('#xlsx-file-verify').addClass('disable');
 								showError("Please select a valid file");
 							}
 						});
@@ -2081,8 +2577,7 @@ var hierarchyUpload = {
 							} else {
 								var url = $("#fileUrl").val();
 								if (url == undefined || url == '') {
-									$('#xlsx-file-verify').css("pointerEvents",
-											"none");
+									$('#xlsx-file-verify').addClass('disable');
 									showError("Please upload a valid file");
 								} else {
 									var formData = new FormData();
@@ -2122,17 +2617,48 @@ var hierarchyUpload = {
 			showError(response);
 		} else {
 			var jsonResponse = $.parseJSON(response);
+			var responseMsgs = $.parseJSON(jsonResponse.response);
 			if (!jsonResponse.status) {
-				showError(jsonResponse.response);
+				var errMsg = "";
+				if (responseMsgs.USER_UPLOAD != null
+						&& responseMsgs.USER_UPLOAD.length > 0) {
+					errMsg = errMsg + responseMsgs.USER_UPLOAD + ", ";
+				}
+				if (responseMsgs.BRANCH_UPLOAD != null
+						&& responseMsgs.BRANCH_UPLOAD.length > 0) {
+					errMsg = errMsg + responseMsgs.BRANCH_UPLOAD + ", ";
+				}
+				if (responseMsgs.REGION_UPLOAD != null
+						&& responseMsgs.REGION_UPLOAD.length > 0) {
+					errMsg = errMsg + responseMsgs.REGION_UPLOAD + ", ";
+				}
+				if (responseMsgs.USER_DELETE != null
+						&& responseMsgs.USER_DELETE.length > 0) {
+					errMsg = errMsg + responseMsgs.USER_DELETE + ", ";
+				}
+				if (responseMsgs.BRANCH_DELETE != null
+						&& responseMsgs.BRANCH_DELETE.length > 0) {
+					errMsg = errMsg + responseMsgs.BRANCH_DELETE + ", ";
+				}
+				if (responseMsgs.REGION_DELETE != null
+						&& responseMsgs.REGION_DELETE.length > 0) {
+					errMsg = errMsg + responseMsgs.REGION_DELETE + ", ";
+				}
+				if (responseMsgs.UPLOAD_FAILED != null
+						&& responseMsgs.UPLOAD_FAILED.length > 0) {
+					errMsg = errMsg + responseMsgs.UPLOAD_FAILED + ", ";
+				}
+				errMsg = errMsg.replace(/,(?=[^,]*$)/, '');
+				showError(errMsg);
 			} else {
-				showInfo(jsonResponse.response);
+				showInfo(responseMsgs.UPLOAD_SUCCESS);
 			}
 		}
 		$('#com-file').val('');
 		$('#com-xlsx-file').val('');
 		$('#fileUrl').val('');
 		$('#summary').hide();
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 	},
 
 	uploadXlxsSuccessCallback : function(response) {
@@ -2237,7 +2763,6 @@ var hierarchyUpload = {
 
 						} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
 							var color = '#FF3400';
-
 						} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isRegionModified == true) {
 							var color = '#009FE0';
 
@@ -2411,6 +2936,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-region-edit" style="background-color: #F9F9FB;" ><td colspan="9">'
 										+ regionEdit + '</td></tr>').appendTo(
 								'#region-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
+							$('#editRegion-' + i).addClass('disable');
+						}
 					}
 					$('#region-sum-btn').show();
 					$('#summary').show();
@@ -2619,6 +3148,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-branch-edit" style="background-color: #F9F9FB;" ><td colspan="10">'
 										+ branchEdit + '</td></tr>').appendTo(
 								'#branch-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.branches[i].isDeletedRecord == true) {
+							$('#editBranch-' + i).addClass('disable');
+						}
 					}
 					$('#branch-sum-btn').show();
 					if (regionlength == 0) {
@@ -2650,15 +3183,17 @@ var hierarchyUpload = {
 
 						var sendMailCode = "";
 
-						if ( !hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified ||
-								hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded ) {
+						if ((!hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified && !hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord)
+								|| hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded) {
 							// Add checkbox only for users who aren't verified
 							// and new users
-							var sendMailCode = "<div id ='send-mail-" + i + "' class='send-mail-check-img ";
+							var sendMailCode = "<div id ='send-mail-" + i
+									+ "' class='send-mail-check-img ";
 							if (!hierarchyUpload.hierarchyJson.upload.users[i].sendMail) {
 								sendMailCode += "bd-check-img-checked"
 							}
-							sendMailCode += "'onClick='hierarchyUpload.toggleSendMail(" + i + ")'></div>";
+							sendMailCode += "'onClick='hierarchyUpload.toggleSendMail("
+									+ i + ")'></div>";
 						}
 
 						var userEdit = '<div id="hier-user-detail-edit-container"'
@@ -2985,6 +3520,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-users-edit" style="background-color: #F9F9FB;" ><td colspan="17">'
 										+ userEdit + '</td></tr>').appendTo(
 								'#user-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord == true) {
+							$('#editUser-' + i).addClass('disable');
+						}
 					}
 					$('#user-sum-btn').show();
 					if (regionlength == 0 && branchlength == 0) {
@@ -2999,7 +3538,7 @@ var hierarchyUpload = {
 				if ((hierarchyUpload.hierarchyJson.regionValidationErrors == null || hierarchyUpload.hierarchyJson.regionValidationErrors.length == 0)
 						&& (hierarchyUpload.hierarchyJson.branchValidationErrors == null || hierarchyUpload.hierarchyJson.branchValidationErrors.length == 0)
 						&& (hierarchyUpload.hierarchyJson.userValidationErrors == null || hierarchyUpload.hierarchyJson.userValidationErrors.length == 0)) {
-					$('#xlsx-file-upload').css("pointerEvents", "auto");
+					$('#xlsx-file-upload').removeClass('disable');
 					showInfo("Data verified sucessfully with no validation errors.");
 				} else {
 					showError("There are some validation errors which need to be resolved before uploading the data.");
@@ -3028,7 +3567,6 @@ var hierarchyUpload = {
 		}
 
 	},
-
 
 	toggleSendMail : function(iden) {
 		if ($('#send-mail-' + iden).hasClass('bd-check-img-checked')) {
@@ -3093,47 +3631,59 @@ var hierarchyUpload = {
 		if (data.validationErrors.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/abuse.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/abuse.png" style="width: 18px; height: 18px"></span>';
 		} else if (data.validationWarnings.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/icn-neutral-mood.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/warning.png" style="width: 18px; height: 18px"></span>';
 		}
 		return toolTip;
 	},
 
 	saveEdittedRegion : function(i) {
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionName = hierarchyUpload.reverseUndef( $(
-				'#hier-name-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1 = hierarchyUpload.reverseUndef( $(
-				'#hier-address1-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2 = hierarchyUpload.reverseUndef( $(
-				'#hier-address2-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionCity = hierarchyUpload.reverseUndef( $(
-				'#hier-city-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionState = hierarchyUpload.reverseUndef( $(
-				'#hier-state-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode = hierarchyUpload.reverseUndef( $(
-				'#hier-zipcode-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionName = hierarchyUpload
+				.reverseUndef($('#hier-name-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1 = hierarchyUpload
+				.reverseUndef($('#hier-address1-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2 = hierarchyUpload
+				.reverseUndef($('#hier-address2-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionCity = hierarchyUpload
+				.reverseUndef($('#hier-city-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionState = hierarchyUpload
+				.reverseUndef($('#hier-state-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode = hierarchyUpload
+				.reverseUndef($('#hier-zipcode-txt-' + i).val());
 		hierarchyUpload.hierarchyJson.upload.isModifiedFromUI = true;
 
-		$('#regionName-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionName) );
-		$('#regionAddress1-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1) );
-		$('#regionAddress2-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2) );
-		$('#regionCity-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionCity) );
-		$('#regionZipcode-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode) );
-		$('#regionState-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.regions[i].regionState) );
+		$('#regionName-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName));
+		$('#regionAddress1-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1));
+		$('#regionAddress2-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2));
+		$('#regionCity-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity));
+		$('#regionZipcode-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode));
+		$('#regionState-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState));
 
 		$('#editRegion-' + i).parent().next('.hier-region-edit').slideToggle(
 				200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the region. Please click on 'Verify' button to validate the data!!");
 	},
 
@@ -3145,44 +3695,55 @@ var hierarchyUpload = {
 	},
 
 	saveEdittedBranch : function(i) {
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchName = hierarchyUpload.reverseUndef( $(
-				'#hier-branch-name-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId = hierarchyUpload.reverseUndef( $(
-				'#hier-branch-sourceRegionId-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1 = hierarchyUpload.reverseUndef( $(
-				'#hier-branch-address1-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2 = hierarchyUpload.reverseUndef( $(
-				'#hier-branch-address2-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchCity = hierarchyUpload.reverseUndef( $(
-				'#hier-branch-city-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchState = hierarchyUpload.reverseUndef( $(
-				'#hier-branch-state-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode = hierarchyUpload.reverseUndef( $(
-				'#hier-branch-zipcode-txt-' + i).val() );
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchName = hierarchyUpload
+				.reverseUndef($('#hier-branch-name-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId = hierarchyUpload
+				.reverseUndef($('#hier-branch-sourceRegionId-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1 = hierarchyUpload
+				.reverseUndef($('#hier-branch-address1-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2 = hierarchyUpload
+				.reverseUndef($('#hier-branch-address2-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchCity = hierarchyUpload
+				.reverseUndef($('#hier-branch-city-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchState = hierarchyUpload
+				.reverseUndef($('#hier-branch-state-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode = hierarchyUpload
+				.reverseUndef($('#hier-branch-zipcode-txt-' + i).val());
 		hierarchyUpload.hierarchyJson.upload.isModifiedFromUI = true;
 
-		$('#branchName-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchName) );
+		$('#branchName-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName));
 		$('#sourceRegionId-' + i)
 				.text(
-						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId) );
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId));
 		$('#branchAddress1-' + i)
 				.text(
-						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1) );
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1));
 		$('#branchAddress2-' + i)
 				.text(
-						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2) );
-		$('#branchCity-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchCity) );
-		$('#branchZipcode-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode) );
-		$('#branchState-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.branches[i].branchState) );
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2));
+		$('#branchCity-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity));
+		$('#branchZipcode-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode));
+		$('#branchState-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState));
 
 		$('#editBranch-' + i).parent().next('.hier-branch-edit').slideToggle(
 				200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the branch. Please click on 'Verify' button to validate the data!!");
 	},
 
@@ -3194,103 +3755,134 @@ var hierarchyUpload = {
 	},
 
 	saveEdittedUser : function(i) {
-		hierarchyUpload.hierarchyJson.upload.users[i].firstName = hierarchyUpload.reverseUndef( $(
-				'#hier-user-firstName-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.users[i].lastName = hierarchyUpload.reverseUndef( $(
-				'#hier-user-lastName-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.users[i].title = hierarchyUpload.reverseUndef( $(
-				'#hier-user-title-txt-' + i).val() );
-		
-		//These are arrays, so process the string into an array
-		var tempAssignedBranch = $('#hier-user-assignedBranches-txt-' + i).val();
+		hierarchyUpload.hierarchyJson.upload.users[i].firstName = hierarchyUpload
+				.reverseUndef($('#hier-user-firstName-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.users[i].lastName = hierarchyUpload
+				.reverseUndef($('#hier-user-lastName-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.users[i].title = hierarchyUpload
+				.reverseUndef($('#hier-user-title-txt-' + i).val());
+
+		// These are arrays, so process the string into an array
+		var tempAssignedBranch = $('#hier-user-assignedBranches-txt-' + i)
+				.val();
 		if (tempAssignedBranch == undefined || tempAssignedBranch == '') {
 			tempAssignedBranch = [];
 		} else {
-			tempAssignedBranch = tempAssignedBranch.replace(/ /g,'').split(',');
+			tempAssignedBranch = tempAssignedBranch.replace(/ /g, '')
+					.split(',');
 		}
 		hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches = tempAssignedBranch;
-		
-		
+
 		var tempAssignedRegion = $('#hier-user-assignedRegions-txt-' + i).val();
 		if (tempAssignedRegion == undefined || tempAssignedRegion == '') {
 			tempAssignedRegion = [];
 		} else {
-			tempAssignedRegion = tempAssignedRegion.replace(/ /g,'').split(',');
+			tempAssignedRegion = tempAssignedRegion.replace(/ /g, '')
+					.split(',');
 		}
-		
+
 		hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions = tempAssignedRegion;
-		
-		
-		var tempAssignedBranchesAdmin = $('#hier-user-assignedBranchesAdmin-txt-' + i).val();
-		if (tempAssignedBranchesAdmin == undefined || tempAssignedBranchesAdmin == '') {
+
+		var tempAssignedBranchesAdmin = $(
+				'#hier-user-assignedBranchesAdmin-txt-' + i).val();
+		if (tempAssignedBranchesAdmin == undefined
+				|| tempAssignedBranchesAdmin == '') {
 			tempAssignedBranchesAdmin = [];
 		} else {
-			tempAssignedBranchesAdmin = tempAssignedBranchesAdmin.replace(/ /g,'').split(',');
+			tempAssignedBranchesAdmin = tempAssignedBranchesAdmin.replace(/ /g,
+					'').split(',');
 		}
-		
+
 		hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin = tempAssignedBranchesAdmin;
 
-		var tempAssignedRegionsAdmin = $('#hier-user-assignedRegionsAdmin-txt-' + i).val();
-		if (tempAssignedRegionsAdmin == undefined || tempAssignedRegionsAdmin == '') {
+		var tempAssignedRegionsAdmin = $(
+				'#hier-user-assignedRegionsAdmin-txt-' + i).val();
+		if (tempAssignedRegionsAdmin == undefined
+				|| tempAssignedRegionsAdmin == '') {
 			tempAssignedRegionsAdmin = [];
 		} else {
-			tempAssignedRegionsAdmin = tempAssignedRegionsAdmin.replace(/ /g,'').split(',');
+			tempAssignedRegionsAdmin = tempAssignedRegionsAdmin.replace(/ /g,
+					'').split(',');
 		}
-		
-		
+
 		hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin = tempAssignedRegionsAdmin;
-		
-		hierarchyUpload.hierarchyJson.upload.users[i].emailId = hierarchyUpload.reverseUndef( $(
-				'#hier-user-emailId-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber = hierarchyUpload.reverseUndef( $(
-				'#hier-user-phoneNumber-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl = hierarchyUpload.reverseUndef( $(
-				'#hier-user-websiteUrl-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.users[i].license = hierarchyUpload.reverseUndef( $(
-				'#hier-user-license-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer = hierarchyUpload.reverseUndef( $(
-				'#hier-user-legalDisclaimer-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl = hierarchyUpload.reverseUndef( $(
-				'#hier-user-userPhotoUrl-txt-' + i).val() );
-		hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription = hierarchyUpload.reverseUndef( $(
-				'#hier-user-aboutMeDescription-txt-' + i).val() );
+
+		hierarchyUpload.hierarchyJson.upload.users[i].emailId = hierarchyUpload
+				.reverseUndef($('#hier-user-emailId-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber = hierarchyUpload
+				.reverseUndef($('#hier-user-phoneNumber-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl = hierarchyUpload
+				.reverseUndef($('#hier-user-websiteUrl-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.users[i].license = hierarchyUpload
+				.reverseUndef($('#hier-user-license-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer = hierarchyUpload
+				.reverseUndef($('#hier-user-legalDisclaimer-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl = hierarchyUpload
+				.reverseUndef($('#hier-user-userPhotoUrl-txt-' + i).val());
+		hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription = hierarchyUpload
+				.reverseUndef($('#hier-user-aboutMeDescription-txt-' + i).val());
 		hierarchyUpload.hierarchyJson.upload.isModifiedFromUI = true;
 
-		$('#firstName-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].firstName) );
-		$('#lastName-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].lastName) );
-		$('#title-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].title) );
-		$('#assignedBranches-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches) );
-		$('#assignedRegions-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions) );
+		$('#firstName-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName));
+		$('#lastName-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName));
+		$('#title-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title));
+		$('#assignedBranches-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches));
+		$('#assignedRegions-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions));
 		$('#assignedBranchesAdmin-' + i)
 				.text(
-						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin) );
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin));
 		$('#assignedRegionsAdmin-' + i)
 				.text(
-						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin) );
-		$('#emailId-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].emailId) );
-		$('#phoneNumber-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber) );
-		$('#websiteUrl-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl) );
-		$('#license-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].license) );
-		$('#legalDisclaimer-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer) );
-		$('#userPhotoUrl-' + i).text(
-				hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl) );
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin));
+		$('#emailId-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId));
+		$('#phoneNumber-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber));
+		$('#websiteUrl-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl));
+		$('#license-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license));
+		$('#legalDisclaimer-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer));
+		$('#userPhotoUrl-' + i)
+				.text(
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl));
 		$('#aboutMeDescription-' + i)
 				.text(
-						hierarchyUpload.hierundefined( hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription) );
+						hierarchyUpload
+								.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription));
 
 		$('#editUser-' + i).parent().next('.hier-users-edit').slideToggle(200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the user. Please click on 'Verify' button to validate the data!!");
 	},
 

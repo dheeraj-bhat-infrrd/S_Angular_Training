@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -18,4 +19,7 @@ public interface BranchDao extends GenericDao<Branch, Long> {
 
     public List<Branch> getBranchesForCompany( long companyId, int isDefault, int start, int batch )
         throws InvalidInputException;
+
+
+    public List<Long> getBranchIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
 }

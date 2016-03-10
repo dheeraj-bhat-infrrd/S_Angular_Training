@@ -76,7 +76,7 @@ $(document).ready(function() {
 	
 	var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;'>")
 	<c:forEach var="page" items="${pageNames}" varStatus="loop">
-		radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${page.name}"+" <br/>");
+		radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
 	</c:forEach>
 	$("#page").append(radioButtonDiv);
 	

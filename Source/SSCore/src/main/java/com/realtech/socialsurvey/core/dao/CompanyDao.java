@@ -28,4 +28,10 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 
     List<Company> getCompaniesWithExpiredInvoice();
 
+    Company getCompanyByBraintreeSubscriptionId( String subscriptionId );
+
+    List<Company> getAllInvoicedActiveCompanies();
+
+    List<Company> getCompaniesByBillingModeAuto();
+
 }

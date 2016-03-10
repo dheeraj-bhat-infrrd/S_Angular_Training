@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.mail;
 
+import java.util.List;
 import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -391,5 +392,11 @@ public interface EmailServices
 
 
     void sendInvitationToSocialSurveyAdmin( String url, String recipientMailId, String name, String loginName )
+        throws InvalidInputException, UndeliveredEmailException;
+
+    void sendCustomReportMail( String recipientName, List<String> recipientMailIds, String subject,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
+
+    public void sendZillowReviewComplaintHandleMail( String recipientMailId, String customerName, String rating, String reviewUrl )
         throws InvalidInputException, UndeliveredEmailException;
 }

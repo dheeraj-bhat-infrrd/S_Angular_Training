@@ -22,11 +22,14 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
-@Component("company")
-public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements CompanyDao {
-	private static final Logger LOG = LoggerFactory.getLogger(CompanyDaoImpl.class);
+
+@Component ( "company")
+public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements CompanyDao
+{
+    private static final Logger LOG = LoggerFactory.getLogger( CompanyDaoImpl.class );
     private static final String activeUsersInCompany = "select subquery_Data.COMPANY_ID, C.COMPANY, subquery_Data.USER_ID, subquery_Data.FIRST_NAME,"
         + "subquery_Data.LAST_NAME, subquery_Data.LOGIN_NAME,subquery_Data.REGION_ID,subquery_Data.BRANCH_ID,subquery_Data.REGION, "
         + "subquery_Data.BRANCH, group_concat(distinct outer_up.PROFILES_MASTER_ID) as PROFILES_MASTER_ID From USER_PROFILE outer_up JOIN"
@@ -39,8 +42,8 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         + "LICENSE_DETAILS L ON L.COMPANY_ID = U.COMPANY_ID where L.ACCOUNTS_MASTER_ID = 4 ) as  subquery_Data ON "
         + "outer_up.USER_ID = subquery_Data.USER_ID where C.COMPANY_ID = subquery_Data.COMPANY_ID "
         + "group by outer_up.USER_ID order by subquery_Data.COMPANY_ID, outer_up.REGION_ID, outer_up.BRANCH_ID";
-    
-    
+
+
     private static final String activeUsersInGivenCompany = "select subquery_Data.COMPANY_ID, C.COMPANY, subquery_Data.USER_ID, subquery_Data.FIRST_NAME,"
         + "subquery_Data.LAST_NAME, subquery_Data.LOGIN_NAME,subquery_Data.REGION_ID,subquery_Data.BRANCH_ID,subquery_Data.REGION, "
         + "subquery_Data.BRANCH, group_concat(distinct outer_up.PROFILES_MASTER_ID) as PROFILES_MASTER_ID From USER_PROFILE outer_up JOIN"
@@ -54,66 +57,82 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         + "outer_up.USER_ID = subquery_Data.USER_ID where C.COMPANY_ID = subquery_Data.COMPANY_ID "
         + "group by outer_up.USER_ID order by subquery_Data.COMPANY_ID, outer_up.REGION_ID, outer_up.BRANCH_ID";
 
-	@Autowired
-	SessionFactory sessionFactory;
+    private static final String companyDetailByBillingMode = "select C.COMPANY_ID ,  C.COMPANY  , C.STATUS , C.BILLING_MODE , C.CREATED_ON ,  "
+        + " L.SUBSCRIPTION_ID  , L.LICENSE_START_DATE , L.PAYMENT_RETRIES  from " + "COMPANY C JOIN LICENSE_DETAILS L "
+        + "ON L.COMPANY_ID = C.COMPANY_ID where L.PAYMENT_MODE= 'A'";
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<Company> searchBetweenTimeIntervals(Timestamp lowerTime, Timestamp higherTime) {
-		LOG.debug("Inside method searchBetweenTimeIntervals");
-		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(Company.class);
-		criteria.add(Restrictions.ge("createdOn", lowerTime));
-		if (higherTime != null) {
-			criteria.add(Restrictions.le("createdOn", higherTime));
-		}
-		return criteria.list();
-	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Company> searchCompaniesByName(String namePattern) {
-		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(Company.class);
-		criteria.add(Restrictions.like("company", namePattern, MatchMode.START));
-		return criteria.list();
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Company> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status , boolean inCompleteCompany) {
-		Criteria criteria = getSession().createCriteria(Company.class);
-		criteria.add(Restrictions.ilike("company", namePattern, MatchMode.START));
-		
-		if(inCompleteCompany){
-            criteria.add(Restrictions.sqlRestriction("COMPANY_ID NOT in (select ld.COMPANY_ID from LICENSE_DETAILS ld)"));		    
-		}else{
-		    if (status > -1) {
-                criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, status));
+    @Autowired
+    SessionFactory sessionFactory;
+
+
+    @Override
+    @SuppressWarnings ( "unchecked")
+    public List<Company> searchBetweenTimeIntervals( Timestamp lowerTime, Timestamp higherTime )
+    {
+        LOG.debug( "Inside method searchBetweenTimeIntervals" );
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class );
+        criteria.add( Restrictions.ge( "createdOn", lowerTime ) );
+        if ( higherTime != null ) {
+            criteria.add( Restrictions.le( "createdOn", higherTime ) );
+        }
+        return criteria.list();
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Company> searchCompaniesByName( String namePattern )
+    {
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class );
+        criteria.add( Restrictions.like( "company", namePattern, MatchMode.START ) );
+        return criteria.list();
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Company> searchCompaniesByNameAndKeyValue( String namePattern, int accountType, int status,
+        boolean inCompleteCompany )
+    {
+        Criteria criteria = getSession().createCriteria( Company.class );
+        criteria.add( Restrictions.ilike( "company", namePattern, MatchMode.START ) );
+
+        if ( inCompleteCompany ) {
+            criteria.add( Restrictions.sqlRestriction( "COMPANY_ID NOT in (select ld.COMPANY_ID from LICENSE_DETAILS ld)" ) );
+        } else {
+            if ( status > -1 ) {
+                criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, status ) );
             }
-		    if(status == CommonConstants.STATUS_ACTIVE){
-	            criteria.add(Restrictions.sqlRestriction("COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld)"));          
-		    }
-            if (accountType > -1) {
-                criteria.add(Restrictions.sqlRestriction("COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld where ACCOUNTS_MASTER_ID=" + accountType + ")"));
+            if ( status == CommonConstants.STATUS_ACTIVE ) {
+                criteria.add( Restrictions.sqlRestriction( "COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld)" ) );
             }
-		}
-		criteria.addOrder( Order.asc("company") );
-		return criteria.list();
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Company> getCompaniesByDateRange(Timestamp startTime, Timestamp endTime) {
-		Criteria criteria = getSession().createCriteria(Company.class);
-		criteria.add(Restrictions.ne(CommonConstants.CREATED_BY, "ADMIN"));
-		criteria.addOrder(Order.desc(CommonConstants.CREATED_ON));
-		if (startTime != null)
-			criteria.add(Restrictions.ge(CommonConstants.CREATED_ON, startTime));
-		if (endTime != null)
-			criteria.add(Restrictions.le(CommonConstants.CREATED_ON, endTime));
-		return criteria.list();
-	}
+            if ( accountType > -1 ) {
+                criteria.add( Restrictions
+                    .sqlRestriction( "COMPANY_ID in (select ld.COMPANY_ID from LICENSE_DETAILS ld where ACCOUNTS_MASTER_ID="
+                        + accountType + ")" ) );
+            }
+        }
+        criteria.addOrder( Order.asc( "company" ) );
+        return criteria.list();
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Company> getCompaniesByDateRange( Timestamp startTime, Timestamp endTime )
+    {
+        Criteria criteria = getSession().createCriteria( Company.class );
+        criteria.add( Restrictions.ne( CommonConstants.CREATED_BY, "ADMIN" ) );
+        criteria.addOrder( Order.desc( CommonConstants.CREATED_ON ) );
+        if ( startTime != null )
+            criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, startTime ) );
+        if ( endTime != null )
+            criteria.add( Restrictions.le( CommonConstants.CREATED_ON, endTime ) );
+        return criteria.list();
+    }
 
 
     @SuppressWarnings ( "unchecked")
@@ -146,8 +165,8 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         LOG.info( "Method to get user adoption data for company id : " + companyId + ",getUserAdoptionData() finished." );
         return rows;
     }
-    
-    
+
+
     /**
      * Method to fetch all users in each company for billing report
      * @param companyId
@@ -155,7 +174,8 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
      */
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<BillingReportData> getAllUsersInCompanysForBillingReport( int startIndex, int batchSize ){
+    public List<BillingReportData> getAllUsersInCompanysForBillingReport( int startIndex, int batchSize )
+    {
         LOG.info( "Method getAllUsersInCompanyForBillingReport started" );
         Query query = getSession().createSQLQuery( activeUsersInCompany );
         if ( startIndex > -1 ) {
@@ -170,7 +190,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
             LOG.debug( "Cound not find any more users in company having billing mode Invoice and of type enterprise" );
             return null;
         }
-        
+
         //Parse rows into BilllingReportData
         List<BillingReportData> billingReportData = new ArrayList<BillingReportData>();
         for ( Object[] row : rows ) {
@@ -193,14 +213,14 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
                     profilesMasterIds.add( profilesMasterId );
             }
             reportRow.setProfilesMasterIds( profilesMasterIds );
-            
+
             billingReportData.add( reportRow );
         }
         LOG.info( "Method getAllUsersInCompanyForBillingReport finished" );
         return billingReportData;
     }
-    
-    
+
+
     /**
      * Method to fetch all users in given companies for billing report
      * @param companyId
@@ -208,8 +228,9 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
      */
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<BillingReportData> getAllUsersInGivenCompaniesForBillingReport( int startIndex, int batchSize , Long companyId ){
-        LOG.info( "Method getAllUsersInGivenCompaniesForBillingReport started for company : " + companyId);
+    public List<BillingReportData> getAllUsersInGivenCompaniesForBillingReport( int startIndex, int batchSize, Long companyId )
+    {
+        LOG.info( "Method getAllUsersInGivenCompaniesForBillingReport started for company : " + companyId );
         Query query = getSession().createSQLQuery( activeUsersInGivenCompany );
         query.setParameter( "companyId", companyId );
         if ( startIndex > -1 ) {
@@ -224,7 +245,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
             LOG.debug( "Cound not find any more users in company : " + companyId );
             return null;
         }
-        
+
         //Parse rows into BilllingReportData
         List<BillingReportData> billingReportData = new ArrayList<BillingReportData>();
         for ( Object[] row : rows ) {
@@ -247,28 +268,102 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
                     profilesMasterIds.add( profilesMasterId );
             }
             reportRow.setProfilesMasterIds( profilesMasterIds );
-            
+
             billingReportData.add( reportRow );
         }
         LOG.info( "Method getAllUsersInGivenCompaniesForBillingReport finished" );
         return billingReportData;
     }
-    
+
+
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<Company> getCompaniesWithExpiredInvoice(){
+    public List<Company> getCompaniesWithExpiredInvoice()
+    {
         LOG.debug( "method getCompaniesWithExpiredInvoice started " );
         Session session = sessionFactory.getCurrentSession();
-        Criteria criteria = session.createCriteria(Company.class, "company");
-        criteria.createAlias("company.licenseDetails", "licenseDetail");
-        criteria.add(Restrictions.eq("licenseDetail.paymentMode", CommonConstants.BILLING_MODE_INVOICE) );
-        criteria.add(Restrictions.eq("licenseDetail.accountsMaster.accountsMasterId", CommonConstants.ACCOUNTS_MASTER_ENTERPRISE) );
-        criteria.add(Restrictions.le("licenseDetail.nextInvoiceBillingDate",  new Date(System.currentTimeMillis()) ) );
-        criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        Criteria criteria = session.createCriteria( Company.class, "company" );
+        criteria.createAlias( "company.licenseDetails", "licenseDetail" );
+        criteria.add( Restrictions.eq( "licenseDetail.paymentMode", CommonConstants.BILLING_MODE_INVOICE ) );
+        criteria.add( Restrictions.eq( "licenseDetail.accountsMaster.accountsMasterId",
+            CommonConstants.ACCOUNTS_MASTER_ENTERPRISE ) );
+        criteria.add( Restrictions.le( "licenseDetail.nextInvoiceBillingDate", new Date( System.currentTimeMillis() ) ) );
+        criteria.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY );
         List<Company> companies = criteria.list();
         LOG.debug( "method getCompaniesWithExpiredInvoice started ended" );
         return companies;
-        
+
+    }
+
+
+    @Override
+    public Company getCompanyByBraintreeSubscriptionId( String subscriptionId )
+    {
+        LOG.debug( "method getCompaniesWithExpiredInvoice started " );
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class, "company" );
+        criteria.createAlias( "company.licenseDetails", "licenseDetail" );
+        criteria.add( Restrictions.eq( "licenseDetail.paymentMode", CommonConstants.BILLING_MODE_AUTO ) );
+        criteria.add( Restrictions.le( "licenseDetail.subscriptionId", subscriptionId ) );
+        criteria.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY );
+        criteria.setMaxResults( 1 );
+        Company company = (Company) criteria.uniqueResult();
+        LOG.debug( "method getCompaniesWithExpiredInvoice started ended" );
+        return company;
+
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Company> getAllInvoicedActiveCompanies()
+    {
+        LOG.debug( "method getAllInvoicedActiveCompanies started " );
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class, "company" );
+        criteria.add( Restrictions.eq( "status", CommonConstants.STATUS_ACTIVE ) );
+        criteria.createAlias( "company.licenseDetails", "licenseDetail" );
+        criteria.add( Restrictions.eq( "licenseDetail.paymentMode", CommonConstants.BILLING_MODE_INVOICE ) );
+        criteria.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY );
+        List<Company> companies = criteria.list();
+        LOG.debug( "method getAllInvoicedActiveCompanies started ended" );
+        return companies;
+
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Company> getCompaniesByBillingModeAuto()
+    {
+        LOG.debug( "method getCompaniesByBillingModeAuto started " );
+        Query query = getSession().createSQLQuery( companyDetailByBillingMode );
+        LOG.debug( "QUERY : " + query.getQueryString() );
+        List<Object[]> rows = (List<Object[]>) query.list();
+        List<Company> companies = new ArrayList<Company>();
+
+        for ( Object[] row : rows ) {
+            Company company = new Company();
+            company.setCompanyId( Long.parseLong( String.valueOf( row[0] ) ) );
+            company.setCompany( String.valueOf( row[1] ) );
+            company.setStatus( Integer.parseInt( String.valueOf( row[2] ) ) );
+            company.setBillingMode( String.valueOf( row[3] ) );
+            company.setCreatedOn( Timestamp.valueOf( String.valueOf( row[4] ) ) );
+
+            LicenseDetail licenseDetail = new LicenseDetail();
+            licenseDetail.setSubscriptionId( String.valueOf( row[5] ) );
+            if(String.valueOf( row[6] ) != null)
+                licenseDetail.setLicenseStartDate( Timestamp.valueOf( String.valueOf( row[6] ) ) );
+            licenseDetail.setPaymentRetries( Integer.parseInt( String.valueOf( row[7] ) )  );
+
+            List<LicenseDetail> licenseDetails = new ArrayList<LicenseDetail>();
+            licenseDetails.add( licenseDetail );
+            company.setLicenseDetails( licenseDetails );
+
+            companies.add( company );
+        }
+
+        return companies;
     }
 }
 // JIRA SS-42 By RM-05 EOC

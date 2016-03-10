@@ -627,13 +627,28 @@ public class SolrSearchServiceImpl implements SolrSearchService
             //solrQuery.setSort( CommonConstants.REVIEW_COUNT_SOLR, ORDER.desc );
             //solrQuery.setSort( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, ORDER.desc );
             String query = "";
+            String firstName = "";
+            String lastName = "";
+            String displayName = null;
             if ( !patternFirst.equals( "" ) && !patternLast.equals( "" ) ) {
-                query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " AND "
+                query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR "
                     + CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+                firstName = patternFirst;
+                lastName = patternLast;
+                displayName = firstName.trim() + " " + lastName.trim();
             } else if ( !patternFirst.equals( "" ) && patternLast.equals( "" ) ) {
                 query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*";
+                firstName = patternFirst;
+                displayName = firstName.trim();
             } else if ( patternFirst.equals( "" ) && !patternLast.equals( "" ) ) {
                 query = CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+                lastName = patternLast;
+                displayName = lastName.trim();
+            }
+
+            //search display name 
+            if ( displayName != null && !displayName.isEmpty() ) {
+                query = query + " OR " + generateSubQueryToSearch( CommonConstants.USER_DISPLAY_NAME_SOLR, displayName );
             }
             solrQuery.setQuery( query );
             solrQuery.addFilterQuery( CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR );
@@ -651,6 +666,26 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method searchUsersByFirstOrLastName() called for parameter : " + patternFirst + ", " + patternLast
             + " returning : " + response.getResults() );
         return response.getResults();
+    }
+
+
+    private String generateSubQueryToSearch( String columnName, String srchString )
+    {
+        String query = "";
+        if ( srchString.contains( " " ) ) {
+            String[] srchStringArray = srchString.split( " " );
+            for ( int i = 0; i < srchStringArray.length; i++ ) {
+                String curSrchString = ( srchStringArray[i] ).trim() + "*";
+                if ( i != 0 )
+                    query = query + " OR ";
+                query = query + columnName + ":" + curSrchString + " OR " + columnName + ":" + "*\\ " + curSrchString;
+            }
+        } else {
+            srchString = srchString.trim() + "*";
+            query = query + columnName + ":" + srchString + " OR " + columnName + ":" + "*\\ " + srchString;
+        }
+
+        return query;
     }
 
 
@@ -1300,6 +1335,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         return results;
     }
 
+
     /*
      * (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.search.SolrSearchService#searchBranchRegionOrAgentByNameForAdmin(java.lang.String, java.lang.String, java.lang.String, long)
@@ -1316,7 +1352,6 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
         List<SolrDocument> results = new ArrayList<SolrDocument>();
         QueryResponse response = null;
-        searchKey = searchKey + "*";
 
         SolrQuery query = new SolrQuery();
         try {
@@ -1336,18 +1371,34 @@ public class SolrSearchServiceImpl implements SolrSearchService
             }
 
             query.setQuery( "*:*" );
-            
+
             //search for login name also in case of user
-            if ( !searchColumn.equalsIgnoreCase( CommonConstants.USER_DISPLAY_NAME_SOLR ) ){
-                query
-                .addFilterQuery( CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO );
-                query.addFilterQuery( searchColumn + ":" + searchKey );
-            }else{
-                query.addFilterQuery( searchColumn + ":" + searchKey + " OR " + CommonConstants.USER_LOGIN_NAME_SOLR );
+            if ( !searchColumn.equalsIgnoreCase( CommonConstants.USER_DISPLAY_NAME_SOLR ) ) {
+                query.addFilterQuery( CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO );
+                /*query.addFilterQuery( searchColumn + ":" + searchKey );*/
+                String serchKeyQuery = "";
+                if ( searchKey != null && !searchKey.isEmpty() ){
+                    serchKeyQuery = generateSubQueryToSearch( searchColumn , searchKey );
+                }
+                query.addFilterQuery( serchKeyQuery );
+            } else {
+                String serchKeyQuery = "";
+                if ( searchKey != null && !searchKey.isEmpty() ) {
+                    serchKeyQuery = serchKeyQuery
+                        + generateSubQueryToSearch( CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey );
+                    serchKeyQuery = serchKeyQuery + " OR "
+                        + generateSubQueryToSearch( CommonConstants.USER_LOGIN_NAME_SOLR, searchKey );
+                }
+                query.addFilterQuery( serchKeyQuery );
+                query.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
+
             }
-               
+
             //filter for only active user
-            query.addFilterQuery( "-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_INACTIVE );
+            query.addFilterQuery( CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR "
+                + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_NOT_VERIFIED + " OR "
+                + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE );
+            
 
             LOG.debug( "Querying solr for searching " + searchKey );
             response = solrServer.query( query );
@@ -1369,6 +1420,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished" );
         return results;
     }
+
 
     @Override
     public String fetchRegionsByCompany( long companyId, int size ) throws InvalidInputException, SolrException,
@@ -2449,13 +2501,30 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
         SolrDocumentList results;
         QueryResponse response = null;
-        pattern = pattern + "*";
+        /*String namePattern = pattern + "*";
+        namePattern = namePattern.replace(" ", "\\ ");
+        String middlePattern = "*\\ " + namePattern;*/
         try {
             SolrServer solrServer = new HttpSolrServer( solrUserUrl );
             SolrQuery solrQuery = new SolrQuery();
-            solrQuery.setQuery( "displayName:" + pattern + " OR " + CommonConstants.USER_FIRST_NAME_SOLR + ":" + pattern
-                + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":" + pattern + " OR " + CommonConstants.USER_LOGIN_NAME_SOLR
-                + ":" + pattern );
+            /*solrQuery.setQuery( CommonConstants.USER_DISPLAY_NAME_SOLR + ":" + namePattern + " OR "
+                + CommonConstants.USER_DISPLAY_NAME_SOLR + ":" + middlePattern + " OR " + CommonConstants.USER_FIRST_NAME_SOLR
+                + ":" + namePattern + " OR " + CommonConstants.USER_FIRST_NAME_SOLR + ":" + middlePattern + " OR "
+                + CommonConstants.USER_LAST_NAME_SOLR + ":" + namePattern + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":"
+                + middlePattern + " OR " + CommonConstants.USER_LOGIN_NAME_SOLR + ":" + namePattern + " OR "
+                + CommonConstants.USER_LOGIN_NAME_SOLR + ":" + middlePattern );*/
+
+            String query = "";
+
+
+            //search display name 
+            if ( pattern != null && !pattern.isEmpty() ) {
+                query = query + generateSubQueryToSearch( CommonConstants.USER_DISPLAY_NAME_SOLR, pattern );
+                query = query + " OR " + generateSubQueryToSearch( CommonConstants.USER_LOGIN_NAME_SOLR, pattern );
+            }
+
+            solrQuery.setQuery( query );
+
             solrQuery.addFilterQuery( CommonConstants.COMPANY_ID_SOLR + ":" + adminFromSearch.getCompanyId() );
             if ( !admin.isCompanyAdmin() ) {
                 if ( admin.isRegionAdmin() ) {

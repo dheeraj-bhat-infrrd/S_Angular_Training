@@ -10,8 +10,11 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
@@ -24,6 +27,9 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDaoImpl.class);
+
+    @Autowired
+    private CompanyDao companyDao;
 
 	/*
 	 * Method to return all the users that match email id passed.
@@ -244,6 +250,50 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
         }
         LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
         return (List<User>) criteria.list();
+    }
+
+
+    /**
+     * Method to fetch all user ids under company based on profile master
+     * @param companyId
+     * @throws InvalidInputException
+     * */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<Long> getUserIdsUnderCompanyBasedOnProfileMasterId( long companyId, int profileMasterId, int start,
+        int batchSize ) throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( "Invalid company id passed in getAgentIdsUnderCompany method" );
+        }
+        LOG.info( "Method to get all user ids under company id : " + companyId + " based on profile master id : "
+            + profileMasterId + ",getUserIdsUnderCompanyBasedOnProfileMasterId() started." );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( User.class );
+            criteria.setProjection( Projections.property( CommonConstants.USER_ID ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ) );
+            criteria.add( criterion );
+            if ( start >= 0 )
+                criteria.setFirstResult( start );
+            if ( batchSize > 0 ) {
+                criteria.setMaxResults( batchSize );
+            }
+            criteria.add( Restrictions
+                .sqlRestriction( "USER_ID in (select up.USER_ID from USER_PROFILE up where PROFILES_MASTER_ID="
+                    + profileMasterId + " and STATUS=" + CommonConstants.STATUS_ACTIVE + ")" ) );
+        } catch ( HibernateException e ) {
+            LOG.error(
+                "HibernateException caught in getUserIdsUnderCompanyBasedOnProfileMasterId(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getUserIdsUnderCompanyBasedOnProfileMasterId().", e );
+        }
+        LOG.info( "Method to get all user ids under company id : " + companyId + " based on profile master id : "
+            + profileMasterId + ",getUserIdsUnderCompanyBasedOnProfileMasterId() ended." );
+        return criteria.list();
     }
 }
 // JIRA SS-42 By RM-05 EOC

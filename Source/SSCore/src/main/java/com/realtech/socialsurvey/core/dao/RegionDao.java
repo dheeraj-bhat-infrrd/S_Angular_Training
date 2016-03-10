@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
 import java.util.Set;
+
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -18,4 +19,7 @@ public interface RegionDao extends GenericDao<Region, Long> {
 
 
     public List<Region> getRegionsForCompany( long companyId, int start, int batch ) throws InvalidInputException;
+
+
+    public List<Long> getRegionIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
 }

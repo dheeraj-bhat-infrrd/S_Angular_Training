@@ -132,6 +132,11 @@ public class User implements UserDetails, Serializable {
 	// bi-directional many-to-one association to UserEmailMapping
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserEmailMapping> userEmailMappings;
+    
+    
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<SurveyPreInitiation> surveyPreInitiation;
+    
 
 	public long getUserId() {
 		return this.userId;

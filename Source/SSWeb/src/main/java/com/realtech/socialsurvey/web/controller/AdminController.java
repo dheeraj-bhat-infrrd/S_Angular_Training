@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
+import com.realtech.socialsurvey.core.services.admin.AdminService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
@@ -62,6 +63,8 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.vo.SubscriptionVO;
+import com.realtech.socialsurvey.core.vo.TransactionVO;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
@@ -108,6 +111,9 @@ public class AdminController
     @Autowired
     private RequestUtils requestUtils;
 
+    @Autowired
+    private AdminService adminService;
+
 
     @RequestMapping ( value = "/admindashboard")
     public String adminDashboard( Model model, HttpServletRequest request )
@@ -127,7 +133,7 @@ public class AdminController
 
         if ( company != null && company.getCompanyId() > 0 ) {
             List<LicenseDetail> licenseDetails = company.getLicenseDetails();
-            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || licenseDetails.size() == 0) {
+            if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || licenseDetails.size() == 0 ) {
                 try {
                     if ( licenseDetails.size() > 0 ) {
                         // delete company from braintree
@@ -167,8 +173,8 @@ public class AdminController
         model.addAttribute("companyList", companies);*/
         return JspResolver.ADMIN_HIERARCHY_VIEW;
     }
-    
-    
+
+
     @RequestMapping ( value = "/adminusermanagement")
     public String adminUserManagementPage( Model model, HttpServletRequest request )
     {
@@ -176,7 +182,6 @@ public class AdminController
         LOG.info( "Inside adminUserManagementPage() method in admin controller" );
         return JspResolver.ADMIN_USER_MANAGEMENT;
     }
-
 
 
     @RequestMapping ( value = "/companyhierarchy")
@@ -539,17 +544,17 @@ public class AdminController
 
         try {
             User adminUser = userManagementService.getUserObjByUserId( adminUserid );
-            
+
             //check if user is social survey admin
             boolean isSSAdmin = false;
             List<UserProfile> userProfiles = adminUser.getUserProfiles();
-                for ( UserProfile userProfile : userProfiles ) {
-                    if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
-                        isSSAdmin = true;
-                    }
+            for ( UserProfile userProfile : userProfiles ) {
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID ) {
+                    isSSAdmin = true;
                 }
+            }
 
-            if ( !adminUser.isSuperAdmin() && ! isSSAdmin ) {
+            if ( !adminUser.isSuperAdmin() && !isSSAdmin ) {
                 throw new InvalidInputException( "Admin user in session is not realtech admin" );
             }
             sessionHelper.loginAdminAs( adminUser.getLoginName(), CommonConstants.BYPASS_PWD );
@@ -569,8 +574,7 @@ public class AdminController
         return JspResolver.ADMIN_INVITE_VIEW;
     }
 
-    
-    
+
     @RequestMapping ( value = "/showaddsocialsurveyadmin", method = RequestMethod.GET)
     public String showAddSocialSurveyAdmin()
     {
@@ -578,6 +582,7 @@ public class AdminController
 
         return JspResolver.ADMIN_ADD_SS_ADMIN;
     }
+
 
     @RequestMapping ( value = "/downloadcompanyregistrationreport")
     public void downloadCompanyRegistrationReport( HttpServletRequest request, HttpServletResponse response )
@@ -780,45 +785,45 @@ public class AdminController
         return message;
 
     }
-    
+
+
     @ResponseBody
     @RequestMapping ( value = "/createsocialsurveyadmin", method = RequestMethod.POST)
-    public String createSocialSurveyAdmin( @RequestParam("firstName") String firstName,
-        @RequestParam("lastName") String lastName, @RequestParam("emailId") String emailId )
+    public String createSocialSurveyAdmin( @RequestParam ( "firstName") String firstName,
+        @RequestParam ( "lastName") String lastName, @RequestParam ( "emailId") String emailId )
     {
-        
-        try{
-            if(firstName == null || firstName.isEmpty()){
-                throw new InvalidInputException("First Name can't be empty");
+
+        try {
+            if ( firstName == null || firstName.isEmpty() ) {
+                throw new InvalidInputException( "First Name can't be empty" );
             }
-            
-            if(lastName == null || lastName.isEmpty()){
-                throw new InvalidInputException("Last Name can't be empty");
+
+            if ( lastName == null || lastName.isEmpty() ) {
+                throw new InvalidInputException( "Last Name can't be empty" );
             }
-            
-            if(emailId == null || emailId.isEmpty()){
-                throw new InvalidInputException("Email Id can't be empty");
+
+            if ( emailId == null || emailId.isEmpty() ) {
+                throw new InvalidInputException( "Email Id can't be empty" );
             }
-            
+
             User admin = sessionHelper.getCurrentUser();
             admin = userManagementService.getUserObjByUserId( admin.getUserId() );
-            
+
             userManagementService.createSocialSurveyAdmin( admin, firstName, lastName, emailId );
-        }
-        catch (NonFatalException e) {
-            LOG.error("NonFatalException while adding a social survey admin. Reason : " + e.getMessage(), e);
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while adding a social survey admin. Reason : " + e.getMessage(), e );
             return e.getMessage();
         }
 
-        LOG.info("Successfully completed controller to add a social survey admin");
-        return messageUtils.getDisplayMessage(DisplayMessageConstants.SUCCESSFULLY_CREATED_SS_ADMIN, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-        
+        LOG.info( "Successfully completed controller to add a social survey admin" );
+        return messageUtils.getDisplayMessage( DisplayMessageConstants.SUCCESSFULLY_CREATED_SS_ADMIN,
+            DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+
     }
-    
-    
-    
+
+
     @RequestMapping ( value = "/getsocialsurveyadminlist", method = RequestMethod.GET)
-    public String createSocialSurveyAdmin( Model model , HttpServletRequest request )
+    public String createSocialSurveyAdmin( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to fetch user by user, findUserByUserId() started." );
 
@@ -835,8 +840,8 @@ public class AdminController
             List<User> usersList = userManagementService.getSocialSurveyAdmins( admin );
             model.addAttribute( "userslist", usersList );
             model.addAttribute( "numFound", usersList.size() );
-            
-       
+
+
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
                 nonFatalException );
@@ -848,16 +853,16 @@ public class AdminController
         LOG.info( "Method to fetch users by company , findUsersForCompany() finished." );
         return JspResolver.ADMIN_SS_ADMIN_LIST;
     }
-    
-    
+
+
     @RequestMapping ( value = "/deletesocialsurveyadmin", method = RequestMethod.POST)
-    public String deleteSocialSurveyAdmin( Model model , HttpServletRequest request )
+    public String deleteSocialSurveyAdmin( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to fetch user by user, findUserByUserId() started." );
 
 
         try {
-            
+
             String ssAdminIdStr = request.getParameter( "userId" );
             long ssAdminId = 0l;
             try {
@@ -872,8 +877,8 @@ public class AdminController
             }
 
             userManagementService.deleteSSAdmin( admin, ssAdminId );
-            
-       
+
+
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
                 nonFatalException );
@@ -883,8 +888,9 @@ public class AdminController
         }
 
         LOG.info( "Method to delete SocialSurveyAdminfinished." );
-        model.addAttribute("message",messageUtils.getDisplayMessage(DisplayMessageConstants.SS_ADMIN_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+        model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.SS_ADMIN_DELETE_SUCCESSFUL,
+            DisplayMessageType.SUCCESS_MESSAGE ) );
         return JspResolver.MESSAGE_HEADER;
     }
-    
+
 }
