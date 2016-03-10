@@ -195,7 +195,7 @@
 									<spring:message code="label.emailsettings.key" />
 								</div>
 							</c:if>
-							<c:if test="false">
+							<c:if test="true">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
 									<spring:message code="label.showwidget.key" />
 								</div>
