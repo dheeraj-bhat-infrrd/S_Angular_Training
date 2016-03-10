@@ -446,4 +446,71 @@ public class DashboardServiceImplTest
     {
         dashboardServiceImpl.downloadCompanyHierarchyReportData( 0 );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAllSurveyCountForStatisticsWithNullColumnName() throws InvalidInputException, NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getAllSurveyCountForStatistics( null, 0, 30 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAllSurveyCountForStatisticsWithEmtyColumnName() throws InvalidInputException, NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getAllSurveyCountForStatistics( "", 0, 30 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAllSurveyCountForStatisticsWithInvalidColumnValue() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getAllSurveyCountForStatistics( "test", 0, 30 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetSocialPostsForPastNdaysWithHierarchyForStatisticsWithNullColumnName() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getSocialPostsForPastNdaysWithHierarchyForStatistics( null, 0, 30 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetSocialPostsForPastNdaysWithHierarchyForStatisticsWithEmtyColumnName() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getSocialPostsForPastNdaysWithHierarchyForStatistics( "", 0, 30 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetSocialPostsForPastNdaysWithHierarchyForStatisticsWithInvalidColumnValue() throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getSocialPostsForPastNdaysWithHierarchyForStatistics( "test", 0, 30 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetZillowImportCountWithNullColumnName() throws InvalidInputException, NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getZillowImportCount( null, 0, 30 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetZillowImportCountWithEmtyColumnName() throws InvalidInputException, NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getZillowImportCount( "", 0, 30 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetZillowImportCountWithInvalidColumnValue() throws InvalidInputException, NoRecordsFetchedException
+    {
+        dashboardServiceImpl.getZillowImportCount( "test", 0, 30 );
+    }
 }

@@ -4574,7 +4574,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         zillowTempPost.setEntityColumnName( columnName );
         zillowTempPost.setEntityId( profile.getIden() );
         zillowTempPost.setZillowReviewUrl( surveyDetails.getSourceId() );
-        zillowTempPost.setZillowReviewSourceLink( profile.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
+        if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null
+            && profile.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
+            zillowTempPost.setZillowReviewSourceLink( profile.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
+        } else {
+            zillowTempPost.setZillowReviewSourceLink( "" );
+        }
         zillowTempPost.setZillowReviewRating( surveyDetails.getScore() );
         zillowTempPost.setZillowReviewerName( surveyDetails.getCustomerFirstName() );
         zillowTempPost.setZillowReviewSummary( surveyDetails.getReview() );
