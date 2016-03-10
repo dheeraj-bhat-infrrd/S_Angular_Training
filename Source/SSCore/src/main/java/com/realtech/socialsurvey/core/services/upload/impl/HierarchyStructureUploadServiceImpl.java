@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -45,6 +46,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.StringListUploadHistory;
 import com.realtech.socialsurvey.core.entities.StringUploadHistory;
+import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
@@ -109,6 +111,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     @Resource
     @Qualifier ( "user")
     private UserDao userDao;
+    
+    @Autowired
+    GenericDao<UploadStatus, Long> uploadStatusDao;
 
 
     @Override
@@ -2148,5 +2153,81 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
             agentSettings, userPhotoUrl );
     }
+    
 
+    /**
+     * Method to search for initiated hierarchy upload entries in the upload status table
+     * @return
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    public List<UploadStatus> findInitiatedHierarchyUploads() throws NoRecordsFetchedException
+    {
+        LOG.info( "Searching for initiated hierarchy upload entries" );
+        List<UploadStatus> initiatedUploads = uploadStatusDao.findByColumn( UploadStatus.class, CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE );
+        if ( initiatedUploads == null || initiatedUploads.isEmpty() ) {
+            throw new NoRecordsFetchedException( "No hierarchy upload entries found" );
+        }
+        return initiatedUploads;
+    }
+    
+    
+    /**
+     * Method to update an uploadStatus entry
+     * @param uploadStatus
+     */
+    @Override
+    public void updateUploadStatus( UploadStatus uploadStatus )
+    {
+        LOG.info( "Updating uploadStatus" );
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        uploadStatus.setModifiedOn( currentTime );
+        uploadStatusDao.update( uploadStatus );
+    }
+    
+    
+    /**
+     * Method to add an uploadStatus entry
+     * @param uploadStatus
+     */
+    @Override
+    public void addUploadStatusEntry( UploadStatus uploadStatus )
+    {
+        LOG.info( "Adding uploadStatus entry" );
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        uploadStatus.setModifiedOn( currentTime );
+        uploadStatus.setCreatedOn( currentTime );
+        uploadStatusDao.save( uploadStatus );
+    }
+    
+    
+    /**
+     * Method to fetch the hierarchy to be uploaded
+     * @param company
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    public HierarchyUpload fetchHierarchyToBeUploaded( Company company ) throws InvalidInputException
+    {
+        if ( company == null ) {
+            throw new InvalidInputException( "Company object is empty" );
+        }
+        LOG.info( "Fetching hierarchy to be uploaded for company : " + company.getCompany() );
+        return hierarchyUploadDao.getUploadHierarchyDetailsByCompany( company.getCompanyId() );
+    }
+    
+    /**
+     * Used to get user from userId
+     * 
+     * @return
+     */
+    @Transactional
+    @Override
+    public User getUser( long userId )
+    {
+        User user = userDao.findById( User.class, userId );
+        return user;
+    }
 }

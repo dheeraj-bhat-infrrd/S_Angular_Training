@@ -193,6 +193,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_IMAGE_PROCESSING_STARTER = "ImageProcessingStarter";
     public static final String BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR = "HierarchySettingsCorrector";
     public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
+    public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
     
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -216,6 +217,7 @@ public interface CommonConstants
     public static final String BILLING_REPORT_GENERATOR = "Billing Report Generator";
     public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
+    public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
     
     /**
      * Mongo entities and column name constants
@@ -662,6 +664,7 @@ public interface CommonConstants
     public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
     public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
+    public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
 
     /*
      * Mongo social post Source
@@ -1054,4 +1057,18 @@ public interface CommonConstants
     public static final String USER_DELETE_ERROR_LIST = "USER_DELETE";
     public static final String BRANCH_DELETE_ERROR_LIST = "BRANCH_DELETE";
     public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
+    
+    //Hierarchy upload status constants
+    public static final int HIERARCHY_UPLOAD_INITIATED = 1;
+    public static final int HIERARCHY_UPLOAD_PROCESSING = 0;
+    public static final int HIERARCHY_UPLOAD_UPLOADING_REGIONS = 2;
+    public static final int HIERARCHY_UPLOAD_UPLOADING_BRANCHES = 3;
+    public static final int HIERARCHY_UPLOAD_UPLOADING_USERS = 4;
+    public static final int HIERARCHY_UPLOAD_DELETING_USERS = 5;
+    public static final int HIERARCHY_UPLOAD_DELETING_BRANCHES = 6;
+    public static final int HIERARCHY_UPLOAD_DELETING_REGIONS = 7;
+    public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 8;
+    public static final int HIERARCHY_UPLOAD_ERROR = 9;
+    
+    
 }
