@@ -2674,6 +2674,7 @@ var hierarchyUpload = {
 		$('#com-xlsx-file').val('');
 		$('#fileUrl').val('');
 		$('#summary').hide();
+		$('#xlsVerifyUplaod').addClass('disable');
 		$('#xlsx-file-upload').addClass('disable');
 	},
 
@@ -2688,13 +2689,25 @@ var hierarchyUpload = {
 			if (!jsonResponse.status) {
 				showError(jsonResponse.response);
 			} else {
-				if (jsonResponse.response != null
-						&& jsonResponse.response != '') {
+				if (jsonResponse.uploadStatus < 6) {
+					$('#uploadBatchStatus').empty();
 					$('<div>' + jsonResponse.response + '</div>').appendTo(
 							'#uploadBatchStatus');
 					$('#uploadBatchStatus').show();
+					showLoaderOnPagination($('#uploadBatchStatus'));
+					setTimeout(callAjaxPOSTWithTextDataUpload("./fetchUploadBatchStatus.do",
+							hierarchyUpload.fetchUploadBatchStatusCallback, true,
+							null), 15000);
 				} else {
+					hideLoaderOnPagination($('#uploadBatchStatus'));
 					$('#xlsVerifyUplaod').removeClass('disable');
+				}
+				if (jsonResponse.lastUploadRunTimestamp != null
+						&& jsonResponse.lastUploadRunTimestamp != '') {
+					$('#lastUploadRunTimestamp').text(
+							'Last Uploaded On: '
+									+ jsonResponse.lastUploadRunTimestamp);
+					$('#lastUploadRunTimestamp').show();
 				}
 			}
 		}

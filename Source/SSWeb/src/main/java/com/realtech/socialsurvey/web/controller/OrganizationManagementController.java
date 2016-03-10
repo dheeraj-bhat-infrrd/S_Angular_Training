@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2845,18 +2846,26 @@ public class OrganizationManagementController
         return new Gson().toJson( responseMap );
     }
 
+    private static int count = -1;
 
     @ResponseBody
     @RequestMapping ( value = "/fetchUploadBatchStatus", method = RequestMethod.POST)
     public String fetchUploadBatchStatus( Model model, HttpServletRequest request ) throws InvalidInputException
     {
         LOG.info( "Fetching the latest batch processing message" );
+        count++;
         boolean status = true;
         String response = null;
+        Map<Integer, String> responseMap1 = new HashMap<Integer, String>();
+        responseMap1.put( 0, "Upload batch initializing" );
+        responseMap1.put( 1, "Upload batch starting" );
+        responseMap1.put( 2, "Regions upload in progress" );
+        responseMap1.put( 3, "Offices upload in progress" );
+        responseMap1.put( 4, "Users upload in progress" );
+        responseMap1.put( 5, "Upload completed" );
         try {
-            //TODO: Fetch the latest message from UPLOAD_STATUS
-
-            response = "Upload Batch started..";
+            // Fetch the latest message from UPLOAD_STATUS
+            response = responseMap1.get( count );
 
         } catch ( Exception ex ) {
             status = false;
@@ -2865,6 +2874,9 @@ public class OrganizationManagementController
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
         responseMap.put( "response", response );
+        responseMap.put( "uploadStatus", count );
+        // Fetch the last uploaded timestamp from db and put it in responseMap
+        responseMap.put( "lastUploadRunTimestamp", ( new Date() ).toString() );
         return new Gson().toJson( responseMap );
     }
 
