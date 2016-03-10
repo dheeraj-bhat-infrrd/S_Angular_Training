@@ -752,6 +752,17 @@ function bindSelectButtons() {
 		var columnName = colName;
 		var columnValue = colValue;
 		if($('#dsh-grph-srch-survey-div').is(':visible')){
+			if($('#dsh-grph-sel-item').val()==''){
+				$('#dsh-grph-sel-item').addClass("empty-field");
+				if($('#graph-sel-list').val()=="regionName"){
+				$('#overlay-toast').html("Please choose a valid Region Name");
+				}else if($('#graph-sel-list').val()=="branchName"){
+					$('#overlay-toast').html("Please choose a valid Office Name");
+				}
+				showToast();
+				return;
+			}
+			
 			columnName = lastColNameForGraph;
 			columnValue = lastColValueForGraph;
 		}
@@ -760,9 +771,22 @@ function bindSelectButtons() {
 	$("#survey-count-days").change(function() {
 		var columnName = colName;
 		var columnValue = colValue;
+		
 		if($('#dsh-srch-survey-div').is(':visible')){
+			if($('#dsh-sel-item').val()==''){
+				$('#dsh-sel-item').addClass("empty-field");
+				if($('#selection-list').val()=="regionName"){
+					$('#overlay-toast').html("Please choose a valid Region Name");
+					}else if($('#selection-list').val()=="branchName"){
+						$('#overlay-toast').html("Please choose a valid Office Name");
+					}
+					showToast();
+				return;
+			}
+		
 			columnName = lastColNameForCount;
 			columnValue = lastColValueForCount;
+			
 		}
 		showSurveyStatistics(columnName, columnValue);
 	});
@@ -811,6 +835,7 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 	};
 	showDashOverlay('#mid-dash');
 	callAjaxGetWithPayloadData("./surveycount.do", function(data) {
+		$('#dsh-sel-item').removeClass("empty-field");
 		$('#dash-survey-status').html(data);
 	}, payload, true);
 }
@@ -1051,6 +1076,7 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
+			$('#dsh-grph-sel-item').removeClass("empty-field");
 			graphData = data;
 			paintSurveyGraph();
 			hideDashOverlay('#low-dash');
