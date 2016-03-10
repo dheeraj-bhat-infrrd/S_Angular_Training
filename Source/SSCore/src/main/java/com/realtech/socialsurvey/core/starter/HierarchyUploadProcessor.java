@@ -6,6 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -18,7 +19,7 @@ import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 
-
+@Component
 public class HierarchyUploadProcessor implements Runnable
 {
     public static final Logger LOG = LoggerFactory.getLogger( HierarchyUploadProcessor.class );
@@ -43,6 +44,7 @@ public class HierarchyUploadProcessor implements Runnable
                     List<UploadStatus> initiatedUploads = hierarchyStructureUploadService.findInitiatedHierarchyUploads();
                     for ( UploadStatus uploadStatus : initiatedUploads ) {
                         Company company = uploadStatus.getCompany();
+                        User adminUser = hierarchyStructureUploadService.getUser( uploadStatus.getAdminUserId() );
                         try {
                             // Update uploadStatus to 0
                             uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_PROCESSING );
@@ -50,7 +52,6 @@ public class HierarchyUploadProcessor implements Runnable
                             //Upload hierarchy
                             HierarchyUpload hierarchyUpload = hierarchyStructureUploadService
                                 .fetchHierarchyToBeUploaded( company );
-                            User adminUser = hierarchyStructureUploadService.getUser( CommonConstants.REALTECH_ADMIN_ID );
                             Map<String, List<String>> errors = hierarchyStructureUploadService.uploadHierarchy(
                                 hierarchyUpload, company, adminUser );
                             if ( !errors.isEmpty() ) {
@@ -60,6 +61,7 @@ public class HierarchyUploadProcessor implements Runnable
                             UploadStatus completedUploadStatus = new UploadStatus();
                             completedUploadStatus.setCompany( company );
                             completedUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_UPLOAD_COMPLETE );
+                            completedUploadStatus.setAdminUserId( adminUser.getUserId() );
                             completedUploadStatus.setMessage( "Hierarchy upload completed successfully." );
                             hierarchyStructureUploadService.addUploadStatusEntry( completedUploadStatus );
                         } catch ( InvalidInputException e ) {
@@ -67,7 +69,9 @@ public class HierarchyUploadProcessor implements Runnable
                             UploadStatus errorUploadStatus = new UploadStatus();
                             errorUploadStatus.setCompany( company );
                             errorUploadStatus.setMessage( "ERROR : " + e.getMessage() );
+                            errorUploadStatus.setAdminUserId( adminUser.getUserId() );
                             errorUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ERROR );
+                            hierarchyStructureUploadService.addUploadStatusEntry( errorUploadStatus );
                             continue;
                         }
                     }

@@ -23,7 +23,8 @@ public class UploadStatus
     @GeneratedValue ( strategy = GenerationType.IDENTITY)
     @Column ( name = "UPLOAD_STATUS_ID")
     private long uploadStatusId;
-
+    @Column ( name = "ADMIN_USER_ID")
+    private long adminUserId;
     @Column ( name = "MESSAGE")
     private String message;
 
@@ -56,6 +57,24 @@ public class UploadStatus
     public void setUploadStatusId( long uploadStatusId )
     {
         this.uploadStatusId = uploadStatusId;
+    }
+
+
+    /**
+     * @return the adminUserId
+     */
+    public long getAdminUserId()
+    {
+        return adminUserId;
+    }
+
+
+    /**
+     * @param adminUserId the adminUserId to set
+     */
+    public void setAdminUserId( long adminUserId )
+    {
+        this.adminUserId = adminUserId;
     }
 
 

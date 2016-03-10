@@ -5,15 +5,15 @@ import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.handler.HierarchyUploadHandler;
 
-
+@Component
 public class HierarchyUploader extends QuartzJobBean
 {
     public static final Logger LOG = LoggerFactory.getLogger( HierarchyUploader.class );
 
-    //TODO: Make new handler
     private HierarchyUploadHandler uploadHandler;
 
 

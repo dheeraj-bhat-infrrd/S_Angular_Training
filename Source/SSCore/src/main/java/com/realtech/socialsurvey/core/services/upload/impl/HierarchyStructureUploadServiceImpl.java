@@ -133,7 +133,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             LOG.error( "Invalid user details to upload." );
             throw new InvalidInputException( "Invalid user details to upload." );
         }
-        if ( !user.isCompanyAdmin() ) {
+        if ( !user.isCompanyAdmin() && user.getIsOwner() != CommonConstants.IS_OWNER ) {
             LOG.error( "User is not authorized to upload hierarchy." );
             throw new InvalidInputException( "User is not authorized to upload hierarchy." );
         }
@@ -146,6 +146,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         List<String> regionDeleteErrors = new ArrayList<String>();
         // start with addition and modification of each unit starting from the highest hierarchy and then deletion starting from the lowest hierarchy
         // uploading regions
+        //TODO: Add appropriate upload statuses at each stage
         uploadRegions( upload, user, company, regionUploadErrors );
         // Uploading branches
         uploadBranches( upload, user, company, branchUploadErrors );
