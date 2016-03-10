@@ -2828,10 +2828,12 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
             // Insert upload validation object in mongo
+            //TODO : Save this in the new collection?
             hierarchyStructureUploadService.saveHierarchyUploadInMongo( uploadValidation.getUpload() );
 
-            // Insert a row in UPLOAD_STATUS with status = 0
-
+            //TODO: Remove all other UPLOAD_STATUS entries from the same company, if present
+            //TODO: Insert a row in UPLOAD_STATUS with status = 1
+            
             response = "Hierarchy upload batch is initialized successfully";
         } catch ( Exception ex ) {
             status = false;
@@ -2852,7 +2854,7 @@ public class OrganizationManagementController
         boolean status = true;
         String response = null;
         try {
-            // Fetch the latest message from UPLOAD_STATUS
+            //TODO: Fetch the latest message from UPLOAD_STATUS
 
             response = "Upload Batch started..";
 

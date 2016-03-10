@@ -80,6 +80,7 @@
 				<value>com.realtech.socialsurvey.core.entities.ZillowTempPost</value>
 				<value>com.realtech.socialsurvey.core.entities.ExternalSurveyTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.UploadStatus</value>
 			</list>
 		</property>
 	</bean>

@@ -22,5 +22,22 @@ public interface HierarchyUploadDao
      * @throws InvalidInputException
      */
     public HierarchyUpload getHierarchyUploadByCompany( long companyId ) throws InvalidInputException;
+    
+    
+    /**
+     * Method to save hierarchy upload in UPLOAD_HIERARCHY_DETAILS collection
+     * @param hierarchyUpload
+     * @throws InvalidInputException
+     */
+    public void saveUploadHierarchyDetails( HierarchyUpload hierarchyUpload ) throws InvalidInputException;
+    
+    
+    /**
+     * Method to get hieararchy upload object from UPLOAD_HIERARCHY_DETAILS collection
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    public HierarchyUpload getUploadHierarchyDetailsByCompany( long companyId ) throws InvalidInputException;
 
 }
