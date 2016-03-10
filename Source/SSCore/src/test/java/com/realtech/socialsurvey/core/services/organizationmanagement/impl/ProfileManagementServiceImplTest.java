@@ -1823,4 +1823,11 @@ public class ProfileManagementServiceImplTest
     {
         profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "test", new SurveyDetails(), null );
     }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetReviewsForReportsWithInvalidIden() throws InvalidInputException
+    {
+        profileManagementServiceImpl.getReviewsForReports( 0, 0, 0, 0, 0, "test", false, null, null, null );
+    }
 }
