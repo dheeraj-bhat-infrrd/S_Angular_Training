@@ -145,8 +145,6 @@ public class UploadValidationServiceImpl implements UploadValidationService
                         + " cannot be deleted as it has active users associated with it" );
                     region.getValidationErrors().add( "Region at row " + region.getRowNum()
                         + " cannot be deleted as it has active users associated with it" );
-                } else {
-                    validationObject.setNumberOfRegionsDeleted( validationObject.getNumberOfRegionsDeleted() + 1 );
                 }
             }
         }
@@ -175,8 +173,6 @@ public class UploadValidationServiceImpl implements UploadValidationService
                         + " cannot be deleted as it has active users associated with it" );
                     branch.getValidationErrors().add( "Office at row " + branch.getRowNum()
                         + " cannot be deleted as it has active users associated with it" );
-                } else {
-                    validationObject.setNumberOfBranchesDeleted( validationObject.getNumberOfBranchesDeleted() + 1 );
                 }
             }
         }

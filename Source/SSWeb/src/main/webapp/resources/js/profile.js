@@ -752,7 +752,7 @@ function paintReviews(result){
 			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
 		}
 		if(reviewItem.source == "Zillow") {
-			reviewsHtml += '<a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
+			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
 		}
 		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
 			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";

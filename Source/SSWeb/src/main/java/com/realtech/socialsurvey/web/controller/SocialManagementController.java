@@ -1910,7 +1910,7 @@ public class SocialManagementController
                                 LOG.error( "The email failed to get delivered. Reason : ", e );
                             }
                         }
-                        LOG.error( "Error code : " + code + " Error description : " + errorMessage );
+                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
                     } else {
                         socialManagementService.updateZillowCallCount();
                     }
@@ -1935,7 +1935,13 @@ public class SocialManagementController
                                         //         zillowTotalScore += Double.valueOf( rating );
                                         //     }
                                         // }
-                                        profileManagementService.buildSurveyDetailsFromReviewMap( reviews, collectionName, profileSettings, user.getCompany().getCompanyId() );
+                                        //TODO : get a confirmation on this
+                                        // check if user had changed his Zillow account
+                                        if(checkZillowAccountChanged(profileSettings,zillowScreenName)){
+                                            
+                                        }
+                                        profileManagementService.buildSurveyDetailsFromReviewMap( reviews, collectionName,
+                                            profileSettings, user.getCompany().getCompanyId(), false, false );
                                     }
                                 }
                             }
@@ -2602,5 +2608,20 @@ public class SocialManagementController
 
         LOG.info( "Method searchSocialPosts() finished." );
         return posts;
+    }
+
+
+    //TODO : get a confirmation on this
+    private boolean checkZillowAccountChanged( OrganizationUnitSettings profileSettings, String zillowScreenName )
+    {
+        if ( profileSettings == null ) {
+            LOG.error( "profileSettings passed cannot be null or empty in checkZillowAccountChanged()" );
+            return false;
+        }
+        if ( zillowScreenName == null || zillowScreenName.isEmpty() ) {
+            LOG.error( "zillowScreenName passed cannot be null or empty in checkZillowAccountChanged()" );
+            return false;
+        }
+        return true;
     }
 }

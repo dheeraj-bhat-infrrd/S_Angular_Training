@@ -1988,7 +1988,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         User uploadedUser = null;
         List<User> userList = new ArrayList<User>();
         if ( checkIfEmailIdExists( user.getEmailId(), adminUser.getCompany() ) ) {
-            throw new UserAdditionException( "The user already exists" );
+            throw new UserAdditionException( "The user "+user.getSourceUserId()+" already exists" );
         }
         //Mask email address if needed
         String emailId = user.getEmailId();

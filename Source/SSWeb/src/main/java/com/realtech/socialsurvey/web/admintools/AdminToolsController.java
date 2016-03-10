@@ -392,11 +392,11 @@ public class AdminToolsController
                 if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
 
                     if ( !recipientMailId.contains( "," ) ) {
-                        if ( !organizationManagementService.validateEmail( recipientMailId ) )
+                        if ( !organizationManagementService.validateEmail( recipientMailId.trim() ) )
                             throw new InvalidInputException( "Mail id - " + recipientMailId
                                 + " entered as send alert to input is invalid", DisplayMessageConstants.GENERAL_ERROR );
                         else
-                            emailIdList.add( recipientMailId );
+                            emailIdList.add( recipientMailId.trim() );
                     } else {
                         String mailIds[] = recipientMailId.split( "," );
 
@@ -450,11 +450,11 @@ public class AdminToolsController
                 if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
 
                     if ( !recipientMailId.contains( "," ) ) {
-                        if ( !organizationManagementService.validateEmail( recipientMailId ) )
+                        if ( !organizationManagementService.validateEmail( recipientMailId.trim() ) )
                             throw new InvalidInputException( "Mail id - " + recipientMailId
                                 + " entered as send alert to input is invalid", DisplayMessageConstants.GENERAL_ERROR );
                         else
-                            emailIdList.add( recipientMailId );
+                            emailIdList.add( recipientMailId.trim() );
                     } else {
                         String mailIds[] = recipientMailId.split( "," );
 
@@ -477,7 +477,7 @@ public class AdminToolsController
 
                 response = Response.ok( subscriptions ).build();
             } catch ( Exception e ) {
-                LOG.error( "Exception occured while getting active subscriptions. Reason : " + e.getStackTrace() );
+                LOG.error( "Exception occured while getting active subscriptions. Reason : " + e.getMessage());
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while getting all active subscriptions" ),
                     e.getMessage() );
@@ -497,12 +497,40 @@ public class AdminToolsController
         LOG.info( "Method to getBillingModeAutoCompanies started." );
         List<Company> companies = null;
         Response response = null;
-
+        String recipientMailId = request.getParameter( "recipientMailId" );
+        List<String> emailIdList = new ArrayList<String>();
         try {
             try {
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
+                //parse email  ids
+                if ( recipientMailId != null && !recipientMailId.isEmpty() ) {
+
+                    if ( !recipientMailId.contains( "," ) ) {
+                        if ( !organizationManagementService.validateEmail( recipientMailId.trim() ) )
+                            throw new InvalidInputException( "Mail id - " + recipientMailId
+                                + " entered as send alert to input is invalid", DisplayMessageConstants.GENERAL_ERROR );
+                        else
+                            emailIdList.add( recipientMailId.trim() );
+                    } else {
+                        String mailIds[] = recipientMailId.split( "," );
+
+                        for ( String mailID : mailIds ) {
+                            if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                                throw new InvalidInputException( "Mail id - " + mailID
+                                    + " entered amongst the mail ids as send alert to input is invalid",
+                                    DisplayMessageConstants.GENERAL_ERROR );
+                            else
+                                emailIdList.add( mailID.trim() );
+                        }
+                    }
+
+                }
                 companies = adminService.getAllAutoBillingModeCompanies();
+                if ( emailIdList != null && !emailIdList.isEmpty() ) {
+                    LOG.debug( "Generating excel and sending mail to user" );
+                    adminService.generateAutoBillingCompanyListExcelAndMail( companies, emailIdList );
+                }
                 response = Response.ok( companies ).build();
             } catch ( Exception e ) {
                 LOG.error( "Exception occured while getting auto billing mode companies. Reason : " + e.getStackTrace() );

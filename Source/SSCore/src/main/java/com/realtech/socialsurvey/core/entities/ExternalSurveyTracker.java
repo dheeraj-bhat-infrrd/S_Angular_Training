@@ -45,6 +45,9 @@ public class ExternalSurveyTracker
     @Column ( name = "REVIEW_RATING")
     private double reviewRating;
 
+    @Column ( name = "AUTO_POST_STATUS")
+    private int autoPostStatus;
+    
     @Column ( name = "COMPLAINT_RES_STATUS")
     private int complaintResolutionStatus;
 
@@ -187,6 +190,24 @@ public class ExternalSurveyTracker
     public void setReviewRating( double reviewRating )
     {
         this.reviewRating = reviewRating;
+    }
+
+
+    /**
+     * @return the autoPostStatus
+     */
+    public int getAutoPostStatus()
+    {
+        return autoPostStatus;
+    }
+
+
+    /**
+     * @param autoPostStatus the autoPostStatus to set
+     */
+    public void setAutoPostStatus( int autoPostStatus )
+    {
+        this.autoPostStatus = autoPostStatus;
     }
 
 

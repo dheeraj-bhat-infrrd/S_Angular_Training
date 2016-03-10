@@ -203,7 +203,11 @@ public class Utils
             }
             int lastPlus = emailAddress.lastIndexOf( '+' );
             String unmaskedemailAddress = new StringBuilder(emailAddress).replace( lastPlus, lastPlus + 1, "@" ).toString();
-            unmaskedemailAddress = unmaskedemailAddress.replace( maskingSuffix, "" );
+            int lastSuffix = unmaskedemailAddress.lastIndexOf( maskingSuffix );
+            if ( lastSuffix <= 0 ) {
+                return emailAddress;
+            }
+            unmaskedemailAddress = new StringBuilder( unmaskedemailAddress ).replace( lastSuffix, unmaskedemailAddress.length(), "" ).toString();
             if ( validateEmail( unmaskedemailAddress ) ) {
                 return unmaskedemailAddress;
             }

@@ -13,8 +13,8 @@ var companyNameRegEx = /^[a-zA-Z0-9\\/ ]*$/;
 var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
-var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
-var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
+var firstNamePatternRegex =/^[a-zA-Z][a-zA-Z\s]{2,}$/;
+var lastNamePatternRegEx = /^[a-zA-Z][a-zA-Z\s]{2,}$/;
 var pageInitialized = false;
 var currentPhoneRegEx; // Vary the phone regex according to masking
 var stateList; // usStateList
@@ -742,25 +742,25 @@ function validateTextArea(elementId) {
 function validateCountryZipcode(elementId, isOnlyShowToast) {
 
 	if (selectedCountryRegEx == "" || selectedCountryRegEx == '/^$/') {
-	
-		var countryCode =$('#country-code').val();	
-		var flag=false;
-		
+
+		var countryCode = $('#country-code').val();
+		var flag = false;
+
 		for (var i = 0; i < postCodeRegex.length; i++) {
-			
-			 if (postCodeRegex[i].code == countryCode) {
+
+			if (postCodeRegex[i].code == countryCode) {
 				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
 				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
-				flag=true;
+				flag = true;
 				break;
-			}	
+			}
 		}
-		
+
 		if (!flag) {
-			
-		selectedCountryRegEx = ".*";
-		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
-		
+
+			selectedCountryRegEx = ".*";
+			selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+
 		}
 	}
 
@@ -1299,6 +1299,170 @@ function initializeFindAProPage() {
 		fetchUsers(start);
 	});
 }
+var UnmatchedUserSize = 10;
+var UnmatchedUserStartIndex = 0;
+function initializeUnmatchedUserPage() {
+	$('#new').html('');
+	$('#un-new-paginate-btn').attr("data-start", 0);
+	UnmatchedUserStartIndex = 0;
+	fetchUnmatchedUsers(UnmatchedUserStartIndex);
+	/*adjustTextContainerWidthOnResize();
+
+	$(window).resize(function() {
+		if ($(window).width() < 768) {
+			adjustTextContainerWidthOnResize();
+		}
+	});
+*/
+	
+}
+
+function bindEventForUnmatchedUserPage(){
+	
+	// Click events proList pagination buttons
+	$('#un-new-paginate-btn')
+			.on(
+					'click',
+					'#un-new-next.paginate-button',
+					function(e) {
+						var start = parseInt($('#un-new-paginate-btn').attr(
+								"data-start"));
+						var batch = parseInt($('#un-new-paginate-btn').attr(
+								"data-batch"));
+
+						start += batch;
+						$('#un-new-paginate-btn').attr("data-start", start);
+						fetchUnmatchedUsers(start);
+					});
+
+	$('#un-new-paginate-btn')
+			.on(
+					'click',
+					'#un-new-prev.paginate-button',
+					function(e) {
+						var start = parseInt($('#un-new-paginate-btn').attr(
+								"data-start"));
+						var batch = parseInt($('#un-new-paginate-btn').attr(
+								"data-batch"));
+
+						start -= batch;
+						$('#un-new-paginate-btn').attr("data-start", start);
+						fetchUnmatchedUsers(start);
+					});
+
+	$('#un-new-paginate-btn').on('keypress', '#sel-page-un-new-list', function(e) {
+		// if the letter is not digit then don't type anything
+		if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+			return false;
+		}
+		var totalPage = parseInt($('#un-new-total-pages').text());
+		var prevPageNoVal = parseInt($('#sel-page-un-new-list').val());
+		if (prevPageNoVal == NaN) {
+			prevPageNoVal = 0;
+		}
+		var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+		pageNo = parseInt(pageNo);
+		if (pageNo >= totalPage || pageNo <= 0) {
+			return false;
+		}
+	});
+
+	$('#un-new-paginate-btn').on('keyup', '#sel-page-un-new-list', function(e) {
+		if (e.which == 13) {
+			$(this).trigger('blur');
+		}
+	});
+
+	$('#un-new-paginate-btn').on('blur', '#sel-page-un-new-list', function(e) {
+		var batch = parseInt($('#un-new-paginate-btn').attr("data-batch"));
+		var pageNoVal = parseInt($('#sel-page-un-new-list').val());
+		UnmatchedUserStartIndex = (pageNoVal - 1) * batch;
+		$('#un-new-paginate-btn').attr("data-start", UnmatchedUserStartIndex);
+		fetchUnmatchedUsers(UnmatchedUserStartIndex);
+	});
+}
+
+var ProcessedUserSize = 10;
+var ProcessedUserStartIndex = 0;
+function initializeProcesedUserPage(){
+	$('#processed').html('');
+	$('#un-processed-paginate-btn').attr("data-start", 0);
+	ProcessedUserStartIndex = 0;
+	fetchProcessedUsers(ProcessedUserStartIndex);
+	/*adjustTextContainerWidthOnResize();
+
+	$(window).resize(function() {
+		if ($(window).width() < 768) {
+			adjustTextContainerWidthOnResize();
+		}
+	});
+*/
+	// Click events proList pagination buttons
+	
+}
+
+function bindEventsForProcessUserPage(){
+	$('#un-processed-paginate-btn')
+	.on(
+			'click',
+			'#un-processed-next.paginate-button',
+			function(e) {
+				var start = parseInt($('#un-processed-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#un-processed-paginate-btn').attr(
+						"data-batch"));
+
+				start += batch;
+				$('#un-processed-paginate-btn').attr("data-start", start);
+				fetchProcessedUsers(start);
+			});
+
+$('#un-processed-paginate-btn')
+	.on(
+			'click',
+			'#un-processed-prev.paginate-button',
+			function(e) {
+				var start = parseInt($('#un-processed-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#un-processed-paginate-btn').attr(
+						"data-batch"));
+
+				start -= batch;
+				$('#un-processed-paginate-btn').attr("data-start", start);
+				fetchProcessedUsers(start);
+			});
+
+$('#un-processed-paginate-btn').on('keypress', '#sel-page-un-processed-list', function(e) {
+// if the letter is not digit then don't type anything
+if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+	return false;
+}
+var totalPage = parseInt($('#un-processed-total-pages').text());
+var prevPageNoVal = parseInt($('#sel-page-un-processed-list').val());
+if (prevPageNoVal == NaN) {
+	prevPageNoVal = 0;
+}
+var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+pageNo = parseInt(pageNo);
+if (pageNo >= totalPage || pageNo <= 0) {
+	return false;
+}
+});
+
+$('#un-processed-paginate-btn').on('keyup', '#sel-page-un-processed-list', function(e) {
+if (e.which == 13) {
+	$(this).trigger('blur');
+}
+});
+
+$('#un-processed-paginate-btn').on('blur', '#sel-page-un-processed-list', function(e) {
+var batch = parseInt($('#un-processed-paginate-btn').attr("data-batch"));
+var pageNoVal = parseInt($('#sel-page-un-processed-list').val());
+ProcessedUserStartIndex= (pageNoVal - 1) * batch;
+$('#un-processed-paginate-btn').attr("data-start", ProcessedUserStartIndex);
+fetchProcessedUsers(ProcessedUserStartIndex);
+});
+}
 
 /**
  * Method to fetch users list based on the criteria i.e if profile level is
@@ -1330,6 +1494,27 @@ function fetchUsers(newIndex) {
 	}
 }
 
+function fetchUnmatchedUsers(newIndex) {
+	showOverlay();
+	var payload = {
+			"batchSize" : UnmatchedUserSize,
+			"startIndex" : newIndex
+		
+		};
+
+	callAjaxGetWithPayloadData("./getunmatchedpreinitiatedsurveys.do", paginateUnmatchedUser,payload, true);
+		
+}
+function fetchProcessedUsers(newIndex){
+	showOverlay();
+	var payload = {
+			"batchSize" : ProcessedUserSize,
+			"startIndex" : newIndex
+		
+		};
+
+	callAjaxGetWithPayloadData("./getprocessedpreinitiatedsurveys.do", paginateProcessedUser,payload, true);
+}
 // Function to validate registration form
 function validateFindProForm() {
 	$("#serverSideerror").hide();
@@ -1387,7 +1572,74 @@ function updatePaginationBtnsForProList() {
 	}
 	$('#sel-page-prolist').val(pageNo);
 }
+function updatePaginationBtnsForUnmatchedUser() {
+	var start = parseInt($('#un-new-paginate-btn').attr("data-start"));
+	var total = parseInt($('#un-new-paginate-btn').attr("data-total"));
+	var batch = parseInt($('#un-new-paginate-btn').attr("data-batch"));
 
+	// update previous button
+	if (start == 0) {
+		$('#un-new-prev').removeClass('paginate-button');
+	} else {
+		$('#un-new-prev').addClass('paginate-button');
+	}
+
+	// update next button
+	if (start + batch >= total) {
+		$('#un-new-next').removeClass('paginate-button');
+	} else {
+		$('#un-new-next').addClass('paginate-button');
+	}
+
+	// update page no
+	var pageNo = 0;
+	if (start < total) {
+		pageNo = (start / batch) + 1;
+	} else {
+		pageNo = start / batch;
+	}
+	var emptyPageNo = isNaN(pageNo);
+	if (emptyPageNo) {
+		$('#un-new-paginate-btn').attr("data-start", 0);
+		$('#un-new-prev').removeClass('paginate-button');
+		pageNo = 1;
+	}
+	$('#sel-page-un-new-list').val(pageNo);
+}
+function updatePaginationBtnsForProcessedUser(){
+	var startProcess = parseInt($('#un-processed-paginate-btn').attr("data-start"));
+	var totalProcess = parseInt($('#un-processed-paginate-btn').attr("data-total"));
+	var batchProcess = parseInt($('#un-processed-paginate-btn').attr("data-batch"));
+
+	// update previous button
+	if (startProcess == 0) {
+		$('#un-processed-prev').removeClass('paginate-button');
+	} else {
+		$('#un-processed-prev').addClass('paginate-button');
+	}
+
+	// update next button
+	if (startProcess + batchProcess >= totalProcess) {
+		$('#un-processed-next').removeClass('paginate-button');
+	} else {
+		$('#un-processed-next').addClass('paginate-button');
+	}
+
+	// update page no
+	var pageNoProcess = 0;
+	if (startProcess < totalProcess) {
+		pageNoProcess = startProcess / batchProcess + 1;
+	} else {
+		pageNoProcess = startProcess / batchProcess;
+	}
+	var emptyPageNo = isNaN(pageNoProcess);
+	if (emptyPageNo) {
+		$('#un-processed-paginate-btn').attr("data-start", 0);
+		$('#un-processed-prev').removeClass('paginate-button');
+		pageNoProcess = 1;
+	}
+	$('#sel-page-un-processed-list').val(pageNoProcess);
+}
 function paginateUsersProList(response) {
 	var reponseJson = $.parseJSON(response);
 	var start = parseInt($('#pro-paginate-btn').attr("data-start"));
@@ -1420,7 +1672,66 @@ function paginateUsersProList(response) {
 	scrollToTop();
 	hideOverlay();
 }
+function paginateUnmatchedUser(response) {
+	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#un-new-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#un-new-paginate-btn').attr("data-batch"));
 
+	// error message
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#new').append("No Data found");
+	} else {
+		if (start == 0) {
+			var usersSize = reponseJson.totalRecord;
+			if (usersSize > 0) {
+				$('#un-new-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+
+				$('#un-new-total-pages').text(totalPage);
+			}
+			
+		}
+		paintUnmatchedUser(reponseJson);
+	}
+	updatePaginationBtnsForUnmatchedUser();
+	hideOverlay();
+}
+function paginateProcessedUser(response){
+	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#un-processed-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#un-processed-paginate-btn').attr("data-batch"));
+
+	// error message
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#processed').append("No Data found");
+	} else {
+		if (start == 0) {
+			var usersSize = reponseJson.totalRecord;
+			if (usersSize > 0) {
+				$('#un-processed-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+
+				$('#un-processed-total-pages').text(totalPage);
+			}
+			
+		}
+		paintProcessedUser(reponseJson);
+	}
+	updatePaginationBtnsForProcessedUser();
+	hideOverlay();
+}
 function paintProList(usersList) {
 	if (usersList != undefined) {
 		var usersSize = usersList.length;
@@ -1510,6 +1821,174 @@ function paintProList(usersList) {
 			});
 		}
 	}
+}
+function undefinedval(hierval) {
+	  if (hierval == undefined) {
+	   return "";
+	  }else if(hierval == "null"){
+		  return "";
+	  }
+	  return hierval;
+	 }
+
+function paintUnmatchedUser(usersList) {
+	if (usersList != undefined) {
+		var usersSize = usersList.surveyPreInitiationList.length;
+
+		var untrack = "";
+		if (usersSize > 0) {
+			usersList.surveyPreInitiationList.forEach(function(arrayItem) {
+
+				 untrack += '<div class="un-row">'+
+				'						<div style="width:10%" class="float-left unmatchtab ss-id">'+undefinedval(arrayItem.surveySourceId)+'</div>'+
+				'						<div style="width:20%" class="float-left unmatchtab ss-eid">'+undefinedval(arrayItem.agentEmailId)+'</div>'+
+				'						<div style="width:40%" class="float-left unmatchtab ss-cname">'+undefinedval(arrayItem.customerFirstName)+'<span style="margin-left:2px;">'+ undefinedval(arrayItem.customerLastName)+'</span><span style="margin-left:2px;"> < '+undefinedval(arrayItem.customerEmailId)+' > </span></div>'+
+				'						<div style="width:20%" class="float-left unmatchtab ss-date">'+undefinedval(arrayItem.createdOn)+'</div>'+
+				'						<div style="width:10%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'+
+				'						</div>';
+					
+			});
+			
+			$('#new').html(untrack);
+			 bindClickEventForProcessButton();
+
+		}
+	}
+}
+function paintProcessedUser(usersList){
+	if (usersList != undefined) {
+		var usersSize = usersList.surveyPreInitiationList.length;
+
+		var unprocess = "";
+		if (usersSize > 0) {
+			usersList.surveyPreInitiationList.forEach(function(arrayItem) {
+				if(undefinedval(arrayItem.status)==9){
+					var action="Always Ignore";
+				}else{
+
+					var action="Aliased";
+				}
+				unprocess += '<div class="un-row">'+
+						'						<div style="width:10%" class="float-left unmatchtab ss-id">'+undefinedval(arrayItem.surveySourceId)+'</div>'+
+						'						<div style="width:20%" class="float-left unmatchtab ss-eid">'+undefinedval(arrayItem.agentEmailId)+'</div>'+
+						'						<div style="width:40%" class="float-left unmatchtab ss-cname">'+undefinedval(arrayItem.customerFirstName)+'<span style="margin-left:2px;">'+ undefinedval(arrayItem.customerLastName)+'</span><span style="margin-left:2px;"> < '+undefinedval(arrayItem.customerEmailId)+' > </span></div>'+
+						'						<div style="width:20%" class="float-left unmatchtab ss-date">'+undefinedval(arrayItem.createdOn)+'</div>'+
+						'						<div style="width:10%" class="float-left unmatchtab" >'+action+'</div>'+
+						'						</div>';
+							
+					});
+			
+			$('#processed').html(unprocess);
+
+		}
+	}
+}
+
+function bindClickEventForProcessButton(){
+	
+	$('.ss-process').click(function(e){
+		var id=$(this).parent().find(".ss-id").text();
+		var user=$(this).parent().find(".ss-eid").text();
+		var customer=$(this).parent().find(".ss-cname").text();
+
+
+		var popup = '<div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">ID</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+id+'</div>'+
+		'	 </div>'+
+		'	 <div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">User</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+user+'</div>'+
+		'	 </div>'+
+		'<div class="bd-hr-form-item clearfix">'+
+		'	     <div class="float-left bd-frm-left-un">Customer</div>'+
+		'	      <div class="float-left bd-frm-right-un">'+customer+'</div>'+
+		'	 </div><div class="bd-hr-form-item clearfix" id="ignore">'+
+		'	     <div class="float-left bd-frm-left-un"></div>'+
+		'	     <div class="float-left bd-frm-right">'+
+		'	         <div class="bd-frm-check-wrapper clearfix bd-check-wrp">'+
+		'	             <div class="float-left bd-check-img bd-check-img-checked"></div>'+
+		'	             <input type="hidden" name="isIgnore" value="false" id="is-ignore" class="ignore-clear">'+
+		'	             <div class="float-left bd-check-txt bd-check-sm">Always Ignore</div>'+
+		'	         </div>'+
+		'	     </div>'+
+		'	 </div>'+
+		'<div id="bd-single" class="bd-hr-form-item clearfix">'+
+		'	    <div class="float-left bd-frm-left-un">Alias</div>'+
+		'	    <div class="float-left bd-frm-left-un pos-relative">'+
+		'	        <input id="match-user-email" class="bd-frm-rt-txt bd-dd-img">'+
+		'	    </div>'+
+		'	</div>';
+			
+
+	
+		e.stopPropagation();
+		$('#overlay-continue').html("Save");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-header').html("Match User");
+		$('#overlay-text').html(popup);
+		
+		
+		$('#overlay-continue').click(function(){
+			saveUserMap(user);
+			$('#overlay-continue').unbind('click');
+		});
+		$('#overlay-main').show();
+		bindAdminCheckBoxClick();
+		attachAutocompleteAliasDropdown();
+	});
+	if($('#is-ignore').val()==true){
+	if($('#match-user-email').val()!=""){
+		$('#match-user-email').val('');
+		$('#match-user-email').attr('agent-id' , 0);
+	$('#match-user-email').attr("disabled");
+	}
+}
+	
+
+}
+
+var insaved= false;
+function saveUserMap(aliasMail){
+	if(insaved==true){
+		return;
+	}
+	var isIgnore=$('#is-ignore').val();
+	var agentId=$('#match-user-email').attr('agent-id');
+	
+	if(isIgnore == 'true'){
+		agentId = 0;
+	}else{
+		if(agentId == undefined || agentId <=0){
+			$('#overlay-toast').html('Please enter valid alias!');
+			showToast();			
+			return;
+		}
+			
+	}
+
+	insaved==true;
+	var payload = {
+			"emailAddress" : aliasMail,
+			"agentId" : agentId,
+			"ignoredEmail" : isIgnore
+		
+		};
+		
+		isAjaxRequestRunningProcessedUser = true;
+
+		callAjaxGetWithPayloadData('./saveemailmapping.do', function(data){
+			insaved==false;
+			$('#overlay-main').hide();
+			$('#overlay-toast').html(data);
+			showToast();
+			
+			initializeUnmatchedUserPage();
+			initializeProcesedUserPage();
+			
+			
+		}, payload, true);
+	
 }
 
 /**
@@ -2042,6 +2521,7 @@ var hierarchyUpload = {
 				.change(
 						function() {
 							$('#summary').hide();
+							$('#xlsx-file-upload').addClass('disable');
 							var fileAdd = $(this).val().split('\\');
 							$('#com-xlsx-file')
 									.val(fileAdd[fileAdd.length - 1]);
@@ -2050,16 +2530,15 @@ var hierarchyUpload = {
 							}
 
 							if (hierarchyUpload.verified == false) {
-								$('#xlsx-file-verify').css("pointerEvents",
-										"none");
+								$('#xlsx-file-verify').addClass('disable');
 								showError("Please upload xlsx file");
 							}
 
 							if (hierarchyUpload.verified == true) {
 								hierarchyUpload.canUpload = true;
 								hierarchyUpload.verified = false;
-								$('#xlsx-file-verify').css("pointerEvents",
-										"auto");
+								$('#xlsx-file-verify').removeClass('disable');
+
 								var formData = new FormData();
 								formData.append("file", $('#com-file').prop(
 										"files")[0]);
@@ -2073,8 +2552,7 @@ var hierarchyUpload = {
 							}
 
 							else {
-								$('#xlsx-file-verify').css("pointerEvents",
-										"none");
+								$('#xlsx-file-verify').addClass('disable');
 								showError("Please select a valid file");
 							}
 						});
@@ -2099,8 +2577,7 @@ var hierarchyUpload = {
 							} else {
 								var url = $("#fileUrl").val();
 								if (url == undefined || url == '') {
-									$('#xlsx-file-verify').css("pointerEvents",
-											"none");
+									$('#xlsx-file-verify').addClass('disable');
 									showError("Please upload a valid file");
 								} else {
 									var formData = new FormData();
@@ -2181,7 +2658,7 @@ var hierarchyUpload = {
 		$('#com-xlsx-file').val('');
 		$('#fileUrl').val('');
 		$('#summary').hide();
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 	},
 
 	uploadXlxsSuccessCallback : function(response) {
@@ -2286,7 +2763,6 @@ var hierarchyUpload = {
 
 						} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
 							var color = '#FF3400';
-
 						} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isRegionModified == true) {
 							var color = '#009FE0';
 
@@ -2460,6 +2936,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-region-edit" style="background-color: #F9F9FB;" ><td colspan="9">'
 										+ regionEdit + '</td></tr>').appendTo(
 								'#region-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
+							$('#editRegion-' + i).addClass('disable');
+						}
 					}
 					$('#region-sum-btn').show();
 					$('#summary').show();
@@ -2668,6 +3148,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-branch-edit" style="background-color: #F9F9FB;" ><td colspan="10">'
 										+ branchEdit + '</td></tr>').appendTo(
 								'#branch-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.branches[i].isDeletedRecord == true) {
+							$('#editBranch-' + i).addClass('disable');
+						}
 					}
 					$('#branch-sum-btn').show();
 					if (regionlength == 0) {
@@ -2699,7 +3183,7 @@ var hierarchyUpload = {
 
 						var sendMailCode = "";
 
-						if (!hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified
+						if ((!hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified && !hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord)
 								|| hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded) {
 							// Add checkbox only for users who aren't verified
 							// and new users
@@ -3036,6 +3520,10 @@ var hierarchyUpload = {
 										+ '</div></td></tr><tr class="hide hier-users-edit" style="background-color: #F9F9FB;" ><td colspan="17">'
 										+ userEdit + '</td></tr>').appendTo(
 								'#user-upload');
+
+						if (hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord == true) {
+							$('#editUser-' + i).addClass('disable');
+						}
 					}
 					$('#user-sum-btn').show();
 					if (regionlength == 0 && branchlength == 0) {
@@ -3050,7 +3538,7 @@ var hierarchyUpload = {
 				if ((hierarchyUpload.hierarchyJson.regionValidationErrors == null || hierarchyUpload.hierarchyJson.regionValidationErrors.length == 0)
 						&& (hierarchyUpload.hierarchyJson.branchValidationErrors == null || hierarchyUpload.hierarchyJson.branchValidationErrors.length == 0)
 						&& (hierarchyUpload.hierarchyJson.userValidationErrors == null || hierarchyUpload.hierarchyJson.userValidationErrors.length == 0)) {
-					$('#xlsx-file-upload').css("pointerEvents", "auto");
+					$('#xlsx-file-upload').removeClass('disable');
 					showInfo("Data verified sucessfully with no validation errors.");
 				} else {
 					showError("There are some validation errors which need to be resolved before uploading the data.");
@@ -3143,11 +3631,11 @@ var hierarchyUpload = {
 		if (data.validationErrors.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/abuse.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/abuse.png" style="width: 18px; height: 18px"></span>';
 		} else if (data.validationWarnings.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/icn-neutral-mood.png" style="width: 15px"></span>';
+					+ '"><img src="resources/images/warning.png" style="width: 18px; height: 18px"></span>';
 		}
 		return toolTip;
 	},
@@ -3195,7 +3683,7 @@ var hierarchyUpload = {
 		$('#editRegion-' + i).parent().next('.hier-region-edit').slideToggle(
 				200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the region. Please click on 'Verify' button to validate the data!!");
 	},
 
@@ -3255,7 +3743,7 @@ var hierarchyUpload = {
 		$('#editBranch-' + i).parent().next('.hier-branch-edit').slideToggle(
 				200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the branch. Please click on 'Verify' button to validate the data!!");
 	},
 
@@ -3394,7 +3882,7 @@ var hierarchyUpload = {
 
 		$('#editUser-' + i).parent().next('.hier-users-edit').slideToggle(200);
 
-		$('#xlsx-file-upload').css("pointerEvents", "none");
+		$('#xlsx-file-upload').addClass('disable');
 		showInfo("Successfully modified the user. Please click on 'Verify' button to validate the data!!");
 	},
 
