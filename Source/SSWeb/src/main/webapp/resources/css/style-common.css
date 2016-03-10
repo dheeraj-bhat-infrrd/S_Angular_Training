@@ -8456,7 +8456,11 @@ label.url-change-input-label {
 	min-width: 180px;
 }
 
+.empty-field{
+	border:1px solid #D0021B;
+}
 .disable {
 	opacity: 0.4;
 	pointer-events: none;
 }
+
