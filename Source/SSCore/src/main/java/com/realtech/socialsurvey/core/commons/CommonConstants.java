@@ -1069,6 +1069,19 @@ public interface CommonConstants
     public static final int HIERARCHY_UPLOAD_DELETING_REGIONS = 7;
     public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 8;
     public static final int HIERARCHY_UPLOAD_ERROR = 9;
+    public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 10;
     
+    //Hierarchy upload message constants
+    public static final String UPLOAD_MSG_INITIATED = "Import initiated";
+    public static final String UPLOAD_MSG_STARTED = "Import started";
+    public static final String UPLOAD_MSG_UPLOADING_REGIONS = "Importing regions";
+    public static final String UPLOAD_MSG_UPLOADING_BRANCHES = "Importing offices";
+    public static final String UPLOAD_MSG_UPLOADING_USERS = "Importing users";
+    public static final String UPLOAD_MSG_DELETING_USERS = "Deleting removed users";
+    public static final String UPLOAD_MSG_DELETING_BRANCHES = "Deleting removed offices";
+    public static final String UPLOAD_MSG_DELETING_REGIONS = "Deleting removed regions";
+    public static final String UPLOAD_MSG_UPLOAD_COMPLETE = "Import successful";
+    public static final String UPLOAD_MSG_UPLOAD_ERROR = "Error importing comany hierarchy";
+    public static final String UPLOAD_MSG_NO_UPLOAD = "";
     
 }

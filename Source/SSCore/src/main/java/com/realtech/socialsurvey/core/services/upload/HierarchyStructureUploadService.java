@@ -45,4 +45,20 @@ public interface HierarchyStructureUploadService
      * @throws InvalidInputException
      */
     public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException;
+
+    public void addNewUploadRequest( User adminUser );
+
+    public UploadStatus fetchLatestUploadStatus( Company company );
+
+    public void uploadUsers( HierarchyUpload upload, User adminUser, List<String> errorList );
+
+    public void deleteUsers( HierarchyUpload upload, User adminUser, Company company, List<String> errorList );
+
+    public void uploadRegions( HierarchyUpload upload, User user, Company company, List<String> errorList );
+
+    public void uploadBranches( HierarchyUpload upload, User user, Company company, List<String> errorList );
+
+    public void deleteRegions( HierarchyUpload upload, User adminUser, Company company, List<String> errorList );
+
+    public void deleteBranches( HierarchyUpload upload, User adminUser, Company company, List<String> errorList );
 }
