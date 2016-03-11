@@ -135,8 +135,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Autowired
     private ProfileManagementService profileManagementService;
 
-    @Autowired
-    private ZillowUpdateService zillowUpdateService;
+//    @Autowired
+//    private ZillowUpdateService zillowUpdateService;
 
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;

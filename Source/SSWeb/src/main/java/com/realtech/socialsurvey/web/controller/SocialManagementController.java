@@ -86,6 +86,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
@@ -218,10 +219,11 @@ public class SocialManagementController
     
     @Value ( "${ZILLOW_ENDPOINT}")
     private String zillowEndpoint;
-    
+
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
-    
+
+
     /**
      * Returns the social authorization page
      * 
@@ -1831,6 +1833,11 @@ public class SocialManagementController
                 if ( userSettings == null || entityType == null || profileSettings == null) {
                     throw new InvalidInputException( "No user settings found in session" );
                 }
+                // if user has changed his Zillow account, then delete existing Zillow reviews
+                if ( checkZillowAccountChanged( profileSettings, zillowScreenName ) ) {
+                    LOG.debug("Deleting zillow feed for agent ID : " + profileSettings.getIden());
+                    surveyHandler.deleteExistingZillowSurveysByEntity( entityType, profileSettings.getIden());
+                }
                 
                 String errorCode = request.getParameter( "error" );
                 if ( errorCode != null ) {
@@ -1935,13 +1942,8 @@ public class SocialManagementController
                                         //         zillowTotalScore += Double.valueOf( rating );
                                         //     }
                                         // }
-                                        //TODO : get a confirmation on this
-                                        // check if user had changed his Zillow account
-                                        if(checkZillowAccountChanged(profileSettings,zillowScreenName)){
-                                            
-                                        }
-                                        profileManagementService.buildSurveyDetailsFromReviewMap( reviews, collectionName,
-                                            profileSettings, user.getCompany().getCompanyId(), false, false );
+                                        organizationManagementService.pushZillowReviews( reviews, collectionName, profileSettings, user
+                                            .getCompany().getCompanyId() );
                                     }
                                 }
                             }
@@ -2614,14 +2616,20 @@ public class SocialManagementController
     //TODO : get a confirmation on this
     private boolean checkZillowAccountChanged( OrganizationUnitSettings profileSettings, String zillowScreenName )
     {
-        if ( profileSettings == null ) {
-            LOG.error( "profileSettings passed cannot be null or empty in checkZillowAccountChanged()" );
+        if ( profileSettings == null || profileSettings.getSocialMediaTokens() == null
+            || profileSettings.getSocialMediaTokens().getZillowToken() == null
+            || profileSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName() == null ) {
+            LOG.error( "zillow settings missing in profile id : " + profileSettings.getIden()
+                + " in checkZillowAccountChanged()" );
             return false;
         }
         if ( zillowScreenName == null || zillowScreenName.isEmpty() ) {
-            LOG.error( "zillowScreenName passed cannot be null or empty in checkZillowAccountChanged()" );
+            LOG.error( "zillowScreenName passed is null or empty in checkZillowAccountChanged()" );
             return false;
         }
-        return true;
+        if ( !profileSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName().equalsIgnoreCase( zillowScreenName ) ) {
+            return true;
+        }
+        return false;
     }
 }

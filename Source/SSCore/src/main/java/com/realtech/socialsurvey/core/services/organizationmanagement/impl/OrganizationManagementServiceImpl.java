@@ -120,6 +120,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -286,6 +287,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Value ( "${BATCH_SIZE}")
     private int pageSize;
+
+    @Autowired
+    private ZillowUpdateService zillowUpdateService;
     
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -6491,6 +6495,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         // read the file
 
         return null;
+    }
+
+
+    @Override
+    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+        OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException
+    {
+        zillowUpdateService.pushZillowReviews( reviews, collectionName, profileSettings, companyId );
     }
 }
 // JIRA: SS-27: By RM05: EOC

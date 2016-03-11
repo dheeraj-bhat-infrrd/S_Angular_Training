@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1292,4 +1293,8 @@ public interface OrganizationManagementService
 
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,
         boolean holdSendingMail, boolean sendMail ) throws InvalidInputException;
+
+
+    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+        OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException;
 }
