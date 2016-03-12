@@ -8463,4 +8463,13 @@ label.url-change-input-label {
 	opacity: 0.4;
 	pointer-events: none;
 }
-
+.widget-display{
+	border: 1px solid #dcdcdc;
+	height: 405px !important;
+	padding: 10px;
+	margin: 1px;
+}
+.widget-btn-cpy{
+	margin-left: auto;
+	margin-right: auto;
+}

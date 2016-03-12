@@ -39,16 +39,16 @@
 			<spring:message code="label.widgetheader.key" />
 		</div>
 		<div class="clearfix st-score-wrapper" style="height: 600px">
-			<div id="basic-widget-view" class="float-left st-score-txt"></div>
-			<div class="clearfix float-right st-score-rt pos-relative">
-				<div class="float-left" style="padding: 0px 20px 0px 100px;">
-					<div class="st-widget-txt">
+			<div id="basic-widget-view" class="float-left st-score-txt widget-display" ></div>
+			<div class="clearfix float-right st-score-rt pos-relative widget-code" style="width: 40%;">
+				<div style="padding:5px">
+					<div class="st-widget-txt" style="font-weight: 600 !important;">
 						<spring:message code="label.widgetdesc.key" />
 					</div>
 					<div id="widget-container" class="prof-user-address prof-edit-icn">
 						<textarea id="widget-code-area"></textarea>
 					</div>
-					<div class="float-left ol-btn-wrapper">
+					<div class="ol-btn-wrapper widget-copy widget-btn-cpy" >
 						<div id="overlay-continue" class="ol-btn cursor-pointer"
 							onclick="javascript:copyToClipboard('widget-code-area')">Copy
 							to clipboard</div>
