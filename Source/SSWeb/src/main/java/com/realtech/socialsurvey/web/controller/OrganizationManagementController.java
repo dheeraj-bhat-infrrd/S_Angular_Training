@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -2828,13 +2828,12 @@ public class OrganizationManagementController
         String hierarchyJson = request.getParameter( "hierarchyJson" );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
-            // Insert upload validation object in mongo
-            //TODO : Save this in the new collection?
+            User user = sessionHelper.getCurrentUser();
+            //Insert hieararchy upload in UPLOAD_HIERARCHY_DETAILS collections
             hierarchyStructureUploadService.saveHierarchyUploadInMongo( uploadValidation.getUpload() );
 
-            //TODO: Remove all other UPLOAD_STATUS entries from the same company, if present
-            //TODO: Insert a row in UPLOAD_STATUS with status = 1
-            
+            //Initiate upload by adding entry in upload status table
+            hierarchyStructureUploadService.addNewUploadRequest( user );
             response = "Hierarchy upload batch is initialized successfully";
         } catch ( Exception ex ) {
             status = false;
@@ -2846,37 +2845,38 @@ public class OrganizationManagementController
         return new Gson().toJson( responseMap );
     }
 
-    private static int count = -1;
+
 
     @ResponseBody
     @RequestMapping ( value = "/fetchUploadBatchStatus", method = RequestMethod.POST)
     public String fetchUploadBatchStatus( Model model, HttpServletRequest request ) throws InvalidInputException
     {
         LOG.info( "Fetching the latest batch processing message" );
-        count++;
+        //TODO: Get the actual stuff instead
+        User user = sessionHelper.getCurrentUser();
         boolean status = true;
         String response = null;
-        Map<Integer, String> responseMap1 = new HashMap<Integer, String>();
-        responseMap1.put( 0, "Upload batch initializing" );
-        responseMap1.put( 1, "Upload batch starting" );
-        responseMap1.put( 2, "Regions upload in progress" );
-        responseMap1.put( 3, "Offices upload in progress" );
-        responseMap1.put( 4, "Users upload in progress" );
-        responseMap1.put( 5, "Upload completed" );
+        UploadStatus latestStatus = hierarchyStructureUploadService.fetchLatestUploadStatus( user.getCompany() );
+        int uploadStatus = -1;
+        String lastUploadRunTimestamp = null;
         try {
-            // Fetch the latest message from UPLOAD_STATUS
-            response = responseMap1.get( count );
-
-        } catch ( Exception ex ) {
+            if ( latestStatus == null ) {
+                response = CommonConstants.UPLOAD_MSG_NO_UPLOAD;
+            } else {
+                response = latestStatus.getMessage();
+                lastUploadRunTimestamp = latestStatus.getModifiedOn().toString();
+                uploadStatus = latestStatus.getStatus();
+            }
+        } catch ( Exception e ) {
             status = false;
-            response = ex.getMessage();
+            response = e.getMessage();
         }
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
         responseMap.put( "response", response );
-        responseMap.put( "uploadStatus", count );
+        responseMap.put( "uploadStatus", uploadStatus );
         // Fetch the last uploaded timestamp from db and put it in responseMap
-        responseMap.put( "lastUploadRunTimestamp", ( new Date() ).toString() );
+        responseMap.put( "lastUploadRunTimestamp", lastUploadRunTimestamp );
         return new Gson().toJson( responseMap );
     }
 

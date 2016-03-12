@@ -117,7 +117,6 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Override
-    @Transactional
     public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user ) throws InvalidInputException
     {
         // the upload object should have the current value as well the changes made by the user in the sheet/ UI
@@ -146,7 +145,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         List<String> regionDeleteErrors = new ArrayList<String>();
         // start with addition and modification of each unit starting from the highest hierarchy and then deletion starting from the lowest hierarchy
         // uploading regions
-        //TODO: Add appropriate upload statuses at each stage
+        //Add appropriate upload statuses at each stage
         uploadRegions( upload, user, company, regionUploadErrors );
         // Uploading branches
         uploadBranches( upload, user, company, branchUploadErrors );
@@ -185,9 +184,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void deleteUsers( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
+    @Override
+    public void deleteUsers( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.debug( "Deleting removed users" );
+        
+        //Add new upload status
+        UploadStatus userDeleteStatus = new UploadStatus();
+        userDeleteStatus.setAdminUserId( adminUser.getUserId() );
+        userDeleteStatus.setCompany( adminUser.getCompany() );
+        userDeleteStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_DELETING_USERS );
+        userDeleteStatus.setMessage( CommonConstants.UPLOAD_MSG_DELETING_USERS );
+        addUploadStatusEntry( userDeleteStatus );
+        
         List<UserUploadVO> userList = upload.getUsers();
         if ( userList == null || userList.isEmpty() ) {
             LOG.warn( "Empty userList" );
@@ -217,9 +226,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void deleteBranches( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
+    @Override
+    public void deleteBranches( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.info( "Deleting branches" );
+        
+        //Add new upload status
+        UploadStatus branchDeleteStatus = new UploadStatus();
+        branchDeleteStatus.setAdminUserId( adminUser.getUserId() );
+        branchDeleteStatus.setCompany( adminUser.getCompany() );
+        branchDeleteStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_DELETING_BRANCHES );
+        branchDeleteStatus.setMessage( CommonConstants.UPLOAD_MSG_DELETING_BRANCHES );
+        addUploadStatusEntry( branchDeleteStatus );
+        
         List<BranchUploadVO> branches = upload.getBranches();
         if ( branches == null || branches.isEmpty() ) {
             LOG.warn( "Empty branch list" );
@@ -269,9 +288,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void deleteRegions( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
+    @Override
+    public void deleteRegions( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.info( "Deleting regions" );
+        
+        //Add new upload status
+        UploadStatus regionDeleteStatus = new UploadStatus();
+        regionDeleteStatus.setAdminUserId( adminUser.getUserId() );
+        regionDeleteStatus.setCompany( adminUser.getCompany() );
+        regionDeleteStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_DELETING_REGIONS );
+        regionDeleteStatus.setMessage( CommonConstants.UPLOAD_MSG_DELETING_REGIONS );
+        addUploadStatusEntry( regionDeleteStatus );
+        
         List<RegionUploadVO> regions = upload.getRegions();
         if ( regions == null || regions.isEmpty() ) {
             LOG.warn( "Empty region list" );
@@ -323,9 +352,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void uploadBranches( HierarchyUpload upload, User user, Company company, List<String> errorList )
+    @Override
+    public void uploadBranches( HierarchyUpload upload, User user, Company company, List<String> errorList )
     {
         LOG.debug( "Uploading new branches" );
+        
+        //Add new upload status
+        UploadStatus branchUploadStatus = new UploadStatus();
+        branchUploadStatus.setAdminUserId( user.getUserId() );
+        branchUploadStatus.setCompany( company );
+        branchUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_UPLOADING_BRANCHES );
+        branchUploadStatus.setMessage( CommonConstants.UPLOAD_MSG_UPLOADING_BRANCHES );
+        addUploadStatusEntry( branchUploadStatus );
+        
         List<BranchUploadVO> branchesToBeUploaded = upload.getBranches();
         if ( branchesToBeUploaded != null && !branchesToBeUploaded.isEmpty() ) {
             Branch branch = null;
@@ -480,9 +519,20 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void uploadRegions( HierarchyUpload upload, User user, Company company, List<String> errorList )
+    @Override
+    public void uploadRegions( HierarchyUpload upload, User user, Company company, List<String> errorList )
     {
         LOG.debug( "Uploading new regions." );
+        
+        //Add new upload status
+        UploadStatus regionUploadStatus = new UploadStatus();
+        regionUploadStatus.setAdminUserId( user.getUserId() );
+        regionUploadStatus.setCompany( company );
+        regionUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_UPLOADING_REGIONS );
+        regionUploadStatus.setMessage( CommonConstants.UPLOAD_MSG_UPLOADING_REGIONS );
+        addUploadStatusEntry( regionUploadStatus );
+        
+        
         List<RegionUploadVO> regionsToBeUploaded = upload.getRegions();
         if ( regionsToBeUploaded != null && !regionsToBeUploaded.isEmpty() ) {
             Region region = null;
@@ -1909,9 +1959,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param adminUser
      */
     @Transactional ( propagation = Propagation.REQUIRES_NEW)
-    void uploadUsers( HierarchyUpload upload, User adminUser, List<String> errorList )
+    @Override
+    public void uploadUsers( HierarchyUpload upload, User adminUser, List<String> errorList )
     {
         LOG.debug( "Uploading users to database" );
+        
+        //Add new upload status
+        UploadStatus userUploadStatus = new UploadStatus();
+        userUploadStatus.setAdminUserId( adminUser.getUserId() );
+        userUploadStatus.setCompany( adminUser.getCompany() );
+        userUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_UPLOADING_USERS );
+        userUploadStatus.setMessage( CommonConstants.UPLOAD_MSG_UPLOADING_USERS );
+        addUploadStatusEntry( userUploadStatus );
+        
         Map<String, UserUploadVO> currentUserMap = new HashMap<String, UserUploadVO>();
         try {
             HierarchyUpload currentUpload = hierarchyUploadDao
@@ -2179,6 +2239,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param uploadStatus
      */
     @Override
+    @Transactional ( propagation = Propagation.REQUIRES_NEW)
     public void updateUploadStatus( UploadStatus uploadStatus )
     {
         LOG.info( "Updating uploadStatus" );
@@ -2193,6 +2254,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param uploadStatus
      */
     @Override
+    @Transactional ( propagation = Propagation.REQUIRES_NEW)
     public void addUploadStatusEntry( UploadStatus uploadStatus )
     {
         LOG.info( "Adding uploadStatus entry" );
@@ -2200,6 +2262,74 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadStatus.setModifiedOn( currentTime );
         uploadStatus.setCreatedOn( currentTime );
         uploadStatusDao.save( uploadStatus );
+    }
+    
+    
+    /**
+     * Method to fetch the latest upload status
+     * @param company
+     * @return
+     */
+    @Override
+    public UploadStatus fetchLatestUploadStatus( Company company )
+    {
+        LOG.info( "Method to fetch latest uploadStatus started for company " + company.getCompany() );
+        UploadStatus latestStatus = null;
+
+        //Get a list of all the statuses
+        List<UploadStatus> uploadStatuses = uploadStatusDao.findByColumn( UploadStatus.class, "company.companyId",
+            company.getCompanyId() );
+        if ( uploadStatuses != null && !uploadStatuses.isEmpty() ) {
+            for ( UploadStatus uploadStatus : uploadStatuses ) {
+                latestStatus = newerStatus( latestStatus, uploadStatus );
+            }
+        }
+
+        return latestStatus;
+    }
+    
+
+    /**
+     * Method to select the newer status
+     * @param currentStatus
+     * @param newStatus
+     * @return
+     */
+    UploadStatus newerStatus( UploadStatus currentStatus, UploadStatus newStatus )
+    {
+        //Least status will always be 0 or 1. Can't have both
+
+        //When we get the first status
+        if ( currentStatus == null ) {
+            return newStatus;
+        }
+        if ( currentStatus.getStatus() > newStatus.getStatus() ) {
+            return currentStatus;
+        } else {
+            return newStatus;
+        }
+    }
+    
+    
+    /**
+     * Method to initiate hierarchy upload
+     * @param adminUser
+     */
+    @Override
+    public void addNewUploadRequest( User adminUser )
+    {
+        //Remove old records for the company
+        List<String> conditions = new ArrayList<String>();
+        conditions.add( "company.companyId = " + adminUser.getCompany().getCompanyId() );
+        uploadStatusDao.deleteByCondition( "UploadStatus", conditions );
+
+        //Add new entry
+        UploadStatus newStatus = new UploadStatus();
+        newStatus.setAdminUserId( adminUser.getUserId() );
+        newStatus.setCompany( adminUser.getCompany() );
+        newStatus.setMessage( CommonConstants.UPLOAD_MSG_INITIATED );
+        newStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_INITIATED );
+        addUploadStatusEntry( newStatus );
     }
     
     
@@ -2235,6 +2365,6 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     @Override
     public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException
     {
-        hierarchyUploadDao.saveHierarchyUploadObject( upload );
+        hierarchyUploadDao.saveUploadHierarchyDetails( upload );
     }
 }

@@ -2560,6 +2560,7 @@ var hierarchyUpload = {
 		}
 		return hierval.trim();
 	},
+	getStatusCall : undefined,
 
 	fileUpload : function() {
 		$('#com-file')
@@ -2677,8 +2678,13 @@ var hierarchyUpload = {
 		$('#xlsVerifyUplaod').addClass('disable');
 		$('#xlsx-file-upload').addClass('disable');
 	},
-
+	
 	fetchUploadBatchStatusCallback : function(response) {
+		$(window).on('hashchange', function() {
+			if (hierarchyUpload.getStatusCall != undefined) {
+				hierarchyUpload.getStatusCall.abort();
+			}
+		});
 		if (!response) {
 			$('#com-file').val('');
 			$('#com-xlsx-file').val('');
@@ -2689,16 +2695,26 @@ var hierarchyUpload = {
 			if (!jsonResponse.status) {
 				showError(jsonResponse.response);
 			} else {
-				if (jsonResponse.uploadStatus < 6) {
+				//If not complete/error, keep making a request every 15 seconds
+				if ( !(jsonResponse.uploadStatus == 9 || jsonResponse.uploadStatus == 8
+						|| jsonResponse.uploadStatus == -1 ) ) {
 					$('#uploadBatchStatus').empty();
 					$('<div>' + jsonResponse.response + '</div>').appendTo(
 							'#uploadBatchStatus');
 					$('#uploadBatchStatus').show();
 					showLoaderOnPagination($('#uploadBatchStatus'));
-					setTimeout(callAjaxPOSTWithTextDataUpload("./fetchUploadBatchStatus.do",
-							hierarchyUpload.fetchUploadBatchStatusCallback, true,
-							null), 15000);
+					setTimeout(function(){
+								hierarchyUpload.getStatusCall = callAjaxPOSTWithTextDataUpload(
+										"./fetchUploadBatchStatus.do",
+										hierarchyUpload.fetchUploadBatchStatusCallback,
+										true, null);
+					}, 15000);
 				} else {
+					if (response != undefined && response != null && response != '') {
+						$('<div>' + jsonResponse.response + '</div>').appendTo(
+								'#uploadBatchStatus');
+						$('#uploadBatchStatus').show();
+					}
 					hideLoaderOnPagination($('#uploadBatchStatus'));
 					$('#xlsVerifyUplaod').removeClass('disable');
 				}
@@ -2712,6 +2728,7 @@ var hierarchyUpload = {
 			}
 		}
 	},
+	
 
 	uploadXlxsSuccessCallback : function(response) {
 		if (!response) {

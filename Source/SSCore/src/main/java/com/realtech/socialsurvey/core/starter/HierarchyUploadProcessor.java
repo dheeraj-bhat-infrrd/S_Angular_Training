@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 
+
 @Component
 public class HierarchyUploadProcessor implements Runnable
 {
@@ -48,6 +49,7 @@ public class HierarchyUploadProcessor implements Runnable
                         try {
                             // Update uploadStatus to 0
                             uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_PROCESSING );
+                            uploadStatus.setMessage( CommonConstants.UPLOAD_MSG_STARTED );
                             hierarchyStructureUploadService.updateUploadStatus( uploadStatus );
                             //Upload hierarchy
                             HierarchyUpload hierarchyUpload = hierarchyStructureUploadService
@@ -68,7 +70,8 @@ public class HierarchyUploadProcessor implements Runnable
                             //If error occurs, add uploadStatus ERROR and store message
                             UploadStatus errorUploadStatus = new UploadStatus();
                             errorUploadStatus.setCompany( company );
-                            errorUploadStatus.setMessage( "ERROR : " + e.getMessage() );
+                            errorUploadStatus.setMessage( CommonConstants.UPLOAD_MSG_UPLOAD_ERROR + ". ERROR: "
+                                + e.getMessage() );
                             errorUploadStatus.setAdminUserId( adminUser.getUserId() );
                             errorUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ERROR );
                             hierarchyStructureUploadService.addUploadStatusEntry( errorUploadStatus );
