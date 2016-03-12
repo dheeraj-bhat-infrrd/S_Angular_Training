@@ -113,7 +113,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
@@ -231,8 +230,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
-    @Autowired
-    private ZillowUpdateService zillowUpdateService;
+//    @Autowired
+//    private ZillowUpdateService zillowUpdateService;
 
     @Autowired
     private ZillowHierarchyDao zillowHierarchyDao;
@@ -4406,7 +4405,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    @Transactional
     public List<SurveyDetails> buildSurveyDetailsFromReviewMap( List<HashMap<String, Object>> reviews, String collectionName,
         OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException
     {
@@ -4468,7 +4466,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     surveyDetails.setAgentId( profile.getIden() );
                     if ( profile.getContact_details() != null && profile.getContact_details().getName() != null
                         && profile.getContact_details().getName().trim().length() > 0 ) {
-                        surveyDetails.setAgentName(profile.getContact_details().getName());
+                        surveyDetails.setAgentName( profile.getContact_details().getName() );
                     }
                     surveyDetails.setCompanyId( companyId );
                 }
@@ -4495,15 +4493,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 // else
                 //    zillowReviewScoreTotal += surveyDetails.getScore();
             }
-            
-            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
-                && fromBatch ) {
-                try {
-                    pushToZillowPostTemp( profile, collectionName, surveyDetails, review );
-                } catch ( Exception e ) {
-                    LOG.error( "Exception occurred while pushing Zillow review into temp table. Reason :", e );
-                }
+
+            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) && fromBatch ) {
+                postToTempTable( collectionName, profile, surveyDetails, review );
             }
+
             if ( fromPublicPage ) {
                 String reviewDesc = surveyDetails.getReview();
                 if ( reviewDescription != null && !reviewDescription.isEmpty() ) {
@@ -4591,5 +4585,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         zillowTempPostDao.saveOrUpdateZillowTempPost( zillowTempPost );
 
         LOG.info( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp ended" );
+    }
+
+
+    @Transactional
+    public void postToTempTable( String collectionName, OrganizationUnitSettings profile,
+        SurveyDetails surveyDetails, Map<String, Object> review )
+    {
+        try {
+            pushToZillowPostTemp( profile, collectionName, surveyDetails, review );
+        } catch ( Exception e ) {
+            LOG.error( "Exception occurred while pushing Zillow review into temp table. Reason :", e );
+        }
     }
 }
