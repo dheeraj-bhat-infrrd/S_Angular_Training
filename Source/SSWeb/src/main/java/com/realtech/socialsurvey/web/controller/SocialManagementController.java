@@ -1918,6 +1918,9 @@ public class SocialManagementController
                             }
                         }
                         throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
+                    } else if ( !code.equalsIgnoreCase( "0" ) ) {
+                        String errorMessage = (String) messageMap.get( "text" );
+                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
                     } else {
                         socialManagementService.updateZillowCallCount();
                     }
