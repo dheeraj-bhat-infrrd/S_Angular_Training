@@ -335,6 +335,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             status, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
         LOG.debug( "Creating user profile for :" + emailId + " with profile completion stage : "
             + CommonConstants.ADD_COMPANY_STAGE );
@@ -463,6 +465,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
         LOG.debug( "Inserting agent settings for the user:" + user );
         insertAgentSettings( user );
@@ -500,6 +504,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, String.valueOf( admin.getUserId() ) );
         user = userDao.save( user );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
         LOG.info( "Method to add a new user, inviteNewUser() finished for email id : " + emailId );
         return user;
