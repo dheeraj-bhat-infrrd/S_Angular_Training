@@ -49,6 +49,7 @@ public class OrganizationUnitSettings {
 	private String[] hideSectionsFromProfilePage;
 	private SocialMediaTokens deletedSocialTokens;
 	private boolean allowOverrideForSocialMedia;
+	private boolean allowZillowAutoPost;
 
 	// status of the record, A for active and D for deleted
 	private String status;
@@ -372,6 +373,25 @@ public class OrganizationUnitSettings {
     {
         this.allowOverrideForSocialMedia = allowOverrideForSocialMedia;
     }
+
+
+    /**
+     * @return the allowZillowAutoPost
+     */
+    public boolean isAllowZillowAutoPost()
+    {
+        return allowZillowAutoPost;
+    }
+
+
+    /**
+     * @param allowZillowAutoPost the allowZillowAutoPost to set
+     */
+    public void setAllowZillowAutoPost( boolean allowZillowAutoPost )
+    {
+        this.allowZillowAutoPost = allowZillowAutoPost;
+    }
+
 
     @Override
 	public String toString() {

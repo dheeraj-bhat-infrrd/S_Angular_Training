@@ -202,7 +202,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                                         // post the zillow review to social media
                                         boolean autoPostSuccess = false;
                                         try {
-                                            autoPostSuccess = postToSocialMedia( zillowTempPost, agentSetting, surveyDetails );
+                                            autoPostSuccess = postToSocialMedia( zillowTempPost, agentSetting, surveyDetails, agentSetting );
                                         } catch ( Exception e ) {
                                             LOG.error( "Error occurred while posting to social media. Reason", e );
                                         }
@@ -215,7 +215,8 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                                         boolean complaintResStatus = triggerComplaintResolutionWorkflowForZillowReview(
                                             companySettings, zillowTempPost, surveyDetails, agentSetting, postToSocialMedia );
 
-                                        if ( !complaintResStatus ) {// add to external survey tracker
+                                        if ( !complaintResStatus && autoPostSuccess ) {
+                                            // add to external survey tracker
                                             socialManagementService.saveExternalSurveyTracker(
                                                 zillowTempPost.getEntityColumnName(), zillowTempPost.getEntityId(),
                                                 CommonConstants.SURVEY_SOURCE_ZILLOW, agentSetting.getSocialMediaTokens()
@@ -327,7 +328,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
      }*/
 
     public boolean postToSocialMedia( ZillowTempPost zillowTempPost, OrganizationUnitSettings organizationUnitSettings,
-        SurveyDetails surveyDetails ) throws NonFatalException
+        SurveyDetails surveyDetails, OrganizationUnitSettings agentSettings ) throws NonFatalException
     {
 
         LOG.info( "Method to post feedback of customer to various pages of social networking sites started." );
@@ -365,6 +366,33 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                     .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                 List<OrganizationUnitSettings> branchSettings = settingsMap
                     .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+                boolean doAutoPost = false;
+                for ( OrganizationUnitSettings companySetting : companySettings ) {
+                    if ( companySetting.isAllowZillowAutoPost() && !doAutoPost ) {
+                        doAutoPost = companySetting.isAllowZillowAutoPost();
+                    }
+                }
+                for ( OrganizationUnitSettings regionSetting : regionSettings ) {
+                    if ( regionSetting.isAllowZillowAutoPost() && !doAutoPost ) {
+                        doAutoPost = regionSetting.isAllowZillowAutoPost();
+                    }
+                }
+                for ( OrganizationUnitSettings branchSetting : branchSettings ) {
+                    if ( branchSetting.isAllowZillowAutoPost() && !doAutoPost ) {
+                        doAutoPost = branchSetting.isAllowZillowAutoPost();
+                    }
+                }
+
+                if ( agentSettings.isAllowZillowAutoPost() && !doAutoPost ) {
+                    doAutoPost = agentSettings.isAllowZillowAutoPost();
+                }
+
+
+                // Since auto post flag is not set true in hierarchy
+                if ( true || !doAutoPost ) {
+                    return false;
+                }
 
                 SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                     companySettings.get( 0 ), regionSettings, branchSettings );
