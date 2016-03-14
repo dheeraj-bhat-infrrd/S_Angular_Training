@@ -5,8 +5,11 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
+import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+
 
 /**
  * Uploads hierarchy for a company
@@ -22,5 +25,40 @@ public interface HierarchyStructureUploadService
      * @return 
      * @throws InvalidInputException
      */
-    public Map<String, List<String>> uploadHierarchy(HierarchyUpload upload, Company company, User user) throws InvalidInputException;
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user )
+        throws InvalidInputException;
+
+    public List<UploadStatus> findInitiatedHierarchyUploads() throws NoRecordsFetchedException;
+
+    public void updateUploadStatus( UploadStatus uploadStatus );
+
+    public HierarchyUpload fetchHierarchyToBeUploaded( Company company ) throws InvalidInputException;
+
+    public User getUser( long userId );
+
+    public void addUploadStatusEntry( UploadStatus uploadStatus );
+
+
+    /**
+     * Saves the hierarchy upload object in mongo db
+     * @param upload
+     * @throws InvalidInputException
+     */
+    public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException;
+
+    public void addNewUploadRequest( User adminUser );
+
+    public UploadStatus fetchLatestUploadStatus( Company company );
+
+    public void uploadUsers( HierarchyUpload upload, User adminUser, List<String> errorList );
+
+    public void deleteUsers( HierarchyUpload upload, User adminUser, Company company, List<String> errorList );
+
+    public void uploadRegions( HierarchyUpload upload, User user, Company company, List<String> errorList );
+
+    public void uploadBranches( HierarchyUpload upload, User user, Company company, List<String> errorList );
+
+    public void deleteRegions( HierarchyUpload upload, User adminUser, Company company, List<String> errorList );
+
+    public void deleteBranches( HierarchyUpload upload, User adminUser, Company company, List<String> errorList );
 }
