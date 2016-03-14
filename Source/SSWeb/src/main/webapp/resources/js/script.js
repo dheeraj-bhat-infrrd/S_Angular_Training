@@ -32,7 +32,27 @@ function buildMessageDiv(){
         $('.hm-header-main-wrapper').after(errorDiv);
     }
 }
-
+function buildMessageInvalidDiv(){
+	if($('.err-nw-wrapper-invalid').length == 0){
+        var errorDiv = $("<div id='err-nw-wrapper-invalid' class='err-nw-wrapper-invalid'>");
+            var closeSpan = $('<span class="err-new-close-invalid">');
+            var textSpan = $('<span id="err-nw-txt-invalid">');
+            errorDiv.append(closeSpan);
+            errorDiv.append(textSpan);
+        $('.hm-header-main-wrapper').after(errorDiv);
+    }
+}
+function buildMessageSuccessDiv(){
+	if($('.err-nw-wrapper-success').length == 0){
+        var errorDiv = $("<div id='err-nw-wrapper-success' class='err-nw-wrapper-success'>");
+            var closeSpan = $('<span class="err-new-close-success">');
+            var textSpan = $('<span id="err-nw-txt-success">');
+            errorDiv.append(closeSpan);
+            errorDiv.append(textSpan);
+        $('.hm-header-main-wrapper').after(errorDiv);
+    }
+	
+}
 function showError(msg){
 	buildMessageDiv();
     $('#err-nw-txt').html(msg);
@@ -40,9 +60,28 @@ function showError(msg){
     $('#err-nw-wrapper').slideDown(200);
     $(window).scrollTop($('#err-nw-wrapper').offset().top);
 }
-
+function showInvalidError(msg){
+	buildMessageInvalidDiv();
+    $('#err-nw-txt-invalid').html(msg);
+    $('#err-nw-wrapper-invalid').removeClass('bg-black-success');
+    $('#err-nw-wrapper-invalid').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-invalid').offset().top);
+}
+function showErrorSuccess(msg){
+	buildMessageSuccessDiv();
+	$('#err-nw-txt-success').html(msg);
+    $('#err-nw-wrapper-success').removeClass('bg-black-success');
+    $('#err-nw-wrapper-success').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-success').offset().top);
+}
 function hideError(){
     $('#err-nw-wrapper').slideUp(200);
+}
+function hideErrorInvalid(){
+    $('#err-nw-wrapper-invalid').slideUp(200);
+}
+function hideErrorSuccess(){
+    $('#err-nw-wrapper-success').slideUp(200);
 }
 
 function showInfo(msg){
@@ -52,6 +91,13 @@ function showInfo(msg){
     $(window).scrollTop($('#err-nw-wrapper').offset().top);
     $('#err-nw-wrapper').addClass('bg-black-success');
 }
+function showInfoSuccess(msg){
+	buildMessageSuccessDiv();
+    $('#err-nw-txt-success').html(msg);
+    $('#err-nw-wrapper-success').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-success').offset().top);
+    $('#err-nw-wrapper-success').addClass('bg-black-success');
+}
 
 function hideInfo(){
     $('#err-nw-wrapper').slideUp(200);
@@ -59,10 +105,31 @@ function hideInfo(){
         $('#err-nw-wrapper').removeClass('bg-black-success');
     },200);
 }
+function hideInfoInvalid(){
+    $('#err-nw-wrapper-invalid').slideUp(200);
+    setTimeout(function(){
+        $('#err-nw-wrapper-invalid').removeClass('bg-black-success');
+    },200);
+}
+function hideInfoSuccess(){
+    $('#err-nw-wrapper-success').slideUp(200);
+    setTimeout(function(){
+        $('#err-nw-wrapper-success').removeClass('bg-black-success');
+    },200);
+}
 
 $(document).on('click', '.err-new-close', function() {
 	hideError();
 	hideInfo();
+});
+$(document).on('click', '.err-new-close-invalid', function() {
+	hideErrorInvalid();
+	hideInfoInvalid();
+});
+
+$(document).on('click', '.err-new-close-success', function() {
+	hideErrorSuccess();
+	hideInfoSuccess();
 });
 
 function showRegErr(msg){
@@ -82,6 +149,24 @@ function showErrorMobileAndWeb(msg) {
 		showError(msg);
 	}
 }
+function showErrorInvalidMobileAndWeb(msg){
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showInvalidError(msg);
+	}
+}
+function showErrorSuccessMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showErrorSuccess(msg);
+	}
+}
 function showInfoMobileAndWeb(msg) {
 	if($(window).width() < 768){
 		$('#overlay-toast').html(msg);
@@ -89,6 +174,15 @@ function showInfoMobileAndWeb(msg) {
 	}
 	else {
 		showInfo(msg);
+	}
+}
+function showInfoSuccessMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showInfoSuccess(msg);
 	}
 }
 

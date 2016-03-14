@@ -2015,13 +2015,13 @@ function displayMessageForRegionAndBranchAddition(data) {
 	var invalidEmailAddressDiv = $("#display-invalid-email-addr-msg-div");
 	var alreadyExistEmailAddressDiv = $("#display-already-exist-email-addr-msg-div");
 	if($(displayMessageDiv).hasClass("success-message")) {
-		showInfoMobileAndWeb($(displayMessageDiv).html());
+		showInfoSuccessMobileAndWeb($(displayMessageDiv).html());
 	}
 	else if($(displayMessageDiv).hasClass("error-message")) {
-		showErrorMobileAndWeb($(displayMessageDiv).html());
+		showErrorSuccessMobileAndWeb($(displayMessageDiv).html());
 	}
 	if($(invalidEmailAddressDiv).hasClass("error-message")) {
-		showErrorMobileAndWeb($(invalidEmailAddressDiv).html());
+		showErrorInvalidMobileAndWeb($(invalidEmailAddressDiv).html());
 	}
 	if($(alreadyExistEmailAddressDiv).hasClass("error-message")) {
 		showErrorMobileAndWeb($(alreadyExistEmailAddressDiv).html());
