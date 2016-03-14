@@ -1360,7 +1360,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @throws UserAdditionException
      */
     @Transactional
-    User assignBranchesToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
+    @Override
+    public User assignBranchesToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
         HierarchyUpload upload, boolean isAdmin )
         throws UserAssignmentException, InvalidInputException, NoRecordsFetchedException, SolrException, UserAdditionException
     {
@@ -1496,7 +1497,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @throws UserAdditionException
      */
     @Transactional
-    User assignRegionsToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
+    @Override
+    public User assignRegionsToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
         HierarchyUpload upload, boolean isAdmin )
         throws UserAssignmentException, InvalidInputException, NoRecordsFetchedException, SolrException, UserAdditionException
     {
@@ -1609,8 +1611,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         return assigneeUser;
     }
 
-    
-    User modifyUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
+    @Transactional
+    @Override
+    public User modifyUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException,
         UndeliveredEmailException
     {
@@ -1729,7 +1732,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @throws UserAssignmentException
      */
     @Transactional
-    User assignUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
+    @Override
+    public User assignUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         LOG.info( "Method assignUser() started for user : " + user.getEmailId() );
