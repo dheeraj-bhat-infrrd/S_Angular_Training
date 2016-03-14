@@ -326,6 +326,17 @@
 	.btn-wid-sm{
 	width:330px !important;
 	}
+	.hierarchy-btn{
+	float:none;
+	margin-top:10px;
+	}
+	.widget-code{
+    float:none !important;
+    width: auto !important;
+    }
+    .widget-copy{
+    padding:0px !important;
+    }
 }
 
 
@@ -445,6 +456,10 @@
     .wc-form-input {
     	width:  210px;
     }
+    .widget-code{
+    float:none !important;
+    width: auto !important;
+    }
 }
 
 
@@ -523,6 +538,9 @@
 	}
 	.reg-cap-txt{
         width: 256px !important;
+    }
+    #summary{
+       width: 100% !important;
     }
 }
 

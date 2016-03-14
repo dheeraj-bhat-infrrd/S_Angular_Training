@@ -97,7 +97,7 @@ public interface SurveyDetailsDao
      * @return
      * @throws InvalidInputException
      */
-    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive) throws InvalidInputException;
+    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
     /**
      * Gets an aggregated count for completed survey
      * @param organizationUnitColumn
@@ -163,12 +163,6 @@ public interface SurveyDetailsDao
 
     void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName );
 
-    // Commented as Zillow surveys are not stored in database, SS-1276
-    // void removeZillowSurveysByEntity( String entityType, long entityId );
-
-    // Commented as Zillow surveys are not stored in database, SS-1276
-    // void removeExcessZillowSurveysByEntity( String entityType, long entityId );
-
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows );
 
@@ -191,7 +185,7 @@ public interface SurveyDetailsDao
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
 
 
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId  , boolean fetchAbusive );
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String collectionName, long collectionId  , boolean fetchAbusive, boolean forStatistics );
 
 
     public void updateSurveyAsUnderResolution( String surveyId );
@@ -232,4 +226,25 @@ public interface SurveyDetailsDao
 
 
     public void updateAgentInfoInSurveys( long fromUserId, User toUser, UserProfile toUserProfile ) throws InvalidInputException;
+
+
+    public void removeExistingZillowSurveysByEntity( String entityType, long entityId );
+
+
+    public SurveyDetails getZillowReviewByQueryMap( Map<String, Object> queries ) throws InvalidInputException;
+
+
+    public void resetShowSurveyOnUIPropertyForNonLatestReviews( String columnName, long id, List<String> latestSurveyIdList );
+
+
+    public long getCompletedSurveyCountForStatistics( String organizationUnitColumn, long organizationUnitColumnValue,
+        Timestamp startDate, Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
+
+
+    public long getZillowImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
+        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
+
+
+    public List<SurveyDetails> getFeedbacksForReports( String columnName, long columnValue, int start, int rows, double startScore,
+        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria );
 }

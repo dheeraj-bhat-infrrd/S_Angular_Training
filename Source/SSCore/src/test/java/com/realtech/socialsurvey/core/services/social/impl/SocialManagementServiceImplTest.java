@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -359,6 +360,49 @@ public class SocialManagementServiceImplTest
     public void testPostToFacebookForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
     {
         socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testgetUnmatchedPreInitiatedSurveysForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.getUnmatchedPreInitiatedSurveys( 0, 1, 10 );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testgetProcessedPreInitiatedSurveysForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.getProcessedPreInitiatedSurveys( 0, 1, 10 );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateAgentIdOfSurveyPreinitiationRecordsForEmailForNullUser() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.updateAgentIdOfSurveyPreinitiationRecordsForEmail( null, "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateAgentIdOfSurveyPreinitiationRecordsForEmailForNullEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.updateAgentIdOfSurveyPreinitiationRecordsForEmail( new User(), null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateAgentIdOfSurveyPreinitiationRecordsForEmailForEmptyEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.updateAgentIdOfSurveyPreinitiationRecordsForEmail( new User(), "" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateSurveyPreinitiationRecordsAsIgnoredForNullEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.updateSurveyPreinitiationRecordsAsIgnored( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testupdateSurveyPreinitiationRecordsAsIgnoredForEmptyEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        socialManagementServiceImpl.updateSurveyPreinitiationRecordsAsIgnored( "" );
     }
     
 }

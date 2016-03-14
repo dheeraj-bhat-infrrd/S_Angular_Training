@@ -568,6 +568,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         } else {
             throw new InvalidInputException( "Invalid encompass crm info state : " + state );
         }
+        
+        //Add criteria to make sure that it doesn't pick up companies that are deleted
+        query.addCriteria( Criteria.where( KEY_STATUS ).ne( CommonConstants.STATUS_DELETED_MONGO ) );
         organizationUnitsSettingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
             CommonConstants.COMPANY_SETTINGS_COLLECTION );
         if ( organizationUnitsSettingsList == null || organizationUnitsSettingsList.isEmpty() ) {
@@ -754,5 +757,22 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
 
         mongoTemplate.updateFirst( query, update, AGENT_SETTINGS_COLLECTION );
+    }
+
+
+    @Override
+    public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> identifiers )
+    {
+        LOG.info( "Fetching social media tokens from " + collectionName );
+        List<OrganizationUnitSettings> settings = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_ZILLOW_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( identifiers ) );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( KEY_SURVEY_SETTINGS )
+            .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
+        settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
+        LOG.info( "Fetched " + ( settings != null ? settings.size() : "none" ) + " items with social media tokens from "
+            + collectionName );
+        return settings;
     }
 }

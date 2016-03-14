@@ -214,6 +214,46 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sent reset password mail" );
     }
 
+    
+    
+    @Override
+    public void sendInvitationToSocialSurveyAdmin( String url, String recipientMailId, String name, String loginName )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method to send Email to social survey admin link with URL : " + url + "\t and Recipients Mail ID : "
+            + recipientMailId );
+        if ( url == null || url.isEmpty() ) {
+            LOG.error( "URL generated can not be null or empty" );
+            throw new InvalidInputException( "URL generated can not be null or empty" );
+        }
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipients Email Id can not be null or empty" );
+            throw new InvalidInputException( "Recipients Email Id can not be null or empty" );
+        }
+        if ( name == null || name.isEmpty() ) {
+            LOG.error( "Recipients name can not be null or empty" );
+            throw new InvalidInputException( "Recipients name can not be null or empty" );
+        }
+        
+        LOG.info( "Initiating URL Service to shorten the url " + url );
+        url = urlService.shortenUrl( url );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SS_ADMIN_INVITATION_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SS_ADMIN_INVITATION_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, loginName ,  url, url, url, appBaseUrl,
+            appBaseUrl ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+        LOG.info( "Successfully sent invitation to social survey admin " );
+    }
+
 
     /**
      * Sends a mail to the user when his subscription payment fails.
@@ -1707,6 +1747,55 @@ public class EmailServicesImpl implements EmailServices
 
 
     /**
+     * Method to send complaint handle mail to the admin's for zillow reviews
+     * @param recipientMailId
+     * @param customerName
+     * @param rating
+     * @param reviewSummary
+     * @param reviewDescription
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     * */
+    @Async
+    @Override
+    public void sendZillowReviewComplaintHandleMail( String recipientMailId, String customerName, String rating,
+        String reviewUrl ) throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey complaint handler mail " );
+        }
+
+        if ( customerName == null || customerName.isEmpty() ) {
+            LOG.error( "Customer name is empty or null " );
+            throw new InvalidInputException( "Customer name is empty or null " );
+        }
+
+        String[] mailIds = recipientMailId.split( "," );
+        List<String> mailIdList = new ArrayList<String>();
+
+        for ( String mailId : mailIds ) {
+            mailIdList.add( mailId.trim() );
+        }
+
+        LOG.info( "Sending complaint handle email to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( mailIdList );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_BODY );
+
+        //SS-1435: Send survey details too.
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, customerName, rating,
+            reviewUrl ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_SUBJECT, messageBodyReplacements, false, false );
+        LOG.info( "Successfully sent survey completion mail" );
+    }
+
+    /**
      * Method to forward customer reply to recipient
      *
      * @param recipientMailId
@@ -1812,6 +1901,39 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
 
         LOG.info( "Method sendBillingReportMail() finished." );
+    }
+    
+    
+    /**
+     * Method to send the billing report in a mail to the social survey admin
+     */
+    @Override
+    public void sendCustomReportMail( String recipientName, List<String> recipientMailIds, String subject,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendCustomReportMail() started." );
+        if ( recipientMailIds == null || recipientMailIds.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending billing report mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending billing report mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailIds );
+        emailEntity.setAttachmentDetail( attachmentsDetails );
+        
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SEND_REPORT_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( subject ) );
+        
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SEND_REPORT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, true, false );
+
+        LOG.info( "Method sendCustomReportMail() finished." );
     }
 }
 // JIRA: SS-7: By RM02: EOC

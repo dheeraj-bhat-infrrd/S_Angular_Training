@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
 @Component ( "userProfile")
@@ -192,6 +193,15 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         LOG.info( "Method deleteUserProfilesByCompany() finished." );
     }
 
+    @Override
+    public void deleteUserProfilesByUser( long userId )
+    {
+        LOG.info( "Method deleteUserProfilesByUser() called to delete profiles of userId id : " + userId );
+        Query query = getSession().createQuery( "delete from UserProfile where user.userId=?" );
+        query.setParameter( 0, userId );
+        query.executeUpdate();
+        LOG.info( "Method deleteUserProfilesByUser() finished." );
+    }
 
     @SuppressWarnings ( "unchecked")
     @Override
@@ -223,6 +233,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
 
     @Override
+    @Transactional
     public Map<String, Long> findPrimaryUserProfileByAgentId( long entityId )
     {
         LOG.info( "Method findPrimaryUserProfileByAgentId() called for agent id : " + entityId );
@@ -622,4 +633,32 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         return userUserProfileMap;
 
     }
-}
+    
+    /**
+     * Method to get userProfile given the userId, branchId and regionId
+     * 
+     * @param userId
+     * @param branchId
+     * @param regionId
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    public UserProfile findUserProfile( long userId, long branchId, long regionId, int profilesMasterId ) throws NoRecordsFetchedException
+    {
+        LOG.info( "Method to find userProfile for userId: " + userId + " branchId: " + branchId + " regionId : " + regionId + " started." );
+        Criteria criteria = getSession().createCriteria( UserProfile.class );
+        criteria.add( Restrictions.eq( CommonConstants.USER_COLUMN + "." + CommonConstants.USER_ID, userId ) );
+        criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
+        criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
+        criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN + "." + "profileId", profilesMasterId ) );
+        @SuppressWarnings ( "unchecked")
+        List<UserProfile> userProfiles = criteria.list();
+        if ( userProfiles == null || userProfiles.isEmpty() ) {
+            throw new NoRecordsFetchedException( "No records fetched for userId : " + userId + " branchId: " + branchId + " regionId : " + regionId );
+        }
+        LOG.info( "Method to find userProfile for userId: " + userId + " branchId: " + branchId + " regionId : " + regionId + " finished." );
+        return userProfiles.get( 0 );
+    }
+ }

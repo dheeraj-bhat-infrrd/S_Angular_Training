@@ -53,7 +53,8 @@ var postCodeRegex = [
 		},
 		{
 			"code" : "AU",
-			"regex" : "\\d{4}"
+			/*"regex" : "\\d{4}"*/
+			 "regex": "^((0[289][0-9]{2})|([1345689][0-9]{3})|(2[0-8][0-9]{2})|(290[0-9])|(291[0-4])|(7[0-4][0-9]{2})|(7[8-9][0-9]{2}))$"
 		},
 		{
 			"code" : "AT",
@@ -161,7 +162,8 @@ var postCodeRegex = [
 		},
 		{
 			"code" : "CA",
-			"regex" : "(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\d(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\s{0,1}\\d(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\d"
+			/*"regex" : "(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\d(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\s{0,1}\\d(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\d"*/
+			"regex" : "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$"
 		}, {
 			"code" : "CV",
 			"regex" : "\\d{4}"

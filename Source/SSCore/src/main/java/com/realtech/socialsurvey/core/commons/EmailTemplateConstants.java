@@ -47,6 +47,9 @@ public final class EmailTemplateConstants {
 
 	public static final String RESET_PASSWORD_MAIL_BODY = "ResetPasswordMailBody.html";
 	public static final String RESET_PASSWORD_MAIL_SUBJECT = "ResetPasswordMailSubject.txt";
+	
+	public static final String SS_ADMIN_INVITATION_MAIL_BODY = "SocialSurveyAdminInvitationMailBody.html";
+	public static final String SS_ADMIN_INVITATION_MAIL_SUBJECT = "SocialSurveyAdminInvitationMailSubject.txt";
 
 	public static final String RETRIES_EXHAUSTED_MAIL_BODY = "RetriesExhaustedMailBody.html";
 	public static final String RETRIES_EXHAUSTED_MAIL_SUBJECT = "RetriesExhaustedMailSubject.txt";
@@ -126,4 +129,11 @@ public final class EmailTemplateConstants {
     
     public static final String BILLING_REPORT_MAIL_SUBJECT = "BillingReportMailSubject.txt";
     public static final String BILLING_REPORT_MAIL_BODY = "BillingReportMailBody.html";
+    
+    public static final String SEND_REPORT_MAIL_SUBJECT = "sendReportMailSubject.txt";
+    public static final String SEND_REPORT_MAIL_BODY = "sendReportMailBody.html";
+
+    public static final String ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_SUBJECT = "ZillowReviewComplaintHandlerMailSubject.txt";
+    public static final String ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_BODY = "ZillowReviewComplaintHandlerMailBody.html";
+
 }

@@ -119,6 +119,9 @@ public final class DisplayMessageConstants
     public static final String DISCLAIMER_UPDATE_UNSUCCESSFUL = "DISCLAIMER_UPDATE_UNSUCCESSFUL";
     public static final String ERROR_IN_SENDING_HELP_MESSAGE = "ERROR_IN_SENDING_HELP_MESSAGE";
     public static final String NOT_ABLE_TO_DELETE_USER_PRIFILE = "NOT_ABLE_TO_DELETE_USER_PRIFILE";
+    public static final String FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL = "FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL";
+    public static final String FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL = "FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL";
+    public static final String ADD_EMAIL_ID_FOR_USER__UNSUCCESSFUL = "ADD_EMAIL_ID_FOR_USER__UNSUCCESSFUL";
 
     // success message constants
     public static final String HELP_MESSAGE_SUCCESSFULLY_SEND = "HELP_MESSAGE_SUCCESSFULLY_SEND";
@@ -213,9 +216,11 @@ public final class DisplayMessageConstants
     public static final String CONTACT_US_MESSAGE_SENT = "CONTACT_US_MESSAGE_SENT";
     public static final String DISCLAIMER_UPDATE_SUCCESSFUL = "DISCLAIMER_UPDATE_SUCCESSFUL";
     public static final String EMAIL_ID_UPDATE_UNSUCCESSFUL = "EMAIL_ID_UPDATE_UNSUCCESSFUL";
+    public static final String ADD_EMAIL_ID_FOR_USER__SUCCESSFUL = "ADD_EMAIL_ID_FOR_USER__SUCCESSFUL";
 
     //Realtech admin module
     public static final String COMPANY_NOT_REGISTERD = "COMPANY_NOT_REGISTERD";
+    public static final String SS_ADMIN_DELETE_SUCCESSFUL = "SS_ADMIN_DELETE_SUCCESSFUL";
 
 
     public static final String TRY_AGAIN = "TRY_AGAIN";
@@ -227,4 +232,5 @@ public final class DisplayMessageConstants
     public static final String INVALID_AUTHORIZATION_HEADER = "INVALID_AUTHORIZATION_HEADER";
     
     public static final String INVALID_SOCIAL_POST_REMINDER_ERROR = "INVALID_SOCIAL_POST_REMINDER_ERROR";
+    public static final String SUCCESSFULLY_CREATED_SS_ADMIN = "SUCCESSFULLY_CREATED_SS_ADMIN";
 }

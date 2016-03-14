@@ -48,6 +48,7 @@ public class SurveyDetails
     private boolean underResolution;
     private boolean isAbuseRepByUser;
     private SocialMediaPostResponseDetails socialMediaPostResponseDetails;
+    private boolean showSurveyOnUI;
 
     public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
     {
@@ -550,4 +551,15 @@ public class SurveyDetails
         this.isAbuseRepByUser = isAbuseRepByUser;
     }
 
+
+    public boolean isShowSurveyOnUI()
+    {
+        return showSurveyOnUI;
+    }
+
+
+    public void setShowSurveyOnUI( boolean showSurveyOnUI )
+    {
+        this.showSurveyOnUI = showSurveyOnUI;
+    }
 }

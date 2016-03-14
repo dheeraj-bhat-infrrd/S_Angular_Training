@@ -168,7 +168,7 @@ public class UserManagementServiceImplTest
     public void testinviteUserToRegisterForNullFirstName() throws InvalidInputException, SolrException,
         UserAlreadyExistsException, UndeliveredEmailException
     {
-        userManagementServiceImpl.inviteUserToRegister( new User(), null, "test", "test2", false );
+        userManagementServiceImpl.inviteUserToRegister( new User(), null, "test", "test2", false, true );
     }
 
 
@@ -176,7 +176,7 @@ public class UserManagementServiceImplTest
     public void testinviteUserToRegisterForNullEmail() throws InvalidInputException, SolrException, UserAlreadyExistsException,
         UndeliveredEmailException
     {
-        userManagementServiceImpl.inviteUserToRegister( new User(), "test", "test2", null, false );
+        userManagementServiceImpl.inviteUserToRegister( new User(), "test", "test2", null, false, true );
     }
 
 
@@ -1084,5 +1084,58 @@ public class UserManagementServiceImplTest
             .thenReturn( null );
         Mockito.when( userDao.getActiveUser( Mockito.anyString() ) ).thenThrow( NoRecordsFetchedException.class );
         userManagementServiceImpl.getUserByEmailAddress( TestConstants.TEST_MAIL_ID_STRING );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testDeleteSSAdminForNullAdmin() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.deleteSSAdmin( null , 0l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testDeleteSSAdminForNoUserFound() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.deleteSSAdmin( new User() , 0l );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testsaveEmailUserMappingForNullEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.saveEmailUserMapping( null, 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testsaveEmailUserMappingForEmptyEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.saveEmailUserMapping( "", 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testsaveEmailUserMappingForInvalidUserId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.saveEmailUserMapping( "test", 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testsaveIgnoredEmailCompanyMappingForNullEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.saveIgnoredEmailCompanyMapping( null, 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testsaveIgnoredEmailCompanyMappingForEmptyEmail() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.saveIgnoredEmailCompanyMapping( "", 1l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testsaveIgnoredEmailCompanyMappingForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( null );
+        userManagementServiceImpl.saveIgnoredEmailCompanyMapping( "test", 1l );
     }
 }

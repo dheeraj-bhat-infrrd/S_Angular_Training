@@ -96,6 +96,7 @@ import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -119,6 +120,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -285,6 +287,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Value ( "${BATCH_SIZE}")
     private int pageSize;
+
+    @Autowired
+    private ZillowUpdateService zillowUpdateService;
     
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -2448,7 +2453,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -2480,7 +2485,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail ) throws InvalidInputException
+    @Override
+    public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail, boolean sendMail ) throws InvalidInputException
     {
         LOG.info( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
@@ -2601,7 +2607,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                      * if no user is present with the specified emailId, send an invite to register
                      */
                     try {
-                        user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId, holdSendingMail );
+                        user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId, holdSendingMail, sendMail );
                     } catch ( UserAlreadyExistsException | UndeliveredEmailException e1 ) {
                         LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(), e1 );
                     }
@@ -2898,7 +2904,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -3022,7 +3028,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
         UserAssignmentException
     {
         LOG.info( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
@@ -3040,7 +3046,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers.add( assigneeUser );
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list for the email addresses provided" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail, sendMail );
             assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
@@ -4524,7 +4530,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -4716,7 +4722,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -6400,6 +6406,103 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
         return setterValue;
+    }
+
+
+    /**
+     * Method to fetch all region ids under a company
+     *
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<Long> getRegionIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException
+    {
+        if ( companyId <= 0l )
+            throw new InvalidInputException( "Invalid company id passed as argument " );
+        LOG.info( "Method getRegionIdsUnderCompany called for companyId:" + companyId );
+        List<Long> regionIds = regionDao.getRegionIdsUnderCompany( companyId, start, batchSize );
+        LOG.info( "Method getRegionIdsUnderCompany call ended for companyId:" + companyId );
+        return regionIds;
+    }
+
+
+    /**
+     * Method to fetch all branch ids under a company
+     *
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<Long> getBranchIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException
+    {
+        if ( companyId <= 0l )
+            throw new InvalidInputException( "Invalid company id passed as argument " );
+        LOG.info( "Method getBranchIdsUnderCompany called for companyId:" + companyId );
+        List<Long> branchIds = branchDao.getBranchIdsUnderCompany( companyId, start, batchSize );
+        LOG.info( "Method getBranchIdsUnderCompany call ended for companyId:" + companyId );
+        return branchIds;
+    }
+
+
+    /**
+     * Method to fetch all agent ids under a company
+     *
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<Long> getAgentIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException
+    {
+        if ( companyId <= 0l )
+            throw new InvalidInputException( "Invalid company id passed as argument " );
+        LOG.info( "Method getAgentIdsUnderCompany called for companyId:" + companyId );
+        List<Long> userIds = userDao.getUserIdsUnderCompanyBasedOnProfileMasterId( companyId,
+            CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, start, batchSize );
+        LOG.info( "Method getAgentIdsUnderCompany call ended for companyId:" + companyId );
+        return userIds;
+    }
+
+
+    /** Method to fetch unit settings connected to zillow
+     * @param collectionName
+     * @param ids
+     * */
+    @Transactional
+    @Override
+    public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> ids )
+    {
+        List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.fetchUnitSettingsConnectedToZillow(
+            collectionName, ids );
+        return unitSettings;
+    }
+
+
+    @Override
+    public UploadValidation validateUserUploadSheet( String uploadFileName ) throws InvalidInputException
+    {
+        // get the file and read the file
+        if ( uploadFileName == null || uploadFileName.isEmpty() ) {
+            LOG.error( "Uploaded file is not present " + uploadFileName );
+            throw new InvalidInputException( "Uploaded file is not present " + uploadFileName );
+        }
+        // read the file
+
+        return null;
+    }
+
+
+    @Override
+    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+        OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException
+    {
+        zillowUpdateService.pushZillowReviews( reviews, collectionName, profileSettings, companyId );
     }
 }
 // JIRA: SS-27: By RM05: EOC

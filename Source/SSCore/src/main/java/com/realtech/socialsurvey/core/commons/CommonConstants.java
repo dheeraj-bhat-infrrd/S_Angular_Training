@@ -42,6 +42,7 @@ public interface CommonConstants
     public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 2;
     public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
     public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
+    public static final int PROFILES_MASTER_SS_ADMIN_PROFILE_ID = 5;
     public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 
     /**
@@ -121,6 +122,9 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_CORRUPT_RECORD = 3;
     public static final int STATUS_SURVEYPREINITIATION_NOT_PROCESSED = 4;
     public static final int STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD = 5;
+    public static final int STATUS_SURVEYPREINITIATION_COMPLETE = 7;
+    public static final int STATUS_SURVEYPREINITIATION_OLD_RECORD = 8;
+    public static final int STATUS_SURVEYPREINITIATION_IGNORED_RECORD = 9;
 
     /**
      * Hibernate entities and column name constants
@@ -188,6 +192,8 @@ public interface CommonConstants
     public static final String BATCH_TYPE_SET_COMPANY_ID_IN_SOCIAL_POSTS = "SetCompanyIdInSocialPosts";
     public static final String BATCH_TYPE_IMAGE_PROCESSING_STARTER = "ImageProcessingStarter";
     public static final String BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR = "HierarchySettingsCorrector";
+    public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
+    public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
     
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -208,6 +214,10 @@ public interface CommonConstants
     public static final String BATCH_NAME_SET_COMPANY_ID_IN_SOCIAL_POSTS = "Set Company Id In Social Posts Stored In Database";
     public static final String BATCH_NAME_IMAGE_PROCESSING_STARTER = "Image Processing Starter";
     public static final String BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR = "Hierarchy Settings Corrector For Old Records";
+    public static final String BILLING_REPORT_GENERATOR = "Billing Report Generator";
+    public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
+    public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
+    public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
     
     /**
      * Mongo entities and column name constants
@@ -254,6 +264,7 @@ public interface CommonConstants
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN ="isLogoImageProcessed";
     public static final String IS_UNMARKED_ABUSIVE_COLUMN ="isUnmarkedAbusive";
     public static final String DELETED_SOCIAL_MEDIA_TOKENS_COLUMN = "deletedSocialTokens";
+    public static final String SHOW_SURVEY_ON_UI_COLUMN = "showSurveyOnUI";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -415,6 +426,11 @@ public interface CommonConstants
     public static final String TEMP_FOLDER = "Temp";
     public static final String LINKEDIN_URL_PART = "licdn";
     public static final String FILE_SEPARATOR = "/";
+    
+    public static final String ACTIVE_SUBSCRIPTION_MAIL_SUBJECT = "Active Subscription List in Braintree";
+    public static final String TRANSACTION_LIST_MAIL_SUBJECT = "Transaction list for Subscription ";
+    
+    public static final String ADMIN_RECEPIENT_DISPLAY_NAME = "Admin";
 
     /**
      * Email templates config
@@ -483,8 +499,8 @@ public interface CommonConstants
     public static final String EMAIL_REGEX = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     public static final String FIRST_NAME_REGEX = "[a-zA-Z ]+";
     public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
-    public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z]{2,}$";
-    public static final String FINDAPRO_LAST_NAME_REGEX = "^[a-zA-Z]{2,}$";
+    public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z][a-zA-Z\\s]{2,}$";
+    public static final String FINDAPRO_LAST_NAME_REGEX = "^[a-zA-Z][a-zA-Z\\s]{2,}$";
     public static final String URL_REGEX = "^(http(s)?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
 
     /**
@@ -648,6 +664,7 @@ public interface CommonConstants
     public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
     public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
+    public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
 
     /*
      * Mongo social post Source
@@ -822,6 +839,7 @@ public interface CommonConstants
     public static final DecimalFormat SOCIAL_RANKING_WHOLE_FORMAT = new DecimalFormat( "#" );
 
     public static final String TWITTER_MESSAGE = "%s Star Survey Response from %s for %s on %s ";
+    public static final String ZILLOW_TWITTER_MESSAGE = "%s Star response from %s for %s on %s ";
 
     // file upload types
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
@@ -873,6 +891,11 @@ public interface CommonConstants
     public static final String URL_DETAILS_ACCESS_DATES_COLUMN = "accessDates";
     public static final String URL_DETAILS_MODIFIED_ON_COLUMN = "modifiedOn";
     public static final String URL_DETAILS_QUERY_PARAMS_COLUMN = "queryParams";
+    
+    public static final String URL_PARAM_RESET_PASSWORD = "resetorset";
+    public static final String URL_PARAM_RESETORSET_VALUE_RESET = "reset";
+    public static final String URL_PARAM_RESETORSET_VALUE_SET = "set";
+    
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";
@@ -1004,5 +1027,61 @@ public interface CommonConstants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
+
+    //Hierarchy Upload constants
+    public static final String HIERARCHY_UPLOAD_COLLECTION = "HIERARCHY_UPLOAD";
+
     public static final String ZILLOW_CALL_REQUEST = "webservice/ProReviews.htm?output=json&returncompletecontent=true&count=50";
+
+    // Zillow Temp Post Table column names
+    public static final String ZILLOW_REVIEW_URL_COLUMN = "zillowReviewUrl";
+    public static final String ENTITY_COLUMN_NAME_COLUMN = "entityColumnName";
+    public static final String ZILLOW_ENTITY_ID_COLUMN = "entityId";
+    public static final String ZILLOW_REVIEW_DATE_COLUMN = "zillowReviewDate";
+
+    // Auto Post Tracker Table column names
+    public static final String REVIEW_SOURCE_COLUMN = "reviewSource";
+    public static final String REVIEW_SOURCE_URL_COLUMN = "reviewSourceUrl";
+    public static final String REVIEW_DATE_COLUMN = "reviewDate";
+
+    public static final String HIERARCHY_REGION_HEADERS_INVALID = "Invalid headers in the Regions sheet";
+
+    public static final String HIERARCHY_BRANCH_HEADERS_INVALID = "Invalid headers in the Offices sheet";
+
+    public static final String HIERARCHY_USER_HEADERS_INVALID = "Invalid headers in the Users sheet";
+
+    //Hierarchy upload error constants
+    public static final String USER_UPLOAD_ERROR_LIST = "USER_UPLOAD";
+    public static final String BRANCH_UPLOAD_ERROR_LIST = "BRANCH_UPLOAD";
+    public static final String REGION_UPLOAD_ERROR_LIST = "REGION_UPLOAD";
+    public static final String USER_DELETE_ERROR_LIST = "USER_DELETE";
+    public static final String BRANCH_DELETE_ERROR_LIST = "BRANCH_DELETE";
+    public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
+    
+    //Hierarchy upload status constants
+    public static final int HIERARCHY_UPLOAD_INITIATED = 1;
+    public static final int HIERARCHY_UPLOAD_PROCESSING = 0;
+    public static final int HIERARCHY_UPLOAD_UPLOADING_REGIONS = 2;
+    public static final int HIERARCHY_UPLOAD_UPLOADING_BRANCHES = 3;
+    public static final int HIERARCHY_UPLOAD_UPLOADING_USERS = 4;
+    public static final int HIERARCHY_UPLOAD_DELETING_USERS = 5;
+    public static final int HIERARCHY_UPLOAD_DELETING_BRANCHES = 6;
+    public static final int HIERARCHY_UPLOAD_DELETING_REGIONS = 7;
+    public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 8;
+    public static final int HIERARCHY_UPLOAD_ERROR = 9;
+    public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 10;
+    
+    //Hierarchy upload message constants
+    public static final String UPLOAD_MSG_INITIATED = "Import initiated";
+    public static final String UPLOAD_MSG_STARTED = "Import started";
+    public static final String UPLOAD_MSG_UPLOADING_REGIONS = "Importing regions";
+    public static final String UPLOAD_MSG_UPLOADING_BRANCHES = "Importing offices";
+    public static final String UPLOAD_MSG_UPLOADING_USERS = "Importing users";
+    public static final String UPLOAD_MSG_DELETING_USERS = "Deleting removed users";
+    public static final String UPLOAD_MSG_DELETING_BRANCHES = "Deleting removed offices";
+    public static final String UPLOAD_MSG_DELETING_REGIONS = "Deleting removed regions";
+    public static final String UPLOAD_MSG_UPLOAD_COMPLETE = "Import successful";
+    public static final String UPLOAD_MSG_UPLOAD_ERROR = "Error importing comany hierarchy";
+    public static final String UPLOAD_MSG_NO_UPLOAD = "";
+    
 }

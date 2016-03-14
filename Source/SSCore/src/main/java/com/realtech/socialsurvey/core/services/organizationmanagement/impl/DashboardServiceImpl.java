@@ -55,26 +55,29 @@ import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BillingReportData;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
-import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.Survey;
+import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 
 
 // JIRA SS-137 BY RM05:BOC
@@ -127,6 +130,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Resource
     @Qualifier ( "branch")
     private BranchDao branchDao;
+    
+    @Autowired
+    private HierarchyDownloadService hierarchyDownloadService;
+    
+    @Autowired
+    private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
+    
+    @Autowired
+    private GenericDao<SurveyQuestionsMapping, Long> surveyQuestionsMappingDao;
 
 
     @Transactional
@@ -186,6 +198,65 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         LOG.debug( "Incomplete survey: " + incompleteSurveyCount );
         return completedSurveyCount + incompleteSurveyCount;
     }
+    
+
+    @Transactional
+    @Override
+    public long getAllSurveyCountForStatistics( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
+    {
+        LOG.info( "Get all survey count for " + columnName + " and value " + columnValue + " with number of days: "
+            + numberOfDays );
+
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
+        }
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
+        }
+
+        Calendar startTime = Calendar.getInstance();
+        startTime.add( Calendar.DATE, -1 * numberOfDays );
+        // strip the time component of start time
+        startTime.set( Calendar.HOUR_OF_DAY, 0 );
+        startTime.set( Calendar.MINUTE, 0 );
+        startTime.set( Calendar.SECOND, 0 );
+        startTime.set( Calendar.MILLISECOND, 0 );
+
+        Timestamp startDate = null;
+        Timestamp endDate = null;
+        if ( numberOfDays >= 0 ) {
+            startDate = new Timestamp( startTime.getTimeInMillis() );
+            endDate = new Timestamp( System.currentTimeMillis() );
+        }
+
+        long completedSurveyCount = getCompletedSurveyCountForStatistics( columnName, columnValue, startDate, endDate, true );
+        // TODO: remove hard coding
+        long companyId = -1;
+        long agentId = -1;
+        Set<Long> agentIds = null;
+        if ( columnName.equals( "companyId" ) ) {
+            // agent list will be null
+            companyId = columnValue;
+        } else if ( columnName.equals( "agentId" ) ) {
+            // agent list will have one element, the agent id
+            agentId = columnValue;
+        } else if ( columnName.equals( "regionId" ) ) {
+            agentIds = userProfileDao.findUserIdsByRegion( columnValue );
+        } else if ( columnName.equals( "branchId" ) ) {
+            agentIds = userProfileDao.findUserIdsByBranch( columnValue );
+        }
+        //long incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds);
+        //JIRA SS-1350 begin
+        long incompleteSurveyCount = 0;
+        if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
+            incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount( companyId, agentId,
+                CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds );
+        }
+        //JIRA SS-1350 end
+        LOG.debug( "Completed survey: " + completedSurveyCount );
+        LOG.debug( "Incomplete survey: " + incompleteSurveyCount );
+        return completedSurveyCount + incompleteSurveyCount;
+    }
 
 
     @Override
@@ -216,7 +287,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             startDate = new Timestamp( startTime.getTimeInMillis() );
             endDate = new Timestamp( System.currentTimeMillis() );
         }
-        return getCompletedSurveyCount( columnName, columnValue, startDate, endDate, true );
+        return getCompletedSurveyCountForStatistics( columnName, columnValue, startDate, endDate, true );
     }
 
 
@@ -224,6 +295,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         boolean filterAbusive ) throws InvalidInputException
     {
         return surveyDetailsDao.getCompletedSurveyCount( columnName, columnValue, startDate, endDate, filterAbusive );
+    }
+
+
+    private long getCompletedSurveyCountForStatistics( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
+        boolean filterAbusive ) throws InvalidInputException
+    {
+        return surveyDetailsDao.getCompletedSurveyCountForStatistics( columnName, columnValue, startDate, endDate, filterAbusive );
     }
 
 
@@ -253,7 +331,21 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
-        return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue, false );
+        return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue, false, false );
+    }
+    
+    @Override
+    public long getSocialPostsForPastNdaysWithHierarchyForStatistics( String columnName, long columnValue, int numberOfDays )
+        throws InvalidInputException
+    {
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
+        }
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
+        }
+
+        return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue, false, true );
     }
 
 
@@ -691,7 +783,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      * Method to create excel file from all the completed survey data.
      */
     @Override
-    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileLocation )
+    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileLocation, String profileLevel, long companyId )
         throws IOException, InvalidInputException
     {
         if ( fileLocation == null || fileLocation.isEmpty() ) {
@@ -699,6 +791,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         if ( surveyDetails == null ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter surveyDetails is null" );
+        }
+        
+        if ( profileLevel == null || profileLevel.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter profileLevel is null or empty" );
+        }
+        
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter company id is invalid" );
         }
 
         // Blank workbook
@@ -732,12 +832,42 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 }
             }
         }
+        
+        if ( max == 0 ) {
+            try {
+                // Find Survey Questions configured for company
+                Company company = companyDao.findById( Company.class, companyId );
+                Map<String, Object> queries = new HashMap<String, Object>();
+                queries.put( CommonConstants.COMPANY_COLUMN, company );
+                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+
+                List<SurveyCompanyMapping> surveyCompanyMappingList = surveyCompanyMappingDao.findByKeyValue(
+                    SurveyCompanyMapping.class, queries );
+                if ( surveyCompanyMappingList != null && surveyCompanyMappingList.size() > 0 ) {
+
+                    Survey survey = surveyCompanyMappingList.get( 0 ).getSurvey();
+
+                    queries = new HashMap<String, Object>();
+                    queries.put( CommonConstants.SURVEY_COLUMN, survey );
+                    queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+
+                    List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByKeyValueAscending(
+                        SurveyQuestionsMapping.class, queries, CommonConstants.SURVEY_QUESTION_ORDER_COLUMN );
+
+                    if ( surveyQuestionsMappings != null && surveyCompanyMappingList.size() > 0 ) {
+                        max = surveyCompanyMappingList.size();
+                    }
+                }
+            } catch ( Exception e ) {
+                LOG.warn( "Error occurred while fetching survey question details for company id : " + companyId );
+            }
+        }
+        
 
         // This data needs to be written (List<Object>)
         Map<String, List<Object>> data = new TreeMap<>();
         List<Object> surveyDetailsToPopulate = new ArrayList<>();
         for ( SurveyDetails survey : surveyDetails ) {
-            // exclude reviews which dont have survey answers, like zillow
             if ( survey.getSurveyResponse() != null ) {
                 String agentName = survey.getAgentName();
                 surveyDetailsToPopulate.add( agentName.substring( 0, agentName.lastIndexOf( ' ' ) ) );
@@ -824,6 +954,95 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
                 data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
                 surveyDetailsToPopulate = new ArrayList<>();
+            } else if ( survey.getSource().equalsIgnoreCase( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
+                if ( survey.getAgentId() > 0 ) {
+                    String agentName = survey.getAgentName();
+                    if ( agentName == null || agentName.isEmpty() ) {
+                        try {
+                            AgentSettings agentSettings = organizationManagementService.getAgentSettings( survey.getAgentId() );
+                            if ( agentSettings.getContact_details() != null
+                                && agentSettings.getContact_details().getName() != null
+                                && !agentSettings.getContact_details().getName().isEmpty() ) {
+                                agentName = agentSettings.getContact_details().getName();
+                            } else {
+                                agentName = "";
+                            }
+                        } catch ( NoRecordsFetchedException e ) {
+                            LOG.warn( "Error occurred while fetching agent settings for id : " + survey.getAgentId() );
+                        }
+                    }
+                    if ( agentName.contains( " " ) ) {
+                        surveyDetailsToPopulate.add( agentName.substring( 0, agentName.lastIndexOf( ' ' ) ) );
+                        surveyDetailsToPopulate.add( agentName.substring( agentName.lastIndexOf( ' ' ) + 1 ) );
+                    } else {
+                        surveyDetailsToPopulate.add( agentName );
+                        surveyDetailsToPopulate.add( "" );
+                    }
+                    
+                    surveyDetailsToPopulate.add( survey.getCustomerFirstName() );
+                    surveyDetailsToPopulate.add( "" );
+                    surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getCreatedOn() ) );
+                    surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getModifiedOn() ) );
+                    surveyDetailsToPopulate.add( Days.daysBetween( new DateTime( survey.getCreatedOn() ),
+                        new DateTime( survey.getModifiedOn() ) ).getDays() );
+
+                    surveyDetailsToPopulate.add( survey.getSource() );
+
+                    //add score
+                    surveyDetailsToPopulate.add( ratingFormat.format( survey.getScore() ) );
+
+                    // Since Zillow reviews have no Survey Response Data, push empty data
+                    for ( int i = 1; i <= max; i++ ) {
+                        surveyDetailsToPopulate.add( "" );
+                    }
+                    surveyDetailsToPopulate.add( "" );
+                    surveyDetailsToPopulate.add( survey.getReview() );
+                    if ( survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty() ) {
+                        String status = survey.getAgreedToShare();
+                        if ( status.equals( "true" ) ) {
+                            surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
+                        } else {
+                            surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
+                        }
+                    } else {
+                        surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
+                    }
+                    if ( survey.getSocialMediaPostDetails() != null ) {
+                        Set<String> socialMedia = new HashSet<>();
+                        if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null
+                            && survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() != null
+                            && !survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn().isEmpty() ) {
+                            socialMedia.addAll( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() );
+                        }
+                        if ( survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
+                            && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null
+                            && !survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn().isEmpty() ) {
+                            socialMedia.addAll( survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() );
+                        }
+                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null
+                            && !survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList().isEmpty() ) {
+                            for ( RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails()
+                                .getRegionMediaPostDetailsList() ) {
+                                if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() ) {
+                                    socialMedia.addAll( regionMediaDetail.getSharedOn() );
+                                }
+                            }
+                        }
+                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null
+                            && !survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList().isEmpty() ) {
+                            for ( BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails()
+                                .getBranchMediaPostDetailsList() ) {
+                                if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() ) {
+                                    socialMedia.addAll( branchMediaDetail.getSharedOn() );
+                                }
+                            }
+                        }
+                        surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
+                    }
+
+                    data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
+                    surveyDetailsToPopulate = new ArrayList<>();
+                }
             }
         }
 
@@ -1052,18 +1271,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
 
     /**
-     * Method to return records of billing report data based on start index and batch size
-     */
-    @Override
-    @Transactional
-    public List<BillingReportData> getBillingReportRecords( int startIndex, int batchSize )
-    {
-        LOG.info( "Method getBillingReportRecords started for startIndex : " + startIndex + " and batchSize : " + batchSize );
-        return companyDao.getAllUsersInCompanysForBillingReport( startIndex, batchSize );
-    }
-
-
-    /**
      * Method to check if billing report entries exist
      */
     @Override
@@ -1112,7 +1319,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
 
         Company company = companyDao.findById( Company.class, companyId );
-        Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( company );
+        /*Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( company );
         Branch defaultBranchOfDefaultRegion = organizationManagementService.getDefaultBranchForRegion( defaultRegion
             .getRegionId() );
         List<Region> regionList = new ArrayList<Region>();
@@ -1585,8 +1792,50 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 if ( obj instanceof Long )
                     cell.setCellValue( String.valueOf( (Long) obj ) );
             }
+        }*/
+        HierarchyUpload hierarchyUpload = hierarchyDownloadService.fetchUpdatedHierarchyStructure( company );
+        return hierarchyDownloadService.generateHierarchyDownloadReport( hierarchyUpload, company );
+    }
+
+
+    @Override
+    public long getZillowImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
+    {
+
+        LOG.info( "Get completed survey count for " + columnName + " and value " + columnValue + " with number of days: "
+            + numberOfDays );
+
+        if ( columnName == null || columnName.isEmpty() ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
-        return workbook;
+        if ( columnValue <= 0l ) {
+            throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
+        }
+
+
+        Calendar startTime = Calendar.getInstance();
+        startTime.add( Calendar.DATE, -1 * numberOfDays );
+        // strip the time component of start time
+        startTime.set( Calendar.HOUR_OF_DAY, 0 );
+        startTime.set( Calendar.MINUTE, 0 );
+        startTime.set( Calendar.SECOND, 0 );
+        startTime.set( Calendar.MILLISECOND, 0 );
+
+        Timestamp startDate = null;
+        Timestamp endDate = null;
+        if ( numberOfDays >= 0 ) {
+            startDate = new Timestamp( startTime.getTimeInMillis() );
+            endDate = new Timestamp( System.currentTimeMillis() );
+        }
+        return getZillowImportCount( columnName, columnValue, startDate, endDate, true );
+    
+    }
+
+
+    long getZillowImportCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
+        boolean filterAbusive ) throws InvalidInputException
+    {
+        return surveyDetailsDao.getZillowImportCount( columnName, columnValue, startDate, endDate, filterAbusive );
     }
 }
 // JIRA SS-137 BY RM05:EOC

@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.WordUtils;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -43,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -157,6 +160,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Autowired
     private UrlService urlService;
 
+    @Autowired
+    private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
     /**
      * Method to store question and answer format into mongo.
@@ -208,6 +213,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setUrl( surveyUrl );
         surveyDetails.setEditable( true );
         surveyDetails.setSource( source );
+        surveyDetails.setShowSurveyOnUI( true );
 
         SurveyDetails survey = surveyDetailsDao
             .getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
@@ -1275,20 +1281,41 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
         String custLastName ) throws NoRecordsFetchedException
     {
-        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started. " );
-        Map<String, Object> queries = new HashMap<>();
+        LOG.info( "Method getPreInitiatedSurvey() started. " );
+        /*Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.AGENT_ID_COLUMN, agentId );
-        queries.put( "customerEmailId", customerEmail );
+        queries.put( "customerEmailId", customerEmail );*/
+        Criterion agentIdCriteria = Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId );
+        Criterion emailCriteria = Restrictions.eq( "customerEmailId", customerEmail );
+        Criterion statusCriteria = Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+        Criterion firstNameCriteria = null;
+        Criterion lastNameCriteria = null;
 
         if ( custFirstName != null && !custFirstName.isEmpty() ) {
-            queries.put( "customerFirstName", custFirstName );
+            //queries.put( "customerFirstName", custFirstName );
+            firstNameCriteria = Restrictions.eq( "customerFirstName", custFirstName );
         }
         if ( custLastName != null && !custFirstName.isEmpty() ) {
-            queries.put( "customerLastName", custLastName );
+            //queries.put( "customerLastName", custLastName );
+            lastNameCriteria = Restrictions.eq( "customerLastName", custLastName );
         }
-
-        List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
-            queries );
+        List<SurveyPreInitiation> surveyPreInitiations;
+        if ( firstNameCriteria != null && lastNameCriteria != null ) {
+            surveyPreInitiations = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, agentIdCriteria,
+                emailCriteria, firstNameCriteria, lastNameCriteria, statusCriteria );
+        } else if ( firstNameCriteria != null ) {
+            surveyPreInitiations = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, agentIdCriteria,
+                emailCriteria, firstNameCriteria, statusCriteria );
+        } else if ( lastNameCriteria != null ) {
+            surveyPreInitiations = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, agentIdCriteria,
+                emailCriteria, lastNameCriteria, statusCriteria );
+        } else {
+            surveyPreInitiations = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, agentIdCriteria,
+                emailCriteria, statusCriteria );
+        }
+        
+        /*List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
+            queries );*/
         LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
         if ( surveyPreInitiations != null && !surveyPreInitiations.isEmpty() ) {
             return surveyPreInitiations.get( CommonConstants.INITIAL_INDEX );
@@ -1316,7 +1343,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         LOG.info( "Method deleteSurveyPreInitiationDetailsPermanently() started." );
         if ( surveyPreInitiation != null )
-            surveyPreInitiationDao.delete( surveyPreInitiation );
+            surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+        surveyPreInitiationDao.saveOrUpdate( surveyPreInitiation );
+        //surveyPreInitiationDao.delete( surveyPreInitiation );
         LOG.info( "Method deleteSurveyPreInitiationDetailsPermanently() finished." );
     }
 
@@ -1364,6 +1393,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> invalidAgents = new ArrayList<>();
         List<SurveyPreInitiation> customersWithoutName = new ArrayList<>();
         List<SurveyPreInitiation> customersWithoutEmailId = new ArrayList<>();
+        List<SurveyPreInitiation> ignoredEmailRecords = new ArrayList<>();
+        List<SurveyPreInitiation> oldRecords = new ArrayList<>();
+        
         Set<Long> companies = new HashSet<>();
         for ( SurveyPreInitiation survey : surveys ) {
             int status = CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED;
@@ -1407,7 +1439,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 }
 
             }
-            if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
+            Timestamp engagementClosedTime = survey.getEngagementClosedTime();
+            Calendar calendar = Calendar.getInstance();
+            calendar.add( Calendar.DATE, - validSurveyInterval );
+            Date date = calendar.getTime();
+            
+             if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
                 LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 unavailableAgents.add( survey );
@@ -1423,7 +1460,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 customersWithoutEmailId.add( survey );
                 companies.add( survey.getCompanyId() );
-            } else if ( user == null ) {
+            } else if ( user == null && isEmailIsIgnoredEmail(survey.getAgentEmailId() , survey.getCompanyId() ) ) {
+                LOG.error( "no agent found with this email id and its an ignored record" );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD;
+                ignoredEmailRecords.add( survey );
+                companies.add( survey.getCompanyId() );
+            } else if(engagementClosedTime.before( date )){
+                LOG.info( "An old record found : " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
+                oldRecords.add( survey );
+                companies.add( survey.getCompanyId() );
+            }else if ( user == null ) {
                 LOG.error( "no agent found with this email id" );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 invalidAgents.add( survey );
@@ -1457,11 +1504,35 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         corruptRecords.put( "customersWithoutName", customersWithoutName );
         corruptRecords.put( "customersWithoutEmailId", customersWithoutEmailId );
         corruptRecords.put( "invalidAgents", invalidAgents );
+        corruptRecords.put( "ignoredEmailRecords", ignoredEmailRecords );
+        corruptRecords.put( "oldRecords", oldRecords );
         corruptRecords.put( "companies", companies );
         return corruptRecords;
     }
 
-
+    /**
+     * 
+     * @param emailId
+     * @return
+     */
+    boolean isEmailIsIgnoredEmail(String emailId , long companyId){
+        LOG.debug( "Inside method isEmailIsIgnoredEmail for email : " + emailId );
+        Map<String, Object> queries = new  HashMap<String, Object>();
+        queries.put( "emailId", emailId );
+        queries.put( "company.companyId", companyId );
+        List<CompanyIgnoredEmailMapping> companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.findByKeyValue( CompanyIgnoredEmailMapping.class, queries );
+        if(companyIgnoredEmailMapping == null || companyIgnoredEmailMapping.size() == 0)
+            return false;
+        else
+            return true;
+    }
+    
+    /**
+     * 
+     * @param user
+     * @param surveyPreInitiation
+     * @return
+     */
     int validateUnitsettingsForDotloop( User user, SurveyPreInitiation surveyPreInitiation )
     {
         LOG.info( "Inside method validateUnitSettingsForDotloop " );
@@ -1635,7 +1706,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     // Method to store details of a customer in mysql at the time of sending invite.
-    private void preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
+    void preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
         String custRelationWithAgent, String source )
     {
         LOG.debug( "Method preInitiateSurvey() started to store details of a customer in mysql at the time of  sending invite" );
@@ -1723,11 +1794,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         // check if survey has already been sent to the email id
         // check the pre-initiation and then the survey table
-        HashMap<String, Object> queries = new HashMap<>();
+        /*HashMap<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.AGENT_ID_COLUMN, agentId );
         queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, recipientEmailId );
         List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
-            queries );
+            queries );*/
+        
+        Criterion agentIdCriteria = Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId );
+        Criterion emailCriteria = Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, recipientEmailId );
+        Criterion statusCriteria = Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class,
+            agentIdCriteria, emailCriteria, statusCriteria );
+        
         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
             LOG.warn( "Survey request already sent" );
             throw new DuplicateSurveyRequestException( "Survey request already sent" );
@@ -1759,22 +1837,36 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     //        LOG.info( "Method deleteZillowSurveysByEntity() finished" );
     //    }
 
-    //  Commented as Zillow surveys are not stored in database, SS-1276
+    //    Commented as Zillow surveys are not stored in database, SS-1276
     //    @Override
     //    @Transactional
     //    public void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
     //    {
-    //        LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
-    //        if ( entityType == null || entityType.isEmpty() ) {
-    //            throw new InvalidInputException( "Entity Type is invalid" );
-    //        }
-    //        if ( entityId <= 0 ) {
-    //            throw new InvalidInputException( "Entity ID is invalid" );
-    //        }
-    //        surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
-    //        LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
+    //         LOG.info( "Method deleteExcessZillowSurveysByEntity() started" );
+    //         if ( entityType == null || entityType.isEmpty() ) {
+    //             throw new InvalidInputException( "Entity Type is invalid" );
+    //         }
+    //         if ( entityId <= 0 ) {
+    //             throw new InvalidInputException( "Entity ID is invalid" );
+    //         }
+    //         surveyDetailsDao.removeExcessZillowSurveysByEntity( entityType, entityId );
+    //         LOG.info( "Method deleteExcessZillowSurveysByEntity() finished" );
     //    }
 
+    @Override
+    @Transactional
+    public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
+    {
+        LOG.info( "Method deleteExistingZillowSurveysByEntity() started" );
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Entity Type is invalid" );
+        }
+        if ( entityId <= 0 ) {
+            throw new InvalidInputException( "Entity ID is invalid" );
+        }
+        surveyDetailsDao.removeExistingZillowSurveysByEntity( entityType, entityId );
+        LOG.info( "Method deleteExistingZillowSurveysByEntity() finished" );
+    }
 
     @Override
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows )

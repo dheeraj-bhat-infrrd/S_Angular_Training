@@ -1070,7 +1070,7 @@ public class OrganizationManagementServiceImplTest
         SolrException, UserAssignmentException
     {
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-        organizationManagementServiceImpl.addIndividual( new User(), 1, 1, 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
+        organizationManagementServiceImpl.addIndividual( new User(), 1, 1, 1, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1081,7 +1081,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.doReturn( null ).when( organizationManagementServiceImpl )
             .getDefaultRegionForCompany( Mockito.any( Company.class ) );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
-        organizationManagementServiceImpl.addIndividual( new User(), 1, 0, 0, TestConstants.TEST_EMPTY_ARRAY, false, true );
+        organizationManagementServiceImpl.addIndividual( new User(), 1, 0, 0, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -2318,5 +2318,26 @@ public class OrganizationManagementServiceImplTest
         userList.add( user );
         Mockito.when( userManagementService.getBranchById( Mockito.anyLong() ) ).thenReturn( new Branch() );
         organizationManagementServiceImpl.updateRegionIdForUsers( userList, 1l, 1l, 1l );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetRegionIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getRegionIdsUnderCompany( 0, 0, 50 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getBranchIdsUnderCompany( 0, 0, 50 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getAgentIdsUnderCompany( 0, 0, 50 );
     }
 }

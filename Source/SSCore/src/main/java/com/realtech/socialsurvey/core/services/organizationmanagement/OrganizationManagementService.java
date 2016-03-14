@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -527,8 +529,8 @@ public interface OrganizationManagementService
      * @throws UserAssignmentException
      */
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, NoRecordsFetchedException, SolrException,
-        UserAssignmentException;
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail ) throws InvalidInputException,
+        NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 
     /**
@@ -1259,6 +1261,13 @@ public interface OrganizationManagementService
      * @return
      */
     public List<HierarchySettingsCompare> mismatchRegionHierarchySettings(List<Region> regions);
+    
+    /**
+     * Validates the upload file
+     * @param uploadFileName
+     * @return
+     */
+    public UploadValidation validateUserUploadSheet(String uploadFileName) throws InvalidInputException;
 
 
     List<Region> getRegionsBySearchKey( String searchKey ) throws InvalidInputException, SolrException;
@@ -1269,4 +1278,23 @@ public interface OrganizationManagementService
 
     List<UserFromSearch> getUsersBySearchKey( String searchKey ) throws InvalidInputException, SolrException;
 
+
+    public List<Long> getRegionIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
+
+
+    public List<Long> getBranchIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
+
+
+    public List<Long> getAgentIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException;
+
+
+    public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> ids );
+
+
+    public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,
+        boolean holdSendingMail, boolean sendMail ) throws InvalidInputException;
+
+
+    public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
+        OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException;
 }

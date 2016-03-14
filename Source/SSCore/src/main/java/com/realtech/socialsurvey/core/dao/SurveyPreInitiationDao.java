@@ -83,4 +83,17 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     public void updateAgentInfoOfPreInitiatedSurveys( long fromUserId, User toUser ) throws InvalidInputException;
+
+    List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys( long companyId, int start, int batch );
+
+    List<SurveyPreInitiation> getProcessedPreInitiatedSurveys( long companyId, int start, int batch );
+
+    void updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( User agent, String agentEmailAddress )
+        throws InvalidInputException;
+
+    void updateSurveyPreinitiationRecordsAsIgnored( String agentEmailAddress ) throws InvalidInputException;
+
+    long getUnmatchedPreInitiatedSurveyCount( long companyId );
+
+    long getProcessedPreInitiatedSurveyCount( long companyId );
 }

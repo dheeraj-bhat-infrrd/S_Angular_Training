@@ -266,6 +266,19 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+
+	<!-- Setting hierarchy upload job detail -->
+	<bean id="hierarchyuploadjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.HierarchyUploader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="hierarchyUploadHandler" value-ref="hierarchyUploadHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 	
 	<!-- Setting billing report job detail -->
 	<bean id="billingreportjobdetail"
@@ -275,6 +288,21 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="billingReportHandler" value-ref="billingReportHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
+	<!-- Setting billing report job detail -->
+	<bean id="companiesbillingreportjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.CompaniesBillingReportGenerator" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="billingReportsService" value-ref="billingReportsService" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -339,6 +367,29 @@
 				<entry key="imageProcessor" value-ref="imageProcessor" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<!-- Setting zillow review process and auto post detail -->
+	<bean id="zillowreviewprocessandautopostjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.ZillowReviewProcessorAndAutoPostStarter" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="emailServices" value-ref="emailServices" />
+				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="socialManagementService" value-ref="socialManagementService" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="profileManagementService" value-ref="profileManagementService" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="utils" value-ref="utils" />
+				<entry key="zillowAutoPostThreshold" value="${ZILLOW_AUTO_POST_THRESHOLD}" />
+				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
+				<entry key="emailServices" value-ref="emailServices" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -462,6 +513,14 @@
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
+
+	<!-- setting cron for hierarchy upload -->
+	<bean id="hierarchyuploadcron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="hierarchyuploadjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
 	
 	<!-- setting cron for billing report -->
 	<bean id="billingreportcron"
@@ -470,6 +529,14 @@
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2300" />
 	</bean>
+	
+	
+	<bean id="companiesbillingreportcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="companiesbillingreportjobdetail" />
+		<property name="cronExpression" value="0 0 9 * * ?" />
+	</bean>
+	
 	
 	<!-- setting cron for survey file upload -->
 	<bean id="surveyfileuploadcron"
@@ -491,6 +558,12 @@
 		<property name="cronExpression" value="0 0 8 * * ?" />
 	</bean>
 
+	<bean id="zillowreviewprocessandautopostcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="zillowreviewprocessandautopostjobdetail" />
+		<property name="cronExpression" value="0 0 8 * * ?" />
+	</bean>
+
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
@@ -506,13 +579,16 @@
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="imageloaderjobdetail" />
 				<ref bean="fileuploadjobdetail" />
+				<ref bean="hierarchyuploadjobdetail" />
 				<ref bean="billingreportjobdetail" />
 				<ref bean="dotloopjobdetail" />
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
-				<ref bean="imageprocessingjobdetail" /> 
+				<ref bean="imageprocessingjobdetail" />
+				<ref bean="companiesbillingreportjobdetail" />
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
+				<ref bean="zillowreviewprocessandautopostjobdetail" />
 			</list>
 		</property>
 
@@ -530,13 +606,16 @@
 				<ref bean="crmdataagentidmappercron" />
 				<ref bean="imageloadercron" />
 				<ref bean="fileuploadcron" />
+				<ref bean="hierarchyuploadcron" />
 				<ref bean="billingreportcron" />
 				<ref bean="dotloopcron" />
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
 				<ref bean="imageprocessingcron" />
+				<ref bean="companiesbillingreportcron" />
 				<!-- <ref bean="hierarchysettingscron" /> -->
+				<ref bean="zillowreviewprocessandautopostcron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -629,8 +708,14 @@
 	<!-- CSV Upload reader -->
 	<bean id="uploadHandler" class="com.realtech.socialsurvey.core.handler.CSVUploadHandler" />
 	
+	<!-- Hierarchy Upload handler -->
+	<bean id="hierarchyUploadHandler" class="com.realtech.socialsurvey.core.handler.HierarchyUploadHandler" />
+	
 	<!-- Billing report generator -->
 	<bean id="billingReportHandler" class="com.realtech.socialsurvey.core.handler.BillingReportHandler" />
+	
+	<bean id="billingReportsService" class="com.realtech.socialsurvey.core.services.reports.impl.BillingReportsServiceImpl" />
+	
 	
 	<!-- CSV Upload reader -->
 	<bean id="surveyuploadHandler" class="com.realtech.socialsurvey.core.handler.CSVBulkSurveyInitiatorHandler" />
