@@ -645,6 +645,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
      * @throws NoRecordsFetchedException
      */
     @Override
+    @Transactional
     public UserProfile findUserProfile( long userId, long branchId, long regionId, int profilesMasterId ) throws NoRecordsFetchedException
     {
         LOG.info( "Method to find userProfile for userId: " + userId + " branchId: " + branchId + " regionId : " + regionId + " started." );
