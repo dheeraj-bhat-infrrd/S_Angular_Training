@@ -215,7 +215,7 @@ public class EmailServicesImpl implements EmailServices
     }
 
     
-    
+    @Async
     @Override
     public void sendInvitationToSocialSurveyAdmin( String url, String recipientMailId, String name, String loginName )
         throws InvalidInputException, UndeliveredEmailException
@@ -1931,7 +1931,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName ) );
 
         LOG.debug( "Calling email sender to send mail" );
-        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, true, false );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false, false );
 
         LOG.info( "Method sendCustomReportMail() finished." );
     }

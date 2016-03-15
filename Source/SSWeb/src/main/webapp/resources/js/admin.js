@@ -530,10 +530,16 @@ $(document).on('click','#add-ss-admin-form-submit',function(){
 		var formData = $('#add-ss-admin-form').serialize();
 		showOverlay();
 		callAjaxPostWithPayloadData("./createsocialsurveyadmin.do", function(data){
-			$('#overlay-toast').html(data);
-			$("#add-ss-admin-fname").val('');
-			$("#add-ss-admin-lname").val('');
-			$("#add-ss-admin-emailid").val('');
+			data = JSON.parse(data);
+			 if(data.isCreated){
+				$("#add-ss-admin-fname").val('');
+				$("#add-ss-admin-lname").val('');
+				$("#add-ss-admin-emailid").val('');
+				//repaint admin list
+				showMainContent('./adminusermanagement.do');
+			 }
+			
+			$('#overlay-toast').html(data.message);
 			showToast();
 		}, formData, true);
 	}
