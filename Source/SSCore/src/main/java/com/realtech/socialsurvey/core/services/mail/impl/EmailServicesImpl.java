@@ -215,7 +215,7 @@ public class EmailServicesImpl implements EmailServices
     }
 
     
-    
+    @Async
     @Override
     public void sendInvitationToSocialSurveyAdmin( String url, String recipientMailId, String name, String loginName )
         throws InvalidInputException, UndeliveredEmailException
@@ -1876,6 +1876,7 @@ public class EmailServicesImpl implements EmailServices
     /**
      * Method to send the billing report in a mail to the social survey admin
      */
+    @Async
     @Override
     public void sendBillingReportMail( String firstName, String lastName, String recipientMailId,
         Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
@@ -1907,6 +1908,7 @@ public class EmailServicesImpl implements EmailServices
     /**
      * Method to send the billing report in a mail to the social survey admin
      */
+    @Async
     @Override
     public void sendCustomReportMail( String recipientName, List<String> recipientMailIds, String subject,
         Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
