@@ -1876,7 +1876,6 @@ public class EmailServicesImpl implements EmailServices
     /**
      * Method to send the billing report in a mail to the social survey admin
      */
-    @Async
     @Override
     public void sendBillingReportMail( String firstName, String lastName, String recipientMailId,
         Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
@@ -1908,7 +1907,6 @@ public class EmailServicesImpl implements EmailServices
     /**
      * Method to send the billing report in a mail to the social survey admin
      */
-    @Async
     @Override
     public void sendCustomReportMail( String recipientName, List<String> recipientMailIds, String subject,
         Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
@@ -1933,7 +1931,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName ) );
 
         LOG.debug( "Calling email sender to send mail" );
-        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, true, false );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false, false );
 
         LOG.info( "Method sendCustomReportMail() finished." );
     }
