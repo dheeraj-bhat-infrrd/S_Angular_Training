@@ -48,7 +48,7 @@ public class HierarchyUploadProcessor implements Runnable
                         User adminUser = hierarchyStructureUploadService.getUser( uploadStatus.getAdminUserId() );
                         try {
                             // Update uploadStatus to 0
-                            uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_PROCESSING );
+                            uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_STARTED );
                             uploadStatus.setMessage( CommonConstants.UPLOAD_MSG_STARTED );
                             hierarchyStructureUploadService.updateUploadStatus( uploadStatus );
                             //Upload hierarchy

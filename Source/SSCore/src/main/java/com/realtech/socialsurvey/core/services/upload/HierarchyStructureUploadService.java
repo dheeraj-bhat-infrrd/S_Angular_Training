@@ -81,4 +81,20 @@ public interface HierarchyStructureUploadService
 
     public User assignUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
+
+    
+    /**
+     * Method to fetch all the upload statuses for a company
+     * @param company
+     * @return
+     */
+    public List<UploadStatus> fetchUploadStatusForCompany( Company company );
+
+    
+    /**
+     * Method to determine the latest status
+     * @param uploadStatuses
+     * @return
+     */
+    public int highestStatus( List<UploadStatus> uploadStatuses );
 }

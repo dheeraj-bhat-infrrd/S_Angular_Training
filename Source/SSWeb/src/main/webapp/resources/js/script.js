@@ -2696,11 +2696,13 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				//If not complete/error, keep making a request every 15 seconds
-				if ( !(jsonResponse.uploadStatus == 9 || jsonResponse.uploadStatus == 8
-						|| jsonResponse.uploadStatus == -1 ) ) {
+				if ( !(jsonResponse.uploadStatus == 4 || jsonResponse.uploadStatus == 5
+						|| jsonResponse.uploadStatus == -1 || jsonResponse.uploadStstus == 6 ) ) {
 					$('#uploadBatchStatus').empty();
-					$('<div>' + jsonResponse.response + '</div>').appendTo(
-							'#uploadBatchStatus');
+					jsonResponse.response.forEach( function(uploadStatus){
+						$('<div>' + uploadStatus.message + '</div>').appendTo(
+						'#uploadBatchStatus');
+					} );
 					$('#uploadBatchStatus').show();
 					showLoaderOnPagination($('#uploadBatchStatus'));
 					setTimeout(function(){
@@ -2710,9 +2712,12 @@ var hierarchyUpload = {
 										true, null);
 					}, 15000);
 				} else {
-					if (response != undefined && response != null && response != '') {
-						$('<div>' + jsonResponse.response + '</div>').appendTo(
-								'#uploadBatchStatus');
+					if (response != undefined && response != null && response != '' && jsonResponse.response != []) {
+						$('#uploadBatchStatus').empty();
+						jsonResponse.response.forEach( function(uploadStatus){
+							$('<div>' + uploadStatus.message + '</div>').appendTo(
+							'#uploadBatchStatus');
+						} );
 						$('#uploadBatchStatus').show();
 					}
 					hideLoaderOnPagination($('#uploadBatchStatus'));

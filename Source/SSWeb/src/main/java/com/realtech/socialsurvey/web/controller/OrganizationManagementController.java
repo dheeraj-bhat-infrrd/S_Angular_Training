@@ -2856,16 +2856,13 @@ public class OrganizationManagementController
         User user = sessionHelper.getCurrentUser();
         boolean status = true;
         String response = null;
-        UploadStatus latestStatus = hierarchyStructureUploadService.fetchLatestUploadStatus( user.getCompany() );
-        int uploadStatus = -1;
-        String lastUploadRunTimestamp = null;
+        int latestStatus = -1;
+        List<UploadStatus> latestStatuses = hierarchyStructureUploadService.fetchUploadStatusForCompany( user.getCompany() );
         try {
-            if ( latestStatus == null ) {
+            if ( latestStatuses == null || latestStatuses.isEmpty() ) {
                 response = CommonConstants.UPLOAD_MSG_NO_UPLOAD;
             } else {
-                response = latestStatus.getMessage();
-                lastUploadRunTimestamp = latestStatus.getModifiedOn().toString();
-                uploadStatus = latestStatus.getStatus();
+                latestStatus = hierarchyStructureUploadService.highestStatus( latestStatuses );
             }
         } catch ( Exception e ) {
             status = false;
@@ -2873,10 +2870,12 @@ public class OrganizationManagementController
         }
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
-        responseMap.put( "response", response );
-        responseMap.put( "uploadStatus", uploadStatus );
-        // Fetch the last uploaded timestamp from db and put it in responseMap
-        responseMap.put( "lastUploadRunTimestamp", lastUploadRunTimestamp );
+        if ( latestStatuses == null || latestStatuses.isEmpty() ) {
+            responseMap.put( "response", response );
+        } else {
+            responseMap.put( "response", latestStatuses );
+        }
+        responseMap.put( "uploadStatus", latestStatus );
         return new Gson().toJson( responseMap );
     }
 
