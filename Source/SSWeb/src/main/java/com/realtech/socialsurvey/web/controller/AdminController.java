@@ -63,8 +63,6 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.core.vo.SubscriptionVO;
-import com.realtech.socialsurvey.core.vo.TransactionVO;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
@@ -790,9 +788,13 @@ public class AdminController
     @ResponseBody
     @RequestMapping ( value = "/createsocialsurveyadmin", method = RequestMethod.POST)
     public String createSocialSurveyAdmin( @RequestParam ( "firstName") String firstName,
-        @RequestParam ( "lastName") String lastName, @RequestParam ( "emailId") String emailId )
+        @RequestParam ( "lastName") String lastName, @RequestParam ( "emailId") String emailId  )
     {
 
+        LOG.info( "Method to fetch createSocialSurveyAdmin started." );
+        boolean isCreated = true; 
+        String message = "";
+        Map<Object,Object> returnData = new HashMap<Object,Object>();
         try {
             if ( firstName == null || firstName.isEmpty() ) {
                 throw new InvalidInputException( "First Name can't be empty" );
@@ -810,22 +812,29 @@ public class AdminController
             admin = userManagementService.getUserObjByUserId( admin.getUserId() );
 
             userManagementService.createSocialSurveyAdmin( admin, firstName, lastName, emailId );
+            message =  messageUtils.getDisplayMessage( DisplayMessageConstants.SUCCESSFULLY_CREATED_SS_ADMIN,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding a social survey admin. Reason : " + e.getMessage(), e );
-            return e.getMessage();
+            isCreated = false;
+            message = e.getMessage();
         }
 
         LOG.info( "Successfully completed controller to add a social survey admin" );
-        return messageUtils.getDisplayMessage( DisplayMessageConstants.SUCCESSFULLY_CREATED_SS_ADMIN,
-            DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        
+        returnData.put( "isCreated", isCreated );
+        returnData.put( "message", message );
+        Gson gson = new Gson(); 
+        
+        return gson.toJson(returnData); 
 
     }
 
 
     @RequestMapping ( value = "/getsocialsurveyadminlist", method = RequestMethod.GET)
-    public String createSocialSurveyAdmin( Model model, HttpServletRequest request )
+    public String getSocialSurveyAdminList( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to fetch user by user, findUserByUserId() started." );
+        LOG.info( "Method to fetch getSocialSurveyAdminList started." );
 
 
         try {
@@ -850,7 +859,7 @@ public class AdminController
             return JspResolver.MESSAGE_HEADER;
         }
 
-        LOG.info( "Method to fetch users by company , findUsersForCompany() finished." );
+        LOG.info( "Method getSocialSurveyAdminList() finished." );
         return JspResolver.ADMIN_SS_ADMIN_LIST;
     }
 
@@ -858,7 +867,7 @@ public class AdminController
     @RequestMapping ( value = "/deletesocialsurveyadmin", method = RequestMethod.POST)
     public String deleteSocialSurveyAdmin( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to fetch user by user, findUserByUserId() started." );
+        LOG.info( "Method deleteSocialSurveyAdmin started." );
 
 
         try {
@@ -887,7 +896,7 @@ public class AdminController
             return JspResolver.MESSAGE_HEADER;
         }
 
-        LOG.info( "Method to delete SocialSurveyAdminfinished." );
+        LOG.info( "Method to delete SocialSurveyAdmin finished." );
         model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.SS_ADMIN_DELETE_SUCCESSFUL,
             DisplayMessageType.SUCCESS_MESSAGE ) );
         return JspResolver.MESSAGE_HEADER;
