@@ -102,7 +102,7 @@ public interface SocialManagementService
 
 
     public boolean updateLinkedin( OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl,
-        String linkedinMessageFeedback ) throws NonFatalException;
+        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow ) throws NonFatalException;
 
 
     public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, OrganizationUnitSettings unitSettings,
@@ -157,7 +157,7 @@ public interface SocialManagementService
 
     void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,
         String linkedinMessageFeedback, int accountMasterId, SocialMediaPostDetails socialMediaPostDetails,
-        SocialMediaPostResponseDetails socialMediaPostResponseDetails ) throws InvalidInputException, NoRecordsFetchedException;
+        SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings, boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     void postToTwitterForHierarchy( String twitterMessage, double rating, String serverBaseUrl, int accountMasterId,
