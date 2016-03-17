@@ -533,7 +533,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	background: url(../images/dashloader.gif) no-repeat center;
 	background-size: 50px 50px;
 	background-color: rgba(255, 255, 255, 0.7);
-	min-height: 180px;
+	min-height: 220px;
 }
 
 #low-dash {
@@ -5438,6 +5438,7 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	margin-top: -2px;
 	border-radius: 3px;
 	cursor: pointer;
+	min-width: 120px;
 }
 
 tr.v-tbl-header {

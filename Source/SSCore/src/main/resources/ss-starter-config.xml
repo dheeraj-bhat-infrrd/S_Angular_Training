@@ -586,7 +586,7 @@
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
 				<ref bean="imageprocessingjobdetail" />
-				<ref bean="companiesbillingreportjobdetail" />
+				<!-- <ref bean="companiesbillingreportjobdetail" /> -->
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
 			</list>
@@ -613,7 +613,7 @@
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
 				<ref bean="imageprocessingcron" />
-				<ref bean="companiesbillingreportcron" />
+				<!-- <ref bean="companiesbillingreportcron" /> -->
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<ref bean="zillowreviewprocessandautopostcron" />
 			</list>
