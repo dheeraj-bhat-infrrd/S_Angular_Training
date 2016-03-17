@@ -2039,6 +2039,35 @@ function displayMessage(data) {
 }
 
 /**
+ * function to display success and failure message to user after adding region and branch action
+ * @param data
+ */
+function displayMessageForRegionAndBranchAddition(data) {
+	$("#temp-message").html(data);
+	var displayMessageDiv = $("#temp-message #display-msg-div");
+	var invalidEmailAddressDiv = $("#display-invalid-email-addr-msg-div");
+	var alreadyExistEmailAddressDiv = $("#display-already-exist-email-addr-msg-div");
+	if($(displayMessageDiv).hasClass("success-message")) {
+		showInfoSuccessMobileAndWeb($(displayMessageDiv).html());
+	}
+	else if($(displayMessageDiv).hasClass("error-message")) {
+		showErrorSuccessMobileAndWeb($(displayMessageDiv).html());
+	}
+	if($(invalidEmailAddressDiv).hasClass("error-message")) {
+		showErrorInvalidMobileAndWeb($(invalidEmailAddressDiv).html());
+	}
+	if($(alreadyExistEmailAddressDiv).hasClass("error-message")) {
+		showErrorMobileAndWeb($(alreadyExistEmailAddressDiv).html());
+	}
+	var invalidMessage = $('#invalid-display-msg-div').text();
+	if(invalidMessage != undefined && invalidMessage != ""){
+		$('#overlay-toast').html(invalidMessage);
+		showToast();
+	}
+	$("#temp-message").html("");
+}
+
+/**
  * checks whether is authorized to build hierarchy and displays message to the user
  */
 function checkUserAuthorization(){
@@ -2591,7 +2620,7 @@ function addRegion(formId,disableEle) {
  */
 function addRegionCallBack(data) {
 	hideOverlay();
-	displayMessage(data);
+	displayMessageForRegionAndBranchAddition(data);
 	showStateCityRow("region-state-city-row", "region-state-txt", "region-city-txt");
 	resetInputFields("edit-region-form");
 	$('#region-country').val(defaultCountry);
@@ -2763,7 +2792,7 @@ function addOffice(formId,disableEle) {
  */
 function addOfficeCallBack(data) {
 	hideOverlay();
-	displayMessage(data);
+	displayMessageForRegionAndBranchAddition(data);
 	showStateCityRow("office-state-city-row", "office-state-txt", "office-city-txt");
 	resetInputFields("edit-office-form");
 	$('#office-country').val(defaultCountry);
