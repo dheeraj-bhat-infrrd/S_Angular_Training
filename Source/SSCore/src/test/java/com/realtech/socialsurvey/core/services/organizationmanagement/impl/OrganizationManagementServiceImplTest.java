@@ -1072,7 +1072,7 @@ public class OrganizationManagementServiceImplTest
         SolrException, UserAssignmentException
     {
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-        organizationManagementServiceImpl.addIndividual( new User(), 1, 1, 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
+        organizationManagementServiceImpl.addIndividual( new User(), 1, 1, 1, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1083,7 +1083,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.doReturn( null ).when( organizationManagementServiceImpl )
             .getDefaultRegionForCompany( Mockito.any( Company.class ) );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
-        organizationManagementServiceImpl.addIndividual( new User(), 1, 0, 0, TestConstants.TEST_EMPTY_ARRAY, false, true );
+        organizationManagementServiceImpl.addIndividual( new User(), 1, 0, 0, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -2372,5 +2372,24 @@ public class OrganizationManagementServiceImplTest
         assertTrue( "Invalid user assignment not found", userMap.size() != 0 && !userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ).isEmpty() );
         assertEquals( "Invalid user assignment email id is not same as assignee user email id passed as argument",
             userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ).get( 0 ).getEmailId(), assigneeUser.getEmailId() );
+    }
+    @Test ( expected = InvalidInputException.class)
+    public void testGetRegionIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getRegionIdsUnderCompany( 0, 0, 50 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetBranchIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getBranchIdsUnderCompany( 0, 0, 50 );
+    }
+
+
+    @Test ( expected = InvalidInputException.class)
+    public void testGetAgentIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.getAgentIdsUnderCompany( 0, 0, 50 );
     }
 }

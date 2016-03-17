@@ -339,3 +339,8 @@
     color: #DE3838;
     margin-bottom: 10px;
 }
+
+.st-widget-txt {
+    line-height: 26px;
+    width: 100%;
+}

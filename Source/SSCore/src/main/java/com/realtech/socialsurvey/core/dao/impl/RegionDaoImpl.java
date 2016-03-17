@@ -10,11 +10,13 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -129,5 +131,41 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
             return regionList;
 
     }
+
+
+    /**
+     * Method to fetch all region ids under company
+     * @param companyId
+     * @throws InvalidInputException
+     * */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<Long> getRegionIdsUnderCompany( long companyId, int start, int batchSize ) throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( "Invalid company id passed in getRegionIdsUnderCompany method" );
+        }
+        LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() started." );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( Region.class );
+            criteria.setProjection( Projections.property( CommonConstants.REGION_ID_COLUMN ).as(
+                CommonConstants.REGION_ID_COLUMN ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
+            criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+            if ( start > 0 )
+                criteria.setFirstResult( start );
+            if ( batchSize > 0 )
+                criteria.setMaxResults( batchSize );
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getRegionIdsUnderCompany(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getRegionIdsUnderCompany().", e );
+        }
+        LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() ended." );
+        return criteria.list();
+    }
+
 }
 // JIRA SS-42 By RM-05 EOC

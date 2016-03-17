@@ -274,43 +274,52 @@ public class DotloopReviewProcessor extends QuartzJobBean
         // new records and then add the new record.
         LOG.debug( "Processing loops for profile id: " + profileId + " and byPassRecords flag: " + byPassRecords );
         for ( LoopProfileMapping loop : loops ) {
-            // Setting profile id for the loop
-            loop.setProfileId( profileId );
-            // if status is not sold, stop the process and send a mail to the admin
-            if ( !loop.getLoopStatus().equalsIgnoreCase( SOLD_STATUS ) ) {
-                LOG.warn( "Found a loop status which is not sold." );
-                throw new FatalException( "Found a loop status which is not sold. Details: Loop view id: "
-                    + loop.getLoopViewId() + " for profile id: " + profileId + ". Collection: " + collectionName + " ID: "
-                    + organizationUnitId );
-            }
-            // check if the record is present in the database then skip the loop. if not, then
-            // process it
-            LoopProfileMapping loopFromSystem = null;
-            try {
-                loopFromSystem = organizationManagementService.getLoopByProfileAndLoopId( profileId, loop.getLoopId(),
-                    collectionName, organizationUnitId );
-            } catch ( InvalidInputException e ) {
-                LOG.error( "Could not get loop details from database for loop id " + loop.getLoopId() + " for profile "
-                    + profileId, e );
-                continue;
-            }
-            if ( loopFromSystem == null ) {
-                LOG.info( "Loop " + loop.getLoopId() + " for profile " + profileId + " is not present. Hence processing." );
-                if ( !byPassRecords ) {
-                    processLoop( collectionName, loop, authorizationHeader, organizationUnitId );
+            try{
+                // Setting profile id for the loop
+                loop.setProfileId( profileId );
+                // if status is not sold, stop the process and send a mail to the admin
+                if ( !loop.getLoopStatus().equalsIgnoreCase( SOLD_STATUS ) ) {
+                    LOG.warn( "Found a loop status which is not sold." );
+                    throw new FatalException( "Found a loop status which is not sold. Details: Loop view id: "
+                        + loop.getLoopViewId() + " for profile id: " + profileId + ". Collection: " + collectionName + " ID: "
+                        + organizationUnitId );
+                    
                 }
-                LOG.debug( "Insert into tracker." );
+                // check if the record is present in the database then skip the loop. if not, then
+                // process it
+                LoopProfileMapping loopFromSystem = null;
                 try {
-                    loop = setHierarchyInformationInLoop( loop, collectionName, organizationUnitId );
-                    loop.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-                    organizationManagementService.saveLoopsForProfile( loop );
+                    loopFromSystem = organizationManagementService.getLoopByProfileAndLoopId( profileId, loop.getLoopId(),
+                        collectionName, organizationUnitId );
                 } catch ( InvalidInputException e ) {
-                    LOG.warn( "Could not insert loop " + loop.getLoopId() + " for profile " + loop.getProfileId() );
+                    LOG.error( "Could not get loop details from database for loop id " + loop.getLoopId() + " for profile "
+                        + profileId, e );
+                    continue;
                 }
-            } else {
-                // record is present. process next record
-                LOG.info( "Loop " + loop.getLoopId() + " for profile " + profileId + " is present. Hence skipping." );
-                continue;
+                if ( loopFromSystem == null ) {
+                    LOG.info( "Loop " + loop.getLoopId() + " for profile " + profileId + " is not present. Hence processing." );
+                    if ( !byPassRecords ) {
+                        processLoop( collectionName, loop, authorizationHeader, organizationUnitId );
+                    }
+                    LOG.debug( "Insert into tracker." );
+                    try {
+                        loop = setHierarchyInformationInLoop( loop, collectionName, organizationUnitId );
+                        loop.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+                        organizationManagementService.saveLoopsForProfile( loop );
+                    } catch ( InvalidInputException e ) {
+                        LOG.warn( "Could not insert loop " + loop.getLoopId() + " for profile " + loop.getProfileId() );
+                    }
+                } else {
+                    // record is present. process next record
+                    LOG.info( "Loop " + loop.getLoopId() + " for profile " + profileId + " is present. Hence skipping." );
+                    continue;
+                }
+            }catch(FatalException e){
+                try {
+                    emailServices.sendFatalExceptionEmail( applicationAdminEmail, e.getMessage() );
+                } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
+                    LOG.error( "Error while sending mail to admin " , e );
+                }
             }
         }
     }

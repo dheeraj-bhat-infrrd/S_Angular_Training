@@ -168,7 +168,7 @@ function searchAndDisplayBranches(key) {
 function searchAndDisplayUsers(key) {
 	
 	showOverlay();
-	callAjaxGETAndAbortLastRequest("/fetchusersbykey.do?searchKey="+key, function(data) {
+	callAjaxGETAndAbortLastRequest("/fetchusersbykey.do?searchKey="+encodeURIComponent(key), function(data) {
 		
 		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
 		
@@ -334,6 +334,7 @@ $(document).on('click', '.comp-row', function(e) {
 function bindUserLoginEvent() {
 	console.log("inside admin");
 	$('.user-login-icn').on('click', function(e) {
+		$( '.user-login-icn').unbind( "click" );
 		e.stopImmediatePropagation();
 		var payload = {
 			"colName" : "userId",
@@ -529,10 +530,16 @@ $(document).on('click','#add-ss-admin-form-submit',function(){
 		var formData = $('#add-ss-admin-form').serialize();
 		showOverlay();
 		callAjaxPostWithPayloadData("./createsocialsurveyadmin.do", function(data){
-			$('#overlay-toast').html(data);
-			$("#add-ss-admin-fname").val('');
-			$("#add-ss-admin-lname").val('');
-			$("#add-ss-admin-emailid").val('');
+			data = JSON.parse(data);
+			 if(data.isCreated){
+				$("#add-ss-admin-fname").val('');
+				$("#add-ss-admin-lname").val('');
+				$("#add-ss-admin-emailid").val('');
+				//repaint admin list
+				showMainContent('./adminusermanagement.do');
+			 }
+			
+			$('#overlay-toast').html(data.message);
 			showToast();
 		}, formData, true);
 	}

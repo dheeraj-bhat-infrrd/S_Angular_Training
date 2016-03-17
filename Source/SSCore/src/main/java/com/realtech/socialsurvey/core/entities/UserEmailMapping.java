@@ -37,6 +37,10 @@ public class UserEmailMapping implements Serializable
     @ManyToOne ( fetch = FetchType.LAZY)
     @JoinColumn ( name = "USER_ID")
     private User user;
+    
+    @ManyToOne ( fetch = FetchType.LAZY)
+    @JoinColumn ( name = "COMPANY_ID")
+    private Company company;
 
     @Column ( name = "CREATED_BY")
     private String createdBy;
@@ -72,6 +76,17 @@ public class UserEmailMapping implements Serializable
     }
 
 
+    public Company getCompany()
+    {
+        return company;
+    }
+
+
+    public void setCompany( Company company )
+    {
+        this.company = company;
+    }
+    
     /**
      * @return the emailId
      */

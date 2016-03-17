@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -592,16 +593,6 @@ public interface ProfileManagementService
     public void deleteSocialPost( String postMongoId ) throws InvalidInputException;
 
 
-    /**
-     * Method to update zillow feed if required when the profile page is opened.
-     * @param profile
-     * @param collection
-     * @throws InvalidInputException
-     */
-    //  Commented as Zillow surveys are not stored in database, SS-1276
-    //  void updateZillowFeed( OrganizationUnitSettings profile, String collection ) throws InvalidInputException;
-
-
     Map<String, Long> getHierarchyDetailsByEntity( String entityType, long entityId ) throws InvalidInputException,
         ProfileNotFoundException;
 
@@ -617,8 +608,8 @@ public interface ProfileManagementService
         String profileLevel, Date startDate, Date endDate ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<SurveyDetails> fetchZillowData( OrganizationUnitSettings profile, String collection )
-        throws InvalidInputException, UnavailableException;
+    public List<SurveyDetails> fetchAndSaveZillowData( OrganizationUnitSettings profile, String collection, long companyId,
+        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException;
 
 
     public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow, long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException;
@@ -635,4 +626,11 @@ public interface ProfileManagementService
     public Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden );
 
 
+    public List<SurveyDetails> buildSurveyDetailsFromReviewMap( List<HashMap<String, Object>> reviews, String collectionName,
+        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException;
+
+
+    public List<SurveyDetails> getReviewsForReports( long iden, double startScore, double limitScore, int startIndex, int numOfRows,
+        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+        throws InvalidInputException;
 }

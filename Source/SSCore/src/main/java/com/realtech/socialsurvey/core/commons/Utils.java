@@ -13,8 +13,10 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -190,6 +192,60 @@ public class Utils
 		return maskedEmailAddress;
 	}
     
+
+    public String unmaskEmailAddress( String emailAddress )
+    {
+        String unmaskedEmailAddress = null;
+        LOG.debug( "Unmasking email address: " + emailAddress );
+        if ( maskingPrefix == null || maskingPrefix.isEmpty() ) {
+            if ( maskingSuffix == null || maskingSuffix.isEmpty() ) {
+                return emailAddress;
+            }
+            int lastPlus = emailAddress.lastIndexOf( '+' );
+            String unmaskedemailAddress = new StringBuilder(emailAddress).replace( lastPlus, lastPlus + 1, "@" ).toString();
+            int lastSuffix = unmaskedemailAddress.lastIndexOf( maskingSuffix );
+            if ( lastSuffix <= 0 ) {
+                return emailAddress;
+            }
+            unmaskedemailAddress = new StringBuilder( unmaskedemailAddress ).replace( lastSuffix, unmaskedemailAddress.length(), "" ).toString();
+            if ( validateEmail( unmaskedemailAddress ) ) {
+                return unmaskedemailAddress;
+            }
+            return emailAddress;
+        }
+        String pattern = "^" + maskingPrefix + "\\+(.+)" + maskingSuffix + "$";
+
+        Pattern unmaskRegex = Pattern.compile( pattern );
+
+        Matcher matcher = unmaskRegex.matcher( emailAddress );
+        if ( matcher.find() ) {
+            unmaskedEmailAddress = matcher.group( 1 );
+            //Replace last + with @
+            int lastPlus = unmaskedEmailAddress.lastIndexOf( '+' );
+            if ( lastPlus > 0 ) {
+                unmaskedEmailAddress = new StringBuilder( unmaskedEmailAddress ).replace( lastPlus, lastPlus + 1, "@" )
+                    .toString();
+                if ( validateEmail( unmaskedEmailAddress ) ) {
+                    return unmaskedEmailAddress;
+                }
+            }
+
+        }
+        return emailAddress;
+    }
+    
+    
+    public Boolean validateEmail( String emailId )
+    {
+        boolean validEmail = true;
+        LOG.info( "Method validateAndParseEmailIds called" );
+        Pattern pattern = Pattern.compile( CommonConstants.EMAIL_REGEX, Pattern.CASE_INSENSITIVE );
+        Matcher matcher = pattern.matcher( emailId );
+        validEmail = matcher.matches();
+        return validEmail;
+    }
+    
+    
     /**
      * @return
      */
@@ -228,5 +284,35 @@ public class Utils
     public String generateRandomAlphaNumericString(){
         SecureRandom random = new SecureRandom();
         return new BigInteger(40, random).toString(20);
+    }
+
+
+    /**
+     * Method to check whether review has abusive words
+     * @param review
+     * @return
+     */
+    public boolean checkReviewForSwearWords( String review, String swearWords[] )
+    {
+        if ( review == null || review.isEmpty() ) {
+            LOG.error( "review passed as argument is null or empty" );
+            return false;
+        }
+
+        if ( swearWords == null || swearWords.length == 0 ) {
+            LOG.error( "swearWords passed as argument cannot be null or empty" );
+            return false;
+        }
+        LOG.info( "Method to check review for abusive words, checkReviewForSwearWords called" );
+        List<String> swearList = Arrays.asList( swearWords );
+        String reviewParts[] = review.split( " " );
+        for ( String reviewWord : reviewParts ) {
+            if ( swearList.contains( reviewWord.trim().toLowerCase() ) ) {
+                LOG.info( "Method to check review for abusive words, checkReviewForSwearWords ended" );
+                return true;
+            }
+        }
+        LOG.info( "Method to check review for abusive words, checkReviewForSwearWords ended" );
+        return false;
     }
 }

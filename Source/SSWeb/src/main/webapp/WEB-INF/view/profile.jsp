@@ -15,9 +15,6 @@
 		<c:if test="${not empty contact_details.title}">
 			<c:set var="title" value="${contact_details.title}"></c:set>
 		</c:if>
-		<c:if test="${not empty contact_details.industry}">
-			<c:set var="vertical" value="${contact_details.industry}"></c:set>
-		</c:if>
 		<c:if test="${not empty contact_details.firstName }">
 			<c:set var="firstName" value="${contact_details.firstName}"></c:set>
 		</c:if>
@@ -34,7 +31,7 @@
 			<c:set var="city" value="${contact_details.city}"></c:set>
 		</c:if>
 	</c:if>
-	<c:if test="${empty vertical && not empty profile.vertical}">
+	<c:if test="${not empty profile.vertical}">
 		<c:set var="vertical" value="${profile.vertical}"></c:set>
 	</c:if>
 	<c:choose>

@@ -95,6 +95,12 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
             .get( "customersWithoutName" );
         List<SurveyPreInitiation> customersWithoutEmailId = (List<SurveyPreInitiation>) corruptRecords
             .get( "customersWithoutEmailId" );
+        
+        List<SurveyPreInitiation> ignoredEmailRecords = (List<SurveyPreInitiation>) corruptRecords
+            .get( "ignoredEmailRecords" );
+        List<SurveyPreInitiation> oldRecords = (List<SurveyPreInitiation>) corruptRecords
+            .get( "oldRecords" );
+        
         Set<Long> companies = (Set<Long>) corruptRecords.get( "companies" );
 
         for ( Long companyId : companies ) {
@@ -128,6 +134,20 @@ public class CrmDataAgentIdMapper extends QuartzJobBean
                 if ( survey.getCompanyId() == companyId ) {
                     Row row = sheet.createRow( rownum++ );
                     row = fillCellsInRow( row, survey, count++, "Customer Email Id Is Not Present" );
+                }
+            }
+            
+            for ( SurveyPreInitiation survey : ignoredEmailRecords ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Agent Email Id is ignored" );
+                }
+            }
+            
+            for ( SurveyPreInitiation survey : oldRecords ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Old record" );
                 }
             }
 

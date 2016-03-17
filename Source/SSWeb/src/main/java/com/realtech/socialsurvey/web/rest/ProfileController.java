@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -1804,17 +1805,18 @@ public class ProfileController
                 if ( companyProfile.getSocialMediaTokens() != null
                     && companyProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for company id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( companyProfile,
-                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                    // Commented as Zillow reviews will be fetched only for Agents, SS-307
+                    // List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( companyProfile,
+                    //    CommonConstants.COMPANY_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for company id: " + iden );
-                    String json = new Gson().toJson( surveyDetailsList );
-                    response = Response.ok( json ).build();
+                    //String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok().build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch zillow reviews for company: " + iden, e );
-            } catch ( UnavailableException e ) {
-                LOG.error( "Could not fetch zillow reviews for company: " + iden, e );
-                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
+            //} catch ( UnavailableException e ) {
+            //    LOG.error( "Could not fetch zillow reviews for company: " + iden, e );
+            //    response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_REGION ) ) {
             try {
@@ -1823,17 +1825,18 @@ public class ProfileController
                 if ( regionProfile.getSocialMediaTokens() != null
                     && regionProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for region id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile,
-                        CommonConstants.REGION_SETTINGS_COLLECTION );
+                    // Commented as Zillow reviews will be fetched only for Agents, SS-307
+                    // List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( regionProfile,
+                    //    CommonConstants.REGION_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for region id: " + iden );
-                    String json = new Gson().toJson( surveyDetailsList );
-                    response = Response.ok( json ).build();
+                    // String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok().build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch zillow reviews for region: " + iden, e );
-            } catch ( UnavailableException e ) {
-                LOG.error( "Could not fetch zillow reviews for region: " + iden, e );
-                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
+            //} catch ( UnavailableException e ) {
+            //    LOG.error( "Could not fetch zillow reviews for region: " + iden, e );
+            //    response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_BRANCH ) ) {
             try {
@@ -1842,29 +1845,32 @@ public class ProfileController
                 if ( branchProfile.getSocialMediaTokens() != null
                     && branchProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for branch id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile,
-                        CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                    // Commented as Zillow reviews will be fetched only for Agents, SS-307
+                    // List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( branchProfile,
+                    //    CommonConstants.BRANCH_SETTINGS_COLLECTION );
                     LOG.info( "Done fetching zillow reviews for branch id: " + iden );
-                    String json = new Gson().toJson( surveyDetailsList );
-                    response = Response.ok( json ).build();
+//                    String json = new Gson().toJson( surveyDetailsList );
+                    response = Response.ok().build();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
             } catch ( NoRecordsFetchedException e ) {
                 LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
-            } catch ( UnavailableException e ) {
-                LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
-                response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
+            //} catch ( UnavailableException e ) {
+            //   LOG.error( "Could not fetch zillow reviews for branch: " + iden, e );
+            //   response = Response.ok( CommonConstants.ZILLOW_FETCH_FAIL_RESPONSE ).build();
             }
         } else if ( profileType.equals( PROFILE_TYPE_INDIVIDUAL ) ) {
             try {
+                // get company id for the user id
+                User user = userManagementService.getUserByUserId( iden );
                 // get the individual details
                 AgentSettings individualProfile = organizationManagementService.getAgentSettings( iden );
                 if ( individualProfile.getSocialMediaTokens() != null
                     && individualProfile.getSocialMediaTokens().getZillowToken() != null ) {
                     LOG.info( "Fetcing zillow reviews for agent id: " + iden );
-                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchZillowData( individualProfile,
-                        CommonConstants.AGENT_SETTINGS_COLLECTION );
+                    List<SurveyDetails> surveyDetailsList = profileManagementService.fetchAndSaveZillowData( individualProfile,
+                        CommonConstants.AGENT_SETTINGS_COLLECTION, user.getCompany().getCompanyId(), false, true );
                     LOG.info( "Done fetching zillow reviews for agent id: " + iden );
                     String json = new Gson().toJson( surveyDetailsList );
                     response = Response.ok( json ).build();
