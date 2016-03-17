@@ -47,9 +47,12 @@
 					</div>
 				</div>
 			</div>
-			<div class="reg_form_row clearfix">
-				<div class="reg_btn" id="add-ss-admin-form-submit"><spring:message code="label.done.key" /></div>
+			<div class="bd-hr-form-item clearfix">
+					<div class="float-left bd-frm-left"></div>
+				<div class="float-left hm-header-right text-center" id="add-ss-admin-form-submit"><spring:message code="label.create.key" /></div>
+				<div class="float-left hm-header-right text-center" id="cancel-ss-admin-form-submit"  onclick="javascript:showMainContent('./adminusermanagement.do')"><spring:message code="label.cancel.key" /></div>				
 			</div>
+			
 		</div>
 	</form>
 </div>
