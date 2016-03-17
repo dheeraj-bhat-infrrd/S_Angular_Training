@@ -1589,26 +1589,32 @@ public class SocialManagementController
             LOG.error( "InvalidInputException caught in postToFacebook(). Nested exception is ", e );
         }
 
-        User user = sessionHelper.getCurrentUser();
-        List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
-        String message = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for " + agentName
-            + " on SocialSurvey ";
-        String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-        message += linkedinProfileUrl;
-        message = message.replaceAll( "null", "" );
-        String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " " + feedback;
-        for ( OrganizationUnitSettings setting : settings ) {
-            try {
-                if ( setting != null )
-                    if ( !socialManagementService
-                        .updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback ) )
-                        linkedinNotSetup = false;
-            } catch ( NonFatalException e ) {
-                LOG.error( "NonFatalException caught in postToLinkedin() while trying to post to twitter. Nested excption is ",
-                    e );
+        try {
+            User user = sessionHelper.getCurrentUser();
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user
+                .getUserId() );
+            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for "
+                + agentName + " on SocialSurvey ";
+            String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            message += linkedinProfileUrl;
+            message = message.replaceAll( "null", "" );
+            String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " " + feedback;
+            for ( OrganizationUnitSettings setting : settings ) {
+                try {
+                    if ( setting != null )
+                        if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
+                            linkedinMessageFeedback, companySettings, false ) )
+                            linkedinNotSetup = false;
+                } catch ( NonFatalException e ) {
+                    LOG.error(
+                        "NonFatalException caught in postToLinkedin() while trying to post to twitter. Nested excption is ", e );
+                }
             }
+        } catch ( Exception e ) {
+            LOG.error( "Exception caught in postToLinkedin() while trying to post to twitter. Nested excption is ", e );
         }
-
         LOG.info( "Method to post feedback of customer to various pages of twitter finished." );
         return linkedinNotSetup + "";
     }
