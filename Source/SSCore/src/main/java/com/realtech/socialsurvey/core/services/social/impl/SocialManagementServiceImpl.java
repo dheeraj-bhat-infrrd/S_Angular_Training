@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -54,6 +56,7 @@ import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostResponseDetails;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
@@ -301,11 +304,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             .getFacebookAccessToken(), null ) );
                     try {
                         facebookNotSetup = false;
+                        String completeProfileUrl = agentSettings.getCompleteProfileUrl();
+                        if ( completeProfileUrl == null || completeProfileUrl.isEmpty() ) {
+                            completeProfileUrl = surveyHandler.getApplicationBaseUrl()
+                                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl();
+                        }
                         // Updating customised data
                         PostUpdate postUpdate = new PostUpdate( message );
-                        postUpdate.setCaption( agentSettings.getCompleteProfileUrl() );
+                        postUpdate.setCaption( completeProfileUrl );
                         try {
-                            postUpdate.setLink( new URL( agentSettings.getCompleteProfileUrl() ) );
+                            postUpdate.setLink( new URL( completeProfileUrl ) );
                         } catch ( MalformedURLException e1 ) {
                             // TODO Auto-generated catch block
                             e1.printStackTrace();
@@ -385,7 +393,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     public boolean updateLinkedin( OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl,
-        String linkedinMessageFeedback ) throws NonFatalException
+        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow ) throws NonFatalException
     {
         if ( agentSettings == null ) {
             throw new InvalidInputException( "AgentSettings can not be null" );
@@ -408,11 +416,47 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         // add header
                         post.setHeader( "Content-Type", "application/json" );
-                        String a = "{\"comment\": \"\",\"content\": {" + "\"title\": \"\"," + "\"description\": \"" + message
-                            + "-" + linkedinMessageFeedback + "\"," + "\"submitted-url\": \"" + linkedinProfileUrl + "\",  "
-                            + "\"submitted-image-url\": \"" + applicationLogoUrlForLinkedin + "\"},"
-                            + "\"visibility\": {\"code\": \"anyone\" }}";
-                        StringEntity entity = new StringEntity( a );
+                        // String a = "{\"comment\": \"\",\"content\": {" + "\"title\": \"\"," + "\"description\": \"" + message
+                        //    + "-" + linkedinMessageFeedback + "\"," + "\"submitted-url\": \"" + linkedinProfileUrl + "\",  "
+                        //    + "\"submitted-image-url\": \"" + applicationLogoUrlForLinkedin + "\"},"
+                        //    + "\"visibility\": {\"code\": \"anyone\" }}";
+                        // StringEntity entity = new StringEntity( a );
+
+                        ContactDetailsSettings agentContactDetailsSettings = agentSettings.getContact_details();
+                        String agentTitle = agentContactDetailsSettings.getTitle();
+                        String companyName = companySettings.getContact_details().getName();
+                        String location = agentContactDetailsSettings.getLocation();
+                        String industry = agentContactDetailsSettings.getIndustry();
+                        if ( industry == null || industry.isEmpty() ) {
+                            industry = companySettings.getContact_details().getIndustry();
+                        }
+
+                        String title = WordUtils.capitalize( agentContactDetailsSettings.getName() ) + ", "
+                            + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle + ", " : "" ) + companyName + ", "
+                            + ( location != null && !location.isEmpty() ? location + ", " : "" ) + industry
+                            + " Professional Reviews | " + ( isZillow ? "Zillow" : "SocialSurvey.me" );
+
+                        String description = "Reviews for " + agentContactDetailsSettings.getName() + ". "
+                            + agentContactDetailsSettings.getFirstName() + " is a  " + industry + " professional in "
+                            + ( location != null && !location.isEmpty() ? location : "" ) + ". "
+                            + agentContactDetailsSettings.getFirstName() + " is the "
+                            + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle : "" ) + " of " + companyName + ".";
+
+                        String logoUrl = applicationLogoUrlForLinkedin;
+
+                        if ( agentSettings.getLogo() != null && !agentSettings.getLogo().isEmpty() ) {
+                            logoUrl = agentSettings.getLogo();
+                        } else if ( companySettings.getLogo() != null && !companySettings.getLogo().isEmpty() ) {
+                            logoUrl = companySettings.getLogo();
+                        }
+
+                        message = StringEscapeUtils.escapeXml( message );
+
+                        String linkedPostJSON = "{\"comment\": \"" + message + "\",\"content\": {" + "\"title\": \"" + title
+                            + "\"," + "\"description\": \"" + description + "\","
+                            + "\"submitted-url\": \"" + linkedinProfileUrl + "\",  " + "\"submitted-image-url\": \"" + logoUrl
+                            + "\"}," + "\"visibility\": {\"code\": \"anyone\" }}";
+                        StringEntity entity = new StringEntity( linkedPostJSON );
                         post.setEntity( entity );
                         try {
                             HttpResponse response = client.execute( post );
@@ -1039,7 +1083,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Override
     public void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,
         String linkedinMessageFeedback, int accountMasterId, SocialMediaPostDetails socialMediaPostDetails,
-        SocialMediaPostResponseDetails socialMediaPostResponseDetails ) throws InvalidInputException, NoRecordsFetchedException
+        SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings, boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Method postToLinkedInForHierarchy() started" );
         if ( socialMediaPostDetails == null ) {
@@ -1066,7 +1110,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( agentSettings != null ) {
                 try {
                     if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                        if ( !updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
+                        if ( !updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
+                            companySettings, isZillow ) ) {
                             List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
                             if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                 agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
@@ -1106,7 +1151,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( companySetting != null ) {
                     try {
                         if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
-                            if ( !updateLinkedin( companySetting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
+                            if ( !updateLinkedin( companySetting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
+                                companySetting, isZillow ) ) {
                                 List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails()
                                     .getSharedOn();
                                 if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
@@ -1153,7 +1199,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         try {
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
+                                if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
+                                    companySettings, isZillow ) ) {
                                     List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                                     if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                         regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
@@ -1198,7 +1245,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         try {
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback ) ) {
+                                if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
+                                    companySettings, isZillow ) ) {
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                                     if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                         branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
@@ -1616,30 +1664,39 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             //if onlyPostToSocialSurvey is false than only post on the social media otherwise just add social survey channel in social media post list
             if ( !isAbusive && !onlyPostToSocialSurvey ) {
                 // Facebook
-                String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
-                    + " for " + agentName + " on Social Survey - view at " + surveyHandler.getApplicationBaseUrl()
-                    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-                facebookMessage += "\n Feedback : " + feedback;
+                //                facebook older message pattern
+                //                String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+                //                    + " for " + agentName + " on Social Survey - view at " + surveyHandler.getApplicationBaseUrl()
+                //                    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                //                facebookMessage += "\n Feedback : " + feedback;
+
+                String facebookMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+                    + "-star review on SocialSurvey saying : \"" + feedback + "\".\nView this and more at "
+                    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
                 postToFacebookForHierarchy( facebookMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
 
                 // LinkedIn
-                String linkedinMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
-                    + " for " + agentName + " on SocialSurvey ";
+                String linkedinMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+                    + "-star review on SocialSurvey saying : \"" + feedback + "\". View this and more at "
+                    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
                 String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                     + agentProfileLink;
                 String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
 
                 postToLinkedInForHierarchy( linkedinMessage, rating, linkedinProfileUrl, linkedinMessageFeedback,
-                    accountMasterId, socialMediaPostDetails, socialMediaPostResponseDetails );
+                    accountMasterId, socialMediaPostDetails, socialMediaPostResponseDetails, companySettings.get( 0 ), false );
 
                 // Twitter
-                String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
-                    customerDisplayName, agentName, "@SocialSurveyMe" )
-                    + surveyHandler.getApplicationBaseUrl()
-                    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
+                // String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
+                //    customerDisplayName, agentName, "@SocialSurveyMe" )
+                //    + surveyHandler.getApplicationBaseUrl()
+                //    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                String twitterMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+                    + "-star review @SocialSurveyMe. " + surveyHandler.getApplicationBaseUrl()
+                    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
                 postToTwitterForHierarchy( twitterMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
 

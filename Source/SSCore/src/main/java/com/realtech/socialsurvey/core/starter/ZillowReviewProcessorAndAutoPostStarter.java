@@ -390,7 +390,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 
 
                 // Since auto post flag is not set true in hierarchy
-                if ( true || !doAutoPost ) {
+                if ( false || doAutoPost ) {
                     return false;
                 }
 
@@ -492,33 +492,56 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                 }
 
                 String feedback = Jsoup.parse( zillowTempPost.getZillowReviewDescription() ).text();
-                String linkedInfeedback = StringEscapeUtils.escapeXml( feedback );
+                //                String linkedInfeedback = StringEscapeUtils.escapeXml( feedback );
 
 
                 // Facebook
-                String facebookMessage = ratingFormat.format( zillowTempPost.getZillowReviewRating() ) + "-Star response from "
-                    + surveyDetails.getCustomerFirstName() + " for " + agentName + " on Zillow - view at "
-                    + zillowTempPost.getZillowReviewUrl();
-                facebookMessage += "\n Feedback : " + feedback;
+                //String facebookMessage = ratingFormat.format( zillowTempPost.getZillowReviewRating() ) + "-Star response from "
+                //    + surveyDetails.getCustomerFirstName() + " for " + agentName + " on Zillow - view at "
+                //    + zillowTempPost.getZillowReviewUrl();
+                //facebookMessage += "\n Feedback : " + feedback;
+
+                String profileLink = "";
+                if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                    && agentSettings.getSocialMediaTokens().getZillowToken() != null
+                    && agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null
+                    && !agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink().isEmpty() ) {
+                    profileLink = agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink();
+                } else {
+                    profileLink = zillowTempPost.getZillowReviewSourceLink();
+                }
+
+                String facebookMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                    + "-star review on Zillow via SocialSurvey saying : \"" + feedback + "\"\nView this and more at "
+                    + profileLink;
 
                 socialManagementService.postToFacebookForHierarchy( facebookMessage, zillowTempPost.getZillowReviewRating(),
                     zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
 
                 // LinkedIn
-                String linkedinMessage = ratingFormat.format( zillowTempPost.getZillowReviewRating() ) + "-Star response from "
-                    + surveyDetails.getCustomerFirstName() + " for " + agentName + " on Zillow ";
-                String linkedinProfileUrl = zillowTempPost.getZillowReviewUrl();
-                String linkedinMessageFeedback = "From : " + surveyDetails.getCustomerFirstName() + " - " + linkedInfeedback;
+                String linkedinMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                    + "-star review on Zillow via SocialSurvey saying : \""
+                    + ( feedback != null && feedback.length() > 500 ? feedback.substring( 0, 500 ) : feedback )
+                    + "\". View this and more at " + profileLink;
+                // String linkedinProfileUrl = zillowTempPost.getZillowReviewUrl();
+                String linkedinProfileUrl = profileLink;
+                String linkedinMessageFeedback = "From : " + surveyDetails.getCustomerFirstName() + " - " + feedback;
 
                 socialManagementService.postToLinkedInForHierarchy( linkedinMessage, zillowTempPost.getZillowReviewRating(),
                     linkedinProfileUrl, linkedinMessageFeedback, accountMasterId, socialMediaPostDetails,
-                    socialMediaPostResponseDetails );
+                    socialMediaPostResponseDetails, companySettings.get( 0 ), true );
 
                 // Twitter
-                String twitterMessage = String.format( CommonConstants.ZILLOW_TWITTER_MESSAGE,
-                    ratingFormat.format( zillowTempPost.getZillowReviewRating() ), surveyDetails.getCustomerFirstName(),
-                    agentName, "@SocialSurveyMe" ) + zillowTempPost.getZillowReviewUrl();
+                //String twitterMessage = String.format( CommonConstants.ZILLOW_TWITTER_MESSAGE,
+                //    ratingFormat.format( zillowTempPost.getZillowReviewRating() ), surveyDetails.getCustomerFirstName(),
+                //    agentName, "@SocialSurveyMe" ) + zillowTempPost.getZillowReviewUrl();
+
+                String twitterMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                    + "-star review @Zillow via @SocialSurveyMe. " + profileLink;
 
                 socialManagementService.postToTwitterForHierarchy( twitterMessage, zillowTempPost.getZillowReviewRating(),
                     zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,

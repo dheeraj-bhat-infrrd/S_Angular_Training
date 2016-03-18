@@ -3935,15 +3935,16 @@ img.prof-image {
 	box-shadow: 0px 2px 2px 0px #e3e3e3;
 }
 
-.err-nw-wrapper {
+.err-nw-wrapper ,.err-nw-wrapper-invalid,.err-nw-wrapper-success{
 	display: none;
 	background-color: #E57C66;
 	color: #fff;
 	line-height: 36px;
 	text-align: center;
+	margin-bottom:5px;
 }
 
-.err-new-close {
+.err-new-close, .err-new-close-success, .err-new-close-invalid {
 	display: inline-block;
 	margin-right: 5px;
 	height: 36px;
@@ -4004,7 +4005,14 @@ img.prof-image {
 	background-position: right center;
 	background-size: auto 22px;
 }
-
+.bg-black-success .err-new-close-success {
+	background-position: right center;
+	background-size: auto 22px;
+}
+.bg-black-success .err-new-close-invalid{
+	background-position: right center;
+	background-size: auto 22px;
+}
 .header-right {
 	position: relative;
 	height: 55px;

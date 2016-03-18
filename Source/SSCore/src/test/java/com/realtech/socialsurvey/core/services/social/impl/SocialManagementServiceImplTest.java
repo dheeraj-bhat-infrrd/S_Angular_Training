@@ -103,7 +103,7 @@ public class SocialManagementServiceImplTest
     public void testUpdateLinkedinNullAgentSettings() throws NonFatalException
     {
         socialManagementServiceImpl.updateLinkedin( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING );
+            TestConstants.TEST_STRING, new OrganizationUnitSettings(), false );
     }
 
 
@@ -340,15 +340,18 @@ public class SocialManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPostToLinkedInForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2" , "test3", 2, null, new SocialMediaPostResponseDetails() );
+        socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2", "test3", 2, null,
+            new SocialMediaPostResponseDetails(), new OrganizationUnitSettings(), false );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testPostToLinkedInForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2",  "test3" ,  2, new SocialMediaPostDetails() , null );
+        socialManagementServiceImpl.postToLinkedInForHierarchy( "test", 5.0, "test2", "test3", 2, new SocialMediaPostDetails(),
+            null, new OrganizationUnitSettings(), false );
     }
-    
+
     
     @Test ( expected = InvalidInputException.class)
     public void testPostToFacebookForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
