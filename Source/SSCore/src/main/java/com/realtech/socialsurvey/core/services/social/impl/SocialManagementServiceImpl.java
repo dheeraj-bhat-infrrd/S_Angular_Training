@@ -84,7 +84,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -442,19 +441,21 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             + agentContactDetailsSettings.getFirstName() + " is the "
                             + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle : "" ) + " of " + companyName + ".";
 
-                        String logoUrl = applicationLogoUrlForLinkedin;
+                        String imageUrl = applicationLogoUrlForLinkedin;
 
                         if ( agentSettings.getProfileImageUrl() != null && !agentSettings.getProfileImageUrl().isEmpty() ) {
-                            logoUrl = agentSettings.getProfileImageUrl();
+                            imageUrl = agentSettings.getProfileImageUrl();
                         } else if ( companySettings.getLogo() != null && !companySettings.getLogo().isEmpty() ) {
-                            logoUrl = companySettings.getLogo();
+                            imageUrl = companySettings.getLogo();
                         }
 
+                        String profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                            + agentSettings.getProfileUrl();
                         message = StringEscapeUtils.escapeXml( message );
 
                         String linkedPostJSON = "{\"comment\": \"" + message + "\",\"content\": {" + "\"title\": \"" + title
                             + "\"," + "\"description\": \"" + description + "\","
-                            + "\"submitted-url\": \"" + linkedinProfileUrl + "\",  " + "\"submitted-image-url\": \"" + logoUrl
+                            + "\"submitted-url\": \"" + profileUrl + "\",  " + "\"submitted-image-url\": \"" + imageUrl
                             + "\"}," + "\"visibility\": {\"code\": \"anyone\" }}";
                         StringEntity entity = new StringEntity( linkedPostJSON );
                         post.setEntity( entity );
@@ -1672,7 +1673,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                 String facebookMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
                     + "-star review on SocialSurvey saying : \"" + feedback + "\".\nView this and more at "
-                    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink+"/";
 
                 postToFacebookForHierarchy( facebookMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
@@ -2097,10 +2098,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate )
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate, String postedOn )
     {
         externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating, autoPostStatus,
-            complaintResolutionStatus, reviewDate );
+            complaintResolutionStatus, reviewDate, postedOn );
     }
 
 
