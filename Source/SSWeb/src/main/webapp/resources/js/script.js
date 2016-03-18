@@ -2765,6 +2765,11 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				showInfo(jsonResponse.response);
+				//start fetching batch status
+				callAjaxPOSTWithTextDataUpload(
+						"./fetchUploadBatchStatus.do",
+						hierarchyUpload.fetchUploadBatchStatusCallback,
+						true, null);
 			}
 		}
 		$('#com-file').val('');
@@ -2781,6 +2786,7 @@ var hierarchyUpload = {
 				hierarchyUpload.getStatusCall.abort();
 			}
 		});
+		$('#lastUploadRunTimestamp').hide();
 		if (!response) {
 			$('#com-file').val('');
 			$('#com-xlsx-file').val('');
@@ -2811,20 +2817,22 @@ var hierarchyUpload = {
 					if (response != undefined && response != null && response != '' && jsonResponse.response != []) {
 						$('#uploadBatchStatus').empty();
 						jsonResponse.response.forEach( function(uploadStatus){
-							$('<div>' + uploadStatus.message + '</div>').appendTo(
-							'#uploadBatchStatus');
+							if (jsonResponse.uploadStatus == uploadStatus.status) {
+								$('<div>' + uploadStatus.message + '</div>').appendTo(
+								'#uploadBatchStatus');
+							}
 						} );
 						$('#uploadBatchStatus').show();
 					}
 					hideLoaderOnPagination($('#uploadBatchStatus'));
 					$('#xlsVerifyUplaod').removeClass('disable');
-				}
-				if (jsonResponse.lastUploadRunTimestamp != null
-						&& jsonResponse.lastUploadRunTimestamp != '') {
-					$('#lastUploadRunTimestamp').text(
-							'Last Imported On: '
-									+ jsonResponse.lastUploadRunTimestamp);
-					$('#lastUploadRunTimestamp').show();
+					if (jsonResponse.lastUploadRunTimestamp != null
+							&& jsonResponse.lastUploadRunTimestamp != '') {
+						$('#lastUploadRunTimestamp').text(
+								'Last Imported On: '
+										+ jsonResponse.lastUploadRunTimestamp);
+						$('#lastUploadRunTimestamp').show();
+					}
 				}
 			}
 		}
