@@ -533,7 +533,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	background: url(../images/dashloader.gif) no-repeat center;
 	background-size: 50px 50px;
 	background-color: rgba(255, 255, 255, 0.7);
-	min-height: 180px;
+	min-height: 220px;
 }
 
 #low-dash {
@@ -3935,15 +3935,16 @@ img.prof-image {
 	box-shadow: 0px 2px 2px 0px #e3e3e3;
 }
 
-.err-nw-wrapper {
+.err-nw-wrapper ,.err-nw-wrapper-invalid,.err-nw-wrapper-success{
 	display: none;
 	background-color: #E57C66;
 	color: #fff;
 	line-height: 36px;
 	text-align: center;
+	margin-bottom:5px;
 }
 
-.err-new-close {
+.err-new-close, .err-new-close-success, .err-new-close-invalid {
 	display: inline-block;
 	margin-right: 5px;
 	height: 36px;
@@ -4004,7 +4005,14 @@ img.prof-image {
 	background-position: right center;
 	background-size: auto 22px;
 }
-
+.bg-black-success .err-new-close-success {
+	background-position: right center;
+	background-size: auto 22px;
+}
+.bg-black-success .err-new-close-invalid{
+	background-position: right center;
+	background-size: auto 22px;
+}
 .header-right {
 	position: relative;
 	height: 55px;
@@ -5438,6 +5446,7 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	margin-top: -2px;
 	border-radius: 3px;
 	cursor: pointer;
+	min-width: 120px;
 }
 
 tr.v-tbl-header {
@@ -8456,7 +8465,20 @@ label.url-change-input-label {
 	min-width: 180px;
 }
 
+.empty-field{
+	border:1px solid #D0021B;
+}
 .disable {
 	opacity: 0.4;
 	pointer-events: none;
+}
+.widget-display{
+	border: 1px solid #dcdcdc;
+	height: 405px !important;
+	padding: 10px;
+	margin: 1px;
+}
+.widget-btn-cpy{
+	margin-left: auto;
+	margin-right: auto;
 }

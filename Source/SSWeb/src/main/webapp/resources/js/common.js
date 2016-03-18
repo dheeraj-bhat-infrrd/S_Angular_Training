@@ -174,7 +174,7 @@ function callAjaxPOSTWithTextDataUpload(url, callBackFunction, isAsync, formData
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
-	$.ajax({
+	return $.ajax({
 				url : url,
 				type : "POST",
 				dataType : "text",

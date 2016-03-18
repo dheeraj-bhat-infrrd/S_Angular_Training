@@ -218,10 +218,11 @@ public class SocialManagementController
     
     @Value ( "${ZILLOW_ENDPOINT}")
     private String zillowEndpoint;
-    
+
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
-    
+
+
     /**
      * Returns the social authorization page
      * 
@@ -1588,26 +1589,32 @@ public class SocialManagementController
             LOG.error( "InvalidInputException caught in postToFacebook(). Nested exception is ", e );
         }
 
-        User user = sessionHelper.getCurrentUser();
-        List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
-        String message = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for " + agentName
-            + " on SocialSurvey ";
-        String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-        message += linkedinProfileUrl;
-        message = message.replaceAll( "null", "" );
-        String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " " + feedback;
-        for ( OrganizationUnitSettings setting : settings ) {
-            try {
-                if ( setting != null )
-                    if ( !socialManagementService
-                        .updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback ) )
-                        linkedinNotSetup = false;
-            } catch ( NonFatalException e ) {
-                LOG.error( "NonFatalException caught in postToLinkedin() while trying to post to twitter. Nested excption is ",
-                    e );
+        try {
+            User user = sessionHelper.getCurrentUser();
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
+                .getCompanyId() );
+            List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user
+                .getUserId() );
+            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for "
+                + agentName + " on SocialSurvey ";
+            String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            message += linkedinProfileUrl;
+            message = message.replaceAll( "null", "" );
+            String linkedinMessageFeedback = "From : " + custFirstName + " " + custLastName + " " + feedback;
+            for ( OrganizationUnitSettings setting : settings ) {
+                try {
+                    if ( setting != null )
+                        if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
+                            linkedinMessageFeedback, companySettings, false ) )
+                            linkedinNotSetup = false;
+                } catch ( NonFatalException e ) {
+                    LOG.error(
+                        "NonFatalException caught in postToLinkedin() while trying to post to twitter. Nested excption is ", e );
+                }
             }
+        } catch ( Exception e ) {
+            LOG.error( "Exception caught in postToLinkedin() while trying to post to twitter. Nested excption is ", e );
         }
-
         LOG.info( "Method to post feedback of customer to various pages of twitter finished." );
         return linkedinNotSetup + "";
     }
@@ -1831,6 +1838,11 @@ public class SocialManagementController
                 if ( userSettings == null || entityType == null || profileSettings == null) {
                     throw new InvalidInputException( "No user settings found in session" );
                 }
+                // if user has changed his Zillow account, then delete existing Zillow reviews
+                if ( checkZillowAccountChanged( profileSettings, zillowScreenName ) ) {
+                    LOG.debug("Deleting zillow feed for agent ID : " + profileSettings.getIden());
+                    surveyHandler.deleteExistingZillowSurveysByEntity( entityType, profileSettings.getIden());
+                }
                 
                 String errorCode = request.getParameter( "error" );
                 if ( errorCode != null ) {
@@ -1911,6 +1923,9 @@ public class SocialManagementController
                             }
                         }
                         throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
+                    } else if ( !code.equalsIgnoreCase( "0" ) ) {
+                        String errorMessage = (String) messageMap.get( "text" );
+                        throw new NonFatalException( "Error code : " + code + " Error description : " + errorMessage );
                     } else {
                         socialManagementService.updateZillowCallCount();
                     }
@@ -1926,23 +1941,18 @@ public class SocialManagementController
                             if ( proReviews != null ) {
                                 reviews = (List<HashMap<String, Object>>) proReviews.get( "review" );
                                 if ( reviews != null ) {
-                                    for ( HashMap<String, Object> review : reviews ) {
-                                        // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                                        // String rating = (String) review.get( "rating" );
-                                        // if ( rating != null && !rating.isEmpty() ) {
-                                        //     if ( Double.valueOf( rating ) != Double.NaN ) {
-                                        //         zillowReviewCount++;
-                                        //         zillowTotalScore += Double.valueOf( rating );
-                                        //     }
-                                        // }
-                                        //TODO : get a confirmation on this
-                                        // check if user had changed his Zillow account
-                                        if(checkZillowAccountChanged(profileSettings,zillowScreenName)){
-                                            
-                                        }
-                                        profileManagementService.buildSurveyDetailsFromReviewMap( reviews, collectionName,
-                                            profileSettings, user.getCompany().getCompanyId(), false, false );
-                                    }
+                                    // for ( HashMap<String, Object> review : reviews ) {
+                                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
+                                    // String rating = (String) review.get( "rating" );
+                                    // if ( rating != null && !rating.isEmpty() ) {
+                                    //     if ( Double.valueOf( rating ) != Double.NaN ) {
+                                    //         zillowReviewCount++;
+                                    //         zillowTotalScore += Double.valueOf( rating );
+                                    //     }
+                                    // }
+                                    organizationManagementService.pushZillowReviews( reviews, collectionName, profileSettings,
+                                        user.getCompany().getCompanyId() );
+                                    // }
                                 }
                             }
                         }
@@ -2614,14 +2624,20 @@ public class SocialManagementController
     //TODO : get a confirmation on this
     private boolean checkZillowAccountChanged( OrganizationUnitSettings profileSettings, String zillowScreenName )
     {
-        if ( profileSettings == null ) {
-            LOG.error( "profileSettings passed cannot be null or empty in checkZillowAccountChanged()" );
+        if ( profileSettings == null || profileSettings.getSocialMediaTokens() == null
+            || profileSettings.getSocialMediaTokens().getZillowToken() == null
+            || profileSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName() == null ) {
+            LOG.error( "zillow settings missing in profile id : " + profileSettings.getIden()
+                + " in checkZillowAccountChanged()" );
             return false;
         }
         if ( zillowScreenName == null || zillowScreenName.isEmpty() ) {
-            LOG.error( "zillowScreenName passed cannot be null or empty in checkZillowAccountChanged()" );
+            LOG.error( "zillowScreenName passed is null or empty in checkZillowAccountChanged()" );
             return false;
         }
-        return true;
+        if ( !profileSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName().equalsIgnoreCase( zillowScreenName ) ) {
+            return true;
+        }
+        return false;
     }
 }

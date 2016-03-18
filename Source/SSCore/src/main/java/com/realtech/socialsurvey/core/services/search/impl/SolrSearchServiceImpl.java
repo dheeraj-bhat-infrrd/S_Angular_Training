@@ -2521,6 +2521,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
             if ( pattern != null && !pattern.isEmpty() ) {
                 query = query + generateSubQueryToSearch( CommonConstants.USER_DISPLAY_NAME_SOLR, pattern );
                 query = query + " OR " + generateSubQueryToSearch( CommonConstants.USER_LOGIN_NAME_SOLR, pattern );
+            }else{
+                query = "*:*";
             }
 
             solrQuery.setQuery( query );

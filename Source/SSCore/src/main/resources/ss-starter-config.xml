@@ -266,6 +266,19 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+
+	<!-- Setting hierarchy upload job detail -->
+	<bean id="hierarchyuploadjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.HierarchyUploader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="hierarchyUploadHandler" value-ref="hierarchyUploadHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 	
 	<!-- Setting billing report job detail -->
 	<bean id="billingreportjobdetail"
@@ -500,6 +513,14 @@
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
+
+	<!-- setting cron for hierarchy upload -->
+	<bean id="hierarchyuploadcron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="hierarchyuploadjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
 	
 	<!-- setting cron for billing report -->
 	<bean id="billingreportcron"
@@ -558,13 +579,14 @@
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="imageloaderjobdetail" />
 				<ref bean="fileuploadjobdetail" />
+				<ref bean="hierarchyuploadjobdetail" />
 				<ref bean="billingreportjobdetail" />
 				<ref bean="dotloopjobdetail" />
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
 				<ref bean="imageprocessingjobdetail" />
-				<ref bean="companiesbillingreportjobdetail" />
+				<!-- <ref bean="companiesbillingreportjobdetail" /> -->
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
 			</list>
@@ -584,13 +606,14 @@
 				<ref bean="crmdataagentidmappercron" />
 				<ref bean="imageloadercron" />
 				<ref bean="fileuploadcron" />
+				<ref bean="hierarchyuploadcron" />
 				<ref bean="billingreportcron" />
 				<ref bean="dotloopcron" />
 				<ref bean="surveyfileuploadcron" />
 				<ref bean="solrreviewcounterupdatercron" />
 				<!-- <ref bean="setcompanyidsinsocialpostscron" /> -->
 				<ref bean="imageprocessingcron" />
-				<ref bean="companiesbillingreportcron" />
+				<!-- <ref bean="companiesbillingreportcron" /> -->
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<ref bean="zillowreviewprocessandautopostcron" />
 			</list>
@@ -684,6 +707,9 @@
 
 	<!-- CSV Upload reader -->
 	<bean id="uploadHandler" class="com.realtech.socialsurvey.core.handler.CSVUploadHandler" />
+	
+	<!-- Hierarchy Upload handler -->
+	<bean id="hierarchyUploadHandler" class="com.realtech.socialsurvey.core.handler.HierarchyUploadHandler" />
 	
 	<!-- Billing report generator -->
 	<bean id="billingReportHandler" class="com.realtech.socialsurvey.core.handler.BillingReportHandler" />

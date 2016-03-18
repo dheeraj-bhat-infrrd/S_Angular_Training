@@ -193,6 +193,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_IMAGE_PROCESSING_STARTER = "ImageProcessingStarter";
     public static final String BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR = "HierarchySettingsCorrector";
     public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
+    public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
     
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -216,6 +217,7 @@ public interface CommonConstants
     public static final String BILLING_REPORT_GENERATOR = "Billing Report Generator";
     public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
+    public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
     
     /**
      * Mongo entities and column name constants
@@ -662,6 +664,7 @@ public interface CommonConstants
     public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
     public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
+    public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
 
     /*
      * Mongo social post Source
@@ -778,6 +781,8 @@ public interface CommonConstants
     public static final String VALID_USERS_LIST = "validUsersList";
 
     public static final String INVALID_USERS_LIST = "invalidUsersList";
+
+    public static final String INVALID_USERS_ASSIGN_LIST = "invalidUsersAssignList";
 
     public static final String BRANCH_OBJECT = "branch";
 
@@ -1024,6 +1029,9 @@ public interface CommonConstants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
+    // Error Suffix for the email address already taken
+    public static final String EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX = " already taken";
+
 
     //Hierarchy Upload constants
     public static final String HIERARCHY_UPLOAD_COLLECTION = "HIERARCHY_UPLOAD";
@@ -1054,4 +1062,37 @@ public interface CommonConstants
     public static final String USER_DELETE_ERROR_LIST = "USER_DELETE";
     public static final String BRANCH_DELETE_ERROR_LIST = "BRANCH_DELETE";
     public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
+    
+    //Hierarchy upload status constants
+    
+    public static final int HIERARCHY_UPLOAD_ENTITY_INITIATED = 1;
+    public static final int HIERARCHY_UPLOAD_ENTITY_STARTED = 2;
+    public static final int HIERARCHY_UPLOAD_ENTITY_DONE = 0;
+    public static final int HIERARCHY_UPLOAD_ENTITY_ERROR = 3;
+    public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 4;
+    public static final int HIERARCHY_UPLOAD_ERROR = 5;
+    public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 6;
+    
+    //Hierarchy upload message constants
+    public static final String UPLOAD_MSG_INITIATED = "Import initiated";
+    public static final String UPLOAD_MSG_STARTED = "Import started";
+    public static final String UPLOAD_MSG_UPLOADING_REGIONS = "Importing regions";
+    public static final String UPLOAD_MSG_UPLOADING_BRANCHES = "Importing offices";
+    public static final String UPLOAD_MSG_UPLOADING_USERS = "Importing users";
+    public static final String UPLOAD_MSG_DELETING_USERS = "Deleting removed users";
+    public static final String UPLOAD_MSG_DELETING_BRANCHES = "Deleting removed offices";
+    public static final String UPLOAD_MSG_DELETING_REGIONS = "Deleting removed regions";
+    public static final String UPLOAD_MSG_UPLOAD_COMPLETE = "Import successful";
+    public static final String UPLOAD_MSG_UPLOAD_ERROR = "Error importing company hierarchy";
+    public static final String UPLOAD_MSG_NO_UPLOAD = "";
+    public static final String UPLOAD_ADDED_REGIONS = "No. of regions added : ";
+    public static final String UPLOAD_MODIFIED_REGIONS = "No. of regions modified : ";
+    public static final String UPLOAD_DELETED_REGIONS = "No. of regions deleted : ";
+    public static final String UPLOAD_ADDED_BRANCHES = "No. of offices added : ";
+    public static final String UPLOAD_MODIFIED_BRANCHES = "No. of offices modified : ";
+    public static final String UPLOAD_DELETED_BRANCHES = "No. of offices deleted : ";
+    public static final String UPLOAD_ADDED_USERS = "No. of users added : ";
+    public static final String UPLOAD_MODIFIED_USERS = "No. of users modified : ";
+    public static final String UPLOAD_DELETED_USERS = "No. of users deleted : ";
+    
 }

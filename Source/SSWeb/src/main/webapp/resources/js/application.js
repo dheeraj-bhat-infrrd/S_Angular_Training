@@ -752,6 +752,17 @@ function bindSelectButtons() {
 		var columnName = colName;
 		var columnValue = colValue;
 		if($('#dsh-grph-srch-survey-div').is(':visible')){
+			if($('#dsh-grph-sel-item').val()==''){
+				$('#dsh-grph-sel-item').addClass("empty-field");
+				if($('#graph-sel-list').val()=="regionName"){
+				$('#overlay-toast').html("Please choose a valid Region Name");
+				}else if($('#graph-sel-list').val()=="branchName"){
+					$('#overlay-toast').html("Please choose a valid Office Name");
+				}
+				showToast();
+				return;
+			}
+			
 			columnName = lastColNameForGraph;
 			columnValue = lastColValueForGraph;
 		}
@@ -760,9 +771,22 @@ function bindSelectButtons() {
 	$("#survey-count-days").change(function() {
 		var columnName = colName;
 		var columnValue = colValue;
+		
 		if($('#dsh-srch-survey-div').is(':visible')){
+			if($('#dsh-sel-item').val()==''){
+				$('#dsh-sel-item').addClass("empty-field");
+				if($('#selection-list').val()=="regionName"){
+					$('#overlay-toast').html("Please choose a valid Region Name");
+					}else if($('#selection-list').val()=="branchName"){
+						$('#overlay-toast').html("Please choose a valid Office Name");
+					}
+					showToast();
+				return;
+			}
+		
 			columnName = lastColNameForCount;
 			columnValue = lastColValueForCount;
+			
 		}
 		showSurveyStatistics(columnName, columnValue);
 	});
@@ -811,6 +835,7 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 	};
 	showDashOverlay('#mid-dash');
 	callAjaxGetWithPayloadData("./surveycount.do", function(data) {
+		$('#dsh-sel-item').removeClass("empty-field");
 		$('#dash-survey-status').html(data);
 	}, payload, true);
 }
@@ -931,14 +956,15 @@ function fetchReviewsOnDashboard(isNextBatch) {
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
 		var tempDiv = $('<div>').html(data);
 		var reviewsCount = tempDiv.children('div.dsh-review-cont').length;
-		
+		var ssReviewsPresent = true;
 		//check if no reviews found
 		if(startIndexCmp == 0) {
 			var name = $('#review-desc').attr('data-profile-name');
 			if (reviewsCount == 0) {
 				$("#review-desc").html("No reviews found for " + name);
 				$("#review-details").html('');
-				return;
+//				return;
+				ssReviewsPresent = false;
 			} else {
 				$("#review-desc").html("What people say about " + name);
 			}
@@ -948,13 +974,15 @@ function fetchReviewsOnDashboard(isNextBatch) {
 			doStopPaginationDashboard = true;
 		}
 		
-		if (startIndexCmp == 0)
-			$('#review-details').html(data);
-		else
-			$('#review-details').append(data);
+		if(ssReviewsPresent){
+			if (startIndexCmp == 0)
+				$('#review-details').html(data);
+			else
+				$('#review-details').append(data);
 		
-		//Update events
-		updateEventOnDashboardPageForReviews();
+			//Update events
+			updateEventOnDashboardPageForReviews();
+		}
 		startIndexCmp += batchSizeCmp;
 		
 		if(!isNextBatch) {
@@ -964,7 +992,7 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 			fetchReviewsOnDashboard(true);
 		} else {
-			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true);
+			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp);
 		}
 	}, payload, true);
 }
@@ -1048,6 +1076,7 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
+			$('#dsh-grph-sel-item').removeClass("empty-field");
 			graphData = data;
 			paintSurveyGraph();
 			hideDashOverlay('#low-dash');
@@ -2010,6 +2039,35 @@ function displayMessage(data) {
 }
 
 /**
+ * function to display success and failure message to user after adding region and branch action
+ * @param data
+ */
+function displayMessageForRegionAndBranchAddition(data) {
+	$("#temp-message").html(data);
+	var displayMessageDiv = $("#temp-message #display-msg-div");
+	var invalidEmailAddressDiv = $("#display-invalid-email-addr-msg-div");
+	var alreadyExistEmailAddressDiv = $("#display-already-exist-email-addr-msg-div");
+	if($(displayMessageDiv).hasClass("success-message")) {
+		showInfoSuccessMobileAndWeb($(displayMessageDiv).html());
+	}
+	else if($(displayMessageDiv).hasClass("error-message")) {
+		showErrorSuccessMobileAndWeb($(displayMessageDiv).html());
+	}
+	if($(invalidEmailAddressDiv).hasClass("error-message")) {
+		showErrorInvalidMobileAndWeb($(invalidEmailAddressDiv).html());
+	}
+	if($(alreadyExistEmailAddressDiv).hasClass("error-message")) {
+		showErrorMobileAndWeb($(alreadyExistEmailAddressDiv).html());
+	}
+	var invalidMessage = $('#invalid-display-msg-div').text();
+	if(invalidMessage != undefined && invalidMessage != ""){
+		$('#overlay-toast').html(invalidMessage);
+		showToast();
+	}
+	$("#temp-message").html("");
+}
+
+/**
  * checks whether is authorized to build hierarchy and displays message to the user
  */
 function checkUserAuthorization(){
@@ -2562,7 +2620,7 @@ function addRegion(formId,disableEle) {
  */
 function addRegionCallBack(data) {
 	hideOverlay();
-	displayMessage(data);
+	displayMessageForRegionAndBranchAddition(data);
 	showStateCityRow("region-state-city-row", "region-state-txt", "region-city-txt");
 	resetInputFields("edit-region-form");
 	$('#region-country').val(defaultCountry);
@@ -2734,7 +2792,7 @@ function addOffice(formId,disableEle) {
  */
 function addOfficeCallBack(data) {
 	hideOverlay();
-	displayMessage(data);
+	displayMessageForRegionAndBranchAddition(data);
 	showStateCityRow("office-state-city-row", "office-state-txt", "office-city-txt");
 	resetInputFields("edit-office-form");
 	$('#office-country').val(defaultCountry);
@@ -7476,12 +7534,12 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
 		} else {
-			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false);
+			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false, countOfReviewsFetched, numOfRows);
 		}
 	}, true);
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard, start, batchSize){
 	if (currentProfileIden == undefined || currentProfileIden == "" || isZillowReviewsCallRunning) {
 		return; //Return if profile id is undefined
 	}
@@ -7511,6 +7569,13 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	                stopFetchReviewPagination = true; //Stop pagination as zillow reviews are fetch one shot
 	                if (result != undefined && result.length > 0) {
 						// build zillow reviews html here
+	                	var lastIndex = start - batchSize;
+						// remove the No Reviews Found
+						if (isFromDashBoard && lastIndex <= 0) {
+							$("#review-desc").html("");
+						} else if (!isFromDashBoard && start <= 0) {
+							$("#prof-review-item").html("");
+						}
 						paintReviews(result,isFromDashBoard);
 	                }
 	            }
