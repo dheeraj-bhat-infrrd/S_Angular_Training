@@ -1044,15 +1044,15 @@ public class SurveyManagementController
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
             if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                 if ( !socialManagementService.updateLinkedin( agentSettings, message, linkedinProfileUrl,
-                    linkedinMessageFeedback ) ) {
+                    linkedinMessageFeedback, companySettings.get( 0 ), false ) ) {
                     if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                         agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                 }
             }
             for ( OrganizationUnitSettings setting : companySettings ) {
                 if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                    if ( !socialManagementService
-                        .updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback ) ) {
+                    if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
+                        linkedinMessageFeedback, companySettings.get( 0 ), false ) ) {
                         if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                             companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                     }
@@ -1063,8 +1063,8 @@ public class SurveyManagementController
                 OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
                     .getRegionId() );
                 if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                    if ( !socialManagementService
-                        .updateLinkedin( setting, message, linkedinProfileUrl, linkedinMessageFeedback ) ) {
+                    if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
+                        linkedinMessageFeedback, companySettings.get( 0 ), false ) ) {
                         List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                         if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                             regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
@@ -1079,7 +1079,7 @@ public class SurveyManagementController
 
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                            linkedinMessageFeedback ) ) {
+                            linkedinMessageFeedback, companySettings.get( 0 ), false ) ) {
                             List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                             if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                 branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );

@@ -33,7 +33,28 @@ function buildMessageDiv() {
 	}
 }
 
-function showError(msg) {
+function buildMessageInvalidDiv(){
+	if($('.err-nw-wrapper-invalid').length == 0){
+        var errorDiv = $("<div id='err-nw-wrapper-invalid' class='err-nw-wrapper-invalid'>");
+            var closeSpan = $('<span class="err-new-close-invalid">');
+            var textSpan = $('<span id="err-nw-txt-invalid">');
+            errorDiv.append(closeSpan);
+            errorDiv.append(textSpan);
+        $('.hm-header-main-wrapper').after(errorDiv);
+    }
+}
+function buildMessageSuccessDiv(){
+	if($('.err-nw-wrapper-success').length == 0){
+        var errorDiv = $("<div id='err-nw-wrapper-success' class='err-nw-wrapper-success'>");
+            var closeSpan = $('<span class="err-new-close-success">');
+            var textSpan = $('<span id="err-nw-txt-success">');
+            errorDiv.append(closeSpan);
+            errorDiv.append(textSpan);
+        $('.hm-header-main-wrapper').after(errorDiv);
+    }
+	
+}
+function showError(msg){
 	buildMessageDiv();
 	$('#err-nw-txt').html(msg);
 	$('#err-nw-wrapper').removeClass('bg-black-success');
@@ -41,8 +62,28 @@ function showError(msg) {
 	$(window).scrollTop($('#err-nw-wrapper').offset().top);
 }
 
-function hideError() {
-	$('#err-nw-wrapper').slideUp(200);
+function showInvalidError(msg){
+	buildMessageInvalidDiv();
+    $('#err-nw-txt-invalid').html(msg);
+    $('#err-nw-wrapper-invalid').removeClass('bg-black-success');
+    $('#err-nw-wrapper-invalid').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-invalid').offset().top);
+}
+function showErrorSuccess(msg){
+	buildMessageSuccessDiv();
+	$('#err-nw-txt-success').html(msg);
+    $('#err-nw-wrapper-success').removeClass('bg-black-success');
+    $('#err-nw-wrapper-success').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-success').offset().top);
+}
+function hideError(){
+    $('#err-nw-wrapper').slideUp(200);
+}
+function hideErrorInvalid(){
+    $('#err-nw-wrapper-invalid').slideUp(200);
+}
+function hideErrorSuccess(){
+    $('#err-nw-wrapper-success').slideUp(200);
 }
 
 function showInfo(msg) {
@@ -52,6 +93,13 @@ function showInfo(msg) {
 	$(window).scrollTop($('#err-nw-wrapper').offset().top);
 	$('#err-nw-wrapper').addClass('bg-black-success');
 }
+function showInfoSuccess(msg){
+	buildMessageSuccessDiv();
+    $('#err-nw-txt-success').html(msg);
+    $('#err-nw-wrapper-success').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-success').offset().top);
+    $('#err-nw-wrapper-success').addClass('bg-black-success');
+}
 
 function hideInfo() {
 	$('#err-nw-wrapper').slideUp(200);
@@ -59,10 +107,31 @@ function hideInfo() {
 		$('#err-nw-wrapper').removeClass('bg-black-success');
 	}, 200);
 }
+function hideInfoInvalid(){
+    $('#err-nw-wrapper-invalid').slideUp(200);
+    setTimeout(function(){
+        $('#err-nw-wrapper-invalid').removeClass('bg-black-success');
+    },200);
+}
+function hideInfoSuccess(){
+    $('#err-nw-wrapper-success').slideUp(200);
+    setTimeout(function(){
+        $('#err-nw-wrapper-success').removeClass('bg-black-success');
+    },200);
+}
 
 $(document).on('click', '.err-new-close', function() {
 	hideError();
 	hideInfo();
+});
+$(document).on('click', '.err-new-close-invalid', function() {
+	hideErrorInvalid();
+	hideInfoInvalid();
+});
+
+$(document).on('click', '.err-new-close-success', function() {
+	hideErrorSuccess();
+	hideInfoSuccess();
 });
 
 function showRegErr(msg) {
@@ -81,12 +150,39 @@ function showErrorMobileAndWeb(msg) {
 		showError(msg);
 	}
 }
+function showErrorInvalidMobileAndWeb(msg){
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showInvalidError(msg);
+	}
+}
+function showErrorSuccessMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showErrorSuccess(msg);
+	}
+}
 function showInfoMobileAndWeb(msg) {
 	if ($(window).width() < 768) {
 		$('#overlay-toast').html(msg);
 		showToast();
 	} else {
 		showInfo(msg);
+	}
+}
+function showInfoSuccessMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showInfoSuccess(msg);
 	}
 }
 
@@ -2669,6 +2765,11 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				showInfo(jsonResponse.response);
+				//start fetching batch status
+				callAjaxPOSTWithTextDataUpload(
+						"./fetchUploadBatchStatus.do",
+						hierarchyUpload.fetchUploadBatchStatusCallback,
+						true, null);
 			}
 		}
 		$('#com-file').val('');
@@ -2685,6 +2786,7 @@ var hierarchyUpload = {
 				hierarchyUpload.getStatusCall.abort();
 			}
 		});
+		$('#lastUploadRunTimestamp').hide();
 		if (!response) {
 			$('#com-file').val('');
 			$('#com-xlsx-file').val('');
@@ -2696,11 +2798,13 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				//If not complete/error, keep making a request every 15 seconds
-				if ( !(jsonResponse.uploadStatus == 9 || jsonResponse.uploadStatus == 8
-						|| jsonResponse.uploadStatus == -1 ) ) {
+				if ( !(jsonResponse.uploadStatus == 4 || jsonResponse.uploadStatus == 5
+						|| jsonResponse.uploadStatus == -1 || jsonResponse.uploadStstus == 6 ) ) {
 					$('#uploadBatchStatus').empty();
-					$('<div>' + jsonResponse.response + '</div>').appendTo(
-							'#uploadBatchStatus');
+					jsonResponse.response.forEach( function(uploadStatus){
+						$('<div>' + uploadStatus.message + '</div>').appendTo(
+						'#uploadBatchStatus');
+					} );
 					$('#uploadBatchStatus').show();
 					showLoaderOnPagination($('#uploadBatchStatus'));
 					setTimeout(function(){
@@ -2710,20 +2814,25 @@ var hierarchyUpload = {
 										true, null);
 					}, 15000);
 				} else {
-					if (response != undefined && response != null && response != '') {
-						$('<div>' + jsonResponse.response + '</div>').appendTo(
+					if (response != undefined && response != null && response != '' && jsonResponse.response != []) {
+						$('#uploadBatchStatus').empty();
+						jsonResponse.response.forEach( function(uploadStatus){
+							if (jsonResponse.uploadStatus == uploadStatus.status) {
+								$('<div>' + uploadStatus.message + '</div>').appendTo(
 								'#uploadBatchStatus');
+							}
+						} );
 						$('#uploadBatchStatus').show();
 					}
 					hideLoaderOnPagination($('#uploadBatchStatus'));
 					$('#xlsVerifyUplaod').removeClass('disable');
-				}
-				if (jsonResponse.lastUploadRunTimestamp != null
-						&& jsonResponse.lastUploadRunTimestamp != '') {
-					$('#lastUploadRunTimestamp').text(
-							'Last Uploaded On: '
-									+ jsonResponse.lastUploadRunTimestamp);
-					$('#lastUploadRunTimestamp').show();
+					if (jsonResponse.lastUploadRunTimestamp != null
+							&& jsonResponse.lastUploadRunTimestamp != '') {
+						$('#lastUploadRunTimestamp').text(
+								'Last Imported On: '
+										+ jsonResponse.lastUploadRunTimestamp);
+						$('#lastUploadRunTimestamp').show();
+					}
 				}
 			}
 		}

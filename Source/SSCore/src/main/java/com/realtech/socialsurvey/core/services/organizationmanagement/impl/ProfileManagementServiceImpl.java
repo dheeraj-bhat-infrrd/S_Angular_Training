@@ -4074,6 +4074,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                         }
                                     }
                                     LOG.error( "Error code : " + code + " Error description : " + errorMessage );
+                                } else if ( !code.equalsIgnoreCase( "0" ) ) {
+                                    String errorMessage = (String) messageMap.get( "text" );
+                                    LOG.error( "Error code : " + code + " Error description : " + errorMessage );
                                 } else {
                                     surveyDetailsDao.updateZillowCallCount();
                                 }

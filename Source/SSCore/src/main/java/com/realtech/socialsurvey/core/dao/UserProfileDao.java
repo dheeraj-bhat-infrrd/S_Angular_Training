@@ -40,7 +40,7 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     public Map<String, Long> findPrimaryUserProfileByAgentId( long entityId );
-    
+
 
     public Set<Long> findUserIdsByBranch( long branchId );
 
@@ -82,6 +82,9 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     public void updateEmailIdForUserProfile( long userId, String emailId ) throws InvalidInputException;
+
+
+    Map<Long, List<UserProfile>> getUserProfilesForUsers( List<Long> userIds );
 
 
     void deleteUserProfilesByUser( long userId );
