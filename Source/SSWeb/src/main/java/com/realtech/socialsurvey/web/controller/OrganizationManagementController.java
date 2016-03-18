@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -2857,12 +2858,15 @@ public class OrganizationManagementController
         boolean status = true;
         String response = null;
         int latestStatus = -1;
+        Timestamp lastUploadTime = null;
         List<UploadStatus> latestStatuses = hierarchyStructureUploadService.fetchUploadStatusForCompany( user.getCompany() );
         try {
             if ( latestStatuses == null || latestStatuses.isEmpty() ) {
                 response = CommonConstants.UPLOAD_MSG_NO_UPLOAD;
             } else {
-                latestStatus = hierarchyStructureUploadService.highestStatus( latestStatuses );
+                UploadStatus uploadStatus = hierarchyStructureUploadService.highestStatus( latestStatuses );
+                latestStatus = uploadStatus.getStatus();
+                lastUploadTime = uploadStatus.getModifiedOn();
             }
         } catch ( Exception e ) {
             status = false;
@@ -2876,6 +2880,7 @@ public class OrganizationManagementController
             responseMap.put( "response", latestStatuses );
         }
         responseMap.put( "uploadStatus", latestStatus );
+        responseMap.put( "lastUploadRunTimestamp", lastUploadTime );
         return new Gson().toJson( responseMap );
     }
 

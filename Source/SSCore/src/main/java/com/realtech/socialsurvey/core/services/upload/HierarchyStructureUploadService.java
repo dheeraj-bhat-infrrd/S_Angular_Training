@@ -96,5 +96,5 @@ public interface HierarchyStructureUploadService
      * @param uploadStatuses
      * @return
      */
-    public int highestStatus( List<UploadStatus> uploadStatuses );
+    public UploadStatus highestStatus( List<UploadStatus> uploadStatuses );
 }

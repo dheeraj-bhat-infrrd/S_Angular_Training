@@ -2726,7 +2726,7 @@ var hierarchyUpload = {
 				if (jsonResponse.lastUploadRunTimestamp != null
 						&& jsonResponse.lastUploadRunTimestamp != '') {
 					$('#lastUploadRunTimestamp').text(
-							'Last Uploaded On: '
+							'Last Imported On: '
 									+ jsonResponse.lastUploadRunTimestamp);
 					$('#lastUploadRunTimestamp').show();
 				}

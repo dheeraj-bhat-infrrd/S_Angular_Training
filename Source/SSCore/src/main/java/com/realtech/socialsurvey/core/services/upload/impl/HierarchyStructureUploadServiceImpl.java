@@ -2461,7 +2461,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @return
      */
     @Override
-    public int highestStatus( List<UploadStatus> uploadStatuses )
+    public UploadStatus highestStatus( List<UploadStatus> uploadStatuses )
     {
         UploadStatus latestStatus = null;
         if ( uploadStatuses != null && !uploadStatuses.isEmpty() ) {
@@ -2469,9 +2469,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             for ( UploadStatus uploadStatus : uploadStatuses ) {
                 latestStatus = newerStatus( latestStatus, uploadStatus );
             }
-            return latestStatus.getStatus();
+            return latestStatus;
         }
-        return -1;
+        return null;
     }
     
     
