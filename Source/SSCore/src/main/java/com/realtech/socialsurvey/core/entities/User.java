@@ -115,6 +115,9 @@ public class User implements UserDetails, Serializable {
 
 	@Transient
 	private String profileUrl;
+	
+	@Transient
+	private String mappedEmails;
 
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -505,5 +508,15 @@ public class User implements UserDetails, Serializable {
     public void setUserEmailMappings( List<UserEmailMapping> userEmailMappings )
     {
         this.userEmailMappings = userEmailMappings;
+    }
+
+    public String getMappedEmails()
+    {
+        return mappedEmails;
+    }
+
+    public void setMappedEmails( String mappedEmails )
+    {
+        this.mappedEmails = mappedEmails;
     }
 }

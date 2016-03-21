@@ -1395,6 +1395,17 @@ function initializeFindAProPage() {
 		fetchUsers(start);
 	});
 }
+var MappedUserSize = 10;
+var MappedUserStartIndex = 0;
+function initializeMapped() {
+	$('#mapped').html('');
+	$('#mapped-paginate-btn').attr("data-start", 0);
+	MappedUserStartIndex = 0;
+	fetchMappedUsers(MappedUserStartIndex);
+	
+
+}
+
 var UnmatchedUserSize = 10;
 var UnmatchedUserStartIndex = 0;
 function initializeUnmatchedUserPage() {
@@ -1402,15 +1413,74 @@ function initializeUnmatchedUserPage() {
 	$('#un-new-paginate-btn').attr("data-start", 0);
 	UnmatchedUserStartIndex = 0;
 	fetchUnmatchedUsers(UnmatchedUserStartIndex);
-	/*
-	 * adjustTextContainerWidthOnResize();
-	 * 
-	 * $(window).resize(function() { if ($(window).width() < 768) {
-	 * adjustTextContainerWidthOnResize(); } });
-	 */
+	
 
 }
+function  bindEventForMappedUserPage(){
+	// Click events proList pagination buttons
+	$('#mapped-paginate-btn').on(
+			'click',
+			'#mapped-next.paginate-button',
+			function(e) {
+				var start = parseInt($('#mapped-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#mapped-paginate-btn').attr(
+						"data-batch"));
 
+				start += batch;
+				$('#mapped-paginate-btn').attr("data-start", start);
+				fetchMappedUsers(start);
+			});
+
+	$('#mapped-paginate-btn').on(
+			'click',
+			'#mapped-prev.paginate-button',
+			function(e) {
+				var start = parseInt($('#mapped-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#mapped-paginate-btn').attr(
+						"data-batch"));
+
+				start -= batch;
+				$('#mapped-paginate-btn').attr("data-start", start);
+				fetchMappedUsers(start);
+			});
+
+	$('#mapped-paginate-btn').on(
+			'keypress',
+			'#sel-page-mapped-list',
+			function(e) {
+				// if the letter is not digit then don't type anything
+				if (e.which != 8 && e.which != 0
+						&& (e.which < 48 || e.which > 57)) {
+					return false;
+				}
+				var totalPage = parseInt($('#mapped-total-pages').text());
+				var prevPageNoVal = parseInt($('#sel-page-mapped-list').val());
+				if (prevPageNoVal == NaN) {
+					prevPageNoVal = 0;
+				}
+				var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+				pageNo = parseInt(pageNo);
+				if (pageNo >= totalPage || pageNo <= 0) {
+					return false;
+				}
+			});
+
+	$('#mapped-paginate-btn').on('keyup', '#sel-page-mapped-list', function(e) {
+		if (e.which == 13) {
+			$(this).trigger('blur');
+		}
+	});
+
+	$('#mapped-paginate-btn').on('blur', '#sel-page-mapped-list', function(e) {
+		var batch = parseInt($('#mapped-paginate-btn').attr("data-batch"));
+		var pageNoVal = parseInt($('#sel-page-mapped-list').val());
+		MappedUserStartIndex = (pageNoVal - 1) * batch;
+		$('#mapped-paginate-btn').attr("data-start", MappedUserStartIndex);
+		fetchMappedUsers(MappedUserStartIndex);
+	});
+}
 function bindEventForUnmatchedUserPage() {
 
 	// Click events proList pagination buttons
@@ -1485,13 +1555,6 @@ function initializeProcesedUserPage() {
 	$('#un-processed-paginate-btn').attr("data-start", 0);
 	ProcessedUserStartIndex = 0;
 	fetchProcessedUsers(ProcessedUserStartIndex);
-	/*
-	 * adjustTextContainerWidthOnResize();
-	 * 
-	 * $(window).resize(function() { if ($(window).width() < 768) {
-	 * adjustTextContainerWidthOnResize(); } });
-	 */
-	// Click events proList pagination buttons
 }
 
 function bindEventsForProcessUserPage() {
@@ -1600,7 +1663,18 @@ function fetchUsers(newIndex) {
 			hideOverlay();
 	}
 }
+function fetchMappedUsers(newIndex){
+	showOverlay();
+	var payload = {
+		"batchSize" : MappedUserSize,
+		"startIndex" : newIndex
 
+	};
+
+	callAjaxGetWithPayloadData("./getuserwithaliasedemails.do",
+			paginateMappedUser, payload, true);
+
+}
 function fetchUnmatchedUsers(newIndex) {
 	showOverlay();
 	var payload = {
@@ -1680,6 +1754,40 @@ function updatePaginationBtnsForProList() {
 		pageNo = 1;
 	}
 	$('#sel-page-prolist').val(pageNo);
+}
+function updatePaginationBtnsForMappedUser(){
+	var start = parseInt($('#mapped-paginate-btn').attr("data-start"));
+	var total = parseInt($('#mapped-paginate-btn').attr("data-total"));
+	var batch = parseInt($('#mapped-paginate-btn').attr("data-batch"));
+
+	// update previous button
+	if (start == 0) {
+		$('#mapped-prev').removeClass('paginate-button');
+	} else {
+		$('#mapped-prev').addClass('paginate-button');
+	}
+
+	// update next button
+	if (start + batch >= total) {
+		$('#mapped-next').removeClass('paginate-button');
+	} else {
+		$('#mapped-next').addClass('paginate-button');
+	}
+
+	// update page no
+	var pageNo = 0;
+	if (start < total) {
+		pageNo = (start / batch) + 1;
+	} else {
+		pageNo = start / batch;
+	}
+	var emptyPageNo = isNaN(pageNo);
+	if (emptyPageNo) {
+		$('#mapped-paginate-btn').attr("data-start", 0);
+		$('#mapped-prev').removeClass('paginate-button');
+		pageNo = 1;
+	}
+	$('#sel-page-mapped-list').val(pageNo);
 }
 function updatePaginationBtnsForUnmatchedUser() {
 	var start = parseInt($('#un-new-paginate-btn').attr("data-start"));
@@ -1782,6 +1890,36 @@ function paginateUsersProList(response) {
 	}
 	updatePaginationBtnsForProList();
 	scrollToTop();
+	hideOverlay();
+}
+function paginateMappedUser(response){
+	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#mapped-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#mapped-paginate-btn').attr("data-batch"));
+
+	// error message
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#mapped').append("No Data found");
+	} else {
+		if (start == 0) {
+			var usersSize = reponseJson.totalRecord;
+			if (usersSize > 0) {
+				$('#mapped-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+
+				$('#mapped-total-pages').text(totalPage);
+			}
+
+		}
+		paintMappedUser(reponseJson);
+	}
+	updatePaginationBtnsForMappedUser();
 	hideOverlay();
 }
 function paginateUnmatchedUser(response) {
@@ -1943,6 +2081,198 @@ function undefinedval(hierval) {
 	}
 	return hierval;
 }
+function paintMappedUser(usersList){
+	if (usersList != undefined) {
+		var usersSize = usersList.users.length;
+
+		var untrack = "";
+		if (usersSize > 0) {
+			usersList.users
+					.forEach(function(arrayItem) {
+
+						untrack += '<div class="un-row">'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-name">'
+								+ undefinedval(arrayItem.firstName)
+								+ '</div>'
+								+' <div class="hide ss-id">'
+								+undefinedval(arrayItem.userId)
+								+'</div>'
+								+ '						<div style="width:40%" class="float-left unmatchtab ss-eids">'
+								+ undefinedval(arrayItem.mappedEmails)
+								+ '</div>'
+								+ '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab v-mapped-edit cursor-pointer"></div>'
+								+ '						</div>';
+
+					});
+
+			$('#mapped').html(untrack);
+			/*bindClickEventForMappedButton();*/
+			editMap();
+		}
+	}
+}
+function editMap(){
+	$('.v-mapped-edit').click(function(e) {
+	var id =  parseInt($(this).parent().find(".ss-id").text());
+	$('#current-user-id').val(id);
+    var	payload={
+			"agentId":id
+	};
+	callAjaxGetWithPayloadData("./getemailmappingsforuser.do",
+			editEmailMap,payload,true);
+	});
+   
+}
+
+//save email mappings ajax request running var
+var isSaveEmailForUserRunning = false;
+
+function editEmailMap(response) {
+	var reponseJson = $.parseJSON(response);
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#mapped-email-info').append("No Data found");
+	} else {
+		
+		var emailMap="";
+          var emails =reponseJson.length;
+          if(emails>0){
+        	  reponseJson.forEach(function(arrayEmail){
+        		  emailMap+='<div class="un-row">'
+						+ '						<div style="width:40%" class="float-left unmatchtab email-id">'
+						+ undefinedval(arrayEmail.emailId)
+						+ '</div>'
+						+ '						<div style="width:30%" class="float-left unmatchtab email-created">'
+						+ undefinedval(arrayEmail.createdOn)
+						+ '</div>'
+						+ '						<div style="width:20%;height:38px;" class="float-left unmatchtab email-map-remove cursor-pointer" onclick="emailDelete(this,'+undefinedval(arrayEmail.userEmailMappingId)+');"></div>'
+						+'</div>'
+        	  });
+        	  
+
+        		$("input", $("#email-form")).bind("keyup", function(){ AdditionEvent() });
+        	  $('#mapped-emil-info').html(emailMap);
+        	  $('#email-map-pop-up').show();
+        	  $('#email-map-cancel').click(function(e){
+        		  $('#email-form')[0].reset();
+        		  $('#email1').nextAll().remove();
+        		  $('#email-map-add').show();
+        		  $('#email-map-save').hide();
+        		  $('#input-email').hide();
+        		 $('#email-map-pop-up').hide(); 
+        		 initializeMapped();
+        	  });
+        	  $('#email-map-add').click(function(e){
+        		  $('#email-map-add').hide();
+        		  $('#email-map-save').show();
+         		 $('#input-email').show(); 
+         	  });
+			  
+        	  
+        	  //save button
+        	  $('#email-map-save').click(function(e) {
+        		  
+        		  		//check if ajax is already running
+        		  		if(isSaveEmailForUserRunning)
+        		  			return;
+        		  		
+						var emails = "";
+						var isValidated = true;
+						$("#new-email-wrapper :input").each(function() {
+							var curEmail = $(this).val();
+							if(curEmail != ""){
+								if (emailRegex.test(curEmail) == true) {
+									emails += curEmail;
+									emails += ",";
+								} else {
+									$('#overlay-toast').html("Please enter valid email id : " + curEmail);
+									showToast();
+									isValidated = false;
+									return;
+								}
+							}
+							
+						});
+						if(emails == "" || isValidated == false)
+							return;
+						var eLast = emails.lastIndexOf(",");
+						emails = emails.substring(0, eLast);
+						var cureid=$('#current-user-id').val();
+						var payload = {
+							"emailIds" : emails,
+							"agentId" : cureid
+						};
+						
+						isSaveEmailForUserRunning = true;
+						callAjaxPostWithPayloadData(
+								"./saveemailmappingsforuser.do", saveEmailMap,
+								payload, true);
+					});
+        	 
+          }
+	}
+}
+function saveEmailMap(data){
+	//make false the ajax running function
+	isSaveEmailForUserRunning = false;
+	if(data=="Successfully added email address"){
+		$('#email1').nextAll().remove();
+		  $('#email-form')[0].reset();
+		 $('#email-map-pop-up').hide(); 
+		 $('#email-map-add').show();
+		  $('#email-map-save').hide();
+		  $('#input-email').hide(); 
+		 initializeMapped();
+	}
+	 $('#overlay-toast').html(data);
+		showToast();
+}
+function emailDelete(deleteElement,emailMapId){
+	var url="deleteuseremailmapping.do?emailMappingId="+emailMapId;
+callAjaxGET(url, function(data) {
+var response = $.parseJSON(data);
+if(response.succeed==true){
+	$(deleteElement).closest('.un-row').remove();
+	$('#overlay-toast').html(response.message);
+	showToast();
+}
+}, false);
+};
+
+function AllInputsFilled() {
+    return $("input[type='email']", $("#email-form")).filter(function() {
+        return $(this).val().trim() === "";
+    }).size() === 0;
+}
+
+function AdditionEvent() {
+    if (AllInputsFilled()) {
+        AddInput();    
+    }
+}
+
+function AddInput() {
+    var cnt = $("input[type='email']", $("#email-form")).size() + 1;
+/*    $("#email-form").children().last().append("<br><span style='padding:5px;'>Enter another email-id </span><input type='email' class='email-input-txt' placeholder='someone@example.com' name='email" + cnt+ "' id='email" + cnt+ "' /><span><img src='resources/images/close_srv.png' class='remove-email-input' onclick='bindRemoveEmailInput(this);'> </span>");*/
+    $("#email-form").children().last().append("<br><span style='padding:5px;'>Enter another email-id </span><input type='email' class='email-input-txt' placeholder='someone@example.com' name='email" + cnt+ "' id='email" + cnt+ "' />");
+    $("input", $("#email-form")).unbind("keyup").bind("keyup", function(){ AdditionEvent() });
+
+}
+/*$(document).on("input", '.email-input-txt', function() {
+	var url="./populateemail.do";
+	callAjaxGET(url, function(data) {
+		$('#input-email').after(data);
+	}, true);
+	
+});*/
+function bindRemoveEmailInput(emailInput){
+	
+	$(emailInput).parent().prev().prev().remove();
+	$(emailInput).parent().prev().remove();
+	/*$(emailInput).remove()*/;
+}
+
+
 
 function paintUnmatchedUser(usersList) {
 	if (usersList != undefined) {
@@ -2023,6 +2353,75 @@ function paintProcessedUser(usersList) {
 
 		}
 	}
+}
+function bindClickEventForMappedButton(){
+	$('.v-mapped-edit')
+	.click(
+			function(e) {
+				var id=$(this).parent().find("ss-id").text();
+				/*
+				var name = $(this).parent().find(".ss-name").text();
+				var eids = $(this).parent().find(".ss-eids").text();
+				var customer = $(this).parent().find(".ss-cname")
+						.text();
+
+				var popup = '<div class="bd-hr-form-item clearfix">'
+						+ '	     <div class="float-left bd-frm-left-un">'+eids+'</div>'
+						+ '	      <div class="float-left bd-frm-right-un">'
+						+ delete
+						+ '</div>'
+						+ '	 </div>'
+						+ '	 <div class="bd-hr-form-item clearfix">'
+						+ '	     <div class="float-left bd-frm-left-un">Eids</div>'
+						+ '	      <div class="float-left bd-frm-right-un">'
+						+ eids
+						+ '</div>'
+						+ '	 </div>'
+						+ '<div class="bd-hr-form-item clearfix">'
+						+ '	     <div class="float-left bd-frm-left-un">Customer</div>'
+						+ '	      <div class="float-left bd-frm-right-un">'
+						+ customer
+						+ '</div>'
+						+ '	 </div><div class="bd-hr-form-item clearfix" id="ignore">'
+						+ '	     <div class="float-left bd-frm-left-un"></div>'
+						+ '	     <div class="float-left bd-frm-right">'
+						+ '	         <div class="bd-frm-check-wrapper clearfix bd-check-wrp">'
+						+ '	             <div class="float-left bd-check-img bd-check-img-checked"></div>'
+						+ '	             <input type="hidden" name="isIgnore" value="false" id="is-ignore" class="ignore-clear">'
+						+ '	             <div class="float-left bd-check-txt bd-check-sm">Always Ignore</div>'
+						+ '	         </div>'
+						+ '	     </div>'
+						+ '	 </div>'
+						+ '<div id="bd-single" class="bd-hr-form-item clearfix">'
+						+ '	    <div class="float-left bd-frm-left-un">Alias</div>'
+						+ '	    <div class="float-left bd-frm-left-un pos-relative">'
+						+ '	        <input id="match-user-email" class="bd-frm-rt-txt bd-dd-img">'
+						+ '	    </div>' + '	</div>';
+
+				e.stopPropagation();
+				$('#overlay-continue').html("Save");
+				$('#overlay-cancel').html("Cancel");
+				$('#overlay-header').html( name );
+				$('#overlay-text').html(popup);
+
+				$('#overlay-continue').click(function() {
+					saveUserMap(user);
+					$('#overlay-continue').unbind('click');
+				});
+				$('#overlay-main').show();
+				bindAdminCheckBoxClick();
+				attachAutocompleteAliasDropdown();
+			*/
+				
+			});
+if ($('#is-ignore').val() == true) {
+if ($('#match-user-email').val() != "") {
+	$('#match-user-email').val('');
+	$('#match-user-email').attr('agent-id', 0);
+	$('#match-user-email').attr("disabled");
+}
+}
+
 }
 
 function bindClickEventForProcessButton() {

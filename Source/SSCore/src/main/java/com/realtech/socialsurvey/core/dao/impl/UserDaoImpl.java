@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -22,181 +24,197 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
-// JIRA SS-42 By RM-05 : BOC
-@Component("user")
-public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UserDaoImpl.class);
+// JIRA SS-42 By RM-05 : BOC
+@Component ( "user")
+public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
+{
+
+    private static final Logger LOG = LoggerFactory.getLogger( UserDaoImpl.class );
 
     @Autowired
     private CompanyDao companyDao;
 
-	/*
-	 * Method to return all the users that match email id passed.
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<User> fetchUsersBySimilarEmailId(User user, String emailId) {
-		LOG.info("Method to fetch all the users by email id,fetchUsersBySimilarEmailId() started.");
-		Criteria criteria = getSession().createCriteria(User.class);
-		try {
-			criteria.add(Restrictions.ilike(CommonConstants.EMAIL_ID, "%" + emailId + "%"));
-			criteria.add(Restrictions.eq(CommonConstants.COMPANY, user.getCompany()));
 
-			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED));
-			criteria.add(criterion);
-		}
-		catch (HibernateException hibernateException) {
-			LOG.error("Exception caught in fetchUsersBySimilarEmailId() ", hibernateException);
-			throw new DatabaseException("Exception caught in fetchUsersBySimilarEmailId() ", hibernateException);
-		}
-
-		LOG.info("Method to fetch all the users by email id, fetchUsersBySimilarEmailId() finished.");
-
-		return (List<User>) criteria.list();
-	}
-
-	/*
-	 * Method to get count of active and unauthorized users belonging to a company.
-	 */
-	@Override
-	public long getUsersCountForCompany(Company company) {
-		LOG.info("Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() started.");
-
-		Criteria criteria = getSession().createCriteria(User.class);
-		try {
-			criteria.add(Restrictions.eq(CommonConstants.COMPANY, company));
-
-			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED));
-			criteria.add(criterion);
-		}
-		catch (HibernateException hibernateException) {
-			throw new DatabaseException("Exception caught in getUsersCountForCompany() ", hibernateException);
-		}
-
-		LOG.info("Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() finished.");
-		return (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-	}
-
-	/*
-	 * Method to get list of active and unauthorized users belonging to a company.
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<User> getUsersForCompany(Company company) {
-		LOG.info("Method getUsersForCompany called to fetch list of users of company : " + company.getCompany());
-		Criteria criteria = getSession().createCriteria(User.class);
-		try {
-			criteria.add(Restrictions.eq(CommonConstants.COMPANY, company));
-
-			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED),
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
-			criteria.add(criterion);
-			criteria.addOrder(Order.asc("firstName"));
-			criteria.addOrder(Order.asc("lastName"));
-		}
-		catch (HibernateException hibernateException) {
-			throw new DatabaseException("Exception caught in getUsersForCompany() ", hibernateException);
-		}
-		LOG.info("Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany());
-		return (List<User>) criteria.list();
-	}
-
-	/*
-	 * Method to check if any user exist with the email-id and is still active in a company
-	 */
-	@Override
-	public User getActiveUser(String emailId) throws NoRecordsFetchedException {
-		LOG.debug("Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : " + emailId);
-		Criteria criteria = getSession().createCriteria(User.class);
-		try {
-			criteria.add(Restrictions.eq(CommonConstants.LOGIN_NAME, emailId));
-			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED),
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
-			criteria.add(criterion);
-		}
-		catch (HibernateException hibernateException) {
-			throw new DatabaseException("Exception caught in getUsersForCompany() ", hibernateException);
-		}
-		@SuppressWarnings("unchecked") List<User> users = criteria.list();
-		if (users == null || users.isEmpty()) {
-			LOG.debug("No active users found with the emaild id " + emailId);
-			throw new NoRecordsFetchedException("No active user found for the emailid");
-		}
-		LOG.debug("Method checkIfAnyActiveUserExists() successfull, active user with the emailId " + emailId);
-		return users.get(CommonConstants.INITIAL_INDEX);
-	}
-
-	/*
-	 * Method to return all the users that match email id passed.
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<User> fetchUsersByEmailId(List<String> emailIds) {
-		LOG.info("Method to fetch all the users by email id,fetchUsersBySimilarEmailId() started.");
-		Criteria criteria = getSession().createCriteria(User.class);
-		try {
-			criteria.add(Restrictions.in(CommonConstants.EMAIL_ID, emailIds));
-			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
-		}
-		catch (HibernateException hibernateException) {
-			LOG.error("Exception caught in fetchUsersBySimilarEmailId() ", hibernateException);
-			throw new DatabaseException("Exception caught in fetchUsersBySimilarEmailId() ", hibernateException);
-		}
-
-		LOG.info("Method to fetch all the users by email id, fetchUsersBySimilarEmailId() finished.");
-
-		return (List<User>) criteria.list();
-	}
-
-	/*
-	 * Method to delete all the users of a company.
-	 */
-	@Override
-	public void deleteUsersByCompanyId(long companyId) {
-		LOG.info("Method to delete all the users by company id,deleteUsersByCompanyId() started.");
-		try {
-			Query query = getSession().createQuery("delete from User where company.companyId=?");
-			query.setParameter(0, companyId);
-			query.executeUpdate();
-		}
-		catch (HibernateException hibernateException) {
-			LOG.error("Exception caught in deleteUsersByCompanyId() ", hibernateException);
-			throw new DatabaseException("Exception caught in deleteUsersByCompanyId() ", hibernateException);
-		}
-		LOG.info("Method to fetch all the users by email id, deleteUsersByCompanyId() finished.");
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.realtech.socialsurvey.core.dao.UserDao#getActiveUserByEmailAndCompany(java.lang.String, com.realtech.socialsurvey.core.entities.Company)
-	 */
-	@Override
-    public User getActiveUserByEmailAndCompany(String emailId , Company company) throws NoRecordsFetchedException {
-        LOG.debug("Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : " + emailId);
-        Criteria criteria = getSession().createCriteria(User.class);
+    /*
+     * Method to return all the users that match email id passed.
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<User> fetchUsersBySimilarEmailId( User user, String emailId )
+    {
+        LOG.info( "Method to fetch all the users by email id,fetchUsersBySimilarEmailId() started." );
+        Criteria criteria = getSession().createCriteria( User.class );
         try {
-            criteria.add(Restrictions.eq(CommonConstants.LOGIN_NAME, emailId));
-            criteria.add(Restrictions.eq(CommonConstants.COMPANY, company ));
-            Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
-                    Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED),
-                    Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
-            criteria.add(criterion);
+            criteria.add( Restrictions.ilike( CommonConstants.EMAIL_ID, "%" + emailId + "%" ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY, user.getCompany() ) );
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ) );
+            criteria.add( criterion );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUsersBySimilarEmailId() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUsersBySimilarEmailId() ", hibernateException );
         }
-        catch (HibernateException hibernateException) {
-            throw new DatabaseException("Exception caught in getActiveUserByEmailAndCompany() ", hibernateException);
+
+        LOG.info( "Method to fetch all the users by email id, fetchUsersBySimilarEmailId() finished." );
+
+        return (List<User>) criteria.list();
+    }
+
+
+    /*
+     * Method to get count of active and unauthorized users belonging to a company.
+     */
+    @Override
+    public long getUsersCountForCompany( Company company )
+    {
+        LOG.info( "Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() started." );
+
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY, company ) );
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ) );
+            criteria.add( criterion );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersCountForCompany() ", hibernateException );
         }
-        @SuppressWarnings("unchecked") List<User> users = criteria.list();
-        if (users == null || users.isEmpty()) {
-            LOG.debug("No active users found with the emaild id " + emailId);
-            throw new NoRecordsFetchedException("No active user found for the emailid");
+
+        LOG.info( "Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() finished." );
+        return (long) criteria.setProjection( Projections.rowCount() ).uniqueResult();
+    }
+
+
+    /*
+     * Method to get list of active and unauthorized users belonging to a company.
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<User> getUsersForCompany( Company company )
+    {
+        LOG.info( "Method getUsersForCompany called to fetch list of users of company : " + company.getCompany() );
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY, company ) );
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+            criteria.add( criterion );
+            criteria.addOrder( Order.asc( "firstName" ) );
+            criteria.addOrder( Order.asc( "lastName" ) );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
         }
-        LOG.debug("Method getActiveUserByEmailAndCompany() successfull, active user with the emailId " + emailId);
-        return users.get(CommonConstants.INITIAL_INDEX);
+        LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
+        return (List<User>) criteria.list();
+    }
+
+
+    /*
+     * Method to check if any user exist with the email-id and is still active in a company
+     */
+    @Override
+    public User getActiveUser( String emailId ) throws NoRecordsFetchedException
+    {
+        LOG.debug( "Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : "
+            + emailId );
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.LOGIN_NAME, emailId ) );
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+            criteria.add( criterion );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
+        }
+        @SuppressWarnings ( "unchecked") List<User> users = criteria.list();
+        if ( users == null || users.isEmpty() ) {
+            LOG.debug( "No active users found with the emaild id " + emailId );
+            throw new NoRecordsFetchedException( "No active user found for the emailid" );
+        }
+        LOG.debug( "Method checkIfAnyActiveUserExists() successfull, active user with the emailId " + emailId );
+        return users.get( CommonConstants.INITIAL_INDEX );
+    }
+
+
+    /*
+     * Method to return all the users that match email id passed.
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<User> fetchUsersByEmailId( List<String> emailIds )
+    {
+        LOG.info( "Method to fetch all the users by email id,fetchUsersBySimilarEmailId() started." );
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.in( CommonConstants.EMAIL_ID, emailIds ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchUsersBySimilarEmailId() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchUsersBySimilarEmailId() ", hibernateException );
+        }
+
+        LOG.info( "Method to fetch all the users by email id, fetchUsersBySimilarEmailId() finished." );
+
+        return (List<User>) criteria.list();
+    }
+
+
+    /*
+     * Method to delete all the users of a company.
+     */
+    @Override
+    public void deleteUsersByCompanyId( long companyId )
+    {
+        LOG.info( "Method to delete all the users by company id,deleteUsersByCompanyId() started." );
+        try {
+            Query query = getSession().createQuery( "delete from User where company.companyId=?" );
+            query.setParameter( 0, companyId );
+            query.executeUpdate();
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in deleteUsersByCompanyId() ", hibernateException );
+            throw new DatabaseException( "Exception caught in deleteUsersByCompanyId() ", hibernateException );
+        }
+        LOG.info( "Method to fetch all the users by email id, deleteUsersByCompanyId() finished." );
+    }
+
+
+    /*
+     * (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.dao.UserDao#getActiveUserByEmailAndCompany(java.lang.String, com.realtech.socialsurvey.core.entities.Company)
+     */
+    @Override
+    public User getActiveUserByEmailAndCompany( String emailId, Company company ) throws NoRecordsFetchedException
+    {
+        LOG.debug( "Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : "
+            + emailId );
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.LOGIN_NAME, emailId ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY, company ) );
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+            criteria.add( criterion );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getActiveUserByEmailAndCompany() ", hibernateException );
+        }
+        @SuppressWarnings ( "unchecked") List<User> users = criteria.list();
+        if ( users == null || users.isEmpty() ) {
+            LOG.debug( "No active users found with the emaild id " + emailId );
+            throw new NoRecordsFetchedException( "No active user found for the emailid" );
+        }
+        LOG.debug( "Method getActiveUserByEmailAndCompany() successfull, active user with the emailId " + emailId );
+        return users.get( CommonConstants.INITIAL_INDEX );
     }
 
 
@@ -211,6 +229,10 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
         LOG.info( "Method getUsersForUserIds called to fetch users for user ids : " + userIds );
         try {
             criteria.add( Restrictions.in( CommonConstants.USER_ID, userIds ) );
+            
+            criteria.addOrder( Order.asc( "firstName" ) );
+            criteria.addOrder( Order.asc( "lastName" ) );
+            
         } catch ( HibernateException hibernateException ) {
             throw new DatabaseException( "Exception caught in getUsersForUserIds() ", hibernateException );
         }
@@ -295,5 +317,83 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
             + profileMasterId + ",getUserIdsUnderCompanyBasedOnProfileMasterId() ended." );
         return criteria.list();
     }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<User> getUsersAndEmailMappingForCompany( Company company, int start, int batch ) throws InvalidInputException
+    {
+        if ( company == null )
+            throw new InvalidInputException( "Company passed in getBranchesForCompany() cannot be null" );
+        LOG.info( "Method getUsersForCompany called to fetch list of users of company : " + company.getCompany() );
+        Criteria criteria = getSession().createCriteria( User.class, "user" );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY, company ) );
+
+            criteria.createAlias( "user.userEmailMappings", "emailMapping" );
+            criteria.add( Restrictions.eq( "emailMapping.status", CommonConstants.STATUS_ACTIVE ) );
+
+            //criteria.add( Restrictions.sizeGt("userEmailMappings", 0) );
+            //  criteria.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY );
+
+
+            criteria.setProjection( Projections.distinct( Projections.property( CommonConstants.USER_ID ) ) );
+
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+            criteria.add( criterion );
+            
+            if ( start > -1 )
+                criteria.setFirstResult( start );
+            if ( batch > -1 )
+                criteria.setMaxResults( batch );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
+        }
+        LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
+
+        List<Long> userIds = criteria.list();
+
+        List<User> users = getUsersForUserIds( userIds );
+
+        return users;
+    }
+
+
+    @Override
+    public Long getCountOfUsersAndEmailMappingForCompany( Company company ) throws InvalidInputException
+    {
+        if ( company == null )
+            throw new InvalidInputException( "Company passed in getBranchesForCompany() cannot be null" );
+        LOG.info( "Method getUsersForCompany called to fetch list of users of company : " + company.getCompany() );
+        Criteria criteria = getSession().createCriteria( User.class, "user" );
+        Long count;
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY, company ) );
+
+            criteria.createAlias( "user.userEmailMappings", "emailMapping" );
+            criteria.add( Restrictions.eq( "emailMapping.status", CommonConstants.STATUS_ACTIVE ) );
+
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+            criteria.add( criterion );
+
+            //count distinct users by email id
+            criteria.setProjection( Projections.countDistinct( CommonConstants.USER_ID ) );
+            count = (Long) criteria.uniqueResult();
+
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
+        }
+        LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
+        return count;
+    }
+
 }
 // JIRA SS-42 By RM-05 EOC

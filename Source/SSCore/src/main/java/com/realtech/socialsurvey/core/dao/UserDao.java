@@ -36,4 +36,8 @@ public interface UserDao extends GenericDao<User, Long> {
         throws InvalidInputException;
 	// JIRA SS-76 by RM-06 : EOC
 
+    List<User> getUsersAndEmailMappingForCompany( Company company, int start, int batch ) throws InvalidInputException;
+
+    Long getCountOfUsersAndEmailMappingForCompany( Company company ) throws InvalidInputException;
+
 }
