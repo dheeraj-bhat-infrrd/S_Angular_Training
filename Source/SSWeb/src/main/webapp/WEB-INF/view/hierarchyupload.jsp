@@ -61,6 +61,16 @@
 			<spring:message code="label.import.key" />
 		</div>
 	</div>
+	<div class="float-right" style="margin-right: 50px; margin-top: 10px;">
+		<div class="float-left bd-cust-rad-item clearfix">
+			<div data-type="append" class="float-left bd-cust-rad-img bd-cust-rad-img-checked"></div>
+			<div class="float-left bd-cust-rad-txt">Append Mode</div>
+		</div>
+		<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix">
+			<div data-type="replace" class="float-left bd-cust-rad-img"></div>
+			<div class="float-left bd-cust-rad-txt">Replace Mode</div>
+		</div>
+	</div>
 </div>
 <div id="no-data"
 	style="width: 120px; margin: auto; color: #009FE0; font-size: 30px;"
