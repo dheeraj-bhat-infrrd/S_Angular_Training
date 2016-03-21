@@ -2741,7 +2741,6 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = null;
         LOG.info( "Validating the hierarchy file" );
         String fileUrl = request.getParameter( "fileUrl" );
-        //TODO: add append mode code
         boolean isAppend = false;
         if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
             isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
@@ -2807,12 +2806,8 @@ public class OrganizationManagementController
         User user = sessionHelper.getCurrentUser();
         Map<String, List<String>> map = new HashMap<String, List<String>>();
         List<String> value = new ArrayList<String>();
-        boolean isAppend = false;
-        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
-            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
-        }
         try {
-            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user, isAppend );
+            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user, false );
             if ( map == null || map.isEmpty() ) {
                 value.add( "Data uploaded successfully." );
                 map.put( "UPLOAD_SUCCESS", value );
@@ -2841,13 +2836,17 @@ public class OrganizationManagementController
         String response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        boolean isAppend = false;
+        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
+            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
+        }
         try {
             User user = sessionHelper.getCurrentUser();
             //Insert hieararchy upload in UPLOAD_HIERARCHY_DETAILS collections
             hierarchyStructureUploadService.saveHierarchyUploadInMongo( uploadValidation.getUpload() );
 
             //Initiate upload by adding entry in upload status table
-            hierarchyStructureUploadService.addNewUploadRequest( user );
+            hierarchyStructureUploadService.addNewUploadRequest( user, isAppend );
             response = "Hierarchy upload batch is initialized successfully";
         } catch ( Exception ex ) {
             status = false;

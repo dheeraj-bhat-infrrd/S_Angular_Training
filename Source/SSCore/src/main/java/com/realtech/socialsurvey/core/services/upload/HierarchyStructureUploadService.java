@@ -51,7 +51,7 @@ public interface HierarchyStructureUploadService
      */
     public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException;
 
-    public void addNewUploadRequest( User adminUser );
+    public void addNewUploadRequest( User adminUser, boolean isAppend );
 
     public UploadStatus fetchLatestUploadStatus( Company company );
 

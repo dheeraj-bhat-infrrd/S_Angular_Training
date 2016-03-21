@@ -2497,7 +2497,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param adminUser
      */
     @Override
-    public void addNewUploadRequest( User adminUser )
+    public void addNewUploadRequest( User adminUser, boolean isAppend )
     {
         //Remove old records for the company
         List<String> conditions = new ArrayList<String>();
@@ -2510,6 +2510,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         newStatus.setCompany( adminUser.getCompany() );
         newStatus.setMessage( CommonConstants.UPLOAD_MSG_INITIATED );
         newStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_INITIATED );
+        if ( isAppend ) {
+            newStatus.setUploadMode( CommonConstants.UPLOAD_MODE_APPEND );
+        }
         addUploadStatusEntry( newStatus );
     }
     
