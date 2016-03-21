@@ -2367,6 +2367,17 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
     
     
+    
+    @Override
+    @Transactional
+    public void updateUploadStatusToNoUpload(UploadStatus uploadStatus)
+    {
+        LOG.info( "Upadting uploadStatus to no upload" );
+        uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_NO_UPLOAD );
+        uploadStatusDao.update( uploadStatus );
+    }
+    
+    
     /**
      * Method to add an uploadStatus entry
      * @param uploadStatus

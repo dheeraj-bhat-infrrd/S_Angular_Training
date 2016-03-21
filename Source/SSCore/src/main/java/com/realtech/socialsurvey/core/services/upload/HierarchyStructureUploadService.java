@@ -97,4 +97,11 @@ public interface HierarchyStructureUploadService
      * @return
      */
     public UploadStatus highestStatus( List<UploadStatus> uploadStatuses );
+
+    
+    /**
+     * Method to set upload status to no upload pending
+     * @param uploadStatus
+     */
+    public void updateUploadStatusToNoUpload( UploadStatus uploadStatus );
 }

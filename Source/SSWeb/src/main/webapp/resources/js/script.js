@@ -2799,7 +2799,7 @@ var hierarchyUpload = {
 			} else {
 				//If not complete/error, keep making a request every 15 seconds
 				if ( !(jsonResponse.uploadStatus == 4 || jsonResponse.uploadStatus == 5
-						|| jsonResponse.uploadStatus == -1 || jsonResponse.uploadStstus == 6 ) ) {
+						|| jsonResponse.uploadStatus == -1 || jsonResponse.uploadStatus == 6 ) ) {
 					$('#uploadBatchStatus').empty();
 					jsonResponse.response.forEach( function(uploadStatus){
 						$('<div>' + uploadStatus.message + '</div>').appendTo(
@@ -2817,7 +2817,7 @@ var hierarchyUpload = {
 					if (response != undefined && response != null && response != '' && jsonResponse.response != []) {
 						$('#uploadBatchStatus').empty();
 						jsonResponse.response.forEach( function(uploadStatus){
-							if (jsonResponse.uploadStatus == uploadStatus.status) {
+							if ( jsonResponse.uploadStatus != 6 && jsonResponse.uploadStatus == uploadStatus.status) {
 								$('<div>' + uploadStatus.message + '</div>').appendTo(
 								'#uploadBatchStatus');
 							}

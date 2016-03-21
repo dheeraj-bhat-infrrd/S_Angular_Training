@@ -2867,6 +2867,13 @@ public class OrganizationManagementController
                 UploadStatus uploadStatus = hierarchyStructureUploadService.highestStatus( latestStatuses );
                 latestStatus = uploadStatus.getStatus();
                 lastUploadTime = uploadStatus.getModifiedOn();
+                
+                //So that this is shown only once, if hierarchy upload status is 4, set it to 6 and update
+                if ( latestStatus == CommonConstants.HIERARCHY_UPLOAD_UPLOAD_COMPLETE ) {
+                    hierarchyStructureUploadService.updateUploadStatusToNoUpload( uploadStatus );
+                    //Change status back to upload status for the json object
+                    uploadStatus.setStatus( latestStatus );
+                }
             }
         } catch ( Exception e ) {
             status = false;
