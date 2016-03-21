@@ -88,7 +88,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
     @Override
-    public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException
+    public UploadValidation validateUserUploadFile( Company company, String fileName, boolean isAppend )
+        throws InvalidInputException
     {
         if ( fileName == null || fileName.isEmpty() ) {
             LOG.error( "Invalid upload details" );
@@ -119,10 +120,11 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             Map<String, String> sourceRegionIdErrors = new HashMap<String, String>();
             Map<String, String> sourceBranchIdErrors = new HashMap<String, String>();
             Map<String, String> sourceUserIdErrors = new HashMap<String, String>();
-            parseRegions( workBook, validationObject, sourceRegionIdErrors );
-            parseBranches( workBook, validationObject, sourceBranchIdErrors );
-            parseUsers( workBook, validationObject, sourceUserIdErrors );
-            uploadValidationService.validateHeirarchyUpload( validationObject, sourceRegionIdErrors, sourceBranchIdErrors, sourceUserIdErrors );
+            parseRegions( workBook, validationObject, sourceRegionIdErrors, isAppend );
+            parseBranches( workBook, validationObject, sourceBranchIdErrors, isAppend );
+            parseUsers( workBook, validationObject, sourceUserIdErrors, isAppend );
+            uploadValidationService.validateHeirarchyUpload( validationObject, sourceRegionIdErrors, sourceBranchIdErrors,
+                sourceUserIdErrors );
         } catch ( IOException e ) {
             e.printStackTrace();
         } catch ( Exception e ) {
@@ -160,7 +162,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @throws InvalidInputException
      */
     @Override
-    public UploadValidation validateHierarchyUploadJson( Company company, UploadValidation newUploadValidation )
+    public UploadValidation validateHierarchyUploadJson( Company company, UploadValidation newUploadValidation, boolean isAppend )
         throws InvalidInputException
     {
         LOG.info( "Method validateHierarchyUploadJson() started" );
@@ -176,9 +178,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         Map<String, String> sourceBranchIdErrors = new HashMap<String, String>();
         Map<String, String> sourceUserIdErrors = new HashMap<String, String>();
         
-        parseRegions( newUploadValidation.getUpload().getRegions(), validationObject, sourceRegionIdErrors );
-        parseBranches( newUploadValidation.getUpload().getBranches(), validationObject, sourceBranchIdErrors );
-        parseUsers( newUploadValidation.getUpload().getUsers(), validationObject, sourceUserIdErrors );
+        parseRegions( newUploadValidation.getUpload().getRegions(), validationObject, sourceRegionIdErrors, isAppend );
+        parseBranches( newUploadValidation.getUpload().getBranches(), validationObject, sourceBranchIdErrors, isAppend );
+        parseUsers( newUploadValidation.getUpload().getUsers(), validationObject, sourceUserIdErrors, isAppend );
         uploadValidationService.validateHeirarchyUpload( validationObject, sourceRegionIdErrors, sourceBranchIdErrors, sourceUserIdErrors );
         LOG.info( "Method validateHierarchyUploadJson() finished" );
         return validationObject;
@@ -190,7 +192,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param uploadedRegions
      * @param validationObject
      */
-    void parseRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject, Map<String, String> sourceRegionIdErrors )
+    void parseRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject,
+        Map<String, String> sourceRegionIdErrors, boolean isAppend )
     {
         if ( uploadedRegions == null ) {
             uploadedRegions = new ArrayList<RegionUploadVO>();
@@ -220,7 +223,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             //check for duplicate source ids
             checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
         }
-        markDeletedRegions( uploadedRegions, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedRegions( uploadedRegions, validationObject );
+        }
         List<String> errors = new ArrayList<String>();
         if ( !sourceRegionIdErrors.isEmpty() ) {
             for ( String key : sourceRegionIdErrors.keySet() ) {
@@ -298,7 +304,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param uploadedBranches
      * @param validationObject
      */
-    void parseBranches( List<BranchUploadVO> uploadedBranches, UploadValidation validationObject, Map<String, String> sourceBranchIdErrors )
+    void parseBranches( List<BranchUploadVO> uploadedBranches, UploadValidation validationObject,
+        Map<String, String> sourceBranchIdErrors, boolean isAppend )
     {
         if ( uploadedBranches == null ) {
             uploadedBranches = new ArrayList<BranchUploadVO>();
@@ -327,7 +334,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             //check for duplicate source ids
             checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
         }
-        markDeletedBranches( uploadedBranches, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedBranches( uploadedBranches, validationObject );
+        }
         List<String> errors = new ArrayList<String>();
         if ( !sourceBranchIdErrors.isEmpty() ) {
             for ( String key : sourceBranchIdErrors.keySet() ) {
@@ -340,7 +350,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
     
     
-    void parseUsers( List<UserUploadVO> uploadedUsers, UploadValidation validationObject, Map<String, String> sourceUserIdErrors )
+    void parseUsers( List<UserUploadVO> uploadedUsers, UploadValidation validationObject,
+        Map<String, String> sourceUserIdErrors, boolean isAppend )
 
     {
         if ( uploadedUsers == null ) {
@@ -377,7 +388,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             //check for duplicate source ids
             checkForDuplicateSourceUserIds( sourceUserIdErrors, uploadedUser );
         }
-        markDeletedUsers( uploadedUsers, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedUsers( uploadedUsers, validationObject );
+        }
         List<String> errors = new ArrayList<String>();
         if ( !sourceUserIdErrors.isEmpty() ) {
             for ( String key : sourceUserIdErrors.keySet() ) {
@@ -397,7 +411,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param validationObject
      * @throws InvalidInputException 
      */
-    void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceRegionIdErrors ) throws InvalidInputException
+    void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceRegionIdErrors,
+        boolean isAppend ) throws InvalidInputException
     {
         // Parse the list of regions from the sheet. Parse each row. Check for validation errors. If validation is successful, check if region is modified or added. If modified then add to the modified count or to the addition count. Then map and check if there are any regions that were deleted
         // Possible errors in regions
@@ -506,11 +521,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
             validationObject.setRegionValidationErrors( errors );
         }
-        markDeletedRegions( uploadedRegions, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedRegions( uploadedRegions, validationObject );
+        }
     }
 
 
-    void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceBranchIdErrors ) throws InvalidInputException
+    void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceBranchIdErrors,
+        boolean isAppend ) throws InvalidInputException
     {
         // Parse each row for branches and then check for valid branches. On successful validation, check if the branch is a new, modified or deleted branch.
         // Possible reasons for errors
@@ -632,11 +651,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
             validationObject.setBranchValidationErrors( errors );
         }
-        markDeletedBranches( uploadedBranches, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedBranches( uploadedBranches, validationObject );
+        }
     }
 
 
-    void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceUserIdErrors ) throws InvalidInputException
+    void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceUserIdErrors,
+        boolean isAppend ) throws InvalidInputException
     {
         // Parse each row for users and then check for valid users. On successful validation, check if the user is a new, modified or deleted user.
         // Possible reasons for errors
@@ -807,7 +830,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
             validationObject.setBranchValidationErrors( errors );
         }
-        markDeletedUsers( uploadedUsers, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedUsers( uploadedUsers, validationObject );
+        }
     }
 
 

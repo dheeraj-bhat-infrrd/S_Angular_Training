@@ -2741,12 +2741,17 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = null;
         LOG.info( "Validating the hierarchy file" );
         String fileUrl = request.getParameter( "fileUrl" );
+        //TODO: add append mode code
+        boolean isAppend = false;
+        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
+            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
+        }
         try {
             if ( fileUrl == null || fileUrl.isEmpty() ) {
                 throw new InvalidInputException( "File URL cannot be empty" );
             }
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
+            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl, isAppend );
             response = uploadValidation;
         } catch ( InvalidInputException ex ) {
             status = false;
@@ -2768,11 +2773,15 @@ public class OrganizationManagementController
         boolean status = true;
         Object response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
+        boolean isAppend = false;
+        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
+            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
+        }
         LOG.info( hierarchyJson );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
+            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation, isAppend );
             response = uploadValidation;
         } catch ( Exception ex ) {
             status = false;
@@ -2798,8 +2807,12 @@ public class OrganizationManagementController
         User user = sessionHelper.getCurrentUser();
         Map<String, List<String>> map = new HashMap<String, List<String>>();
         List<String> value = new ArrayList<String>();
+        boolean isAppend = false;
+        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
+            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
+        }
         try {
-            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user );
+            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user, isAppend );
             if ( map == null || map.isEmpty() ) {
                 value.add( "Data uploaded successfully." );
                 map.put( "UPLOAD_SUCCESS", value );
@@ -2853,7 +2866,6 @@ public class OrganizationManagementController
     public String fetchUploadBatchStatus( Model model, HttpServletRequest request ) throws InvalidInputException
     {
         LOG.info( "Fetching the latest batch processing message" );
-        //TODO: Get the actual stuff instead
         User user = sessionHelper.getCurrentUser();
         boolean status = true;
         String response = null;

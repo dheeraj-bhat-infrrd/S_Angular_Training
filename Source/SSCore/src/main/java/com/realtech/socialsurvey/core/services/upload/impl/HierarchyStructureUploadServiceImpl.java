@@ -117,7 +117,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Override
-    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user ) throws InvalidInputException
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user, boolean isAppend )
+        throws InvalidInputException
     {
         // the upload object should have the current value as well the changes made by the user in the sheet/ UI
         if ( upload == null ) {
@@ -151,12 +152,16 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadBranches( upload, user, company, branchUploadErrors );
         // Uploading users
         uploadUsers( upload, user, userUploadErrors );
-        // Delete users
-        deleteUsers( upload, user, company, userDeleteErrors );
-        // Delete branches
-        deleteBranches( upload, user, company, branchDeleteErrors );
-        // Delete regions
-        deleteRegions( upload, user, company, regionDeleteErrors );
+        
+        //Append mode doesn't deal with deletion, you can either add or delete users
+        if ( !isAppend ) {
+            // Delete users
+            deleteUsers( upload, user, company, userDeleteErrors );
+            // Delete branches
+            deleteBranches( upload, user, company, branchDeleteErrors );
+            // Delete regions
+            deleteRegions( upload, user, company, regionDeleteErrors );
+        }
 
         hierarchyUploadDao.saveHierarchyUploadObject( upload );
         

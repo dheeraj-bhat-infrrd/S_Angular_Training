@@ -54,8 +54,12 @@ public class HierarchyUploadProcessor implements Runnable
                             //Upload hierarchy
                             HierarchyUpload hierarchyUpload = hierarchyStructureUploadService
                                 .fetchHierarchyToBeUploaded( company );
+                            boolean isAppend = false;
+                            if ( uploadStatus.getUploadMode() == CommonConstants.UPLOAD_MODE_APPEND ) {
+                                isAppend = true;
+                            }
                             Map<String, List<String>> errors = hierarchyStructureUploadService.uploadHierarchy(
-                                hierarchyUpload, company, adminUser );
+                                hierarchyUpload, company, adminUser, isAppend );
                             if ( !errors.isEmpty() ) {
                                 //TODO: Send a mail or store somewhere
                             }
