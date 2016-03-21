@@ -769,7 +769,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_ZILLOW_SOCIAL_MEDIA_TOKEN ).exists( true ) );
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( identifiers ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( KEY_SURVEY_SETTINGS )
-            .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
+            .include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_URL ).exclude( "_id" );
         settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
         LOG.info( "Fetched " + ( settings != null ? settings.size() : "none" ) + " items with social media tokens from "
             + collectionName );

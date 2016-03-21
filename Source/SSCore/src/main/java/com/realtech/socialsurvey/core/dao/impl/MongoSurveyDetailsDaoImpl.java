@@ -2603,4 +2603,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
         LOG.info( "Method resetShowSurveyOnUIPropertyForNonLatestReviews() to reset the showSurveyOnUI for Zillow Reviews finished." );
     }
+
+
+    @Override
+    public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        String surveyMongoId = surveyDetails.get_id();
+        LOG.info( "Method updateZillowSummaryInExistingSurveyDetails() to update summary and description for ." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.SUMMARY_COLUMN, surveyDetails.getSummary() );
+        update.set( CommonConstants.REVIEW_COLUMN, surveyDetails.getReview() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
+    }
 }
