@@ -116,10 +116,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 xlsxException = new InvalidInputException( "The xlsx file does not contain the required sheets" );
                 throw xlsxException;
             }
-            parseRegions( workBook, validationObject );
-            parseBranches( workBook, validationObject );
-            parseUsers( workBook, validationObject );
-            uploadValidationService.validateHeirarchyUpload( validationObject );
+            Map<String, String> sourceRegionIdErrors = new HashMap<String, String>();
+            Map<String, String> sourceBranchIdErrors = new HashMap<String, String>();
+            Map<String, String> sourceUserIdErrors = new HashMap<String, String>();
+            parseRegions( workBook, validationObject, sourceRegionIdErrors );
+            parseBranches( workBook, validationObject, sourceBranchIdErrors );
+            parseUsers( workBook, validationObject, sourceUserIdErrors );
+            uploadValidationService.validateHeirarchyUpload( validationObject, sourceRegionIdErrors, sourceBranchIdErrors, sourceUserIdErrors );
         } catch ( IOException e ) {
             e.printStackTrace();
         } catch ( Exception e ) {
@@ -168,11 +171,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         UploadValidation validationObject = new UploadValidation();
         // get current hierarchy upload
         validationObject.setUpload( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) );
-
-        parseRegions( newUploadValidation.getUpload().getRegions(), validationObject );
-        parseBranches( newUploadValidation.getUpload().getBranches(), validationObject );
-        parseUsers( newUploadValidation.getUpload().getUsers(), validationObject );
-        uploadValidationService.validateHeirarchyUpload( validationObject );
+        
+        Map<String, String> sourceRegionIdErrors = new HashMap<String, String>();
+        Map<String, String> sourceBranchIdErrors = new HashMap<String, String>();
+        Map<String, String> sourceUserIdErrors = new HashMap<String, String>();
+        
+        parseRegions( newUploadValidation.getUpload().getRegions(), validationObject, sourceRegionIdErrors );
+        parseBranches( newUploadValidation.getUpload().getBranches(), validationObject, sourceBranchIdErrors );
+        parseUsers( newUploadValidation.getUpload().getUsers(), validationObject, sourceUserIdErrors );
+        uploadValidationService.validateHeirarchyUpload( validationObject, sourceRegionIdErrors, sourceBranchIdErrors, sourceUserIdErrors );
         LOG.info( "Method validateHierarchyUploadJson() finished" );
         return validationObject;
     }
@@ -183,7 +190,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param uploadedRegions
      * @param validationObject
      */
-    void parseRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject )
+    void parseRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject, Map<String, String> sourceRegionIdErrors )
     {
         if ( uploadedRegions == null ) {
             uploadedRegions = new ArrayList<RegionUploadVO>();
@@ -209,8 +216,20 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             } else {
                 updateUploadValidationWithModifiedRegion( uploadedRegion, validationObject, regionMap );
             }
+            
+            //check for duplicate source ids
+            checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
         }
         markDeletedRegions( uploadedRegions, validationObject );
+        List<String> errors = new ArrayList<String>();
+        if ( !sourceRegionIdErrors.isEmpty() ) {
+            for ( String key : sourceRegionIdErrors.keySet() ) {
+                if ( sourceRegionIdErrors.get( key ) != null && !sourceRegionIdErrors.get( key ).isEmpty() ) {
+                    errors.add( sourceRegionIdErrors.get( key ) );
+                }
+            }
+            validationObject.setRegionValidationErrors( errors );
+        }
     }
 
 
@@ -279,7 +298,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param uploadedBranches
      * @param validationObject
      */
-    void parseBranches( List<BranchUploadVO> uploadedBranches, UploadValidation validationObject )
+    void parseBranches( List<BranchUploadVO> uploadedBranches, UploadValidation validationObject, Map<String, String> sourceBranchIdErrors )
     {
         if ( uploadedBranches == null ) {
             uploadedBranches = new ArrayList<BranchUploadVO>();
@@ -305,12 +324,24 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             } else {
                 updateUploadValidationWithModifiedBranch( uploadedBranch, validationObject, branchMap );
             }
+            //check for duplicate source ids
+            checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
         }
         markDeletedBranches( uploadedBranches, validationObject );
+        List<String> errors = new ArrayList<String>();
+        if ( !sourceBranchIdErrors.isEmpty() ) {
+            for ( String key : sourceBranchIdErrors.keySet() ) {
+                if ( sourceBranchIdErrors.get( key ) != null && !sourceBranchIdErrors.get( key ).isEmpty() ) {
+                    errors.add( sourceBranchIdErrors.get( key ) );
+                }
+            }
+            validationObject.setBranchValidationErrors( errors );
+        }
     }
+    
+    
+    void parseUsers( List<UserUploadVO> uploadedUsers, UploadValidation validationObject, Map<String, String> sourceUserIdErrors )
 
-
-    void parseUsers( List<UserUploadVO> uploadedUsers, UploadValidation validationObject )
     {
         if ( uploadedUsers == null ) {
             uploadedUsers = new ArrayList<UserUploadVO>();
@@ -343,8 +374,19 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
                 updateUploadValidationWithModifiedUser( uploadedUser, validationObject, userMap );
             }
+            //check for duplicate source ids
+            checkForDuplicateSourceUserIds( sourceUserIdErrors, uploadedUser );
         }
         markDeletedUsers( uploadedUsers, validationObject );
+        List<String> errors = new ArrayList<String>();
+        if ( !sourceUserIdErrors.isEmpty() ) {
+            for ( String key : sourceUserIdErrors.keySet() ) {
+                if ( sourceUserIdErrors.get( key ) != null && !sourceUserIdErrors.get( key ).isEmpty() ) {
+                    errors.add( sourceUserIdErrors.get( key ) );
+                }
+            }
+            validationObject.setBranchValidationErrors( errors );
+        }
     }
 
 
@@ -355,7 +397,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param validationObject
      * @throws InvalidInputException 
      */
-    void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject ) throws InvalidInputException
+    void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceRegionIdErrors ) throws InvalidInputException
     {
         // Parse the list of regions from the sheet. Parse each row. Check for validation errors. If validation is successful, check if region is modified or added. If modified then add to the modified count or to the addition count. Then map and check if there are any regions that were deleted
         // Possible errors in regions
@@ -370,7 +412,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         XSSFCell cell = null;
         RegionUploadVO uploadedRegion = null;
         List<RegionUploadVO> uploadedRegions = new ArrayList<RegionUploadVO>();
-
+        
         //Create header map
         Map<Integer, String> headerMap = new HashMap<Integer, String>();
         headerMap.put( 1, CommonConstants.CHR_REGION_REGION_ID );
@@ -452,12 +494,23 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 updateUploadValidationWithModifiedRegion( uploadedRegion, validationObject, regionMap );
             }
             uploadedRegions.add( uploadedRegion );
+            //check for duplicate source ids
+            checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
+        }
+        List<String> errors = new ArrayList<String>();
+        if ( !sourceRegionIdErrors.isEmpty() ) {
+            for ( String key : sourceRegionIdErrors.keySet() ) {
+                if ( sourceRegionIdErrors.get( key ) != null && !sourceRegionIdErrors.get( key ).isEmpty() ) {
+                    errors.add( sourceRegionIdErrors.get( key ) );
+                }
+            }
+            validationObject.setRegionValidationErrors( errors );
         }
         markDeletedRegions( uploadedRegions, validationObject );
     }
 
 
-    void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject ) throws InvalidInputException
+    void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceBranchIdErrors ) throws InvalidInputException
     {
         // Parse each row for branches and then check for valid branches. On successful validation, check if the branch is a new, modified or deleted branch.
         // Possible reasons for errors
@@ -567,12 +620,23 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 updateUploadValidationWithModifiedBranch( uploadedBranch, validationObject, branchMap );
             }
             uploadedBranches.add( uploadedBranch );
+            //check for duplicate source ids
+            checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
+        }
+        List<String> errors = new ArrayList<String>();
+        if ( !sourceBranchIdErrors.isEmpty() ) {
+            for ( String key : sourceBranchIdErrors.keySet() ) {
+                if ( sourceBranchIdErrors.get( key ) != null && !sourceBranchIdErrors.get( key ).isEmpty() ) {
+                    errors.add( sourceBranchIdErrors.get( key ) );
+                }
+            }
+            validationObject.setBranchValidationErrors( errors );
         }
         markDeletedBranches( uploadedBranches, validationObject );
     }
 
 
-    void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject ) throws InvalidInputException
+    void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceUserIdErrors ) throws InvalidInputException
     {
         // Parse each row for users and then check for valid users. On successful validation, check if the user is a new, modified or deleted user.
         // Possible reasons for errors
@@ -730,6 +794,18 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 updateUploadValidationWithModifiedUser( uploadedUser, validationObject, userMap );
             }
             uploadedUsers.add( uploadedUser );
+            
+            //check for duplicate source ids
+            checkForDuplicateSourceUserIds( sourceUserIdErrors, uploadedUser );
+        }
+        List<String> errors = new ArrayList<String>();
+        if ( !sourceUserIdErrors.isEmpty() ) {
+            for ( String key : sourceUserIdErrors.keySet() ) {
+                if ( sourceUserIdErrors.get( key ) != null && !sourceUserIdErrors.get( key ).isEmpty() ) {
+                    errors.add( sourceUserIdErrors.get( key ) );
+                }
+            }
+            validationObject.setBranchValidationErrors( errors );
         }
         markDeletedUsers( uploadedUsers, validationObject );
     }
@@ -765,6 +841,14 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             return true;
         } else if ( uploadedRegion.getSourceRegionId() == null || uploadedRegion.getSourceRegionId().isEmpty() ) {
             return true;
+        } else if ( uploadedRegion.getRegionName() != null && !uploadedRegion.getRegionName().isEmpty() ) {
+            RegionUploadVO curRegion = uploadedRegions.get( uploadedRegions.indexOf( uploadedRegion ) );
+            if ( curRegion.getRegionName() != null && !curRegion.getRegionName().isEmpty() ) {
+                if ( !curRegion.getRegionName().equalsIgnoreCase( uploadedRegion.getRegionName() ) ) {
+                    return true;
+                }
+            }
+            return false;
         } else {
             return false;
         }
@@ -777,6 +861,14 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             return true;
         } else if ( uploadedBranch.getSourceBranchId() == null || uploadedBranch.getSourceBranchId().isEmpty() ) {
             return true;
+        } else if ( uploadedBranch.getBranchName() != null && !uploadedBranch.getBranchName().isEmpty() ) {
+            BranchUploadVO curBranch = uploadedBranches.get( uploadedBranches.indexOf( uploadedBranch ) );
+            if ( curBranch.getBranchName() != null && !curBranch.getBranchName().isEmpty() ) {
+                if ( !curBranch.getBranchName().equalsIgnoreCase( uploadedBranch.getBranchName() ) ) {
+                    return true;
+                }
+            }
+            return false;
         } else {
             return false;
         }
@@ -789,7 +881,14 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             return true;
         } else if ( uploadedUser.getSourceUserId() == null || uploadedUser.getSourceUserId().isEmpty() ) {
             return true;
-        } else {
+        } else if ( uploadedUser.getEmailId() != null && !uploadedUser.getEmailId().isEmpty() ) {
+            UserUploadVO curUser = uploadedUsers.get( uploadedUsers.indexOf( uploadedUser ) );
+            if ( curUser.getEmailId() != null && !curUser.getEmailId().isEmpty() ) {
+                if ( !curUser.getEmailId().equalsIgnoreCase( uploadedUser.getEmailId() ) ) {
+                    return true;
+                }
+            }
+        }{
             return false;
         }
     }
@@ -1261,5 +1360,77 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             return true;
         }
         return false;
+    }
+    
+    
+    /**
+     * Method to check for duplicate sourceRegionIds
+     * @param sourceRegionIdErrors
+     * @param uploadedRegion
+     */
+    void checkForDuplicateSourceRegionIds( Map<String, String> sourceRegionIdErrors, RegionUploadVO uploadedRegion )
+    {
+        //check for duplicate source ids
+        if ( sourceRegionIdErrors.containsKey( uploadedRegion.getSourceRegionId() ) ) {
+            if ( sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ) == null
+                || sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ).isEmpty() ) {
+                sourceRegionIdErrors.put(
+                    uploadedRegion.getSourceRegionId(),
+                    "The Region ID : " + uploadedRegion.getSourceRegionId() + " is duplicated at row : "
+                        + uploadedRegion.getRowNum() );
+            } else {
+                sourceRegionIdErrors.put( uploadedRegion.getSourceRegionId(),
+                    sourceRegionIdErrors.get( uploadedRegion.getSourceRegionId() ) + ", " + uploadedRegion.getRowNum() );
+            }
+        } else {
+            sourceRegionIdErrors.put( uploadedRegion.getSourceRegionId(), null );
+        }
+    }
+    
+    
+    /**
+     * Method to check for duplicate sourceBranchIds
+     * @param sourceBranchIdErrors
+     * @param uploadedBranch
+     */
+    void checkForDuplicateSourceBranchIds( Map<String, String> sourceBranchIdErrors, BranchUploadVO uploadedBranch )
+    {
+        if ( sourceBranchIdErrors.containsKey( uploadedBranch.getSourceBranchId() ) ) {
+            if ( sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ) == null
+                || sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ).isEmpty() ) {
+                sourceBranchIdErrors.put(
+                    uploadedBranch.getSourceBranchId(),
+                    "The Office ID : " + uploadedBranch.getSourceBranchId() + " is duplicated at row : "
+                        + uploadedBranch.getRowNum() );
+            } else {
+                sourceBranchIdErrors.put( uploadedBranch.getSourceBranchId(),
+                    sourceBranchIdErrors.get( uploadedBranch.getSourceBranchId() ) + ", " + uploadedBranch.getRowNum() );
+            }
+        } else {
+            sourceBranchIdErrors.put( uploadedBranch.getSourceBranchId(), null );
+        }
+    }
+    
+    
+    
+    /**
+     * Method to check for duplicate sourceUserIds
+     * @param sourceUserIdErrors
+     * @param uploadedUser
+     */
+    void checkForDuplicateSourceUserIds( Map<String, String> sourceUserIdErrors, UserUploadVO uploadedUser )
+    {
+        if ( sourceUserIdErrors.containsKey( uploadedUser.getSourceUserId() ) ) {
+            if ( sourceUserIdErrors.get( uploadedUser.getSourceUserId() ) == null
+                || sourceUserIdErrors.get( uploadedUser.getSourceUserId() ).isEmpty() ) {
+                sourceUserIdErrors.put( uploadedUser.getSourceUserId(), "The User ID : " + uploadedUser.getSourceUserId()
+                    + " is duplicated at row : " + uploadedUser.getRowNum() );
+            } else {
+                sourceUserIdErrors.put( uploadedUser.getSourceUserId(), sourceUserIdErrors.get( uploadedUser.getSourceUserId() )
+                    + ", " + uploadedUser.getRowNum() );
+            }
+        } else {
+            sourceUserIdErrors.put( uploadedUser.getSourceUserId(), null );
+        }
     }
 }

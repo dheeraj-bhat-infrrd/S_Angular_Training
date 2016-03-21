@@ -570,6 +570,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
      * @throws InvalidInputException
      */
     @Override
+    @Transactional
     public void updateEmailIdForUserProfile( long userId, String emailId ) throws InvalidInputException
     {
         LOG.info( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " started." );

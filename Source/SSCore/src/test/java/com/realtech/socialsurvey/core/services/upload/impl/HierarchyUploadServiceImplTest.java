@@ -165,11 +165,11 @@ public class HierarchyUploadServiceImplTest
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
         branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
-        branches.add( getBranch( "SCT", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "SCT", "Scottsdale", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
-        regions.add( getRegion( "Lee", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
+        regions.add( getRegion( "Lee", "Lee", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
         upload.setRegions( regions );
         List<UserUploadVO> users = new ArrayList<UserUploadVO>();
         List<String> branchAdmins = new ArrayList<String>();
@@ -179,7 +179,7 @@ public class HierarchyUploadServiceImplTest
         regionAdmins.add( "ABC" );
         regionAdmins.add( "Lee" );
         users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
-        users.add( getUser( "sbrennan", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
+        users.add( getUser( "sbrennan", "cdcdvd", "sean.brennan@summitfunding.net", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
         upload.setUsers( users );
         return upload;
     }
