@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -2746,7 +2745,11 @@ public class OrganizationManagementController
                 throw new InvalidInputException( "File URL cannot be empty" );
             }
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
+            if ( "replace".equals( request.getParameter( "uploadType" ) ) ) {
+                uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
+            } else if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+
+            }
             response = uploadValidation;
         } catch ( InvalidInputException ex ) {
             status = false;
@@ -2772,46 +2775,17 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
+            if ( "replace".equals( request.getParameter( "uploadType" ) ) ) {
+                uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
+            } else if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+
+            }
             response = uploadValidation;
         } catch ( Exception ex ) {
             status = false;
             response = ex.getMessage();
         }
 
-        Map<String, Object> responseMap = new HashMap<String, Object>();
-        responseMap.put( "status", status );
-        responseMap.put( "response", response );
-        return new Gson().toJson( responseMap );
-    }
-
-
-    @ResponseBody
-    @RequestMapping ( value = "/uploadxlsxfile", method = RequestMethod.POST)
-    public String saveHierarchyFileData( Model model, HttpServletRequest request ) throws InvalidInputException
-    {
-        LOG.info( "Saving the hierarchy file data" );
-        boolean status = true;
-        String response = null;
-        String hierarchyJson = request.getParameter( "hierarchyJson" );
-        UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
-        User user = sessionHelper.getCurrentUser();
-        Map<String, List<String>> map = new HashMap<String, List<String>>();
-        List<String> value = new ArrayList<String>();
-        try {
-            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user );
-            if ( map == null || map.isEmpty() ) {
-                value.add( "Data uploaded successfully." );
-                map.put( "UPLOAD_SUCCESS", value );
-            } else {
-                status = false;
-            }
-        } catch ( Exception ex ) {
-            status = false;
-            value.add( ex.getMessage() );
-            map.put( "UPLOAD_FAILED", value );
-        }
-        response = new Gson().toJson( map );
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
         responseMap.put( "response", response );
@@ -2830,7 +2804,7 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
             User user = sessionHelper.getCurrentUser();
-            //Insert hieararchy upload in UPLOAD_HIERARCHY_DETAILS collections
+            //Insert hierarchy upload in UPLOAD_HIERARCHY_DETAILS collections
             hierarchyStructureUploadService.saveHierarchyUploadInMongo( uploadValidation.getUpload() );
 
             //Initiate upload by adding entry in upload status table
@@ -2845,7 +2819,6 @@ public class OrganizationManagementController
         responseMap.put( "response", response );
         return new Gson().toJson( responseMap );
     }
-
 
 
     @ResponseBody
@@ -2867,7 +2840,7 @@ public class OrganizationManagementController
                 UploadStatus uploadStatus = hierarchyStructureUploadService.highestStatus( latestStatuses );
                 latestStatus = uploadStatus.getStatus();
                 lastUploadTime = uploadStatus.getModifiedOn();
-                
+
                 //So that this is shown only once, if hierarchy upload status is 4, set it to 6 and update
                 if ( latestStatus == CommonConstants.HIERARCHY_UPLOAD_UPLOAD_COMPLETE ) {
                     hierarchyStructureUploadService.updateUploadStatusToNoUpload( uploadStatus );
