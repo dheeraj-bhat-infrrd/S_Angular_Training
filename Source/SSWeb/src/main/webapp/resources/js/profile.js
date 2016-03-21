@@ -746,6 +746,10 @@ function paintReviews(result){
 		reviewsHtml += '		</div>';
 		reviewsHtml += '	</div>';
 		
+		if(reviewItem.summary != null && reviewItem.summary.length > 0){
+			reviewsHtml += '<div class="ppl-content">'+reviewItem.summary+'</div>';
+		}
+		
 		if (reviewItem.review.length > 250) {
 			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
 		} else {

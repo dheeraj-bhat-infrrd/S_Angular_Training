@@ -13,6 +13,6 @@ public interface ExternalSurveyTrackerDao
 
 
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink, String reviewUrl,
-        double reviewRating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate );
+        double reviewRating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate, String postedOn );
 
 }

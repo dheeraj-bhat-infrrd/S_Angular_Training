@@ -54,6 +54,9 @@ public class ExternalSurveyTracker
     @Column ( name = "REVIEW_DATE")
     private Timestamp reviewDate;
 
+    @Column ( name = "POSTED_ON")
+    private String postedOn;
+
     @Column ( name = "CREATED_BY")
     private String createdBy;
 
@@ -244,6 +247,24 @@ public class ExternalSurveyTracker
     public void setReviewDate( Timestamp reviewDate )
     {
         this.reviewDate = reviewDate;
+    }
+
+
+    /**
+     * @return the postedOn
+     */
+    public String getPostedOn()
+    {
+        return postedOn;
+    }
+
+
+    /**
+     * @param postedOn the postedOn to set
+     */
+    public void setPostedOn( String postedOn )
+    {
+        this.postedOn = postedOn;
     }
 
 
