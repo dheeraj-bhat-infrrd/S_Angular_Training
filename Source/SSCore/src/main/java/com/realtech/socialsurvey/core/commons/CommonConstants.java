@@ -782,6 +782,8 @@ public interface CommonConstants
 
     public static final String INVALID_USERS_LIST = "invalidUsersList";
 
+    public static final String INVALID_USERS_ASSIGN_LIST = "invalidUsersAssignList";
+
     public static final String BRANCH_OBJECT = "branch";
 
     public static final String REGION_OBJECT = "region";
@@ -1027,6 +1029,9 @@ public interface CommonConstants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
+    // Error Suffix for the email address already taken
+    public static final String EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX = " already taken";
+
 
     //Hierarchy Upload constants
     public static final String HIERARCHY_UPLOAD_COLLECTION = "HIERARCHY_UPLOAD";

@@ -33,7 +33,28 @@ function buildMessageDiv() {
 	}
 }
 
-function showError(msg) {
+function buildMessageInvalidDiv(){
+	if($('.err-nw-wrapper-invalid').length == 0){
+        var errorDiv = $("<div id='err-nw-wrapper-invalid' class='err-nw-wrapper-invalid'>");
+            var closeSpan = $('<span class="err-new-close-invalid">');
+            var textSpan = $('<span id="err-nw-txt-invalid">');
+            errorDiv.append(closeSpan);
+            errorDiv.append(textSpan);
+        $('.hm-header-main-wrapper').after(errorDiv);
+    }
+}
+function buildMessageSuccessDiv(){
+	if($('.err-nw-wrapper-success').length == 0){
+        var errorDiv = $("<div id='err-nw-wrapper-success' class='err-nw-wrapper-success'>");
+            var closeSpan = $('<span class="err-new-close-success">');
+            var textSpan = $('<span id="err-nw-txt-success">');
+            errorDiv.append(closeSpan);
+            errorDiv.append(textSpan);
+        $('.hm-header-main-wrapper').after(errorDiv);
+    }
+	
+}
+function showError(msg){
 	buildMessageDiv();
 	$('#err-nw-txt').html(msg);
 	$('#err-nw-wrapper').removeClass('bg-black-success');
@@ -41,8 +62,28 @@ function showError(msg) {
 	$(window).scrollTop($('#err-nw-wrapper').offset().top);
 }
 
-function hideError() {
-	$('#err-nw-wrapper').slideUp(200);
+function showInvalidError(msg){
+	buildMessageInvalidDiv();
+    $('#err-nw-txt-invalid').html(msg);
+    $('#err-nw-wrapper-invalid').removeClass('bg-black-success');
+    $('#err-nw-wrapper-invalid').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-invalid').offset().top);
+}
+function showErrorSuccess(msg){
+	buildMessageSuccessDiv();
+	$('#err-nw-txt-success').html(msg);
+    $('#err-nw-wrapper-success').removeClass('bg-black-success');
+    $('#err-nw-wrapper-success').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-success').offset().top);
+}
+function hideError(){
+    $('#err-nw-wrapper').slideUp(200);
+}
+function hideErrorInvalid(){
+    $('#err-nw-wrapper-invalid').slideUp(200);
+}
+function hideErrorSuccess(){
+    $('#err-nw-wrapper-success').slideUp(200);
 }
 
 function showInfo(msg) {
@@ -52,6 +93,13 @@ function showInfo(msg) {
 	$(window).scrollTop($('#err-nw-wrapper').offset().top);
 	$('#err-nw-wrapper').addClass('bg-black-success');
 }
+function showInfoSuccess(msg){
+	buildMessageSuccessDiv();
+    $('#err-nw-txt-success').html(msg);
+    $('#err-nw-wrapper-success').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper-success').offset().top);
+    $('#err-nw-wrapper-success').addClass('bg-black-success');
+}
 
 function hideInfo() {
 	$('#err-nw-wrapper').slideUp(200);
@@ -59,10 +107,31 @@ function hideInfo() {
 		$('#err-nw-wrapper').removeClass('bg-black-success');
 	}, 200);
 }
+function hideInfoInvalid(){
+    $('#err-nw-wrapper-invalid').slideUp(200);
+    setTimeout(function(){
+        $('#err-nw-wrapper-invalid').removeClass('bg-black-success');
+    },200);
+}
+function hideInfoSuccess(){
+    $('#err-nw-wrapper-success').slideUp(200);
+    setTimeout(function(){
+        $('#err-nw-wrapper-success').removeClass('bg-black-success');
+    },200);
+}
 
 $(document).on('click', '.err-new-close', function() {
 	hideError();
 	hideInfo();
+});
+$(document).on('click', '.err-new-close-invalid', function() {
+	hideErrorInvalid();
+	hideInfoInvalid();
+});
+
+$(document).on('click', '.err-new-close-success', function() {
+	hideErrorSuccess();
+	hideInfoSuccess();
 });
 
 function showRegErr(msg) {
@@ -81,12 +150,39 @@ function showErrorMobileAndWeb(msg) {
 		showError(msg);
 	}
 }
+function showErrorInvalidMobileAndWeb(msg){
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showInvalidError(msg);
+	}
+}
+function showErrorSuccessMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showErrorSuccess(msg);
+	}
+}
 function showInfoMobileAndWeb(msg) {
 	if ($(window).width() < 768) {
 		$('#overlay-toast').html(msg);
 		showToast();
 	} else {
 		showInfo(msg);
+	}
+}
+function showInfoSuccessMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showInfoSuccess(msg);
 	}
 }
 
@@ -1864,17 +1960,17 @@ function paintUnmatchedUser(usersList) {
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid">'
 								+ undefinedval(arrayItem.agentEmailId)
 								+ '</div>'
-								+ '						<div style="width:40%" class="float-left unmatchtab ss-cname">'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname">'
 								+ undefinedval(arrayItem.customerFirstName)
 								+ '<span style="margin-left:2px;">'
 								+ undefinedval(arrayItem.customerLastName)
-								+ '</span><span style="margin-left:2px;"> < '
+								+ '</span> <br> <span style="margin-left:2px;"> < '
 								+ undefinedval(arrayItem.customerEmailId)
 								+ ' > </span></div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-date">'
-								+ undefinedval(arrayItem.createdOn)
+								+ undefinedval(arrayItem.engagementClosedTime)
 								+ '</div>'
-								+ '						<div style="width:10%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'
+								+ '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'
 								+ '						</div>';
 
 					});
@@ -1898,6 +1994,8 @@ function paintProcessedUser(usersList) {
 						} else {
 
 							var action = "Aliased";
+							if(arrayItem.user != undefined && arrayItem.user.loginName != undefined && arrayItem.user.loginName != "")
+								action += "<br><span title="+ arrayItem.user.loginName + ">" + arrayItem.user.loginName +"</span> " 
 						}
 						unprocess += '<div class="un-row">'
 								+ '						<div style="width:10%" class="float-left unmatchtab ss-id">'
@@ -1906,17 +2004,17 @@ function paintProcessedUser(usersList) {
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid">'
 								+ undefinedval(arrayItem.agentEmailId)
 								+ '</div>'
-								+ '						<div style="width:40%" class="float-left unmatchtab ss-cname">'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname">'
 								+ undefinedval(arrayItem.customerFirstName)
 								+ '<span style="margin-left:2px;">'
 								+ undefinedval(arrayItem.customerLastName)
-								+ '</span><span style="margin-left:2px;"> < '
+								+ '</span> <br> <span style="margin-left:2px;"> < '
 								+ undefinedval(arrayItem.customerEmailId)
 								+ ' > </span></div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-date">'
-								+ undefinedval(arrayItem.createdOn)
+								+ undefinedval(arrayItem.engagementClosedTime)
 								+ '</div>'
-								+ '						<div style="width:10%" class="float-left unmatchtab" >'
+								+ '						<div style="width:20%" class="float-left unmatchtab" >'
 								+ action + '</div>' + '						</div>';
 
 					});

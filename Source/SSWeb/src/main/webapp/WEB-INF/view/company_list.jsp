@@ -29,9 +29,17 @@
 				</div>
 			</div>
 		</div>
+		<div id="err-nw-wrapper-success" class="err-nw-wrapper-success">
+			<span class="err-new-close-success"></span>
+			<span id="err-nw-txt-success"></span>
+		</div>
 		<div id="err-nw-wrapper" class="err-nw-wrapper">
 			<span class="err-new-close"></span>
 			<span id="err-nw-txt"></span>
+		</div>
+		<div id="err-nw-wrapper-invalid" class="err-nw-wrapper-invalid">
+			<span class="err-new-close-invalid"></span>
+			<span id="err-nw-txt-invalid"></span>
 		</div>
 		
 		<div class="ctnt-wrapper clearfix">
