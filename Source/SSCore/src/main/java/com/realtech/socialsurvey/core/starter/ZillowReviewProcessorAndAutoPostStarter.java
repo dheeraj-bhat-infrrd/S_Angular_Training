@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.WordUtils;
 import org.jsoup.Jsoup;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -351,8 +352,8 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                 long agentId = organizationUnitSettings.getIden();
                 User agent = userManagementService.getUserByUserId( agentId );
                 ContactDetailsSettings contactDetailSettings = organizationUnitSettings.getContact_details();
-                String agentName = emailFormatHelper.getCustomerDisplayNameForEmail( contactDetailSettings.getFirstName(),
-                    contactDetailSettings.getLastName() );
+                String agentName = contactDetailSettings.getName();
+                String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( surveyDetails.getCustomerFirstName(), "" );
                 int accountMasterId = 0;
                 try {
                     AccountsMaster masterAccount = agent.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
@@ -516,10 +517,13 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                     profileLink = zillowTempPost.getZillowReviewSourceLink();
                 }
 
-                String facebookMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
-                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
-                    + "-star review on Zillow via SocialSurvey saying : \"" + feedback + "\"\nView this and more at "
-                    + zillowTempPost.getZillowReviewUrl();
+                // String facebookMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review on Zillow via SocialSurvey saying : \"" + feedback + "\"\nView this and more at "
+                //    + zillowTempPost.getZillowReviewUrl();
+
+                String facebookMessage = socialManagementService.buildFacebookAutoPostMessage( customerDisplayName, agentName,
+                    zillowTempPost.getZillowReviewRating(), ratingFormat, feedback, zillowTempPost.getZillowReviewUrl(), true );
 
                 socialManagementService.postToFacebookForHierarchy( facebookMessage, zillowTempPost.getZillowReviewRating(),
                     zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,
@@ -530,10 +534,13 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                     linkedInComment.lastIndexOf( " " ) ) + " ..." ) : linkedInComment;
 
                 // LinkedIn
-                String linkedinMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
-                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
-                    + "-star review on Zillow via SocialSurvey saying : \"" + linkedInComment + "\". View this and more at "
-                    + zillowTempPost.getZillowReviewUrl();
+                // String linkedinMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review on Zillow via SocialSurvey saying : \"" + linkedInComment + "\". View this and more at "
+                //    + zillowTempPost.getZillowReviewUrl();
+
+                String linkedinMessage = socialManagementService.buildLinkedInAutoPostMessage( customerDisplayName, agentName,
+                    zillowTempPost.getZillowReviewRating(), ratingFormat, feedback, zillowTempPost.getZillowReviewUrl(), true );
 
                 String linkedinProfileUrl = zillowTempPost.getZillowReviewUrl();
                 String linkedinMessageFeedback = "From : " + surveyDetails.getCustomerFirstName() + " - " + feedback;
@@ -547,9 +554,12 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                 //    ratingFormat.format( zillowTempPost.getZillowReviewRating() ), surveyDetails.getCustomerFirstName(),
                 //    agentName, "@SocialSurveyMe" ) + zillowTempPost.getZillowReviewUrl();
 
-                String twitterMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
-                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
-                    + "-star review @Zillow via @SocialSurveyMe. " + profileLink;
+                // String twitterMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review @Zillow via @SocialSurveyMe. " + profileLink;
+
+                String twitterMessage = socialManagementService.buildTwitterAutoPostMessage( customerDisplayName, agentName,
+                    zillowTempPost.getZillowReviewRating(), ratingFormat, feedback, zillowTempPost.getZillowReviewUrl(), true );
 
                 socialManagementService.postToTwitterForHierarchy( twitterMessage, zillowTempPost.getZillowReviewRating(),
                     zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,

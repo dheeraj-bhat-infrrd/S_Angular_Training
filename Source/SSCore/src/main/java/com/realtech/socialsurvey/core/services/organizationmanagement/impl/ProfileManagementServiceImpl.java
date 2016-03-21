@@ -4005,8 +4005,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         LOG.debug( "Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing" );
                         // TODO: Convert to proper format from the old url format
                     } else {
-                        Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
-                            zillowScreenName );
+                        Response response = null;
+
+                        try {
+                            response = zillowIntegrationApi
+                                .fetchZillowReviewsByScreennameWithMaxCount( zwsId, zillowScreenName );
+                        } catch ( Exception e ) {
+                            LOG.error( "Exception caught while fetching zillow reviews" + e.getMessage() );
+                            reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
+                            throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
+                                + " zillow account " + zillowScreenName );
+                        }
 
                         ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
                         zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
@@ -4033,17 +4042,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                     // return new ArrayList<SurveyDetails>();
                                 }
                             } catch ( JsonParseException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
+                                LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
                                     + " zillow account " + zillowScreenName );
                             } catch ( JsonMappingException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
+                                LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
                                     + " zillow account " + zillowScreenName );
                             } catch ( IOException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
+                                LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
                                     + " zillow account " + zillowScreenName );
