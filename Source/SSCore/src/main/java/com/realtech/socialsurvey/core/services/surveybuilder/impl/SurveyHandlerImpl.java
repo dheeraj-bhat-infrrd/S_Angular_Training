@@ -2386,5 +2386,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.info( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser ended" );
         return agentUserProfile;
     }
+
+
+    @Override
+    public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.updateZillowSummaryInExistingSurveyDetails( surveyDetails );
+    }
 }
 // JIRA SS-119 by RM-05:EOC

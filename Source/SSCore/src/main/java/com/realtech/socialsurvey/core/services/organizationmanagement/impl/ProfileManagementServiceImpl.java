@@ -4005,8 +4005,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         LOG.debug( "Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing" );
                         // TODO: Convert to proper format from the old url format
                     } else {
-                        Response response = zillowIntegrationApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
-                            zillowScreenName );
+                        Response response = null;
+
+                        try {
+                            response = zillowIntegrationApi
+                                .fetchZillowReviewsByScreennameWithMaxCount( zwsId, zillowScreenName );
+                        } catch ( Exception e ) {
+                            LOG.error( "Exception caught while fetching zillow reviews" + e.getMessage() );
+                            reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
+                            throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
+                                + " zillow account " + zillowScreenName );
+                        }
 
                         ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
                         zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
@@ -4033,17 +4042,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                     // return new ArrayList<SurveyDetails>();
                                 }
                             } catch ( JsonParseException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
+                                LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
                                     + " zillow account " + zillowScreenName );
                             } catch ( JsonMappingException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
+                                LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
                                     + " zillow account " + zillowScreenName );
                             } catch ( IOException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
+                                LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
                                     + " zillow account " + zillowScreenName );
@@ -4432,6 +4441,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         for ( Map<String, Object> review : reviews ) {
             String sourceId = (String) review.get( "reviewURL" );
             String reviewDescription = (String) review.get( "description" );
+            String summary = (String) review.get( "reviewSummary" );
             queries.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, sourceId );
             boolean isAbusive = false;
             if ( fromBatch ) {
@@ -4476,7 +4486,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 String createdDate = (String) review.get( "reviewDate" );
                 surveyDetails.setCompleteProfileUrl( (String) review.get( "reviewerLink" ) );
                 surveyDetails.setCustomerFirstName( (String) review.get( "reviewer" ) );
-                surveyDetails.setReview( (String) review.get( "reviewSummary" ) );
+                surveyDetails.setReview( reviewDescription );
                 surveyDetails.setEditable( false );
                 surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
                 surveyDetails.setScore( Double.valueOf( (String) review.get( "rating" ) ) );
@@ -4488,6 +4498,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setAbusive( isAbusive );
                 surveyDetails.setAbuseRepByUser( false );
                 surveyDetails.setShowSurveyOnUI( true );
+
+                // saving zillow review summary
+                surveyDetails.setSummary( summary );
+
                 surveyHandler.insertSurveyDetails( surveyDetails );
 
                 // Commented as Zillow reviews are saved in Social Survey, SS-307
@@ -4495,19 +4509,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 //    zillowReviewScoreTotal = surveyDetails.getScore();
                 // else
                 //    zillowReviewScoreTotal += surveyDetails.getScore();
+            } else if ( ( surveyDetails.getSummary() == null || surveyDetails.getSummary().trim().length() == 0 )
+                && ( summary != null && summary.length() > 0 ) ) {
+                surveyDetails.setSummary( summary );
+                surveyDetails.setReview( reviewDescription );
+
+                surveyHandler.updateZillowSummaryInExistingSurveyDetails( surveyDetails );
             }
 
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) && fromBatch ) {
                 postToTempTable( collectionName, profile, surveyDetails, review );
             }
 
-            if ( fromPublicPage ) {
-                String reviewDesc = surveyDetails.getReview();
-                if ( reviewDescription != null && !reviewDescription.isEmpty() ) {
-                    reviewDesc = reviewDesc + "<br>" + reviewDescription;
-                    surveyDetails.setReview( reviewDesc );
-                }
-            }
+            /* if ( fromPublicPage ) {
+                 String reviewDesc = surveyDetails.getReview();
+                 if ( reviewDescription != null && !reviewDescription.isEmpty() ) {
+                     reviewDesc = reviewDesc + "<br>" + reviewDescription;
+                     surveyDetails.setReview( reviewDesc );
+                 }
+             }*/
             surveyDetailsList.add( surveyDetails );
             latestSurveyIdList.add( surveyDetails.get_id() );
         }
@@ -4579,7 +4599,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         zillowTempPost.setZillowReviewRating( surveyDetails.getScore() );
         zillowTempPost.setZillowReviewerName( surveyDetails.getCustomerFirstName() );
-        zillowTempPost.setZillowReviewSummary( surveyDetails.getReview() );
+        zillowTempPost.setZillowReviewSummary( surveyDetails.getSummary() );
         zillowTempPost.setZillowReviewDescription( (String) review.get( "description" ) );
         zillowTempPost.setZillowReviewDate( new Timestamp( surveyDetails.getCreatedOn().getTime() ) );
         zillowTempPost.setZillowSurveyId( surveyDetails.get_id() );
