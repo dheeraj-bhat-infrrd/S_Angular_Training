@@ -1960,17 +1960,17 @@ function paintUnmatchedUser(usersList) {
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid">'
 								+ undefinedval(arrayItem.agentEmailId)
 								+ '</div>'
-								+ '						<div style="width:40%" class="float-left unmatchtab ss-cname">'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname">'
 								+ undefinedval(arrayItem.customerFirstName)
 								+ '<span style="margin-left:2px;">'
 								+ undefinedval(arrayItem.customerLastName)
-								+ '</span><span style="margin-left:2px;"> < '
+								+ '</span> <br> <span style="margin-left:2px;"> < '
 								+ undefinedval(arrayItem.customerEmailId)
 								+ ' > </span></div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-date">'
-								+ undefinedval(arrayItem.createdOn)
+								+ undefinedval(arrayItem.engagementClosedTime)
 								+ '</div>'
-								+ '						<div style="width:10%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'
+								+ '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'
 								+ '						</div>';
 
 					});
@@ -1994,6 +1994,8 @@ function paintProcessedUser(usersList) {
 						} else {
 
 							var action = "Aliased";
+							if(arrayItem.user != undefined && arrayItem.user.loginName != undefined && arrayItem.user.loginName != "")
+								action += "<br><span title="+ arrayItem.user.loginName + ">" + arrayItem.user.loginName +"</span> " 
 						}
 						unprocess += '<div class="un-row">'
 								+ '						<div style="width:10%" class="float-left unmatchtab ss-id">'
@@ -2002,17 +2004,17 @@ function paintProcessedUser(usersList) {
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid">'
 								+ undefinedval(arrayItem.agentEmailId)
 								+ '</div>'
-								+ '						<div style="width:40%" class="float-left unmatchtab ss-cname">'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname">'
 								+ undefinedval(arrayItem.customerFirstName)
 								+ '<span style="margin-left:2px;">'
 								+ undefinedval(arrayItem.customerLastName)
-								+ '</span><span style="margin-left:2px;"> < '
+								+ '</span> <br> <span style="margin-left:2px;"> < '
 								+ undefinedval(arrayItem.customerEmailId)
 								+ ' > </span></div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-date">'
-								+ undefinedval(arrayItem.createdOn)
+								+ undefinedval(arrayItem.engagementClosedTime)
 								+ '</div>'
-								+ '						<div style="width:10%" class="float-left unmatchtab" >'
+								+ '						<div style="width:20%" class="float-left unmatchtab" >'
 								+ action + '</div>' + '						</div>';
 
 					});

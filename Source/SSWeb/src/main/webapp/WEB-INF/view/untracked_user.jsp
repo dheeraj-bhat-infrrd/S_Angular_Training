@@ -23,10 +23,10 @@
 					<div id="unmatchd-new" class="clearfix"
 						style="border: #d2dedf 1px solid;">
 						<div style="width:10%" class="float-left unmatchtab unhr-row">ID</div>
-						<div style="width:20%" class="float-left unmatchtab unhr-row">User</div>
-						<div style="width:40%" class="float-left unmatchtab unhr-row">Customer</div>
+						<div style="width:20%" class="float-left unmatchtab unhr-row">Transaction Email</div>
+						<div style="width:30%" class="float-left unmatchtab unhr-row">Customer</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Date</div>
-						<div style="width:10%" class="float-left unmatchtab unhr-row">Action</div>
+						<div style="width:20%" class="float-left unmatchtab unhr-row">Action</div>
 					</div>
 					<div id="new" ></div>
 					
@@ -48,10 +48,10 @@
 					<div id="unmatchd-processed" class="clearfix"
 						style="border: #d2dedf 1px solid;">
 						<div style="width:10%" class="float-left unmatchtab unhr-row">ID</div>
-						<div style="width:20%" class="float-left unmatchtab unhr-row">User</div>
-						<div style="width:40%" class="float-left unmatchtab unhr-row">Customer</div>
+						<div style="width:20%" class="float-left unmatchtab unhr-row">Transaction Email</div>
+						<div style="width:30%" class="float-left unmatchtab unhr-row">Customer</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Date</div>
-						<div style="width:10%" class="float-left unmatchtab unhr-row">Action</div>
+						<div style="width:20%" class="float-left unmatchtab unhr-row">Action</div>
 					</div>
 					<div id="processed"></div>
 					<div id="un-processed-paginate-btn" class="paginate-buttons-survey clearfix hide" data-start="0" data-total="0" data-batch="10">
