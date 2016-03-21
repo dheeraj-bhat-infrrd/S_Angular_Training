@@ -70,6 +70,9 @@ public class HierarchyUploadProcessor implements Runnable
                             completedUploadStatus.setAdminUserId( adminUser.getUserId() );
                             completedUploadStatus.setMessage( "Hierarchy upload completed successfully." );
                             hierarchyStructureUploadService.addUploadStatusEntry( completedUploadStatus );
+                            //Set import started status to done
+                            uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_DONE );
+                            hierarchyStructureUploadService.updateUploadStatus( uploadStatus );
                         } catch ( InvalidInputException e ) {
                             //If error occurs, add uploadStatus ERROR and store message
                             UploadStatus errorUploadStatus = new UploadStatus();
