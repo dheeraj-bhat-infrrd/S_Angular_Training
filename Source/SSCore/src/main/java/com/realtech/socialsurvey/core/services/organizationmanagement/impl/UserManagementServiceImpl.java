@@ -3710,8 +3710,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             StringBuilder mappedEmails = new StringBuilder();
             for ( UserEmailMapping emailMapping : user.getUserEmailMappings() ) {
-                mappedEmails.append( emailMapping.getEmailId() );
-                mappedEmails.append( ", " );
+            	if(emailMapping.getStatus() == CommonConstants.STATUS_ACTIVE){
+            		mappedEmails.append( emailMapping.getEmailId() );
+                    mappedEmails.append( ", " );
+            	}             
             }
             String mappedEmailsString = mappedEmails.toString();
             if ( mappedEmailsString != null && mappedEmailsString.contains( "," ) )
