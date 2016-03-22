@@ -322,6 +322,7 @@
 			function() {
 				hierarchyUpload.fileUpload();
 				hierarchyUpload.hierarchyJson = {};
+				hierarchyUpload.uploadType = "append";
 				callAjaxPOSTWithTextDataUpload("./fetchUploadBatchStatus.do",
 						hierarchyUpload.fetchUploadBatchStatusCallback, true,
 						null);

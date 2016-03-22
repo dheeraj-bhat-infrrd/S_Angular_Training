@@ -2661,6 +2661,7 @@ var hierarchyUpload = {
 				.change(
 						function() {
 							$('#summary').hide();
+							$('#uploadBatchStatus').empty();
 							$('#xlsx-file-upload').addClass('disable');
 							var fileAdd = $(this).val().split('\\');
 							$('#com-xlsx-file')
@@ -2805,9 +2806,10 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				// If not complete/error, keep making a request every 15 seconds
+				
 				if (!(jsonResponse.uploadStatus == 4
-						|| jsonResponse.uploadStatus == 5
-						|| jsonResponse.uploadStatus == -1 || jsonResponse.uploadStatus == 6)) {
+						|| jsonResponse.uploadStatus == 5 || jsonResponse.uploadStatus == 6)) {
+					$('#uploadBatchStatus').empty();
 					jsonResponse.response.forEach(function(uploadStatus) {
 						$('<div>' + uploadStatus.message + '</div>').appendTo(
 								'#uploadBatchStatus');
@@ -2824,7 +2826,6 @@ var hierarchyUpload = {
 				} else {
 					if (response != undefined && response != null
 							&& response != '' && jsonResponse.response != []) {
-						$('#uploadBatchStatus').empty();
 						jsonResponse.response
 								.forEach(function(uploadStatus) {
 									if (jsonResponse.uploadStatus != 6
