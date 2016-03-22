@@ -3822,11 +3822,11 @@ var hierarchyUpload = {
 		if (data.validationErrors.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/abuse.png" style="width: 18px; height: 18px"></span>';
+					+ '"><img src="resources/images/Hazard_Red.png" style="width: 18px; height: 18px"></span>';
 		} else if (data.validationWarnings.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/warning.png" style="width: 18px; height: 18px"></span>';
+					+ '"><img src="resources/images/Hazard_Yellow.png" style="width: 18px; height: 18px"></span>';
 		}
 		return toolTip;
 	},

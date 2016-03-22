@@ -70,21 +70,21 @@ public class HierarchyStructureUploadServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void uploadHierarchyWithNullUploadStructure() throws InvalidInputException
     {
-        hierarchyStructureUpload.uploadHierarchy( null, new Company(), new User() );
+        hierarchyStructureUpload.uploadHierarchy( null, new Company(), new User(), false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void uploadHierarchyWithNullCompany() throws InvalidInputException
     {
-        hierarchyStructureUpload.uploadHierarchy( new HierarchyUpload(), null, new User() );
+        hierarchyStructureUpload.uploadHierarchy( new HierarchyUpload(), null, new User(), false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void uploadHierarchyWithNullUser() throws InvalidInputException
     {
-        hierarchyStructureUpload.uploadHierarchy( new HierarchyUpload(), new Company(), null );
+        hierarchyStructureUpload.uploadHierarchy( new HierarchyUpload(), new Company(), null, false );
     }
 
 
@@ -92,7 +92,7 @@ public class HierarchyStructureUploadServiceImplTest
     public void uploadHierarchyWithNonAdminUser() throws InvalidInputException
     {
         User user = new User();
-        hierarchyStructureUpload.uploadHierarchy( new HierarchyUpload(), new Company(), user );
+        hierarchyStructureUpload.uploadHierarchy( new HierarchyUpload(), new Company(), user, false );
     }
 
 

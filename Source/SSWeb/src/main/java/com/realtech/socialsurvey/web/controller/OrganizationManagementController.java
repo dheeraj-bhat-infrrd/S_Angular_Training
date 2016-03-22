@@ -2740,16 +2740,18 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = null;
         LOG.info( "Validating the hierarchy file" );
         String fileUrl = request.getParameter( "fileUrl" );
+        boolean isAppend = false;
+        if ( request.getParameter( "uploadType" ) != null && !request.getParameter( "uploadType" ).isEmpty() ) {
+            if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+                isAppend = true;
+            }
+        }
         try {
             if ( fileUrl == null || fileUrl.isEmpty() ) {
                 throw new InvalidInputException( "File URL cannot be empty" );
             }
             User user = sessionHelper.getCurrentUser();
-            if ( "replace".equals( request.getParameter( "uploadType" ) ) ) {
-                uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
-            } else if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
-
-            }
+            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl, isAppend );
             response = uploadValidation;
         } catch ( InvalidInputException ex ) {
             status = false;
@@ -2771,15 +2773,17 @@ public class OrganizationManagementController
         boolean status = true;
         Object response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
+        boolean isAppend = false;
+        if ( request.getParameter( "uploadType" ) != null && !request.getParameter( "uploadType" ).isEmpty() ) {
+            if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+                isAppend = true;
+            }
+        }
         LOG.info( hierarchyJson );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
             User user = sessionHelper.getCurrentUser();
-            if ( "replace".equals( request.getParameter( "uploadType" ) ) ) {
-                uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
-            } else if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
-
-            }
+            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation, isAppend );
             response = uploadValidation;
         } catch ( Exception ex ) {
             status = false;
@@ -2802,13 +2806,17 @@ public class OrganizationManagementController
         String response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        boolean isAppend = false;
+        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
+            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
+        }
         try {
             User user = sessionHelper.getCurrentUser();
             //Insert hierarchy upload in UPLOAD_HIERARCHY_DETAILS collections
             hierarchyStructureUploadService.saveHierarchyUploadInMongo( uploadValidation.getUpload() );
 
             //Initiate upload by adding entry in upload status table
-            hierarchyStructureUploadService.addNewUploadRequest( user );
+            hierarchyStructureUploadService.addNewUploadRequest( user, isAppend );
             response = "Hierarchy upload batch is initialized successfully";
         } catch ( Exception ex ) {
             status = false;
@@ -2826,7 +2834,6 @@ public class OrganizationManagementController
     public String fetchUploadBatchStatus( Model model, HttpServletRequest request ) throws InvalidInputException
     {
         LOG.info( "Fetching the latest batch processing message" );
-        //TODO: Get the actual stuff instead
         User user = sessionHelper.getCurrentUser();
         boolean status = true;
         String response = null;
