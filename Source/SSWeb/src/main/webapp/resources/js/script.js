@@ -2138,14 +2138,14 @@ function editEmailMap(response) {
           var emails =reponseJson.length;
           if(emails>0){
         	  reponseJson.forEach(function(arrayEmail){
-        		  emailMap+='<div class="un-row">'
+        		  emailMap+='<div id="user-email-row-'+arrayEmail.userEmailMappingId+'" class="un-row">'
 						+ '						<div style="width:40%" class="float-left unmatchtab email-id">'
 						+ undefinedval(arrayEmail.emailId)
 						+ '</div>'
 						+ '						<div style="width:30%" class="float-left unmatchtab email-created">'
 						+ undefinedval(arrayEmail.createdOn)
 						+ '</div>'
-						+ '						<div style="width:20%;height:38px;" class="float-left unmatchtab email-map-remove cursor-pointer" onclick="emailDelete(this,'+undefinedval(arrayEmail.userEmailMappingId)+');"></div>'
+						+ '						<div style="width:20%;height:38px;" class="float-left unmatchtab email-map-remove cursor-pointer" onclick="emailDelete('+undefinedval(arrayEmail.userEmailMappingId)+',event);"></div>'
 						+'</div>'
         	  });
         	  
@@ -2227,7 +2227,10 @@ function saveEmailMap(data){
 	 $('#overlay-toast').html(data);
 		showToast();
 }
-function emailDelete(deleteElement,emailMapId){
+function emailDelete(emailMapId,e){
+	e.stopPropagation();
+	 confirmDeleteEmailMap(emailMapId);
+/*	e.stopPropagation();
 	var url="deleteuseremailmapping.do?emailMappingId="+emailMapId;
 callAjaxGET(url, function(data) {
 var response = $.parseJSON(data);
@@ -2236,9 +2239,29 @@ if(response.succeed==true){
 	$('#overlay-toast').html(response.message);
 	showToast();
 }
-}, false);
+}, false);*/
 };
-
+function confirmDeleteEmailMap(emailMapId){
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete Email");
+	$('#overlay-text').html("Are you sure you want to delete user ?");
+	$('#overlay-continue').attr("onclick", "deleteEmailMap('" +emailMapId+ "');");
+}
+function deleteEmailMap(id){
+	var url="deleteuseremailmapping.do?emailMappingId="+id;
+	callAjaxGET(url, function(data) {
+		var response = $.parseJSON(data);
+		if(response.succeed==true){
+			$("#user-email-row-"+id).remove();
+			$('#overlay-toast').html(response.message);
+			showToast();
+			$('#overlay-main').hide();
+		}
+		}, false);
+}
 function AllInputsFilled() {
     return $("input[type='email']", $("#email-form")).filter(function() {
         return $(this).val().trim() === "";
@@ -2358,61 +2381,7 @@ function bindClickEventForMappedButton(){
 	$('.v-mapped-edit')
 	.click(
 			function(e) {
-				var id=$(this).parent().find("ss-id").text();
-				/*
-				var name = $(this).parent().find(".ss-name").text();
-				var eids = $(this).parent().find(".ss-eids").text();
-				var customer = $(this).parent().find(".ss-cname")
-						.text();
-
-				var popup = '<div class="bd-hr-form-item clearfix">'
-						+ '	     <div class="float-left bd-frm-left-un">'+eids+'</div>'
-						+ '	      <div class="float-left bd-frm-right-un">'
-						+ delete
-						+ '</div>'
-						+ '	 </div>'
-						+ '	 <div class="bd-hr-form-item clearfix">'
-						+ '	     <div class="float-left bd-frm-left-un">Eids</div>'
-						+ '	      <div class="float-left bd-frm-right-un">'
-						+ eids
-						+ '</div>'
-						+ '	 </div>'
-						+ '<div class="bd-hr-form-item clearfix">'
-						+ '	     <div class="float-left bd-frm-left-un">Customer</div>'
-						+ '	      <div class="float-left bd-frm-right-un">'
-						+ customer
-						+ '</div>'
-						+ '	 </div><div class="bd-hr-form-item clearfix" id="ignore">'
-						+ '	     <div class="float-left bd-frm-left-un"></div>'
-						+ '	     <div class="float-left bd-frm-right">'
-						+ '	         <div class="bd-frm-check-wrapper clearfix bd-check-wrp">'
-						+ '	             <div class="float-left bd-check-img bd-check-img-checked"></div>'
-						+ '	             <input type="hidden" name="isIgnore" value="false" id="is-ignore" class="ignore-clear">'
-						+ '	             <div class="float-left bd-check-txt bd-check-sm">Always Ignore</div>'
-						+ '	         </div>'
-						+ '	     </div>'
-						+ '	 </div>'
-						+ '<div id="bd-single" class="bd-hr-form-item clearfix">'
-						+ '	    <div class="float-left bd-frm-left-un">Alias</div>'
-						+ '	    <div class="float-left bd-frm-left-un pos-relative">'
-						+ '	        <input id="match-user-email" class="bd-frm-rt-txt bd-dd-img">'
-						+ '	    </div>' + '	</div>';
-
-				e.stopPropagation();
-				$('#overlay-continue').html("Save");
-				$('#overlay-cancel').html("Cancel");
-				$('#overlay-header').html( name );
-				$('#overlay-text').html(popup);
-
-				$('#overlay-continue').click(function() {
-					saveUserMap(user);
-					$('#overlay-continue').unbind('click');
-				});
-				$('#overlay-main').show();
-				bindAdminCheckBoxClick();
-				attachAutocompleteAliasDropdown();
-			*/
-				
+				var id=$(this).parent().find("ss-id").text();	
 			});
 if ($('#is-ignore').val() == true) {
 if ($('#match-user-email').val() != "") {

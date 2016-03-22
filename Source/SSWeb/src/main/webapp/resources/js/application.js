@@ -224,7 +224,10 @@ $(document).on('click',  function(e){
 		$('#overlay-incomplete-survey').hide();
 		enableBodyScroll();
 	}
-	
+	if($('#email-map-pop-up' ).is(':visible')){
+		$('#email-map-pop-up').hide();
+		enableBodyScroll();
+	}
 	
 		
 });
@@ -251,6 +254,10 @@ $(document).on('keyup',  function(e){
 			$('#overlay-incomplete-survey').hide();
 			enableBodyScroll();
 		}
+		if($('#email-map-pop-up' ).is(':visible')){
+			$('#email-map-pop-up').hide();
+			enableBodyScroll();
+		}
 		
 		
 	}
@@ -273,6 +280,9 @@ $(document).on('keyup',  function(e){
 			enableBodyScroll();
 		}
 */
+$(document).on('click', '#email-overlay', function(e){
+	e.stopPropagation();
+});
 $(document).on('click', '#payment-data-container', function(e){
 	e.stopPropagation();
 });

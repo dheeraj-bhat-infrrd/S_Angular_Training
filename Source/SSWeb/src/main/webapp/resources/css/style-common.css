@@ -6305,8 +6305,8 @@ tr.u-tbl-header td {
 	height: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
-	z-index: 99999999;
-	background-color: rgba(255, 255, 255, 0.85);
+	z-index: 55555555;
+	background-color: rgba(0, 0, 0, 0.5);
 }
 
 .bd-q-wrapper {
@@ -6380,7 +6380,7 @@ tr.u-tbl-header td {
 	line-height: 40px;
 	margin: 10px auto 0;
 	padding-bottom: 10px;
-	width:50%
+	width:255px;
 }
 .bd-q-pu-done-wrapper-override {
 	margin: 15px auto 0 !important;
