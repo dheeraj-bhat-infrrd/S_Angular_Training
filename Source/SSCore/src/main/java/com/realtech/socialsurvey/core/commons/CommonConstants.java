@@ -1074,7 +1074,7 @@ public interface CommonConstants
     public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 6;
     
     public static final char UPLOAD_MODE_APPEND = 'A';
-    public static final char UPLOAD_MODE_DEFAULT = 'D';
+    public static final char UPLOAD_MODE_REPLACE = 'R';
     
     //Hierarchy upload message constants
     public static final String UPLOAD_MSG_INITIATED = "Import initiated";
