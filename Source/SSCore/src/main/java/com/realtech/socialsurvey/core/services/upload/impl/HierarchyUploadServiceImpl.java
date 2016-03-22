@@ -742,13 +742,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else if ( cellIndex == USER_TITLE_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                         uploadedUser.setTitle( cell.getStringCellValue().trim() );
                     } else if ( cellIndex == USER_BRANCH_ID_INDEX && !cell.getStringCellValue().replaceAll( " ", "" ).isEmpty() ) {
-                        //set assigned branches instead
-                        //uploadedUser.setSourceBranchId( cell.getStringCellValue().trim() );
                         uploadedUser.setAssignedBranches( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" )
                             .split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_REGION_ID_INDEX && !cell.getStringCellValue().replaceAll( " ", "" ).isEmpty() ) {
-                        //set assigned regions instead
-                        //uploadedUser.setSourceRegionId( cell.getStringCellValue().trim() );
                         uploadedUser.setAssignedRegions( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" )
                             .split( "\\s*,\\s*" ) ) );
                     } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX
@@ -762,19 +758,6 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else if ( cellIndex == USER_EMAIL_INDEX ) {
                         String emailId = cell.getStringCellValue().trim();
                         if ( emailId != null && !emailId.isEmpty() ) {
-                            //Masking shouldn't happen at this stage
-                            /*if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
-                                emailId = utils.maskEmailAddress( emailId );
-                                if ( emailId != null ) {
-                                    uploadedUser.setEmailId( uploadedUser.getFirstName()
-                                        + ( uploadedUser.getLastName() != null ? " " + uploadedUser.getLastName() : "" ) + " <"
-                                        + emailId + ">" );
-                                }
-                            } else {
-                                uploadedUser.setEmailId( uploadedUser.getFirstName()
-                                    + ( uploadedUser.getLastName() != null ? " " + uploadedUser.getLastName() : "" ) + " <"
-                                    + emailId + ">" );
-                            }*/
                             uploadedUser.setEmailId( emailId );
                         }
                     } else if ( cellIndex == USER_PHOTO_PROFILE_URL && !cell.getStringCellValue().trim().isEmpty() ) {
