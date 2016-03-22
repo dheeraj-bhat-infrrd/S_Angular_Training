@@ -88,7 +88,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
     @Override
-    public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException
+    public UploadValidation validateUserUploadFile( Company company, String fileName, boolean isAppend )
+        throws InvalidInputException
     {
         if ( fileName == null || fileName.isEmpty() ) {
             LOG.error( "Invalid upload details" );
@@ -119,9 +120,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             Map<String, String> sourceRegionIdErrors = new HashMap<String, String>();
             Map<String, String> sourceBranchIdErrors = new HashMap<String, String>();
             Map<String, String> sourceUserIdErrors = new HashMap<String, String>();
-            parseRegions( workBook, validationObject, sourceRegionIdErrors );
-            parseBranches( workBook, validationObject, sourceBranchIdErrors );
-            parseUsers( workBook, validationObject, sourceUserIdErrors );
+            parseRegions( workBook, validationObject, sourceRegionIdErrors, isAppend );
+            parseBranches( workBook, validationObject, sourceBranchIdErrors, isAppend );
+            parseUsers( workBook, validationObject, sourceUserIdErrors, isAppend );
             if ( validationObject.isBranchHeadersInvalid() || validationObject.isRegionHeadersInvalid()
                 || validationObject.isUserHeadersInvalid() ) {
                 throw new InvalidInputException();
@@ -174,7 +175,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @throws InvalidInputException
      */
     @Override
-    public UploadValidation validateHierarchyUploadJson( Company company, UploadValidation newUploadValidation )
+    public UploadValidation validateHierarchyUploadJson( Company company, UploadValidation newUploadValidation, boolean isAppend )
         throws InvalidInputException
     {
         LOG.info( "Method validateHierarchyUploadJson() started" );
@@ -190,9 +191,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         Map<String, String> sourceBranchIdErrors = new HashMap<String, String>();
         Map<String, String> sourceUserIdErrors = new HashMap<String, String>();
 
-        parseRegions( newUploadValidation.getUpload().getRegions(), validationObject, sourceRegionIdErrors );
-        parseBranches( newUploadValidation.getUpload().getBranches(), validationObject, sourceBranchIdErrors );
-        parseUsers( newUploadValidation.getUpload().getUsers(), validationObject, sourceUserIdErrors );
+        parseRegions( newUploadValidation.getUpload().getRegions(), validationObject, sourceRegionIdErrors, isAppend );
+        parseBranches( newUploadValidation.getUpload().getBranches(), validationObject, sourceBranchIdErrors, isAppend );
+        parseUsers( newUploadValidation.getUpload().getUsers(), validationObject, sourceUserIdErrors, isAppend );
         uploadValidationService.validateHeirarchyUpload( validationObject, sourceRegionIdErrors, sourceBranchIdErrors,
             sourceUserIdErrors );
         LOG.info( "Method validateHierarchyUploadJson() finished" );
@@ -206,7 +207,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param validationObject
      */
     void parseRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject,
-        Map<String, String> sourceRegionIdErrors )
+        Map<String, String> sourceRegionIdErrors, boolean isAppend )
     {
         if ( uploadedRegions == null ) {
             uploadedRegions = new ArrayList<RegionUploadVO>();
@@ -225,7 +226,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
 
             // check if region is added or modified
-            if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions() ) ) {
+            if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions(), uploadedRegions ) ) {
                 validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
                 uploadedRegion.setRegionAdded( true );
                 validationObject.getUpload().getRegions().add( uploadedRegion );
@@ -236,7 +237,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             //check for duplicate source ids
             checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
         }
-        markDeletedRegions( uploadedRegions, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedRegions( uploadedRegions, validationObject );
+        }
         List<String> errors = new ArrayList<String>();
         if ( !sourceRegionIdErrors.isEmpty() ) {
             for ( String key : sourceRegionIdErrors.keySet() ) {
@@ -315,7 +319,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param validationObject
      */
     void parseBranches( List<BranchUploadVO> uploadedBranches, UploadValidation validationObject,
-        Map<String, String> sourceBranchIdErrors )
+        Map<String, String> sourceBranchIdErrors, boolean isAppend )
     {
         if ( uploadedBranches == null ) {
             uploadedBranches = new ArrayList<BranchUploadVO>();
@@ -334,7 +338,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 continue;
             }
             // check if branch is added or modified
-            if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches() ) ) {
+            if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches(), uploadedBranches ) ) {
                 validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
                 uploadedBranch.setBranchAdded( true );
                 validationObject.getUpload().getBranches().add( uploadedBranch );
@@ -344,7 +348,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             //check for duplicate source ids
             checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
         }
-        markDeletedBranches( uploadedBranches, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedBranches( uploadedBranches, validationObject );
+        }
         List<String> errors = new ArrayList<String>();
         if ( !sourceBranchIdErrors.isEmpty() ) {
             for ( String key : sourceBranchIdErrors.keySet() ) {
@@ -358,7 +365,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
     void parseUsers( List<UserUploadVO> uploadedUsers, UploadValidation validationObject,
-        Map<String, String> sourceUserIdErrors )
+        Map<String, String> sourceUserIdErrors, boolean isAppend )
 
     {
         if ( uploadedUsers == null ) {
@@ -395,7 +402,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             //check for duplicate source ids
             checkForDuplicateSourceUserIds( sourceUserIdErrors, uploadedUser );
         }
-        markDeletedUsers( uploadedUsers, validationObject );
+        //In case of append mode, we skip deletion
+        if ( !isAppend ) {
+            markDeletedUsers( uploadedUsers, validationObject );
+        }
         List<String> errors = new ArrayList<String>();
         if ( !sourceUserIdErrors.isEmpty() ) {
             for ( String key : sourceUserIdErrors.keySet() ) {
@@ -415,8 +425,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param validationObject
      * @throws InvalidInputException 
      */
-    void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceRegionIdErrors )
-        throws InvalidInputException
+    void parseRegions( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceRegionIdErrors,
+        boolean isAppend ) throws InvalidInputException
     {
         // Parse the list of regions from the sheet. Parse each row. Check for validation errors. If validation is successful, check if region is modified or added. If modified then add to the modified count or to the addition count. Then map and check if there are any regions that were deleted
         // Possible errors in regions
@@ -503,21 +513,23 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         }
                     }
                 }
-                if ( isRegionUploadEmpty( uploadedRegion ) ) {
-                    continue;
-                }
-                // check if region is added or modified
-                if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions() ) ) {
-                    validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
-                    uploadedRegion.setRegionAdded( true );
-                    validationObject.getUpload().getRegions().add( uploadedRegion );
-                } else {
-                    updateUploadValidationWithModifiedRegion( uploadedRegion, validationObject, regionMap );
-                }
-                uploadedRegions.add( uploadedRegion );
-                //check for duplicate source ids
-                checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
+            if ( isRegionUploadEmpty( uploadedRegion ) ) {
+                continue;
             }
+            // check if region is added or modified
+            // if duplicate record
+            if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions(), uploadedRegions ) ) {
+                validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
+                uploadedRegion.setRegionAdded( true );
+                validationObject.getUpload().getRegions().add( uploadedRegion );
+            } else {
+                updateUploadValidationWithModifiedRegion( uploadedRegion, validationObject, regionMap );
+            }
+            //check for duplicate source ids
+            checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
+            uploadedRegions.add( uploadedRegion );
+        }
+
             List<String> errors = new ArrayList<String>();
             if ( !sourceRegionIdErrors.isEmpty() ) {
                 for ( String key : sourceRegionIdErrors.keySet() ) {
@@ -527,15 +539,19 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 }
                 validationObject.setRegionValidationErrors( errors );
             }
-            markDeletedRegions( uploadedRegions, validationObject );
+            //In case of append mode, we skip deletion
+            if ( !isAppend ) {
+                markDeletedRegions( uploadedRegions, validationObject );
+            }
         } catch ( InvalidInputException ex ) {
             validationObject.setRegionHeadersInvalid( true );
         }
     }
 
 
-    void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceBranchIdErrors )
-        throws InvalidInputException
+    void parseBranches( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceBranchIdErrors,
+        boolean isAppend ) throws InvalidInputException
+
     {
         // Parse each row for branches and then check for valid branches. On successful validation, check if the branch is a new, modified or deleted branch.
         // Possible reasons for errors
@@ -567,6 +583,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         headerMap.put( 8, CommonConstants.CHR_ZIP );
 
         Map<String, Integer> branchMap = null;
+
         try {
             if ( validationObject != null && validationObject.getUpload() != null ) {
                 branchMap = generateBranchIndexMap( validationObject.getUpload().getBranches() );
@@ -635,21 +652,21 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         }
                     }
                 }
-                if ( isBranchUploadEmpty( uploadedBranch ) ) {
-                    continue;
-                }
-                // check if branch is added or modified
-                if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches() ) ) {
-                    validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
-                    uploadedBranch.setBranchAdded( true );
-                    validationObject.getUpload().getBranches().add( uploadedBranch );
-                } else {
-                    updateUploadValidationWithModifiedBranch( uploadedBranch, validationObject, branchMap );
-                }
-                uploadedBranches.add( uploadedBranch );
-                //check for duplicate source ids
-                checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
+            if ( isBranchUploadEmpty( uploadedBranch ) ) {
+                continue;
             }
+            // check if branch is added or modified
+            if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches(), uploadedBranches ) ) {
+                validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
+                uploadedBranch.setBranchAdded( true );
+                validationObject.getUpload().getBranches().add( uploadedBranch );
+            } else {
+                updateUploadValidationWithModifiedBranch( uploadedBranch, validationObject, branchMap );
+            }
+            uploadedBranches.add( uploadedBranch );
+            //check for duplicate source ids
+            checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
+        }
             List<String> errors = new ArrayList<String>();
             if ( !sourceBranchIdErrors.isEmpty() ) {
                 for ( String key : sourceBranchIdErrors.keySet() ) {
@@ -659,15 +676,18 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 }
                 validationObject.setBranchValidationErrors( errors );
             }
-            markDeletedBranches( uploadedBranches, validationObject );
+            //In case of append mode, we skip deletion
+            if ( !isAppend ) {
+                markDeletedBranches( uploadedBranches, validationObject );
+            }
         } catch ( InvalidInputException ex ) {
             validationObject.setBranchHeadersInvalid( true );
         }
     }
 
 
-    void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceUserIdErrors )
-        throws InvalidInputException
+    void parseUsers( XSSFWorkbook workBook, UploadValidation validationObject, Map<String, String> sourceUserIdErrors,
+        boolean isAppend ) throws InvalidInputException
     {
         // Parse each row for users and then check for valid users. On successful validation, check if the user is a new, modified or deleted user.
         // Possible reasons for errors
@@ -717,11 +737,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             if ( userMap == null ) {
                 userMap = new HashMap<String, Integer>();
             }
-
             if ( !rows.hasNext() ) {
                 throw new InvalidInputException( CommonConstants.HIERARCHY_USER_HEADERS_INVALID );
             }
-
             while ( rows.hasNext() ) {
                 row = (XSSFRow) rows.next();
                 // skip the first 1 rows. first row is the schema and second is the header
@@ -771,19 +789,6 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         } else if ( cellIndex == USER_EMAIL_INDEX ) {
                             String emailId = cell.getStringCellValue().trim();
                             if ( emailId != null && !emailId.isEmpty() ) {
-                                //Masking shouldn't happen at this stage
-                                /*if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
-                                emailId = utils.maskEmailAddress( emailId );
-                                if ( emailId != null ) {
-                                    uploadedUser.setEmailId( uploadedUser.getFirstName()
-                                        + ( uploadedUser.getLastName() != null ? " " + uploadedUser.getLastName() : "" ) + " <"
-                                        + emailId + ">" );
-                                }
-                                } else {
-                                uploadedUser.setEmailId( uploadedUser.getFirstName()
-                                    + ( uploadedUser.getLastName() != null ? " " + uploadedUser.getLastName() : "" ) + " <"
-                                    + emailId + ">" );
-                                }*/
                                 uploadedUser.setEmailId( emailId );
                             }
                         } else if ( cellIndex == USER_PHOTO_PROFILE_URL && !cell.getStringCellValue().trim().isEmpty() ) {
@@ -840,7 +845,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 }
                 validationObject.setBranchValidationErrors( errors );
             }
-            markDeletedUsers( uploadedUsers, validationObject );
+            //In case of append mode, we skip deletion
+            if ( !isAppend ) {
+                markDeletedUsers( uploadedUsers, validationObject );
+            }
         } catch ( InvalidInputException ex ) {
             validationObject.setUserHeadersInvalid( true );
         }
@@ -871,43 +879,31 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
 
-    boolean isNewRegion( RegionUploadVO uploadedRegion, List<RegionUploadVO> uploadedRegions )
+    boolean isNewRegion( RegionUploadVO uploadedRegion, List<RegionUploadVO> existingRegions,
+        List<RegionUploadVO> uploadedRegions )
     {
-        if ( uploadedRegions != null && !uploadedRegions.contains( uploadedRegion ) ) {
+        if ( existingRegions != null && !existingRegions.contains( uploadedRegion ) ) {
             return true;
         } else if ( uploadedRegion.getSourceRegionId() == null || uploadedRegion.getSourceRegionId().isEmpty() ) {
             return true;
-        } else if ( uploadedRegion.getRegionName() != null && !uploadedRegion.getRegionName().isEmpty() ) {
-            RegionUploadVO curRegion = uploadedRegions.get( uploadedRegions.indexOf( uploadedRegion ) );
-            if ( curRegion.getRegionName() != null && !curRegion.getRegionName().isEmpty() ) {
-                if ( !curRegion.getRegionName().equalsIgnoreCase( uploadedRegion.getRegionName() ) ) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            return false;
+        } else if ( uploadedRegions.contains( uploadedRegion ) ) {
+            return true;
         }
+        return false;
     }
 
 
-    boolean isNewBranch( BranchUploadVO uploadedBranch, List<BranchUploadVO> uploadedBranches )
+    boolean isNewBranch( BranchUploadVO uploadedBranch, List<BranchUploadVO> existingBranches,
+        List<BranchUploadVO> uploadedBranches )
     {
-        if ( uploadedBranches != null && !uploadedBranches.contains( uploadedBranch ) ) {
+        if ( existingBranches != null && !existingBranches.contains( uploadedBranch ) ) {
             return true;
         } else if ( uploadedBranch.getSourceBranchId() == null || uploadedBranch.getSourceBranchId().isEmpty() ) {
             return true;
-        } else if ( uploadedBranch.getBranchName() != null && !uploadedBranch.getBranchName().isEmpty() ) {
-            BranchUploadVO curBranch = uploadedBranches.get( uploadedBranches.indexOf( uploadedBranch ) );
-            if ( curBranch.getBranchName() != null && !curBranch.getBranchName().isEmpty() ) {
-                if ( !curBranch.getBranchName().equalsIgnoreCase( uploadedBranch.getBranchName() ) ) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            return false;
+        } else if ( uploadedBranches.contains( uploadedBranch ) ) {
+            return true;
         }
+        return false;
     }
 
 
@@ -1022,8 +1018,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( !branch.isBranchAdded() ) {
                     if ( ( branch.getBranchName() == null && uploadedBranch.getBranchName() != null )
                         || ( branch.getBranchName() != null && uploadedBranch.getBranchName() == null )
-                        || ( branch.getBranchName() != null && uploadedBranch.getBranchName() != null
-                            && !branch.getBranchName().equalsIgnoreCase( uploadedBranch.getBranchName() ) ) ) {
+                        || ( branch.getBranchName() != null && uploadedBranch.getBranchName() != null && !branch
+                            .getBranchName().equalsIgnoreCase( uploadedBranch.getBranchName() ) ) ) {
                         branch.setBranchName( uploadedBranch.getBranchName() );
                         branch.setBranchNameModified( true );
                     } else {
@@ -1031,8 +1027,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( branch.getBranchAddress1() == null && uploadedBranch.getBranchAddress1() != null )
                         || ( branch.getBranchAddress1() != null && uploadedBranch.getBranchAddress1() == null )
-                        || ( branch.getBranchAddress1() != null && uploadedBranch.getBranchAddress1() != null
-                            && !branch.getBranchAddress1().equalsIgnoreCase( uploadedBranch.getBranchAddress1() ) ) ) {
+                        || ( branch.getBranchAddress1() != null && uploadedBranch.getBranchAddress1() != null && !branch
+                            .getBranchAddress1().equalsIgnoreCase( uploadedBranch.getBranchAddress1() ) ) ) {
                         branch.setBranchAddress1( uploadedBranch.getBranchAddress1() );
                         branch.setBranchAddress1Modified( true );
                     } else {
@@ -1045,8 +1041,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( branch.getBranchAddress2() == null && uploadedBranch.getBranchAddress2() != null )
                         || ( branch.getBranchAddress2() != null && uploadedBranch.getBranchAddress2() == null )
-                        || ( branch.getBranchAddress2() != null && uploadedBranch.getBranchAddress2() != null
-                            && !branch.getBranchAddress2().equalsIgnoreCase( uploadedBranch.getBranchAddress2() ) ) ) {
+                        || ( branch.getBranchAddress2() != null && uploadedBranch.getBranchAddress2() != null && !branch
+                            .getBranchAddress2().equalsIgnoreCase( uploadedBranch.getBranchAddress2() ) ) ) {
                         branch.setBranchAddress2( uploadedBranch.getBranchAddress2() );
                         branch.setBranchAddress2Modified( true );
                     } else {
@@ -1054,8 +1050,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( branch.getBranchCity() == null && uploadedBranch.getBranchCity() != null )
                         || ( branch.getBranchCity() != null && uploadedBranch.getBranchCity() == null )
-                        || ( branch.getBranchCity() != null && uploadedBranch.getBranchCity() != null
-                            && !branch.getBranchCity().equalsIgnoreCase( uploadedBranch.getBranchCity() ) ) ) {
+                        || ( branch.getBranchCity() != null && uploadedBranch.getBranchCity() != null && !branch
+                            .getBranchCity().equalsIgnoreCase( uploadedBranch.getBranchCity() ) ) ) {
                         branch.setBranchCity( uploadedBranch.getBranchCity() );
                         branch.setBranchCityModified( true );
                     } else {
@@ -1063,8 +1059,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( branch.getBranchState() == null && uploadedBranch.getBranchState() != null )
                         || ( branch.getBranchState() != null && uploadedBranch.getBranchState() == null )
-                        || ( branch.getBranchState() != null && uploadedBranch.getBranchState() != null
-                            && !branch.getBranchState().equalsIgnoreCase( uploadedBranch.getBranchState() ) ) ) {
+                        || ( branch.getBranchState() != null && uploadedBranch.getBranchState() != null && !branch
+                            .getBranchState().equalsIgnoreCase( uploadedBranch.getBranchState() ) ) ) {
                         branch.setBranchState( uploadedBranch.getBranchState() );
                         branch.setBranchStateModified( true );
                     } else {
@@ -1072,8 +1068,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( branch.getBranchZipcode() == null && uploadedBranch.getBranchZipcode() != null )
                         || ( branch.getBranchZipcode() != null && uploadedBranch.getBranchZipcode() == null )
-                        || ( branch.getBranchZipcode() != null && uploadedBranch.getBranchZipcode() != null
-                            && !branch.getBranchZipcode().equalsIgnoreCase( uploadedBranch.getBranchZipcode() ) ) ) {
+                        || ( branch.getBranchZipcode() != null && uploadedBranch.getBranchZipcode() != null && !branch
+                            .getBranchZipcode().equalsIgnoreCase( uploadedBranch.getBranchZipcode() ) ) ) {
                         branch.setBranchZipcode( uploadedBranch.getBranchZipcode() );
                         branch.setBranchZipcodeModified( true );
                     } else {
@@ -1081,16 +1077,16 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( branch.getSourceRegionId() == null && uploadedBranch.getSourceRegionId() != null )
                         || ( branch.getSourceRegionId() != null && uploadedBranch.getSourceRegionId() == null )
-                        || ( branch.getSourceRegionId() != null && uploadedBranch.getSourceRegionId() != null
-                            && !branch.getSourceRegionId().equalsIgnoreCase( uploadedBranch.getSourceRegionId() ) ) ) {
+                        || ( branch.getSourceRegionId() != null && uploadedBranch.getSourceRegionId() != null && !branch
+                            .getSourceRegionId().equalsIgnoreCase( uploadedBranch.getSourceRegionId() ) ) ) {
                         branch.setSourceRegionId( uploadedBranch.getSourceRegionId() );
                         branch.setSourceRegionIdModified( true );
                     } else {
                         branch.setSourceRegionIdModified( false );
                     }
-                    if ( branch.isBranchNameModified() || branch.isBranchAddress1Modified() || branch.isBranchAddress2Modified()
-                        || branch.isBranchCityModified() || branch.isBranchStateModified() || branch.isBranchZipcodeModified()
-                        || branch.isSourceRegionIdModified() ) {
+                    if ( branch.isBranchNameModified() || branch.isBranchAddress1Modified()
+                        || branch.isBranchAddress2Modified() || branch.isBranchCityModified() || branch.isBranchStateModified()
+                        || branch.isBranchZipcodeModified() || branch.isSourceRegionIdModified() ) {
                         validationObject.setNumberOfBranchesModified( validationObject.getNumberOfBranchesModified() + 1 );
                         branch.setBranchModified( true );
                     } else {
@@ -1115,8 +1111,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( !user.isUserAdded() ) {
                     if ( ( user.getFirstName() == null && uploadedUser.getFirstName() != null )
                         || ( user.getFirstName() != null && uploadedUser.getFirstName() == null )
-                        || ( user.getFirstName() != null && uploadedUser.getFirstName() != null
-                            && !user.getFirstName().equalsIgnoreCase( uploadedUser.getFirstName() ) ) ) {
+                        || ( user.getFirstName() != null && uploadedUser.getFirstName() != null && !user.getFirstName()
+                            .equalsIgnoreCase( uploadedUser.getFirstName() ) ) ) {
                         user.setFirstName( uploadedUser.getFirstName() );
                         user.setFirstNameModified( true );
                     } else {
@@ -1124,8 +1120,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getLastName() == null && uploadedUser.getLastName() != null )
                         || ( user.getLastName() != null && uploadedUser.getLastName() == null )
-                        || ( user.getLastName() != null && uploadedUser.getLastName() != null
-                            && !user.getLastName().equalsIgnoreCase( uploadedUser.getLastName() ) ) ) {
+                        || ( user.getLastName() != null && uploadedUser.getLastName() != null && !user.getLastName()
+                            .equalsIgnoreCase( uploadedUser.getLastName() ) ) ) {
                         user.setLastName( uploadedUser.getLastName() );
                         user.setLastNameModified( true );
                     } else {
@@ -1133,61 +1129,56 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getTitle() == null && uploadedUser.getTitle() != null )
                         || ( user.getTitle() != null && uploadedUser.getTitle() == null )
-                        || ( user.getTitle() != null && uploadedUser.getTitle() != null
-                            && !user.getTitle().equalsIgnoreCase( uploadedUser.getTitle() ) ) ) {
+                        || ( user.getTitle() != null && uploadedUser.getTitle() != null && !user.getTitle().equalsIgnoreCase(
+                            uploadedUser.getTitle() ) ) ) {
                         user.setTitle( uploadedUser.getTitle() );
                         user.setTitleModified( true );
                     } else {
                         user.setTitleModified( false );
                     }
-                    if ( ( ( user.getAssignedBranchesAdmin() != null && !user.getAssignedBranchesAdmin().isEmpty() )
-                        && ( uploadedUser.getAssignedBranchesAdmin() == null
-                            || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
-                        || ( ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() )
-                            && ( uploadedUser.getAssignedBranchesAdmin() != null
-                                && !uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
-                        || ( user.getAssignedBranchesAdmin() != null && uploadedUser.getAssignedBranchesAdmin() != null
-                            && !( user.getAssignedBranchesAdmin().containsAll( uploadedUser.getAssignedBranchesAdmin() )
-                                && uploadedUser.getAssignedBranchesAdmin()
-                                    .containsAll( user.getAssignedBranchesAdmin() ) ) ) ) {
+                    if ( ( ( user.getAssignedBranchesAdmin() != null && !user.getAssignedBranchesAdmin().isEmpty() ) && ( uploadedUser
+                        .getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
+                        || ( ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() ) && ( uploadedUser
+                            .getAssignedBranchesAdmin() != null && !uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
+                        || ( user.getAssignedBranchesAdmin() != null && uploadedUser.getAssignedBranchesAdmin() != null && !( user
+                            .getAssignedBranchesAdmin().containsAll( uploadedUser.getAssignedBranchesAdmin() ) && uploadedUser
+                            .getAssignedBranchesAdmin().containsAll( user.getAssignedBranchesAdmin() ) ) ) ) {
                         user.setAssignedBranchesAdmin( uploadedUser.getAssignedBranchesAdmin() );
                         user.setAssignedBrachesAdminModified( true );
                     } else {
                         user.setAssignedBrachesAdminModified( false );
                     }
-                    if ( ( ( user.getAssignedRegionsAdmin() != null && !user.getAssignedRegionsAdmin().isEmpty() )
-                        && ( uploadedUser.getAssignedRegionsAdmin() == null
-                            || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
-                        || ( ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() )
-                            && ( uploadedUser.getAssignedRegionsAdmin() != null
-                                && !uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
-                        || ( user.getAssignedRegionsAdmin() != null && uploadedUser.getAssignedRegionsAdmin() != null
-                            && !( user.getAssignedRegionsAdmin().containsAll( uploadedUser.getAssignedRegionsAdmin() )
-                                && uploadedUser.getAssignedRegionsAdmin().containsAll( user.getAssignedRegionsAdmin() ) ) ) ) {
+                    if ( ( ( user.getAssignedRegionsAdmin() != null && !user.getAssignedRegionsAdmin().isEmpty() ) && ( uploadedUser
+                        .getAssignedRegionsAdmin() == null || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
+                        || ( ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) && ( uploadedUser
+                            .getAssignedRegionsAdmin() != null && !uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
+                        || ( user.getAssignedRegionsAdmin() != null && uploadedUser.getAssignedRegionsAdmin() != null && !( user
+                            .getAssignedRegionsAdmin().containsAll( uploadedUser.getAssignedRegionsAdmin() ) && uploadedUser
+                            .getAssignedRegionsAdmin().containsAll( user.getAssignedRegionsAdmin() ) ) ) ) {
                         user.setAssignedRegionsAdmin( uploadedUser.getAssignedRegionsAdmin() );
                         user.setAssignedRegionsAdminModified( true );
                     } else {
                         user.setAssignedRegionsAdminModified( false );
                     }
-                    if ( ( ( user.getAssignedBranches() != null && !user.getAssignedBranches().isEmpty() )
-                        && ( uploadedUser.getAssignedBranches() == null || uploadedUser.getAssignedBranches().isEmpty() ) )
-                        || ( ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() )
-                            && ( uploadedUser.getAssignedBranches() != null && !uploadedUser.getAssignedBranches().isEmpty() ) )
-                        || ( user.getAssignedBranches() != null && uploadedUser.getAssignedBranches() != null
-                            && !( uploadedUser.getAssignedBranches().containsAll( user.getAssignedBranches() )
-                                && user.getAssignedBranches().containsAll( uploadedUser.getAssignedBranches() ) ) ) ) {
+                    if ( ( ( user.getAssignedBranches() != null && !user.getAssignedBranches().isEmpty() ) && ( uploadedUser
+                        .getAssignedBranches() == null || uploadedUser.getAssignedBranches().isEmpty() ) )
+                        || ( ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() ) && ( uploadedUser
+                            .getAssignedBranches() != null && !uploadedUser.getAssignedBranches().isEmpty() ) )
+                        || ( user.getAssignedBranches() != null && uploadedUser.getAssignedBranches() != null && !( uploadedUser
+                            .getAssignedBranches().containsAll( user.getAssignedBranches() ) && user.getAssignedBranches()
+                            .containsAll( uploadedUser.getAssignedBranches() ) ) ) ) {
                         user.setAssignedBranches( uploadedUser.getAssignedBranches() );
                         user.setAssignedBranchesModified( true );
                     } else {
                         user.setAssignedBranchesModified( false );
                     }
-                    if ( ( ( user.getAssignedRegions() != null && !user.getAssignedRegions().isEmpty() )
-                        && ( uploadedUser.getAssignedRegions() == null || uploadedUser.getAssignedRegions().isEmpty() ) )
-                        || ( ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() )
-                            && ( uploadedUser.getAssignedRegions() != null && !uploadedUser.getAssignedRegions().isEmpty() ) )
-                        || ( user.getAssignedRegions() != null && uploadedUser.getAssignedRegions() != null
-                            && !( user.getAssignedRegions().containsAll( uploadedUser.getAssignedRegions() )
-                                && uploadedUser.getAssignedRegions().containsAll( user.getAssignedRegions() ) ) ) ) {
+                    if ( ( ( user.getAssignedRegions() != null && !user.getAssignedRegions().isEmpty() ) && ( uploadedUser
+                        .getAssignedRegions() == null || uploadedUser.getAssignedRegions().isEmpty() ) )
+                        || ( ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() ) && ( uploadedUser
+                            .getAssignedRegions() != null && !uploadedUser.getAssignedRegions().isEmpty() ) )
+                        || ( user.getAssignedRegions() != null && uploadedUser.getAssignedRegions() != null && !( user
+                            .getAssignedRegions().containsAll( uploadedUser.getAssignedRegions() ) && uploadedUser
+                            .getAssignedRegions().containsAll( user.getAssignedRegions() ) ) ) ) {
                         user.setAssignedRegions( uploadedUser.getAssignedRegions() );
                         user.setAssignedRegionsModified( true );
                     } else {
@@ -1199,8 +1190,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         user.setEmailIdModified( true );
                     } else {
                         String emailId = uploadedUser.getEmailId();
-                        if ( ( user.getEmailId() != null && emailId != null
-                            && !user.getEmailId().equalsIgnoreCase( emailId ) ) ) {
+                        if ( ( user.getEmailId() != null && emailId != null && !user.getEmailId().equalsIgnoreCase( emailId ) ) ) {
                             user.setEmailId( uploadedUser.getEmailId() );
                             user.setEmailIdModified( true );
                         } else {
@@ -1209,8 +1199,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() == null )
                         || ( user.getPhoneNumber() == null && uploadedUser.getPhoneNumber() != null )
-                        || ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() != null
-                            && !user.getPhoneNumber().equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) ) {
+                        || ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() != null && !user.getPhoneNumber()
+                            .equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) ) {
                         user.setPhoneNumber( uploadedUser.getPhoneNumber() );
                         user.setPhoneNumberModified( true );
                     } else {
@@ -1218,8 +1208,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() == null )
                         || ( user.getWebsiteUrl() == null && uploadedUser.getWebsiteUrl() != null )
-                        || ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() != null
-                            && !user.getWebsiteUrl().equalsIgnoreCase( uploadedUser.getWebsiteUrl() ) ) ) {
+                        || ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() != null && !user.getWebsiteUrl()
+                            .equalsIgnoreCase( uploadedUser.getWebsiteUrl() ) ) ) {
                         user.setWebsiteUrl( uploadedUser.getWebsiteUrl() );
                         user.setWebsiteUrlModified( true );
                     } else {
@@ -1227,8 +1217,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getLicense() != null && uploadedUser.getLicense() == null )
                         || ( user.getLicense() == null && uploadedUser.getLicense() != null )
-                        || ( user.getLicense() != null && uploadedUser.getLicense() != null
-                            && !user.getLicense().equalsIgnoreCase( uploadedUser.getLicense() ) ) ) {
+                        || ( user.getLicense() != null && uploadedUser.getLicense() != null && !user.getLicense()
+                            .equalsIgnoreCase( uploadedUser.getLicense() ) ) ) {
                         user.setLicense( uploadedUser.getLicense() );
                         user.setLicenseModified( true );
                     } else {
@@ -1236,8 +1226,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() == null )
                         || ( user.getLegalDisclaimer() == null && uploadedUser.getLegalDisclaimer() != null )
-                        || ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() != null
-                            && !user.getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() ) ) ) {
+                        || ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() != null && !user
+                            .getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() ) ) ) {
                         user.setLegalDisclaimer( uploadedUser.getLegalDisclaimer() );
                         user.setLegalDisclaimerModified( true );
                     } else {
@@ -1245,8 +1235,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() == null )
                         || ( user.getUserPhotoUrl() == null && uploadedUser.getUserPhotoUrl() != null )
-                        || ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() != null
-                            && !user.getUserPhotoUrl().equalsIgnoreCase( uploadedUser.getUserPhotoUrl() ) ) ) {
+                        || ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() != null && !user
+                            .getUserPhotoUrl().equalsIgnoreCase( uploadedUser.getUserPhotoUrl() ) ) ) {
                         user.setUserPhotoUrl( uploadedUser.getUserPhotoUrl() );
                         user.setUserPhotoUrlModified( true );
                     } else {
@@ -1254,8 +1244,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() == null )
                         || ( user.getAboutMeDescription() == null && uploadedUser.getAboutMeDescription() != null )
-                        || ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() != null
-                            && !user.getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() ) ) ) {
+                        || ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() != null && !user
+                            .getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() ) ) ) {
                         user.setAboutMeDescription( uploadedUser.getAboutMeDescription() );
                         user.setAboutMeDescriptionModified( true );
                     } else {
@@ -1291,9 +1281,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 }
             }
             for ( RegionUploadVO region : validationObject.getUpload().getRegions() ) {
-                if ( region.getSourceRegionId() != null && !region.getSourceRegionId().isEmpty()
-                    && ( !uploadedRegions.contains( region )
-                        || uploadedRegionMap.get( region.getSourceRegionId() ).isDeletedRecord() ) ) {
+                if ( region.getSourceRegionId() != null
+                    && !region.getSourceRegionId().isEmpty()
+                    && ( !uploadedRegions.contains( region ) || uploadedRegionMap.get( region.getSourceRegionId() )
+                        .isDeletedRecord() ) ) {
                     region.setDeletedRecord( true );
                     region.setRowNum( 0 );
                     validationObject.setNumberOfRegionsDeleted( validationObject.getNumberOfRegionsDeleted() + 1 );
@@ -1314,9 +1305,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 }
             }
             for ( BranchUploadVO branch : validationObject.getUpload().getBranches() ) {
-                if ( branch.getSourceBranchId() != null && !branch.getSourceBranchId().isEmpty()
-                    && ( !uploadedBranches.contains( branch )
-                        || uploadedBranchMap.get( branch.getSourceBranchId() ).isDeletedRecord() ) ) {
+                if ( branch.getSourceBranchId() != null
+                    && !branch.getSourceBranchId().isEmpty()
+                    && ( !uploadedBranches.contains( branch ) || uploadedBranchMap.get( branch.getSourceBranchId() )
+                        .isDeletedRecord() ) ) {
                     branch.setDeletedRecord( true );
                     branch.setRowNum( 0 );
                     validationObject.setNumberOfBranchesDeleted( validationObject.getNumberOfBranchesDeleted() + 1 );

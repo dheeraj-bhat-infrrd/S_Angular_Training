@@ -30,7 +30,7 @@ public interface HierarchyStructureUploadService
      * @return 
      * @throws InvalidInputException
      */
-    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user )
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user, boolean isAppend )
         throws InvalidInputException;
 
     public List<UploadStatus> findInitiatedHierarchyUploads() throws NoRecordsFetchedException;
@@ -51,7 +51,7 @@ public interface HierarchyStructureUploadService
      */
     public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException;
 
-    public void addNewUploadRequest( User adminUser );
+    public void addNewUploadRequest( User adminUser, boolean isAppend );
 
     public UploadStatus fetchLatestUploadStatus( Company company );
 

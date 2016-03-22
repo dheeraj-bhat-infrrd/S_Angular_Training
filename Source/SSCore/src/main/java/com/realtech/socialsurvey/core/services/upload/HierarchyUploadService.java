@@ -16,7 +16,8 @@ public interface HierarchyUploadService
      * @return
      * @throws InvalidInputException
      */
-    public UploadValidation validateUserUploadFile( Company company, String fileName ) throws InvalidInputException;
+    public UploadValidation validateUserUploadFile( Company company, String fileName, boolean isAppend )
+        throws InvalidInputException;
 
     /**
      * Validate hierarchy upload when modified in the UI
@@ -25,6 +26,6 @@ public interface HierarchyUploadService
      * @return
      * @throws InvalidInputException
      */
-    public UploadValidation validateHierarchyUploadJson( Company company, UploadValidation newUploadValidation )
+    public UploadValidation validateHierarchyUploadJson( Company company, UploadValidation newUploadValidation, boolean isAppend )
         throws InvalidInputException;
 }

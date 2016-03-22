@@ -117,7 +117,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Override
-    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user ) throws InvalidInputException
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user, boolean isAppend )
+        throws InvalidInputException
     {
         // the upload object should have the current value as well the changes made by the user in the sheet/ UI
         if ( upload == null ) {
@@ -151,12 +152,16 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadBranches( upload, user, company, branchUploadErrors );
         // Uploading users
         uploadUsers( upload, user, userUploadErrors );
-        // Delete users
-        deleteUsers( upload, user, company, userDeleteErrors );
-        // Delete branches
-        deleteBranches( upload, user, company, branchDeleteErrors );
-        // Delete regions
-        deleteRegions( upload, user, company, regionDeleteErrors );
+        
+        //Append mode doesn't deal with deletion, you can either add or delete users
+        if ( !isAppend ) {
+            // Delete users
+            deleteUsers( upload, user, company, userDeleteErrors );
+            // Delete branches
+            deleteBranches( upload, user, company, branchDeleteErrors );
+            // Delete regions
+            deleteRegions( upload, user, company, regionDeleteErrors );
+        }
 
         hierarchyUploadDao.saveHierarchyUploadObject( upload );
         
@@ -2492,7 +2497,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param adminUser
      */
     @Override
-    public void addNewUploadRequest( User adminUser )
+    public void addNewUploadRequest( User adminUser, boolean isAppend )
     {
         //Remove old records for the company
         List<String> conditions = new ArrayList<String>();
@@ -2505,6 +2510,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         newStatus.setCompany( adminUser.getCompany() );
         newStatus.setMessage( CommonConstants.UPLOAD_MSG_INITIATED );
         newStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_INITIATED );
+        if ( isAppend ) {
+            newStatus.setUploadMode( CommonConstants.UPLOAD_MODE_APPEND );
+        }
         addUploadStatusEntry( newStatus );
     }
     
