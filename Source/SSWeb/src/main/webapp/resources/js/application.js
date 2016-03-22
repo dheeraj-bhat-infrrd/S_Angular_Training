@@ -991,8 +991,8 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		isDashboardReviewRequestRunning = false;
 		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 			fetchReviewsOnDashboard(true);
-		} else {
-			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp);
+		} else if($('div.dsh-review-cont.hide').length < (2 * batchSizeCmp)) {
+			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp, name);
 		}
 	}, payload, true);
 }
@@ -7504,13 +7504,13 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		isReviewsRequestRunningEditProfile = false;
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
-		} else {
-			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false, countOfReviewsFetched, numOfRows);
+		} else if($('div.dsh-review-cont.hide').length < (2 * numOfRows)) {
+			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false, countOfReviewsFetched, numOfRows, "");
 		}
 	}, true);
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard, start, batchSize){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard, start, batchSize, name){
 	if (currentProfileIden == undefined || currentProfileIden == "" || isZillowReviewsCallRunning) {
 		return; //Return if profile id is undefined
 	}
@@ -7529,6 +7529,7 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	}
 	url += currentProfileIden + "/zillowreviews";
 	isZillowReviewsCallRunning = true;
+	
 	callAjaxGET(url, function(data) {
 		isZillowReviewsCallRunning = false;
 	    if (data != undefined && data != "") {
@@ -7543,7 +7544,7 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	                	var lastIndex = start - batchSize;
 						// remove the No Reviews Found
 						if (isFromDashBoard && lastIndex <= 0) {
-							$("#review-desc").html("");
+							$("#review-desc").html("What people say about " + name);
 						} else if (!isFromDashBoard && start <= 0) {
 							$("#prof-review-item").html("");
 						}
@@ -10514,8 +10515,15 @@ function encompassCretentials(){
 function paintReviews(result, isRequestFromDashBoard){
 	//Check if there are more reviews left
 	var resultSize = result.length;
-	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 
+	if(isRequestFromDashBoard){
+		displayReviewOnDashboard();
+	} else {
+		displayReviewOnEditProfile();
+	}
+	
+	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
+	
 	var reviewsHtml = "";
 	$.each(result, function(i, reviewItem) {
 		var scoreFixVal = 1;
@@ -10607,7 +10615,11 @@ function paintReviews(result, isRequestFromDashBoard){
 		$('#reviews-container').show();
 	}
 
-	hideLoaderOnPagination($('#prof-review-item'));
+	if(isRequestFromDashBoard){
+		hideLoaderOnPagination($('#review-details'));
+	} else { 
+		hideLoaderOnPagination($('#prof-review-item'));
+	}
 	/*if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
 		$("#prof-review-item").html('');
 	}*/
