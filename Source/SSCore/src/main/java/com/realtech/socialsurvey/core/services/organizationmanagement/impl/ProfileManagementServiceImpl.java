@@ -4008,6 +4008,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         Response response = null;
 
                         try {
+                            // Replace - with spaces in zillow screen name
+                            zillowScreenName = zillowScreenName.replaceAll( "-", " " );
                             response = zillowIntegrationApi
                                 .fetchZillowReviewsByScreennameWithMaxCount( zwsId, zillowScreenName );
                         } catch ( Exception e ) {
