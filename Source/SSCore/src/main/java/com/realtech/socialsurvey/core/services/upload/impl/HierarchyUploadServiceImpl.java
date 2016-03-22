@@ -212,7 +212,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
 
             // check if region is added or modified
-            if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions() ) ) {
+            if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions(), uploadedRegions ) ) {
                 validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
                 uploadedRegion.setRegionAdded( true );
                 validationObject.getUpload().getRegions().add( uploadedRegion );
@@ -324,7 +324,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 continue;
             }
             // check if branch is added or modified
-            if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches() ) ) {
+            if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches(), uploadedBranches ) ) {
                 validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
                 uploadedBranch.setBranchAdded( true );
                 validationObject.getUpload().getBranches().add( uploadedBranch );
@@ -501,16 +501,17 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 continue;
             }
             // check if region is added or modified
-            if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions() ) ) {
+            // if duplicate record
+            if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions(), uploadedRegions ) ) {
                 validationObject.setNumberOfRegionsAdded( validationObject.getNumberOfRegionsAdded() + 1 );
                 uploadedRegion.setRegionAdded( true );
                 validationObject.getUpload().getRegions().add( uploadedRegion );
             } else {
                 updateUploadValidationWithModifiedRegion( uploadedRegion, validationObject, regionMap );
             }
-            uploadedRegions.add( uploadedRegion );
             //check for duplicate source ids
             checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
+            uploadedRegions.add( uploadedRegion );
         }
         List<String> errors = new ArrayList<String>();
         if ( !sourceRegionIdErrors.isEmpty() ) {
@@ -631,7 +632,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 continue;
             }
             // check if branch is added or modified
-            if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches() ) ) {
+            if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches(), uploadedBranches ) ) {
                 validationObject.setNumberOfBranchesAdded( validationObject.getNumberOfBranchesAdded() + 1 );
                 uploadedBranch.setBranchAdded( true );
                 validationObject.getUpload().getBranches().add( uploadedBranch );
@@ -860,44 +861,31 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         return true;
     }
 
-
-    boolean isNewRegion( RegionUploadVO uploadedRegion, List<RegionUploadVO> uploadedRegions )
+   
+    boolean isNewRegion( RegionUploadVO uploadedRegion, List<RegionUploadVO> existingRegions,
+        List<RegionUploadVO> uploadedRegions )
     {
-        if ( uploadedRegions != null && !uploadedRegions.contains( uploadedRegion ) ) {
+        if ( existingRegions != null && !existingRegions.contains( uploadedRegion ) ) {
             return true;
         } else if ( uploadedRegion.getSourceRegionId() == null || uploadedRegion.getSourceRegionId().isEmpty() ) {
             return true;
-        } else if ( uploadedRegion.getRegionName() != null && !uploadedRegion.getRegionName().isEmpty() ) {
-            RegionUploadVO curRegion = uploadedRegions.get( uploadedRegions.indexOf( uploadedRegion ) );
-            if ( curRegion.getRegionName() != null && !curRegion.getRegionName().isEmpty() ) {
-                if ( !curRegion.getRegionName().equalsIgnoreCase( uploadedRegion.getRegionName() ) ) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            return false;
+        } else if ( uploadedRegions.contains( uploadedRegion ) ) {
+            return true;
         }
+        return false;
     }
 
 
-    boolean isNewBranch( BranchUploadVO uploadedBranch, List<BranchUploadVO> uploadedBranches )
+    boolean isNewBranch( BranchUploadVO uploadedBranch, List<BranchUploadVO> existingBranches, List<BranchUploadVO> uploadedBranches )
     {
-        if ( uploadedBranches != null && !uploadedBranches.contains( uploadedBranch ) ) {
+        if ( existingBranches != null && !existingBranches.contains( uploadedBranch ) ) {
             return true;
         } else if ( uploadedBranch.getSourceBranchId() == null || uploadedBranch.getSourceBranchId().isEmpty() ) {
             return true;
-        } else if ( uploadedBranch.getBranchName() != null && !uploadedBranch.getBranchName().isEmpty() ) {
-            BranchUploadVO curBranch = uploadedBranches.get( uploadedBranches.indexOf( uploadedBranch ) );
-            if ( curBranch.getBranchName() != null && !curBranch.getBranchName().isEmpty() ) {
-                if ( !curBranch.getBranchName().equalsIgnoreCase( uploadedBranch.getBranchName() ) ) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            return false;
+        } else if ( uploadedBranches.contains( uploadedBranch ) ) {
+            return true;
         }
+        return false;
     }
 
 
