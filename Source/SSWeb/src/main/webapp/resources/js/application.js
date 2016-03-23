@@ -588,7 +588,7 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-grph-srch-survey-div").show();
 	//get profile data for all the records , noOfDays = -1
 	showProfileDetails(newProfileName, newProfileValue, -1);
-	bindSelectButtons();
+	bindSelectButtons(newProfileValue);
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
@@ -603,7 +603,7 @@ function showRegionAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-grph-srch-survey-div").show();
 	//get profile data for all the records , noOfDays = -1
 	showProfileDetails(newProfileName, newProfileValue, -1);
-	bindSelectButtons();
+	bindSelectButtons(newProfileValue);
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
@@ -618,7 +618,7 @@ function showBranchAdminFlow(newProfileName, newProfileValue) {
 	$("#dsh-grph-srch-survey-div").show();
 	//get profile data for all the records , noOfDays = -1
 	showProfileDetails(newProfileName, newProfileValue, -1);
-	bindSelectButtons();
+	bindSelectButtons(newProfileValue);
 	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
 		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
@@ -633,7 +633,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#dsh-grph-srch-survey-div").hide();
 	//get profile data for all the records , noOfDays = -1
 	showProfileDetails(newProfileName, newProfileValue, -1);
-	bindSelectButtons();
+	bindSelectButtons(newProfileValue);
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
@@ -729,7 +729,7 @@ function updateDashboardProfileEvents() {
 }
 
 
-function bindSelectButtons() {
+function bindSelectButtons(newProfileValue) {
 	$("#selection-list").unbind('change');
 	$("#graph-sel-list").unbind('change');
 	$("#dsh-grph-format").unbind('change');
@@ -741,8 +741,15 @@ function bindSelectButtons() {
 		
 		if ($("#selection-list").val() == 'companyId') {
 			$('#dsh-srch-survey-div').hide();
-			showSurveyStatistics('companyId', 0);
-		} else {
+			showSurveyStatistics('companyId', newProfileValue);
+		} else if($("#selection-list").val() == 'regionId'){
+			$('#dsh-srch-survey-div').hide();
+			showSurveyStatistics('regionId', newProfileValue);
+		}else if($("#selection-list").val() == 'branchId'){
+			$('#dsh-srch-survey-div').hide();
+			showSurveyStatistics('branchId', newProfileValue);
+		}
+		else{
 			$('#dsh-srch-survey-div').show();
 		}
 	});
@@ -752,8 +759,14 @@ function bindSelectButtons() {
 		
 		if ($("#graph-sel-list").val() == 'companyId') {
 			$('#dsh-grph-srch-survey-div').hide();
-			showSurveyStatisticsGraphically('companyId', 0);
-		} else {
+			showSurveyStatisticsGraphically('companyId', newProfileValue);
+		} else if($("#graph-sel-list").val() == 'regionId'){
+			$('#dsh-grph-srch-survey-div').hide();
+			showSurveyStatisticsGraphically('regionId', newProfileValue);
+		}else if($("#graph-sel-list").val() == 'branchId'){
+			$('#dsh-grph-srch-survey-div').hide();
+			showSurveyStatisticsGraphically('branchId', newProfileValue);
+		}else {
 			$('#dsh-grph-srch-survey-div').show();
 		}
 	});
@@ -812,10 +825,14 @@ function populateSurveyStatisticsList(columnName) {
 	}
 	if ((columnName == "companyId") && (accountType == "ENTERPRISE")) {
 		options += "<option value=regionName>Region</option>";
+	}else if((columnName == "regionId") && (accountType == "ENTERPRISE")){
+		options += "<option value=regionId>Region</option>";
 	}
 	if (accountType == "ENTERPRISE" || accountType == "COMPANY") {
 		if (columnName == "companyId" || columnName == "regionId") {
 			options += "<option value=branchName>Office</option>";
+		}else if(columnName == "branchId"){
+			options += "<option value=branchId>Office</option>";
 		}
 	}
 	if (columnName == "companyId" || columnName == "regionId" || columnName == "branchId") {
@@ -826,6 +843,9 @@ function populateSurveyStatisticsList(columnName) {
 	$("#graph-sel-list").html(options);
 	
 	if (columnName == "companyId") {
+		$('#dsh-srch-survey-div').hide();
+		$('#dsh-grph-srch-survey-div').hide();
+	}else if(columnName == "regionId"||columnName == "branchId"){
 		$('#dsh-srch-survey-div').hide();
 		$('#dsh-grph-srch-survey-div').hide();
 	}
