@@ -2200,7 +2200,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         // String facebookMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
         //    + "-star review on" + ( isZillow ? " Zillow via" : " " ) + "SocialSurvey saying : \"" + feedback
         //    + "\".\nView this and more at " + linkUrl + "/";
-        String facebookMessage = ratingFormat.format( rating ) + " Star review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
+        String facebookMessage = ratingFormat.format( rating ) + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
             + " \u2014 " + feedback + " by " + customerDisplayName + " for " + agentName + "\n" + linkUrl;
         return facebookMessage;
     }
@@ -2217,7 +2217,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         // String linkedinMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
         //    + "-star review on" + ( isZillow ? " Zillow via " : " " ) + "SocialSurvey saying : \"" + linkedInComment
         //    + "\". View this and more at " + linkUrl;
-        String linkedinMessage = ratingFormat.format( rating ) + " Star review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
+        String linkedinMessage = ratingFormat.format( rating ) + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
             + " &dash; " + linkedInComment + " by " + customerDisplayName + " for " + agentName + "&lmnlf;" + linkUrl;
         return linkedinMessage;
     }
@@ -2230,7 +2230,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         // String twitterMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
         //    + "-star review" + ( isZillow ? " @Zillow via " : " " ) + "@SocialSurveyMe. "
         //    + linkUrl;
-        String twitterMessage = ratingFormat.format( rating ) + " Star review on " + ( isZillow ? "#Zillow" : "#SocialSurvey" )
+        String twitterMessage = ratingFormat.format( rating ) + " Star Review on " + ( isZillow ? "#Zillow" : "#SocialSurvey" )
             + " by " + customerDisplayName + " for " + agentName + "\n"+ linkUrl;
         return twitterMessage;
     }

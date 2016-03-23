@@ -121,6 +121,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private UserInviteDao userInviteDao;
 
     @Autowired
+    private GenericDao<LicenseDetail, Long> licenseDetailsDao;
+
+    @Autowired
     private GenericDao<Company, Long> companyDao;
 
     @Autowired
@@ -149,9 +152,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Resource
     @Qualifier ( "userEmailMapping")
     private UserEmailMappingDao userEmailMappingDao;
-
-    @Autowired
-    private GenericDao<LicenseDetail, Long> licenseDetailsDao;
 
     @Resource
     @Qualifier ( "branch")
