@@ -23,7 +23,7 @@
 		</c:choose>
 		<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 			data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
-			data-review="${feedback.review}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
+			data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
 			
 			<div class="ppl-header-wrapper clearfix">
 				<div class="float-left ppl-header-left">
@@ -53,6 +53,9 @@
 					</c:if>
 				</div>
 			</div>
+			<c:if test="${ not empty feedback.summary }">
+				<div class="ppl-content">${feedback.summary}</div>
+			</c:if>
 			<div class="ppl-content">${feedback.review}</div>
 			<div class="ppl-share-wrapper clearfix share-plus-height">
 				<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div>

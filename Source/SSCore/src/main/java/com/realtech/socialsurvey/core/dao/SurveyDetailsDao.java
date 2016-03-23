@@ -247,4 +247,7 @@ public interface SurveyDetailsDao
 
     public List<SurveyDetails> getFeedbacksForReports( String columnName, long columnValue, int start, int rows, double startScore,
         double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria );
+
+
+    public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
 }

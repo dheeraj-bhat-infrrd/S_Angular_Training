@@ -84,7 +84,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -442,19 +441,23 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             + agentContactDetailsSettings.getFirstName() + " is the "
                             + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle : "" ) + " of " + companyName + ".";
 
-                        String logoUrl = applicationLogoUrlForLinkedin;
+                        String imageUrl = applicationLogoUrlForLinkedin;
 
-                        if ( agentSettings.getLogo() != null && !agentSettings.getLogo().isEmpty() ) {
-                            logoUrl = agentSettings.getLogo();
+                        if ( agentSettings.getProfileImageUrl() != null && !agentSettings.getProfileImageUrl().isEmpty() ) {
+                            imageUrl = agentSettings.getProfileImageUrl();
                         } else if ( companySettings.getLogo() != null && !companySettings.getLogo().isEmpty() ) {
-                            logoUrl = companySettings.getLogo();
+                            imageUrl = companySettings.getLogo();
                         }
 
+                        String profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                            + agentSettings.getProfileUrl();
                         message = StringEscapeUtils.escapeXml( message );
+
+                        message = message.replace( "&amp;lmnlf;", "\\n" ).replace( "&amp;dash;", "\\u2014" );
 
                         String linkedPostJSON = "{\"comment\": \"" + message + "\",\"content\": {" + "\"title\": \"" + title
                             + "\"," + "\"description\": \"" + description + "\","
-                            + "\"submitted-url\": \"" + linkedinProfileUrl + "\",  " + "\"submitted-image-url\": \"" + logoUrl
+                            + "\"submitted-url\": \"" + profileUrl + "\",  " + "\"submitted-image-url\": \"" + imageUrl
                             + "\"}," + "\"visibility\": {\"code\": \"anyone\" }}";
                         StringEntity entity = new StringEntity( linkedPostJSON );
                         post.setEntity( entity );
@@ -1670,17 +1673,26 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 //                    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
                 //                facebookMessage += "\n Feedback : " + feedback;
 
-                String facebookMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
-                    + "-star review on SocialSurvey saying : \"" + feedback + "\".\nView this and more at "
-                    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                // String facebookMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+                //    + "-star review on SocialSurvey saying : \"" + feedback + "\".\nView this and more at "
+                //    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink+"/";
+
+                String facebookMessage = buildFacebookAutoPostMessage( customerDisplayName, agentName, rating, ratingFormat,
+                    feedback, surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                        + agentProfileLink + "/", false );
 
                 postToFacebookForHierarchy( facebookMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
 
                 // LinkedIn
-                String linkedinMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
-                    + "-star review on SocialSurvey saying : \"" + feedback + "\". View this and more at "
-                    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                // String linkedinMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+                //    + "-star review on SocialSurvey saying : \"" + feedback + "\". View this and more at "
+                //    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+
+                String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating, ratingFormat,
+                    feedback, surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                        + agentProfileLink, false );
+
                 String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                     + agentProfileLink;
                 String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
@@ -1694,9 +1706,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 //    customerDisplayName, agentName, "@SocialSurveyMe" )
                 //    + surveyHandler.getApplicationBaseUrl()
                 //    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-                String twitterMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
-                    + "-star review @SocialSurveyMe. " + surveyHandler.getApplicationBaseUrl()
-                    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                // String twitterMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+                //    + "-star review @SocialSurveyMe. " + surveyHandler.getApplicationBaseUrl()
+                //    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+                String twitterMessage = buildTwitterAutoPostMessage( customerDisplayName, agentName, rating, ratingFormat,
+                    feedback, surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                        + agentProfileLink, false );
                 postToTwitterForHierarchy( twitterMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
 
@@ -2097,10 +2112,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate )
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate, String postedOn )
     {
         externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating, autoPostStatus,
-            complaintResolutionStatus, reviewDate );
+            complaintResolutionStatus, reviewDate, postedOn );
     }
 
 
@@ -2175,5 +2190,48 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         LOG.debug( "method getProcessedPreInitiatedSurveys called for email id : " + emailAddress );
         surveyPreInitiationDao.updateSurveyPreinitiationRecordsAsIgnored( emailAddress );
+    }
+
+
+    @Override
+    public String buildFacebookAutoPostMessage( String customerDisplayName, String agentName, double rating,
+        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow )
+    {
+        // String facebookMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+        //    + "-star review on" + ( isZillow ? " Zillow via" : " " ) + "SocialSurvey saying : \"" + feedback
+        //    + "\".\nView this and more at " + linkUrl + "/";
+        String facebookMessage = ratingFormat.format( rating ) + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
+            + " \u2014 " + feedback + " by " + customerDisplayName + " for " + agentName + "\n" + linkUrl;
+        return facebookMessage;
+    }
+
+
+    @Override
+    public String buildLinkedInAutoPostMessage( String customerDisplayName, String agentName, double rating,
+        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow )
+    {
+        String linkedInComment = feedback != null && feedback.length() > 500 ? feedback.substring( 0, 500 ) : feedback;
+        linkedInComment = feedback != null && feedback.length() > 500 ? ( linkedInComment.substring( 0,
+            linkedInComment.lastIndexOf( " " ) ) + " ..." ) : linkedInComment;
+
+        // String linkedinMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+        //    + "-star review on" + ( isZillow ? " Zillow via " : " " ) + "SocialSurvey saying : \"" + linkedInComment
+        //    + "\". View this and more at " + linkUrl;
+        String linkedinMessage = ratingFormat.format( rating ) + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
+            + " &dash; " + linkedInComment + " by " + customerDisplayName + " for " + agentName + "&lmnlf;" + linkUrl;
+        return linkedinMessage;
+    }
+
+
+    @Override
+    public String buildTwitterAutoPostMessage( String customerDisplayName, String agentName, double rating,
+        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow )
+    {
+        // String twitterMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
+        //    + "-star review" + ( isZillow ? " @Zillow via " : " " ) + "@SocialSurveyMe. "
+        //    + linkUrl;
+        String twitterMessage = ratingFormat.format( rating ) + " Star Review on " + ( isZillow ? "#Zillow" : "#SocialSurvey" )
+            + " by " + customerDisplayName + " for " + agentName + "\n"+ linkUrl;
+        return twitterMessage;
     }
 }
