@@ -22,7 +22,7 @@
 		</c:choose>
 		<div data-firstname="${reviewItem.customerFirstName}"
 			data-lastname="${reviewItem.customerLastName}"
-			data-review="${reviewItem.review}" data-score="${reviewItem.score}"
+			data-review="${fn:escapeXml(feedback.review)}" data-score="${reviewItem.score}"
 			data-agentname="${reviewItem.agentName}" class="ppl-review-item dsh-review-cont hide">
 
 			<div class="ppl-header-wrapper clearfix">
@@ -40,6 +40,9 @@
 					</div>
 				</div>
 			</div>
+			<c:if test="${ not empty reviewItem.summary }">
+				<div class="ppl-content">${reviewItem.summary}</div>
+			</c:if>
 			<div class="ppl-content">${reviewItem.review}</div>
 			<div class="ppl-share-wrapper clearfix share-plus-height">
 				<div class="float-left blue-text ppl-share-shr-txt">

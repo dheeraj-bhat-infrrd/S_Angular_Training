@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.WordUtils;
 import org.jsoup.Jsoup;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -200,20 +200,27 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                                     if ( checkReviewCanBePostedToSocialMedia( zillowTempPost, agentSetting, companySettings,
                                         surveyDetails ) ) {
                                         // post the zillow review to social media
+                                        List<String> postedOnList = null;
                                         boolean autoPostSuccess = false;
+                                        String postedOn = "";
                                         try {
-                                            autoPostSuccess = postToSocialMedia( zillowTempPost, agentSetting, surveyDetails, agentSetting );
+                                            postedOnList = postToSocialMedia( zillowTempPost, agentSetting, surveyDetails,
+                                                agentSetting );
                                         } catch ( Exception e ) {
                                             LOG.error( "Error occurred while posting to social media. Reason", e );
                                         }
                                         int postToSocialMedia = 0;
-                                        if ( autoPostSuccess ) {
+                                        if ( postedOnList != null && postedOnList.size() > 0 ) {
                                             postToSocialMedia = CommonConstants.YES;
+                                            autoPostSuccess = true;
+                                            postedOn = postedOnList.toString().replace( "[", "" ).replace( "]", "" )
+                                                .replace( ", ", "," );
                                         }
-                                        
+
                                         // check review for complaint resolution
                                         boolean complaintResStatus = triggerComplaintResolutionWorkflowForZillowReview(
-                                            companySettings, zillowTempPost, surveyDetails, agentSetting, postToSocialMedia );
+                                            companySettings, zillowTempPost, surveyDetails, agentSetting, postToSocialMedia,
+                                            postedOn );
 
                                         if ( !complaintResStatus && autoPostSuccess ) {
                                             // add to external survey tracker
@@ -222,7 +229,8 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                                                 CommonConstants.SURVEY_SOURCE_ZILLOW, agentSetting.getSocialMediaTokens()
                                                     .getZillowToken().getZillowProfileLink(),
                                                 zillowTempPost.getZillowReviewUrl(), zillowTempPost.getZillowReviewRating(),
-                                                postToSocialMedia, CommonConstants.NO, zillowTempPost.getZillowReviewDate() );
+                                                postToSocialMedia, CommonConstants.NO, zillowTempPost.getZillowReviewDate(),
+                                                postedOn );
                                         }
                                     }
                                     // add to zillow temp post id to processed list
@@ -240,7 +248,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 
                 } catch ( Exception e ) {
                     LOG.error( "Exception occurred while processing zillow for company id : " + company.getCompanyId() );
-                  //update batch tracker with error message
+                    //update batch tracker with error message
                     batchTrackerService.updateErrorForBatchTrackerByBatchType(
                         CommonConstants.BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER, e.getMessage() );
                     //send report bug mail to admin
@@ -327,13 +335,12 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
          return null;
      }*/
 
-    public boolean postToSocialMedia( ZillowTempPost zillowTempPost, OrganizationUnitSettings organizationUnitSettings,
+    public List<String> postToSocialMedia( ZillowTempPost zillowTempPost, OrganizationUnitSettings organizationUnitSettings,
         SurveyDetails surveyDetails, OrganizationUnitSettings agentSettings ) throws NonFatalException
     {
 
         LOG.info( "Method to post feedback of customer to various pages of social networking sites started." );
-        boolean successfullyPosted = true;
-
+        List<String> postedOnList = new ArrayList<String>();
         try {
 
             DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
@@ -345,8 +352,8 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                 long agentId = organizationUnitSettings.getIden();
                 User agent = userManagementService.getUserByUserId( agentId );
                 ContactDetailsSettings contactDetailSettings = organizationUnitSettings.getContact_details();
-                String agentName = emailFormatHelper.getCustomerDisplayNameForEmail( contactDetailSettings.getFirstName(),
-                    contactDetailSettings.getLastName() );
+                String agentName = contactDetailSettings.getName();
+                String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( surveyDetails.getCustomerFirstName(), "" );
                 int accountMasterId = 0;
                 try {
                     AccountsMaster masterAccount = agent.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
@@ -355,7 +362,6 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                 } catch ( NullPointerException e ) {
                     LOG.error( "NullPointerException caught in postToSocialMedia() while fetching account master id for agent "
                         + agent.getFirstName() );
-                    successfullyPosted = false;
                 }
 
                 Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
@@ -391,7 +397,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 
                 // Since auto post flag is not set true in hierarchy
                 if ( false || doAutoPost ) {
-                    return false;
+                    return postedOnList;
                 }
 
                 SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
@@ -511,23 +517,32 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                     profileLink = zillowTempPost.getZillowReviewSourceLink();
                 }
 
-                String facebookMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
-                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
-                    + "-star review on Zillow via SocialSurvey saying : \"" + feedback + "\"\nView this and more at "
-                    + profileLink;
+                // String facebookMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review on Zillow via SocialSurvey saying : \"" + feedback + "\"\nView this and more at "
+                //    + zillowTempPost.getZillowReviewUrl();
+
+                String facebookMessage = socialManagementService.buildFacebookAutoPostMessage( customerDisplayName, agentName,
+                    zillowTempPost.getZillowReviewRating(), ratingFormat, feedback, zillowTempPost.getZillowReviewUrl(), true );
 
                 socialManagementService.postToFacebookForHierarchy( facebookMessage, zillowTempPost.getZillowReviewRating(),
                     zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
 
+                String linkedInComment = feedback != null && feedback.length() > 500 ? feedback.substring( 0, 500 ) : feedback;
+                linkedInComment = feedback != null && feedback.length() > 500 ? ( linkedInComment.substring( 0,
+                    linkedInComment.lastIndexOf( " " ) ) + " ..." ) : linkedInComment;
+
                 // LinkedIn
-                String linkedinMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
-                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
-                    + "-star review on Zillow via SocialSurvey saying : \""
-                    + ( feedback != null && feedback.length() > 500 ? feedback.substring( 0, 500 ) : feedback )
-                    + "\". View this and more at " + profileLink;
-                // String linkedinProfileUrl = zillowTempPost.getZillowReviewUrl();
-                String linkedinProfileUrl = profileLink;
+                // String linkedinMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review on Zillow via SocialSurvey saying : \"" + linkedInComment + "\". View this and more at "
+                //    + zillowTempPost.getZillowReviewUrl();
+
+                String linkedinMessage = socialManagementService.buildLinkedInAutoPostMessage( customerDisplayName, agentName,
+                    zillowTempPost.getZillowReviewRating(), ratingFormat, feedback, zillowTempPost.getZillowReviewUrl(), true );
+
+                String linkedinProfileUrl = zillowTempPost.getZillowReviewUrl();
                 String linkedinMessageFeedback = "From : " + surveyDetails.getCustomerFirstName() + " - " + feedback;
 
                 socialManagementService.postToLinkedInForHierarchy( linkedinMessage, zillowTempPost.getZillowReviewRating(),
@@ -539,9 +554,12 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                 //    ratingFormat.format( zillowTempPost.getZillowReviewRating() ), surveyDetails.getCustomerFirstName(),
                 //    agentName, "@SocialSurveyMe" ) + zillowTempPost.getZillowReviewUrl();
 
-                String twitterMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
-                    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
-                    + "-star review @Zillow via @SocialSurveyMe. " + profileLink;
+                // String twitterMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review @Zillow via @SocialSurveyMe. " + profileLink;
+
+                String twitterMessage = socialManagementService.buildTwitterAutoPostMessage( customerDisplayName, agentName,
+                    zillowTempPost.getZillowReviewRating(), ratingFormat, feedback, zillowTempPost.getZillowReviewUrl(), true );
 
                 socialManagementService.postToTwitterForHierarchy( twitterMessage, zillowTempPost.getZillowReviewRating(),
                     zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,
@@ -557,42 +575,57 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 
                 // check if auto post triggered anywhere in hierarchy
                 if ( agentSocialList != null && agentSocialList.size() > 0 ) {
-                    return true;
+                    for ( String agentSocialPostMedia : agentSocialList ) {
+                        if ( !postedOnList.contains( agentSocialPostMedia ) ) {
+                            postedOnList.add( agentSocialPostMedia );
+                        }
+                    }
                 } else if ( companySocialList != null && companySocialList.size() > 0 ) {
-                    return true;
+                    for ( String companySocialPostMedia : companySocialList ) {
+                        if ( !postedOnList.contains( companySocialPostMedia ) ) {
+                            postedOnList.add( companySocialPostMedia );
+                        }
+                    }
                 } else if ( socialMediaPostDetails != null && socialMediaPostDetails.getRegionMediaPostDetailsList() != null ) {
                     for ( RegionMediaPostDetails regionMediaPostDetailsList : socialMediaPostDetails
                         .getRegionMediaPostDetailsList() ) {
                         if ( regionMediaPostDetailsList != null && regionMediaPostDetailsList.getSharedOn() != null
-                            && regionMediaPostDetailsList.getSharedOn().size() > 0 )
-                            return true;
+                            && regionMediaPostDetailsList.getSharedOn().size() > 0 ) {
+                            for ( String regionSocialPostMedia : regionMediaPostDetailsList.getSharedOn() ) {
+                                if ( !postedOnList.contains( regionSocialPostMedia ) ) {
+                                    postedOnList.add( regionSocialPostMedia );
+                                }
+                            }
+                        }
                     }
                 } else if ( socialMediaPostDetails != null && socialMediaPostDetails.getBranchMediaPostDetailsList() != null ) {
                     for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
                         .getBranchMediaPostDetailsList() ) {
                         if ( branchMediaPostDetails != null && branchMediaPostDetails.getSharedOn() != null
-                            && branchMediaPostDetails.getSharedOn().size() > 0 )
-                            return true;
+                            && branchMediaPostDetails.getSharedOn().size() > 0 ) {
+                            for ( String branchSocialPostMedia : branchMediaPostDetails.getSharedOn() ) {
+                                if ( !postedOnList.contains( branchSocialPostMedia ) ) {
+                                    postedOnList.add( branchSocialPostMedia );
+                                }
+                            }
+                        }
                     }
-                } else {
-                    return false;
                 }
             }
         } catch ( NonFatalException e ) {
             LOG.error(
                 "Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
                 e );
-            successfullyPosted = false;
             throw new NonFatalException( e.getMessage() );
         }
         LOG.info( "Method to post feedback of customer to various pages of social networking sites finished." );
-        return successfullyPosted;
-
+        return postedOnList;
     }
 
 
     private boolean triggerComplaintResolutionWorkflowForZillowReview( OrganizationUnitSettings companySettings,
-        ZillowTempPost zillowTempPost, SurveyDetails survey, OrganizationUnitSettings unitSettings, int autoPostSuccess )
+        ZillowTempPost zillowTempPost, SurveyDetails survey, OrganizationUnitSettings unitSettings, int autoPostSuccess,
+        String postedOn )
     {
         LOG.info( "Method to trigger complaint resolution workflow for a review, triggerComplaintResolutionWorkflowForZillowReview started." );
         // trigger complaint resolution workflow if configured
@@ -619,7 +652,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
                         zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW, unitSettings.getSocialMediaTokens()
                             .getZillowToken().getZillowProfileLink(), zillowTempPost.getZillowReviewUrl(),
                         zillowTempPost.getZillowReviewRating(), autoPostSuccess, CommonConstants.YES,
-                        zillowTempPost.getZillowReviewDate() );
+                        zillowTempPost.getZillowReviewDate(), postedOn );
                     return true;
                 } catch ( InvalidInputException | UndeliveredEmailException e ) {
                     LOG.error( "Error while sending complaint resolution mail to admins. Reason :", e );

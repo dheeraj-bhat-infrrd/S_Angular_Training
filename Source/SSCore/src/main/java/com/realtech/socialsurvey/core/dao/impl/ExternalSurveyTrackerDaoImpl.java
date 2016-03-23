@@ -40,7 +40,7 @@ public class ExternalSurveyTrackerDaoImpl extends GenericDaoImpl<ExternalSurveyT
     @Override
     @Transactional
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double reviewRating, int autoPostStatus, int complaintResolutionStatus,Timestamp reviewDate )
+        String reviewUrl, double reviewRating, int autoPostStatus, int complaintResolutionStatus,Timestamp reviewDate, String postedOn )
     {
         if ( checkExternalSurveyTrackerDetailsExist( entityColumnName, entityId, source, reviewUrl, reviewDate ) == null ) {
             ExternalSurveyTracker externalSurveyTracker = new ExternalSurveyTracker();
@@ -53,6 +53,7 @@ public class ExternalSurveyTrackerDaoImpl extends GenericDaoImpl<ExternalSurveyT
             externalSurveyTracker.setAutoPostStatus( autoPostStatus );
             externalSurveyTracker.setComplaintResolutionStatus( complaintResolutionStatus );
             externalSurveyTracker.setReviewDate( reviewDate );
+            externalSurveyTracker.setPostedOn( postedOn );
             externalSurveyTracker.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
             externalSurveyTracker.setCreatedBy( String.valueOf( entityId ) );
             externalSurveyTracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
