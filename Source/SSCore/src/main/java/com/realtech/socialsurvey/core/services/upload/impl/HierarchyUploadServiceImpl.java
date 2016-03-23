@@ -204,15 +204,16 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
     /**
      * Validates regions modified in the UI
-     * @param uploadedRegions
+     * @param inputRegions
      * @param validationObject
      */
-    void parseRegions( List<RegionUploadVO> uploadedRegions, UploadValidation validationObject,
+    void parseRegions( List<RegionUploadVO> inputRegions, UploadValidation validationObject,
         Map<String, String> sourceRegionIdErrors, boolean isAppend )
     {
-        if ( uploadedRegions == null ) {
-            uploadedRegions = new ArrayList<RegionUploadVO>();
+        if ( inputRegions == null ) {
+            inputRegions = new ArrayList<RegionUploadVO>();
         }
+        List<RegionUploadVO> uploadedRegions = new ArrayList<RegionUploadVO>();
         Map<String, Integer> regionMap = null;
         if ( validationObject != null && validationObject.getUpload() != null ) {
             regionMap = generateRegionIndexMap( validationObject.getUpload().getRegions() );
@@ -221,7 +222,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             regionMap = new HashMap<String, Integer>();
         }
 
-        for ( RegionUploadVO uploadedRegion : uploadedRegions ) {
+        for ( RegionUploadVO uploadedRegion : inputRegions ) {
             if ( isRegionUploadEmpty( uploadedRegion ) ) {
                 continue;
             }
@@ -237,6 +238,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
             //check for duplicate source ids
             checkForDuplicateSourceRegionIds( sourceRegionIdErrors, uploadedRegion );
+            uploadedRegions.add( uploadedRegion );
         }
         //In case of append mode, we skip deletion
         if ( !isAppend ) {
@@ -316,17 +318,18 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
     /**
      * Validates branches modified in the UI
-     * @param uploadedBranches
+     * @param inputBranches
      * @param validationObject
      */
-    void parseBranches( List<BranchUploadVO> uploadedBranches, UploadValidation validationObject,
+    void parseBranches( List<BranchUploadVO> inputBranches, UploadValidation validationObject,
         Map<String, String> sourceBranchIdErrors, boolean isAppend )
     {
-        if ( uploadedBranches == null ) {
-            uploadedBranches = new ArrayList<BranchUploadVO>();
+        if ( inputBranches == null ) {
+            inputBranches = new ArrayList<BranchUploadVO>();
         }
 
         Map<String, Integer> branchMap = null;
+        List<BranchUploadVO> uploadedBranches = new ArrayList<BranchUploadVO>();
         if ( validationObject != null && validationObject.getUpload() != null ) {
             branchMap = generateBranchIndexMap( validationObject.getUpload().getBranches() );
         }
@@ -334,7 +337,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             branchMap = new HashMap<String, Integer>();
         }
 
-        for ( BranchUploadVO uploadedBranch : uploadedBranches ) {
+        for ( BranchUploadVO uploadedBranch : inputBranches ) {
             if ( isBranchUploadEmpty( uploadedBranch ) ) {
                 continue;
             }
@@ -348,6 +351,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
             //check for duplicate source ids
             checkForDuplicateSourceBranchIds( sourceBranchIdErrors, uploadedBranch );
+            uploadedBranches.add( uploadedBranch );
         }
         //In case of append mode, we skip deletion
         if ( !isAppend ) {
