@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -59,9 +60,6 @@ public class UserManagementServiceImplTest
     private GenericDao<RemovedUser, Long> removedUserDao;
 
     @Mock
-    private GenericDao<LicenseDetail, Long> licenseDetailsDao;
-
-    @Mock
     private UserDao userDao;
 
     @Mock
@@ -71,7 +69,10 @@ public class UserManagementServiceImplTest
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     @Mock
-    private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
+    private UserEmailMappingDao userEmailMappingDao;
+
+    @Mock
+    private GenericDao<LicenseDetail, Long> licenseDetailsDao;
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
@@ -312,9 +313,8 @@ public class UserManagementServiceImplTest
     @Test ( expected = NoRecordsFetchedException.class)
     public void testSsUserAdditionAllowedForNullLicenceDetail() throws InvalidInputException, NoRecordsFetchedException
     {
-        Mockito.when(
-            licenseDetailsDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.anyString() ) )
-            .thenReturn( null );
+        Mockito.doReturn( null ).when( licenseDetailsDao )
+        .findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.any( Company.class ) );
         Company company = new Company();
         User user = new User();
         user.setCompany( company );
@@ -325,9 +325,8 @@ public class UserManagementServiceImplTest
     @Test ( expected = NoRecordsFetchedException.class)
     public void testSsUserAdditionAllowedForEmptyLicenceDetail() throws InvalidInputException, NoRecordsFetchedException
     {
-        Mockito.when(
-            licenseDetailsDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.anyString() ) )
-            .thenReturn( new ArrayList<LicenseDetail>() );
+        Mockito.doReturn( new ArrayList<LicenseDetail>() ).when( licenseDetailsDao )
+        .findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.any( Company.class ) );
         Company company = new Company();
         User user = new User();
         user.setCompany( company );
@@ -346,9 +345,10 @@ public class UserManagementServiceImplTest
         licenseDetail.setAccountsMaster( accountsMaster );
         licenceDetailList.add( licenseDetail );
 
-        Mockito.when(
-            licenseDetailsDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.anyString() ) )
-            .thenReturn( licenceDetailList );
+        Mockito
+            .when(
+                licenseDetailsDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(),
+                    Mockito.any( Company.class ) ) ).thenReturn( licenceDetailList );
 
         Company company = new Company();
         User user = new User();
@@ -369,9 +369,9 @@ public class UserManagementServiceImplTest
         licenseDetail.setAccountsMaster( accountsMaster );
         licenceDetailList.add( licenseDetail );
 
-        Mockito.when(
-            licenseDetailsDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.anyString() ) )
-            .thenReturn( licenceDetailList );
+        Mockito.doReturn( licenceDetailList ).when( licenseDetailsDao )
+        .findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.any( Company.class ) );
+        
         Mockito.when( userDao.getUsersCountForCompany( (Company) Mockito.anyObject() ) ).thenReturn( 2l );
 
         Company company = new Company();
@@ -393,9 +393,9 @@ public class UserManagementServiceImplTest
         licenseDetail.setAccountsMaster( accountsMaster );
         licenceDetailList.add( licenseDetail );
 
-        Mockito.when(
-            licenseDetailsDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.anyString() ) )
-            .thenReturn( licenceDetailList );
+        Mockito.doReturn( licenceDetailList ).when( licenseDetailsDao )
+        .findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(), Mockito.any( Company.class ) );
+        
         Mockito.when( userDao.getUsersCountForCompany( (Company) Mockito.anyObject() ) ).thenReturn( 3l );
 
         Company company = new Company();
