@@ -137,6 +137,33 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
         LOG.info( "Successfully sent registration invite mail" );
     }
+    
+    
+    @Async
+    @Override
+    public void sendCompanyRegistrationStageMail( String recipientMailId, String registrationStage, String name, String details )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method to send registration stage mail started" );
+        if ( registrationStage == null || registrationStage.isEmpty() ) {
+            throw new InvalidInputException( "Registration stage cannot be empty" );
+        }
+        if ( name == null || name.isEmpty() ) {
+            throw new InvalidInputException( "Name cannot be null" );
+        }
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_SUBJECT;
+
+        if ( details == null ) {
+            details = "";
+        }
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, registrationStage, details ) );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+    }
 
 
     @Async

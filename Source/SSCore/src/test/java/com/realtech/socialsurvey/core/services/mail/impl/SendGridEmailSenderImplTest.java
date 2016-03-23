@@ -54,7 +54,7 @@ public class SendGridEmailSenderImplTest
     @Test ( expected = InvalidInputException.class)
     public void testSendEmailByEmailEntityWithNullRecipients() throws InvalidInputException
     {
-        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity );
+        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity, false );
     }
 
 
@@ -62,7 +62,7 @@ public class SendGridEmailSenderImplTest
     public void testSendEmailByEmailEntityWithEmptyRecipients() throws InvalidInputException
     {
         emailEntity.setRecipients( new ArrayList<String>() );
-        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity );
+        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity, false );
     }
 
 
@@ -70,7 +70,7 @@ public class SendGridEmailSenderImplTest
     public void testSendEmailByEmailEntityWithNullBody() throws InvalidInputException
     {
         emailEntity.setRecipients( recipients );
-        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity );
+        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity, false );
     }
 
 
@@ -79,7 +79,7 @@ public class SendGridEmailSenderImplTest
     {
         emailEntity.setRecipients( recipients );
         emailEntity.setBody( TestConstants.TEST_EMPTY_STRING );
-        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity );
+        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity, false );
     }
 
 
@@ -88,7 +88,7 @@ public class SendGridEmailSenderImplTest
     {
         emailEntity.setRecipients( recipients );
         emailEntity.setBody( TestConstants.TEST_STRING );
-        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity );
+        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity, false );
     }
 
 
@@ -98,7 +98,7 @@ public class SendGridEmailSenderImplTest
         emailEntity.setRecipients( recipients );
         emailEntity.setBody( TestConstants.TEST_STRING );
         emailEntity.setSubject( TestConstants.TEST_EMPTY_STRING );
-        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity );
+        sendGridEmailSenderImpl.sendEmailByEmailEntity( emailEntity, false );
     }
 
 
