@@ -527,7 +527,7 @@ public class ZillowReviewProcessorAndAutoPostStarter extends QuartzJobBean
 
                 socialManagementService.postToFacebookForHierarchy( facebookMessage, zillowTempPost.getZillowReviewRating(),
                     zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,
-                    socialMediaPostResponseDetails );
+                    socialMediaPostResponseDetails, true );
 
                 String linkedInComment = feedback != null && feedback.length() > 500 ? feedback.substring( 0, 500 ) : feedback;
                 linkedInComment = feedback != null && feedback.length() > 500 ? ( linkedInComment.substring( 0,

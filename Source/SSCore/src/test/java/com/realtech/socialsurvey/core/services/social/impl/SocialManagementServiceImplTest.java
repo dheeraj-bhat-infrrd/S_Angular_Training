@@ -356,13 +356,13 @@ public class SocialManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPostToFacebookForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails() );
+        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails(), false );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testPostToFacebookForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null );
+        socialManagementServiceImpl.postToFacebookForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null, false );
     }
     
     @Test ( expected = InvalidInputException.class)

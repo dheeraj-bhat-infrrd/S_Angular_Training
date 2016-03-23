@@ -152,7 +152,7 @@ public interface SocialManagementService
 
 
     void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
-        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails )
+        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails, boolean isZillow )
         throws InvalidInputException, NoRecordsFetchedException;
 
 
