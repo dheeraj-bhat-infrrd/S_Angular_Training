@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
@@ -70,13 +71,16 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
     @Autowired
     private UserDao userDao;
-    
+
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
-    
+
     @Autowired
     private Utils utils;
-    
+
+    @Autowired
+    private UserProfileDao userProfileDao;
+
     private static char TYPE_USER = 'U';
     private static char TYPE_BRANCH = 'O';
     private static char TYPE_REGION = 'R';
@@ -516,9 +520,10 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         for ( RegionUploadVO regionUploadVO : regions ) {
             regionMap.put( regionUploadVO.getRegionId(), regionUploadVO );
         }
-        
+
         //Set BranchVOs
-        List<BranchUploadVO> branches = generateBranchUploadVOsForCompany( company, oldHierarchyUpload, hierarchyUpload, regionMap );
+        List<BranchUploadVO> branches = generateBranchUploadVOsForCompany( company, oldHierarchyUpload, hierarchyUpload,
+            regionMap );
         hierarchyUpload.setBranches( branches );
 
         //Set UserVOs
@@ -565,17 +570,26 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
         int start = 0;
         List<User> batchUserList = new ArrayList<User>();
+        Map<Long, List<UserProfile>> batchUserAndProfileMap;
+        List<Long> batchUserIds;
         do {
             batchUserList = userDao.getUsersForCompany( company, start, BATCH_SIZE );
+            batchUserIds = new ArrayList<Long>();
             if ( batchUserList != null && batchUserList.size() > 0 ) {
                 for ( User user : batchUserList ) {
+                    batchUserIds.add( user.getUserId() );
+                }
+                //get profiles for users
+                batchUserAndProfileMap = userProfileDao.getUserProfilesForUsers( batchUserIds );
+                //add batch profiles to profile list
+                for ( User user : batchUserList ) {
                     UserUploadVO userUploadVO = generateUserUploadVOForUser( user, regionMap, branchMap, oldSourceMap,
-                        newSourceMap );
+                        newSourceMap, batchUserAndProfileMap );
                     userVOs.add( userUploadVO );
                 }
             }
             start += BATCH_SIZE;
-        } while ( batchUserList != null && batchUserList.size() == BATCH_SIZE  );
+        } while ( batchUserList != null && batchUserList.size() == BATCH_SIZE );
         currentHierarchyUpload.setUserSourceMapping( newSourceMap );
 
         LOG.info( "Method to generate user upload VOs for company : " + company.getCompany() + " finished" );
@@ -590,8 +604,8 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
      * @throws InvalidInputException
      */
     public UserUploadVO generateUserUploadVOForUser( User user, Map<Long, RegionUploadVO> regionMap,
-        Map<Long, BranchUploadVO> branchMap, Map<Long, String> oldSourceMap, Map<String, Long> newSourceMap )
-        throws InvalidInputException
+        Map<Long, BranchUploadVO> branchMap, Map<Long, String> oldSourceMap, Map<String, Long> newSourceMap,
+        Map<Long, List<UserProfile>> userAndProfileMap ) throws InvalidInputException
     {
         if ( user == null ) {
             throw new InvalidInputException( "User is null" );
@@ -616,7 +630,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         userUploadVO.setBelongsToCompany( true );
 
         //Get list of branchIds, list of regionIds and isAgent
-        List<UserProfile> userProfiles = user.getUserProfiles();
+        List<UserProfile> userProfiles = userAndProfileMap.get( user.getUserId() );
         List<String> assignedBranchSourceIds = new ArrayList<String>();
         List<String> assignedRegionSourceIds = new ArrayList<String>();
         List<String> assignedBranchesAdmin = new ArrayList<String>();
@@ -678,13 +692,13 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 && !( agentSettings.getContact_details().getTitle().isEmpty() ) ) {
                 userUploadVO.setTitle( agentSettings.getContact_details().getTitle() );
             }
-            
+
             if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
                 userUploadVO.setEmailId( utils.unmaskEmailAddress( user.getEmailId() ) );
             } else {
                 userUploadVO.setEmailId( user.getEmailId() );
             }
-            
+
             if ( agentSettings.getContact_details().getContact_numbers() != null
                 && agentSettings.getContact_details().getContact_numbers().getWork() != null
                 && !( agentSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) ) {
@@ -714,7 +728,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         userUploadVO.setAssignedRegions( assignedRegionSourceIds );
         userUploadVO.setAssignedBranchesAdmin( assignedBranchesAdmin );
         userUploadVO.setAssignedRegionsAdmin( assignedRegionsAdmin );
-        
+
         //set the is verified column
         if ( user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED ) {
             userUploadVO.setUserVerified( false );
@@ -762,7 +776,8 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                     if ( branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
                         continue;
                     }
-                    BranchUploadVO branchUploadVO = generateBranchUploadVOForBranch( branch, oldSourceMap, newSourceMap, regionMap );
+                    BranchUploadVO branchUploadVO = generateBranchUploadVOForBranch( branch, oldSourceMap, newSourceMap,
+                        regionMap );
                     branchVOs.add( branchUploadVO );
                 }
             start += BATCH_SIZE;
