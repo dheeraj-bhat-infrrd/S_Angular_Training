@@ -8496,3 +8496,7 @@ label.url-change-input-label {
 	margin-right:auto;
 	width:100%;
 }
+.un-no-data{
+	font-size: 18px;
+    padding: 5px;
+}
