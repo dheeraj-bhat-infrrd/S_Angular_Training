@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import scala.Array;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
@@ -229,10 +232,10 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         LOG.info( "Method getUsersForUserIds called to fetch users for user ids : " + userIds );
         try {
             criteria.add( Restrictions.in( CommonConstants.USER_ID, userIds ) );
-            
+
             criteria.addOrder( Order.asc( "firstName" ) );
             criteria.addOrder( Order.asc( "lastName" ) );
-            
+
         } catch ( HibernateException hibernateException ) {
             throw new DatabaseException( "Exception caught in getUsersForUserIds() ", hibernateException );
         }
@@ -345,7 +348,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
             criteria.add( criterion );
-            
+
             if ( start > -1 )
                 criteria.setFirstResult( start );
             if ( batch > -1 )
@@ -356,8 +359,9 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
 
         List<Long> userIds = criteria.list();
-
-        List<User> users = getUsersForUserIds( userIds );
+        List<User> users = new ArrayList<User>();
+        if ( userIds != null && !userIds.isEmpty() )
+            users = getUsersForUserIds( userIds );
 
         return users;
     }
