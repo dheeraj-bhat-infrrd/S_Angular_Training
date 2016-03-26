@@ -2,6 +2,7 @@
 /.settings/*
 .gitignore
 .classpath
+.settings
 .project
 .springBeans
 Source/SSCore/.settings
