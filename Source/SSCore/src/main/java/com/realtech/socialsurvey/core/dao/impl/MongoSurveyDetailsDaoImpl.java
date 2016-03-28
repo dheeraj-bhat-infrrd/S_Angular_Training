@@ -1175,7 +1175,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public long getCompletedSurveyCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
-        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
+        Timestamp endDate, boolean filterAbusive, boolean filterZillowReviews ) throws InvalidInputException
     {
         LOG.info( "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
         if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
@@ -1205,6 +1205,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( startDate != null && endDate != null ) {
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+        }
+        if(filterZillowReviews){
+            query.addCriteria( Criteria.where( CommonConstants.SOURCE_COLUMN ).ne(CommonConstants.SURVEY_SOURCE_ZILLOW) );
         }
         LOG.debug( "Query: " + query.toString() );
         long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
