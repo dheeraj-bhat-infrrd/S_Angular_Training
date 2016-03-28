@@ -6809,8 +6809,12 @@ tr.u-tbl-header td {
 	line-height: 50px;
 }
 
-.smiley-rat-1 {
+/* .smiley-rat-1 {
 	background: url(../csssprites/smileys.png) no-repeat -15px -19px;
+} */
+.smiley-rat-1 {
+	background: url(../images/no-star.png) no-repeat;
+	background-size: contain;
 }
 
 .smiley-rat-2 {
