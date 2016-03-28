@@ -2104,13 +2104,13 @@ function paintMappedUser(usersList){
 					.forEach(function(arrayItem) {
 
 						untrack += '<div class="un-row">'
-								+ '						<div style="width:30%" class="float-left unmatchtab ss-name">'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-name" title="'+ undefinedval(arrayItem.firstName) + '">'
 								+ undefinedval(arrayItem.firstName)
 								+ '</div>'
-								+' <div class="hide ss-id">'
+								+' <div class="hide ss-id" title="'+ undefinedval(arrayItem.userId) + '">'
 								+undefinedval(arrayItem.userId)
 								+'</div>'
-								+ '						<div style="width:40%" class="float-left unmatchtab ss-eids">'
+								+ '						<div style="width:40%" class="float-left unmatchtab ss-eids" title="'+ undefinedval(arrayItem.mappedEmails) + '">'
 								+ undefinedval(arrayItem.mappedEmails)
 								+ '</div>'
 								+ '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab v-mapped-edit cursor-pointer"></div>'
@@ -2126,6 +2126,7 @@ function paintMappedUser(usersList){
 }
 function editMap(){
 	$('.v-mapped-edit').click(function(e) {
+		disableBodyScroll();
 	var id =  parseInt($(this).parent().find(".ss-id").text());
 	$('#current-user-id').val(id);
     var	payload={
@@ -2184,7 +2185,6 @@ function editEmailMap(response) {
         	  
         	  //save button
         	  $('#email-map-save').click(function(e) {
-        		  
         		  		//check if ajax is already running
         		  		if(isSaveEmailForUserRunning)
         		  			return;
@@ -2215,7 +2215,6 @@ function editEmailMap(response) {
 							"emailIds" : emails,
 							"agentId" : cureid
 						};
-						
 						isSaveEmailForUserRunning = true;
 						callAjaxPostWithPayloadData(
 								"./saveemailmappingsforuser.do", saveEmailMap,
@@ -2320,20 +2319,20 @@ function paintUnmatchedUser(usersList) {
 					.forEach(function(arrayItem) {
 
 						untrack += '<div class="un-row">'
-								+ '						<div style="width:10%" class="float-left unmatchtab ss-id">'
+								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.surveySourceId) + '">'
 								+ undefinedval(arrayItem.surveySourceId)
 								+ '</div>'
-								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid">'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="'+ undefinedval(arrayItem.agentEmailId) + '">'
 								+ undefinedval(arrayItem.agentEmailId)
 								+ '</div>'
-								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname">'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="'+ undefinedval(arrayItem.customerFirstName) + '">'
 								+ undefinedval(arrayItem.customerFirstName)
 								+ '<span style="margin-left:2px;">'
 								+ undefinedval(arrayItem.customerLastName)
-								+ '</span> <br> <span style="margin-left:2px;"> < '
+								+ '</span> <br> <span style="margin-left:2px;" title="'+ undefinedval(arrayItem.customerEmailId) + '"> < '
 								+ undefinedval(arrayItem.customerEmailId)
 								+ ' > </span></div>'
-								+ '						<div style="width:20%" class="float-left unmatchtab ss-date">'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.engagementClosedTime) + '">'
 								+ undefinedval(arrayItem.engagementClosedTime)
 								+ '</div>'
 								+ '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>'
@@ -2364,20 +2363,20 @@ function paintProcessedUser(usersList) {
 								action += "<br><span title="+ arrayItem.user.loginName + ">" + arrayItem.user.loginName +"</span> " 
 						}
 						unprocess += '<div class="un-row">'
-								+ '						<div style="width:10%" class="float-left unmatchtab ss-id">'
+								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.surveySourceId) + '">'
 								+ undefinedval(arrayItem.surveySourceId)
 								+ '</div>'
-								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid">'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="'+ undefinedval(arrayItem.agentEmailId) + '">'
 								+ undefinedval(arrayItem.agentEmailId)
 								+ '</div>'
-								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname">'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="'+ undefinedval(arrayItem.customerFirstName) + '">'
 								+ undefinedval(arrayItem.customerFirstName)
 								+ '<span style="margin-left:2px;">'
 								+ undefinedval(arrayItem.customerLastName)
-								+ '</span> <br> <span style="margin-left:2px;"> < '
+								+ '</span> <br> <span style="margin-left:2px;" title="'+ undefinedval(arrayItem.customerEmailId) + '"> < '
 								+ undefinedval(arrayItem.customerEmailId)
 								+ ' > </span></div>'
-								+ '						<div style="width:20%" class="float-left unmatchtab ss-date">'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.engagementClosedTime) + '">'
 								+ undefinedval(arrayItem.engagementClosedTime)
 								+ '</div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab" >'
@@ -2418,19 +2417,19 @@ function bindClickEventForProcessButton() {
 
 						var popup = '<div class="bd-hr-form-item clearfix">'
 								+ '	     <div class="float-left bd-frm-left-un">ID</div>'
-								+ '	      <div class="float-left bd-frm-right-un">'
+								+ '	      <div class="float-left bd-frm-right-un" title="'+ id + '">'
 								+ id
 								+ '</div>'
 								+ '	 </div>'
 								+ '	 <div class="bd-hr-form-item clearfix">'
 								+ '	     <div class="float-left bd-frm-left-un">User</div>'
-								+ '	      <div class="float-left bd-frm-right-un">'
+								+ '	      <div class="float-left bd-frm-right-un" title="'+  user + '">'
 								+ user
 								+ '</div>'
 								+ '	 </div>'
 								+ '<div class="bd-hr-form-item clearfix">'
 								+ '	     <div class="float-left bd-frm-left-un">Customer</div>'
-								+ '	      <div class="float-left bd-frm-right-un">'
+								+ '	      <div class="float-left bd-frm-right-un" title="'+  customer + '">'
 								+ customer
 								+ '</div>'
 								+ '	 </div><div class="bd-hr-form-item clearfix" id="ignore">'
