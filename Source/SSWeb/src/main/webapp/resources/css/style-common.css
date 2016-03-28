@@ -6809,13 +6809,13 @@ tr.u-tbl-header td {
 	line-height: 50px;
 }
 
-/* .smiley-rat-1 {
+ .smiley-rat-1 {
 	background: url(../csssprites/smileys.png) no-repeat -15px -19px;
-} */
-.smiley-rat-1 {
+} 
+ .smiley-rat-0 {
 	background: url(../images/no-star.png) no-repeat;
 	background-size: contain;
-}
+} 
 
 .smiley-rat-2 {
 	background: url(../csssprites/smileys.png) no-repeat -45px -19px;
@@ -6829,15 +6829,13 @@ tr.u-tbl-header td {
 	background: url(../csssprites/smileys.png) no-repeat -106px -19px;
 }
 
+.smiley-rat-5 {
+	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
+}
 .verified-badge {
 	background: url(../images/ss-verified-customer-badge.png) no-repeat;
 	cursor: pointer;
 }
-
-.smiley-rat-5 {
-	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
-}
-
 .smiley-bg-rat-1 {
 	background: url(../images/smiley-bg-rat-1.png) no-repeat center;
 }
