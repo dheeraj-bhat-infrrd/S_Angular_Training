@@ -399,4 +399,17 @@ public interface EmailServices
 
     public void sendZillowReviewComplaintHandleMail( String recipientMailId, String customerName, String rating, String reviewUrl )
         throws InvalidInputException, UndeliveredEmailException;
+
+    /**
+     * 
+     * @param recipientName
+     * @param recipientMailIds
+     * @param subject
+     * @param body
+     * @param attachmentsDetails
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    public void sendCustomMail( String recipientName, String recipientMailId, String subject, String body,
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
 }
