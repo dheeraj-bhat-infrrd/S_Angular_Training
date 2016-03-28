@@ -60,6 +60,7 @@
 						<option value="60"><spring:message code="label.duration.two.key" /></option>
 						<option value="90" ><spring:message code="label.duration.three.key" /></option>
 						<option value="365" selected><spring:message code="label.duration.four.key" /></option>
+						<option value="-1"><spring:message code="label.duration.five.key"/></option>
 					</select>
 				</div>
 			</div>
