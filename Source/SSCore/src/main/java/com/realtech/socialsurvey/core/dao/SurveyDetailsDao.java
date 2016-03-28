@@ -97,7 +97,7 @@ public interface SurveyDetailsDao
      * @return
      * @throws InvalidInputException
      */
-    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
+    public long getCompletedSurveyCount(String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate, Timestamp endDate, boolean filterAbusive, boolean filterZillowReviews ) throws InvalidInputException;
     /**
      * Gets an aggregated count for completed survey
      * @param organizationUnitColumn

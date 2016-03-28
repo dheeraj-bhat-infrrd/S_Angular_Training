@@ -294,7 +294,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     private long getCompletedSurveyCount( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
         boolean filterAbusive ) throws InvalidInputException
     {
-        return surveyDetailsDao.getCompletedSurveyCount( columnName, columnValue, startDate, endDate, filterAbusive );
+        return surveyDetailsDao.getCompletedSurveyCount( columnName, columnValue, startDate, endDate, filterAbusive, true );
     }
 
 
@@ -345,7 +345,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
-        return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue, false, true );
+        return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue, false, false );
     }
 
 

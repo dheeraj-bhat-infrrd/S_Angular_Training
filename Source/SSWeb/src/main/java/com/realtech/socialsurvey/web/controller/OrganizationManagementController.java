@@ -64,6 +64,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -152,6 +153,9 @@ public class OrganizationManagementController
 
     @Autowired
     private UploadValidationService uploadValidationService;
+    
+    @Autowired
+    private EmailServices emailServices;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -181,6 +185,9 @@ public class OrganizationManagementController
     private String sadTextComplete;
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
+    
+    @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
+    private String salesLeadEmail;
 
 
     /**
@@ -339,6 +346,29 @@ public class OrganizationManagementController
             LOG.debug( "Updating profile completion stage" );
             userManagementService.updateProfileCompletionStage( user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
                 CommonConstants.ADD_ACCOUNT_TYPE_STAGE );
+            
+            //TODO: specify details
+            String details = "First Name : " + user.getFirstName() + "<br/>" +
+                "Last Name : " + user.getLastName() + "<br/>" + 
+                "Email Address : "  + user.getEmailId() + "<br/>" +               
+                "Company Name : " + companyName + "<br/>" + 
+                "Address1 : " + address1 + "<br/>" + 
+                "Address2 : " + address2 + "<br/>" + 
+                "Country : " + country + "<br/>" + 
+                "Zipcode : " + zipCode + "<br/>" + 
+                "State : " + state + "<br/>" + 
+                "City : " + city + "<br/>" + 
+                "Contact Info : " + companyContactNo + "<br/>" +   
+                "Vertical : " + vertical;
+                ;
+            try {
+                emailServices.sendCompanyRegistrationStageMail( salesLeadEmail,
+                    CommonConstants.COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING, companyName, details );
+            } catch ( InvalidInputException e ) {
+                e.printStackTrace();
+            } catch ( UndeliveredEmailException e ) {
+                e.printStackTrace();
+            }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding company information. Reason :" + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );

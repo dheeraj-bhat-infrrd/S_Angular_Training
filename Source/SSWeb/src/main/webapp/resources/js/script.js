@@ -1901,6 +1901,7 @@ function paginateMappedUser(response){
 	if (reponseJson.errMessage) {
 		showError(reponseJson.errMessage);
 		$('#mapped').append("No Data found");
+		hideOverlay();
 	} else {
 		if (start == 0) {
 			var usersSize = reponseJson.totalRecord;
@@ -1914,6 +1915,10 @@ function paginateMappedUser(response){
 				}
 
 				$('#mapped-total-pages').text(totalPage);
+			}else if(usersSize == 0){
+				$('#mapped-no-data').html("No data found");
+				$('#mapped-no-data').show();
+				
 			}
 
 		}
@@ -1931,6 +1936,7 @@ function paginateUnmatchedUser(response) {
 	if (reponseJson.errMessage) {
 		showError(reponseJson.errMessage);
 		$('#new').append("No Data found");
+		hideOverlay();
 	} else {
 		if (start == 0) {
 			var usersSize = reponseJson.totalRecord;
@@ -1944,6 +1950,9 @@ function paginateUnmatchedUser(response) {
 				}
 
 				$('#un-new-total-pages').text(totalPage);
+			}else if(usersSize ==0){
+				$('#new-no-data').html("No data found");
+				$('#new-no-data').show();
 			}
 
 		}
@@ -1961,6 +1970,7 @@ function paginateProcessedUser(response) {
 	if (reponseJson.errMessage) {
 		showError(reponseJson.errMessage);
 		$('#processed').append("No Data found");
+		hideOverlay();
 	} else {
 		if (start == 0) {
 			var usersSize = reponseJson.totalRecord;
@@ -1975,6 +1985,9 @@ function paginateProcessedUser(response) {
 				}
 
 				$('#un-processed-total-pages').text(totalPage);
+			}else if(usersSize == 0){
+				$('#processed-no-data').html("No data found");
+				$('#processed-no-data').show();
 			}
 
 		}

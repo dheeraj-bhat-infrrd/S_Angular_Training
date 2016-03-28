@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -22,6 +23,7 @@ import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -95,7 +97,8 @@ public class HierarchyDownloadServiceImplTest
         Mockito.when( organizationManagementService.getAgentSettings( Mockito.anyLong() ) ).thenThrow(
             NoRecordsFetchedException.class );
         hierarchyDownloadServiceImpl.generateUserUploadVOForUser( null, new HashMap<Long, RegionUploadVO>(),
-            new HashMap<Long, BranchUploadVO>(), new HashMap<Long, String>(), new HashMap<String, Long>() );
+            new HashMap<Long, BranchUploadVO>(), new HashMap<Long, String>(), new HashMap<String, Long>(),
+            new HashMap<Long, List<UserProfile>>() );
     }
 
 
@@ -106,7 +109,8 @@ public class HierarchyDownloadServiceImplTest
         Mockito.when( organizationManagementService.getAgentSettings( Mockito.anyLong() ) ).thenThrow(
             NoRecordsFetchedException.class );
         hierarchyDownloadServiceImpl.generateUserUploadVOForUser( new User(), new HashMap<Long, RegionUploadVO>(),
-            new HashMap<Long, BranchUploadVO>(), new HashMap<Long, String>(), new HashMap<String, Long>() );
+            new HashMap<Long, BranchUploadVO>(), new HashMap<Long, String>(), new HashMap<String, Long>(),
+            new HashMap<Long, List<UserProfile>>() );
     }
 
 
@@ -125,7 +129,7 @@ public class HierarchyDownloadServiceImplTest
         hierarchyDownloadServiceImpl
             .getRegionUploadVOForRegion( null, new HashMap<Long, String>(), new HashMap<String, Long>() );
     }
-    
+
 
     @Test ( expected = InvalidInputException.class)
     public void generateBranchUploadVOForBranchTestBranchNull() throws InvalidInputException

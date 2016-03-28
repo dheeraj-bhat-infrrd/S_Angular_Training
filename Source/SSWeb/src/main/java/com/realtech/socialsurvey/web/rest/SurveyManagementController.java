@@ -56,7 +56,6 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -1906,10 +1905,13 @@ public class SurveyManagementController
         String phrase = null;
         if ( feedback != null && !feedback.isEmpty() ) {
             feedback = feedback.toLowerCase();
-            String[] swearList = surveyHandler.getSwearList();
-            for ( String swearWord : swearList ) {
-                if ( feedback.contains( swearWord ) ) {
-                    phrase = swearWord;
+            String[] swearWords = surveyHandler.getSwearList();
+            List<String> swearList = Arrays.asList( swearWords );
+            String reviewParts[] = feedback.split( " " );
+            for ( String reviewWord : reviewParts ) {
+                if ( swearList.contains( reviewWord.trim().toLowerCase() ) ) {
+                    LOG.info( "Method to check review for abusive words, checkReviewForSwearWords ended" );
+                    phrase = reviewWord;
                     break;
                 }
             }
