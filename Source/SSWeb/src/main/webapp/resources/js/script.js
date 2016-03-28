@@ -2806,9 +2806,9 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				// If not complete/error, keep making a request every 15 seconds
-				
 				if (!(jsonResponse.uploadStatus == 4
-						|| jsonResponse.uploadStatus == 5 || jsonResponse.uploadStatus == 6)) {
+						|| jsonResponse.uploadStatus == 5
+						|| jsonResponse.uploadStatus == 6 || jsonResponse.uploadStatus == -1)) {
 					$('#uploadBatchStatus').empty();
 					jsonResponse.response.forEach(function(uploadStatus) {
 						$('<div>' + uploadStatus.message + '</div>').appendTo(
