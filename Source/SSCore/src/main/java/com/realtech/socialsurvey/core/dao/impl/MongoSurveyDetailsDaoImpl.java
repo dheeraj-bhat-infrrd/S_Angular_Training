@@ -237,8 +237,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
-        update.set( CommonConstants.CREATED_ON, new Date() );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
@@ -261,8 +259,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, false );
         update.set( CommonConstants.IS_UNMARKED_ABUSIVE_COLUMN, true );
-        update.set( CommonConstants.CREATED_ON, new Date() );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
