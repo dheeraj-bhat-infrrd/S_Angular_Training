@@ -23,8 +23,12 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
 @Component
@@ -45,6 +49,12 @@ public class Utils
 
 	@Value("${EMAIL_MASKING_SUFFIX}")
 	private String maskingSuffix;
+
+    @Value ( "${SENDER_EMAIL_DOMAIN}")
+    private String defaultEmailDomain;
+
+    @Autowired
+    private EncryptionHelper encryptionHelper;
 
     /**
      * Method to generate region profile url based on company profile name and region profile name
@@ -314,5 +324,43 @@ public class Utils
         }
         LOG.info( "Method to check review for abusive words, checkReviewForSwearWords ended" );
         return false;
+    }
+
+
+    /**
+     * Method to encrypt user id in email id
+     * */
+    public String encryptUserEmailId( String emailId )
+    {
+        if ( emailId == null || emailId.isEmpty() ) {
+            LOG.error( "Email id passed is empty or null in encryptUserEmailId" );
+            return emailId;
+        }
+        LOG.info( "Method to encrypt user id in mail, encryptUserEmailId started" );
+        String newEmailId = emailId;
+        String agentEmailRegex = "u(\\d+)@" + Matcher.quoteReplacement( defaultEmailDomain );
+        Pattern pattern = Pattern.compile( agentEmailRegex );
+        Matcher matcher = pattern.matcher( emailId );
+        if ( matcher.find() ) {
+            LOG.info( "Mail id belongs to agent mail id format" );
+            LOG.info( "agent id from the mail id is " + matcher.group( 1 ) );
+            String userIdString = matcher.group( 1 );
+            int paddingBitsNeeded = 16 - userIdString.length();
+            if ( paddingBitsNeeded > 0 ) {
+                StringBuilder paddedBitString = new StringBuilder();
+                for ( int i = 0; i < paddingBitsNeeded; i++ ) {
+                    paddedBitString.append( "0" );
+                }
+                userIdString = paddedBitString.toString() + userIdString;
+            }
+            try {
+                userIdString = encryptionHelper.encodeBase64( userIdString );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "Exception occurred while encrypting the user id. Reason : ", e );
+            }
+            newEmailId = "u-" + userIdString + "@" + defaultEmailDomain;
+        }
+        LOG.info( "Method to encrypt user id in mail, encryptUserEmailId ended" );
+        return newEmailId;
     }
 }
