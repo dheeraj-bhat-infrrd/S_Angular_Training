@@ -222,9 +222,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     {
         LOG.info( "Method deleteSurveysWithIds() started" );
         //First get the list of surveys that will be deleted
-        String deleteQuery = "update SurveyPreInitiation set status=7 where surveyPreIntitiationId in (:incompleteSurveyIds)";
+        String deleteQuery = "update SurveyPreInitiation set status=7, modifiedOn=(:modifiedOnTime) where surveyPreIntitiationId in (:incompleteSurveyIds) and status in (:statuses)";
         Query query = getSession().createQuery( deleteQuery );
+        query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameterList( "incompleteSurveyIds", incompleteSurveyIds );
+        query.setParameterList( "statuses", new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED,
+            CommonConstants.SURVEY_STATUS_INITIATED } );
         query.executeUpdate();
     }
 
@@ -436,9 +439,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         if ( agentId <= 0l ) {
             throw new InvalidInputException( "Invalid agent ID : " + agentId );
         }
-        String deleteQuery = "update SurveyPreInitiation set status=7 where agentId = (:deletedAgentId)";
+        String deleteQuery = "update SurveyPreInitiation set status=7, modifiedOn=(:modifiedOnTime) where agentId = (:deletedAgentId) and status in (:statuses)";
         Query query = getSession().createQuery( deleteQuery );
+        query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( "deletedAgentId", agentId );
+        query.setParameterList( "statuses", new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED,
+            CommonConstants.SURVEY_STATUS_INITIATED } );
         query.executeUpdate();
         LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " finished." );
     }
