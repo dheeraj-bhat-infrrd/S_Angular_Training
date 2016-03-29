@@ -2822,7 +2822,7 @@ var hierarchyUpload = {
 										"./fetchUploadBatchStatus.do",
 										hierarchyUpload.fetchUploadBatchStatusCallback,
 										true, null);
-							}, 15000);
+							}, 2000);
 				} else {
 					if (response != undefined && response != null
 							&& response != '' && jsonResponse.response != []) {
