@@ -224,7 +224,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         deletedUsersStatus = updateUploadStatus( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS,
                             deletedUsers );
                         deletedUsersOldCount = deletedUsers;
-                        nextTime = nextTime + 15*1000;
+                        nextTime = nextTime + 2*1000;
                     }
                 } catch ( Exception e ) {
                     // process errors and return them to the user
@@ -293,7 +293,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                             deletedBranchesStatus = updateUploadStatus( deletedBranchesStatus,
                                 CommonConstants.UPLOAD_DELETED_BRANCHES, deletedBranches );
                             deletedBranchesOldCount = deletedBranches;
-                            nextTime = nextTime + 15*1000;
+                            nextTime = nextTime + 2*1000;
                         }
                     }
 
@@ -367,7 +367,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                             deletedRegionsStatus = updateUploadStatus( deletedRegionsStatus,
                                 CommonConstants.UPLOAD_DELETED_REGIONS, deletedRegions );
                             deletedRegionsOldCount = deletedRegions;
-                            nextTime = nextTime + 15*1000;
+                            nextTime = nextTime + 2*1000;
                         }
                     }
 
@@ -459,7 +459,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                                 CommonConstants.UPLOAD_MODIFIED_BRANCHES, modifiedBranches );
                             modifiedBranchesOldCount = modifiedBranches;
                         }
-                        nextTime = nextTime + 15*1000;
+                        nextTime = nextTime + 2*1000;
                     }
                 } catch ( InvalidInputException | BranchAdditionException | SolrException | NoRecordsFetchedException
                     | UserAssignmentException e ) {
@@ -642,7 +642,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                                 CommonConstants.UPLOAD_MODIFIED_REGIONS, modifiedRegions );
                             modifiedRegionsOldCount = modifiedRegions;
                         }
-                        nextTime = nextTime + 15 * 1000;
+                        nextTime = nextTime + 2 * 1000;
                     }
                 } catch ( InvalidInputException | SolrException | NoRecordsFetchedException | UserAssignmentException e ) {
                     // Add error records
@@ -2133,7 +2133,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                             CommonConstants.UPLOAD_MODIFIED_USERS, modifiedUsers );
                         modifiedUsersOldCount = modifiedUsers;
                     }
-                    nextTime = nextTime + 15 * 1000;
+                    nextTime = nextTime + 2 * 1000;
                 }
             }
         } catch ( Exception e ) {
