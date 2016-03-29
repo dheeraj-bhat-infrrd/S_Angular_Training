@@ -496,8 +496,13 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	bindDatePickerforIndividualSurveyDownload();
 	
 	getIncompleteSurveyCount(colName, colValue);
+	if(is_dashboard_loaded === undefined){ //file never entered. the global var was not set.
+		window.is_dashboard_loaded = 1;
+		fetchReviewsOnDashboard(false);
+	}else{
+		return;
+	}
 	fetchReviewsOnDashboard(false);
-	
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-sel-item');
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
 }
@@ -968,8 +973,12 @@ $(document).on('click', '.dash-lp-rt-img', function() {
 
 var isDashboardReviewRequestRunning = false;
 var doStopPaginationDashboard = false;
-
+ 
+var isAjaxInProgress=false;
 function fetchReviewsOnDashboard(isNextBatch) {
+	if (isAjaxInProgress==true){
+		return;
+	}
 	if(isDashboardReviewRequestRunning) return; //Return if ajax request is still running
 	
 	var payload = {
@@ -978,12 +987,14 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		"startIndex" : startIndexCmp,
 		"batchSize" : batchSizeCmp
 	};
+	
 	isDashboardReviewRequestRunning = true;
 	if(!isNextBatch) {
 		showLoaderOnPagination($('#review-details'));
 	}
-	
+	isAjaxInProgress=true;
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
+		isAjaxInProgress=false;
 		var tempDiv = $('<div>').html(data);
 		var reviewsCount = tempDiv.children('div.dsh-review-cont').length;
 		var ssReviewsPresent = true;
@@ -1092,13 +1103,17 @@ function showSurveyStatisticsGraphically(columnName, columnValue) {
 	showDashOverlay('#low-dash');
 	showSurveyGraph(columnName, columnValue, numberOfDays);
 }
-
+var isSurveydetailsforgraph=false;
 function showSurveyGraph(columnName, columnValue, numberOfDays) {
+	if(isSurveydetailsforgraph==true){
+		return;
+	}
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
 		"numberOfDays" : numberOfDays
 	};
+	isSurveydetailsforgraph=true;
 	$.ajax({
 		url : "./surveydetailsforgraph.do",
 		type : "GET",
@@ -1106,6 +1121,7 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
+			isSurveydetailsforgraph=false;
 			$('#dsh-grph-sel-item').removeClass("empty-field");
 			graphData = data;
 			paintSurveyGraph();
@@ -1221,6 +1237,7 @@ function paintSurveyGraph() {
 			position : 'none'
 		}
 	};
+	
 
 	removeAllPreviousGraphToolTip();
 	
@@ -1247,7 +1264,9 @@ function convertYearWeekKeyToDate(key) {
 
 function convertYearMonthKeyToDate(key) {
 	var year = parseInt(key.substr(0, 4));
-	var monthNumber = parseInt(key.substr(4)) - 1;
+	var monthStr = key.substr(4 , key.length);
+	var monthInt = parseInt(monthStr , "10"); //add base value
+	var monthNumber = monthInt - 1;
 	return Date.today().set({
 		day : 1,
 		month : monthNumber,
