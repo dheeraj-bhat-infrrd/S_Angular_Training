@@ -7584,7 +7584,8 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 		// url += "branch/";
 		return;
 	} else if (profileLevel == 'agentId') {
-		url += "individual/";
+		// url += "individual/";
+		return;
 	}
 	url += currentProfileIden + "/zillowreviews";
 	isZillowReviewsCallRunning = true;

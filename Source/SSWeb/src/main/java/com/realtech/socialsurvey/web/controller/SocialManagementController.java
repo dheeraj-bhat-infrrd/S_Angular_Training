@@ -64,6 +64,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialMonitorData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
@@ -1456,7 +1457,7 @@ public class SocialManagementController
             try {
                 if ( setting != null )
                     if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
-                        requestUtils.getRequestServerName( request ) , user.getCompany().getCompanyId()) )
+                        requestUtils.getRequestServerName( request ) , user.getCompany().getCompanyId(), agentProfileLink ) )
                         facebookNotSetup = false;
             } catch ( FacebookException | InvalidInputException e ) {
                 LOG.error(
@@ -1578,7 +1579,7 @@ public class SocialManagementController
         ratingFormat.setMaximumFractionDigits( 1 );
         String agentProfileLink = "";
         String custDisplayName = null;
-        AgentSettings agentSettings;
+        AgentSettings agentSettings = new AgentSettings();
         try {
             custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
             agentSettings = userManagementService.getUserSettings( agentId );
@@ -1605,7 +1606,7 @@ public class SocialManagementController
                 try {
                     if ( setting != null )
                         if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                            linkedinMessageFeedback, companySettings, false ) )
+                            linkedinMessageFeedback, companySettings, false, agentSettings, new SocialMediaPostResponse() ) )
                             linkedinNotSetup = false;
                 } catch ( NonFatalException e ) {
                     LOG.error(

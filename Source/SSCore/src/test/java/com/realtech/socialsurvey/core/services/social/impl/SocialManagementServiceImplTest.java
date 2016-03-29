@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
@@ -88,7 +89,7 @@ public class SocialManagementServiceImplTest
     public void testUpdateStatusIntoFacebookPageWithNullAgentSettings() throws InvalidInputException, FacebookException
     {
         socialManagementServiceImpl.updateStatusIntoFacebookPage( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_LONG );
+            TestConstants.TEST_LONG, TestConstants.TEST_STRING );
     }
 
 
@@ -103,7 +104,7 @@ public class SocialManagementServiceImplTest
     public void testUpdateLinkedinNullAgentSettings() throws NonFatalException
     {
         socialManagementServiceImpl.updateLinkedin( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, new OrganizationUnitSettings(), false );
+            TestConstants.TEST_STRING, new OrganizationUnitSettings(), false, new AgentSettings(), new SocialMediaPostResponse() );
     }
 
 

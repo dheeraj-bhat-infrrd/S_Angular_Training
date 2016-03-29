@@ -89,6 +89,9 @@ public class DotloopReviewProcessor extends QuartzJobBean
     private static final String BUYER_ROLE = "Buyer";
 
     private static final String SOLD_STATUS = "Sold";
+    
+    private boolean newLoopFound = false;
+    private boolean newRecordFound = false;
 
 
     @Override
@@ -301,6 +304,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
                     if ( !byPassRecords ) {
                         processLoop( collectionName, loop, authorizationHeader, organizationUnitId );
                     }
+                    //update the flag
+                    newLoopFound = true;
                     LOG.debug( "Insert into tracker." );
                     try {
                         loop = setHierarchyInformationInLoop( loop, collectionName, organizationUnitId );
@@ -367,7 +372,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         && participant.getMemberOfMyTeam().equals( CommonConstants.YES_STRING ) ) {
                         agentEmailId = participant.getEmail();
                         if ( maskEmail.equals( CommonConstants.YES_STRING ) ) {
-                            agentEmailId = utils.maskEmailAddress( agentEmailId );
+                            if(agentEmailId != null && !agentEmailId.isEmpty())
+                                agentEmailId = utils.maskEmailAddress( agentEmailId );
                         }
                     }
                     if ( participant.getRole() != null
@@ -404,6 +410,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
                         surveyPreInitiation.setSurveySourceId( String.valueOf( loop.getLoopViewId() ) );
                         try {
                             surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
+                            //update the flag
+                            newRecordFound = true;
                         } catch ( InvalidInputException e ) {
                             LOG.error( "Unable to insert this record ", e );
                         }
@@ -493,6 +501,9 @@ public class DotloopReviewProcessor extends QuartzJobBean
         String apiKey = dotloopCrmInfo.getApi();
         LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );
         String authorizationHeader = CommonConstants.AUTHORIZATION_HEADER + apiKey;
+        //re initialize the flag;
+        newLoopFound = false;
+        newRecordFound = false;
         // get list of profiles
         List<DotLoopProfileEntity> profileList = getDotLoopProfiles( authorizationHeader, apiKey );
         if ( profileList != null && !profileList.isEmpty() ) {
@@ -558,6 +569,26 @@ public class DotloopReviewProcessor extends QuartzJobBean
                 }
             }
         }
+        
+        //send report to admin if no new record is fetched
+        if(!newLoopFound && !newRecordFound){
+            String subject = "No record fetched from Dotloop for " + collectionName + " id : " + unitSettings.getIden();
+            String body = "";
+            if(!newLoopFound)
+                body += "No new loop found for the entity <br/>";
+            if(!newRecordFound)
+                body += "No new record found for the entity <br/>";
+            try {
+                emailServices.sendCustomMail( applicationAdminName, applicationAdminEmail, subject, body, null );
+            } catch ( InvalidInputException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch ( UndeliveredEmailException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
     }
 
 

@@ -45,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -727,7 +728,7 @@ public class SurveyManagementController
             try {
                 if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                     if ( !socialManagementService.updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl,
-                        user.getCompany().getCompanyId() ) ) {
+                        user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl() ) ) {
                         // TODO: Bad code: Remove the company id from the parameter: End
                         if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                             agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
@@ -741,7 +742,7 @@ public class SurveyManagementController
                 try {
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl,
-                            user.getCompany().getCompanyId() ) ) {
+                            user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl() ) ) {
                             if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                                 companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                         }
@@ -758,7 +759,7 @@ public class SurveyManagementController
                         .getRegionId() );
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl,
-                            user.getCompany().getCompanyId() ) ) {
+                            user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl() ) ) {
                             List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                             if ( !regionSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                                 regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
@@ -780,7 +781,7 @@ public class SurveyManagementController
 
                         if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                             if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
-                                serverBaseUrl, user.getCompany().getCompanyId() ) ) {
+                                serverBaseUrl, user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl() ) ) {
                                 List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                                 if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                                     branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
@@ -1043,7 +1044,7 @@ public class SurveyManagementController
             String linkedinMessageFeedback = "From : " + customerDisplayName + " " + feedback;
             if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                 if ( !socialManagementService.updateLinkedin( agentSettings, message, linkedinProfileUrl,
-                    linkedinMessageFeedback, companySettings.get( 0 ), false ) ) {
+                    linkedinMessageFeedback, companySettings.get( 0 ), false, agentSettings, new SocialMediaPostResponse() ) ) {
                     if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                         agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                 }
@@ -1051,7 +1052,7 @@ public class SurveyManagementController
             for ( OrganizationUnitSettings setting : companySettings ) {
                 if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                     if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                        linkedinMessageFeedback, companySettings.get( 0 ), false ) ) {
+                        linkedinMessageFeedback, companySettings.get( 0 ), false, agentSettings, new SocialMediaPostResponse() ) ) {
                         if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                             companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                     }
@@ -1063,7 +1064,7 @@ public class SurveyManagementController
                     .getRegionId() );
                 if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                     if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                        linkedinMessageFeedback, companySettings.get( 0 ), false ) ) {
+                        linkedinMessageFeedback, companySettings.get( 0 ), false, agentSettings, new SocialMediaPostResponse() ) ) {
                         List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                         if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                             regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
@@ -1078,7 +1079,7 @@ public class SurveyManagementController
 
                     if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                         if ( !socialManagementService.updateLinkedin( setting, message, linkedinProfileUrl,
-                            linkedinMessageFeedback, companySettings.get( 0 ), false ) ) {
+                            linkedinMessageFeedback, companySettings.get( 0 ), false, agentSettings, new SocialMediaPostResponse() ) ) {
                             List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                             if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                 branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
