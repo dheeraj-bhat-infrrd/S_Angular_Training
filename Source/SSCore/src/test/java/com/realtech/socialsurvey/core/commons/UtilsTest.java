@@ -6,7 +6,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 public class UtilsTest {
@@ -186,6 +188,18 @@ public class UtilsTest {
             "u-MDAwMDAwMDAwMDAwMDAwMQ@raremile.com" );
     }
 
+
+
+    @Test
+    public void testEncryptUserEmailIdWhileEncryptingThrowsException() throws InvalidInputException
+    {
+        EncryptionHelper encryptionHelper = Mockito.mock( EncryptionHelper.class );
+        Whitebox.setInternalState( utils, "defaultEmailDomain", "raremile.com" );
+        Whitebox.setInternalState( utils, "encryptionHelper", encryptionHelper );
+        Mockito.when( encryptionHelper.encodeBase64( Mockito.anyString() ) ).thenThrow( new InvalidInputException( "test exception" ) );
+        assertEquals( "Encrypted mail id is not as expected", utils.encryptUserEmailId( "u1@raremile.com" ),
+            "u1@raremile.com" );
+    }
 
     @Test
     public void testEncryptUserEmailIdWithNonUserId()
