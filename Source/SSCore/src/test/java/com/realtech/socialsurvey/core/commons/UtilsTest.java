@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.internal.util.reflection.Whitebox;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 public class UtilsTest {
 
@@ -173,5 +174,25 @@ public class UtilsTest {
         Whitebox.setInternalState( utils, "maskingPrefix", "test" );
         Whitebox.setInternalState( utils, "maskingSuffix", "@abc.com" );
         assertEquals( "Unmask successful", "test+1@abc.com", utils.unmaskEmailAddress( "test+1@abc.com" ) );
+    }
+
+
+    @Test
+    public void testEncryptUserEmailIdWithUserEmailId()
+    {
+        Whitebox.setInternalState( utils, "defaultEmailDomain", "raremile.com" );
+        Whitebox.setInternalState( utils, "encryptionHelper", new EncryptionHelper() );
+        assertEquals( "Encrypted mail id is not as expected", utils.encryptUserEmailId( "u1@raremile.com" ),
+            "u-MDAwMDAwMDAwMDAwMDAwMQ@raremile.com" );
+    }
+
+
+    @Test
+    public void testEncryptUserEmailIdWithNonUserId()
+    {
+        Whitebox.setInternalState( utils, "defaultEmailDomain", "raremile.com" );
+        Whitebox.setInternalState( utils, "encryptionHelper", new EncryptionHelper() );
+        assertEquals( "Encrypted mail id is not as expected", utils.encryptUserEmailId( "admin@raremile.com" ),
+            "admin@raremile.com" );
     }
 }

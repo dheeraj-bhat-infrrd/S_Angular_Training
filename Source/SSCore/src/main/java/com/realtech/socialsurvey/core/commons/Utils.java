@@ -342,23 +342,27 @@ public class Utils
         Pattern pattern = Pattern.compile( agentEmailRegex );
         Matcher matcher = pattern.matcher( emailId );
         if ( matcher.find() ) {
-            LOG.info( "Mail id belongs to agent mail id format" );
-            LOG.info( "agent id from the mail id is " + matcher.group( 1 ) );
+            LOG.debug( "Mail id belongs to agent mail id format" );
+            LOG.debug( "agent id from the mail id is " + matcher.group( 1 ) );
             String userIdString = matcher.group( 1 );
             int paddingBitsNeeded = 16 - userIdString.length();
             if ( paddingBitsNeeded > 0 ) {
+                LOG.debug("Adding padding bits to the user id");
                 StringBuilder paddedBitString = new StringBuilder();
                 for ( int i = 0; i < paddingBitsNeeded; i++ ) {
                     paddedBitString.append( "0" );
                 }
                 userIdString = paddedBitString.toString() + userIdString;
+                LOG.debug("Added padding bits to the user id");
             }
             try {
+                LOG.debug("Encrypting the user id");
                 userIdString = encryptionHelper.encodeBase64( userIdString );
+                newEmailId = "u-" + userIdString + "@" + defaultEmailDomain;
+                LOG.debug("Encrypted the user id successfully");
             } catch ( InvalidInputException e ) {
                 LOG.error( "Exception occurred while encrypting the user id. Reason : ", e );
             }
-            newEmailId = "u-" + userIdString + "@" + defaultEmailDomain;
         }
         LOG.info( "Method to encrypt user id in mail, encryptUserEmailId ended" );
         return newEmailId;
