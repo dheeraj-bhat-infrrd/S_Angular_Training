@@ -237,8 +237,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
-        update.set( CommonConstants.CREATED_ON, new Date() );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
@@ -261,8 +259,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, false );
         update.set( CommonConstants.IS_UNMARKED_ABUSIVE_COLUMN, true );
-        update.set( CommonConstants.CREATED_ON, new Date() );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
@@ -965,10 +961,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
         }
 
-        if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
-            query
-                .addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
-        }
+        // Commented as Zillow reviews for individuals will also be shown from cache
+        // if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+        //    query
+        //        .addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+        // }
 
         if ( startScore > -1 && limitScore > -1 ) {
             query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),

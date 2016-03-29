@@ -1903,6 +1903,39 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Method sendBillingReportMail() finished." );
     }
     
+    /**
+     * 
+     */
+    @Override
+    public void sendCustomMail( String recipientName, String recipientMailId, String subject, String body , 
+        Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendCustomMail() started." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending custom mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending custom mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        if(attachmentsDetails != null && !attachmentsDetails.isEmpty())
+            emailEntity.setAttachmentDetail( attachmentsDetails );
+        
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.CUSTOM_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( subject ) );
+        
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.CUSTOM_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName , body ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false, false );
+
+        LOG.info( "Method sendCustomReportMail() finished." );
+    }
+    
     
     /**
      * Method to send the billing report in a mail to the social survey admin
@@ -1935,5 +1968,7 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.info( "Method sendCustomReportMail() finished." );
     }
-}
+    
+}   
+
 // JIRA: SS-7: By RM02: EOC
