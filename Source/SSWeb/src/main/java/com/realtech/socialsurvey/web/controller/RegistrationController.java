@@ -110,7 +110,7 @@ public class RegistrationController
 
         try {
             LOG.debug( "Validating form elements" );
-            validateFormParameters( firstName, lastName, emailId );
+            userManagementService.validateFormParametersForInvitation( firstName, lastName, emailId );
             LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName : " + lastName
                 + " and emailID : " + emailId );
 
@@ -124,7 +124,7 @@ public class RegistrationController
             // continue with the invitation
             try {
                 LOG.debug( "Calling service for sending the registration invitation" );
-                userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false );
+                userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false, null );
                 LOG.debug( "Service for sending the registration invitation excecuted successfully" );
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e );
@@ -297,15 +297,6 @@ public class RegistrationController
         String emailId = request.getParameter( "emailId" );
 
         try {
-            LOG.debug( "Validating form elements" );
-            validateFormParameters( firstName, lastName, emailId );
-            LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName
-                + " and emailID: " + emailId );
-            // check if email id already exists
-            if ( userManagementService.userExists( emailId.trim() ) ) {
-                LOG.warn( emailId + " is already present" );
-                throw new UserAlreadyExistsException( "Email address " + emailId + " already exists." );
-            }
             if ( validateCaptcha.equals( CommonConstants.YES_STRING ) ) {
                 if ( !captchaValidation.isCaptchaValid( request.getRemoteAddr(), captchaSecretKey,
                     request.getParameter( "g-recaptcha-response" ) ) ) {
@@ -319,12 +310,10 @@ public class RegistrationController
             model.addAttribute( "lastname", lastName );
             model.addAttribute( "emailid", emailId );
             model.addAttribute( "isDirectRegistration", true );
-
-            // send verification mail and then redirect to index page
-            LOG.debug( "Calling service for sending the registration invitation" );
-            userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false );
-            LOG.debug( "Service for sending the registration invitation excecuted successfully" );
-
+            
+            // validate and invite corporate
+            userManagementService.validateAndInviteCorporateToRegister(firstName, lastName, emailId, false, null);
+            
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
             return JspResolver.REGISTRATION_INVITE_SUCCESSFUL;
@@ -363,7 +352,7 @@ public class RegistrationController
 
         try {
             LOG.debug( "Validating form elements" );
-            validateFormParameters( firstName, lastName, emailId );
+            userManagementService.validateFormParametersForInvitation( firstName, lastName, emailId );
             LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName
                 + " and emailID: " + emailId );
             // check if email id already exists
@@ -373,7 +362,7 @@ public class RegistrationController
             }
 
             LOG.debug( "Calling service for sending the registration invitation" );
-            userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false );
+            userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false, null );
             LOG.debug( "Service for sending the registration invitation excecuted successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -653,39 +642,6 @@ public class RegistrationController
     }
 
 
-    /**
-     * Method to validate form parameters of invitation form
-     * 
-     * @param firstName
-     * @param lastName
-     * @param emailId
-     * @throws InvalidInputException
-     */
-    private void validateFormParameters( String firstName, String lastName, String emailId ) throws InvalidInputException
-    {
-        LOG.debug( "Validating invitation form parameters" );
-
-        // check if first name is null or empty and only contains alphabets
-        if ( firstName == null || firstName.isEmpty() || !firstName.matches( CommonConstants.FIRST_NAME_REGEX ) ) {
-            throw new InvalidInputException( "Firstname is invalid in registration", DisplayMessageConstants.INVALID_FIRSTNAME );
-        }
-
-        // check if last name only contains alphabets
-        if ( lastName != null && !lastName.isEmpty() ) {
-            if ( !( lastName.matches( CommonConstants.LAST_NAME_REGEX ) ) ) {
-                throw new InvalidInputException( "Last name is invalid in registration",
-                    DisplayMessageConstants.INVALID_LASTNAME );
-            }
-        }
-
-        // check if email Id isEmpty, null or whether it matches the regular expression or not
-        if ( emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId ) ) {
-            throw new InvalidInputException( "Email address is invalid in registration",
-                DisplayMessageConstants.INVALID_EMAILID );
-        }
-        LOG.debug( "Invitation form parameters validated successfully" );
-    }
-
 
     /**
      * JIRA:SS-26 BY RM02 Method to validate form parameters of registration form
@@ -707,7 +663,7 @@ public class RegistrationController
          * call the invitation form parameters validation as the form parameters and validation
          * criteria are same
          */
-        validateFormParameters( firstName, lastName, emailId );
+        userManagementService.validateFormParametersForInvitation( firstName, lastName, emailId );
 
         if ( password == null || password.isEmpty() || password.length() < CommonConstants.PASSWORD_LENGTH
             || confirmPassword == null || confirmPassword.isEmpty() ) {

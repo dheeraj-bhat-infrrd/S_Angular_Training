@@ -81,6 +81,7 @@
 				<value>com.realtech.socialsurvey.core.entities.ExternalSurveyTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.UploadStatus</value>
+				<value>com.realtech.socialsurvey.core.entities.ReferralInvitiation</value>
 			</list>
 		</property>
 	</bean>
