@@ -1,15 +1,11 @@
 package com.realtech.socialsurvey.core.entities;
 
-import java.util.List;
 
-
-public class BranchMediaPostDetails
+public class BranchMediaPostDetails extends MediaPostDetails
 {
     private long branchId;
 
     private long regionId;
-
-    private List<String> sharedOn;
 
 
     public long getBranchId()
@@ -21,18 +17,6 @@ public class BranchMediaPostDetails
     public void setBranchId( long branchId )
     {
         this.branchId = branchId;
-    }
-
-
-    public List<String> getSharedOn()
-    {
-        return sharedOn;
-    }
-
-
-    public void setSharedOn( List<String> sharedOn )
-    {
-        this.sharedOn = sharedOn;
     }
 
 

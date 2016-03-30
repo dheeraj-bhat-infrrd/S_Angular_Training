@@ -1,12 +1,9 @@
 package com.realtech.socialsurvey.core.entities;
 
-import java.util.List;
 
-public class RegionMediaPostDetails
+public class RegionMediaPostDetails extends MediaPostDetails
 {
     private long regionId;
-
-    private List<String> sharedOn;
 
 
     public long getRegionId()
@@ -18,17 +15,5 @@ public class RegionMediaPostDetails
     public void setRegionId( long regionId )
     {
         this.regionId = regionId;
-    }
-
-
-    public List<String> getSharedOn()
-    {
-        return sharedOn;
-    }
-
-
-    public void setSharedOn( List<String> sharedOn )
-    {
-        this.sharedOn = sharedOn;
     }
 }

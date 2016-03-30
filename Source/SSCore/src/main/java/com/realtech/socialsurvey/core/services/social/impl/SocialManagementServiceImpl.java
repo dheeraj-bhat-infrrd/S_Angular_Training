@@ -59,7 +59,9 @@ import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.EntityMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
+import com.realtech.socialsurvey.core.entities.MediaPostDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -865,8 +867,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      */
     @Override
     public void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
-        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails, boolean isZillow )
-        throws InvalidInputException, NoRecordsFetchedException
+        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails,
+        boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException
     {
 
         LOG.debug( "Method postToFacebookForHierarchy() started" );
@@ -897,42 +899,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
 
             if ( agentSettings != null ) {
-                try {
-                    if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                        List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
-                        if ( !isZillow ) {
-                            updatedFacebookMessage = facebookMessage + agentSettings.getCompleteProfileUrl() + "/";
-                        }
-                        if ( !updateStatusIntoFacebookPage( agentSettings, updatedFacebookMessage, serverBaseUrl, companyId, agentSettings.getCompleteProfileUrl() ) ) {
-                            if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
-                                agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-
-                            SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                            facebookPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
-                                .getFacebookAccessTokenToPost() );
-                            facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            facebookPostResponse.setResponseMessage( "Ok" );
-                            if ( agentMediaPostResponseDetails.getFacebookPostResponseList() == null )
-                                agentMediaPostResponseDetails
-                                    .setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            agentMediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
-
-                        }
-                    }
-                } catch ( FacebookException e ) {
-                    LOG.error(
-                        "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
-                        e );
-                    SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                    facebookPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
-                        .getFacebookAccessTokenToPost() );
-                    facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                    facebookPostResponse.setResponseMessage( e.getMessage() );
-                    if ( agentMediaPostResponseDetails.getFacebookPostResponseList() == null )
-                        agentMediaPostResponseDetails.setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                    agentMediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
-                    reportBug( "Facebook", agentSettings.getProfileName(), e );
-                }
+                postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating, serverBaseUrl,
+                    agentSettings, socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails, isZillow );
             }
         }
 
@@ -944,45 +912,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 OrganizationUnitSettings companySetting = organizationManagementService
                     .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
                 if ( companySetting != null ) {
-                    try {
-                        if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
-                            if ( !isZillow ) {
-                                updatedFacebookMessage = facebookMessage + companySetting.getCompleteProfileUrl() + "/";
-                            }
-                            if ( !updateStatusIntoFacebookPage( companySetting, updatedFacebookMessage, serverBaseUrl,
-                                companySetting.getIden(), agentSettings.getCompleteProfileUrl() ) ) {
-                                List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails()
-                                    .getSharedOn();
-                                if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
-                                    companySocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-
-                                SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                                facebookPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getFacebookToken()
-                                    .getFacebookAccessTokenToPost() );
-                                facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                facebookPostResponse.setResponseMessage( "Ok" );
-                                if ( companyMediaPostResponseDetails.getFacebookPostResponseList() == null )
-                                    companyMediaPostResponseDetails
-                                        .setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                companyMediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
-
-                            }
-                        }
-                    } catch ( FacebookException e ) {
-                        LOG.error(
-                            "FacebookException caught in postToSocialMedia() while trying to post to facebook for company. Nested excption is ",
-                            e );
-                        SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                        facebookPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getFacebookToken()
-                            .getFacebookAccessTokenToPost() );
-                        facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                        facebookPostResponse.setResponseMessage( e.getMessage() );
-                        if ( companyMediaPostResponseDetails.getFacebookPostResponseList() == null )
-                            companyMediaPostResponseDetails
-                                .setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                        companyMediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
-                        reportBug( "Facebook", companySetting.getProfileName(), e );
-                    }
+                    postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating, serverBaseUrl,
+                        companySetting, socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails,
+                        isZillow );
                 }
             }
 
@@ -996,44 +928,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
-
-                        try {
-                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !isZillow ) {
-                                    updatedFacebookMessage = facebookMessage + setting.getCompleteProfileUrl() + "/";
-                                }
-                                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, agentSettings.getCompleteProfileUrl() ) ) {
-                                    List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                    if ( !regionSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
-                                        regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                                    regionMediaPostDetails.setSharedOn( regionSocialList );
-
-                                    SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                                    facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                                        .getFacebookAccessTokenToPost() );
-                                    facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                    facebookPostResponse.setResponseMessage( "Ok" );
-                                    if ( regionMediaPostResponseDetails.getFacebookPostResponseList() == null )
-                                        regionMediaPostResponseDetails
-                                            .setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                    regionMediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
-                                }
-                            }
-                        } catch ( FacebookException e ) {
-                            LOG.error(
-                                "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
-                                e );
-                            SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                            facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                                .getFacebookAccessTokenToPost() );
-                            facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            facebookPostResponse.setResponseMessage( e.getMessage() );
-                            if ( regionMediaPostResponseDetails.getFacebookPostResponseList() == null )
-                                regionMediaPostResponseDetails
-                                    .setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            regionMediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
-                            reportBug( "Facebook", setting.getProfileName(), e );
-                        }
+                        postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
+                            serverBaseUrl, setting, regionMediaPostDetails, regionMediaPostResponseDetails, isZillow );
                     }
 
                 }
@@ -1049,44 +945,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
 
                     if ( setting != null ) {
-                        try {
-                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !isZillow ) {
-                                    updatedFacebookMessage = facebookMessage + setting.getCompleteProfileUrl() + "/";
-                                }
-                                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, agentSettings.getCompleteProfileUrl() ) ) {
-                                    List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
-                                        branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                                    branchMediaPostDetails.setSharedOn( branchSocialList );
-
-                                    SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                                    facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                                        .getFacebookAccessTokenToPost() );
-                                    facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                    facebookPostResponse.setResponseMessage( "Ok" );
-                                    if ( branchMediaPostResponseDetails.getFacebookPostResponseList() == null )
-                                        branchMediaPostResponseDetails
-                                            .setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                    branchMediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
-                                }
-                            }
-
-                        } catch ( FacebookException e ) {
-                            LOG.error(
-                                "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
-                                e );
-                            SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                            facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                                .getFacebookAccessTokenToPost() );
-                            facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            facebookPostResponse.setResponseMessage( e.getMessage() );
-                            if ( branchMediaPostResponseDetails.getFacebookPostResponseList() == null )
-                                branchMediaPostResponseDetails
-                                    .setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            branchMediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
-                            reportBug( "Facebook", setting.getProfileName(), e );
-                        }
+                        postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
+                            serverBaseUrl, setting, branchMediaPostDetails, branchMediaPostResponseDetails, isZillow );
                     }
                 }
 
@@ -1094,6 +954,50 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
 
         LOG.debug( "Method postToFacebookForHierarchy() ended" );
+    }
+    
+    
+    void postToFacebookForAHierarchy( long companyId, AgentSettings agentSettings, String facebookMessage, String updatedFacebookMessage,
+        double rating, String serverBaseUrl, OrganizationUnitSettings setting, MediaPostDetails mediaPostDetails,
+        EntityMediaPostResponseDetails mediaPostResponseDetails, boolean isZillow ) throws InvalidInputException
+    {
+        try {
+            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                if ( !isZillow ) {
+                    updatedFacebookMessage = facebookMessage + setting.getCompleteProfileUrl() + "/";
+                }
+                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId,
+                    agentSettings.getCompleteProfileUrl() ) ) {
+                    List<String> socialList = mediaPostDetails.getSharedOn();
+                    if ( !socialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                        socialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    }
+                    mediaPostDetails.setSharedOn( socialList );
+
+                    SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
+                    facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
+                        .getFacebookAccessTokenToPost() );
+                    facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+                    facebookPostResponse.setResponseMessage( "Ok" );
+                    if ( mediaPostResponseDetails.getFacebookPostResponseList() == null ) {
+                        mediaPostResponseDetails.setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
+                    }
+                    mediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
+                }
+            }
+        } catch ( FacebookException e ) {
+            LOG.error( "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
+                e );
+            SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
+            facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
+                .getFacebookAccessTokenToPost() );
+            facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+            facebookPostResponse.setResponseMessage( e.getMessage() );
+            if ( mediaPostResponseDetails.getFacebookPostResponseList() == null )
+                mediaPostResponseDetails.setFacebookPostResponseList( new ArrayList<SocialMediaPostResponse>() );
+            mediaPostResponseDetails.getFacebookPostResponseList().add( facebookPostResponse );
+            reportBug( "Facebook", setting.getProfileName(), e );
+        }
     }
 
 
@@ -1360,44 +1264,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList = socialMediaPostResponseDetails
             .getBranchMediaPostResponseDetailsList();
 
-        //Post for agent
+        //Post for agent //TODO: This isn't working!!!
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
             AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails
                 .getAgentMediaPostDetails().getAgentId() );
             if ( agentSettings != null ) {
-                try {
-                    if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                        if ( !tweet( agentSettings, twitterMessage, companyId ) ) {
-                            List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
-                            if ( !agentSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                                agentSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
-
-                            SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                            twitterPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getTwitterToken()
-                                .getTwitterAccessToken() );
-                            twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            twitterPostResponse.setResponseMessage( "Ok" );
-                            if ( agentMediaPostResponseDetails.getTwitterPostResponseList() == null )
-                                agentMediaPostResponseDetails
-                                    .setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            agentMediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
-                        }
-                    }
-                } catch ( TwitterException e ) {
-                    LOG.error(
-                        "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
-                        e );
-                    SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                    twitterPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getTwitterToken()
-                        .getTwitterAccessToken() );
-                    twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                    twitterPostResponse.setResponseMessage( e.getMessage() );
-                    if ( agentMediaPostResponseDetails.getTwitterPostResponseList() == null )
-                        agentMediaPostResponseDetails.setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                    agentMediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
-
-                    reportBug( "Twitter", agentSettings.getProfileName(), e );
-                }
+                postToTwitterForAHierarchy( agentSettings, rating, companyId, twitterMessage,
+                    socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
             }
 
         }
@@ -1410,42 +1283,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 OrganizationUnitSettings companySetting = organizationManagementService
                     .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
                 if ( companySetting != null ) {
-                    try {
-                        if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
-                            if ( !tweet( companySetting, twitterMessage, companyId ) ) {
-                                List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails()
-                                    .getSharedOn();
-                                if ( !companySocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                                    companySocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
-
-                                SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                                twitterPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getTwitterToken()
-                                    .getTwitterAccessToken() );
-                                twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                twitterPostResponse.setResponseMessage( "Ok" );
-                                if ( companyMediaPostResponseDetails.getTwitterPostResponseList() == null )
-                                    companyMediaPostResponseDetails
-                                        .setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                companyMediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
-                            }
-                        }
-                    } catch ( TwitterException e ) {
-                        LOG.error(
-                            "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
-                            e );
-
-                        SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                        twitterPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getTwitterToken()
-                            .getTwitterAccessToken() );
-                        twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                        twitterPostResponse.setResponseMessage( e.getMessage() );
-                        if ( companyMediaPostResponseDetails.getTwitterPostResponseList() == null )
-                            companyMediaPostResponseDetails
-                                .setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                        companyMediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
-
-                        reportBug( "Twitter", companySetting.getProfileName(), e );
-                    }
+                    postToTwitterForAHierarchy( companySetting, rating, companyId, twitterMessage,
+                        socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
                 }
             }
 
@@ -1458,43 +1297,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
-
-                        try {
-                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !tweet( setting, twitterMessage, companyId ) ) {
-                                    List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                    if ( !regionSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                                        regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
-                                    regionMediaPostDetails.setSharedOn( regionSocialList );
-
-                                    SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                                    twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken()
-                                        .getTwitterAccessToken() );
-                                    twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                    twitterPostResponse.setResponseMessage( "Ok" );
-                                    if ( regionMediaPostResponseDetails.getTwitterPostResponseList() == null )
-                                        regionMediaPostResponseDetails
-                                            .setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                    regionMediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
-                                }
-                            }
-                        } catch ( TwitterException e ) {
-                            LOG.error(
-                                "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
-                                e );
-
-                            SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                            twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken()
-                                .getTwitterAccessToken() );
-                            twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            twitterPostResponse.setResponseMessage( e.getMessage() );
-                            if ( regionMediaPostResponseDetails.getTwitterPostResponseList() == null )
-                                regionMediaPostResponseDetails
-                                    .setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            regionMediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
-
-                            reportBug( "Twitter", setting.getProfileName(), e );
-                        }
+                        postToTwitterForAHierarchy( setting, rating, companyId, twitterMessage, regionMediaPostDetails,
+                            regionMediaPostResponseDetails );
                     }
 
                 }
@@ -1509,46 +1313,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList(
                             branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
-
-                        try {
-
-
-                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !tweet( setting, twitterMessage, companyId ) ) {
-                                    List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    if ( !branchSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                                        branchSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
-                                    branchMediaPostDetails.setSharedOn( branchSocialList );
-
-                                    SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                                    twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken()
-                                        .getTwitterAccessToken() );
-                                    twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                    twitterPostResponse.setResponseMessage( "Ok" );
-                                    if ( branchMediaPostResponseDetails.getTwitterPostResponseList() == null )
-                                        branchMediaPostResponseDetails
-                                            .setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                    branchMediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
-                                }
-                            }
-
-                        } catch ( TwitterException e ) {
-                            LOG.error(
-                                "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
-                                e );
-
-                            SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                            twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken()
-                                .getTwitterAccessToken() );
-                            twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            twitterPostResponse.setResponseMessage( e.getMessage() );
-                            if ( branchMediaPostResponseDetails.getTwitterPostResponseList() == null )
-                                branchMediaPostResponseDetails
-                                    .setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            branchMediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
-
-                            reportBug( "Twitter", setting.getProfileName(), e );
-                        }
+                        postToTwitterForAHierarchy( setting, rating, companyId, twitterMessage, branchMediaPostDetails,
+                            branchMediaPostResponseDetails );
                     }
 
                 }
@@ -1557,6 +1323,44 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
 
         LOG.debug( "Method postToTwitterForHierarchy() ended" );
+    }
+    
+    
+    public void postToTwitterForAHierarchy( OrganizationUnitSettings setting, Double rating, long companyId,
+        String twitterMessage, MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails )
+        throws InvalidInputException
+    {
+        try {
+            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                if ( !tweet( setting, twitterMessage, companyId ) ) {
+                    List<String> regionSocialList = mediaPostDetails.getSharedOn();
+                    if ( !regionSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                        regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    mediaPostDetails.setSharedOn( regionSocialList );
+
+                    SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
+                    twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken()
+                        .getTwitterAccessToken() );
+                    twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+                    twitterPostResponse.setResponseMessage( "Ok" );
+                    if ( mediaPostResponseDetails.getTwitterPostResponseList() == null )
+                        mediaPostResponseDetails.setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
+                    mediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
+                }
+            }
+        } catch ( TwitterException e ) {
+            LOG.error( "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e );
+
+            SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
+            twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
+            twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+            twitterPostResponse.setResponseMessage( e.getMessage() );
+            if ( mediaPostResponseDetails.getTwitterPostResponseList() == null )
+                mediaPostResponseDetails.setTwitterPostResponseList( new ArrayList<SocialMediaPostResponse>() );
+            mediaPostResponseDetails.getTwitterPostResponseList().add( twitterPostResponse );
+
+            reportBug( "Twitter", setting.getProfileName(), e );
+        }
     }
 
 
