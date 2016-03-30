@@ -1525,6 +1525,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( "emailId", emailId );
         queries.put( "company.companyId", companyId );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         List<CompanyIgnoredEmailMapping> companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.findByKeyValue(
             CompanyIgnoredEmailMapping.class, queries );
         if ( companyIgnoredEmailMapping == null || companyIgnoredEmailMapping.size() == 0 )

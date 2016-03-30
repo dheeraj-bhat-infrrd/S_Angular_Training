@@ -53,8 +53,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     private static final String proceesedCurruptedSurveyCount = "select count(*)  from "
         + "SURVEY_PRE_INITIATION "
         + " where COMPANY_ID= :companyId AND ( (AGENT_EMAILID IN "
-        + " (select EMAIL_ID from USER_EMAIL_MAPPING where COMPANY_ID=:companyId) ) OR  ( AGENT_EMAILID IN "
-        + " (select EMAIL_ID from COMPANY_IGNORED_EMAIL_MAPPING where COMPANY_ID=:companyId) ) )";
+        + " (select EMAIL_ID from USER_EMAIL_MAPPING where COMPANY_ID=:companyId AND STATUS="+ CommonConstants.STATUS_ACTIVE +") ) OR  ( AGENT_EMAILID IN "
+        + " (select EMAIL_ID from COMPANY_IGNORED_EMAIL_MAPPING where COMPANY_ID=:companyId AND STATUS="+  CommonConstants.STATUS_ACTIVE +") ) )";
 
 
     @Override
@@ -622,8 +622,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update updateAgentIdOfPreInitiatedSurveys started." );
         String queryStr = "UPDATE SURVEY_PRE_INITIATION SET STATUS = "
-            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + "  WHERE AGENT_EMAILID = ? AND STATUS = "
-            + CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + "  WHERE AGENT_EMAILID = ? AND (STATUS = "
+            + CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD + " OR STATUS = " + CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD + ") ";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, agentEmailAddress );
 

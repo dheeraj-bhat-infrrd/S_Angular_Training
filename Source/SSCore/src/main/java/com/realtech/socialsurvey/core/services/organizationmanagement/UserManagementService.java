@@ -543,5 +543,8 @@ public interface UserManagementService
 
 
     void deleteUserEmailMapping( User agent, long emailMappingId ) throws InvalidInputException;
+
+
+    void deleteIgnoredEmailMapping( String emailId ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

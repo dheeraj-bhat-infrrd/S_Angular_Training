@@ -32,6 +32,9 @@ public class CompanyIgnoredEmailMapping implements Serializable
     @ManyToOne ( fetch = FetchType.LAZY)
     @JoinColumn ( name = "COMPANY_ID")
     private Company company;
+    
+    @Column(name = "STATUS")
+    private int status;
 
     @Column ( name = "CREATED_BY")
     private String createdBy;
@@ -116,4 +119,13 @@ public class CompanyIgnoredEmailMapping implements Serializable
     }
 
 
+    public int getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus( int status )
+    {
+        this.status = status;
+    }
 }
