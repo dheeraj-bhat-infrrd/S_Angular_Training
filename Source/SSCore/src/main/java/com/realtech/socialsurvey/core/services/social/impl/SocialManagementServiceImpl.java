@@ -1016,7 +1016,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Override
     public void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,
         String linkedinMessageFeedback, int accountMasterId, SocialMediaPostDetails socialMediaPostDetails,
-        SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings, boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException
+        SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings,
+        boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Method postToLinkedInForHierarchy() started" );
         if ( socialMediaPostDetails == null ) {
@@ -1044,38 +1045,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
 
             if ( agentSettings != null ) {
-                try {
-                    if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                        if ( !isZillow ) {
-                            updatedLinkedInMessage = linkedinMessage + agentSettings.getCompleteProfileUrl() + "/";
-                        }
-                        SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                        linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-
-                        if ( !updateLinkedin( agentSettings, updatedLinkedInMessage, linkedinProfileUrl,
-                            linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
-                            List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
-                            if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                                agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-
-                            if ( agentMediaPostResponseDetails.getLinkedinPostResponseList() == null )
-                                agentMediaPostResponseDetails
-                                    .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            agentMediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-                        }
-                    }
-                } catch ( Exception e ) {
-                    SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                    linkedinPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getLinkedInToken()
-                        .getLinkedInAccessToken() );
-                    linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                    linkedinPostResponse.setResponseMessage( e.getMessage() );
-                    if ( agentMediaPostResponseDetails.getLinkedinPostResponseList() == null )
-                        agentMediaPostResponseDetails.setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                    agentMediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-
-                    reportBug( "Linkedin", agentSettings.getProfileName(), e );
-                }
+                postToLinkedInForAHierarchy( agentSettings, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                    linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
+                    socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
             }
         }
 
@@ -1086,42 +1058,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 OrganizationUnitSettings companySetting = organizationManagementService
                     .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
                 if ( companySetting != null ) {
-                    try {
-                        if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
-                            if ( !isZillow ) {
-                                updatedLinkedInMessage = linkedinMessage + companySetting.getCompleteProfileUrl() + "/";
-                            }
-                            SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                            linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-
-                            if ( !updateLinkedin( companySetting, updatedLinkedInMessage, linkedinProfileUrl,
-                                linkedinMessageFeedback, companySetting, isZillow, agentSettings, linkedinPostResponse ) ) {
-                                List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails()
-                                    .getSharedOn();
-                                if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                                    companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-
-
-                                if ( companyMediaPostResponseDetails.getLinkedinPostResponseList() == null )
-                                    companyMediaPostResponseDetails
-                                        .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                companyMediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-                            }
-                        }
-                    } catch ( Exception e ) {
-
-                        SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                        linkedinPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getLinkedInToken()
-                            .getLinkedInAccessToken() );
-                        linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                        linkedinPostResponse.setResponseMessage( e.getMessage() );
-                        if ( companyMediaPostResponseDetails.getLinkedinPostResponseList() == null )
-                            companyMediaPostResponseDetails
-                                .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                        companyMediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-
-                        reportBug( "Linkedin", companySetting.getProfileName(), e );
-                    }
+                    postToLinkedInForAHierarchy( companySetting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                        linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
+                        socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
                 }
             }
 
@@ -1135,43 +1074,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
-
-                        try {
-                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !isZillow ) {
-                                    updatedLinkedInMessage = linkedinMessage + setting.getCompleteProfileUrl() + "/";
-                                }
-
-                                SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                                linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-
-                                if ( !updateLinkedin( setting, updatedLinkedInMessage, linkedinProfileUrl,
-                                    linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
-                                    List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
-                                    if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                                        regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                                    regionMediaPostDetails.setSharedOn( regionSocialList );
-
-
-                                    if ( regionMediaPostResponseDetails.getLinkedinPostResponseList() == null )
-                                        regionMediaPostResponseDetails
-                                            .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                    regionMediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-                                }
-                            }
-                        } catch ( Exception e ) {
-                            SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                            linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken()
-                                .getLinkedInAccessToken() );
-                            linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            linkedinPostResponse.setResponseMessage( e.getMessage() );
-                            if ( regionMediaPostResponseDetails.getLinkedinPostResponseList() == null )
-                                regionMediaPostResponseDetails
-                                    .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            regionMediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-
-                            reportBug( "Linkedin", setting.getProfileName(), e );
-                        }
+                        postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
+                            regionMediaPostDetails, regionMediaPostResponseDetails );
                     }
                 }
             }
@@ -1184,48 +1089,56 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList(
                             branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
-
-                        try {
-                            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !isZillow ) {
-                                    updatedLinkedInMessage = linkedinMessage + setting.getCompleteProfileUrl() + "/";
-                                }
-                                SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                                linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-
-                                if ( !updateLinkedin( setting, updatedLinkedInMessage, linkedinProfileUrl,
-                                    linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
-                                    List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
-                                    if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
-                                        branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                                    branchMediaPostDetails.setSharedOn( branchSocialList );
-
-                                    if ( branchMediaPostResponseDetails.getLinkedinPostResponseList() == null )
-                                        branchMediaPostResponseDetails
-                                            .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                                    branchMediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-                                }
-                            }
-
-                        } catch ( Exception e ) {
-                            SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                            linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken()
-                                .getLinkedInAccessToken() );
-                            linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            linkedinPostResponse.setResponseMessage( e.getMessage() );
-                            if ( branchMediaPostResponseDetails.getLinkedinPostResponseList() == null )
-                                branchMediaPostResponseDetails
-                                    .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
-                            branchMediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-
-                            reportBug( "Linkedin", setting.getProfileName(), e );
-                        }
+                        postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
+                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
+                            branchMediaPostDetails, branchMediaPostResponseDetails );
                     }
                 }
             }
         }
 
         LOG.debug( "Method postToLinkedInForHierarchy() ended" );
+    }
+    
+    
+    void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
+        String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
+        OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
+        EntityMediaPostResponseDetails mediaPostResponseDetails )
+    {
+        try {
+            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+                if ( !isZillow ) {
+                    updatedLinkedInMessage = linkedinMessage + setting.getCompleteProfileUrl() + "/";
+                }
+
+                SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
+                linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+
+                if ( !updateLinkedin( setting, updatedLinkedInMessage, linkedinProfileUrl, linkedinMessageFeedback,
+                    companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
+                    List<String> socialList = mediaPostDetails.getSharedOn();
+                    if ( !socialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
+                        socialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    mediaPostDetails.setSharedOn( socialList );
+
+
+                    if ( mediaPostResponseDetails.getLinkedinPostResponseList() == null )
+                        mediaPostResponseDetails.setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
+                    mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
+                }
+            }
+        } catch ( Exception e ) {
+            SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
+            linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
+            linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+            linkedinPostResponse.setResponseMessage( e.getMessage() );
+            if ( mediaPostResponseDetails.getLinkedinPostResponseList() == null )
+                mediaPostResponseDetails.setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
+            mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
+
+            reportBug( "Linkedin", setting.getProfileName(), e );
+        }
     }
 
 
@@ -1264,7 +1177,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList = socialMediaPostResponseDetails
             .getBranchMediaPostResponseDetailsList();
 
-        //Post for agent //TODO: This isn't working!!!
+        //Post for agent
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
             AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails
                 .getAgentMediaPostDetails().getAgentId() );
@@ -1333,10 +1246,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         try {
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
                 if ( !tweet( setting, twitterMessage, companyId ) ) {
-                    List<String> regionSocialList = mediaPostDetails.getSharedOn();
-                    if ( !regionSocialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
-                        regionSocialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
-                    mediaPostDetails.setSharedOn( regionSocialList );
+                    List<String> socialList = mediaPostDetails.getSharedOn();
+                    if ( !socialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
+                        socialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
+                    mediaPostDetails.setSharedOn( socialList );
 
                     SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
                     twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken()
