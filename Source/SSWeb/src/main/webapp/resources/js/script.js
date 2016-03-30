@@ -3247,7 +3247,6 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				hierarchyUpload.hierarchyJson = jsonResponse.response;
-				console.log(hierarchyUpload.hierarchyJson);
 				$('#region-added').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfRegionsAdded != 0) {
 					$(
@@ -3748,7 +3747,6 @@ var hierarchyUpload = {
 					$('#user-upload').empty();
 					var userlength = hierarchyUpload.hierarchyJson.upload.users.length;
 					for (var i = 0; i < userlength; i++) {
-						alert(hierarchyUpload.hierarchyJson.upload.users[i].isInAppendMode);
 						if (hierarchyUpload.hierarchyJson.upload.users[i].isInAppendMode == true
 								|| hierarchyUpload.uploadType == 'replace') {
 							if (hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded == true) {
