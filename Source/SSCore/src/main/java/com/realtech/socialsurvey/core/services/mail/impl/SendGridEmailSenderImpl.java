@@ -112,7 +112,8 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         boolean mailSent = true;
         Email email = new Email();
         email.addTo( emailEntity.getRecipients().toArray( new String[emailEntity.getRecipients().size()] ) );
-        email.setFrom( emailEntity.getSenderEmailId() );
+        String encryptedFromId = utils.encryptUserEmailId( emailEntity.getSenderEmailId() );
+        email.setFrom( encryptedFromId );
         email.setFromName( emailEntity.getSenderName() );
         email.setSubject( emailEntity.getSubject() );
         email.setHtml( emailEntity.getBody() );

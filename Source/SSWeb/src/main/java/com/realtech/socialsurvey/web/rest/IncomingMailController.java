@@ -18,6 +18,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
 @Controller
@@ -40,6 +41,8 @@ public class IncomingMailController
     @Autowired
     private EmailServices emailServices;
 
+    @Autowired
+    private EncryptionHelper encryptionHelper;
 
 
     /**
@@ -127,13 +130,16 @@ public class IncomingMailController
 
         LOG.info( "Method resolveMailTo() called to resolve mail to email id" );
         String resolvedMailId = mailTo;
-        String agentEmailRegex = "u(\\d+)@" + Matcher.quoteReplacement( defaultEmailDomain );
+        String agentEmailRegex = "u-(.*)@" + Matcher.quoteReplacement( defaultEmailDomain );
+        // String agentEmailRegex = "u(\\d+)@" + Matcher.quoteReplacement( defaultEmailDomain );
         Pattern pattern = Pattern.compile( agentEmailRegex );
         Matcher matcher = pattern.matcher( mailTo );
         if ( matcher.find() ) {
             LOG.info( "Mail id belongs to agent mail id format" );
-            LOG.info( "agent id from the mail id is " + matcher.group( 1 ) );
-            User user = userManagementService.getUserObjByUserId( Long.parseLong( matcher.group( 1 ) ) );
+            String encryptedUserId = matcher.group( 1 );
+            String userId = encryptionHelper.decodeBase64( encryptedUserId );
+            LOG.info( "agent id from the mail id is " + userId );
+            User user = userManagementService.getUserObjByUserId( Long.parseLong( userId ) );
             resolvedMailId = user.getEmailId();
         } else if ( mailTo.contains( defaultFromAddress ) || mailTo.contains( applicationAdminEmail ) ) {
             resolvedMailId = applicationAdminEmail;
