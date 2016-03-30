@@ -401,8 +401,8 @@ public interface EmailServices
         throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void sendCompanyRegistrationStageMail(  String recipientMailId, String registrationStage, String name, String details ) throws InvalidInputException,
-        UndeliveredEmailException;
+    public void sendCompanyRegistrationStageMail( String recipientMailId, String registrationStage, String name,
+        String details, boolean isImmediate ) throws InvalidInputException, UndeliveredEmailException;
     /**
      * 
      * @param recipientName

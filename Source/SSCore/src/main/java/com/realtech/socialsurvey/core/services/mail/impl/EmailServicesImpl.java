@@ -141,8 +141,8 @@ public class EmailServicesImpl implements EmailServices
     
     @Async
     @Override
-    public void sendCompanyRegistrationStageMail( String recipientMailId, String registrationStage, String name, String details )
-        throws InvalidInputException, UndeliveredEmailException
+    public void sendCompanyRegistrationStageMail( String recipientMailId, String registrationStage, String name,
+        String details, boolean isImmediate ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method to send registration stage mail started" );
         if ( registrationStage == null || registrationStage.isEmpty() ) {
@@ -162,7 +162,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, registrationStage, details ) );
-        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, isImmediate, false );
     }
 
 

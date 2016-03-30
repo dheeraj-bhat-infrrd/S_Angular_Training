@@ -473,13 +473,13 @@ public class RegistrationController
             return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
         }
 
-        //TODO: specify details
+        //specify details
         String details = "First Name : " + firstName + "<br/>" +
             "Last Name : " + lastName + "<br/>" + 
             "Email Address : "  + emailId;
         try {
             emailServices.sendCompanyRegistrationStageMail( salesLeadEmail, CommonConstants.COMPANY_REGISTRATION_STAGE_STARTED,
-                emailId, details );
+                emailId, details, true );
         } catch ( InvalidInputException e ) {
             e.printStackTrace();
         } catch ( UndeliveredEmailException e ) {

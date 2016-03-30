@@ -180,7 +180,7 @@ public class PaymentController {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		     
-            //TODO: specify details
+            //specify details
             String details = "First Name : " + user.getFirstName() + "<br/>" +
                 "Last Name : " + user.getLastName() + "<br/>" + 
                 "Email Address : "  + user.getEmailId() + "<br/>" +               
@@ -188,7 +188,7 @@ public class PaymentController {
                 "Account Type : " + strAccountType;
             try {
                 emailServices.sendCompanyRegistrationStageMail( supportMail,
-                    CommonConstants.COMPANY_REGISTRATION_STAGE_COMPLETE, user.getCompany().getCompany(), details );
+                    CommonConstants.COMPANY_REGISTRATION_STAGE_COMPLETE, user.getCompany().getCompany(), details, false );
             } catch ( InvalidInputException e ) {
                 e.printStackTrace();
             } catch ( UndeliveredEmailException e ) {
