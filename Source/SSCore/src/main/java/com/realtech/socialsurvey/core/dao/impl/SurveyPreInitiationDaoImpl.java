@@ -159,8 +159,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.le( "lastReminderTime", new Timestamp( new Date().getTime() - surveyReminderInterval
                 * 24 * 60 * 60 * 1000 ) ) );
-            criteria
-                .add( Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ) );
+            criteria.add( Restrictions.and(
+                Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ),
+                Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) ) );
             if ( maxReminders > 0 )
                 criteria.add( Restrictions.lt( "reminderCounts", maxReminders ) );
             LOG.info( "Method getIncompleteSurveyForReminder() finished." );
@@ -180,7 +181,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         List<SurveyPreInitiation> surveys = new ArrayList<>();
 
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
-        criteria.add( Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ) );
+        criteria.add( Restrictions.and(
+            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ),
+            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) ) );
         try {
             if ( startDate != null && endDate != null ) {
                 criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, new Timestamp( startDate.getTime() ) ) );
@@ -222,7 +225,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     {
         LOG.info( "Method deleteSurveysWithIds() started" );
         //First get the list of surveys that will be deleted
-        String deleteQuery = "update SurveyPreInitiation set status=7, modifiedOn=(:modifiedOnTime) where surveyPreIntitiationId in (:incompleteSurveyIds) and status in (:statuses)";
+        String deleteQuery = "update SurveyPreInitiation set status=0, modifiedOn=(:modifiedOnTime) where surveyPreIntitiationId in (:incompleteSurveyIds) and status in (:statuses)";
         Query query = getSession().createQuery( deleteQuery );
         query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameterList( "incompleteSurveyIds", incompleteSurveyIds );
@@ -244,7 +247,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     {
         LOG.info( "Method fetchSurveysByIds() started" );
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
-        criteria.add( Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ) );
+        criteria.add( Restrictions.and(
+            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ),
+            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) ) );
         criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, incompleteSurveyIds ) );
         return criteria.list();
     }
@@ -439,7 +444,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         if ( agentId <= 0l ) {
             throw new InvalidInputException( "Invalid agent ID : " + agentId );
         }
-        String deleteQuery = "update SurveyPreInitiation set status=7, modifiedOn=(:modifiedOnTime) where agentId = (:deletedAgentId) and status in (:statuses)";
+        String deleteQuery = "update SurveyPreInitiation set status=0, modifiedOn=(:modifiedOnTime) where agentId = (:deletedAgentId) and status in (:statuses)";
         Query query = getSession().createQuery( deleteQuery );
         query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( "deletedAgentId", agentId );

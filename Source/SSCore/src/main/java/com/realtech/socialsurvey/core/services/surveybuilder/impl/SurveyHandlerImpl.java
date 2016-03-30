@@ -1287,8 +1287,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         queries.put( "customerEmailId", customerEmail );*/
         Criterion agentIdCriteria = Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId );
         Criterion emailCriteria = Restrictions.eq( "customerEmailId", customerEmail );
-        Criterion statusCriteria = Restrictions.ne( CommonConstants.STATUS_COLUMN,
-            CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+        Criterion statusCriteria = Restrictions.and(
+            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ),
+            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) );
         Criterion firstNameCriteria = null;
         Criterion lastNameCriteria = null;
 
@@ -1809,8 +1810,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         Criterion agentIdCriteria = Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId );
         Criterion emailCriteria = Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, recipientEmailId );
-        Criterion statusCriteria = Restrictions.ne( CommonConstants.STATUS_COLUMN,
-            CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+        Criterion statusCriteria = Restrictions.and(
+            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ),
+            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) );
         List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class,
             agentIdCriteria, emailCriteria, statusCriteria );
 
