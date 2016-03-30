@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.social;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -102,7 +103,7 @@ public interface SocialManagementService
 
 
     public boolean updateLinkedin( OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl,
-        String linkedinMessageFeedback ) throws NonFatalException;
+        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow ) throws NonFatalException;
 
 
     public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, OrganizationUnitSettings unitSettings,
@@ -157,7 +158,7 @@ public interface SocialManagementService
 
     void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,
         String linkedinMessageFeedback, int accountMasterId, SocialMediaPostDetails socialMediaPostDetails,
-        SocialMediaPostResponseDetails socialMediaPostResponseDetails ) throws InvalidInputException, NoRecordsFetchedException;
+        SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings, boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     void postToTwitterForHierarchy( String twitterMessage, double rating, String serverBaseUrl, int accountMasterId,
@@ -185,7 +186,7 @@ public interface SocialManagementService
 
 
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate );
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate, String postedOn );
 
 
     public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds );
@@ -203,5 +204,17 @@ public interface SocialManagementService
 
 
     void updateSurveyPreinitiationRecordsAsIgnored( String emailAddress ) throws InvalidInputException;
+
+
+    public String buildFacebookAutoPostMessage( String customerDisplayName, String agentName, double rating,
+        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow );
+
+
+    public String buildLinkedInAutoPostMessage( String customerDisplayName, String agentName, double rating,
+        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow );
+
+
+    public String buildTwitterAutoPostMessage( String customerDisplayName, String agentName, double rating,
+        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow );
 }
 // JIRA SS-34 BY RM02 BOC

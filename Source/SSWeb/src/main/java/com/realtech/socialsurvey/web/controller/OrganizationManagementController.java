@@ -3,7 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -2740,12 +2740,18 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = null;
         LOG.info( "Validating the hierarchy file" );
         String fileUrl = request.getParameter( "fileUrl" );
+        boolean isAppend = false;
+        if ( request.getParameter( "uploadType" ) != null && !request.getParameter( "uploadType" ).isEmpty() ) {
+            if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+                isAppend = true;
+            }
+        }
         try {
             if ( fileUrl == null || fileUrl.isEmpty() ) {
                 throw new InvalidInputException( "File URL cannot be empty" );
             }
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
+            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl, isAppend );
             response = uploadValidation;
         } catch ( InvalidInputException ex ) {
             status = false;
@@ -2767,50 +2773,23 @@ public class OrganizationManagementController
         boolean status = true;
         Object response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
+        boolean isAppend = false;
+        if ( request.getParameter( "uploadType" ) != null && !request.getParameter( "uploadType" ).isEmpty() ) {
+            if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+                isAppend = true;
+            }
+        }
         LOG.info( hierarchyJson );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
+            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation, isAppend );
             response = uploadValidation;
         } catch ( Exception ex ) {
             status = false;
             response = ex.getMessage();
         }
 
-        Map<String, Object> responseMap = new HashMap<String, Object>();
-        responseMap.put( "status", status );
-        responseMap.put( "response", response );
-        return new Gson().toJson( responseMap );
-    }
-
-
-    @ResponseBody
-    @RequestMapping ( value = "/uploadxlsxfile", method = RequestMethod.POST)
-    public String saveHierarchyFileData( Model model, HttpServletRequest request ) throws InvalidInputException
-    {
-        LOG.info( "Saving the hierarchy file data" );
-        boolean status = true;
-        String response = null;
-        String hierarchyJson = request.getParameter( "hierarchyJson" );
-        UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
-        User user = sessionHelper.getCurrentUser();
-        Map<String, List<String>> map = new HashMap<String, List<String>>();
-        List<String> value = new ArrayList<String>();
-        try {
-            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user );
-            if ( map == null || map.isEmpty() ) {
-                value.add( "Data uploaded successfully." );
-                map.put( "UPLOAD_SUCCESS", value );
-            } else {
-                status = false;
-            }
-        } catch ( Exception ex ) {
-            status = false;
-            value.add( ex.getMessage() );
-            map.put( "UPLOAD_FAILED", value );
-        }
-        response = new Gson().toJson( map );
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
         responseMap.put( "response", response );
@@ -2827,13 +2806,17 @@ public class OrganizationManagementController
         String response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        boolean isAppend = false;
+        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
+            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
+        }
         try {
             User user = sessionHelper.getCurrentUser();
-            //Insert hieararchy upload in UPLOAD_HIERARCHY_DETAILS collections
+            //Insert hierarchy upload in UPLOAD_HIERARCHY_DETAILS collections
             hierarchyStructureUploadService.saveHierarchyUploadInMongo( uploadValidation.getUpload() );
 
             //Initiate upload by adding entry in upload status table
-            hierarchyStructureUploadService.addNewUploadRequest( user );
+            hierarchyStructureUploadService.addNewUploadRequest( user, isAppend );
             response = "Hierarchy upload batch is initialized successfully";
         } catch ( Exception ex ) {
             status = false;
@@ -2846,26 +2829,31 @@ public class OrganizationManagementController
     }
 
 
-
     @ResponseBody
     @RequestMapping ( value = "/fetchUploadBatchStatus", method = RequestMethod.POST)
     public String fetchUploadBatchStatus( Model model, HttpServletRequest request ) throws InvalidInputException
     {
         LOG.info( "Fetching the latest batch processing message" );
-        //TODO: Get the actual stuff instead
         User user = sessionHelper.getCurrentUser();
         boolean status = true;
         String response = null;
-        UploadStatus latestStatus = hierarchyStructureUploadService.fetchLatestUploadStatus( user.getCompany() );
-        int uploadStatus = -1;
-        String lastUploadRunTimestamp = null;
+        int latestStatus = -1;
+        Timestamp lastUploadTime = null;
+        List<UploadStatus> latestStatuses = hierarchyStructureUploadService.fetchUploadStatusForCompany( user.getCompany() );
         try {
-            if ( latestStatus == null ) {
+            if ( latestStatuses == null || latestStatuses.isEmpty() ) {
                 response = CommonConstants.UPLOAD_MSG_NO_UPLOAD;
             } else {
-                response = latestStatus.getMessage();
-                lastUploadRunTimestamp = latestStatus.getModifiedOn().toString();
-                uploadStatus = latestStatus.getStatus();
+                UploadStatus uploadStatus = hierarchyStructureUploadService.highestStatus( latestStatuses );
+                latestStatus = uploadStatus.getStatus();
+                lastUploadTime = uploadStatus.getModifiedOn();
+
+                //So that this is shown only once, if hierarchy upload status is 4, set it to 6 and update
+                if ( latestStatus == CommonConstants.HIERARCHY_UPLOAD_UPLOAD_COMPLETE ) {
+                    hierarchyStructureUploadService.updateUploadStatusToNoUpload( uploadStatus );
+                    //Change status back to upload status for the json object
+                    uploadStatus.setStatus( latestStatus );
+                }
             }
         } catch ( Exception e ) {
             status = false;
@@ -2873,10 +2861,13 @@ public class OrganizationManagementController
         }
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
-        responseMap.put( "response", response );
-        responseMap.put( "uploadStatus", uploadStatus );
-        // Fetch the last uploaded timestamp from db and put it in responseMap
-        responseMap.put( "lastUploadRunTimestamp", lastUploadRunTimestamp );
+        if ( latestStatuses == null || latestStatuses.isEmpty() ) {
+            responseMap.put( "response", response );
+        } else {
+            responseMap.put( "response", latestStatuses );
+        }
+        responseMap.put( "uploadStatus", latestStatus );
+        responseMap.put( "lastUploadRunTimestamp", lastUploadTime );
         return new Gson().toJson( responseMap );
     }
 

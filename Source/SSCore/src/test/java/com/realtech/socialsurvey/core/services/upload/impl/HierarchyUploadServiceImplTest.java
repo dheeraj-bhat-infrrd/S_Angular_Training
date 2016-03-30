@@ -74,14 +74,14 @@ public class HierarchyUploadServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testValidateUserUploadFileIfCompanyInvalidFileNameInvalid() throws InvalidInputException
     {
-        hierarchyUploadServiceImpl.validateUserUploadFile( null, null );
+        hierarchyUploadServiceImpl.validateUserUploadFile( null, null, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testValidateUserUploadFileIfCompanyInvalidFileNameValid() throws InvalidInputException
     {
-        hierarchyUploadServiceImpl.validateUserUploadFile( null, "src/test/resources/testCSV.xlsx" );
+        hierarchyUploadServiceImpl.validateUserUploadFile( null, "src/test/resources/testCSV.xlsx", false );
     }
 
 
@@ -93,7 +93,7 @@ public class HierarchyUploadServiceImplTest
         File file = new File( "." );
         Mockito.when( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) ).thenReturn( getHierarchyUpload() );
         UploadValidation validationObj = hierarchyUploadServiceImpl.validateUserUploadFile( company,
-            "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx" );
+            "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx", false );
         Assert.assertNotNull( validationObj );
         Assert.assertNotNull( validationObj.getUpload() );
         Assert.assertEquals( 11, validationObj.getUpload().getRegions().size() );
@@ -110,7 +110,7 @@ public class HierarchyUploadServiceImplTest
         Mockito.when( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) ).thenReturn( getHierarchyUpload() );
         File file = new File( "." );
         UploadValidation validationObj = hierarchyUploadServiceImpl.validateUserUploadFile( company,
-            "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx" );
+            "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx", false );
         Assert.assertNotNull( validationObj );
         Assert.assertEquals( 76, validationObj.getNumberOfBranchesAdded() );
         Assert.assertEquals( 1, validationObj.getNumberOfBranchesDeleted() );
@@ -131,7 +131,7 @@ public class HierarchyUploadServiceImplTest
         Mockito.when( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) ).thenReturn( getHierarchyUpload_deletedUser() );
         File file = new File( "." );
         UploadValidation validationObj = hierarchyUploadServiceImpl.validateUserUploadFile( company,
-            "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx" );
+            "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx", false );
         Assert.assertNotNull( validationObj );
         Assert.assertEquals( 1, validationObj.getNumberOfUsersDeleted() );
     }
@@ -165,11 +165,11 @@ public class HierarchyUploadServiceImplTest
         HierarchyUpload upload = new HierarchyUpload();
         List<BranchUploadVO> branches = new ArrayList<BranchUploadVO>();
         branches.add( getBranch( "ABC", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
-        branches.add( getBranch( "SCT", "abcdefh", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
+        branches.add( getBranch( "SCT", "Scottsdale", "ABC", true, "Bangalore", "KA", "123456", 1 ) );
         upload.setBranches( branches );
         List<RegionUploadVO> regions = new ArrayList<RegionUploadVO>();
         regions.add( getRegion( "ABC", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
-        regions.add( getRegion( "Lee", "abcdefh", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
+        regions.add( getRegion( "Lee", "Lee", "12 sdvdv", "12 sdvdv", "Bangalore", "India", "KA", "123456", 1 ) );
         upload.setRegions( regions );
         List<UserUploadVO> users = new ArrayList<UserUploadVO>();
         List<String> branchAdmins = new ArrayList<String>();
@@ -179,7 +179,7 @@ public class HierarchyUploadServiceImplTest
         regionAdmins.add( "ABC" );
         regionAdmins.add( "Lee" );
         users.add( getUser( "XYZ", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
-        users.add( getUser( "sbrennan", "cdcdvd", "asncj@dmck.com", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
+        users.add( getUser( "sbrennan", "cdcdvd", "sean.brennan@summitfunding.net", "ABC", "ABC", branchAdmins, regionAdmins, 1 ) );
         upload.setUsers( users );
         return upload;
     }
@@ -237,7 +237,7 @@ public class HierarchyUploadServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void validateHierarchyUploadJsonTestInvalidNewUpload() throws InvalidInputException
     {
-        hierarchyUploadServiceImpl.validateHierarchyUploadJson( new Company(), null );
+        hierarchyUploadServiceImpl.validateHierarchyUploadJson( new Company(), null, false );
     }
 
 }

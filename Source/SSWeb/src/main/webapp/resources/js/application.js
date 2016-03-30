@@ -991,8 +991,8 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		isDashboardReviewRequestRunning = false;
 		if($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
 			fetchReviewsOnDashboard(true);
-		} else {
-			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp);
+		} else if($('div.dsh-review-cont.hide').length < (2 * batchSizeCmp)) {
+			fetchZillowReviewsBasedOnProfile(colName, colValue,isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp, name);
 		}
 	}, payload, true);
 }
@@ -2039,6 +2039,35 @@ function displayMessage(data) {
 }
 
 /**
+ * function to display success and failure message to user after adding region and branch action
+ * @param data
+ */
+function displayMessageForRegionAndBranchAddition(data) {
+	$("#temp-message").html(data);
+	var displayMessageDiv = $("#temp-message #display-msg-div");
+	var invalidEmailAddressDiv = $("#display-invalid-email-addr-msg-div");
+	var alreadyExistEmailAddressDiv = $("#display-already-exist-email-addr-msg-div");
+	if($(displayMessageDiv).hasClass("success-message")) {
+		showInfoSuccessMobileAndWeb($(displayMessageDiv).html());
+	}
+	else if($(displayMessageDiv).hasClass("error-message")) {
+		showErrorSuccessMobileAndWeb($(displayMessageDiv).html());
+	}
+	if($(invalidEmailAddressDiv).hasClass("error-message")) {
+		showErrorInvalidMobileAndWeb($(invalidEmailAddressDiv).html());
+	}
+	if($(alreadyExistEmailAddressDiv).hasClass("error-message")) {
+		showErrorMobileAndWeb($(alreadyExistEmailAddressDiv).html());
+	}
+	var invalidMessage = $('#invalid-display-msg-div').text();
+	if(invalidMessage != undefined && invalidMessage != ""){
+		$('#overlay-toast').html(invalidMessage);
+		showToast();
+	}
+	$("#temp-message").html("");
+}
+
+/**
  * checks whether is authorized to build hierarchy and displays message to the user
  */
 function checkUserAuthorization(){
@@ -2591,7 +2620,7 @@ function addRegion(formId,disableEle) {
  */
 function addRegionCallBack(data) {
 	hideOverlay();
-	displayMessage(data);
+	displayMessageForRegionAndBranchAddition(data);
 	showStateCityRow("region-state-city-row", "region-state-txt", "region-city-txt");
 	resetInputFields("edit-region-form");
 	$('#region-country').val(defaultCountry);
@@ -2763,7 +2792,7 @@ function addOffice(formId,disableEle) {
  */
 function addOfficeCallBack(data) {
 	hideOverlay();
-	displayMessage(data);
+	displayMessageForRegionAndBranchAddition(data);
 	showStateCityRow("office-state-city-row", "office-state-txt", "office-city-txt");
 	resetInputFields("edit-office-form");
 	$('#office-country').val(defaultCountry);
@@ -7504,13 +7533,13 @@ function fetchReviewsOnEditProfile(attrName, attrVal, isNextBatch) {
 		isReviewsRequestRunningEditProfile = false;
 		if($('div.dsh-review-cont.hide').length <= numOfRows && !doStopReviewsPaginationEditProfile) {
 			fetchReviewsOnEditProfile(attrName, attrVal, true);
-		} else {
-			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false, countOfReviewsFetched, numOfRows);
+		} else if($('div.dsh-review-cont.hide').length < (2 * numOfRows)) {
+			fetchZillowReviewsBasedOnProfile(attrName, attrVal,isZillowReviewsCallRunning, false, countOfReviewsFetched, numOfRows, "");
 		}
 	}, true);
 }
 
-function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard, start, batchSize){
+function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNextBatch, isFromDashBoard, start, batchSize, name){
 	if (currentProfileIden == undefined || currentProfileIden == "" || isZillowReviewsCallRunning) {
 		return; //Return if profile id is undefined
 	}
@@ -7529,6 +7558,7 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	}
 	url += currentProfileIden + "/zillowreviews";
 	isZillowReviewsCallRunning = true;
+	
 	callAjaxGET(url, function(data) {
 		isZillowReviewsCallRunning = false;
 	    if (data != undefined && data != "") {
@@ -7543,7 +7573,7 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 	                	var lastIndex = start - batchSize;
 						// remove the No Reviews Found
 						if (isFromDashBoard && lastIndex <= 0) {
-							$("#review-desc").html("");
+							$("#review-desc").html("What people say about " + name);
 						} else if (!isFromDashBoard && start <= 0) {
 							$("#prof-review-item").html("");
 						}
@@ -10514,8 +10544,15 @@ function encompassCretentials(){
 function paintReviews(result, isRequestFromDashBoard){
 	//Check if there are more reviews left
 	var resultSize = result.length;
-	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 
+	if(isRequestFromDashBoard){
+		displayReviewOnDashboard();
+	} else {
+		displayReviewOnEditProfile();
+	}
+	
+	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
+	
 	var reviewsHtml = "";
 	$.each(result, function(i, reviewItem) {
 		var scoreFixVal = 1;
@@ -10563,6 +10600,10 @@ function paintReviews(result, isRequestFromDashBoard){
 			reviewsHtml += '	</div>';
 		}
 		
+		if(reviewItem.summary != null && reviewItem.summary.length > 0){
+			reviewsHtml += '<div class="ppl-content">'+reviewItem.summary+'</div>';
+		}
+		
 		if (reviewItem.review.length > 250) {
 			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
 		} else {
@@ -10603,7 +10644,11 @@ function paintReviews(result, isRequestFromDashBoard){
 		$('#reviews-container').show();
 	}
 
-	hideLoaderOnPagination($('#prof-review-item'));
+	if(isRequestFromDashBoard){
+		hideLoaderOnPagination($('#review-details'));
+	} else { 
+		hideLoaderOnPagination($('#prof-review-item'));
+	}
 	/*if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
 		$("#prof-review-item").html('');
 	}*/

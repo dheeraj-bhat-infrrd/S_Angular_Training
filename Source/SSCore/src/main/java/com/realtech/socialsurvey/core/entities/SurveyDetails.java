@@ -49,6 +49,7 @@ public class SurveyDetails
     private boolean isAbuseRepByUser;
     private SocialMediaPostResponseDetails socialMediaPostResponseDetails;
     private boolean showSurveyOnUI;
+    private String summary;
 
     public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
     {
@@ -561,5 +562,17 @@ public class SurveyDetails
     public void setShowSurveyOnUI( boolean showSurveyOnUI )
     {
         this.showSurveyOnUI = showSurveyOnUI;
+    }
+
+
+    public String getSummary()
+    {
+        return summary;
+    }
+
+
+    public void setSummary( String summary )
+    {
+        this.summary = summary;
     }
 }

@@ -48,14 +48,18 @@ public class HierarchyUploadProcessor implements Runnable
                         User adminUser = hierarchyStructureUploadService.getUser( uploadStatus.getAdminUserId() );
                         try {
                             // Update uploadStatus to 0
-                            uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_PROCESSING );
+                            uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_STARTED );
                             uploadStatus.setMessage( CommonConstants.UPLOAD_MSG_STARTED );
                             hierarchyStructureUploadService.updateUploadStatus( uploadStatus );
                             //Upload hierarchy
                             HierarchyUpload hierarchyUpload = hierarchyStructureUploadService
                                 .fetchHierarchyToBeUploaded( company );
+                            boolean isAppend = false;
+                            if ( uploadStatus.getUploadMode() == CommonConstants.UPLOAD_MODE_APPEND ) {
+                                isAppend = true;
+                            }
                             Map<String, List<String>> errors = hierarchyStructureUploadService.uploadHierarchy(
-                                hierarchyUpload, company, adminUser );
+                                hierarchyUpload, company, adminUser, isAppend );
                             if ( !errors.isEmpty() ) {
                                 //TODO: Send a mail or store somewhere
                             }
@@ -66,6 +70,9 @@ public class HierarchyUploadProcessor implements Runnable
                             completedUploadStatus.setAdminUserId( adminUser.getUserId() );
                             completedUploadStatus.setMessage( "Hierarchy upload completed successfully." );
                             hierarchyStructureUploadService.addUploadStatusEntry( completedUploadStatus );
+                            //Set import started status to done
+                            uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_DONE );
+                            hierarchyStructureUploadService.updateUploadStatus( uploadStatus );
                         } catch ( InvalidInputException e ) {
                             //If error occurs, add uploadStatus ERROR and store message
                             UploadStatus errorUploadStatus = new UploadStatus();

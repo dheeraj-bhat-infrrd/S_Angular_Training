@@ -29,34 +29,41 @@ public class UploadValidationServiceImpl implements UploadValidationService
 
 
     @Override
-    public void validateHeirarchyUpload( UploadValidation validationObject )
+    public void validateHeirarchyUpload( UploadValidation validationObject, Map<String, String> regionErrors,
+        Map<String, String> branchErrors, Map<String, String> userErrors )
     {
-        validateRegions( validationObject );
-        validateBranches( validationObject );
-        validateUsers( validationObject );
+        validateRegions( validationObject, regionErrors );
+        validateBranches( validationObject, branchErrors );
+        validateUsers( validationObject, userErrors );
         validateDeletedRegionsRecords( validationObject );
         validateDeletedBranchesRecords( validationObject );
     }
 
 
-    void validateRegions( UploadValidation validationObject )
+    void validateRegions( UploadValidation validationObject, Map<String, String> regionErrors )
     {
-        List<String> regionValidationErrors = new ArrayList<String>();
+        List<String> regionValidationErrors = validationObject.getRegionValidationErrors();
+        if ( regionValidationErrors == null ) {
+            regionValidationErrors = new ArrayList<String>();
+        }
         for ( RegionUploadVO uploadedRegion : validationObject.getUpload().getRegions() ) {
             if ( !uploadedRegion.isDeletedRecord() ) {
                 if ( uploadedRegion.getValidationErrors() != null ) {
                     uploadedRegion.getValidationErrors().clear();
                 }
-                validateRegionForErrors( uploadedRegion, regionValidationErrors );
+                validateRegionForErrors( uploadedRegion, regionValidationErrors, regionErrors );
             }
         }
         validationObject.setRegionValidationErrors( regionValidationErrors );
     }
 
 
-    void validateBranches( UploadValidation validationObject )
+    void validateBranches( UploadValidation validationObject, Map<String, String> branchErrors )
     {
-        List<String> branchValidationErrors = new ArrayList<String>();
+        List<String> branchValidationErrors = validationObject.getBranchValidationErrors();
+        if ( branchValidationErrors == null ) {
+            branchValidationErrors = new ArrayList<String>();
+        }
         List<String> branchValidationWarnings = new ArrayList<String>();
         for ( BranchUploadVO uploadedBranch : validationObject.getUpload().getBranches() ) {
             if ( !uploadedBranch.isDeletedRecord() ) {
@@ -66,7 +73,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
                 if ( uploadedBranch.getValidationErrors() != null ) {
                     uploadedBranch.getValidationErrors().clear();
                 }
-                validateBranchForErrors( uploadedBranch, branchValidationErrors, validationObject.getUpload() );
+                validateBranchForErrors( uploadedBranch, branchValidationErrors, validationObject.getUpload(), branchErrors );
                 validateBranchForWarnings( uploadedBranch, branchValidationWarnings );
             }
         }
@@ -75,7 +82,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
     }
 
 
-    void validateUsers( UploadValidation validationObject )
+    void validateUsers( UploadValidation validationObject, Map<String, String> userErrors )
     {
         List<String> userValidationErrors = new ArrayList<String>();
         List<String> userValidationWarnings = new ArrayList<String>();
@@ -87,7 +94,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
                 if ( uploadeduser.getValidationWarnings() != null ) {
                     uploadeduser.getValidationWarnings().clear();
                 }
-                validateUserForErrors( uploadeduser, userValidationErrors, validationObject.getUpload() );
+                validateUserForErrors( uploadeduser, userValidationErrors, validationObject.getUpload(), userErrors );
                 validateUserForWarnings( uploadeduser, userValidationWarnings );
             }
         }
@@ -247,7 +254,8 @@ public class UploadValidationServiceImpl implements UploadValidationService
     }
 
 
-    private void validateRegionForErrors( RegionUploadVO uploadedRegion, List<String> regionValidationErrors )
+    private void validateRegionForErrors( RegionUploadVO uploadedRegion, List<String> regionValidationErrors,
+        Map<String, String> regionErrors )
     {
         boolean errorRecord = false;
         if ( uploadedRegion.getSourceRegionId() == null || uploadedRegion.getSourceRegionId().isEmpty() ) {
@@ -263,6 +271,17 @@ public class UploadValidationServiceImpl implements UploadValidationService
                 .add( "Region name at row: " + uploadedRegion.getRowNum() + " is not provided" );
             errorRecord = true;
         }
+        
+        if ( regionErrors != null && !regionErrors.isEmpty() ) {
+            if ( regionErrors.containsKey( uploadedRegion.getSourceRegionId() ) ) {
+                String error = regionErrors.get( uploadedRegion.getSourceRegionId() );
+                if ( error != null && !error.isEmpty() ) {
+                    regionValidationErrors.add( error );
+                    uploadedRegion.getValidationErrors().add( error );
+                    errorRecord = true;
+                }
+            }
+        }
 
         if ( errorRecord ) {
             uploadedRegion.setErrorRecord( true );
@@ -271,7 +290,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
 
 
     private void validateBranchForErrors( BranchUploadVO uploadedBranch, List<String> branchValidationErrors,
-        HierarchyUpload upload )
+        HierarchyUpload upload, Map<String, String> branchErrors )
     {
         boolean errorRecord = false;
         if ( uploadedBranch.getSourceBranchId() == null || uploadedBranch.getSourceBranchId().isEmpty() ) {
@@ -310,6 +329,17 @@ public class UploadValidationServiceImpl implements UploadValidationService
             errorRecord = true;
         }
 
+        if ( branchErrors != null && !branchErrors.isEmpty() ) {
+            if ( branchErrors.containsKey( uploadedBranch.getSourceBranchId() ) ) {
+                String error = branchErrors.get( uploadedBranch.getSourceBranchId() );
+                if ( error != null && !error.isEmpty() ) {
+                    branchValidationErrors.add( error );
+                    uploadedBranch.getValidationErrors().add( error );
+                    errorRecord = true;
+                }
+            }
+        }
+        
         if ( errorRecord ) {
             uploadedBranch.setErrorRecord( true );
         }
@@ -320,7 +350,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
     {
         boolean isWarningRecord = false;
         if ( uploadedBranch.getSourceRegionId() == null || uploadedBranch.getSourceRegionId().isEmpty() ) {
-            LOG.error( "Office at row " + uploadedBranch.getRowNum() + " is not assigned to any region" );
+            LOG.warn( "Office at row " + uploadedBranch.getRowNum() + " is not assigned to any region" );
             branchValidationWarnings.add( "Office at row " + uploadedBranch.getRowNum() + " is not assigned to any region" );
             uploadedBranch.getValidationWarnings()
                 .add( "Office at row " + uploadedBranch.getRowNum() + " is not assigned to any region" );
@@ -332,7 +362,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
     }
 
 
-    private void validateUserForErrors( UserUploadVO uploadedUser, List<String> userValidationErrors, HierarchyUpload upload )
+    private void validateUserForErrors( UserUploadVO uploadedUser, List<String> userValidationErrors, HierarchyUpload upload, Map<String, String> userErrors )
     {
         boolean errorRecord = false;
         if ( uploadedUser.getSourceUserId() == null || uploadedUser.getSourceUserId().isEmpty() ) {
@@ -394,6 +424,18 @@ public class UploadValidationServiceImpl implements UploadValidationService
                 errorRecord = true;
             }
         }
+        
+        if ( userErrors != null && !userErrors.isEmpty() ) {
+            if ( userErrors.containsKey( uploadedUser.getSourceUserId() ) ) {
+                String error = userErrors.get( uploadedUser.getSourceUserId() );
+                if ( error != null && !error.isEmpty() ) {
+                    userValidationErrors.add( error );
+                    uploadedUser.getValidationErrors().add( error );
+                    errorRecord = true;
+                }
+            }
+        }
+        
         if ( errorRecord ) {
             uploadedUser.setErrorRecord( true );
         }
@@ -421,7 +463,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
         }
 
         if ( !isAssignedToBranch && !isAssignedToRegion && !isAssignedToBranchAdmin && !isAssignedToRegionAdmin ) {
-            LOG.error( "User at row " + uploadedUser.getRowNum()
+            LOG.warn( "User at row " + uploadedUser.getRowNum()
                 + " is not assigned to any region or branch. User will be assigned to the company." );
             userValidationWarnings.add( "User at row " + uploadedUser.getRowNum()
                 + " is not assigned to any region or branch. User will be assigned to the company." );
@@ -430,21 +472,21 @@ public class UploadValidationServiceImpl implements UploadValidationService
             isWarningRecord = true;
         } else {
             if ( !isAssignedToBranch ) {
-                LOG.error( "User at row " + uploadedUser.getRowNum() + " is not assigned to any office" );
+                LOG.warn( "User at row " + uploadedUser.getRowNum() + " is not assigned to any office" );
                 userValidationWarnings.add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any office" );
                 uploadedUser.getValidationWarnings()
                     .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any office" );
                 isWarningRecord = true;
             }
             if ( !isAssignedToRegion ) {
-                LOG.error( "User at row " + uploadedUser.getRowNum() + " is not assigned to any region" );
+                LOG.warn( "User at row " + uploadedUser.getRowNum() + " is not assigned to any region" );
                 userValidationWarnings.add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any region" );
                 uploadedUser.getValidationWarnings()
                     .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any region" );
                 isWarningRecord = true;
             }
             if ( !isAssignedToBranchAdmin ) {
-                LOG.error( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin office" );
+                LOG.warn( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin office" );
                 userValidationWarnings
                     .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin office" );
                 uploadedUser.getValidationWarnings()
@@ -452,7 +494,7 @@ public class UploadValidationServiceImpl implements UploadValidationService
                 isWarningRecord = true;
             }
             if ( !isAssignedToRegionAdmin ) {
-                LOG.error( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin region" );
+                LOG.warn( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin region" );
                 userValidationWarnings
                     .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin region" );
                 uploadedUser.getValidationWarnings()

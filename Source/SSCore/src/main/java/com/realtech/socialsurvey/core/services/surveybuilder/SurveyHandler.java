@@ -274,4 +274,7 @@ public interface SurveyHandler
 
 
     public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
+
+
+    public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
 }
