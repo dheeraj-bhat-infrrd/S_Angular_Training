@@ -49,15 +49,18 @@ public class DashboardServiceImplTest
 
     @Mock
     private CompanyDao companyDao;
+    
+    @Mock
+    private GenericDao<FileUpload, Long> fileUploadDao;
 
     @Mock
     private OrganizationManagementService organizationManagementService;
 
     @Mock
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+    
 
-    @Mock
-    private GenericDao<FileUpload, Long> fileUploadDao;
+
 
 
     @BeforeClass
@@ -436,7 +439,7 @@ public class DashboardServiceImplTest
     public void testGetBillingReportToBeSentForNoRecords() throws NoRecordsFetchedException
     {
         Mockito.when( fileUploadDao.findByKeyValue( Mockito.eq( FileUpload.class ), Mockito.anyMap() ) ).thenReturn( null );
-        dashboardServiceImpl.getBillingReportToBeSent();
+        dashboardServiceImpl.getReportsToBeSent();
     }
 
 

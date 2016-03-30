@@ -159,6 +159,17 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 	    List<SocialUpdateAction> actions = mongoTemplate.find( query, SocialUpdateAction.class, CommonConstants.SOCIAL_HISTORY_COLLECTION );
 	    return actions;
 	}
+	
+	
+	@Override
+    public List<SocialUpdateAction> getSocialConnectionHistoryByEntityIds(String entityType, List<Long> entityIds){
+        Query query = new Query();
+        if ( entityType != null ) {
+            query.addCriteria( Criteria.where( entityType ).in( entityIds ) );
+        }
+        List<SocialUpdateAction> actions = mongoTemplate.find( query, SocialUpdateAction.class, CommonConstants.SOCIAL_HISTORY_COLLECTION );
+        return actions;
+    }
 
     /**
      * Method to fetch social posts from mongodb

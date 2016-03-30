@@ -250,4 +250,7 @@ public interface SurveyDetailsDao
 
 
     public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
+
+
+    Map<Long, Date> getLatestCompletedSurveyDateForAgents( long companyId );
 }

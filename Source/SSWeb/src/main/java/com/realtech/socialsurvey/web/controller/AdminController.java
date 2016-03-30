@@ -180,6 +180,15 @@ public class AdminController
         LOG.info( "Inside adminUserManagementPage() method in admin controller" );
         return JspResolver.ADMIN_USER_MANAGEMENT;
     }
+    
+    
+    @RequestMapping ( value = "/admindownloadreports")
+    public String adminDownloadReports( Model model, HttpServletRequest request )
+    {
+
+        LOG.info( "Inside downloadreports() method in admin controller" );
+        return JspResolver.ADMIN_DOWNLOAD_REPORTS;
+    }
 
 
     @RequestMapping ( value = "/companyhierarchy")

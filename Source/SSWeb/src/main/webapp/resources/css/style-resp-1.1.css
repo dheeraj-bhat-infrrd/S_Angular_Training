@@ -337,6 +337,12 @@
     .widget-copy{
     padding:0px !important;
     }
+    .admin-report-val-col{
+     float:none !important;
+    }
+    #admin-bill-rep-bnt{
+    float:none !important;
+    }
 }
 
 
@@ -460,6 +466,10 @@
     float:none !important;
     width: auto !important;
     }
+    .admin-report-val-col{
+     float:none !important;
+    }
+    
 }
 
 
@@ -705,6 +715,13 @@
 	.float-none{
 	float:none;
 	}
+	.nav-tabs>li>a {
+	width: 100%;
+	margin-bottom: 5px;
+    }
+    .nav-tabs>li{
+    float:none;
+    }
 	
 	
 }

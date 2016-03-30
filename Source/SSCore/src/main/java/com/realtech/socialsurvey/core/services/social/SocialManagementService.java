@@ -18,6 +18,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -217,5 +218,9 @@ public interface SocialManagementService
 
     public String buildTwitterAutoPostMessage( String customerDisplayName, String agentName, double rating,
         DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow );
+
+
+    Map<Long, List<SocialUpdateAction>> getSocialConnectionsHistoryForEntities( String entityType, List<Long> entityIds )
+        throws InvalidInputException, ProfileNotFoundException;
 }
 // JIRA SS-34 BY RM02 BOC

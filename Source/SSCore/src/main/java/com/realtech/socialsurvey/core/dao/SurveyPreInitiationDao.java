@@ -96,4 +96,6 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
     long getUnmatchedPreInitiatedSurveyCount( long companyId );
 
     long getProcessedPreInitiatedSurveyCount( long companyId );
+
+    Map<Long, Date> getLatestSurveySentForAgent( long companyId );
 }

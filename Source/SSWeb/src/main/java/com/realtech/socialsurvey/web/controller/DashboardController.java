@@ -2206,7 +2206,7 @@ public class DashboardController
         }
         //Check if a request already exists
         try {
-            dashboardService.getBillingReportToBeSent();
+            dashboardService.getActiveBillingReports();
             LOG.info( "A request already exists for getting the billing report" );
         } catch ( NoRecordsFetchedException e ) {
             //Request doesn't already exist. Create one.
@@ -2219,70 +2219,86 @@ public class DashboardController
         LOG.info( "Method to get billing report file getBillingReportFile() finished." );
     }
 
+    
+    @ResponseBody
+    @RequestMapping ( value = "/downloadcompanyuserreport" )
+    public String getCompanyUsersReport( HttpServletRequest request )
+    {
+        LOG.info( "Method getCompanyUsersReport() started." );
+        String status = CommonConstants.SUCCESS_ATTRIBUTE;
+        try{
+            User user = sessionHelper.getCurrentUser();
+            if ( !( user.isSuperAdmin() ) ) {
+                throw new UnsupportedOperationException( "User is not authorized to perform this action" );
+            }
+            
+            String mailId = request.getParameter( "mailid" );
+            String companyIdStr = request.getParameter( "companyId" );
+            long companyId;
+            
+            if(companyIdStr == null || companyIdStr.isEmpty()){
+                throw new InvalidInputException("Passed parameter companyId is invalid");
+            }
+            try {
+                companyId = Long.parseLong( companyIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while parsing companyId in getCompanyUsersReport(). Nested exception is ",
+                    e );
+                throw e;
+            }
+             adminReport.createEntryInFileUploadForCompanyHierarchyReport( mailId , companyId);
+            
+        }catch(NonFatalException e){
+            status = CommonConstants.ERROR;
+            LOG.error( "Error while getting Company Users Report" , e );
+        }
+        LOG.info( "Method getCompanyUsersReport() finished." );
+        
+        return status;
+    }
+
 
     /**
      * Method to download hierarchy report for a company
      * */
+    @ResponseBody
     @RequestMapping ( value = "/downloadcompanyhierarchyreport")
-    public void getCompanyHierarchyReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    public String getCompanyHierarchyReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
     {
         LOG.info( "Method to get company hierarchy report file, getCompanyHierarchyReportFile() started." );
-        User user = sessionHelper.getCurrentUser();
+        String status = CommonConstants.SUCCESS_ATTRIBUTE;
 
         try {
-            String columnName = request.getParameter( "columnName" );
-            if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for column name." );
-                throw new InvalidInputException( "Invalid value (null/empty) passed for column name." );
+            User user = sessionHelper.getCurrentUser();
+            if ( !( user.isSuperAdmin() ) ) {
+                throw new UnsupportedOperationException( "User is not authorized to perform this action" );
             }
 
-            long iden = 0;
-            String columnValue = request.getParameter( "columnValue" );
-            if ( columnValue != null && !columnValue.isEmpty() ) {
-                try {
-                    iden = Long.parseLong( columnValue );
-                } catch ( NumberFormatException e ) {
-                    LOG.error(
-                        "NumberFormatException caught while parsing columnValue in getCompanyHierarchyReportFile(). Nested exception is ",
-                        e );
-                    throw e;
-                }
+            String mailId = request.getParameter( "mailid" );
+            String companyIdStr = request.getParameter( "companyId" );
+            long companyId;
+
+            if ( companyIdStr == null || companyIdStr.isEmpty() ) {
+                throw new InvalidInputException( "Passed parameter companyId is invalid" );
             }
             try {
-                String profileLevel = getProfileLevel( columnName );
-                String fileName = "Company_Hierarchy_Report-" + profileLevel + "-" + user.getFirstName() + "_"
-                    + user.getLastName() + "-" + ( new Timestamp( new Date().getTime() ) ) + EXCEL_FILE_EXTENSION;
-                XSSFWorkbook workbook = dashboardService.downloadCompanyHierarchyReportData( iden );
-                response.setContentType( EXCEL_FORMAT );
-                String headerKey = CONTENT_DISPOSITION_HEADER;
-                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
-                response.setHeader( headerKey, headerValue );
-
-                // write into file
-                OutputStream responseStream = null;
-                try {
-                    responseStream = response.getOutputStream();
-                    workbook.write( responseStream );
-                } catch ( IOException e ) {
-                    LOG.error( "IOException caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
-                } finally {
-                    try {
-                        responseStream.close();
-                    } catch ( IOException e ) {
-                        LOG.error( "IOException caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
-                    }
-                }
-                response.flushBuffer();
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
+                companyId = Long.parseLong( companyIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while parsing companyId in getCompanyHierarchyReportFile(). Nested exception is ",
+                    e );
                 throw e;
-            } catch ( IOException e ) {
-                LOG.error( "IOException caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
             }
+            adminReport.createEntryInFileUploadForCompanyHierarchyReport( mailId, companyId );
+
         } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in getCompanyHierarchyReportFile(). Nested exception is ", e );
+            status = CommonConstants.ERROR;
+            LOG.error( "Error while getting Company Users Report", e );
         }
         LOG.info( "Method to get company hierarchy report file, getCompanyHierarchyReportFile() ended." );
+        return status;
     }
+ 
 }
 // JIRA SS-137 : by RM-05 : EOC
