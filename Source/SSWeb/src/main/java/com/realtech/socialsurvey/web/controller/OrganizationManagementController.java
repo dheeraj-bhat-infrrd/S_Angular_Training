@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -153,7 +154,7 @@ public class OrganizationManagementController
 
     @Autowired
     private UploadValidationService uploadValidationService;
-    
+
     @Autowired
     private EmailServices emailServices;
 
@@ -185,7 +186,7 @@ public class OrganizationManagementController
     private String sadTextComplete;
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
-    
+
     @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
     private String salesLeadEmail;
 
@@ -346,21 +347,14 @@ public class OrganizationManagementController
             LOG.debug( "Updating profile completion stage" );
             userManagementService.updateProfileCompletionStage( user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
                 CommonConstants.ADD_ACCOUNT_TYPE_STAGE );
-            
+
             //TODO: specify details
-            String details = "First Name : " + user.getFirstName() + "<br/>" +
-                "Last Name : " + user.getLastName() + "<br/>" + 
-                "Email Address : "  + user.getEmailId() + "<br/>" +               
-                "Company Name : " + companyName + "<br/>" + 
-                "Address1 : " + address1 + "<br/>" + 
-                "Address2 : " + address2 + "<br/>" + 
-                "Country : " + country + "<br/>" + 
-                "Zipcode : " + zipCode + "<br/>" + 
-                "State : " + state + "<br/>" + 
-                "City : " + city + "<br/>" + 
-                "Contact Info : " + companyContactNo + "<br/>" +   
-                "Vertical : " + vertical;
-                ;
+            String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
+                + "Email Address : " + user.getEmailId() + "<br/>" + "Company Name : " + companyName + "<br/>" + "Address1 : "
+                + address1 + "<br/>" + "Address2 : " + address2 + "<br/>" + "Country : " + country + "<br/>" + "Zipcode : "
+                + zipCode + "<br/>" + "State : " + state + "<br/>" + "City : " + city + "<br/>" + "Contact Info : "
+                + companyContactNo + "<br/>" + "Vertical : " + vertical;
+            ;
             try {
                 emailServices.sendCompanyRegistrationStageMail( salesLeadEmail,
                     CommonConstants.COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING, companyName, details );
@@ -502,9 +496,9 @@ public class OrganizationManagementController
                     CommonConstants.INVOICE_BILLED_DEFULAT_SUBSCRIPTION_ID );
                 // set profile completion flag for the company admin
                 LOG.debug( "Calling sevices for updating profile completion stage" );
-                userManagementService
-                    .updateProfileCompletionStage( user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-                        CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE );
+                userManagementService.updateProfileCompletionStage( user,
+                    CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+                    CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE );
                 LOG.debug( "Successfully executed sevices for updating profile completion stage" );
                 returnPage = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
             } else {
@@ -532,8 +526,8 @@ public class OrganizationManagementController
             unlockIndividualAccountLogoSettings( user, Integer.parseInt( strAccountType ) );
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException while adding account type. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
 
@@ -642,8 +636,8 @@ public class OrganizationManagementController
 
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException while showing app settings. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
         model.addAttribute( "crmMappings", mappings );
@@ -809,8 +803,8 @@ public class OrganizationManagementController
             // TODO : Encrypting the password
             String cipherPassword = encompassPassword;
 
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
             EncompassCrmInfo encompassCrmInfo;
             if ( companySettings.getCrm_info() != null
                 && companySettings.getCrm_info().getCrm_source().equals( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
@@ -863,8 +857,8 @@ public class OrganizationManagementController
         String message;
 
         try {
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
             EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
             encompassCrmInfo.setState( CommonConstants.ENCOMPASS_PRODUCTION_STATE );
             encompassCrmInfo.setNumberOfDays( 0 );
@@ -872,8 +866,9 @@ public class OrganizationManagementController
             encompassCrmInfo.setGenerateReport( false );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while saving encompass detials. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
@@ -898,14 +893,15 @@ public class OrganizationManagementController
         String message;
 
         try {
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
             EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
             encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while disabling encompass. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
@@ -940,8 +936,8 @@ public class OrganizationManagementController
             if ( emailIdForReport == null || emailIdForReport.isEmpty() ) {
                 throw new InvalidInputException( "emailId cannot be empty" );
             }
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
             EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
             encompassCrmInfo.setNumberOfDays( numOfDays );
             encompassCrmInfo.setEmailAddressForReport( emailIdForReport );
@@ -1002,7 +998,8 @@ public class OrganizationManagementController
         String userName = request.getParameter( "encompass-username" );
         String password = request.getParameter( "encompass-password" );
         String url = request.getParameter( "encompass-url" );
-        if ( userName == null || userName.isEmpty() || password == null || password.isEmpty() || url == null || url.isEmpty() ) {
+        if ( userName == null || userName.isEmpty() || password == null || password.isEmpty() || url == null
+            || url.isEmpty() ) {
             LOG.warn( "Encompass validation failed" );
             throw new InvalidInputException( "All fields not set for encompass", DisplayMessageConstants.GENERAL_ERROR );
         }
@@ -1031,8 +1028,8 @@ public class OrganizationManagementController
         String message = "";
 
         try {
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
             MailContentSettings updatedMailContentSettings = null;
             if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
 
@@ -1059,7 +1056,8 @@ public class OrganizationManagementController
 
                 message = messageUtils
                     .getDisplayMessage( DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
             }
 
             else if ( mailCategory != null && mailCategory.equals( "participationremindermail" ) ) {
@@ -1085,9 +1083,10 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject );
                 session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
 
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                message = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
             }
 
             else if ( mailCategory != null && mailCategory.equals( "surveycompletionmail" ) ) {
@@ -1140,9 +1139,10 @@ public class OrganizationManagementController
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, mailSubject );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
 
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                message = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
             }
 
             else if ( mailCategory != null && mailCategory.equals( "socialpostremindermail" ) ) {
@@ -1170,7 +1170,8 @@ public class OrganizationManagementController
 
                 message = messageUtils
                     .getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_MAILBODY_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
             }
 
             else if ( mailCategory != null && mailCategory.equals( "restartsurveymail" ) ) {
@@ -1230,8 +1231,8 @@ public class OrganizationManagementController
         String message = "";
 
         try {
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
             MailContent defaultMailContent = null;
             if ( mailCategory != null && mailCategory.equals( "participationmail" ) ) {
                 defaultMailContent = organizationManagementService.deleteMailBodyFromSetting( companySettings,
@@ -1245,7 +1246,8 @@ public class OrganizationManagementController
                 mailSubject = defaultMailContent.getMail_subject();
                 message = messageUtils
                     .getDisplayMessage( DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
 
                 session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody );
                 session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, mailSubject );
@@ -1261,9 +1263,10 @@ public class OrganizationManagementController
                 // mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                message = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
 
                 session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
                 session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject );
@@ -1296,9 +1299,10 @@ public class OrganizationManagementController
                 // mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                message = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SURVEY_COMPLETION_UNPLEASANT_MAILBODY_UPDATE_SUCCESSFUL,
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
 
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
                 session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, mailSubject );
@@ -1309,15 +1313,15 @@ public class OrganizationManagementController
                     CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY );
 
                 mailBody = defaultMailContent.getMail_body();
-                mailBody = emailFormatHelper
-                    .replaceEmailBodyWithParams( mailBody, organizationManagementService
-                        .getSurveyParamOrder( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) );
+                mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody, organizationManagementService
+                    .getSurveyParamOrder( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_CATEGORY ) );
                 //mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);
 
                 mailSubject = defaultMailContent.getMail_subject();
                 message = messageUtils
                     .getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_MAILBODY_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
 
                 session.setAttribute( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
                 session.setAttribute( CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION, mailSubject );
@@ -1532,8 +1536,8 @@ public class OrganizationManagementController
 
         try {
             User user = sessionHelper.getCurrentUser();
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
 
             if ( mailCategory != null && mailCategory.equals( "reminder-interval" ) ) {
                 int reminderInterval = Integer.parseInt( request.getParameter( "reminder-interval" ) );
@@ -1584,7 +1588,8 @@ public class OrganizationManagementController
                 LOG.info( "Updating Social Post Reminder Interval" );
                 message = messageUtils
                     .getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
             }
 
             else if ( mailCategory != null && mailCategory.equals( "post-reminder-needed" ) ) {
@@ -1595,8 +1600,9 @@ public class OrganizationManagementController
                     originalSurveySettings.setSocialPostReminderDisabled( isReminderDisabled );
                 }
                 LOG.info( "Updating Social Post Reminder Needed" );
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SOCIAL_POST_REMINDER_ENABLED_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                message = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
+                        DisplayMessageType.SUCCESS_MESSAGE )
                     .getMessage();
             }
 
@@ -1606,8 +1612,9 @@ public class OrganizationManagementController
             }
         } catch ( NumberFormatException e ) {
             LOG.error( "NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL,
-                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating survey settings. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
@@ -1634,8 +1641,8 @@ public class OrganizationManagementController
 
         try {
             User user = sessionHelper.getCurrentUser();
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
 
             if ( mailCategory != null && mailCategory.equals( "post-reminder-interval" ) ) {
                 int reminderInterval = Integer.parseInt( request.getParameter( "reminder-interval" ) );
@@ -1651,7 +1658,8 @@ public class OrganizationManagementController
                 LOG.info( "Updating Social Post Reminder Interval" );
                 message = messageUtils
                     .getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                        DisplayMessageType.SUCCESS_MESSAGE )
+                    .getMessage();
             }
 
             else if ( mailCategory != null && mailCategory.equals( "post-reminder-needed" ) ) {
@@ -1662,8 +1670,9 @@ public class OrganizationManagementController
                     originalSurveySettings.setSocialPostReminderDisabled( isReminderDisabled );
                 }
                 LOG.info( "Updating Social Post Reminder Needed" );
-                message = messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.SOCIAL_POST_REMINDER_ENABLED_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                message = messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.SOCIAL_POST_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
+                        DisplayMessageType.SUCCESS_MESSAGE )
                     .getMessage();
             }
 
@@ -1673,8 +1682,9 @@ public class OrganizationManagementController
             }
         } catch ( NumberFormatException e ) {
             LOG.error( "NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL,
-                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL, DisplayMessageType.ERROR_MESSAGE )
+                .getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating survey settings. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
@@ -1700,8 +1710,8 @@ public class OrganizationManagementController
 
         try {
             User user = sessionHelper.getCurrentUser();
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
-                .getCompanyId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
 
             if ( otherCategory != null && otherCategory.equals( "other-location" ) ) {
                 boolean isLocationEnabled = Boolean.parseBoolean( request.getParameter( "other-location" ) );
@@ -1789,7 +1799,8 @@ public class OrganizationManagementController
                 newAccountsMasterId = Integer.parseInt( accountType );
             } catch ( NumberFormatException e ) {
                 LOG.error( "Error while parsing account type " );
-                throw new InvalidInputException( "Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e );
+                throw new InvalidInputException( "Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR,
+                    e );
             }
             LOG.info( "Making the API call to upgrade" );
             gateway.upgradePlanForSubscription( user, newAccountsMasterId, nonce );
@@ -1797,23 +1808,26 @@ public class OrganizationManagementController
 
             switch ( newAccountsMasterId ) {
                 case CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL:
-                    message = messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.TO_INDIVIDUAL_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                    message = messageUtils
+                        .getDisplayMessage( DisplayMessageConstants.TO_INDIVIDUAL_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+                            DisplayMessageType.SUCCESS_MESSAGE )
+                        .getMessage();
                     break;
                 case CommonConstants.ACCOUNTS_MASTER_TEAM:
                     message = messageUtils.getDisplayMessage( DisplayMessageConstants.TO_TEAM_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
                         DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
                     break;
                 case CommonConstants.ACCOUNTS_MASTER_COMPANY:
-                    message = messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.TO_COMPANY_SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                    message = messageUtils
+                        .getDisplayMessage( DisplayMessageConstants.TO_COMPANY_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+                            DisplayMessageType.SUCCESS_MESSAGE )
                         .getMessage();
                     break;
                 case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE:
-                    message = messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.TO_ENTERPRISE_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+                    message = messageUtils
+                        .getDisplayMessage( DisplayMessageConstants.TO_ENTERPRISE_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+                            DisplayMessageType.SUCCESS_MESSAGE )
+                        .getMessage();
                     break;
             }
             LOG.info( "message returned : " + message );
@@ -1834,7 +1848,8 @@ public class OrganizationManagementController
 
             return makeJsonMessage( CommonConstants.STATUS_INACTIVE, message );
         } catch ( SubscriptionUpgradeUnsuccessfulException e ) {
-            LOG.error( "SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e );
+            LOG.error( "SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(),
+                e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
 
             return makeJsonMessage( CommonConstants.STATUS_INACTIVE, message );
@@ -1876,7 +1891,8 @@ public class OrganizationManagementController
         LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX );
 
         LOG.debug( "Adding the current plan in the model and the upgrade flag" );
-        model.addAttribute( CommonConstants.CURRENT_LICENSE_ID, currentLicenseDetail.getAccountsMaster().getAccountsMasterId() );
+        model.addAttribute( CommonConstants.CURRENT_LICENSE_ID,
+            currentLicenseDetail.getAccountsMaster().getAccountsMasterId() );
         model.addAttribute( CommonConstants.UPGRADE_FLAG, CommonConstants.YES );
 
         LOG.info( "Returning the upgrade account selection page" );
@@ -1937,15 +1953,14 @@ public class OrganizationManagementController
                 toAccountsMasterId = Integer.parseInt( accountType );
             } catch ( NumberFormatException e ) {
                 LOG.error( "Error while parsing account type " );
-                throw new InvalidInputException( "Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e );
+                throw new InvalidInputException( "Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR,
+                    e );
             }
             int fromAccountsMasterId = user.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
                 .getAccountsMaster().getAccountsMasterId();
 
-            model.addAttribute(
-                "balanceAmount",
-                String.format( "%.02f",
-                    gateway.getBalacnceAmountForPlanUpgrade( user.getCompany(), fromAccountsMasterId, toAccountsMasterId ) ) );
+            model.addAttribute( "balanceAmount", String.format( "%.02f",
+                gateway.getBalacnceAmountForPlanUpgrade( user.getCompany(), fromAccountsMasterId, toAccountsMasterId ) ) );
             model.addAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION, toAccountsMasterId );
         } catch ( InvalidInputException e ) {
             LOG.error( "Exception has occured : " + e.getMessage(), e );
@@ -1977,7 +1992,8 @@ public class OrganizationManagementController
             AccountType accountType = null;
 
             if ( currentLicenseDetail == null ) {
-                LOG.error( "createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId() );
+                LOG.error(
+                    "createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId() );
                 throw new InvalidInputException(
                     "createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId() );
             }
@@ -2048,8 +2064,8 @@ public class OrganizationManagementController
             // userManagementService.updateUserLoginTimeAndNum(user);
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException while adding account type. Reason: " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.ERROR_PAGE;
         }
 
@@ -2108,7 +2124,8 @@ public class OrganizationManagementController
 
             // Updating settings in session
             HttpSession session = request.getSession();
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             if ( userSettings != null )
                 userSettings.setCompanySettings( companySettings );
         } catch ( NonFatalException e ) {
@@ -2153,7 +2170,8 @@ public class OrganizationManagementController
 
             // Updating settings in session
             HttpSession session = request.getSession();
-            UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             if ( userSettings != null )
                 userSettings.setCompanySettings( companySettings );
         } catch ( NonFatalException e ) {
@@ -2229,8 +2247,9 @@ public class OrganizationManagementController
             }
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL,
-                DisplayMessageType.ERROR_MESSAGE ).toString();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
+                .toString();
         }
 
         redirectAttributes.addFlashAttribute( CommonConstants.MESSAGE, message );
@@ -2318,8 +2337,9 @@ public class OrganizationManagementController
             if ( !validateDotloopParameters( request ) ) {
                 // TODO: code to test connection
             }
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.DOTLOOP_DATA_UPDATE_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.DOTLOOP_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
         } catch ( NonFatalException e ) {
             if ( request.getAttribute( "savedotloopdetails" ) != null ) {
                 throw e;
@@ -2546,8 +2566,8 @@ public class OrganizationManagementController
 
                 for ( String mailID : mailIds ) {
                     if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                        throw new InvalidInputException( "Mail id - " + mailID
-                            + " entered amongst the mail ids as send alert to input is invalid",
+                        throw new InvalidInputException(
+                            "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
                             DisplayMessageConstants.GENERAL_ERROR );
                     else
                         mailIDStr += mailID.trim() + " , ";
@@ -2746,12 +2766,18 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = null;
         LOG.info( "Validating the hierarchy file" );
         String fileUrl = request.getParameter( "fileUrl" );
+        boolean isAppend = false;
+        if ( request.getParameter( "uploadType" ) != null && !request.getParameter( "uploadType" ).isEmpty() ) {
+            if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+                isAppend = true;
+            }
+        }
         try {
             if ( fileUrl == null || fileUrl.isEmpty() ) {
                 throw new InvalidInputException( "File URL cannot be empty" );
             }
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
+            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl, isAppend );
             response = uploadValidation;
         } catch ( InvalidInputException ex ) {
             status = false;
@@ -2773,50 +2799,24 @@ public class OrganizationManagementController
         boolean status = true;
         Object response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
+        boolean isAppend = false;
+        if ( request.getParameter( "uploadType" ) != null && !request.getParameter( "uploadType" ).isEmpty() ) {
+            if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+                isAppend = true;
+            }
+        }
         LOG.info( hierarchyJson );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
+            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation,
+                isAppend );
             response = uploadValidation;
         } catch ( Exception ex ) {
             status = false;
             response = ex.getMessage();
         }
 
-        Map<String, Object> responseMap = new HashMap<String, Object>();
-        responseMap.put( "status", status );
-        responseMap.put( "response", response );
-        return new Gson().toJson( responseMap );
-    }
-
-
-    @ResponseBody
-    @RequestMapping ( value = "/uploadxlsxfile", method = RequestMethod.POST)
-    public String saveHierarchyFileData( Model model, HttpServletRequest request ) throws InvalidInputException
-    {
-        LOG.info( "Saving the hierarchy file data" );
-        boolean status = true;
-        String response = null;
-        String hierarchyJson = request.getParameter( "hierarchyJson" );
-        UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
-        User user = sessionHelper.getCurrentUser();
-        Map<String, List<String>> map = new HashMap<String, List<String>>();
-        List<String> value = new ArrayList<String>();
-        try {
-            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user );
-            if ( map == null || map.isEmpty() ) {
-                value.add( "Data uploaded successfully." );
-                map.put( "UPLOAD_SUCCESS", value );
-            } else {
-                status = false;
-            }
-        } catch ( Exception ex ) {
-            status = false;
-            value.add( ex.getMessage() );
-            map.put( "UPLOAD_FAILED", value );
-        }
-        response = new Gson().toJson( map );
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
         responseMap.put( "response", response );
@@ -2833,13 +2833,17 @@ public class OrganizationManagementController
         String response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        boolean isAppend = false;
+        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
+            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
+        }
         try {
             User user = sessionHelper.getCurrentUser();
-            //Insert hieararchy upload in UPLOAD_HIERARCHY_DETAILS collections
+            //Insert hierarchy upload in UPLOAD_HIERARCHY_DETAILS collections
             hierarchyStructureUploadService.saveHierarchyUploadInMongo( uploadValidation.getUpload() );
 
             //Initiate upload by adding entry in upload status table
-            hierarchyStructureUploadService.addNewUploadRequest( user );
+            hierarchyStructureUploadService.addNewUploadRequest( user, isAppend );
             response = "Hierarchy upload batch is initialized successfully";
         } catch ( Exception ex ) {
             status = false;
@@ -2857,20 +2861,26 @@ public class OrganizationManagementController
     public String fetchUploadBatchStatus( Model model, HttpServletRequest request ) throws InvalidInputException
     {
         LOG.info( "Fetching the latest batch processing message" );
-        //TODO: Get the actual stuff instead
         User user = sessionHelper.getCurrentUser();
         boolean status = true;
         String response = null;
-        UploadStatus latestStatus = hierarchyStructureUploadService.fetchLatestUploadStatus( user.getCompany() );
-        int uploadStatus = -1;
-        String lastUploadRunTimestamp = null;
+        int latestStatus = -1;
+        Timestamp lastUploadTime = null;
+        List<UploadStatus> latestStatuses = hierarchyStructureUploadService.fetchUploadStatusForCompany( user.getCompany() );
         try {
-            if ( latestStatus == null ) {
+            if ( latestStatuses == null || latestStatuses.isEmpty() ) {
                 response = CommonConstants.UPLOAD_MSG_NO_UPLOAD;
             } else {
-                response = latestStatus.getMessage();
-                lastUploadRunTimestamp = latestStatus.getModifiedOn().toString();
-                uploadStatus = latestStatus.getStatus();
+                UploadStatus uploadStatus = hierarchyStructureUploadService.highestStatus( latestStatuses );
+                latestStatus = uploadStatus.getStatus();
+                lastUploadTime = uploadStatus.getModifiedOn();
+
+                //So that this is shown only once, if hierarchy upload status is 4, set it to 6 and update
+                if ( latestStatus == CommonConstants.HIERARCHY_UPLOAD_UPLOAD_COMPLETE ) {
+                    hierarchyStructureUploadService.updateUploadStatusToNoUpload( uploadStatus );
+                    //Change status back to upload status for the json object
+                    uploadStatus.setStatus( latestStatus );
+                }
             }
         } catch ( Exception e ) {
             status = false;
@@ -2878,10 +2888,13 @@ public class OrganizationManagementController
         }
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
-        responseMap.put( "response", response );
-        responseMap.put( "uploadStatus", uploadStatus );
-        // Fetch the last uploaded timestamp from db and put it in responseMap
-        responseMap.put( "lastUploadRunTimestamp", lastUploadRunTimestamp );
+        if ( latestStatuses == null || latestStatuses.isEmpty() ) {
+            responseMap.put( "response", response );
+        } else {
+            responseMap.put( "response", latestStatuses );
+        }
+        responseMap.put( "uploadStatus", latestStatus );
+        responseMap.put( "lastUploadRunTimestamp", lastUploadTime );
         return new Gson().toJson( responseMap );
     }
 
@@ -2896,15 +2909,15 @@ public class OrganizationManagementController
         validation.setNumberOfBranchesModified( 25 );
         validation.setNumberOfUsersModified( 10 );
 
-        validation.setRegionValidationErrors( Arrays.asList( new String[] { "Region ABC does not look good.",
-            "What is wrong with the region below abc?" } ) );
+        validation.setRegionValidationErrors(
+            Arrays.asList( new String[] { "Region ABC does not look good.", "What is wrong with the region below abc?" } ) );
         validation.setBranchValidationErrors( Arrays.asList( new String[] { "Branch B does not have a region." } ) );
-        validation.setUserValidationErrors( Arrays.asList( new String[] { "User A has no assignments.",
-            "Are you kidding me with that?" } ) );
+        validation.setUserValidationErrors(
+            Arrays.asList( new String[] { "User A has no assignments.", "Are you kidding me with that?" } ) );
 
         validation.setRegionValidationWarnings( Arrays.asList( new String[] { "Region names are funny." } ) );
-        validation.setBranchValidationWarnings( Arrays.asList( new String[] {
-            "Branches all around, but no tree to support them.", "That was a very bad joke." } ) );
+        validation.setBranchValidationWarnings( Arrays
+            .asList( new String[] { "Branches all around, but no tree to support them.", "That was a very bad joke." } ) );
 
         return validation;
     }
@@ -2944,12 +2957,12 @@ public class OrganizationManagementController
             }
 
 
-            surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveys(
-                user.getCompany().getCompanyId(), startIndex, batchSize );
+            surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveys( user.getCompany().getCompanyId(),
+                startIndex, batchSize );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
-            return messageUtils.getDisplayMessage(
-                DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, getUnmatchedPreinitiatedSurveys() finished" );
         return new Gson().toJson( surveyPreInitiationList );
@@ -2987,12 +3000,12 @@ public class OrganizationManagementController
                 throw e;
             }
 
-            surveyPreInitiationList = socialManagementService.getProcessedPreInitiatedSurveys(
-                user.getCompany().getCompanyId(), startIndex, batchSize );
+            surveyPreInitiationList = socialManagementService.getProcessedPreInitiatedSurveys( user.getCompany().getCompanyId(),
+                startIndex, batchSize );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
-            return messageUtils.getDisplayMessage(
-                DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, getProcessedPreInitiatedSurveys() finished" );
         return new Gson().toJson( surveyPreInitiationList );
@@ -3032,12 +3045,12 @@ public class OrganizationManagementController
             try {
                 User existingUser = userManagementService.getUserByEmailAddress( emailAddress );
                 if ( existingUser != null )
-                    throw new UserAlreadyExistsException( "The email addresss " + emailAddress
-                        + " is already present in our database." );
+                    throw new UserAlreadyExistsException(
+                        "The email addresss " + emailAddress + " is already present in our database." );
             } catch ( NoRecordsFetchedException e ) {
                 if ( ignoredEmail ) {
-                    userManagementService.saveIgnoredEmailCompanyMapping( emailAddress, loggedInUser.getCompany()
-                        .getCompanyId() );
+                    userManagementService.saveIgnoredEmailCompanyMapping( emailAddress,
+                        loggedInUser.getCompany().getCompanyId() );
                     socialManagementService.updateSurveyPreinitiationRecordsAsIgnored( emailAddress );
                 } else {
                     User user = userManagementService.saveEmailUserMapping( emailAddress, agentId );
@@ -3054,8 +3067,9 @@ public class OrganizationManagementController
                 DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, saveUserEmailMapping() finished" );
-        return messageUtils.getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL,
-            DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        return messageUtils
+            .getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+            .getMessage();
     }
 
 
@@ -3086,8 +3100,7 @@ public class OrganizationManagementController
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
             } catch ( NumberFormatException e ) {
-                LOG.error(
-                    "NumberFormatException caught while trying to convert startIndex or batchSize  Nested exception is ",
+                LOG.error( "NumberFormatException caught while trying to convert startIndex or batchSize  Nested exception is ",
                     e );
                 throw e;
             }
@@ -3096,9 +3109,10 @@ public class OrganizationManagementController
             userList = userManagementService.getUsersAndEmailMappingForCompany( user.getCompany().getCompanyId(), startIndex,
                 batchSize );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while fetching UserWithAliasedEmails. Reason :" + nonFatalException.getMessage(), nonFatalException );
-            return messageUtils.getDisplayMessage(
-                DisplayMessageConstants.FETCH_USER_FOR_EMAIL_MAPPING_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            LOG.error( "NonFatalException while fetching UserWithAliasedEmails. Reason :" + nonFatalException.getMessage(),
+                nonFatalException );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_USER_FOR_EMAIL_MAPPING_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, getUserWithAliasedEmails() finished" );
         return new Gson().toJson( userList );
@@ -3165,17 +3179,15 @@ public class OrganizationManagementController
 
             userManagementService.deleteUserEmailMapping( user, emailMappingId );
 
-            message = messageUtils.getDisplayMessage(
-                DisplayMessageConstants.DELETE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
-                .getMessage();
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.DELETE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             succeed = true;
 
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
             succeed = false;
-            message = messageUtils.getDisplayMessage(
-                DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
-                .getMessage();
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, getUnmatchedPreinitiatedSurveys() finished" );
 
@@ -3211,8 +3223,7 @@ public class OrganizationManagementController
 
                 if ( !emailIds.contains( "," ) ) {
                     if ( !organizationManagementService.validateEmail( emailIds.trim() ) )
-                        throw new InvalidInputException(
-                            "Mail id - " + emailIds + " entered as send alert to input is invalid",
+                        throw new InvalidInputException( "Mail id - " + emailIds + " entered as send alert to input is invalid",
                             DisplayMessageConstants.GENERAL_ERROR );
                     else
                         emailIdList.add( emailIds.trim() );
@@ -3221,8 +3232,8 @@ public class OrganizationManagementController
 
                     for ( String mailID : mailIds ) {
                         if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                            throw new InvalidInputException( "Mail id - " + mailID
-                                + " entered amongst the mail ids as send alert to input is invalid",
+                            throw new InvalidInputException(
+                                "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
                                 DisplayMessageConstants.GENERAL_ERROR );
                         else
                             emailIdList.add( mailID.trim() );
@@ -3236,8 +3247,8 @@ public class OrganizationManagementController
                 try {
                     User existingUser = userManagementService.getUserByEmailAddress( emailId );
                     if ( existingUser != null )
-                        throw new UserAlreadyExistsException( "The email addresss " + emailId
-                            + " is already present in our database." );
+                        throw new UserAlreadyExistsException(
+                            "The email addresss " + emailId + " is already present in our database." );
                 } catch ( NoRecordsFetchedException e ) {
                     User user = userManagementService.saveEmailUserMapping( emailId, agentId );
                     socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailId );
@@ -3254,8 +3265,9 @@ public class OrganizationManagementController
                 DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, saveUserEmailMapping() finished" );
-        return messageUtils.getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL,
-            DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        return messageUtils
+            .getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+            .getMessage();
     }
 
 

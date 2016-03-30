@@ -27,7 +27,47 @@ public class UploadValidation
     private List<String> branchValidationWarnings;
     private List<String> userValidationWarnings;
 
+    private boolean isRegionHeadersInvalid;
+    private boolean isBranchHeadersInvalid;
+    private boolean isUserHeadersInvalid;
+
     private HierarchyUpload upload;
+
+
+    public boolean isRegionHeadersInvalid()
+    {
+        return isRegionHeadersInvalid;
+    }
+
+
+    public void setRegionHeadersInvalid( boolean isRegionHeadersInvalid )
+    {
+        this.isRegionHeadersInvalid = isRegionHeadersInvalid;
+    }
+
+
+    public boolean isBranchHeadersInvalid()
+    {
+        return isBranchHeadersInvalid;
+    }
+
+
+    public void setBranchHeadersInvalid( boolean isBranchHeadersInvalid )
+    {
+        this.isBranchHeadersInvalid = isBranchHeadersInvalid;
+    }
+
+
+    public boolean isUserHeadersInvalid()
+    {
+        return isUserHeadersInvalid;
+    }
+
+
+    public void setUserHeadersInvalid( boolean isUserHeadersInvalid )
+    {
+        this.isUserHeadersInvalid = isUserHeadersInvalid;
+    }
 
 
     public int getNumberOfRegionsAdded()

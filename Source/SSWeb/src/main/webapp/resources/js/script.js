@@ -33,28 +33,28 @@ function buildMessageDiv() {
 	}
 }
 
-function buildMessageInvalidDiv(){
-	if($('.err-nw-wrapper-invalid').length == 0){
-        var errorDiv = $("<div id='err-nw-wrapper-invalid' class='err-nw-wrapper-invalid'>");
-            var closeSpan = $('<span class="err-new-close-invalid">');
-            var textSpan = $('<span id="err-nw-txt-invalid">');
-            errorDiv.append(closeSpan);
-            errorDiv.append(textSpan);
-        $('.hm-header-main-wrapper').after(errorDiv);
-    }
+function buildMessageInvalidDiv() {
+	if ($('.err-nw-wrapper-invalid').length == 0) {
+		var errorDiv = $("<div id='err-nw-wrapper-invalid' class='err-nw-wrapper-invalid'>");
+		var closeSpan = $('<span class="err-new-close-invalid">');
+		var textSpan = $('<span id="err-nw-txt-invalid">');
+		errorDiv.append(closeSpan);
+		errorDiv.append(textSpan);
+		$('.hm-header-main-wrapper').after(errorDiv);
+	}
 }
-function buildMessageSuccessDiv(){
-	if($('.err-nw-wrapper-success').length == 0){
-        var errorDiv = $("<div id='err-nw-wrapper-success' class='err-nw-wrapper-success'>");
-            var closeSpan = $('<span class="err-new-close-success">');
-            var textSpan = $('<span id="err-nw-txt-success">');
-            errorDiv.append(closeSpan);
-            errorDiv.append(textSpan);
-        $('.hm-header-main-wrapper').after(errorDiv);
-    }
-	
+function buildMessageSuccessDiv() {
+	if ($('.err-nw-wrapper-success').length == 0) {
+		var errorDiv = $("<div id='err-nw-wrapper-success' class='err-nw-wrapper-success'>");
+		var closeSpan = $('<span class="err-new-close-success">');
+		var textSpan = $('<span id="err-nw-txt-success">');
+		errorDiv.append(closeSpan);
+		errorDiv.append(textSpan);
+		$('.hm-header-main-wrapper').after(errorDiv);
+	}
+
 }
-function showError(msg){
+function showError(msg) {
 	buildMessageDiv();
 	$('#err-nw-txt').html(msg);
 	$('#err-nw-wrapper').removeClass('bg-black-success');
@@ -62,28 +62,28 @@ function showError(msg){
 	$(window).scrollTop($('#err-nw-wrapper').offset().top);
 }
 
-function showInvalidError(msg){
+function showInvalidError(msg) {
 	buildMessageInvalidDiv();
-    $('#err-nw-txt-invalid').html(msg);
-    $('#err-nw-wrapper-invalid').removeClass('bg-black-success');
-    $('#err-nw-wrapper-invalid').slideDown(200);
-    $(window).scrollTop($('#err-nw-wrapper-invalid').offset().top);
+	$('#err-nw-txt-invalid').html(msg);
+	$('#err-nw-wrapper-invalid').removeClass('bg-black-success');
+	$('#err-nw-wrapper-invalid').slideDown(200);
+	$(window).scrollTop($('#err-nw-wrapper-invalid').offset().top);
 }
-function showErrorSuccess(msg){
+function showErrorSuccess(msg) {
 	buildMessageSuccessDiv();
 	$('#err-nw-txt-success').html(msg);
-    $('#err-nw-wrapper-success').removeClass('bg-black-success');
-    $('#err-nw-wrapper-success').slideDown(200);
-    $(window).scrollTop($('#err-nw-wrapper-success').offset().top);
+	$('#err-nw-wrapper-success').removeClass('bg-black-success');
+	$('#err-nw-wrapper-success').slideDown(200);
+	$(window).scrollTop($('#err-nw-wrapper-success').offset().top);
 }
-function hideError(){
-    $('#err-nw-wrapper').slideUp(200);
+function hideError() {
+	$('#err-nw-wrapper').slideUp(200);
 }
-function hideErrorInvalid(){
-    $('#err-nw-wrapper-invalid').slideUp(200);
+function hideErrorInvalid() {
+	$('#err-nw-wrapper-invalid').slideUp(200);
 }
-function hideErrorSuccess(){
-    $('#err-nw-wrapper-success').slideUp(200);
+function hideErrorSuccess() {
+	$('#err-nw-wrapper-success').slideUp(200);
 }
 
 function showInfo(msg) {
@@ -93,12 +93,12 @@ function showInfo(msg) {
 	$(window).scrollTop($('#err-nw-wrapper').offset().top);
 	$('#err-nw-wrapper').addClass('bg-black-success');
 }
-function showInfoSuccess(msg){
+function showInfoSuccess(msg) {
 	buildMessageSuccessDiv();
-    $('#err-nw-txt-success').html(msg);
-    $('#err-nw-wrapper-success').slideDown(200);
-    $(window).scrollTop($('#err-nw-wrapper-success').offset().top);
-    $('#err-nw-wrapper-success').addClass('bg-black-success');
+	$('#err-nw-txt-success').html(msg);
+	$('#err-nw-wrapper-success').slideDown(200);
+	$(window).scrollTop($('#err-nw-wrapper-success').offset().top);
+	$('#err-nw-wrapper-success').addClass('bg-black-success');
 }
 
 function hideInfo() {
@@ -107,17 +107,17 @@ function hideInfo() {
 		$('#err-nw-wrapper').removeClass('bg-black-success');
 	}, 200);
 }
-function hideInfoInvalid(){
-    $('#err-nw-wrapper-invalid').slideUp(200);
-    setTimeout(function(){
-        $('#err-nw-wrapper-invalid').removeClass('bg-black-success');
-    },200);
+function hideInfoInvalid() {
+	$('#err-nw-wrapper-invalid').slideUp(200);
+	setTimeout(function() {
+		$('#err-nw-wrapper-invalid').removeClass('bg-black-success');
+	}, 200);
 }
-function hideInfoSuccess(){
-    $('#err-nw-wrapper-success').slideUp(200);
-    setTimeout(function(){
-        $('#err-nw-wrapper-success').removeClass('bg-black-success');
-    },200);
+function hideInfoSuccess() {
+	$('#err-nw-wrapper-success').slideUp(200);
+	setTimeout(function() {
+		$('#err-nw-wrapper-success').removeClass('bg-black-success');
+	}, 200);
 }
 
 $(document).on('click', '.err-new-close', function() {
@@ -150,21 +150,19 @@ function showErrorMobileAndWeb(msg) {
 		showError(msg);
 	}
 }
-function showErrorInvalidMobileAndWeb(msg){
-	if($(window).width() < 768){
+function showErrorInvalidMobileAndWeb(msg) {
+	if ($(window).width() < 768) {
 		$('#overlay-toast').html(msg);
 		showToast();
-	}
-	else {
+	} else {
 		showInvalidError(msg);
 	}
 }
 function showErrorSuccessMobileAndWeb(msg) {
-	if($(window).width() < 768){
+	if ($(window).width() < 768) {
 		$('#overlay-toast').html(msg);
 		showToast();
-	}
-	else {
+	} else {
 		showErrorSuccess(msg);
 	}
 }
@@ -177,11 +175,10 @@ function showInfoMobileAndWeb(msg) {
 	}
 }
 function showInfoSuccessMobileAndWeb(msg) {
-	if($(window).width() < 768){
+	if ($(window).width() < 768) {
 		$('#overlay-toast').html(msg);
 		showToast();
-	}
-	else {
+	} else {
 		showInfoSuccess(msg);
 	}
 }
@@ -3027,6 +3024,7 @@ var hierarchyUpload = {
 	verified : false,
 	canUpload : false,
 	hierarchyJson : {},
+	uploadType : "append",
 	hierundefined : function(hierval) {
 		if (hierval == undefined) {
 			return "";
@@ -3046,6 +3044,7 @@ var hierarchyUpload = {
 				.change(
 						function() {
 							$('#summary').hide();
+							$('#uploadBatchStatus').empty();
 							$('#xlsx-file-upload').addClass('disable');
 							var fileAdd = $(this).val().split('\\');
 							$('#com-xlsx-file')
@@ -3094,6 +3093,8 @@ var hierarchyUpload = {
 												"hierarchyJson",
 												JSON
 														.stringify(hierarchyUpload.hierarchyJson));
+								formData.append("uploadType",
+										hierarchyUpload.uploadType);
 								showOverlay();
 								callAjaxPOSTWithTextDataUpload(
 										"./verifyxHierarchyUpload.do",
@@ -3107,6 +3108,8 @@ var hierarchyUpload = {
 								} else {
 									var formData = new FormData();
 									formData.append("fileUrl", url);
+									formData.append("uploadType",
+											hierarchyUpload.uploadType);
 									showOverlay();
 									callAjaxPOSTWithTextDataUpload(
 											"./verifyxlsxfile.do",
@@ -3137,6 +3140,12 @@ var hierarchyUpload = {
 		$('#icn-xlsxfile').click(function() {
 			$('#com-file').trigger('click');
 		});
+
+		$('.bd-cust-rad-img').click(function(e) {
+			$('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
+			$(this).toggleClass('bd-cust-rad-img-checked');
+			hierarchyUpload.uploadType = $(this).data('type');
+		});
 	},
 
 	saveXlxsDataSuccessCallback : function(response) {
@@ -3148,6 +3157,10 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				showInfo(jsonResponse.response);
+				// start fetching batch status
+				callAjaxPOSTWithTextDataUpload("./fetchUploadBatchStatus.do",
+						hierarchyUpload.fetchUploadBatchStatusCallback, true,
+						null);
 			}
 		}
 		$('#com-file').val('');
@@ -3157,13 +3170,14 @@ var hierarchyUpload = {
 		$('#xlsVerifyUplaod').addClass('disable');
 		$('#xlsx-file-upload').addClass('disable');
 	},
-	
+
 	fetchUploadBatchStatusCallback : function(response) {
 		$(window).on('hashchange', function() {
 			if (hierarchyUpload.getStatusCall != undefined) {
 				hierarchyUpload.getStatusCall.abort();
 			}
 		});
+		$('#lastUploadRunTimestamp').hide();
 		if (!response) {
 			$('#com-file').val('');
 			$('#com-xlsx-file').val('');
@@ -3174,40 +3188,52 @@ var hierarchyUpload = {
 			if (!jsonResponse.status) {
 				showError(jsonResponse.response);
 			} else {
-				//If not complete/error, keep making a request every 15 seconds
-				if ( !(jsonResponse.uploadStatus == 9 || jsonResponse.uploadStatus == 8
-						|| jsonResponse.uploadStatus == -1 ) ) {
+				// If not complete/error, keep making a request every 15 seconds
+				if (!(jsonResponse.uploadStatus == 4
+						|| jsonResponse.uploadStatus == 5
+						|| jsonResponse.uploadStatus == 6 || jsonResponse.uploadStatus == -1)) {
 					$('#uploadBatchStatus').empty();
-					$('<div>' + jsonResponse.response + '</div>').appendTo(
-							'#uploadBatchStatus');
+					jsonResponse.response.forEach(function(uploadStatus) {
+						$('<div>' + uploadStatus.message + '</div>').appendTo(
+								'#uploadBatchStatus');
+					});
 					$('#uploadBatchStatus').show();
 					showLoaderOnPagination($('#uploadBatchStatus'));
-					setTimeout(function(){
+					setTimeout(
+							function() {
 								hierarchyUpload.getStatusCall = callAjaxPOSTWithTextDataUpload(
 										"./fetchUploadBatchStatus.do",
 										hierarchyUpload.fetchUploadBatchStatusCallback,
 										true, null);
-					}, 15000);
+							}, 2000);
 				} else {
-					if (response != undefined && response != null && response != '') {
-						$('<div>' + jsonResponse.response + '</div>').appendTo(
-								'#uploadBatchStatus');
+					if (response != undefined && response != null
+							&& response != '' && jsonResponse.response != []) {
+						jsonResponse.response
+								.forEach(function(uploadStatus) {
+									if (jsonResponse.uploadStatus != 6
+											&& jsonResponse.uploadStatus == uploadStatus.status) {
+										$(
+												'<div>' + uploadStatus.message
+														+ '</div>').appendTo(
+												'#uploadBatchStatus');
+									}
+								});
 						$('#uploadBatchStatus').show();
 					}
 					hideLoaderOnPagination($('#uploadBatchStatus'));
 					$('#xlsVerifyUplaod').removeClass('disable');
-				}
-				if (jsonResponse.lastUploadRunTimestamp != null
-						&& jsonResponse.lastUploadRunTimestamp != '') {
-					$('#lastUploadRunTimestamp').text(
-							'Last Uploaded On: '
-									+ jsonResponse.lastUploadRunTimestamp);
-					$('#lastUploadRunTimestamp').show();
+					if (jsonResponse.lastUploadRunTimestamp != null
+							&& jsonResponse.lastUploadRunTimestamp != '') {
+						$('#lastUploadRunTimestamp').text(
+								'Last Imported On: '
+										+ jsonResponse.lastUploadRunTimestamp);
+						$('#lastUploadRunTimestamp').show();
+					}
 				}
 			}
 		}
 	},
-	
 
 	uploadXlxsSuccessCallback : function(response) {
 		if (!response) {
@@ -3221,6 +3247,7 @@ var hierarchyUpload = {
 				showError(jsonResponse.response);
 			} else {
 				hierarchyUpload.hierarchyJson = jsonResponse.response;
+				console.log(hierarchyUpload.hierarchyJson);
 				$('#region-added').empty();
 				if (hierarchyUpload.hierarchyJson.numberOfRegionsAdded != 0) {
 					$(
@@ -3306,187 +3333,189 @@ var hierarchyUpload = {
 				if (regionlength != 0) {
 					$('#region-upload').empty();
 					for (var i = 0; i < regionlength; i++) {
-						if (hierarchyUpload.hierarchyJson.upload.regions[i].isRegionAdded == true) {
-							var color = '#95E566';
+						if (hierarchyUpload.hierarchyJson.upload.regions[i].isInAppendMode == true
+								|| hierarchyUpload.uploadType == 'replace') {
+							if (hierarchyUpload.hierarchyJson.upload.regions[i].isRegionAdded == true) {
+								var color = '#95E566';
 
-						} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
-							var color = '#FF3400';
-						} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isRegionModified == true) {
-							var color = '#009FE0';
+							} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
+								var color = '#FF3400';
+							} else if (hierarchyUpload.hierarchyJson.upload.regions[i].isRegionModified == true) {
+								var color = '#009FE0';
 
-						} else {
-							var color = '#666';
-						}
+							} else {
+								var color = '#666';
+							}
 
-						var regionEdit = '<div id="hier-address-edit-container"'
-								+ '	class="prof-user-address prof-edit-icn">'
-								+ ''
-								+ '	<form id="hier-region-form">'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Region Name</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" name="regionName" id="hier-name-txt-'
-								+ i
-								+ '"'
-								+ '					value=" '
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
-								+ ' ">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Address 1</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" name="regionAddress1"'
-								+ '					id="hier-address1-txt-'
-								+ i
-								+ '" value=" '
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1)
-								+ ' ">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Address 2</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-address2-txt-'
-								+ i
-								+ '"'
-								+ '					name="regionAddress2" value=" '
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2)
-								+ ' ">'
-								+ '			</div>'
-								+ '		</div>'
-								+ ''
-								+ '		<div id="hier-state-city-row" class="hide" style="display: block;">'
-								+ '			<div class="bd-hr-form-item clearfix">'
-								+ '				<div class="float-left bd-frm-left">State</div>'
-								+ '				<div class="float-left bd-frm-right">'
-								+ '					<select class="bd-frm-rt-txt" id="hier-state-txt-'
-								+ i
-								+ '"'
-								+ '						name="regionState" data-value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
-								+ '">'
-								+ '						<option disabled selected>Select State</option>'
-								+ '					</select>'
-								+ '				</div>'
-								+ '			</div>'
-								+ '			<div class="bd-hr-form-item clearfix">'
-								+ '				<div class="float-left bd-frm-left">City</div>'
-								+ '				<div class="float-left bd-frm-right">'
-								+ '					<input class="bd-frm-rt-txt" id="hier-city-txt-'
-								+ i
-								+ '" name="regionCity"'
-								+ '						value=" '
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity)
-								+ ' ">'
-								+ '				</div>'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Zip Code</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-zipcode-txt-'
-								+ i
-								+ '"'
-								+ '					name="regionZipcode" value=" '
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode)
-								+ ' ">'
-								+ '			</div>'
-								+ '		</div>'
-								+ ''
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left"></div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<div id="btn-region-update-'
-								+ i
-								+ '" onClick = "hierarchyUpload.saveEdittedRegion('
-								+ i
-								+ ')" class="bd-btn-save cursor-pointer">Save</div>'
-								+ ''
-								+ '			</div>'
-								+ '		</div>'
-								+ '	</form>'
-								+ '' + '</div>';
+							var regionEdit = '<div id="hier-address-edit-container"'
+									+ '	class="prof-user-address prof-edit-icn">'
+									+ ''
+									+ '	<form id="hier-region-form">'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Region Name</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" name="regionName" id="hier-name-txt-'
+									+ i
+									+ '"'
+									+ '					value=" '
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
+									+ ' ">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Address 1</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" name="regionAddress1"'
+									+ '					id="hier-address1-txt-'
+									+ i
+									+ '" value=" '
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1)
+									+ ' ">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Address 2</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-address2-txt-'
+									+ i
+									+ '"'
+									+ '					name="regionAddress2" value=" '
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2)
+									+ ' ">'
+									+ '			</div>'
+									+ '		</div>'
+									+ ''
+									+ '		<div id="hier-state-city-row" class="hide" style="display: block;">'
+									+ '			<div class="bd-hr-form-item clearfix">'
+									+ '				<div class="float-left bd-frm-left">State</div>'
+									+ '				<div class="float-left bd-frm-right">'
+									+ '					<select class="bd-frm-rt-txt" id="hier-state-txt-'
+									+ i
+									+ '"'
+									+ '						name="regionState" data-value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
+									+ '">'
+									+ '						<option disabled selected>Select State</option>'
+									+ '					</select>'
+									+ '				</div>'
+									+ '			</div>'
+									+ '			<div class="bd-hr-form-item clearfix">'
+									+ '				<div class="float-left bd-frm-left">City</div>'
+									+ '				<div class="float-left bd-frm-right">'
+									+ '					<input class="bd-frm-rt-txt" id="hier-city-txt-'
+									+ i
+									+ '" name="regionCity"'
+									+ '						value=" '
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity)
+									+ ' ">'
+									+ '				</div>'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Zip Code</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-zipcode-txt-'
+									+ i
+									+ '"'
+									+ '					name="regionZipcode" value=" '
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode)
+									+ ' ">'
+									+ '			</div>'
+									+ '		</div>'
+									+ ''
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left"></div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<div id="btn-region-update-'
+									+ i
+									+ '" onClick = "hierarchyUpload.saveEdittedRegion('
+									+ i
+									+ ')" class="bd-btn-save cursor-pointer">Save</div>'
+									+ ''
+									+ '			</div>'
+									+ '		</div>'
+									+ '	</form>' + '' + '</div>';
 
-						$(
-								'<tr style="color:'
-										+ color
-										+ ';height:35px;"><td id="editRegion-'
-										+ i
-										+ '"  class="v-hiararchy-edit" title="Edit" onClick="hierarchyUpload.editRegion('
-										+ i
-										+ ')"></td><td>'
-										+ hierarchyUpload
-												.addToolTip(hierarchyUpload.hierarchyJson.upload.regions[i])
-										+ '</td><td><div class="hier-upload-td">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].rowNum)
-										+ '</div></td><td><div class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].sourceRegionId)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].sourceRegionId)
-										+ '</div></td><td><div id="regionName-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
-										+ '</div></td><td><div id="regionAddress1-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1)
-										+ '</div></td><td><div id="regionAddress2-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2)
-										+ '</div></td><td><div id="regionCity-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity)
-										+ '</div></td><td><div id="regionState-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
-										+ '</div></td><td><div id="regionZipcode-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode)
-										+ '</div></td></tr><tr class="hide hier-region-edit" style="background-color: #F9F9FB;" ><td colspan="9">'
-										+ regionEdit + '</td></tr>').appendTo(
-								'#region-upload');
+							$(
+									'<tr style="color:'
+											+ color
+											+ ';height:35px;"><td id="editRegion-'
+											+ i
+											+ '"  class="v-hiararchy-edit" title="Edit" onClick="hierarchyUpload.editRegion('
+											+ i
+											+ ')"></td><td>'
+											+ hierarchyUpload
+													.addToolTip(hierarchyUpload.hierarchyJson.upload.regions[i])
+											+ '</td><td><div class="hier-upload-td">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].rowNum)
+											+ '</div></td><td><div class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].sourceRegionId)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].sourceRegionId)
+											+ '</div></td><td><div id="regionName-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
+											+ '</div></td><td><div id="regionAddress1-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1)
+											+ '</div></td><td><div id="regionAddress2-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2)
+											+ '</div></td><td><div id="regionCity-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity)
+											+ '</div></td><td><div id="regionState-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
+											+ '</div></td><td><div id="regionZipcode-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode)
+											+ '</div></td></tr><tr class="hide hier-region-edit" style="background-color: #F9F9FB;" ><td colspan="9">'
+											+ regionEdit + '</td></tr>')
+									.appendTo('#region-upload');
 
-						if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
-							$('#editRegion-' + i).addClass('disable');
+							if (hierarchyUpload.hierarchyJson.upload.regions[i].isDeletedRecord == true) {
+								$('#editRegion-' + i).addClass('disable');
+							}
 						}
 					}
 					$('#region-sum-btn').show();
@@ -3497,208 +3526,211 @@ var hierarchyUpload = {
 				if (branchlength != 0) {
 					$('#branch-upload').empty();
 					for (var i = 0; i < branchlength; i++) {
-						if (hierarchyUpload.hierarchyJson.upload.branches[i].isBranchAdded == true) {
-							var color = '#95E566';
+						if (hierarchyUpload.hierarchyJson.upload.branches[i].isInAppendMode == true
+								|| hierarchyUpload.uploadType == 'replace') {
+							if (hierarchyUpload.hierarchyJson.upload.branches[i].isBranchAdded == true) {
+								var color = '#95E566';
 
-						} else if (hierarchyUpload.hierarchyJson.upload.branches[i].isDeletedRecord == true) {
-							var color = '#FF3400';
+							} else if (hierarchyUpload.hierarchyJson.upload.branches[i].isDeletedRecord == true) {
+								var color = '#FF3400';
 
-						} else if (hierarchyUpload.hierarchyJson.upload.branches[i].isBranchModified == true) {
-							var color = '#009FE0';
+							} else if (hierarchyUpload.hierarchyJson.upload.branches[i].isBranchModified == true) {
+								var color = '#009FE0';
 
-						} else {
-							var color = '#666';
-						}
+							} else {
+								var color = '#666';
+							}
 
-						var branchEdit = '<div id="hier-branch-address-edit-container"'
-								+ '	class="prof-user-address prof-edit-icn">'
-								+ ''
-								+ '	<form id="hier-branch-form">'
-								+ '	<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Branch Name</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" name="branchName" id="hier-branch-name-txt-'
-								+ i
-								+ '"'
-								+ '					value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		'
-								+ '	<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Region Id</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" name="branchName" id="hier-branch-sourceRegionId-txt-'
-								+ i
-								+ '"'
-								+ '					value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Address 1</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" name="branchAddress1"'
-								+ '					id="hier-branch-address1-txt-'
-								+ i
-								+ '" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Address 2</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-branch-address2-txt-'
-								+ i
-								+ '"'
-								+ '					name="branchAddress2" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ ''
-								+ '		<div id="hier-branch-state-city-row" class="hide" style="display: block;">'
-								+ '			<div class="bd-hr-form-item clearfix">'
-								+ '				<div class="float-left bd-frm-left">State</div>'
-								+ '				<div class="float-left bd-frm-right">'
-								+ '					<select class="bd-frm-rt-txt" id="hier-branch-state-txt-'
-								+ i
-								+ '"'
-								+ '						name="branchState" data-value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
-								+ '">'
-								+ '						<option disabled selected>Select State</option>'
-								+ '					</select>'
-								+ '				</div>'
-								+ '			</div>'
-								+ '			<div class="bd-hr-form-item clearfix">'
-								+ '				<div class="float-left bd-frm-left">City</div>'
-								+ '				<div class="float-left bd-frm-right">'
-								+ '					<input class="bd-frm-rt-txt" id="hier-branch-city-txt-'
-								+ i
-								+ '" name="branchCity"'
-								+ '						value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
-								+ '">'
-								+ '				</div>'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Zip Code</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-branch-zipcode-txt-'
-								+ i
-								+ '"'
-								+ '					name="branchZipcode" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ ''
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left"></div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<div id="btn-branch-update-'
-								+ i
-								+ '" class="bd-btn-save cursor-pointer" onClick="hierarchyUpload.saveEdittedBranch('
-								+ i
-								+ ')">Save</div>'
-								+ ''
-								+ '			</div>'
-								+ '		</div>' + '	</form>' + '' + '</div>';
+							var branchEdit = '<div id="hier-branch-address-edit-container"'
+									+ '	class="prof-user-address prof-edit-icn">'
+									+ ''
+									+ '	<form id="hier-branch-form">'
+									+ '	<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Branch Name</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" name="branchName" id="hier-branch-name-txt-'
+									+ i
+									+ '"'
+									+ '					value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		'
+									+ '	<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Region Id</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" name="branchName" id="hier-branch-sourceRegionId-txt-'
+									+ i
+									+ '"'
+									+ '					value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Address 1</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" name="branchAddress1"'
+									+ '					id="hier-branch-address1-txt-'
+									+ i
+									+ '" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Address 2</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-branch-address2-txt-'
+									+ i
+									+ '"'
+									+ '					name="branchAddress2" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ ''
+									+ '		<div id="hier-branch-state-city-row" class="hide" style="display: block;">'
+									+ '			<div class="bd-hr-form-item clearfix">'
+									+ '				<div class="float-left bd-frm-left">State</div>'
+									+ '				<div class="float-left bd-frm-right">'
+									+ '					<select class="bd-frm-rt-txt" id="hier-branch-state-txt-'
+									+ i
+									+ '"'
+									+ '						name="branchState" data-value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
+									+ '">'
+									+ '						<option disabled selected>Select State</option>'
+									+ '					</select>'
+									+ '				</div>'
+									+ '			</div>'
+									+ '			<div class="bd-hr-form-item clearfix">'
+									+ '				<div class="float-left bd-frm-left">City</div>'
+									+ '				<div class="float-left bd-frm-right">'
+									+ '					<input class="bd-frm-rt-txt" id="hier-branch-city-txt-'
+									+ i
+									+ '" name="branchCity"'
+									+ '						value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
+									+ '">'
+									+ '				</div>'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Zip Code</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-branch-zipcode-txt-'
+									+ i
+									+ '"'
+									+ '					name="branchZipcode" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ ''
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left"></div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<div id="btn-branch-update-'
+									+ i
+									+ '" class="bd-btn-save cursor-pointer" onClick="hierarchyUpload.saveEdittedBranch('
+									+ i
+									+ ')">Save</div>'
+									+ ''
+									+ '			</div>'
+									+ '		</div>' + '	</form>' + '' + '</div>';
 
-						$(
-								'<tr style="color:'
-										+ color
-										+ ';height:35px;"><td class="v-hiararchy-edit" title="Edit" id="editBranch-'
-										+ i
-										+ '" onClick="hierarchyUpload.editBranch('
-										+ i
-										+ ')"></td><td>'
-										+ hierarchyUpload
-												.addToolTip(hierarchyUpload.hierarchyJson.upload.branches[i])
-										+ '</td><td><div class="hier-upload-td">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].rowNum)
-										+ '</div></td><td><div class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceBranchId)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceBranchId)
-										+ '</div></td><td><div id="branchName-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName)
-										+ '</div></td><td><div id="sourceRegionId-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId)
-										+ '</div></td><td><div id="branchAddress1-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1)
-										+ '</div></td><td><div id="branchAddress2-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
-										+ '</div></td><td><div id="branchCity-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
-										+ '</div></td><td><div id="branchState-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
-										+ '</div></td><td><div id="branchZipcode-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode)
-										+ '</div></td></tr><tr class="hide hier-branch-edit" style="background-color: #F9F9FB;" ><td colspan="10">'
-										+ branchEdit + '</td></tr>').appendTo(
-								'#branch-upload');
+							$(
+									'<tr style="color:'
+											+ color
+											+ ';height:35px;"><td class="v-hiararchy-edit" title="Edit" id="editBranch-'
+											+ i
+											+ '" onClick="hierarchyUpload.editBranch('
+											+ i
+											+ ')"></td><td>'
+											+ hierarchyUpload
+													.addToolTip(hierarchyUpload.hierarchyJson.upload.branches[i])
+											+ '</td><td><div class="hier-upload-td">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].rowNum)
+											+ '</div></td><td><div class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceBranchId)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceBranchId)
+											+ '</div></td><td><div id="branchName-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName)
+											+ '</div></td><td><div id="sourceRegionId-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId)
+											+ '</div></td><td><div id="branchAddress1-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1)
+											+ '</div></td><td><div id="branchAddress2-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
+											+ '</div></td><td><div id="branchCity-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
+											+ '</div></td><td><div id="branchState-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
+											+ '</div></td><td><div id="branchZipcode-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode)
+											+ '</div></td></tr><tr class="hide hier-branch-edit" style="background-color: #F9F9FB;" ><td colspan="10">'
+											+ branchEdit + '</td></tr>')
+									.appendTo('#branch-upload');
 
-						if (hierarchyUpload.hierarchyJson.upload.branches[i].isDeletedRecord == true) {
-							$('#editBranch-' + i).addClass('disable');
+							if (hierarchyUpload.hierarchyJson.upload.branches[i].isDeletedRecord == true) {
+								$('#editBranch-' + i).addClass('disable');
+							}
 						}
 					}
 					$('#branch-sum-btn').show();
@@ -3716,361 +3748,366 @@ var hierarchyUpload = {
 					$('#user-upload').empty();
 					var userlength = hierarchyUpload.hierarchyJson.upload.users.length;
 					for (var i = 0; i < userlength; i++) {
-						if (hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded == true) {
-							var color = '#95E566';
+						alert(hierarchyUpload.hierarchyJson.upload.users[i].isInAppendMode);
+						if (hierarchyUpload.hierarchyJson.upload.users[i].isInAppendMode == true
+								|| hierarchyUpload.uploadType == 'replace') {
+							if (hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded == true) {
+								var color = '#95E566';
 
-						} else if (hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord == true) {
-							var color = '#FF3400';
+							} else if (hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord == true) {
+								var color = '#FF3400';
 
-						} else if (hierarchyUpload.hierarchyJson.upload.users[i].isUserModified == true) {
-							var color = '#009FE0';
+							} else if (hierarchyUpload.hierarchyJson.upload.users[i].isUserModified == true) {
+								var color = '#009FE0';
 
-						} else {
-							var color = '#666';
-						}
-
-						var sendMailCode = "";
-
-						if ((!hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified && !hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord)
-								|| hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded) {
-							// Add checkbox only for users who aren't verified
-							// and new users
-							var sendMailCode = "<div id ='send-mail-" + i
-									+ "' class='send-mail-check-img ";
-							if (!hierarchyUpload.hierarchyJson.upload.users[i].sendMail) {
-								sendMailCode += "bd-check-img-checked"
+							} else {
+								var color = '#666';
 							}
-							sendMailCode += "'onClick='hierarchyUpload.toggleSendMail("
-									+ i + ")'></div>";
-						}
 
-						var userEdit = '<div id="hier-user-detail-edit-container"'
-								+ '	class="prof-user-address prof-edit-icn">'
-								+ ''
-								+ '	<form id="hier-user-form">'
-								+ '	<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">First Name</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" name="userFirstname" id="hier-user-firstName-txt-'
-								+ i
-								+ '"'
-								+ '					value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Last Name</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" name="user-lastname"'
-								+ '					id="hier-user-lastName-txt-'
-								+ i
-								+ '" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Title</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-title-txt-'
-								+ i
-								+ '"'
-								+ '					name="userTitle" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Office Assignment(s)</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-assignedBranches-txt-'
-								+ i
-								+ '"'
-								+ '					name="userBranchAssignment" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Region Assignment(s)</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-assignedRegions-txt-'
-								+ i
-								+ '"'
-								+ '					name="userRegionAssignment" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Office Admin Privilege(s)</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-assignedBranchesAdmin-txt-'
-								+ i
-								+ '"'
-								+ '					name="userBranchPrivilege" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Region Admin Privilege</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-assignedRegionsAdmin-txt-'
-								+ i
-								+ '"'
-								+ '					name="userRegionPrivilege" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Email</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-emailId-txt-'
-								+ i
-								+ '"'
-								+ '					name="userEmail" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Phone</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-phoneNumber-txt-'
-								+ i
-								+ '"'
-								+ '					name="userPhone" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Website</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-websiteUrl-txt-'
-								+ i
-								+ '"'
-								+ '					name="userWebsite" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">License</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-license-txt-'
-								+ i
-								+ '"'
-								+ '					name="userLicense" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Legal Disclaimer</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-legalDisclaimer-txt-'
-								+ i
-								+ '"'
-								+ '					name="userLegalDisclaimer" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ ''
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">Photo</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<input class="bd-frm-rt-txt" id="hier-user-userPhotoUrl-txt-'
-								+ i
-								+ '"'
-								+ '					name="userPhoto" value="'
-								+ hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl)
-								+ '">'
-								+ '			</div>'
-								+ '		</div>'
-								+ ''
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left">About Me Description</div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<textarea class="hier-upload-txt-area" id="hier-user-aboutMeDescription-txt-'
-								+ i
-								+ '" name="userAboutMeDescription">'
-								+ escapeHtml(hierarchyUpload
-										.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription))
-								+ '</textarea>'
-								+ '			</div>'
-								+ '		</div>'
-								+ ''
-								+ '		<div class="bd-hr-form-item clearfix">'
-								+ '			<div class="float-left bd-frm-left"></div>'
-								+ '			<div class="float-left bd-frm-right">'
-								+ '				<div id="btn-user-update-'
-								+ i
-								+ '" class="bd-btn-save cursor-pointer" onClick="hierarchyUpload.saveEdittedUser('
-								+ i
-								+ ')">Save</div>'
-								+ '			</div>'
-								+ '		</div>' + '	</form>' + '' + '</div>';
+							var sendMailCode = "";
 
-						$(
-								'<tr style="color:'
-										+ color
-										+ ';height:35px;"><td id="editUser-'
-										+ i
-										+ '" class="v-hiararchy-edit" title="Edit" onClick="hierarchyUpload.editUser('
-										+ i
-										+ ')"></td><td><div class="hier-upload-td">'
-										+ sendMailCode
-										+ '</div></td><td>'
-										+ hierarchyUpload
-												.addToolTip(hierarchyUpload.hierarchyJson.upload.users[i])
-										+ '</td><td><div class="hier-upload-td">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].rowNum)
-										+ '</div></td><td><div class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].sourceUserId)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].sourceUserId)
-										+ '</div></td><td><div id="firstName-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName)
-										+ '</div></td><td><div id="lastName-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName)
-										+ '</div></td><td><div id="title-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title)
-										+ '</div></td><td><div id="assignedBranches-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches)
-										+ '</div></td><td><div id="assignedRegions-'
-										+ i
-										+ '" ="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions)
-										+ '</div></td><td><div id="assignedBranchesAdmin-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin)
-										+ '</div></td><td><div id="assignedRegionsAdmin-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin)
-										+ '</div></td><td><div id="emailId-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId)
-										+ '</div></td><td><div id="phoneNumber-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber)
-										+ '</div></td><td><div id="websiteUrl-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl)
-										+ '</div></td><td><div id="license-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license)
-										+ '</div></td><td><div id="legalDisclaimer-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer)
-										+ '</div></td><td><div id="userPhotoUrl-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl)
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl)
-										+ '</div></td><td><div id="aboutMeDescription-'
-										+ i
-										+ '" class="hier-upload-td" title="'
-										+ escapeHtml(hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription))
-										+ '">'
-										+ hierarchyUpload
-												.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription)
-										+ '</div></td></tr><tr class="hide hier-users-edit" style="background-color: #F9F9FB;" ><td colspan="17">'
-										+ userEdit + '</td></tr>').appendTo(
-								'#user-upload');
+							if ((!hierarchyUpload.hierarchyJson.upload.users[i].isUserVerified && !hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord)
+									|| hierarchyUpload.hierarchyJson.upload.users[i].isUserAdded) {
+								// Add checkbox only for users who aren't
+								// verified
+								// and new users
+								var sendMailCode = "<div id ='send-mail-" + i
+										+ "' class='send-mail-check-img ";
+								if (!hierarchyUpload.hierarchyJson.upload.users[i].sendMail) {
+									sendMailCode += "bd-check-img-checked"
+								}
+								sendMailCode += "'onClick='hierarchyUpload.toggleSendMail("
+										+ i + ")'></div>";
+							}
 
-						if (hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord == true) {
-							$('#editUser-' + i).addClass('disable');
+							var userEdit = '<div id="hier-user-detail-edit-container"'
+									+ '	class="prof-user-address prof-edit-icn">'
+									+ ''
+									+ '	<form id="hier-user-form">'
+									+ '	<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">First Name</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" name="userFirstname" id="hier-user-firstName-txt-'
+									+ i
+									+ '"'
+									+ '					value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Last Name</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" name="user-lastname"'
+									+ '					id="hier-user-lastName-txt-'
+									+ i
+									+ '" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Title</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-title-txt-'
+									+ i
+									+ '"'
+									+ '					name="userTitle" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Office Assignment(s)</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-assignedBranches-txt-'
+									+ i
+									+ '"'
+									+ '					name="userBranchAssignment" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Region Assignment(s)</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-assignedRegions-txt-'
+									+ i
+									+ '"'
+									+ '					name="userRegionAssignment" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Office Admin Privilege(s)</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-assignedBranchesAdmin-txt-'
+									+ i
+									+ '"'
+									+ '					name="userBranchPrivilege" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Region Admin Privilege</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-assignedRegionsAdmin-txt-'
+									+ i
+									+ '"'
+									+ '					name="userRegionPrivilege" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Email</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-emailId-txt-'
+									+ i
+									+ '"'
+									+ '					name="userEmail" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Phone</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-phoneNumber-txt-'
+									+ i
+									+ '"'
+									+ '					name="userPhone" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Website</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-websiteUrl-txt-'
+									+ i
+									+ '"'
+									+ '					name="userWebsite" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">License</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-license-txt-'
+									+ i
+									+ '"'
+									+ '					name="userLicense" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Legal Disclaimer</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-legalDisclaimer-txt-'
+									+ i
+									+ '"'
+									+ '					name="userLegalDisclaimer" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ ''
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">Photo</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<input class="bd-frm-rt-txt" id="hier-user-userPhotoUrl-txt-'
+									+ i
+									+ '"'
+									+ '					name="userPhoto" value="'
+									+ hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl)
+									+ '">'
+									+ '			</div>'
+									+ '		</div>'
+									+ ''
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left">About Me Description</div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<textarea class="hier-upload-txt-area" id="hier-user-aboutMeDescription-txt-'
+									+ i
+									+ '" name="userAboutMeDescription">'
+									+ escapeHtml(hierarchyUpload
+											.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription))
+									+ '</textarea>'
+									+ '			</div>'
+									+ '		</div>'
+									+ ''
+									+ '		<div class="bd-hr-form-item clearfix">'
+									+ '			<div class="float-left bd-frm-left"></div>'
+									+ '			<div class="float-left bd-frm-right">'
+									+ '				<div id="btn-user-update-'
+									+ i
+									+ '" class="bd-btn-save cursor-pointer" onClick="hierarchyUpload.saveEdittedUser('
+									+ i
+									+ ')">Save</div>'
+									+ '			</div>'
+									+ '		</div>' + '	</form>' + '' + '</div>';
+
+							$(
+									'<tr style="color:'
+											+ color
+											+ ';height:35px;"><td id="editUser-'
+											+ i
+											+ '" class="v-hiararchy-edit" title="Edit" onClick="hierarchyUpload.editUser('
+											+ i
+											+ ')"></td><td><div class="hier-upload-td">'
+											+ sendMailCode
+											+ '</div></td><td>'
+											+ hierarchyUpload
+													.addToolTip(hierarchyUpload.hierarchyJson.upload.users[i])
+											+ '</td><td><div class="hier-upload-td">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].rowNum)
+											+ '</div></td><td><div class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].sourceUserId)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].sourceUserId)
+											+ '</div></td><td><div id="firstName-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName)
+											+ '</div></td><td><div id="lastName-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName)
+											+ '</div></td><td><div id="title-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title)
+											+ '</div></td><td><div id="assignedBranches-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches)
+											+ '</div></td><td><div id="assignedRegions-'
+											+ i
+											+ '" ="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions)
+											+ '</div></td><td><div id="assignedBranchesAdmin-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin)
+											+ '</div></td><td><div id="assignedRegionsAdmin-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin)
+											+ '</div></td><td><div id="emailId-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId)
+											+ '</div></td><td><div id="phoneNumber-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber)
+											+ '</div></td><td><div id="websiteUrl-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl)
+											+ '</div></td><td><div id="license-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license)
+											+ '</div></td><td><div id="legalDisclaimer-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer)
+											+ '</div></td><td><div id="userPhotoUrl-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl)
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl)
+											+ '</div></td><td><div id="aboutMeDescription-'
+											+ i
+											+ '" class="hier-upload-td" title="'
+											+ escapeHtml(hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription))
+											+ '">'
+											+ hierarchyUpload
+													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription)
+											+ '</div></td></tr><tr class="hide hier-users-edit" style="background-color: #F9F9FB;" ><td colspan="17">'
+											+ userEdit + '</td></tr>')
+									.appendTo('#user-upload');
+
+							if (hierarchyUpload.hierarchyJson.upload.users[i].isDeletedRecord == true) {
+								$('#editUser-' + i).addClass('disable');
+							}
 						}
 					}
 					$('#user-sum-btn').show();
@@ -4179,11 +4216,11 @@ var hierarchyUpload = {
 		if (data.validationErrors.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/abuse.png" style="width: 18px; height: 18px"></span>';
+					+ '"><img src="resources/images/Hazard_Red.png" style="width: 18px; height: 18px"></span>';
 		} else if (data.validationWarnings.length > 0) {
 			toolTip = '&nbsp;<span title="'
 					+ toolTipMsg
-					+ '"><img src="resources/images/warning.png" style="width: 18px; height: 18px"></span>';
+					+ '"><img src="resources/images/Hazard_Yellow.png" style="width: 18px; height: 18px"></span>';
 		}
 		return toolTip;
 	},
@@ -4555,4 +4592,9 @@ var companyRegistration = {
 function escapeHtml(unsafe) {
 	return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g,
 			"&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function downloadCompanyHierarchyReport() {
+	window.location.href = "/downloadcompanyhierarchyreport.do?columnName="
+			+ colName + "&columnValue=" + colValue;
 }

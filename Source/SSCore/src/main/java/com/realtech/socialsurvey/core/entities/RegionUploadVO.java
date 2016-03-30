@@ -50,6 +50,19 @@ public class RegionUploadVO
     private boolean isWarningRecord;
     private List<String> validationErrors = new ArrayList<String>();
     private List<String> validationWarnings = new ArrayList<String>();
+    private boolean isInAppendMode;
+
+
+    public boolean isInAppendMode()
+    {
+        return isInAppendMode;
+    }
+
+
+    public void setInAppendMode( boolean isInAppendMode )
+    {
+        this.isInAppendMode = isInAppendMode;
+    }
 
 
     public boolean isWarningRecord()

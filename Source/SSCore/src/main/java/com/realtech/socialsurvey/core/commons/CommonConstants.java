@@ -1066,17 +1066,17 @@ public interface CommonConstants
     public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
     
     //Hierarchy upload status constants
-    public static final int HIERARCHY_UPLOAD_INITIATED = 1;
-    public static final int HIERARCHY_UPLOAD_PROCESSING = 0;
-    public static final int HIERARCHY_UPLOAD_UPLOADING_REGIONS = 2;
-    public static final int HIERARCHY_UPLOAD_UPLOADING_BRANCHES = 3;
-    public static final int HIERARCHY_UPLOAD_UPLOADING_USERS = 4;
-    public static final int HIERARCHY_UPLOAD_DELETING_USERS = 5;
-    public static final int HIERARCHY_UPLOAD_DELETING_BRANCHES = 6;
-    public static final int HIERARCHY_UPLOAD_DELETING_REGIONS = 7;
-    public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 8;
-    public static final int HIERARCHY_UPLOAD_ERROR = 9;
-    public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 10;
+    
+    public static final int HIERARCHY_UPLOAD_ENTITY_INITIATED = 1;
+    public static final int HIERARCHY_UPLOAD_ENTITY_STARTED = 2;
+    public static final int HIERARCHY_UPLOAD_ENTITY_DONE = 0;
+    public static final int HIERARCHY_UPLOAD_ENTITY_ERROR = 3;
+    public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 4;
+    public static final int HIERARCHY_UPLOAD_ERROR = 5;
+    public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 6;
+    
+    public static final char UPLOAD_MODE_APPEND = 'A';
+    public static final char UPLOAD_MODE_REPLACE = 'R';
     
     //Hierarchy upload message constants
     public static final String UPLOAD_MSG_INITIATED = "Import initiated";
@@ -1088,8 +1088,17 @@ public interface CommonConstants
     public static final String UPLOAD_MSG_DELETING_BRANCHES = "Deleting removed offices";
     public static final String UPLOAD_MSG_DELETING_REGIONS = "Deleting removed regions";
     public static final String UPLOAD_MSG_UPLOAD_COMPLETE = "Import successful";
-    public static final String UPLOAD_MSG_UPLOAD_ERROR = "Error importing comany hierarchy";
+    public static final String UPLOAD_MSG_UPLOAD_ERROR = "Error importing company hierarchy";
     public static final String UPLOAD_MSG_NO_UPLOAD = "";
+    public static final String UPLOAD_ADDED_REGIONS = "No. of regions added : ";
+    public static final String UPLOAD_MODIFIED_REGIONS = "No. of regions modified : ";
+    public static final String UPLOAD_DELETED_REGIONS = "No. of regions deleted : ";
+    public static final String UPLOAD_ADDED_BRANCHES = "No. of offices added : ";
+    public static final String UPLOAD_MODIFIED_BRANCHES = "No. of offices modified : ";
+    public static final String UPLOAD_DELETED_BRANCHES = "No. of offices deleted : ";
+    public static final String UPLOAD_ADDED_USERS = "No. of users added : ";
+    public static final String UPLOAD_MODIFIED_USERS = "No. of users modified : ";
+    public static final String UPLOAD_DELETED_USERS = "No. of users deleted : ";
     
     
     //Company registration stage
