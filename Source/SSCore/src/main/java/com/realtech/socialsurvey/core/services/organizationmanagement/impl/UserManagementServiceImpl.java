@@ -339,8 +339,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             status, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
+        //delete the record if marked as ignored
+        deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
+        
 
         LOG.debug( "Creating user profile for :" + emailId + " with profile completion stage : "
             + CommonConstants.ADD_COMPANY_STAGE );
@@ -469,6 +472,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
+      //delete the record if marked as ignored
+        deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
@@ -508,6 +513,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, String.valueOf( admin.getUserId() ) );
         user = userDao.save( user );
+      //delete the record if marked as ignored
+        deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
@@ -3675,7 +3682,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         CompanyIgnoredEmailMapping companyIgnoredEmailMapping = new CompanyIgnoredEmailMapping();
         companyIgnoredEmailMapping.setCompany( company );
         companyIgnoredEmailMapping.setEmailId( emailId );
-
+        companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
+        
         companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
         companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -3783,5 +3791,26 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userEmailMappingDao.update( userEmailMapping );
         
         LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
+    }
+    
+    @Transactional
+    @Override
+    public void deleteIgnoredEmailMapping(String emailId) throws InvalidInputException{
+        LOG.info( "method deleteIgnoredEmailMapping  started for email id : " + emailId );
+        
+        if(emailId == null || emailId.isEmpty()){
+            throw new InvalidInputException("Passed parameter emailId is invalid");
+        }
+        
+        List<CompanyIgnoredEmailMapping> ignoredEmails = companyIgnoredEmailMappingDao.findByColumn( CompanyIgnoredEmailMapping.class, CommonConstants.EMAIL_ID, emailId );
+        if(ignoredEmails != null && !ignoredEmails.isEmpty()){
+            for(CompanyIgnoredEmailMapping ignoredEmail : ignoredEmails){
+                ignoredEmail.setStatus( CommonConstants.STATUS_INACTIVE );
+                ignoredEmail.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                companyIgnoredEmailMappingDao.update( ignoredEmail );
+            }
+        }
+        
+        LOG.info( "method deleteIgnoredEmailMapping finished" );
     }
 }
