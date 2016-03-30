@@ -30,57 +30,73 @@
 	</div>
 </div>
 <div id="xlsVerifyUplaod" class="clearfix disable">
-	<div class="float-left bd-cust-rad-item clearfix"
-		style="margin-left: 45px;">
-		<div data-type="append"
-			class="float-left bd-cust-rad-img bd-cust-rad-img-checked"></div>
-		<div class="float-left bd-cust-rad-txt">Append Mode</div>
-	</div>
-	<div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix">
-		<div data-type="replace" class="float-left bd-cust-rad-img"></div>
-		<div class="float-left bd-cust-rad-txt">Replace Mode</div>
-	</div>
-	<div class="float-right" style="margin-right: 45px; margin-top: 4px;">
-		<div id="dsh-ind-rep-bnt"
-			class="float-right dash-btn-dl-sd btn-wid-sm" style="width: 300px">
-			<div class="dsh-dwnld-btn float-left cursor-pointer"
-				style="width: 100%" onclick="downloadCompanyHierarchyReport()">Download
-				Company Hierarchy Report</div>
-		</div>
-	</div>
-	<div class="float-left">
-		<div class="float-left rfr_lbl" style="margin-top: 10px;">
-			<spring:message code="label.xlsxfile.key" />
-		</div>
-		<div class="float-left rfr_txt" style="margin-top: 10px;">
-			<div class="rfr_icn icn-logo"></div>
-			<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
-			<div class="rfr_txt_fld">
-				<input type="text" class="rfr_input_fld" id="com-xlsx-file"
-					name="XlsxFileName"
-					placeholder='<spring:message code="label.xlsxfile.placeholder.key"/>'
-					value="${XlsxFileName}">
-			</div>
-			<div>
-				<input type="file" class="rfr_input_fld com-logo-comp-info"
-					id="com-file" name="xlsxfile"> <input type="hidden"
-					id="fileUrl" name="fileUrl">
-			</div>
-			<div
-				class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj"
-				id="icn-xlsxfile"></div>
-		</div>
-		<div class="reg_form_row clearfix hierarchy-btn">
-			<div class="reg_btn" id="xlsx-file-verify">
-				<spring:message code="label.verify.key" />
-			</div>
-		</div>
-		<div id="hierarchy-upload" class="reg_form_row clearfix hierarchy-btn">
-			<div class="reg_btn disable" id="xlsx-file-upload">
-				<spring:message code="label.import.key" />
-			</div>
-		</div>
-	</div>
+	<table style="width: 100%">
+		<tr style="margin-top: 10px; margin-left: 45px;">
+			<td>
+				<div class="float-left rfr_lbl">
+					<spring:message code="label.uploadType.key" />
+				</div>
+				<div class="float-left bd-cust-rad-item clearfix">
+					<div data-type="append"
+						class="float-left bd-cust-rad-img bd-cust-rad-img-checked"></div>
+					<div class="float-left bd-cust-rad-txt">Append Mode</div>
+				</div>
+				<div
+					class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix">
+					<div data-type="replace" class="float-left bd-cust-rad-img"></div>
+					<div class="float-left bd-cust-rad-txt">Replace Mode</div>
+				</div>
+				<div class="float-right" style="margin-right: 45px;">
+					<div id="dsh-ind-rep-bnt"
+						class="float-right dash-btn-dl-sd btn-wid-sm" style="width: 300px">
+						<div class="dsh-dwnld-btn float-left cursor-pointer"
+							style="width: 100%" onclick="downloadCompanyHierarchyReport()">Download
+							Company Hierarchy Report</div>
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="float-left">
+					<div class="float-left rfr_lbl" style="margin-top: 10px;">
+						<spring:message code="label.xlsxfile.key" />
+						&nbsp;
+					</div>
+					<div class="float-left rfr_txt" style="margin-top: 10px;">
+						<div class="rfr_icn icn-logo"></div>
+						<div class="icn-lname input-file-icn-left"
+							id="input-file-icn-left"></div>
+						<div class="rfr_txt_fld">
+							<input type="text" class="rfr_input_fld" id="com-xlsx-file"
+								name="XlsxFileName"
+								placeholder='<spring:message code="label.xlsxfile.placeholder.key"/>'
+								value="${XlsxFileName}">
+						</div>
+						<div>
+							<input type="file" class="rfr_input_fld com-logo-comp-info"
+								id="com-file" name="xlsxfile"> <input type="hidden"
+								id="fileUrl" name="fileUrl">
+						</div>
+						<div
+							class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj"
+							id="icn-xlsxfile"></div>
+					</div>
+					<div class="reg_form_row clearfix hierarchy-btn">
+						<div class="reg_btn" id="xlsx-file-verify">
+							<spring:message code="label.verify.key" />
+						</div>
+					</div>
+					<div id="hierarchy-upload"
+						class="reg_form_row clearfix hierarchy-btn">
+						<div class="reg_btn disable" id="xlsx-file-upload">
+							<spring:message code="label.import.key" />
+						</div>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
 </div>
 <div id="no-data"
 	style="width: 120px; margin: auto; color: #009FE0; font-size: 30px;"
