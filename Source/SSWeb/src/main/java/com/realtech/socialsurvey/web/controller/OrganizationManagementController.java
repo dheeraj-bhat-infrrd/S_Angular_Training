@@ -363,7 +363,7 @@ public class OrganizationManagementController
                 ;
             try {
                 emailServices.sendCompanyRegistrationStageMail( salesLeadEmail,
-                    CommonConstants.COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING, companyName, details );
+                    CommonConstants.COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING, companyName, details, true );
             } catch ( InvalidInputException e ) {
                 e.printStackTrace();
             } catch ( UndeliveredEmailException e ) {
