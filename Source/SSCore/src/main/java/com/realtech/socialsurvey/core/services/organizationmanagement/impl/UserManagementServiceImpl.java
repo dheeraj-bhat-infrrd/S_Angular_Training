@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -81,6 +82,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.vo.UserList;
 
 
 /**
@@ -90,7 +92,7 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 @Component
 public class UserManagementServiceImpl implements UserManagementService, InitializingBean
 {
-    
+
     private static final String NAME = "name";
 
     private static final Logger LOG = LoggerFactory.getLogger( UserManagementServiceImpl.class );
@@ -119,6 +121,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private UserInviteDao userInviteDao;
 
     @Autowired
+    private GenericDao<LicenseDetail, Long> licenseDetailsDao;
+
+    @Autowired
     private GenericDao<Company, Long> companyDao;
 
     @Autowired
@@ -132,7 +137,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private BatchTrackerService batchTrackerService;
-    
+
     @Autowired
     private Utils utils;
 
@@ -144,8 +149,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Qualifier ( "userProfile")
     private UserProfileDao userProfileDao;
 
-    @Autowired
-    private GenericDao<LicenseDetail, Long> licenseDetailsDao;
+    @Resource
+    @Qualifier ( "userEmailMapping")
+    private UserEmailMappingDao userEmailMappingDao;
 
     @Resource
     @Qualifier ( "branch")
@@ -186,15 +192,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private SocialManagementService socialManagementService;
-    
+
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
-    
-    @Autowired
-    private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
-    
+
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
+
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -288,11 +292,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         int days = CommonConstants.EXPIRE_AFTER_DAYS;
         // check added to include/exclude link expiry logic.
-        if(days > 0){
-	        long milliseconds = days * 24 * 60 * 60 * 1000;
-	        if ( systemTimestamp - userTimestamp > milliseconds ) {
-	            linkExpired = true;
-	        }
+        if ( days > 0 ) {
+            long milliseconds = days * 24 * 60 * 60 * 1000;
+            if ( systemTimestamp - userTimestamp > milliseconds ) {
+                linkExpired = true;
+            }
         }
         return linkExpired;
     }
@@ -335,6 +339,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             status, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
         LOG.debug( "Creating user profile for :" + emailId + " with profile completion stage : "
             + CommonConstants.ADD_COMPANY_STAGE );
@@ -445,8 +451,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail, boolean sendMail )
-        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
+    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail,
+        boolean sendMail ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
     {
         if ( firstName == null || firstName.isEmpty() ) {
             throw new InvalidInputException( "First name is either null or empty in inviteUserToRegister()." );
@@ -463,6 +469,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
         LOG.debug( "Inserting agent settings for the user:" + user );
         insertAgentSettings( user );
@@ -500,6 +508,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, String.valueOf( admin.getUserId() ) );
         user = userDao.save( user );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
         LOG.info( "Method to add a new user, inviteNewUser() finished for email id : " + emailId );
         return user;
@@ -548,22 +558,23 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userEmailMapping.setStatus( CommonConstants.STATUS_INACTIVE );
             userEmailMappingDao.update( userEmailMapping );
         }
-        
+
         // Marks all the user profiles for given user as inactive.
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
 
         //update profile url in mongo if needed
-        organizationManagementService.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
+        organizationManagementService.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN,
+            userIdToRemove );
 
         //Disconnect social connections(ensure that social connections history is updated)
         socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
-        
+
         //Delete entries from SurveyPreInitiation table
         surveyPreInitiationDao.deletePreInitiatedSurveysForAgent( userIdToRemove );
-        
+
         //Delete entries from the Survey Details Collection
         surveyDetailsDao.deleteIncompleteSurveysForAgent( userIdToRemove );
-        
+
         LOG.info( "Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished." );
     }
 
@@ -628,7 +639,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 userEmailMappingDao.update( userEmailMapping );
             }
         }
-        
+
         //Remove entry from RemovedUser table
 
         List<RemovedUser> entriesToDelete = removedUserDao.findByColumn( RemovedUser.class, CommonConstants.USER_COLUMN, user );
@@ -640,7 +651,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //Update Agent settings
         AgentSettings agentSettings = getUserSettings( userId );
-        
+
 
         //Update profileName and profileUrl if possible
         String profileNameForUpdate = null;
@@ -657,9 +668,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 user.setProfileUrl( "/" + newProfileName );
             }
         }
-        
+
         organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings, restoreSocial );
-        
+
         //Add user to Solr
         solrSearchService.addUserToSolr( user );
 
@@ -680,8 +691,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method to reactivate user " + user.getFirstName() + " finished." );
     }
-    
-    
+
+
     /*
      * Method to get user with login name of a company
      */
@@ -707,8 +718,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method to fetch list of users on the basis of email id is finished." );
         return users.get( CommonConstants.INITIAL_INDEX );
     }
-    
-    
+
+
     /**
      * Method to get user by email address
      * @param emailId
@@ -736,6 +747,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
     }
 
+
     /**
      * Method to get a list of users having the same email ID
      * @param emailId
@@ -744,16 +756,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public List<User> getUsersByEmailId(String emailId) throws InvalidInputException{
+    public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException
+    {
         LOG.info( "Method getUsersByEmailId started for emailId : " + emailId );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email ID is empty" );
         }
         List<User> users = userDao.findByColumn( User.class, CommonConstants.EMAIL_ID, emailId );
-        
+
         LOG.info( "Method getUsersByEmailId finished for emailId : " + emailId );
         return users;
     }
+
 
     // Method to return user with provided email and company
     @Transactional
@@ -833,12 +847,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         LOG.info( "Method to check whether users can be added or not started." );
         boolean isUserAdditionAllowed = false;
-        
-        if(user == null){
-            throw new InvalidInputException("passed user parameter is null");
+
+        if ( user == null ) {
+            throw new InvalidInputException( "passed user parameter is null" );
         }
-        if(user.getCompany() == null){
-            throw new InvalidInputException("passed user parameter doesnt have the company");
+        if ( user.getCompany() == null ) {
+            throw new InvalidInputException( "passed user parameter doesnt have the company" );
         }
 
         List<LicenseDetail> licenseDetails = licenseDetailsDao.findByColumn( LicenseDetail.class, CommonConstants.COMPANY,
@@ -998,8 +1012,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<ProListUser> getMultipleUsersByUserId( List<Long> userIds ) throws InvalidInputException
     {
-        if(userIds == null){
-            throw new InvalidInputException("Invalid parameter passed : passed parameter user id list is null");
+        if ( userIds == null ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter user id list is null" );
         }
         LOG.info( "Method to find multiple users on the basis of list of user id started for user ids " + userIds );
         List<ProListUser> users = new ArrayList<ProListUser>();
@@ -1073,8 +1087,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public List<Branch> getBranchesAssignedToUser( User user ) throws NoRecordsFetchedException, InvalidInputException
     {
-        if(user == null){
-            throw new InvalidInputException("Invalid parameter passed : passed parameter user is null");
+        if ( user == null ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter user is null" );
         }
         LOG.info( "Method to find branches assigned to the user started for " + user.getFirstName() );
         List<Long> branchIds = userProfileDao.getBranchIdsForUser( user );
@@ -1421,7 +1435,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new UserAssignmentException( "An exception occured while removing user assignment. Reason : ", e );
         }
     }
-    
+
 
     /*
      * Method to update the given user as active or inactive.
@@ -1490,7 +1504,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method to delete a profile called for user profile: " + profileIdToDelete );
 
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToDelete );
-        
+
         if ( userProfile == null ) {
             throw new InvalidInputException( "No user profile present for the specified profileId" );
         }
@@ -1500,20 +1514,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
-    
-    
+
+
     @Override
     @Transactional
-    public void updateUserInSolr(User user) throws InvalidInputException, SolrException{
+    public void updateUserInSolr( User user ) throws InvalidInputException, SolrException
+    {
 
         LOG.info( "Method to updateUserInSolr started" );
         //update user in solr
-        if(user == null){
+        if ( user == null ) {
             throw new InvalidInputException( "Method to updateUserInSolr ended" );
         }
         solrSearchService.addUserToSolr( user );
     }
-    
 
 
     /*
@@ -1625,14 +1639,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         String profileName, String loginName, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "Method to send profile completion link to the user started." );
-        if(emailId == null || emailId.isEmpty()){
-            throw new InvalidInputException("Invalid parameter passed : passed parameter emailId is null or empty");
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter emailId is null or empty" );
         }
-        if(profileName == null || profileName.isEmpty()){
-            throw new InvalidInputException("Invalid parameter passed : passed parameter profileName is null or empty");
+        if ( profileName == null || profileName.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter profileName is null or empty" );
         }
-        if(companyId <= 0l){
-            throw new InvalidInputException("Invalid parameter passed : passed parameter company id ininvald");
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter company id ininvald" );
         }
         Map<String, String> urlParams = new HashMap<String, String>();
         urlParams.put( CommonConstants.EMAIL_ID, emailId );
@@ -1661,7 +1675,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void setProfilesOfUser( User user )
     {
         LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started." );
-        if(user != null){
+        if ( user != null ) {
             List<UserProfile> userProfiles = user.getUserProfiles();
             if ( userProfiles != null ) {
                 for ( UserProfile userProfile : userProfiles ) {
@@ -1686,7 +1700,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 }
             }
         }
-        
+
         LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user finished." );
     }
 
@@ -1724,8 +1738,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void sendVerificationLink( User user ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "Method sendVerificationLink of Registration service called" );
-        if(user == null){
-            throw new InvalidInputException("Invalid parameter passed : passed parameter user is null " );
+        if ( user == null ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter user is null " );
         }
         String verificationUrl = null;
 
@@ -1775,9 +1789,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         LOG.debug( "Method inviteUser called with url : " + url + " emailId : " + emailId + " firstname : " + firstName
             + " lastName : " + lastName );
-        
-        if(emailId == null || emailId.isEmpty()){
-            throw new InvalidInputException("Invalid parameter passed : passed parameter email id is null or empty");
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter email id is null or empty" );
         }
 
         String queryParam = extractUrlQueryParam( url );
@@ -2370,7 +2384,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "assignUserToRegion : admin parameter is null" );
             throw new InvalidInputException( "assignUserToRegion : admin parameter is null" );
         }
-        
+
         if ( userId <= 0l ) {
             LOG.error( "assignUserToRegion : userId parameter is null" );
             throw new InvalidInputException( "assignUserToRegion : userId parameter is null" );
@@ -2443,8 +2457,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void insertAgentSettings( User user ) throws InvalidInputException
     {
-        if(user ==null){
-            throw new InvalidInputException("passed parameter user is null");
+        if ( user == null ) {
+            throw new InvalidInputException( "passed parameter user is null" );
         }
         LOG.info( "Inserting agent settings. User id: " + user.getUserId() );
         AgentSettings agentSettings = new AgentSettings();
@@ -2517,7 +2531,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "emailId is null or empty while generating agent profile name" );
         }
-        if ( userId <= 0l  ) {
+        if ( userId <= 0l ) {
             throw new InvalidInputException( "Wrong parameter passed : passed userId is invalid" );
         }
         String profileName = null;
@@ -2556,11 +2570,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @throws InvalidInputException 
      */
     @Override
-    public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings ) throws InvalidInputException
+    public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings )
+        throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
-        if(agentSettings == null){
-            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "passsed input parameter agentSettings is null" );
         }
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
             profileName, agentSettings );
@@ -2578,12 +2593,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param branchSettings
      */
     @Override
-    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings ) throws InvalidInputException
+    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings )
+        throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in BRANCH SETTINGS started" );
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
-        if(branchSettings == null){
-            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        if ( branchSettings == null ) {
+            throw new InvalidInputException( "passsed input parameter agentSettings is null" );
         }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, branchSettings,
@@ -2605,12 +2621,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param regionSettings
      */
     @Override
-    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings ) throws InvalidInputException
+    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings )
+        throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in REGION SETTINGS started" );
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
-        if(regionSettings == null){
-            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        if ( regionSettings == null ) {
+            throw new InvalidInputException( "passsed input parameter agentSettings is null" );
         }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, regionSettings,
@@ -2637,8 +2654,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         LOG.info( "Method to update profile name and url in COMPANY SETTINGS started" );
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
-        if(companySettings == null){
-            throw new InvalidInputException("passsed input parameter agentSettings is null");
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "passsed input parameter agentSettings is null" );
         }
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, companySettings,
@@ -3130,7 +3147,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             logoUrl = agentSettings.getLogo();
         }
         //JIRA SS-1363 end
-        
+
         return logoUrl;
     }
 
@@ -3385,8 +3402,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method to find users on the basis of user ids ended for user ids : " + userIds );
         return userList;
     }
-    
-    
+
+
     // Method to return active user with provided email and company
     @Transactional
     @Override
@@ -3403,7 +3420,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( company == null ) {
             throw new NoRecordsFetchedException( "No company found with the id " + companyId );
         }
-        
+
         User user = getUserByEmailAddress( emailId );
         if ( user.getCompany().getCompanyId() != companyId ) {
             throw new InvalidInputException( "The user is not part of the specified company" );
@@ -3495,9 +3512,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return agentUserProfile;
     }
-    
-    
-    
+
+
     /**
      * Method to add a new user into a company. Admin sends the invite to user for registering.
      * @throws UndeliveredEmailException 
@@ -3520,62 +3536,67 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         String password = utils.generateRandomAlphaNumericString();
-        String encryptedPassword = encryptionHelper.encryptSHA512(password);
-        User user = createUser( admin.getCompany(), encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
-            CommonConstants.STATUS_ACTIVE, CommonConstants.ADMIN_USER_NAME );
+        String encryptedPassword = encryptionHelper.encryptSHA512( password );
+        User user = createUser( admin.getCompany(), encryptedPassword, emailId, firstName, lastName,
+            CommonConstants.STATUS_ACTIVE, CommonConstants.STATUS_ACTIVE, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
-        
-        UserProfile userProfileNew = createUserProfile( user, admin.getCompany(),
-            user.getEmailId(), user.getUserId(), 0, 0, CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID,
-            CommonConstants.IS_PRIMARY_TRUE, CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-            String.valueOf( admin.getUserId() ), String.valueOf( admin.getUserId() ) );
-        
+
+        UserProfile userProfileNew = createUserProfile( user, admin.getCompany(), user.getEmailId(), user.getUserId(), 0, 0,
+            CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID, CommonConstants.IS_PRIMARY_TRUE,
+            CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf( admin.getUserId() ),
+            String.valueOf( admin.getUserId() ) );
+
         userProfileDao.save( userProfileNew );
-        sendInviteMailToSocialSurveyAdmin(emailId , user.getFirstName() + " " + user.getLastName() , admin.getCompany().getCompanyId() );
-        
-       
+        sendInviteMailToSocialSurveyAdmin( emailId, user.getFirstName() + " " + user.getLastName(), admin.getCompany()
+            .getCompanyId() );
+
+
         LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
         return user;
     }
-    
-    
-    private void sendInviteMailToSocialSurveyAdmin(String emailId , String name , long companyId) throws InvalidInputException, UndeliveredEmailException{
+
+
+    private void sendInviteMailToSocialSurveyAdmin( String emailId, String name, long companyId ) throws InvalidInputException,
+        UndeliveredEmailException
+    {
         Map<String, String> urlParams = new HashMap<String, String>();
-        urlParams.put(CommonConstants.EMAIL_ID, emailId);
-        urlParams.put(CommonConstants.COMPANY, companyId + "");
-        urlParams.put(NAME, name);
+        urlParams.put( CommonConstants.EMAIL_ID, emailId );
+        urlParams.put( CommonConstants.COMPANY, companyId + "" );
+        urlParams.put( NAME, name );
         urlParams.put( CommonConstants.URL_PARAM_RESET_PASSWORD, CommonConstants.URL_PARAM_RESETORSET_VALUE_SET );
 
-        LOG.info("Generating URL");
-        String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD);
-        
-        emailServices.sendInvitationToSocialSurveyAdmin( url, emailId, name , emailId );
+        LOG.info( "Generating URL" );
+        String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD );
+
+        emailServices.sendInvitationToSocialSurveyAdmin( url, emailId, name, emailId );
 
     }
-    
-    
+
+
     @Override
-    public List<User> getSocialSurveyAdmins(User admin)
+    public List<User> getSocialSurveyAdmins( User admin )
     {
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( CommonConstants.COMPANY, admin.getCompany() );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         List<User> userList = userDao.findByKeyValue( User.class, queries );
         List<User> ssAdminList = new ArrayList<User>();
-        for(User user : userList){
+        for ( User user : userList ) {
             List<UserProfile> userProfiles = user.getUserProfiles();
-            for(UserProfile userProfile : userProfiles){
-                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID && userProfile.getStatus() == CommonConstants.STATUS_ACTIVE)
+            for ( UserProfile userProfile : userProfiles ) {
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID
+                    && userProfile.getStatus() == CommonConstants.STATUS_ACTIVE )
                     ssAdminList.add( user );
             }
         }
         return ssAdminList;
     }
-    
-    
+
+
     @Override
     @Transactional
-    public void deleteSSAdmin(User admin , long ssAdminId) throws InvalidInputException{
+    public void deleteSSAdmin( User admin, long ssAdminId ) throws InvalidInputException
+    {
 
         LOG.info( "Method to deleteSSAdmin user " + ssAdminId + " called." );
         User userToBeDeactivated = userDao.findById( User.class, ssAdminId );
@@ -3585,7 +3606,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userToBeDeactivated == null ) {
             throw new InvalidInputException( "No user found in databse for user id : " + ssAdminId );
         }
-        
+
         // Create an entry into the RemovedUser table for keeping historical records of users.
         RemovedUser removedUser = new RemovedUser();
         removedUser.setCompany( userToBeDeactivated.getCompany() );
@@ -3595,7 +3616,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         removedUserDao.save( removedUser );
 
         userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
-        
+
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
         userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
@@ -3605,62 +3626,162 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userDao.update( userToBeDeactivated );
     }
 
-    
-    
+
     @Transactional
     @Override
-    public User saveEmailUserMapping( String emailId , long userId ) throws InvalidInputException, NoRecordsFetchedException
+    public User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method to saveEmailUserMapping for : " + emailId + " started." );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty" );
         }
         User user = userDao.findById( User.class, userId );
-        
-        if(user == null){
+
+        if ( user == null ) {
             throw new InvalidInputException( "No user found for agent id : " + userId );
         }
-        
+
         UserEmailMapping userEmailMapping = new UserEmailMapping();
         userEmailMapping.setCompany( user.getCompany() );
         userEmailMapping.setEmailId( emailId );
         userEmailMapping.setUser( user );
         userEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
-        
+
         userEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMapping.setCreatedBy( "ADMIN" );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMapping.setModifiedBy( "ADMIN" );
-        
+
         userEmailMappingDao.save( userEmailMapping );
-        return  user;
+        return user;
     }
-    
-    
+
+
     @Transactional
     @Override
-    public CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId , long companyId ) throws InvalidInputException, NoRecordsFetchedException
+    public CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method to saveIgnoredEmailCompanyMapping for  : " + emailId + " started." );
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty" );
         }
         Company company = companyDao.findById( Company.class, companyId );
-        
-        if(company == null){
+
+        if ( company == null ) {
             throw new InvalidInputException( "No company found for company id : " + companyId );
         }
-        
+
         CompanyIgnoredEmailMapping companyIgnoredEmailMapping = new CompanyIgnoredEmailMapping();
         companyIgnoredEmailMapping.setCompany( company );
         companyIgnoredEmailMapping.setEmailId( emailId );
-        
+
         companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
         companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         companyIgnoredEmailMapping.setModifiedBy( "ADMIN" );
-        
+
         companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.save( companyIgnoredEmailMapping );
-        return  companyIgnoredEmailMapping;
+        return companyIgnoredEmailMapping;
+    }
+
+
+    @Transactional
+    @Override
+    public UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method to getUsersAndEmailMappingForCompant for  companyId : " + companyId + " started." );
+        UserList userList = new UserList();
+        Company company = companyDao.findById( Company.class, companyId );
+
+        if ( company == null ) {
+            throw new InvalidInputException( "No company found for company id : " + companyId );
+        }
+        List<User> usersFromSearch = userDao.getUsersAndEmailMappingForCompany( company, startIndex, batchSize );
+        List<User> users = new ArrayList<User>();
+        for ( User user : usersFromSearch ) {
+            User userVO = new User();
+            userVO.setUserId( user.getUserId() );
+            userVO.setFirstName( user.getFirstName() );
+            userVO.setLastName( user.getLastName() );
+            userVO.setEmailId( user.getEmailId() );
+            userVO.setLoginName( user.getLoginName() );
+
+            StringBuilder mappedEmails = new StringBuilder();
+            for ( UserEmailMapping emailMapping : user.getUserEmailMappings() ) {
+            	if(emailMapping.getStatus() == CommonConstants.STATUS_ACTIVE){
+            		mappedEmails.append( emailMapping.getEmailId() );
+                    mappedEmails.append( ", " );
+            	}             
+            }
+            String mappedEmailsString = mappedEmails.toString();
+            if ( mappedEmailsString != null && mappedEmailsString.contains( "," ) )
+                mappedEmailsString = mappedEmailsString.substring( 0, mappedEmailsString.lastIndexOf( "," ) );
+            userVO.setMappedEmails( mappedEmailsString );
+
+            users.add( userVO );
+        }
+        userList.setUsers( users );
+        userList.setTotalRecord( userDao.getCountOfUsersAndEmailMappingForCompany( company ) );
+
+        return userList;
+    }
+
+
+    @Transactional
+    @Override
+    public List<UserEmailMapping> getUserEmailMappingsForUser( long agentId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Method to getUserEmailMappingsForUser for  agentId : " + agentId + " started." );
+
+        User user = userDao.findById( User.class, agentId );
+
+        if ( user == null ) {
+            throw new InvalidInputException( "No user found for agent id : " + agentId );
+        }
+
+        List<UserEmailMapping> emailMappings = userEmailMappingDao.getAciveUserEmailMappingForUser( user );
+        List<UserEmailMapping> emailMappingsVO = new ArrayList<UserEmailMapping>();
+        for ( UserEmailMapping emailMapping : emailMappings ) {
+            UserEmailMapping emailMappingVO = new UserEmailMapping();
+            emailMappingVO.setUserEmailMappingId( emailMapping.getUserEmailMappingId() );
+            emailMappingVO.setEmailId( emailMapping.getEmailId() );
+            emailMappingVO.setCreatedOn( emailMapping.getCreatedOn() );
+            emailMappingVO.setStatus( emailMapping.getStatus() );
+
+            emailMappingsVO.add( emailMappingVO );
+        }
+
+        return emailMappingsVO;
+    }
+    
+    
+    @Transactional
+    @Override
+    public void deleteUserEmailMapping( User agent , long emailMappingId ) throws InvalidInputException
+    {
+        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
+        if ( agent == null ) {
+            throw new InvalidInputException( "Passed parameter agent is null " );
+        }
+        
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( "userEmailMappingId", emailMappingId );
+        List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+       
+        
+        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null) {
+            throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + emailMappingId );
+        }
+
+        UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
+        userEmailMapping.setStatus( CommonConstants.STATUS_INACTIVE );
+        userEmailMapping.setModifiedBy( String.valueOf(agent.getUserId() ));
+        userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        userEmailMappingDao.update( userEmailMapping );
+        
+        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
 }

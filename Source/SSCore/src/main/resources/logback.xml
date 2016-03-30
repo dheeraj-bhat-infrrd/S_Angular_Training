@@ -22,11 +22,11 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <FileNamePattern>../standalone/log/logfile.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
-            <MaxIndex>5</MaxIndex>
+            <MaxIndex>10</MaxIndex>
         </rollingPolicy>
  
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>5MB</MaxFileSize>
+            <MaxFileSize>25MB</MaxFileSize>
         </triggeringPolicy>
  
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -40,11 +40,11 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <FileNamePattern>../standalone/log/sqllogfile.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
-            <MaxIndex>5</MaxIndex>
+            <MaxIndex>10</MaxIndex>
         </rollingPolicy>
  
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>5MB</MaxFileSize>
+            <MaxFileSize>15MB</MaxFileSize>
         </triggeringPolicy>
  
         <layout class="ch.qos.logback.classic.PatternLayout">

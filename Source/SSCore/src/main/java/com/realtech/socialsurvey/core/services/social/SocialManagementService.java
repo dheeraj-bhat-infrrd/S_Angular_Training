@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
@@ -78,8 +79,8 @@ public interface SocialManagementService
      * @throws InvalidInputException
      * @throws FacebookException
      */
-    public boolean updateStatusIntoFacebookPage( OrganizationUnitSettings agentSettings, String message, String serverBaseUrl,
-        long companyId ) throws InvalidInputException, FacebookException;
+    public boolean updateStatusIntoFacebookPage( OrganizationUnitSettings settings, String message, String serverBaseUrl,
+        long companyId, String completeProfileUrl ) throws InvalidInputException, FacebookException;
 
 
     /**
@@ -102,8 +103,8 @@ public interface SocialManagementService
     public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser( long userId );
 
 
-    public boolean updateLinkedin( OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl,
-        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow ) throws NonFatalException;
+    public boolean updateLinkedin( OrganizationUnitSettings settings, String message, String linkedinProfileUrl,
+        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow, AgentSettings agentSettings, SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException;
 
 
     public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, OrganizationUnitSettings unitSettings,
@@ -152,7 +153,7 @@ public interface SocialManagementService
 
 
     void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
-        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails )
+        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails, boolean isZillow )
         throws InvalidInputException, NoRecordsFetchedException;
 
 

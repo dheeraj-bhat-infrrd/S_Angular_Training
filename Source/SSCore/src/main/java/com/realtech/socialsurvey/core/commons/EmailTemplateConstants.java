@@ -135,5 +135,12 @@ public final class EmailTemplateConstants {
 
     public static final String ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_SUBJECT = "ZillowReviewComplaintHandlerMailSubject.txt";
     public static final String ZILLOW_REVIEW_COMPLAINT_HANDLER_MAIL_BODY = "ZillowReviewComplaintHandlerMailBody.html";
+    
+    public static final String COMPANY_REGISTRATION_STAGE_MAIL_SUBJECT = "CompanyRegistrationStatusSubject.txt";
+    public static final String COMPANY_REGISTRATION_STAGE_MAIL_BODY = "CompanyRegistrationStatusBody.html";
+    public static final String CUSTOM_MAIL_SUBJECT = "customMailSubject.txt";
+    public static final String CUSTOM_MAIL_BODY = "customMailBody.html";
+    
+    
 
 }

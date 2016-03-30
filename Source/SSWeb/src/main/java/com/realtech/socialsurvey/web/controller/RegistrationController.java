@@ -7,8 +7,10 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -77,6 +80,9 @@ public class RegistrationController
 
     @Value ( "${CAPTCHA_SECRET}")
     private String captchaSecretKey;
+    
+    @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
+    private String salesLeadEmail;
 
     // JIRA - SS-536: Added for manual registration via invite
     @Autowired
@@ -467,6 +473,19 @@ public class RegistrationController
             return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
         }
 
+        //TODO: specify details
+        String details = "First Name : " + firstName + "<br/>" +
+            "Last Name : " + lastName + "<br/>" + 
+            "Email Address : "  + emailId;
+        try {
+            emailServices.sendCompanyRegistrationStageMail( salesLeadEmail, CommonConstants.COMPANY_REGISTRATION_STAGE_STARTED,
+                emailId, details );
+        } catch ( InvalidInputException e ) {
+            e.printStackTrace();
+        } catch ( UndeliveredEmailException e ) {
+            e.printStackTrace();
+        }
+        
         LOG.info( "Method registerUser of Registration Controller finished" );
         return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
     }

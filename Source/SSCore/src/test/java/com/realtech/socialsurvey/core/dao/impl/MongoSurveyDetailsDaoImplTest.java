@@ -69,21 +69,21 @@ public class MongoSurveyDetailsDaoImplTest
     @Test ( expected = InvalidInputException.class)
     public void getCompletedSurveyCountTestColumnNull() throws InvalidInputException
     {
-        mongoSurveyDetailsDaoImpl.getCompletedSurveyCount( null, 10l, new Timestamp( 0 ), new Timestamp( 0 ), false );
+        mongoSurveyDetailsDaoImpl.getCompletedSurveyCount( null, 10l, new Timestamp( 0 ), new Timestamp( 0 ), false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void getCompletedSurveyCountTestColumnEmpty() throws InvalidInputException
     {
-        mongoSurveyDetailsDaoImpl.getCompletedSurveyCount( "", 10l, new Timestamp( 0 ), new Timestamp( 0 ), false );
+        mongoSurveyDetailsDaoImpl.getCompletedSurveyCount( "", 10l, new Timestamp( 0 ), new Timestamp( 0 ), false, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void getCompletedSurveyCountTestInvalidColumnValue() throws InvalidInputException
     {
-        mongoSurveyDetailsDaoImpl.getCompletedSurveyCount( "test", 0l, new Timestamp( 0 ), new Timestamp( 0 ), false );
+        mongoSurveyDetailsDaoImpl.getCompletedSurveyCount( "test", 0l, new Timestamp( 0 ), new Timestamp( 0 ), false, false );
     }
 
 

@@ -15,6 +15,7 @@ public class SocialMediaPostResponse
 
     private String accessToken;
 
+    private String referenceUrl;
   
 
     public String getResponseMessage()
@@ -45,6 +46,18 @@ public class SocialMediaPostResponse
     public void setAccessToken( String accessToken )
     {
         this.accessToken = accessToken;
+    }
+
+
+    public String getReferenceUrl()
+    {
+        return referenceUrl;
+    }
+
+
+    public void setReferenceUrl( String referenceUrl )
+    {
+        this.referenceUrl = referenceUrl;
     }
 
 }

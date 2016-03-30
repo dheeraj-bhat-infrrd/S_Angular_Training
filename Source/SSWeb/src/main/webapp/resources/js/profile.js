@@ -713,6 +713,9 @@ function paintReviews(result){
 	$.each(result, function(i, reviewItem) {
 		var scoreFixVal = 1;
 		var date = Date.parse(reviewItem.modifiedOn);
+		if(reviewItem.source == "Zillow") {
+			date = Date.parse(reviewItem.createdOn);
+		}
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
@@ -1068,7 +1071,8 @@ function fetchZillowReviewsBasedOnProfile(profileLevel, currentProfileIden, isNe
 		// url += "branch/";
 		return;
 	} else if (profileLevel == 'INDIVIDUAL') {
-		url += "individual/";
+		// url += "individual/";
+		return;
 	}
 	url += currentProfileIden + "/zillowreviews";
 	isZillowReviewsCallRunning = true;

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -17,10 +19,12 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -34,6 +38,10 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( SurveyPreInitiationDaoImpl.class );
+    
+    @Resource
+    @Qualifier ( "user")
+    private UserDao userDao;
 
     private static final String proceesedCurruptedSurvey = "select SURVEY_PRE_INITIATION_ID ,  SURVEY_SOURCE_ID  , COMPANY_ID , AGENT_EMAILID , "
         + "CUSTOMER_FIRST_NAME  , CUSTOMER_LAST_NAME , CUSTOMER_EMAIL_ID , AGENT_ID , STATUS , CREATED_ON , ENGAGEMENT_CLOSED_TIME  from "
@@ -214,9 +222,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     {
         LOG.info( "Method deleteSurveysWithIds() started" );
         //First get the list of surveys that will be deleted
-        String deleteQuery = "update SurveyPreInitiation set status=7 where surveyPreIntitiationId in (:incompleteSurveyIds)";
+        String deleteQuery = "update SurveyPreInitiation set status=7, modifiedOn=(:modifiedOnTime) where surveyPreIntitiationId in (:incompleteSurveyIds) and status in (:statuses)";
         Query query = getSession().createQuery( deleteQuery );
+        query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameterList( "incompleteSurveyIds", incompleteSurveyIds );
+        query.setParameterList( "statuses", new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED,
+            CommonConstants.SURVEY_STATUS_INITIATED } );
         query.executeUpdate();
     }
 
@@ -428,9 +439,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         if ( agentId <= 0l ) {
             throw new InvalidInputException( "Invalid agent ID : " + agentId );
         }
-        String deleteQuery = "update SurveyPreInitiation set status=7 where agentId = (:deletedAgentId)";
+        String deleteQuery = "update SurveyPreInitiation set status=7, modifiedOn=(:modifiedOnTime) where agentId = (:deletedAgentId) and status in (:statuses)";
         Query query = getSession().createQuery( deleteQuery );
+        query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( "deletedAgentId", agentId );
+        query.setParameterList( "statuses", new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED,
+            CommonConstants.SURVEY_STATUS_INITIATED } );
         query.executeUpdate();
         LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " finished." );
     }
@@ -548,6 +562,16 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             surveyPreInitiation.setStatus( Integer.valueOf( String.valueOf( row[8] ) ) );
             surveyPreInitiation.setCreatedOn( Timestamp.valueOf( String.valueOf( row[9] ) ) );
             surveyPreInitiation.setEngagementClosedTime( Timestamp.valueOf( String.valueOf( row[10] ) ) );
+            if(surveyPreInitiation.getAgentId() > 0){
+                User user = userDao.findById( User.class, surveyPreInitiation.getAgentId() );
+                if(user != null){
+                    User agent = new User();
+                    agent.setUserId( user.getUserId() );
+                    agent.setEmailId( user.getEmailId() );
+                    agent.setLoginName( user.getLoginName() );
+                    surveyPreInitiation.setUser( agent );
+                }
+            }
             surveyPreInitiations.add( surveyPreInitiation );
 
         }

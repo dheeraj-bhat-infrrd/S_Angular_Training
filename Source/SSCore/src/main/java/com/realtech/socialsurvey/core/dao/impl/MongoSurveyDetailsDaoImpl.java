@@ -237,8 +237,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
-        update.set( CommonConstants.CREATED_ON, new Date() );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
@@ -261,8 +259,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, false );
         update.set( CommonConstants.IS_UNMARKED_ABUSIVE_COLUMN, true );
-        update.set( CommonConstants.CREATED_ON, new Date() );
-        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
@@ -298,8 +294,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays, boolean filterAbusive )
     {
         LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() started." );
+        Date startDate = null;
+        /**
+         * if days is not set, take the start date as 1 jan 1970
+         */
+        if ( noOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( noOfDays );
+        }
+
         Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( noOfDays );
         Query query = new Query( Criteria.where( CommonConstants.SURVEY_CLICKED_COLUMN ).is( true ) );
         /*query.addCriteria(Criteria.where("surveyResponse").size(0));*/
         if ( columnName != null ) {
@@ -326,8 +331,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getCompletedSurveyCount( String columnName, long columnValue, int noOfDays )
     {
         LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
+        Date startDate = null;
+        /**
+         * if days is not set, take the start date as 1 jan 1970
+         */
+        if ( noOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( noOfDays );
+        }
+
         Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( noOfDays );
         Query query = new Query( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
@@ -350,8 +364,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getIncompleteSurveyCount( String columnName, long columnValue, int noOfDays )
     {
         LOG.info( "Method to get count of surveys which are not yet completed, getIncompleteSurveyCount() started." );
+        Date startDate = null;
+        /**
+         * if days is not set, take the start date as 1 jan 1970
+         */
+        if ( noOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( noOfDays );
+        }
+
         Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( noOfDays );
         Query query = new Query( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
@@ -654,8 +677,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getSocialPostsCount( String columnName, long columnValue, int numberOfDays )
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
+        Date startDate = null;
+        /**
+         * if days is not set, take the start date as 1 jan 1970
+         */
+        if ( numberOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( numberOfDays );
+        }
+
         Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( numberOfDays );
         TypedAggregation<SurveyDetails> aggregation;
         if ( columnName == null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria
@@ -965,10 +997,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
         }
 
-        if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
-            query
-                .addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
-        }
+        // Commented as Zillow reviews for individuals will also be shown from cache
+        // if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+        //    query
+        //        .addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+        // }
 
         if ( startScore > -1 && limitScore > -1 ) {
             query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
@@ -1175,7 +1208,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public long getCompletedSurveyCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
-        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
+        Timestamp endDate, boolean filterAbusive, boolean filterZillowReviews ) throws InvalidInputException
     {
         LOG.info( "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
         if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
@@ -1205,6 +1238,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( startDate != null && endDate != null ) {
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+        }
+        if(filterZillowReviews){
+            query.addCriteria( Criteria.where( CommonConstants.SOURCE_COLUMN ).ne(CommonConstants.SURVEY_SOURCE_ZILLOW) );
         }
         LOG.debug( "Query: " + query.toString() );
         long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );

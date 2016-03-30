@@ -1100,4 +1100,11 @@ public interface CommonConstants
     public static final String UPLOAD_MODIFIED_USERS = "No. of users modified : ";
     public static final String UPLOAD_DELETED_USERS = "No. of users deleted : ";
     
+    
+    //Company registration stage
+    public static final String COMPANY_REGISTRATION_STAGE_STARTED = "The registration has been initiated";
+    public static final String COMPANY_REGISTRATION_STAGE_COMPLETE = "The registrtion has been completed successfully";
+    public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
+    
+    
 }

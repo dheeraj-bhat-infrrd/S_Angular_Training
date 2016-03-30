@@ -21,6 +21,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -282,32 +284,28 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public boolean updateStatusIntoFacebookPage( OrganizationUnitSettings agentSettings, String message, String serverBaseUrl,
-        long companyId ) throws InvalidInputException, FacebookException
+    public boolean updateStatusIntoFacebookPage( OrganizationUnitSettings settings, String message, String serverBaseUrl,
+        long companyId, String completeProfileUrl ) throws InvalidInputException, FacebookException
     {
-        if ( agentSettings == null ) {
+        if ( settings == null ) {
             throw new InvalidInputException( "AgentSettings can not be null" );
         }
         LOG.info( "Updating Social Tokens information" );
         boolean facebookNotSetup = true;
         Facebook facebook = getFacebookInstance( serverBaseUrl );
-        if ( agentSettings != null ) {
-            if ( agentSettings.getSocialMediaTokens() != null ) {
-                if ( agentSettings.getSocialMediaTokens().getFacebookToken() != null
-                    && agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() != null ) {
-                    if ( agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() != null )
-                        facebook.setOAuthAccessToken( new AccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
+        if ( settings != null ) {
+            if ( settings.getSocialMediaTokens() != null ) {
+                if ( settings.getSocialMediaTokens().getFacebookToken() != null
+                    && settings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() != null ) {
+                    if ( settings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() != null )
+                        facebook.setOAuthAccessToken( new AccessToken( settings.getSocialMediaTokens().getFacebookToken()
                             .getFacebookAccessTokenToPost(), null ) );
                     else
-                        facebook.setOAuthAccessToken( new AccessToken( agentSettings.getSocialMediaTokens().getFacebookToken()
+                        facebook.setOAuthAccessToken( new AccessToken( settings.getSocialMediaTokens().getFacebookToken()
                             .getFacebookAccessToken(), null ) );
                     try {
                         facebookNotSetup = false;
-                        String completeProfileUrl = agentSettings.getCompleteProfileUrl();
-                        if ( completeProfileUrl == null || completeProfileUrl.isEmpty() ) {
-                            completeProfileUrl = surveyHandler.getApplicationBaseUrl()
-                                + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl();
-                        }
+
                         // Updating customised data
                         PostUpdate postUpdate = new PostUpdate( message );
                         postUpdate.setCaption( completeProfileUrl );
@@ -391,23 +389,24 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public boolean updateLinkedin( OrganizationUnitSettings agentSettings, String message, String linkedinProfileUrl,
-        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow ) throws NonFatalException
+    public boolean updateLinkedin( OrganizationUnitSettings settings, String message, String linkedinProfileUrl,
+        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow,
+        AgentSettings agentSettings, SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException
     {
-        if ( agentSettings == null ) {
+        if ( settings == null ) {
             throw new InvalidInputException( "AgentSettings can not be null" );
         }
         boolean linkedinNotSetup = true;
         LOG.info( "updateLinkedin() started." );
-        if ( agentSettings != null ) {
-            if ( agentSettings.getSocialMediaTokens() != null ) {
-                if ( agentSettings.getSocialMediaTokens().getLinkedInToken() != null
-                    && agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null ) {
+        if ( settings != null ) {
+            if ( settings.getSocialMediaTokens() != null ) {
+                if ( settings.getSocialMediaTokens().getLinkedInToken() != null
+                    && settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null ) {
                     linkedinNotSetup = false;
                     String linkedInPost = new StringBuilder( linkedInRestApiUri )
                         .substring( 0, linkedInRestApiUri.length() - 1 );
                     linkedInPost += "/shares?oauth2_access_token="
-                        + agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
+                        + settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
                     linkedInPost += "&format=json";
                     try {
                         HttpClient client = HttpClientBuilder.create().build();
@@ -450,20 +449,31 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         }
 
                         String profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                            + agentSettings.getProfileUrl();
+                            + settings.getProfileUrl();
                         message = StringEscapeUtils.escapeXml( message );
 
                         message = message.replace( "&amp;lmnlf;", "\\n" ).replace( "&amp;dash;", "\\u2014" );
 
                         String linkedPostJSON = "{\"comment\": \"" + message + "\",\"content\": {" + "\"title\": \"" + title
-                            + "\"," + "\"description\": \"" + description + "\","
-                            + "\"submitted-url\": \"" + profileUrl + "\",  " + "\"submitted-image-url\": \"" + imageUrl
-                            + "\"}," + "\"visibility\": {\"code\": \"anyone\" }}";
+                            + "\"," + "\"description\": \"" + description + "\"," + "\"submitted-url\": \"" + profileUrl
+                            + "\",  " + "\"submitted-image-url\": \"" + imageUrl + "\"},"
+                            + "\"visibility\": {\"code\": \"anyone\" }}";
                         StringEntity entity = new StringEntity( linkedPostJSON );
                         post.setEntity( entity );
                         try {
                             HttpResponse response = client.execute( post );
-                            LOG.info( "Server response while posting on linkedin : " + response.toString() );
+                            String responseString = response.toString();
+                            LOG.info( "Server response while posting on linkedin : " + responseString );
+                            JSONObject entityUpdateResponseObj = new JSONObject( EntityUtils.toString( response.getEntity() ) );
+                            if ( responseString.contains( "201 Created" ) ) {
+                                String updateUrl = (String) entityUpdateResponseObj.get( "updateUrl" );
+                                linkedinPostResponse.setReferenceUrl( updateUrl );
+                                linkedinPostResponse.setResponseMessage( "Ok" );
+                            } else {
+                                linkedinPostResponse.setResponseMessage( (String) entityUpdateResponseObj.get( "message" ) );
+                            }
+                            linkedinPostResponse.setAccessToken( settings.getSocialMediaTokens().getLinkedInToken()
+                                .getLinkedInAccessToken() );
                         } catch ( RuntimeException e ) {
                             LOG.error(
                                 "Runtime exception caught while trying to add an update on linkedin. Nested exception is ", e );
@@ -855,7 +865,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      */
     @Override
     public void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
-        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails )
+        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails, boolean isZillow )
         throws InvalidInputException, NoRecordsFetchedException
     {
 
@@ -878,15 +888,22 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList = socialMediaPostResponseDetails
             .getBranchMediaPostResponseDetailsList();
 
+        String updatedFacebookMessage = facebookMessage;
+
+        AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails()
+            .getAgentId() );
+
         //Post for agent
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
-            AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails
-                .getAgentMediaPostDetails().getAgentId() );
+
             if ( agentSettings != null ) {
                 try {
                     if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
                         List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
-                        if ( !updateStatusIntoFacebookPage( agentSettings, facebookMessage, serverBaseUrl, companyId ) ) {
+                        if ( !isZillow ) {
+                            updatedFacebookMessage = facebookMessage + agentSettings.getCompleteProfileUrl() + "/";
+                        }
+                        if ( !updateStatusIntoFacebookPage( agentSettings, updatedFacebookMessage, serverBaseUrl, companyId, agentSettings.getCompleteProfileUrl() ) ) {
                             if ( !agentSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                                 agentSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
 
@@ -929,8 +946,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( companySetting != null ) {
                     try {
                         if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
-                            if ( !updateStatusIntoFacebookPage( companySetting, facebookMessage, serverBaseUrl,
-                                companySetting.getIden() ) ) {
+                            if ( !isZillow ) {
+                                updatedFacebookMessage = facebookMessage + companySetting.getCompleteProfileUrl() + "/";
+                            }
+                            if ( !updateStatusIntoFacebookPage( companySetting, updatedFacebookMessage, serverBaseUrl,
+                                companySetting.getIden(), agentSettings.getCompleteProfileUrl() ) ) {
                                 List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails()
                                     .getSharedOn();
                                 if ( !companySocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
@@ -979,7 +999,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         try {
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, companyId ) ) {
+                                if ( !isZillow ) {
+                                    updatedFacebookMessage = facebookMessage + setting.getCompleteProfileUrl() + "/";
+                                }
+                                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, agentSettings.getCompleteProfileUrl() ) ) {
                                     List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                                     if ( !regionSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                                         regionSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
@@ -1028,7 +1051,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( setting != null ) {
                         try {
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !updateStatusIntoFacebookPage( setting, facebookMessage, serverBaseUrl, companyId ) ) {
+                                if ( !isZillow ) {
+                                    updatedFacebookMessage = facebookMessage + setting.getCompleteProfileUrl() + "/";
+                                }
+                                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, agentSettings.getCompleteProfileUrl() ) ) {
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                                     if ( !branchSocialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) )
                                         branchSocialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
@@ -1105,25 +1131,29 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList = socialMediaPostResponseDetails
             .getBranchMediaPostResponseDetailsList();
 
+        String updatedLinkedInMessage = linkedinMessage;
+
+        AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails()
+            .getAgentId() );
 
         //Post for agent
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
-            AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails
-                .getAgentMediaPostDetails().getAgentId() );
+
             if ( agentSettings != null ) {
                 try {
                     if ( surveyHandler.canPostOnSocialMedia( agentSettings, rating ) ) {
-                        if ( !updateLinkedin( agentSettings, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
-                            companySettings, isZillow ) ) {
+                        if ( !isZillow ) {
+                            updatedLinkedInMessage = linkedinMessage + agentSettings.getCompleteProfileUrl() + "/";
+                        }
+                        SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
+                        linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+
+                        if ( !updateLinkedin( agentSettings, updatedLinkedInMessage, linkedinProfileUrl,
+                            linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
                             List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
                             if ( !agentSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                 agentSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
 
-                            SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                            linkedinPostResponse.setAccessToken( agentSettings.getSocialMediaTokens().getLinkedInToken()
-                                .getLinkedInAccessToken() );
-                            linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                            linkedinPostResponse.setResponseMessage( "Ok" );
                             if ( agentMediaPostResponseDetails.getLinkedinPostResponseList() == null )
                                 agentMediaPostResponseDetails
                                     .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
@@ -1154,18 +1184,20 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( companySetting != null ) {
                     try {
                         if ( surveyHandler.canPostOnSocialMedia( companySetting, rating ) ) {
-                            if ( !updateLinkedin( companySetting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
-                                companySetting, isZillow ) ) {
+                            if ( !isZillow ) {
+                                updatedLinkedInMessage = linkedinMessage + companySetting.getCompleteProfileUrl() + "/";
+                            }
+                            SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
+                            linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+
+                            if ( !updateLinkedin( companySetting, updatedLinkedInMessage, linkedinProfileUrl,
+                                linkedinMessageFeedback, companySetting, isZillow, agentSettings, linkedinPostResponse ) ) {
                                 List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails()
                                     .getSharedOn();
                                 if ( !companySocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                     companySocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
 
-                                SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                                linkedinPostResponse.setAccessToken( companySetting.getSocialMediaTokens().getLinkedInToken()
-                                    .getLinkedInAccessToken() );
-                                linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                linkedinPostResponse.setResponseMessage( "Ok" );
+
                                 if ( companyMediaPostResponseDetails.getLinkedinPostResponseList() == null )
                                     companyMediaPostResponseDetails
                                         .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
@@ -1202,18 +1234,21 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         try {
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
-                                    companySettings, isZillow ) ) {
+                                if ( !isZillow ) {
+                                    updatedLinkedInMessage = linkedinMessage + setting.getCompleteProfileUrl() + "/";
+                                }
+
+                                SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
+                                linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+
+                                if ( !updateLinkedin( setting, updatedLinkedInMessage, linkedinProfileUrl,
+                                    linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
                                     List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
                                     if ( !regionSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                         regionSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                                     regionMediaPostDetails.setSharedOn( regionSocialList );
 
-                                    SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                                    linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken()
-                                        .getLinkedInAccessToken() );
-                                    linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                    linkedinPostResponse.setResponseMessage( "Ok" );
+
                                     if ( regionMediaPostResponseDetails.getLinkedinPostResponseList() == null )
                                         regionMediaPostResponseDetails
                                             .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
@@ -1248,18 +1283,19 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         try {
                             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                                if ( !updateLinkedin( setting, linkedinMessage, linkedinProfileUrl, linkedinMessageFeedback,
-                                    companySettings, isZillow ) ) {
+                                if ( !isZillow ) {
+                                    updatedLinkedInMessage = linkedinMessage + setting.getCompleteProfileUrl() + "/";
+                                }
+                                SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
+                                linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
+
+                                if ( !updateLinkedin( setting, updatedLinkedInMessage, linkedinProfileUrl,
+                                    linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse ) ) {
                                     List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
                                     if ( !branchSocialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                                         branchSocialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                                     branchMediaPostDetails.setSharedOn( branchSocialList );
 
-                                    SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-                                    linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken()
-                                        .getLinkedInAccessToken() );
-                                    linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
-                                    linkedinPostResponse.setResponseMessage( "Ok" );
                                     if ( branchMediaPostResponseDetails.getLinkedinPostResponseList() == null )
                                         branchMediaPostResponseDetails
                                             .setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
@@ -1682,7 +1718,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         + agentProfileLink + "/", false );
 
                 postToFacebookForHierarchy( facebookMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
-                    socialMediaPostResponseDetails );
+                    socialMediaPostResponseDetails, false );
 
                 // LinkedIn
                 // String linkedinMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
@@ -2201,7 +2237,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         //    + "-star review on" + ( isZillow ? " Zillow via" : " " ) + "SocialSurvey saying : \"" + feedback
         //    + "\".\nView this and more at " + linkUrl + "/";
         String facebookMessage = ratingFormat.format( rating ) + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
-            + " \u2014 " + feedback + " by " + customerDisplayName + " for " + agentName + "\n" + linkUrl;
+            + " \u2014 " + feedback + " by " + customerDisplayName + " for " + agentName + "\n" + ( isZillow ? linkUrl : "" );
         return facebookMessage;
     }
 
@@ -2218,7 +2254,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         //    + "-star review on" + ( isZillow ? " Zillow via " : " " ) + "SocialSurvey saying : \"" + linkedInComment
         //    + "\". View this and more at " + linkUrl;
         String linkedinMessage = ratingFormat.format( rating ) + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
-            + " &dash; " + linkedInComment + " by " + customerDisplayName + " for " + agentName + "&lmnlf;" + linkUrl;
+            + " &dash; " + linkedInComment + " by " + customerDisplayName + " for " + agentName + "&lmnlf;" + ( isZillow ? linkUrl : "" );
         return linkedinMessage;
     }
 
