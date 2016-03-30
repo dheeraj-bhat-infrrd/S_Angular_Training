@@ -154,24 +154,7 @@
 							</div>
 						</div>
 						<div class="dwnl-bnt-col float-right">
-							<div id="dsh-admin-rep-bnt" class="float-right dash-btn-dl-sd-admin hide">
-								<select id="download-survey-reports" class="float-left dash-download-sel-item">
-									<option value=1 data-report="loan-officer-ranking"><spring:message
-											code="label.downloadsurveydata.one.key" /></option>
-									<option value=2 data-report="customer-survey"><spring:message
-											code="label.downloadsurveydata.two.key" /></option>
-									<option value=3 data-report="social-monitor"><spring:message
-											code="label.downloadsurveydata.three.key" /></option>
-								</select> 
-								<input id="dsh-start-date" data-date-type="startDate" class="dsh-date-picker"
-									placeholder="<spring:message code="label.startdate.key" />">
-								<span>-</span> <input id="dsh-end-date" data-date-type="startDate" class="dsh-date-picker"
-									placeholder="<spring:message code="label.enddate.key" />">
-								<div id="dsh-admin-report-dwn-btn"
-									class="dash-down-go-button float-right cursor-pointer">
-									<spring:message code="label.downloadsurveydata.key.click" />
-								</div>
-							</div>
+							
 
 							<div id="dsh-ind-rep-bnt" class="float-right dash-btn-dl-sd">
 								<div id="dsh-ind-report-dwn-btn"

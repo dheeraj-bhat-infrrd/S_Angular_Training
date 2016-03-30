@@ -1987,4 +1987,34 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             + " by " + customerDisplayName + " for " + agentName + "\n"+ linkUrl;
         return twitterMessage;
     }
+    
+    
+    
+    
+    @Override
+    public  Map<Long, List<SocialUpdateAction>> getSocialConnectionsHistoryForEntities( String entityType,  List<Long>  entityIds ) throws InvalidInputException, ProfileNotFoundException
+    {
+        //Check if any of the parameters are null or empty
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entity type. EntityType : " + entityType );
+        }
+
+        if ( entityIds == null || entityIds.isEmpty() ) {
+            throw new InvalidInputException( "Invalid entity ID. Entity ID : " + entityIds );
+        }
+        
+        Map<Long, List<SocialUpdateAction>> socialUpdatesMap = new HashMap<Long, List<SocialUpdateAction>>();
+       
+        List<SocialUpdateAction> socialUpdatesList =  socialPostDao.getSocialConnectionHistoryByEntityIds(entityType, entityIds );
+        for ( Long entityId : entityIds ) {
+            socialUpdatesMap.put( entityId, new ArrayList<SocialUpdateAction>() );
+        }
+        List<SocialUpdateAction> curSocialUpdateList;
+        for(SocialUpdateAction curSocialUpdate : socialUpdatesList){
+            curSocialUpdateList = socialUpdatesMap.get( curSocialUpdate.getAgentId() );
+            curSocialUpdateList.add( curSocialUpdate );
+        }
+        
+        return socialUpdatesMap;
+    }
 }

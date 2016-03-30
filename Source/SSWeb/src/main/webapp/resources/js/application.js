@@ -496,8 +496,13 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	bindDatePickerforIndividualSurveyDownload();
 	
 	getIncompleteSurveyCount(colName, colValue);
+	if(is_dashboard_loaded === undefined){ //file never entered. the global var was not set.
+		window.is_dashboard_loaded = 1;
+		fetchReviewsOnDashboard(false);
+	}else{
+		return;
+	}
 	fetchReviewsOnDashboard(false);
-	
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-sel-item');
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
 }
@@ -511,6 +516,83 @@ function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 		if(value != prevVal){
 			$(this).attr('data-prev-val', value);
 			searchBranchRegionOrAgent(value, $(this).attr('data-search-target'));			
+		}
+		//Detect arrow key down
+		else if(e.which == 40) {
+			if($(this).next().is(':visible')) {
+				var parentElement = $(this).next();
+				var selectedElement = parentElement.find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0 && selectedElement.next('.dsh-res-display') && selectedElement.next('.dsh-res-display').length > 0) {
+					selectedElement.removeClass('dsh-res-hover');
+					selectedElement.next('.dsh-res-display').addClass('dsh-res-hover');
+					
+					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
+					//check if the top of current selected element is over the parents top
+					if((updatedSelectedElement.offset().top - parentElement.offset().top + updatedSelectedElement[0].clientHeight) > parentElement[0].clientHeight) {
+						var scrollTopPos = parentElement[0].scrollTop + updatedSelectedElement[0].clientHeight;
+						parentElement[0].scrollTop = scrollTopPos;
+					}
+				} else {
+					$(this).next().children('.dsh-res-display').removeClass('dsh-res-hover');
+					$(this).next().children('.dsh-res-display').first('.dsh-res-display').addClass('dsh-res-hover');
+					parentElement[0].scrollTop = 0;
+				}
+			}
+		}
+		//Detect arrow key up
+		else if(e.which == 38) {
+			if($(this).next().is(':visible')) {
+				var parentElement = $(this).next();
+				var selectedElement = parentElement.find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0 && selectedElement.prev('.dsh-res-display') && selectedElement.prev('.dsh-res-display').length > 0) {
+					selectedElement.removeClass('dsh-res-hover');
+					selectedElement.prev('.dsh-res-display').addClass('dsh-res-hover');
+					
+					var updatedSelectedElement = parentElement.find('.dsh-res-hover');
+					//check if the top of current selected element is over the parents top
+					if((updatedSelectedElement.offset().top - parentElement.offset().top) < 0) {
+						var scrollTopPos = parentElement[0].scrollTop - updatedSelectedElement[0].clientHeight;
+						parentElement[0].scrollTop = scrollTopPos;
+					}
+				} else {
+					$(this).next().children('.dsh-res-display').removeClass('dsh-res-hover');
+					$(this).next().children('.dsh-res-display').last('.dsh-res-display').addClass('dsh-res-hover');
+					parentElement[0].scrollTop = parentElement[0].scrollHeight;
+				}
+			}
+		}
+		
+		//Detect enter key
+		else if(e.which == 13) {
+			if($(this).next().is(':visible')) {
+				var selectedElement = $(this).next().find('.dsh-res-hover');
+				if(selectedElement && selectedElement.length > 0) {
+					selectedElement.click();
+				}
+			}
+		}
+	});
+	
+	$('#'+elementId).on('blur', function(e) {
+		if($(this).next().is(':visible')) {
+			var selectedElement = $(this).next().find('.dsh-res-hover');
+			if(selectedElement && selectedElement.length > 0) {
+				selectedElement.click();
+			} else {
+				$(this).next().children('.dsh-res-display').first().click();
+			}
+		}
+	});
+}
+function bindAutosuggestForCompanySearch(elementId) {
+	//Bind keyup on search for company for dashboard
+	$('#'+elementId).on('keyup', function(e) {
+		var value = $(this).val();
+		var prevVal = $(this).attr('data-prev-val');
+		
+		if(value != prevVal){
+			$(this).attr('data-prev-val', value);
+			searchCompany(value, $(this).attr('data-search-target'));			
 		}
 		//Detect arrow key down
 		else if(e.which == 40) {
@@ -968,8 +1050,12 @@ $(document).on('click', '.dash-lp-rt-img', function() {
 
 var isDashboardReviewRequestRunning = false;
 var doStopPaginationDashboard = false;
-
+ 
+var isAjaxInProgress=false;
 function fetchReviewsOnDashboard(isNextBatch) {
+	if (isAjaxInProgress==true){
+		return;
+	}
 	if(isDashboardReviewRequestRunning) return; //Return if ajax request is still running
 	
 	var payload = {
@@ -978,12 +1064,14 @@ function fetchReviewsOnDashboard(isNextBatch) {
 		"startIndex" : startIndexCmp,
 		"batchSize" : batchSizeCmp
 	};
+	
 	isDashboardReviewRequestRunning = true;
 	if(!isNextBatch) {
 		showLoaderOnPagination($('#review-details'));
 	}
-	
+	isAjaxInProgress=true;
 	callAjaxGetWithPayloadData("./fetchdashboardreviews.do", function(data) {
+		isAjaxInProgress=false;
 		var tempDiv = $('<div>').html(data);
 		var reviewsCount = tempDiv.children('div.dsh-review-cont').length;
 		var ssReviewsPresent = true;
@@ -1092,13 +1180,17 @@ function showSurveyStatisticsGraphically(columnName, columnValue) {
 	showDashOverlay('#low-dash');
 	showSurveyGraph(columnName, columnValue, numberOfDays);
 }
-
+var isSurveydetailsforgraph=false;
 function showSurveyGraph(columnName, columnValue, numberOfDays) {
+	if(isSurveydetailsforgraph==true){
+		return;
+	}
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
 		"numberOfDays" : numberOfDays
 	};
+	isSurveydetailsforgraph=true;
 	$.ajax({
 		url : "./surveydetailsforgraph.do",
 		type : "GET",
@@ -1106,6 +1198,7 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
+			isSurveydetailsforgraph=false;
 			$('#dsh-grph-sel-item').removeClass("empty-field");
 			graphData = data;
 			paintSurveyGraph();
@@ -1221,6 +1314,7 @@ function paintSurveyGraph() {
 			position : 'none'
 		}
 	};
+	
 
 	removeAllPreviousGraphToolTip();
 	
@@ -1247,7 +1341,9 @@ function convertYearWeekKeyToDate(key) {
 
 function convertYearMonthKeyToDate(key) {
 	var year = parseInt(key.substr(0, 4));
-	var monthNumber = parseInt(key.substr(4)) - 1;
+	var monthStr = key.substr(4 , key.length);
+	var monthInt = parseInt(monthStr , "10"); //add base value
+	var monthNumber = monthInt - 1;
 	return Date.today().set({
 		day : 1,
 		month : monthNumber,
@@ -1412,6 +1508,144 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 		});
 	}, payload, true);
 }
+function searchCompany(searchKeyword, flow) {
+	/*var e;*/
+	
+	 /*if (flow == 'reports') {
+		e = document.getElementById("report-sel");	
+	} else {
+		return false;
+	}*/
+	searchColumn = "company";
+	var payload = {
+		"columnName" : colName,
+		"columnValue" : colValue,
+		"searchColumn" :searchColumn ,
+		"searchKey" : searchKeyword
+	};
+	
+	callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
+		 if (flow == 'reports'){
+			$('#admin-srch-report').addClass('dsh-sb-dd');
+			$('#admin-srch-report').html(data).show().perfectScrollbar();
+			$('#admin-srch-report').perfectScrollbar('update');
+			if($('#admin-srch-report').children('div.dsh-res-display').length <= 0) {
+				$('#admin-srch-report').removeClass('dsh-sb-dd');
+				$('#admin-srch-report').hide();
+			}
+		} else if (flow == 'hierarchy'){
+			//TODO: Replace this stuff
+			$('#hierarchy-srch-report').addClass('dsh-sb-dd');
+			$('#hierarchy-srch-report').html(data).show().perfectScrollbar();
+			$('#hierarchy-srch-report').perfectScrollbar('update');
+			if($('#hierarchy-srch-report').children('div.dsh-res-display').length <= 0) {
+				$('#hierarchy-srch-report').removeClass('dsh-sb-dd');
+				$('#hierarchy-srch-report').hide();
+			}
+		}
+		
+		$('.dsh-res-display').off('click');
+		$('.dsh-res-display').click(function(event) {
+			event.stopPropagation();
+			var value = $(this).data('attr');
+			 if (searchColumn == "company") {
+				columnName = "companyId";
+			}
+			
+			 if (flow == 'reports'){
+				$('#dsh-srch-report').removeClass('dsh-sb-dd');
+				$('#admin-report-down').val($(this).html()).attr('data-prev-val',"");
+				$('#admin-report-down').attr('data-iden',columnName);
+				$('#admin-report-down').attr('data-idenVal',value);
+				if (searchColumn == "displayName") {
+					$('#dsh-ind-rep-bnt').show();
+					$('#dsh-admin-rep-bnt').hide();
+				} else {
+					$('#dsh-admin-rep-bnt').show();
+					$('#dsh-ind-rep-bnt').hide();
+				}
+			} else if (flow == 'hierarchy'){
+				//TODO: Replace this stuff
+				$('#dsh-srch-report').removeClass('dsh-sb-dd');
+				$('#hierarchy-report-down').val($(this).html()).attr('data-prev-val',"");
+				$('#hierarchy-report-down').attr('data-iden',columnName);
+				$('#hierarchy-report-down').attr('data-idenVal',value);
+				if (searchColumn == "displayName") {
+					$('#dsh-ind-rep-bnt').show();
+					$('#dsh-admin-rep-bnt').hide();
+				} else {
+					$('#dsh-admin-rep-bnt').show();
+					$('#dsh-ind-rep-bnt').hide();
+				}
+			}
+			$('.dsh-res-display').hide();
+		});
+		$('.dsh-res-display').off('mouseover');
+		$('.dsh-res-display').on('mouseover',function(){
+			$('.dsh-res-display').removeClass('dsh-res-hover');
+			$(this).addClass('dsh-res-hover');
+		});
+		$('.dsh-res-display').off('mouseout');
+		$('.dsh-res-display').on('mouseout',function(){
+			$(this).removeClass('dsh-res-hover');
+		});
+	}, payload, true);
+}
+$(document).on('click','#admin-bill-rep-bnt',function(e){
+	var email=$('#admin-mail-id').val();
+	var idenVal = $('#admin-report-down').attr('data-idenVal');
+	var selectedProf = $('#admin-report-down').attr('data-iden');
+	
+	if(email!= undefined && email!="" ){
+		if (emailRegex.test(email) == false){
+			showErrorMobileAndWeb('Please enter a valid email address');
+		}
+	}
+	if(idenVal == undefined || idenVal == "") {
+		showErrorMobileAndWeb('Please select a company');
+		return;
+	}
+	var payload={
+			"mailid":email,
+			"companyId":idenVal
+	}
+	callAjaxGetWithPayloadData("./downloadcompanyuserreport.do",function(data){
+		if(data=="success"){
+			$('#overlay-toast').html('The User List Report will be mailed to you shortly');
+			showToast();
+		}
+	},payload,true);
+	
+});
+
+$(document).on('click','#admin-hierarchy-rep-bnt',function(e){
+	var email=$('#hierarchy-mail-id').val();
+	var idenVal = $('#hierarchy-report-down').attr('data-idenVal');
+	var selectedProf = $('#hierarchy-report-down').attr('data-iden');
+	
+	if(email!= undefined && email!="" ){
+		if (emailRegex.test(email) == false){
+			showErrorMobileAndWeb('Please enter a valid email address');
+		}
+	}
+	if(idenVal == undefined || idenVal == "") {
+		showErrorMobileAndWeb('Please select a company');
+		return;
+	}
+	var payload={
+			"mailid":email,
+			"companyId":idenVal
+	}
+	callAjaxGetWithPayloadData("./downloadcompanyhierarchyreport.do",function(data){
+		if(data=="success"){
+			$('#overlay-toast').html('The Comapny Hierarchy Report will be mailed to you shortly');
+			showToast();
+		}
+	},payload,true);
+	
+});
+
+
 
 function sendSurveyReminderMail(surveyPreInitiationId, customerName,disableEle) {
 	if ( $(disableEle).data('requestRunning') ) {
@@ -8047,6 +8281,9 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 		break;
 	case 6:
 		window.location.href = "/downloadcompanyhierarchyreport.do?columnName=" + colName + "&columnValue=" + colValue;
+		break;
+	case 7:
+		window.location.href = "/downloadcompanyusersreport.do?columnName=" + colName + "&columnValue=" + colValue;
 		break;
 	default:
 		break;

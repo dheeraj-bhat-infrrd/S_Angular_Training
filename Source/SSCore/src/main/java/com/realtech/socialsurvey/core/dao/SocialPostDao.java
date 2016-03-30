@@ -53,4 +53,6 @@ public interface SocialPostDao {
 
     void updateCompanyIdForSocialPosts( List<SocialPostCompanyIdMapping> socialPostCompanyIdMappings )
         throws InvalidInputException;
+
+    List<SocialUpdateAction> getSocialConnectionHistoryByEntityIds( String entityType, List<Long> entityIds );
 }

@@ -27,4 +27,21 @@ public interface AdminReports {
      * Method to create an entry in the file upload table for billing report
      */
     public void createEntryInFileUploadForBillingReport( String mailId );
+
+    /**
+     * 
+     * @param mailId
+     * @param companyId
+     * @throws InvalidInputException 
+     */
+    public void createEntryInFileUploadForCompanyUserReport( String mailId, long companyId ) throws InvalidInputException;
+
+
+    /**
+     * Method to create an entry in the file upload table for company hierarchy report
+     * @param mailId
+     * @param companyId
+     * @throws InvalidInputException
+     */
+    public void createEntryInFileUploadForCompanyHierarchyReport( String mailId, long companyId ) throws InvalidInputException;
 }

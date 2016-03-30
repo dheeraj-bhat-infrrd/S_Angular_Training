@@ -850,6 +850,8 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
     public static final int FILE_UPLOAD_BILLING_REPORT = 3;
+    public static final int FILE_UPLOAD_COMPANY_USERS_REPORT = 4;
+    public static final int FILE_UPLOAD_COMPANY_HIERARCHY_REPORT = 5;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1021,12 +1023,31 @@ public interface CommonConstants
     public static final String CHR_REGION_REGION_NAME = "Region Name";
     public static final String CHR_ADDRESS_1 = "Address 1";
     public static final String CHR_ADDRESS_2 = "Address 2";
+    public static final String CHR_1 = "1";
+    public static final String CHR_2 = "2";
     public static final String CHR_CITY = "City";
     public static final String CHR_STATE = "State";
     public static final String CHR_ZIP = "Zip";
     public static final String CHR_ID_DESC = "Unique ID used for assignment.";
     public static final String CHR_BRANCH_REGION_ID_DESC = "Region ID from the Region sheet.";
     public static final String CHR_REGION_REGION_NAME_DESC = "Name to be displayed.";
+    public static final String SOCIAL_SURVEY_ACCESS_LAVEL = "SocialSurvey Access Level ";
+    public static final String SOCIAL_SURVEY_INVITE_SENT = "SocialSurvey Invite sent";
+    public static final String DATE_LAST_INVITE_SENT = "Date last invite sent";
+    public static final String PROFILE_VERIFIED = "Profile Verified ";
+    public static final String DATE_OF_LAST_LOGIN = "Date of last log-in";
+    public static final String PROFILE_COMPLETE = "Profile Complete ";
+    public static final String SOCIALLY_CONNECTED = "Socially Connected";
+    public static final String DATE_CONNECTION_ESTABLISHED = "Date connection established";
+    public static final String CONNECTION_STATUS = "Connection Status";
+    public static final String DATE_OF_LAST_POST = "Date of last post";
+    public static final String DATE_ADOPTION_COMPLETED = "Date Adoption completed";
+    public static final String DATE_LAST_SURVEY_SENT = "Date last survey sent";
+    public static final String DATE_LAST_SURVEY_POSTED = "Date last survey posted";
+    
+    //user report mail subject and body
+    public static final String COMPANY_USERS_REPORT_MAIL_SUBJ = "Company Users Report for ";
+    public static final String COMPANY_USERS_REPORT_MAIL_BODY =  "Here is the company users report you requested. Please refer to the attachment for the report.";
     
     //API Call details constants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";

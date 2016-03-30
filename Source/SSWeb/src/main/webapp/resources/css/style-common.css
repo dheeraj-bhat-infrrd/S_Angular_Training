@@ -4242,11 +4242,11 @@ img.prof-image {
 	padding-left: 10px;
 }
 
-.dash-sel-wrapper {
+.dash-sel-wrapper,.admin-sel-wrapper  {
 	margin-bottom: 20px;
 }
 
-.dash-sel-item {
+.dash-sel-item,.admin-sel-item {
 	background-color: #fff;
 	height: 36px;
 	width: 215px;
@@ -4377,7 +4377,7 @@ img.prof-image {
 	text-transform: initial;
 }
 
-.dash-btn-dl-br {
+.dash-btn-dl-br,.admin-btn-dl-br {
 	color: #009FE0;
 	border-radius: 3px;
 	line-height: 32px;
@@ -5158,7 +5158,7 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	line-height: 40px;
 	margin-right: 20px;
 	width: 25%;
-	min-width: 96px;
+	min-width: 60px;
 	min-height: 10px;
 	text-align: right;
 	font-family: opensanslight;
@@ -5174,6 +5174,9 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	text-align: right;
 	font-family: opensanslight;
 	text-align: left;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .bd-frm-right {
@@ -8363,7 +8366,7 @@ label.url-change-input-label {
 /* untracked user */
 
 .unmatchtab{
-	padding: 10px 0px;
+	padding: 10px 2px;
     margin: 0px 0px;
         text-align: center;
         overflow: hidden;
@@ -8407,7 +8410,7 @@ label.url-change-input-label {
 .nav-tabs>li>a {
 	background-color: #009FE0;
 	height: 40px;
-	width: 160px;
+	width: 150px;
 	text-align: center;
 	color: #fff;
 	border-radius: 3px;

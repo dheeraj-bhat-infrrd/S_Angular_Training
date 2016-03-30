@@ -1,6 +1,10 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -35,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,28 +59,34 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.BillingReportData;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 
@@ -99,6 +110,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private SurveyDetailsDao surveyDetailsDao;
+    
+    @Autowired
+    private GenericDao<FeedStatus, Long> feedStatusDao;
+    
+    @Autowired
+    private EmailServices emailServices;
 
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -111,6 +128,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private UserManagementService userManagementService;
+    
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     @Autowired
     private UserProfileDao userProfileDao;
@@ -121,8 +141,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Autowired
     private UserDao userDao;
 
+    
+    
     @Autowired
     private GenericDao<FileUpload, Long> fileUploadDao;
+    
+    
 
     @Autowired
     private RegionDao regionDao;
@@ -139,6 +163,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     
     @Autowired
     private GenericDao<SurveyQuestionsMapping, Long> surveyQuestionsMappingDao;
+    
+    @Value ( "${FILE_DIRECTORY_LOCATION}")
+    private String fileDirectoryLocation;
+
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String adminEmailId;
+
+    @Value ( "${APPLICATION_ADMIN_NAME}")
+    private String adminName;
+
 
 
     @Transactional
@@ -198,11 +232,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         LOG.debug( "Incomplete survey: " + incompleteSurveyCount );
         return completedSurveyCount + incompleteSurveyCount;
     }
-    
+
 
     @Transactional
     @Override
-    public long getAllSurveyCountForStatistics( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
+    public long getAllSurveyCountForStatistics( String columnName, long columnValue, int numberOfDays )
+        throws InvalidInputException
     {
         LOG.info( "Get all survey count for " + columnName + " and value " + columnValue + " with number of days: "
             + numberOfDays );
@@ -298,10 +333,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     }
 
 
-    private long getCompletedSurveyCountForStatistics( String columnName, long columnValue, Timestamp startDate, Timestamp endDate,
-        boolean filterAbusive ) throws InvalidInputException
+    private long getCompletedSurveyCountForStatistics( String columnName, long columnValue, Timestamp startDate,
+        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
     {
-        return surveyDetailsDao.getCompletedSurveyCountForStatistics( columnName, columnValue, startDate, endDate, filterAbusive );
+        return surveyDetailsDao.getCompletedSurveyCountForStatistics( columnName, columnValue, startDate, endDate,
+            filterAbusive );
     }
 
 
@@ -333,7 +369,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
         return surveyDetailsDao.getSocialPostsCountBasedOnHierarchy( numberOfDays, columnName, columnValue, false, false );
     }
-    
+
+
     @Override
     public long getSocialPostsForPastNdaysWithHierarchyForStatistics( String columnName, long columnValue, int numberOfDays )
         throws InvalidInputException
@@ -783,8 +820,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      * Method to create excel file from all the completed survey data.
      */
     @Override
-    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileLocation, String profileLevel, long companyId )
-        throws IOException, InvalidInputException
+    public XSSFWorkbook downloadCustomerSurveyResultsData( List<SurveyDetails> surveyDetails, String fileLocation,
+        String profileLevel, long companyId ) throws IOException, InvalidInputException
     {
         if ( fileLocation == null || fileLocation.isEmpty() ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter fileLocation is null or empty" );
@@ -792,11 +829,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( surveyDetails == null ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter surveyDetails is null" );
         }
-        
+
         if ( profileLevel == null || profileLevel.isEmpty() ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter profileLevel is null or empty" );
         }
-        
+
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter company id is invalid" );
         }
@@ -832,7 +869,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 }
             }
         }
-        
+
         if ( max == 0 ) {
             try {
                 // Find Survey Questions configured for company
@@ -862,7 +899,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 LOG.warn( "Error occurred while fetching survey question details for company id : " + companyId );
             }
         }
-        
+
 
         // This data needs to be written (List<Object>)
         Map<String, List<Object>> data = new TreeMap<>();
@@ -978,7 +1015,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                         surveyDetailsToPopulate.add( agentName );
                         surveyDetailsToPopulate.add( "" );
                     }
-                    
+
                     surveyDetailsToPopulate.add( survey.getCustomerFirstName() );
                     surveyDetailsToPopulate.add( "" );
                     surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getCreatedOn() ) );
@@ -1275,11 +1312,39 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      */
     @Override
     @Transactional
-    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException
+    public List<FileUpload> getReportsToBeSent() throws NoRecordsFetchedException
     {
         LOG.info( "Check if billing report entries exist" );
-        Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN,
-            CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+
+        List<Integer> uploadTypeList = new ArrayList<Integer>();
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_USERS_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT );
+        Criterion fileUploadTypeCriteria = Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, uploadTypeList );
+        List<Integer> statusList = new ArrayList<Integer>();
+        statusList.add( CommonConstants.STATUS_ACTIVE );
+        statusList.add( CommonConstants.STATUS_UNDER_PROCESSING );
+        Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN, statusList );
+        List<FileUpload> filesToBeUploaded = fileUploadDao.findByCriteria( FileUpload.class, fileUploadTypeCriteria,
+            statusCriteria );
+        if ( filesToBeUploaded == null || filesToBeUploaded.isEmpty() ) {
+            throw new NoRecordsFetchedException( "No billing report entries exist" );
+        }
+        return filesToBeUploaded;
+    }
+    
+    /**
+     * 
+     * @return
+     * @throws NoRecordsFetchedException
+     */
+    @Override
+    @Transactional
+    public List<FileUpload> getActiveBillingReports() throws NoRecordsFetchedException
+    {
+        LOG.info( "Method getActiveBillingReports called" );
+
+        Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
         List<Integer> statusList = new ArrayList<Integer>();
         statusList.add( CommonConstants.STATUS_ACTIVE );
         statusList.add( CommonConstants.STATUS_UNDER_PROCESSING );
@@ -1319,480 +1384,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
 
         Company company = companyDao.findById( Company.class, companyId );
-        /*Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( company );
-        Branch defaultBranchOfDefaultRegion = organizationManagementService.getDefaultBranchForRegion( defaultRegion
-            .getRegionId() );
-        List<Region> regionList = new ArrayList<Region>();
-        List<Branch> branchList = new ArrayList<Branch>();
-        List<Branch> defaultBranchList = new ArrayList<Branch>();
-        List<User> userList = new ArrayList<User>();
-        Map<Long, List<UserProfile>> userAndProfileMap = new HashMap<Long, List<UserProfile>>();
-
-
-        final int batch = 100;
-        try {
-            int start = 0;
-            List<Region> batchRegionList = new ArrayList<Region>();
-            do {
-                batchRegionList = regionDao.getRegionsForCompany( companyId, start, batch );
-                if ( batchRegionList != null && batchRegionList.size() > 0 )
-                    regionList.addAll( batchRegionList );
-                start += batch;
-            } while ( batchRegionList != null && batchRegionList.size() == batch );
-
-            start = 0;
-            List<Branch> batchBranchList = new ArrayList<Branch>();
-            do {
-                batchBranchList = branchDao.getBranchesForCompany( companyId, CommonConstants.NO, start, batch );
-                if ( batchBranchList != null && batchBranchList.size() > 0 )
-                    branchList.addAll( batchBranchList );
-                start += batch;
-            } while ( batchBranchList != null && batchBranchList.size() == batch );
-
-            start = 0;
-            batchBranchList = new ArrayList<Branch>();
-            do {
-                batchBranchList = branchDao.getBranchesForCompany( companyId, CommonConstants.YES, start, batch );
-                if ( batchBranchList != null && batchBranchList.size() > 0 )
-                    defaultBranchList.addAll( batchBranchList );
-                start += batch;
-            } while ( batchBranchList != null && batchBranchList.size() == batch );
-
-            start = 0;
-            List<User> batchUserList = new ArrayList<User>();
-            Map<Long, List<UserProfile>> batchUserAndProfileMap;
-            List<Long> batchUserIds;
-            do {
-                batchUserIds = new ArrayList<Long>();
-                batchUserList = userDao.getUsersForCompany( company, start, batch );
-                if ( batchUserList != null && batchUserList.size() > 0 ) {
-                    
-                    for ( User user : batchUserList ) {
-                        batchUserIds.add( user.getUserId() );
-                    }
-                    //get profiles for users
-                    batchUserAndProfileMap = userProfileDao.getUserProfilesForUsers( batchUserIds );
-                    //add batch profiles to profile list
-                    userAndProfileMap.putAll( batchUserAndProfileMap );
-                    //add batch user to the user list
-                    userList.addAll( batchUserList );
-                }
-                start += batch;
-            } while ( batchUserList != null && batchUserList.size() == batch );
-
-        } catch ( Exception e ) {
-            LOG.error( "Exception occurred while fetching region or branches or users for company. Reason : ", e );
-        }
-
-
-        List<Long> defaultBranchIdList = new ArrayList<Long>();
-        if ( defaultBranchList != null && defaultBranchList.size() > 0 ) {
-            for ( Branch defaultBranch : defaultBranchList ) {
-                defaultBranchIdList.add( defaultBranch.getBranchId() );
-            }
-        }
-
-        List<Long> userIdList = new ArrayList<Long>();
-        Map<Long, String> userIdRegionIdsMap = new HashMap<Long, String>();
-        Map<Long, String> userIdBranchIdsMap = new HashMap<Long, String>();
-        Map<Long, String> userIdRegionAsAdminIdsMap = new HashMap<Long, String>();
-        Map<Long, String> userIdBranchAsAdminIdsMap = new HashMap<Long, String>();
-        List<Long> agentIds = new ArrayList<Long>();
-        Map<Long, AgentSettings> userIdSettingsMap = new HashMap<Long, AgentSettings>();
-        User companyAdmin = null;
-        if ( userList != null && userList.size() > 0 ) {
-            for ( User user : userList ) {
-                String regionId = "";
-                String regionIdAsAdmin = "";
-                String branchId = "";
-                String branchIdAsAdmin = "";
-                boolean isCompanyAdminHasAnotherRole = false;
-                boolean isCompanyAdmin = user.getIsOwner() == CommonConstants.YES;
-                //get user profiles for user from map
-                List<UserProfile> userProfileList = userAndProfileMap.get( user.getUserId() );
-                if ( userProfileList != null && userProfileList.size() > 0 ) {
-                    for ( UserProfile userProfile : userProfileList ) {
-                        if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                            if ( defaultRegion.getRegionId() != userProfile.getRegionId()
-                                && CommonConstants.DEFAULT_REGION_ID != userProfile.getRegionId()
-                                && !regionId.contains( String.valueOf( userProfile.getRegionId() ) ) )
-                                regionId += userProfile.getRegionId() + ",";
-                            if ( !defaultBranchIdList.contains( userProfile.getBranchId() )
-                                && CommonConstants.DEFAULT_BRANCH_ID != userProfile.getBranchId()
-                                && defaultBranchOfDefaultRegion.getBranchId() != userProfile.getBranchId()
-                                && !branchId.contains( String.valueOf( userProfile.getBranchId() ) ) )
-                                branchId += userProfile.getBranchId() + ",";
-                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
-                                && !agentIds.contains( user.getUserId() ) ) {
-                                agentIds.add( user.getUserId() );
-                                if ( isCompanyAdmin )
-                                    isCompanyAdminHasAnotherRole = true;
-                            }
-                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                                if ( defaultRegion.getRegionId() != userProfile.getRegionId()
-                                    && CommonConstants.DEFAULT_REGION_ID != userProfile.getRegionId()
-                                    && !regionIdAsAdmin.contains( String.valueOf( userProfile.getRegionId() ) ) ) {
-                                    regionIdAsAdmin += userProfile.getRegionId() + ",";
-                                    if ( isCompanyAdmin )
-                                        isCompanyAdminHasAnotherRole = true;
-                                }
-                            }
-                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                                if ( !defaultBranchIdList.contains( userProfile.getBranchId() )
-                                    && CommonConstants.DEFAULT_BRANCH_ID != userProfile.getBranchId()
-                                    && defaultBranchOfDefaultRegion.getBranchId() != userProfile.getBranchId()
-                                    && !branchIdAsAdmin.contains( String.valueOf( userProfile.getBranchId() ) ) ) {
-                                    branchIdAsAdmin += userProfile.getBranchId() + ",";
-                                    if ( isCompanyAdmin )
-                                        isCompanyAdminHasAnotherRole = true;
-                                }
-                            }
-                        }
-                    }
-                }
-                if ( regionId.length() > 0 )
-                    userIdRegionIdsMap.put( user.getUserId(), regionId.substring( 0, regionId.length() - 1 ) );
-                if ( branchId.length() > 0 )
-                    userIdBranchIdsMap.put( user.getUserId(), branchId.substring( 0, branchId.length() - 1 ) );
-                if ( regionIdAsAdmin.length() > 0 )
-                    userIdRegionAsAdminIdsMap.put( user.getUserId(),
-                        regionIdAsAdmin.substring( 0, regionIdAsAdmin.length() - 1 ) );
-                if ( branchIdAsAdmin.length() > 0 )
-                    userIdBranchAsAdminIdsMap.put( user.getUserId(),
-                        branchIdAsAdmin.substring( 0, branchIdAsAdmin.length() - 1 ) );
-                if ( !isCompanyAdmin || isCompanyAdminHasAnotherRole )
-                    userIdList.add( user.getUserId() );
-                else
-                    companyAdmin = user;
-
-            }
-        }
-
-        if ( companyAdmin != null ) {
-            userList.remove( companyAdmin );
-        }
-
-        if ( userIdList.size() > 0 ) {
-            List<AgentSettings> agentSettingsList = organizationUnitSettingsDao.fetchMultipleAgentSettingsById( userIdList );
-            if ( agentSettingsList != null && agentSettingsList.size() > 0 ) {
-                for ( AgentSettings agentSettings : agentSettingsList ) {
-                    userIdSettingsMap.put( agentSettings.getIden(), agentSettings );
-                }
-            }
-        }
-
-        // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        // Create a blank sheet
-        XSSFSheet userSheet = workbook.createSheet( "Users" );
-        XSSFSheet branchSheet = workbook.createSheet( "Offices" );
-        XSSFSheet regionSheet = workbook.createSheet( "Regions" );
-        Integer usersCounter = 2;
-        Integer branchesCounter = 2;
-        Integer regionsCounter = 2;
-
-        // This data needs to be written (List<Object>)
-        Map<Integer, List<Object>> usersData = new TreeMap<>();
-        Map<Integer, List<Object>> branchesData = new TreeMap<>();
-        Map<Integer, List<Object>> regionsData = new TreeMap<>();
-        List<Object> userReportToPopulate = new ArrayList<>();
-        List<Object> branchesReportToPopulate = new ArrayList<>();
-        List<Object> regionsReportToPopulate = new ArrayList<>();
-
-        // loop on users to populate users sheet
-        if ( userList != null && userList.size() > 0 ) {
-            for ( User user : userList ) {
-                // col 0 - user id
-                // col 1 -  firstname
-                // col 2 - last name
-                // col 3 - title
-                // col 4 - branch ids 
-                // col 5 - region ids
-                // col 6 - public page - Yes if user is an agent 
-                // col 7 - branch ids where he is admin
-                // col 8 - region ids where he is admin
-                // col 9 - email
-                // col 10 - phone
-                // col 11 - website
-                // col 12 - license
-                // col 13 - legal disclaimer
-                // col 14 - photo - profile image url
-                // col 15 - about me
-                AgentSettings userSettings = userIdSettingsMap.get( user.getUserId() );
-
-                userReportToPopulate.add( user.getUserId() );
-                userReportToPopulate.add( user.getFirstName() );
-                if ( user.getLastName() != null && !user.getLastName().trim().equalsIgnoreCase( "" )
-                    && !user.getLastName().trim().equalsIgnoreCase( "null" ) )
-                    userReportToPopulate.add( user.getLastName() );
-                else
-                    userReportToPopulate.add( "" );
-                if ( userSettings != null && userSettings.getContact_details() != null
-                    && userSettings.getContact_details().getTitle() != null )
-                    userReportToPopulate.add( userSettings.getContact_details().getTitle() );
-                else
-                    userReportToPopulate.add( "" );
-                if ( userIdBranchIdsMap.get( user.getUserId() ) != null
-                    && userIdBranchIdsMap.get( user.getUserId() ).length() > 0 )
-                    userReportToPopulate.add( userIdBranchIdsMap.get( user.getUserId() ) );
-                else
-                    userReportToPopulate.add( "" );
-                if ( userIdRegionIdsMap.get( user.getUserId() ) != null
-                    && userIdRegionIdsMap.get( user.getUserId() ).length() > 0 )
-                    userReportToPopulate.add( userIdRegionIdsMap.get( user.getUserId() ) );
-                else
-                    userReportToPopulate.add( "" );
-                if ( agentIds.size() > 0 && agentIds.contains( user.getUserId() ) )
-                    userReportToPopulate.add( CommonConstants.CHR_YES );
-                else
-                    userReportToPopulate.add( CommonConstants.CHR_NO );
-                if ( userIdBranchAsAdminIdsMap.get( user.getUserId() ) != null
-                    && userIdBranchAsAdminIdsMap.get( user.getUserId() ).length() > 0 )
-                    userReportToPopulate.add( userIdBranchAsAdminIdsMap.get( user.getUserId() ) );
-                else
-                    userReportToPopulate.add( "" );
-                if ( userIdRegionAsAdminIdsMap.get( user.getUserId() ) != null
-                    && userIdRegionAsAdminIdsMap.get( user.getUserId() ).length() > 0 )
-                    userReportToPopulate.add( userIdRegionAsAdminIdsMap.get( user.getUserId() ) );
-                else
-                    userReportToPopulate.add( "" );
-                userReportToPopulate.add( user.getEmailId() );
-                if ( userSettings != null && userSettings.getContact_details() != null
-                    && userSettings.getContact_details().getContact_numbers() != null
-                    && userSettings.getContact_details().getContact_numbers().getWork() != null )
-                    userReportToPopulate.add( userSettings.getContact_details().getContact_numbers().getWork() );
-                else
-                    userReportToPopulate.add( "" );
-                if ( userSettings != null && userSettings.getContact_details() != null
-                    && userSettings.getContact_details().getWeb_addresses() != null
-                    && userSettings.getContact_details().getWeb_addresses().getWork() != null )
-                    userReportToPopulate.add( userSettings.getContact_details().getWeb_addresses().getWork() );
-                else
-                    userReportToPopulate.add( "" );
-                if ( userSettings != null && userSettings.getLicenses() != null ) {
-                    Licenses licenses = userSettings.getLicenses();
-                    List<String> authorizedInList = licenses.getAuthorized_in();
-                    String authorizedIns = "";
-                    if ( authorizedInList != null && authorizedInList.size() > 0 ) {
-                        for ( String authorizedIn : authorizedInList ) {
-                            authorizedIns += authorizedIn + ",";
-                        }
-                        userReportToPopulate.add( authorizedIns.substring( 0, authorizedIns.length() - 1 ) );
-                    } else
-                        userReportToPopulate.add( "" );
-                } else
-                    userReportToPopulate.add( "" );
-                if ( userSettings != null && userSettings.getDisclaimer() != null && userSettings.getDisclaimer().length() > 0 )
-                    userReportToPopulate.add( userSettings.getDisclaimer() );
-                else
-                    userReportToPopulate.add( "" );
-                if ( userSettings != null && userSettings.getProfileImageUrl() != null )
-                    userReportToPopulate.add( userSettings.getProfileImageUrl() );
-                else
-                    userReportToPopulate.add( "" );
-                if ( userSettings != null && userSettings.getContact_details().getAbout_me() != null
-                    && userSettings.getContact_details().getAbout_me().length() > 0 )
-                    userReportToPopulate.add( userSettings.getContact_details().getAbout_me() );
-                else
-                    userReportToPopulate.add( "" );
-
-                usersData.put( ( ++usersCounter ), userReportToPopulate );
-                userReportToPopulate = new ArrayList<>();
-            }
-        }
-        // Setting up user sheet headers
-        userReportToPopulate.add( CommonConstants.CHR_USERS_USER_ID );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_FIRST_NAME );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_LAST_NAME );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_TITLE );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_OFFICE_ASSIGNMENTS );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_REGION_ASSIGNMENTS );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_PUBLIC_PROFILE );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_OFFICE_ADMIN_PRIVILEGE );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_REGION_ADMIN_PRIVILEGE );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_EMAIL );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_PHONE );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_WEBSITE );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_LICENSE );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_LEGAL_DISCLAIMER );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_PHOTO );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_ABOUT_ME_DESCRIPTION );
-
-        usersData.put( 1, userReportToPopulate );
-
-        userReportToPopulate = new ArrayList<>();
-
-        // setting up user sheet header descriptions
-        userReportToPopulate.add( CommonConstants.CHR_USERS_USER_ID_DESC );
-        userReportToPopulate.add( "" );
-        userReportToPopulate.add( "" );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_TITLE_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_OFFICE_ASSIGNMENTS_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_REGION_ASSIGNMENTS_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_PUBLIC_PROFILE_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_OFFICE_ADMIN_PRIVILEGE_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_REGION_ADMIN_PRIVILEGE_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_EMAIL_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_PHONE_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_WEBSITE_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_LICENSE_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_LEGAL_DISCLAIMER_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_PHOTO_DESC );
-        userReportToPopulate.add( CommonConstants.CHR_USERS_ABOUT_ME_DESCRIPTION_DESC );
-
-        usersData.put( 2, userReportToPopulate );
-
-        // loop on branches to populate branches sheet
-        if ( branchList != null && branchList.size() > 0 ) {
-            for ( Branch branch : branchList ) {
-                // col 0 office id
-                // col 1 office name
-                // col 2 region id
-                // col 3 address 1
-                // col 4 address 2
-                // col 5 city
-                // col 6 state
-                // col 7 zip
-                branchesReportToPopulate.add( branch.getBranchId() );
-                branchesReportToPopulate.add( branch.getBranch() );
-                if ( branch.getRegion() != null && defaultRegion.getRegionId() != branch.getRegion().getRegionId()
-                    && CommonConstants.DEFAULT_REGION_ID != branch.getRegion().getRegionId() )
-                    branchesReportToPopulate.add( branch.getRegion().getRegionId() );
-                else
-                    branchesReportToPopulate.add( "" );
-                branchesReportToPopulate.add( branch.getAddress1() );
-                branchesReportToPopulate.add( branch.getAddress2() );
-                branchesReportToPopulate.add( branch.getCity() );
-                branchesReportToPopulate.add( branch.getState() );
-                branchesReportToPopulate.add( branch.getZipcode() );
-
-                branchesData.put( ( ++branchesCounter ), branchesReportToPopulate );
-                branchesReportToPopulate = new ArrayList<>();
-            }
-        }
-
-        // Setting up branch sheet headers
-        branchesReportToPopulate.add( CommonConstants.CHR_BRANCH_BRANCH_ID );
-        branchesReportToPopulate.add( CommonConstants.CHR_BRANCH_BRANCH_NAME );
-        branchesReportToPopulate.add( CommonConstants.CHR_REGION_REGION_ID );
-        branchesReportToPopulate.add( CommonConstants.CHR_ADDRESS_1 );
-        branchesReportToPopulate.add( CommonConstants.CHR_ADDRESS_2 );
-        branchesReportToPopulate.add( CommonConstants.CHR_CITY );
-        branchesReportToPopulate.add( CommonConstants.CHR_STATE );
-        branchesReportToPopulate.add( CommonConstants.CHR_ZIP );
-
-        branchesData.put( 1, branchesReportToPopulate );
-
-        branchesReportToPopulate = new ArrayList<>();
-
-        // setting up branch sheet header descriptions
-        branchesReportToPopulate.add( CommonConstants.CHR_ID_DESC );
-        branchesReportToPopulate.add( "" );
-        branchesReportToPopulate.add( CommonConstants.CHR_BRANCH_REGION_ID_DESC );
-        branchesReportToPopulate.add( "" );
-        branchesReportToPopulate.add( "" );
-        branchesReportToPopulate.add( "" );
-        branchesReportToPopulate.add( "" );
-        branchesReportToPopulate.add( "" );
-
-        branchesData.put( 2, branchesReportToPopulate );
-
-        // loop on region to populate region sheet
-        if ( regionList != null && regionList.size() > 0 ) {
-            for ( Region region : regionList ) {
-                // col 0 region id
-                // col 1 region name
-                // col 2 address 1
-                // col 3 address 2
-                // col 4 city
-                // col 5 state
-                // col 6 zip
-                regionsReportToPopulate.add( region.getRegionId() );
-                regionsReportToPopulate.add( region.getRegion() );
-                regionsReportToPopulate.add( region.getAddress1() );
-                regionsReportToPopulate.add( region.getAddress2() );
-                regionsReportToPopulate.add( region.getCity() );
-                regionsReportToPopulate.add( region.getState() );
-                regionsReportToPopulate.add( region.getZipcode() );
-
-                regionsData.put( ( ++regionsCounter ), regionsReportToPopulate );
-                regionsReportToPopulate = new ArrayList<>();
-            }
-        }
-        // Setting up branch sheet headers
-        regionsReportToPopulate.add( CommonConstants.CHR_REGION_REGION_ID );
-        regionsReportToPopulate.add( CommonConstants.CHR_REGION_REGION_NAME );
-        regionsReportToPopulate.add( CommonConstants.CHR_ADDRESS_1 );
-        regionsReportToPopulate.add( CommonConstants.CHR_ADDRESS_2 );
-        regionsReportToPopulate.add( CommonConstants.CHR_CITY );
-        regionsReportToPopulate.add( CommonConstants.CHR_STATE );
-        regionsReportToPopulate.add( CommonConstants.CHR_ZIP );
-
-        regionsData.put( 1, regionsReportToPopulate );
-
-        regionsReportToPopulate = new ArrayList<>();
-
-        // setting up branch sheet header descriptions
-        regionsReportToPopulate.add( CommonConstants.CHR_ID_DESC );
-        regionsReportToPopulate.add( CommonConstants.CHR_REGION_REGION_NAME_DESC );
-        regionsReportToPopulate.add( "" );
-        regionsReportToPopulate.add( "" );
-        regionsReportToPopulate.add( "" );
-        regionsReportToPopulate.add( "" );
-        regionsReportToPopulate.add( "" );
-
-        regionsData.put( 2, regionsReportToPopulate );
-
-
-        // Iterate over data and write to sheet
-        Set<Integer> keyset = usersData.keySet();
-
-        int rownum = 0;
-        for ( Integer key : keyset ) {
-            Row row = userSheet.createRow( rownum++ );
-            List<Object> objArr = usersData.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                if ( obj instanceof Long )
-                    cell.setCellValue( String.valueOf( (Long) obj ) );
-            }
-        }
-        // Iterate over data and write to sheet
-        keyset = branchesData.keySet();
-
-        rownum = 0;
-        for ( Integer key : keyset ) {
-            Row row = branchSheet.createRow( rownum++ );
-            List<Object> objArr = branchesData.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                if ( obj instanceof Long )
-                    cell.setCellValue( String.valueOf( (Long) obj ) );
-            }
-        }
-        // Iterate over data and write to sheet
-        keyset = regionsData.keySet();
-
-        rownum = 0;
-        for ( Integer key : keyset ) {
-            Row row = regionSheet.createRow( rownum++ );
-            List<Object> objArr = regionsData.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                if ( obj instanceof Long )
-                    cell.setCellValue( String.valueOf( (Long) obj ) );
-            }
-        }*/
         HierarchyUpload hierarchyUpload = hierarchyDownloadService.fetchUpdatedHierarchyStructure( company );
         return hierarchyDownloadService.generateHierarchyDownloadReport( hierarchyUpload, company );
     }
@@ -1828,7 +1419,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             endDate = new Timestamp( System.currentTimeMillis() );
         }
         return getZillowImportCount( columnName, columnValue, startDate, endDate, true );
-    
+
     }
 
 
@@ -1837,5 +1428,875 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     {
         return surveyDetailsDao.getZillowImportCount( columnName, columnValue, startDate, endDate, filterAbusive );
     }
+
+
+    /**
+     * Method to create excel file for company user report.
+     * @throws ProfileNotFoundException 
+     */
+    @Override
+    @Transactional
+    public Map<Integer, List<Object>> downloadCompanyUsersReportData( long companyId ) throws InvalidInputException,
+        NoRecordsFetchedException, ProfileNotFoundException
+    {
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
+        }
+
+        Company company = companyDao.findById( Company.class, companyId );
+        Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( company );
+        Branch defaultBranchOfDefaultRegion = organizationManagementService.getDefaultBranchForRegion( defaultRegion
+            .getRegionId() );
+
+        List<Branch> defaultBranchList = new ArrayList<Branch>();
+        List<User> userList = new ArrayList<User>();
+        Map<Long, List<UserProfile>> userAndProfileMap = new HashMap<Long, List<UserProfile>>();
+
+        Map<Long, List<FeedStatus>> userAndFeedStatusMap = new HashMap<Long, List<FeedStatus>>();
+
+
+        final int batch = 100;
+        try {
+
+            int start = 0;
+            List<Branch> batchBranchList = new ArrayList<Branch>();
+            do {
+                batchBranchList = branchDao.getBranchesForCompany( companyId, CommonConstants.YES, start, batch );
+                if ( batchBranchList != null && batchBranchList.size() > 0 )
+                    defaultBranchList.addAll( batchBranchList );
+                start += batch;
+            } while ( batchBranchList != null && batchBranchList.size() == batch );
+
+            start = 0;
+            List<User> batchUserList = new ArrayList<User>();
+            Map<Long, List<UserProfile>> batchUserAndProfileMap;
+            Map<Long, List<FeedStatus>> batchUserAndFeedStatusMap;
+            List<Long> batchUserIds;
+            do {
+                batchUserIds = new ArrayList<Long>();
+                batchUserList = userDao.getUsersForCompany( company, start, batch );
+                if ( batchUserList != null && batchUserList.size() > 0 ) {
+
+                    for ( User user : batchUserList ) {
+                        batchUserIds.add( user.getUserId() );
+                    }
+                    //get profiles for users
+                    batchUserAndProfileMap = userProfileDao.getUserProfilesForUsers( batchUserIds );
+                    //add batch profiles to profile list
+                    userAndProfileMap.putAll( batchUserAndProfileMap );
+
+
+                    //get batch feed status
+                    Map<String, Object> queries = new HashMap<String, Object>();
+                    queries.put( "agentId", batchUserIds );
+                    List<FeedStatus> feedStatusList = feedStatusDao.findByColumnForMultipleValues( FeedStatus.class, "agentId",
+                        batchUserIds );
+                    batchUserAndFeedStatusMap = new HashMap<Long, List<FeedStatus>>();
+                    for ( Long userId : batchUserIds ) {
+                        batchUserAndFeedStatusMap.put( userId, new ArrayList<FeedStatus>() );
+                    }
+                    for ( FeedStatus feedStatus : feedStatusList ) {
+                        List<FeedStatus> curUserFeedList = batchUserAndFeedStatusMap.get( feedStatus.getAgentId() );
+                        curUserFeedList.add( feedStatus );
+                        // batchUserAndFeedStatusMap.put( feedStatus.getAgentId(), curUserFeedList );
+                    }
+
+                    userAndFeedStatusMap.putAll( batchUserAndFeedStatusMap );
+                    //add batch user to the user list
+                    userList.addAll( batchUserList );
+                }
+                start += batch;
+            } while ( batchUserList != null && batchUserList.size() == batch );
+
+        } catch ( Exception e ) {
+            LOG.error( "Exception occurred while fetching region or branches or users for company. Reason : ", e );
+        }
+
+
+        List<Long> defaultBranchIdList = new ArrayList<Long>();
+        if ( defaultBranchList != null && defaultBranchList.size() > 0 ) {
+            for ( Branch defaultBranch : defaultBranchList ) {
+                defaultBranchIdList.add( defaultBranch.getBranchId() );
+            }
+        }
+
+        List<Long> userIdList = new ArrayList<Long>();
+        Map<Long, String> userIdRegionIdsMap = new HashMap<Long, String>();
+        Map<Long, String> userIdBranchIdsMap = new HashMap<Long, String>();
+        Map<Long, String> userIdRegionAsAdminIdsMap = new HashMap<Long, String>();
+        Map<Long, String> userIdBranchAsAdminIdsMap = new HashMap<Long, String>();
+        List<Long> agentIds = new ArrayList<Long>();
+        Map<Long, AgentSettings> userIdSettingsMap = new HashMap<Long, AgentSettings>();
+        User companyAdmin = null;
+        if ( userList != null && userList.size() > 0 ) {
+            for ( User user : userList ) {
+                String regionId = "";
+                String regionsName = "";
+                String regionIdAsAdmin = "";
+                String regionsAsAdminName = "";
+                String branchId = "";
+                String branchsName= "";
+                String branchIdAsAdmin = "";
+                String branchNameAsAdmin = "";
+                boolean isCompanyAdminHasAnotherRole = false;
+                boolean isCompanyAdmin = user.getIsOwner() == CommonConstants.YES;
+                //get user profiles for user from map
+                List<UserProfile> userProfileList = userAndProfileMap.get( user.getUserId() );
+                if ( userProfileList != null && userProfileList.size() > 0 ) {
+                    for ( UserProfile userProfile : userProfileList ) {
+                        if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                            if ( defaultRegion.getRegionId() != userProfile.getRegionId()
+                                && CommonConstants.DEFAULT_REGION_ID != userProfile.getRegionId()
+                                && !regionId.contains( String.valueOf( userProfile.getRegionId() ) ) ) {
+                                regionId += userProfile.getRegionId() + ",";
+                                regionsName += userProfile.getRegionName() + ",";
+                            }
+                            if ( !defaultBranchIdList.contains( userProfile.getBranchId() )
+                                && CommonConstants.DEFAULT_BRANCH_ID != userProfile.getBranchId()
+                                && defaultBranchOfDefaultRegion.getBranchId() != userProfile.getBranchId()
+                                && !branchId.contains( String.valueOf( userProfile.getBranchId() ) ) ) {
+                                branchId += userProfile.getBranchId() + ",";
+                                branchsName += userProfile.getBranchName() + ",";
+                            }
+                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                                && !agentIds.contains( user.getUserId() ) ) {
+                                agentIds.add( user.getUserId() );
+                                if ( isCompanyAdmin )
+                                    isCompanyAdminHasAnotherRole = true;
+                            }
+                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                                if ( defaultRegion.getRegionId() != userProfile.getRegionId()
+                                    && CommonConstants.DEFAULT_REGION_ID != userProfile.getRegionId()
+                                    && !regionIdAsAdmin.contains( String.valueOf( userProfile.getRegionId() ) ) ) {
+                                    regionIdAsAdmin += userProfile.getRegionId() + ",";
+                                    regionsAsAdminName += userProfile.getRegionName() + ",";
+                                    if ( isCompanyAdmin )
+                                        isCompanyAdminHasAnotherRole = true;
+                                }
+                            }
+                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                                if ( !defaultBranchIdList.contains( userProfile.getBranchId() )
+                                    && CommonConstants.DEFAULT_BRANCH_ID != userProfile.getBranchId()
+                                    && defaultBranchOfDefaultRegion.getBranchId() != userProfile.getBranchId()
+                                    && !branchIdAsAdmin.contains( String.valueOf( userProfile.getBranchId() ) ) ) {
+                                    branchIdAsAdmin += userProfile.getBranchId() + ",";
+                                    branchNameAsAdmin += userProfile.getBranchName() + ",";
+                                    if ( isCompanyAdmin )
+                                        isCompanyAdminHasAnotherRole = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                if ( regionsName.length() > 0 ) {
+                    userIdRegionIdsMap.put( user.getUserId(), regionsName.substring( 0, regionsName.length() - 1 ) );
+                }
+                if ( branchsName.length() > 0 ) {
+                    userIdBranchIdsMap.put( user.getUserId(), branchsName.substring( 0, branchsName.length() - 1 ) );
+                }
+                if ( regionsAsAdminName.length() > 0 ) {
+                    userIdRegionAsAdminIdsMap.put( user.getUserId(),
+                        regionsAsAdminName.substring( 0, regionsAsAdminName.length() - 1 ) );
+                }
+                if ( branchNameAsAdmin.length() > 0 ) {
+                    userIdBranchAsAdminIdsMap.put( user.getUserId(),
+                        branchNameAsAdmin.substring( 0, branchNameAsAdmin.length() - 1 ) );
+                }
+                //company admin
+                if ( !isCompanyAdmin || isCompanyAdminHasAnotherRole )
+                    userIdList.add( user.getUserId() );
+                
+                if(isCompanyAdmin)
+                    companyAdmin = user;
+
+            }
+        }
+
+        /* if ( companyAdmin != null ) {
+             userList.remove( companyAdmin );
+         }*/
+
+        if ( userIdList.size() > 0 ) {
+            List<AgentSettings> agentSettingsList = organizationUnitSettingsDao.fetchMultipleAgentSettingsById( userIdList );
+            if ( agentSettingsList != null && agentSettingsList.size() > 0 ) {
+                for ( AgentSettings agentSettings : agentSettingsList ) {
+                    userIdSettingsMap.put( agentSettings.getIden(), agentSettings );
+                }
+            }
+        }
+
+        //get user social media action detail
+        Map<Long, List<SocialUpdateAction>> socialMediaActionMap = socialManagementService
+            .getSocialConnectionsHistoryForEntities( CommonConstants.AGENT_ID_COLUMN, userIdList );
+        Map<Long, Date> latestSurveyCompletedForAgent = surveyDetailsDao.getLatestCompletedSurveyDateForAgents( companyId );
+        Map<Long, Date> latestSurveySentForAgent = surveyPreInitiationDao.getLatestSurveySentForAgent( companyId );
+
+        //get user data map to craete excel from available users details
+        Map<Integer, List<Object>> usersData = createUserDataForCompnyUserReport( userList, agentIds, companyAdmin,
+            userIdSettingsMap, userIdRegionIdsMap, userIdBranchIdsMap, userIdRegionAsAdminIdsMap, userIdBranchAsAdminIdsMap,
+            socialMediaActionMap, userAndFeedStatusMap, latestSurveyCompletedForAgent, latestSurveySentForAgent );
+
+        return usersData;
+    }
+
+
+    /**
+     * 
+     * @param userList
+     * @param agentIds
+     * @param companyAdmin
+     * @param userIdSettingsMap
+     * @param userIdRegionIdsMap
+     * @param userIdBranchIdsMap
+     * @param userIdRegionAsAdminIdsMap
+     * @param userIdBranchAsAdminIdsMap
+     * @param socialMediaActionMap
+     * @param userAndFeedStatusMap
+     * @param latestSurveyCompletedForAgent
+     * @param latestSurveySentForAgent
+     * @return
+     */
+    @SuppressWarnings ( "deprecation")
+    public Map<Integer, List<Object>> createUserDataForCompnyUserReport( List<User> userList, List<Long> agentIds,
+        User companyAdmin, Map<Long, AgentSettings> userIdSettingsMap, Map<Long, String> userIdRegionIdsMap,
+        Map<Long, String> userIdBranchIdsMap, Map<Long, String> userIdRegionAsAdminIdsMap,
+        Map<Long, String> userIdBranchAsAdminIdsMap, Map<Long, List<SocialUpdateAction>> socialMediaActionMap,
+        Map<Long, List<FeedStatus>> userAndFeedStatusMap, Map<Long, Date> latestSurveyCompletedForAgent,
+        Map<Long, Date> latestSurveySentForAgent )
+    {
+
+        Integer usersCounter = 2;
+
+        // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>> usersData = new TreeMap<>();
+        List<Object> userReportToPopulate = new ArrayList<>();
+
+        // loop on users to populate users sheet
+        if ( userList != null && userList.size() > 0 ) {
+            for ( User user : userList ) {
+                // col 0 -  firstname
+                // col 1 - last name
+                // col 2 - email
+                // col 3 - social survey access lavel
+                // col 4 - branch ids 
+                // col 5 - region ids
+                // col 6 - branch ids where he is admin
+                // col 7 - region ids where he is admin
+                // col 8 - SOCIAL_SURVEY_INVITE_SENT
+                // col 9 - DATE_LAST_INVITE_SENT
+                // col 10 - PROFILE_VERIFIED
+                // col 11 - DATE_OF_LAST_LOGIN
+                // col 12 - PROFILE_COMPLETE
+
+                // col 13 - photo - profile image url
+                // col 15 - about me
+                AgentSettings userSettings = userIdSettingsMap.get( user.getUserId() );
+                //social media action
+                List<SocialUpdateAction> userSocialMediaAction = socialMediaActionMap.get( user.getUserId() );
+                List<FeedStatus> userFeedStatus = userAndFeedStatusMap.get( user.getUserId() );
+
+                String usersBranchIds = userIdBranchIdsMap.get( user.getUserId() );
+                String usersRegionIds = userIdRegionIdsMap.get( user.getUserId() );
+
+                String usersBranchAdminIds = userIdBranchAsAdminIdsMap.get( user.getUserId() );
+                String usersRegionAdminIds = userIdRegionAsAdminIdsMap.get( user.getUserId() );
+
+
+                //1.first name
+                userReportToPopulate.add( user.getFirstName() );
+
+                //2.last name
+                if ( user.getLastName() != null && !user.getLastName().trim().equalsIgnoreCase( "" )
+                    && !user.getLastName().trim().equalsIgnoreCase( "null" ) )
+                    userReportToPopulate.add( user.getLastName() );
+                else
+                    userReportToPopulate.add( "" );
+
+                //3.email
+                userReportToPopulate.add( user.getEmailId() );
+
+                //4.social survey access lavel
+                String ssAccessLavel = "";
+                if ( user.getUserId() == companyAdmin.getUserId() )
+                    ssAccessLavel += "Company Admin , ";
+                if ( usersRegionAdminIds != null && usersRegionAdminIds.length() > 0 )
+                    ssAccessLavel += "Region Admin , ";
+                if ( usersBranchAdminIds != null && usersBranchAdminIds.length() > 0 )
+                    ssAccessLavel += "Region Admin , ";
+                if ( agentIds.size() > 0 && agentIds.contains( user.getUserId() ) )
+                    ssAccessLavel += "User , ";
+                if ( ssAccessLavel.contains( "," ) )
+                    ssAccessLavel = ssAccessLavel.substring( 0, ssAccessLavel.lastIndexOf( "," ) );
+
+                userReportToPopulate.add( ssAccessLavel );
+
+                //5.office assignments
+                if ( usersBranchIds != null && usersBranchIds.length() > 0 )
+                    userReportToPopulate.add( usersBranchIds );
+                else
+                    userReportToPopulate.add( "" );
+
+                //6.region assignments
+                if ( usersRegionIds != null && usersRegionIds.length() > 0 )
+                    userReportToPopulate.add( usersRegionIds );
+                else
+                    userReportToPopulate.add( "" );
+
+                //7.office admin 
+                if ( usersBranchAdminIds != null && usersBranchAdminIds.length() > 0 )
+                    userReportToPopulate.add( usersBranchAdminIds );
+                else
+                    userReportToPopulate.add( "" );
+
+                //8.region admin 
+                if ( usersRegionAdminIds != null && usersRegionAdminIds.length() > 0 )
+                    userReportToPopulate.add( usersRegionAdminIds );
+                else
+                    userReportToPopulate.add( "" );
+
+                //9. SOCIAL_SURVEY_INVITE_SENT
+                if ( user.getCreatedOn() != null && user.getCreatedOn().toLocaleString() != null )
+                    userReportToPopulate.add( user.getCreatedOn().toLocaleString() );
+                else
+                    userReportToPopulate.add( "" );
+
+                //10. DATE_LAST_INVITE_SENT
+                //TODO
+                userReportToPopulate.add( "" );
+
+                //11.PROFILE_VERIFIED
+                if ( user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED )
+                    userReportToPopulate.add( CommonConstants.CHR_2 );
+                else
+                    userReportToPopulate.add( CommonConstants.CHR_1 );
+
+                //12. DATE_OF_LAST_LOGIN
+                if ( user.getLastLogin() != null && user.getLastLogin().toLocaleString() != null )
+                    userReportToPopulate.add( user.getLastLogin().toLocaleString() );
+                else
+                    userReportToPopulate.add( "" );
+
+
+                //13. PROFILE_COMPLETE
+                String profileComplete = "";
+                if ( userSettings != null ) {
+                    profileComplete += "( ";
+                    //profile photo
+                    if ( userSettings.getProfileImageUrl() != null && !userSettings.getProfileImageUrl().isEmpty() )
+                        profileComplete += "Photo = Yes";
+                    else
+                        profileComplete += "Photo = No";
+
+                    profileComplete += " , ";
+
+                    //logo
+                    if ( userSettings.getLogo() != null && !userSettings.getLogo().isEmpty() )
+                        profileComplete += "Logo = Yes";
+                    else
+                        profileComplete += "Logo = No";
+
+                    profileComplete += " , ";
+
+                    //Title
+                    if ( userSettings.getContact_details() != null && userSettings.getContact_details().getTitle() != null
+                        && !userSettings.getContact_details().getTitle().isEmpty() )
+                        profileComplete += "Title = Yes";
+                    else
+                        profileComplete += "Title = No";
+
+                    profileComplete += " , ";
+
+                    //Location
+                    if ( userSettings.getContact_details() != null && userSettings.getContact_details().getLocation() != null
+                        && !userSettings.getContact_details().getLocation().isEmpty() )
+                        profileComplete += "Location = Yes";
+                    else
+                        profileComplete += "Location = No";
+
+                    profileComplete += " , ";
+
+                    //Industry
+                    if ( userSettings.getContact_details() != null && userSettings.getContact_details().getIndustry() != null
+                        && !userSettings.getContact_details().getIndustry().isEmpty() )
+                        profileComplete += "Industry = Yes";
+                    else
+                        profileComplete += "Industry = No";
+
+                    profileComplete += " , ";
+
+                    //Licenses
+                    if(userSettings.getLicenses() != null )
+                    	profileComplete += "Licenses = Yes";
+                    else
+                    	profileComplete += "Licenses = No";
+                    profileComplete += " , ";
+
+
+                    //Disclaimer
+                    if ( userSettings.getDisclaimer() != null && !userSettings.getDisclaimer().isEmpty() )
+                        profileComplete += "Disclaimer = Yes";
+                    else
+                        profileComplete += "Disclaimer = No";
+
+                    profileComplete += " , ";
+
+                    //About
+                    if ( userSettings.getContact_details() != null && userSettings.getContact_details().getAbout_me() != null
+                        && !userSettings.getContact_details().getAbout_me().isEmpty() )
+                        profileComplete += "About = Yes";
+                    else
+                        profileComplete += "About = No";
+
+                    profileComplete += " ) ";
+                }
+                userReportToPopulate.add( profileComplete );
+
+                //Socially Connected
+                if ( userSocialMediaAction != null && !userSocialMediaAction.isEmpty() )
+                    userReportToPopulate.add( CommonConstants.CHR_YES );
+                else
+                    userReportToPopulate.add( CommonConstants.CHR_NO );
+
+
+                //get latest facebbok , twitter social media
+                SocialUpdateAction latestFacebookSocialUpdate = null;
+                SocialUpdateAction latestTwitterSocialUpdate = null;
+                SocialUpdateAction latestLinkedInSocialUpdate = null;
+                if ( userSocialMediaAction != null ) {
+                    for ( SocialUpdateAction socialUpdateAction : userSocialMediaAction ) {
+                        if ( socialUpdateAction.getSocialMediaSource().equals( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                            if ( latestFacebookSocialUpdate == null
+                                || socialUpdateAction.getUpdateTime().after( latestFacebookSocialUpdate.getUpdateTime() ) )
+                                latestFacebookSocialUpdate = socialUpdateAction;
+                        }
+
+                        if ( socialUpdateAction.getSocialMediaSource().equals( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                            if ( latestTwitterSocialUpdate == null
+                                || socialUpdateAction.getUpdateTime().after( latestTwitterSocialUpdate.getUpdateTime() ) )
+                                latestTwitterSocialUpdate = socialUpdateAction;
+                        }
+
+                        if ( socialUpdateAction.getSocialMediaSource().equals( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                            if ( latestLinkedInSocialUpdate == null
+                                || socialUpdateAction.getUpdateTime().after( latestLinkedInSocialUpdate.getUpdateTime() ) )
+                                latestLinkedInSocialUpdate = socialUpdateAction;
+                        }
+                    }
+                }
+
+
+                FeedStatus twitterFeedStatus = null;
+                FeedStatus fbFeedStatus = null;
+                FeedStatus linkedInFeedStatus = null;
+                if ( userFeedStatus != null ) {
+                    for ( FeedStatus feedStatus : userFeedStatus ) {
+                        if ( feedStatus.getFeedSource().equals( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
+                            fbFeedStatus = feedStatus;
+                        }
+                        if ( feedStatus.getFeedSource().equals( CommonConstants.TWITTER_SOCIAL_SITE ) ) {
+                            twitterFeedStatus = feedStatus;
+                        }
+                        if ( feedStatus.getFeedSource().equals( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
+                            linkedInFeedStatus = feedStatus;
+                        }
+                    }
+                }
+
+                //facebook
+
+                //connection stablished
+                if ( latestFacebookSocialUpdate != null ) {
+                    userReportToPopulate.add( CommonConstants.CHR_YES );
+                } else {
+                    userReportToPopulate.add( CommonConstants.CHR_NO );
+                }
+
+                //connection status
+                if ( latestFacebookSocialUpdate != null ) {
+                    userReportToPopulate.add( latestFacebookSocialUpdate.getAction() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //last fetch
+                if ( fbFeedStatus != null && fbFeedStatus.getLastFetchedTill() != null ) {
+                    userReportToPopulate.add( fbFeedStatus.getLastFetchedTill().toLocaleString() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+
+                //twitter
+                //connection stablished
+                if ( latestTwitterSocialUpdate != null ) {
+                    userReportToPopulate.add( CommonConstants.CHR_YES );
+                } else {
+                    userReportToPopulate.add( CommonConstants.CHR_NO );
+                }
+
+                //connection status
+                if ( latestTwitterSocialUpdate != null ) {
+                    userReportToPopulate.add( latestTwitterSocialUpdate.getAction() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //last fetch
+                if ( twitterFeedStatus != null && twitterFeedStatus.getLastFetchedTill() != null ) {
+                    userReportToPopulate.add( twitterFeedStatus.getLastFetchedTill().toLocaleString() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //linkedin
+                //connection stablished
+                if ( latestLinkedInSocialUpdate != null ) {
+                    userReportToPopulate.add( CommonConstants.CHR_YES );
+                } else {
+                    userReportToPopulate.add( CommonConstants.CHR_NO );
+                }
+
+                //connection status
+                if ( latestLinkedInSocialUpdate != null ) {
+                    userReportToPopulate.add( latestLinkedInSocialUpdate.getAction() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //last fetch
+                if ( linkedInFeedStatus != null && linkedInFeedStatus.getLastFetchedTill() != null ) {
+                    userReportToPopulate.add( linkedInFeedStatus.getLastFetchedTill().toLocaleString() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+
+                //google
+                if ( userSettings != null && userSettings.getSocialMediaTokens() != null
+                    && userSettings.getSocialMediaTokens().getGoogleToken() != null ) {
+                    userReportToPopulate.add( userSettings.getSocialMediaTokens().getGoogleToken().getProfileLink() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //zillow
+                if ( userSettings != null && userSettings.getSocialMediaTokens() != null
+                    && userSettings.getSocialMediaTokens().getZillowToken() != null ) {
+                    userReportToPopulate.add( userSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //yelp 
+                if ( userSettings != null && userSettings.getSocialMediaTokens() != null
+                    && userSettings.getSocialMediaTokens().getYelpToken() != null ) {
+                    userReportToPopulate.add( userSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //realtor
+                if ( userSettings != null && userSettings.getSocialMediaTokens() != null
+                    && userSettings.getSocialMediaTokens().getRealtorToken() != null ) {
+                    userReportToPopulate.add( userSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //lending tree
+                if ( userSettings != null && userSettings.getSocialMediaTokens() != null
+                    && userSettings.getSocialMediaTokens().getLendingTreeToken() != null ) {
+                    userReportToPopulate.add( userSettings.getSocialMediaTokens().getLendingTreeToken()
+                        .getLendingTreeProfileLink() );
+                } else {
+                    userReportToPopulate.add( "" );
+                }
+
+                //data adoption latestSurveyForAgent
+                userReportToPopulate.add( "" );
+
+                //DATE_LAST_SURVEY_SENT
+                Date latestSentSurveyDate = latestSurveySentForAgent.get( user.getUserId() );
+                if ( latestSentSurveyDate != null && latestSentSurveyDate.toLocaleString() != null )
+                    userReportToPopulate.add( latestSentSurveyDate.toLocaleString() );
+                else
+                    userReportToPopulate.add( "" );
+
+                //DATE_LAST_SURVEY_POSTED
+                Date latestCompletedSurveyDate = latestSurveyCompletedForAgent.get( user.getUserId() );
+                if ( latestCompletedSurveyDate != null && latestCompletedSurveyDate.toLocaleString() != null )
+                    userReportToPopulate.add( latestCompletedSurveyDate.toLocaleString() );
+                else
+                    userReportToPopulate.add( "" );
+
+
+                usersData.put( ( ++usersCounter ), userReportToPopulate );
+                userReportToPopulate = new ArrayList<>();
+            }
+        }
+        // Setting up user sheet headers
+        userReportToPopulate.add( CommonConstants.CHR_USERS_FIRST_NAME );
+        userReportToPopulate.add( CommonConstants.CHR_USERS_LAST_NAME );
+        userReportToPopulate.add( CommonConstants.CHR_USERS_EMAIL );
+        userReportToPopulate.add( CommonConstants.SOCIAL_SURVEY_ACCESS_LAVEL );
+
+        userReportToPopulate.add( CommonConstants.CHR_USERS_OFFICE_ASSIGNMENTS );
+        userReportToPopulate.add( CommonConstants.CHR_USERS_REGION_ASSIGNMENTS );
+        userReportToPopulate.add( CommonConstants.CHR_USERS_OFFICE_ADMIN_PRIVILEGE );
+        userReportToPopulate.add( CommonConstants.CHR_USERS_REGION_ADMIN_PRIVILEGE );
+
+        userReportToPopulate.add( CommonConstants.SOCIAL_SURVEY_INVITE_SENT );
+        userReportToPopulate.add( CommonConstants.DATE_LAST_INVITE_SENT );
+        userReportToPopulate.add( CommonConstants.PROFILE_VERIFIED );
+        userReportToPopulate.add( CommonConstants.DATE_OF_LAST_LOGIN );
+        userReportToPopulate.add( CommonConstants.PROFILE_COMPLETE );
+
+        userReportToPopulate.add( CommonConstants.SOCIALLY_CONNECTED );
+        userReportToPopulate.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+
+        userReportToPopulate.add( CommonConstants.TWITTER_SOCIAL_SITE );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+
+        userReportToPopulate.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+
+
+        userReportToPopulate.add( CommonConstants.GOOGLE_SOCIAL_SITE );
+        userReportToPopulate.add( CommonConstants.ZILLOW_SOCIAL_SITE );
+        userReportToPopulate.add( CommonConstants.YELP_SOCIAL_SITE );
+        userReportToPopulate.add( CommonConstants.REALTOR_SOCIAL_SITE );
+        userReportToPopulate.add( CommonConstants.LENDINGTREE_SOCIAL_SITE );
+
+        userReportToPopulate.add( CommonConstants.DATE_ADOPTION_COMPLETED );
+        userReportToPopulate.add( CommonConstants.DATE_LAST_SURVEY_SENT );
+        userReportToPopulate.add( CommonConstants.DATE_LAST_SURVEY_POSTED );
+
+        usersData.put( 1, userReportToPopulate );
+
+        userReportToPopulate = new ArrayList<>();
+
+        // setting up user sheet header descriptions
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "(1=Green, 2=Red)" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "(Photo, Company Logo, Title, Location, Industry, Licenses, Disclaimer, About)" );
+
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( CommonConstants.DATE_CONNECTION_ESTABLISHED );
+        userReportToPopulate.add( CommonConstants.CONNECTION_STATUS );
+        userReportToPopulate.add( CommonConstants.DATE_OF_LAST_POST );
+
+        userReportToPopulate.add( CommonConstants.DATE_CONNECTION_ESTABLISHED );
+        userReportToPopulate.add( CommonConstants.CONNECTION_STATUS );
+        userReportToPopulate.add( CommonConstants.DATE_OF_LAST_POST );
+
+        userReportToPopulate.add( CommonConstants.DATE_CONNECTION_ESTABLISHED );
+        userReportToPopulate.add( CommonConstants.CONNECTION_STATUS );
+        userReportToPopulate.add( CommonConstants.DATE_OF_LAST_POST );
+
+
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+        userReportToPopulate.add( "" );
+
+        usersData.put( 2, userReportToPopulate );
+
+        return usersData;
+    }
+
+
+    @Override
+    @Transactional
+    public void generateCompanyReportAndMail( Map<Integer, List<Object>> usersData, String recipientMailId, String recipientName , Company company )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "method generateCompanyReportAndMail started" );
+        
+        if(company == null){
+            throw new InvalidInputException("Passed parameter company is null");
+        }
+        // Iterate over data and write to sheet
+        DecimalFormat decimalFormat = new DecimalFormat( "#0" );
+        decimalFormat.setRoundingMode( RoundingMode.DOWN );
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+
+        // Iterate over data and write to sheet
+        Set<Integer> keyset = usersData.keySet();
+
+        int rownum = 0;
+        for ( Integer key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = usersData.get( key );
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String )
+                    cell.setCellValue( (String) obj );
+                if ( obj instanceof Long )
+                    cell.setCellValue( String.valueOf( (Long) obj ) );
+                //resize column 
+                sheet.autoSizeColumn( cellnum - 1 );
+
+            }
+
+        }
+
+
+        // Create file and write report into it
+        boolean excelCreated = false;
+        String fileName = "Company_Users_Report-" + ( new Timestamp( new Date().getTime() ) );
+        FileOutputStream fileOutput = null;
+        InputStream inputStream = null;
+        File file = null;
+        String filePath = null;
+        try {
+            file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+            fileOutput = new FileOutputStream( file );
+            file.createNewFile();
+            workbook.write( fileOutput );
+            filePath = file.getPath();
+            excelCreated = true;
+        } catch ( FileNotFoundException fe ) {
+            LOG.error( "Exception caught while generateCompanyReportAndMail " + fe.getMessage() );
+            excelCreated = false;
+        } catch ( IOException e ) {
+            LOG.error( "Exception caught  while generateCompanyReportAndMail " + e.getMessage() );
+            excelCreated = false;
+        } finally {
+            try {
+                if(fileOutput != null)
+                    fileOutput.close();
+                if ( inputStream != null ) {
+                    inputStream.close();
+                }
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught  while generateCompanyReportAndMail " + e.getMessage() );
+                excelCreated = false;
+            }
+        }
+
+        // Mail the report to the admin
+        if ( excelCreated ) {
+            Map<String, String> attachmentsDetails = new HashMap<String, String>();
+            attachmentsDetails.put( fileName + ".xls", filePath );
+            String mailId = null;
+            if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+                mailId = adminEmailId;
+            } else {
+                mailId = recipientMailId;
+            }
+
+            String name = null;
+            if ( recipientName == null || recipientName.isEmpty() ) {
+                name = adminName;
+            } else {
+                name = recipientName;
+            }
+
+            LOG.debug( "sending mail to : " + name + " at : " + mailId );
+            String subject = CommonConstants.COMPANY_USERS_REPORT_MAIL_SUBJ + company.getCompany();
+            String body = CommonConstants.COMPANY_USERS_REPORT_MAIL_BODY;
+            emailServices.sendCustomMail(name, recipientMailId, subject, body, attachmentsDetails);
+        }
+
+        LOG.info( "method generateCompanyReportAndMail ended" );
+    }
+    
+    
+    @Override
+    @Transactional
+    public void generateCompanyHierarchyReportAndMail( long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
+    {
+        LOG.info( "Method generateCompanyHierarchyReportAndMail started" );
+        XSSFWorkbook workbook = downloadCompanyHierarchyReportData( companyId );
+        if ( workbook == null ) {
+            throw new InvalidInputException( "unable to create workbook" );
+        }
+        // Create file and write report into it
+        boolean excelCreated = false;
+        String fileName = "Company_Hierarchy_Report-" + ( new Timestamp( new Date().getTime() ) );
+        FileOutputStream fileOutput = null;
+        InputStream inputStream = null;
+        File file = null;
+        String filePath = null;
+        try {
+            file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+            fileOutput = new FileOutputStream( file );
+            file.createNewFile();
+            workbook.write( fileOutput );
+            filePath = file.getPath();
+            excelCreated = true;
+        } catch ( FileNotFoundException fe ) {
+            LOG.error( "Exception caught while generateCompanyHierarchyReportAndMail " + fe.getMessage() );
+            excelCreated = false;
+        } catch ( IOException e ) {
+            LOG.error( "Exception caught  while generateCompanyHierarchyReportAndMail " + e.getMessage() );
+            excelCreated = false;
+        } finally {
+            try {
+                if ( fileOutput != null )
+                    fileOutput.close();
+                if ( inputStream != null ) {
+                    inputStream.close();
+                }
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught  while generateCompanyHierarchyReportAndMail " + e.getMessage() );
+                excelCreated = false;
+            }
+        }
+
+        // Mail the report to the admin
+        if ( excelCreated ) {
+            Map<String, String> attachmentsDetails = new HashMap<String, String>();
+            attachmentsDetails.put( fileName + ".xls", filePath );
+            String mailId = null;
+            if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+                mailId = adminEmailId;
+            } else {
+                mailId = recipientMailId;
+            }
+
+            String name = null;
+            if ( recipientName == null || recipientName.isEmpty() ) {
+                name = adminName;
+            } else {
+                name = recipientName;
+            }
+
+            LOG.debug( "sending mail to : " + name + " at : " + mailId );
+            String subject = "Company Hierarchy Report";
+            String body = "Here is the company hierarchy report you requested. Please refer to the attachment for the report";
+            emailServices.sendCustomMail( name, recipientMailId, subject, body, attachmentsDetails );
+        }
+
+        LOG.info( "method generateCompanyHierarchyReportAndMail ended" );
+
+    }
+
 }
 // JIRA SS-137 BY RM05:EOC

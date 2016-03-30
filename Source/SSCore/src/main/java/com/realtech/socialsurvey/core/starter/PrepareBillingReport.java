@@ -10,12 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.reports.BillingReportsService;
 import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
 
@@ -47,9 +49,9 @@ public class PrepareBillingReport implements Runnable
         // Check if a request for billing report is present in FILE_UPLOAD table
         while ( true ) {
             try {
-                List<FileUpload> filesToBeUploaded = dashboardService.getBillingReportToBeSent();
-                if ( filesToBeUploaded != null && !( filesToBeUploaded.isEmpty() ) ) {
-                    FileUpload fileUpload = filesToBeUploaded.get( 0 );
+                List<FileUpload> filesToBeUploadedGenerated = dashboardService.getReportsToBeSent();
+                if ( filesToBeUploadedGenerated != null && !( filesToBeUploadedGenerated.isEmpty() ) ) {
+                    FileUpload fileUpload = filesToBeUploadedGenerated.get( 0 );
                     //FileName stores the recipient mail ID
                     String recipientMailId = fileUpload.getFileName();
 
@@ -59,15 +61,29 @@ public class PrepareBillingReport implements Runnable
                         fileUpload.setStatus( CommonConstants.STATUS_UNDER_PROCESSING );
                         csvUploadService.updateFileUploadRecord( fileUpload );
 
-                        // prepare and send the billing report to admin
-                        Map<String, List<Object>> dataToGenerateBillingReport = billingReportsService.generateBillingReportDataForCompanies();
-                        billingReportsService.generateBillingReportAndMail( dataToGenerateBillingReport , recipientMailId , null );
+                        if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_BILLING_REPORT){
+                         // prepare and send the billing report to admin
+                            Map<String, List<Object>> dataToGenerateBillingReport = billingReportsService.generateBillingReportDataForCompanies();
+                            billingReportsService.generateBillingReportAndMail( dataToGenerateBillingReport , recipientMailId , null );
+                            
+                        }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_COMPANY_USERS_REPORT){
+                            Company company = fileUpload.getCompany();
+                            if(company != null){
+                                Map<Integer, List<Object>> dataToGenerateForCompanyUserReport = dashboardService.downloadCompanyUsersReportData( company.getCompanyId() );
+                                dashboardService.generateCompanyReportAndMail( dataToGenerateForCompanyUserReport, recipientMailId , null , company );
+                            }
+                        } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT ) {
+                            Company company = fileUpload.getCompany();
+                            if ( company != null ) {
+                                dashboardService.generateCompanyHierarchyReportAndMail( company.getCompanyId(), recipientMailId, null );
+                            }
+                        }
                         
                         // update the status to be processed
                         fileUpload.setStatus( CommonConstants.STATUS_INACTIVE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         csvUploadService.updateFileUploadRecord( fileUpload );
-                    } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                    } catch ( InvalidInputException | UndeliveredEmailException | ProfileNotFoundException e ) {
                         LOG.error( "Error in generating billing report generator " , e );
                         try {
                             batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BILLING_REPORT_GENERATOR,

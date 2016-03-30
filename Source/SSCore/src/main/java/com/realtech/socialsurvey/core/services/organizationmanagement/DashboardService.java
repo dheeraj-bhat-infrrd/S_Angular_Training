@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.BillingReportData;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 
 // JIRA SS-137 BY RM05:BOC
@@ -84,7 +85,7 @@ public interface DashboardService
     public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<FileUpload> getBillingReportToBeSent() throws NoRecordsFetchedException;
+    public List<FileUpload> getReportsToBeSent() throws NoRecordsFetchedException;
 
     /**
      * Method to delete surveys from mongo given the survey preinitiation details
@@ -104,5 +105,33 @@ public interface DashboardService
 
     public long getSocialPostsForPastNdaysWithHierarchyForStatistics( String columnName, long columnValue, int numberOfDays )
         throws InvalidInputException;
+
+    /**
+     * 
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws ProfileNotFoundException
+     */
+    Map<Integer, List<Object>> downloadCompanyUsersReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
+
+    void generateCompanyReportAndMail( Map<Integer, List<Object>> usersData, String recipientMailId, String recipientName , Company company )
+        throws InvalidInputException, UndeliveredEmailException;
+
+    List<FileUpload> getActiveBillingReports() throws NoRecordsFetchedException;
+
+
+    /**
+     * Method to generate and mail the company hierarchy report
+     * @param companyId
+     * @param recipientMailId
+     * @param recipientName
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws UndeliveredEmailException
+     */
+    public void generateCompanyHierarchyReportAndMail( long companyId, String recipientMailId, String recipientName )
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 }
 // JIRA SS-137 BY RM05:EOC

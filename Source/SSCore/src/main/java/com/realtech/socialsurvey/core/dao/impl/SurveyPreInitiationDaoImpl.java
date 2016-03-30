@@ -653,4 +653,39 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         query.executeUpdate();
         LOG.info( "Method updateSurveyPreinitiationRecordsAsIgnored  ended." );
     }
+    
+    
+    @Override
+    public Map<Long, Date> getLatestSurveySentForAgent( long companyId )
+    {
+        LOG.info( "Method getLatestSurveySentForAgent() started." );
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+        Map<Long, Date> latestSurveySentForAgent = new HashMap<Long, Date>();
+        List<Integer> statusList = new ArrayList<Integer>();
+        statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+        statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+        statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+        
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, statusList ) );
+            
+            criteria.setProjection(Projections.projectionList().add(Projections.groupProperty(CommonConstants.AGENT_ID_COLUMN)).add(Projections.max( CommonConstants.CREATED_ON )));  
+          
+            List<Object[]> result = criteria.list();
+            for(Object[] obj : result){
+                Long agentId = (Long) obj[0];
+                Date latestSurveyDate = (Date) obj[1];
+                
+                latestSurveySentForAgent.put( agentId, latestSurveyDate );
+            }
+            LOG.info( "Method getLatestSurveySentForAgent() finished." );
+            
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getLatestSurveySentForAgent() ", e );
+            throw new DatabaseException( "Exception caught in getLatestSurveySentForAgent() ", e );
+        }
+        
+        return latestSurveySentForAgent;
+    }
 }
