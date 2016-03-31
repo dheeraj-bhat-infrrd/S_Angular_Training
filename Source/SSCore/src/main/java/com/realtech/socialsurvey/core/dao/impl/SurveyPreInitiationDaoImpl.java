@@ -490,14 +490,22 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     public List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveys( long companyId, int start, int batch )
     {
         LOG.info( "Method getUnmatchedPreInitiatedSurveys() started." );
-        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class , "surveyPreInitiation" );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
             criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
                 CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
+            
+            //remove corrupted records
+            criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN));
+            criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN , ""));
+           criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.CUSTOMER_FIRST_NAME_COLUMN));
+            criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_FIRST_NAME_COLUMN , ""));
+            criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN));
+           criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN , ""));
 
-            criteria.addOrder( Order.desc( "createdOn" ) );
+            criteria.addOrder( Order.desc( CommonConstants.ENGAGEMENT_CLOSED_TIME ) );
 
             if ( start > -1 )
                 criteria.setFirstResult( start );
@@ -518,12 +526,21 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     public long getUnmatchedPreInitiatedSurveyCount( long companyId )
     {
         LOG.info( "Method getUnmatchedPreInitiatedSurveyCount() started." );
-        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class , "surveyPreInitiation" );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
             criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
                 CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
+            
+            //remove corrupted records
+            criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN));
+            criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN , ""));
+            criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.CUSTOMER_FIRST_NAME_COLUMN));
+            criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_FIRST_NAME_COLUMN , ""));
+            criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN));
+            criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN , ""));
+            
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
 

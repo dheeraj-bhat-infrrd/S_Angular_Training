@@ -1446,7 +1446,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             calendar.add( Calendar.DATE, -validSurveyInterval );
             Date date = calendar.getTime();
 
-            if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
+            if ( engagementClosedTime.before( date ) ) {
+                LOG.info( "An old record found : " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
+                oldRecords.add( survey );
+                companies.add( survey.getCompanyId() );
+            } else if ( user == null && isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
+                LOG.error( "no agent found with this email id and its an ignored record" );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD;
+                ignoredEmailRecords.add( survey );
+                companies.add( survey.getCompanyId() );
+            } else if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
                 LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 unavailableAgents.add( survey );
@@ -1461,16 +1471,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
                 customersWithoutEmailId.add( survey );
-                companies.add( survey.getCompanyId() );
-            } else if ( engagementClosedTime.before( date ) ) {
-                LOG.info( "An old record found : " + survey.getSurveyPreIntitiationId() );
-                status = CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD;
-                oldRecords.add( survey );
-                companies.add( survey.getCompanyId() );
-            } else if ( user == null && isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
-                LOG.error( "no agent found with this email id and its an ignored record" );
-                status = CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD;
-                ignoredEmailRecords.add( survey );
                 companies.add( survey.getCompanyId() );
             } else if ( user == null ) {
                 LOG.error( "no agent found with this email id" );
