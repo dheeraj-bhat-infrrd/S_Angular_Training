@@ -470,37 +470,6 @@ public class UploadValidationServiceImpl implements UploadValidationService
             uploadedUser.getValidationWarnings().add( "User at row " + uploadedUser.getRowNum()
                 + " is not assigned to any region or branch. User will be assigned to the company." );
             isWarningRecord = true;
-        } else {
-            if ( !isAssignedToBranch ) {
-                LOG.warn( "User at row " + uploadedUser.getRowNum() + " is not assigned to any office" );
-                userValidationWarnings.add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any office" );
-                uploadedUser.getValidationWarnings()
-                    .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any office" );
-                isWarningRecord = true;
-            }
-            if ( !isAssignedToRegion ) {
-                LOG.warn( "User at row " + uploadedUser.getRowNum() + " is not assigned to any region" );
-                userValidationWarnings.add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any region" );
-                uploadedUser.getValidationWarnings()
-                    .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any region" );
-                isWarningRecord = true;
-            }
-            if ( !isAssignedToBranchAdmin ) {
-                LOG.warn( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin office" );
-                userValidationWarnings
-                    .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin office" );
-                uploadedUser.getValidationWarnings()
-                    .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin office" );
-                isWarningRecord = true;
-            }
-            if ( !isAssignedToRegionAdmin ) {
-                LOG.warn( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin region" );
-                userValidationWarnings
-                    .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin region" );
-                uploadedUser.getValidationWarnings()
-                    .add( "User at row " + uploadedUser.getRowNum() + " is not assigned to any admin region" );
-                isWarningRecord = true;
-            }
         }
 
         if ( isWarningRecord ) {
