@@ -437,6 +437,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
                     // map the history records
                     mapBranchModificationHistory( branchUpload, branch );
+                    //Reset inAppendMode flag
+                    branchUpload.setInAppendMode( false );
 
                     // map the id mapping
                     /*if ( branchUpload.getSourceRegionId() != null && !branchUpload.getSourceRegionId().isEmpty() ) {
@@ -622,6 +624,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     }
                     // map the history records
                     mapRegionModificationHistory( regionUpload, region );
+                    //Reset inAppendMode flag
+                    regionUpload.setInAppendMode( false );
                     // map the id mapping
                     if ( regionUpload.getSourceRegionId() != null && !regionUpload.getSourceRegionId().isEmpty() ) {
                         upload.getRegionSourceMapping().put( regionUpload.getSourceRegionId(), region.getRegionId() );
@@ -2114,6 +2118,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 updateUserSettingsInMongo( user, userToBeUploaded );
                 //map the history records
                 mapUserModificationHistory( userToBeUploaded, user );
+                //Reset inAppendMode flag
+                userToBeUploaded.setInAppendMode( false );
                 //map the id mapping
                 if ( userToBeUploaded.getSourceUserId() != null && !userToBeUploaded.getSourceUserId().isEmpty() ) {
                     upload.getUserSourceMapping().put( userToBeUploaded.getSourceUserId(), userToBeUploaded.getUserId() );
@@ -2396,6 +2402,27 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadStatus.setModifiedOn( currentTime );
         uploadStatus.setCreatedOn( currentTime );
         uploadStatusDao.save( uploadStatus );
+    }
+    
+    
+    /**
+     * Method to add an error upload status entry
+     * @param adminUser
+     * @param company
+     * @param errorStr
+     * @param uploadStatus
+     */
+    @Override
+    @Transactional
+    public void createErrorUploadStatusEntry( User adminUser, Company company, String errorStr, UploadStatus uploadStatus )
+    {
+        UploadStatus errorStatus = new UploadStatus();
+        errorStatus.setAdminUserId( adminUser.getUserId() );
+        errorStatus.setCompany( company );
+        errorStatus.setMessage( errorStr );
+        errorStatus.setUploadMode( uploadStatus.getUploadMode() );
+        errorStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_ERROR );
+        addUploadStatusEntry( errorStatus );
     }
     
     

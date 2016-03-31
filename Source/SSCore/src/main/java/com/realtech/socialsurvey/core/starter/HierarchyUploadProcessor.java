@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.starter;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +62,57 @@ public class HierarchyUploadProcessor implements Runnable
                             Map<String, List<String>> errors = hierarchyStructureUploadService.uploadHierarchy(
                                 hierarchyUpload, company, adminUser, isAppend );
                             if ( !errors.isEmpty() ) {
-                                //TODO: Send a mail or store somewhere
-                            }
+                                if ( errors.containsKey( CommonConstants.USER_UPLOAD_ERROR_LIST ) ) {
+                                    String errorStr = StringUtils.join( errors.get( CommonConstants.USER_UPLOAD_ERROR_LIST ),
+                                        ", " );
+                                    hierarchyStructureUploadService.createErrorUploadStatusEntry( adminUser, company, errorStr,
+                                        uploadStatus );
+                                }
+                                if ( errors.containsKey( CommonConstants.BRANCH_UPLOAD_ERROR_LIST ) ) {
+                                    String errorStr = StringUtils.join( errors.get( CommonConstants.BRANCH_UPLOAD_ERROR_LIST ),
+                                        ", " );
+                                    hierarchyStructureUploadService.createErrorUploadStatusEntry( adminUser, company, errorStr,
+                                        uploadStatus );
+                                }
+                                if ( errors.containsKey( CommonConstants.REGION_UPLOAD_ERROR_LIST ) ) {
+                                    String errorStr = StringUtils.join( errors.get( CommonConstants.REGION_UPLOAD_ERROR_LIST ),
+                                        ", " );
+                                    hierarchyStructureUploadService.createErrorUploadStatusEntry( adminUser, company, errorStr,
+                                        uploadStatus );
+                                }
+                                if ( errors.containsKey( CommonConstants.USER_DELETE_ERROR_LIST ) ) {
+                                    String errorStr = StringUtils.join( errors.get( CommonConstants.USER_DELETE_ERROR_LIST ),
+                                        ", " );
+                                    hierarchyStructureUploadService.createErrorUploadStatusEntry( adminUser, company, errorStr,
+                                        uploadStatus );
+                                }
+                                if ( errors.containsKey( CommonConstants.BRANCH_DELETE_ERROR_LIST ) ) {
+                                    String errorStr = StringUtils.join( errors.get( CommonConstants.BRANCH_DELETE_ERROR_LIST ),
+                                        ", " );
+                                    hierarchyStructureUploadService.createErrorUploadStatusEntry( adminUser, company, errorStr,
+                                        uploadStatus );
+                                }
+                                if ( errors.containsKey( CommonConstants.REGION_DELETE_ERROR_LIST ) ) {
+                                    String errorStr = StringUtils.join( errors.get( CommonConstants.REGION_DELETE_ERROR_LIST ),
+                                        ", " );
+                                    hierarchyStructureUploadService.createErrorUploadStatusEntry( adminUser, company, errorStr,
+                                        uploadStatus );
+                                }
+                                uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ERROR );
+                                uploadStatus.setMessage( CommonConstants.UPLOAD_MSG_UPLOAD_ERROR );
+                                hierarchyStructureUploadService.updateUploadStatus( uploadStatus );
+                                
+                                //Add uploadStatus ERROR
+                                UploadStatus completedUploadStatus = new UploadStatus();
+                                completedUploadStatus.setCompany( company );
+                                completedUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ERROR );
+                                completedUploadStatus.setAdminUserId( adminUser.getUserId() );
+                                completedUploadStatus.setMessage( "Hierarchy upload completed with errors." );
+                                hierarchyStructureUploadService.addUploadStatusEntry( completedUploadStatus );
+                                //Set import started status to done
+                                uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_DONE );
+
+                            } else {
                             //Add uploadStatus COMPLETED
                             UploadStatus completedUploadStatus = new UploadStatus();
                             completedUploadStatus.setCompany( company );
@@ -72,6 +122,7 @@ public class HierarchyUploadProcessor implements Runnable
                             hierarchyStructureUploadService.addUploadStatusEntry( completedUploadStatus );
                             //Set import started status to done
                             uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_DONE );
+                            }
                             hierarchyStructureUploadService.updateUploadStatus( uploadStatus );
                         } catch ( InvalidInputException e ) {
                             //If error occurs, add uploadStatus ERROR and store message
