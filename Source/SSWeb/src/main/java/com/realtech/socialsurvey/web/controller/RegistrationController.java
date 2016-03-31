@@ -37,6 +37,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.referral.ReferralService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -68,6 +69,8 @@ public class RegistrationController
     private OrganizationManagementService organizationManagementService;
     @Autowired
     private EmailServices emailServices;
+    @Autowired
+    private ReferralService referralService;
 
     @Value ( "${VALIDATE_CAPTCHA}")
     private String validateCaptcha;
@@ -252,6 +255,10 @@ public class RegistrationController
 	            redirectAttributes.addFlashAttribute( "emailid", emailAddress );
 	            redirectAttributes.addFlashAttribute( "uniqueIdentifier", urlParams.get( CommonConstants.UNIQUE_IDENTIFIER ) );
 	            redirectAttributes.addFlashAttribute( "isDirectRegistration", true );
+	            // adding referral code if present
+	            if(urlParams.get(CommonConstants.REFERRAL_CODE) != null && !(urlParams.get(CommonConstants.REFERRAL_CODE)).isEmpty()){
+	            	redirectAttributes.addFlashAttribute("referralcode", urlParams.get(CommonConstants.REFERRAL_CODE));
+	            }
 	            LOG.debug( "Validation of url completed. Service returning params to be prepopulated in registration page" );
 	            return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
             }
@@ -420,7 +427,12 @@ public class RegistrationController
              */
             try {
                 LOG.debug( "Registering user with emailId : " + emailId );
-                userManagementService.addCorporateAdmin( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
+                User user = userManagementService.addCorporateAdmin( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
+                
+                // if referral is present then add it to the mapping with user
+                if(request.getParameter("referralcode") != null && !request.getParameter("referralcode").isEmpty()){
+                	referralService.addRefferalMapping(user, request.getParameter("referralcode"));
+                }
 
                 LOG.debug( "Adding newly registered user to principal session" );
                 sessionHelper.loginOnRegistration( emailId, password );

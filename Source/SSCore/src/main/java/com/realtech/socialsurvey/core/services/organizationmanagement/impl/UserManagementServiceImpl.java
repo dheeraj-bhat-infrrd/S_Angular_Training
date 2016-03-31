@@ -254,6 +254,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId,
         boolean isReinvitation, String referralCode ) throws InvalidInputException, UserAlreadyExistsException, NonFatalException

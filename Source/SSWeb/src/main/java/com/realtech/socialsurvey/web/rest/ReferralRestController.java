@@ -37,7 +37,7 @@ public class ReferralRestController
 
 	@RequestMapping(value = "/register", method = RequestMethod.GET, produces = "application/json")
 	public String sendRegistrationMailUsingReferralCode(@RequestParam(value = "firstName") String firstName,
-			@RequestParam(value = "lastName", required = false) String lastName, @RequestParam(value = "emailAddress") String emailAddress,
+			@RequestParam(value = "lastName", required = false, defaultValue = "") String lastName, @RequestParam(value = "emailAddress") String emailAddress,
 			@RequestParam(value = "referralcode") String referralCode) throws InvalidInputException, UserAlreadyExistsException, NonFatalException {
 		LOG.info("Sending invitation mail through referral code");
 		userManagementService.validateAndInviteCorporateToRegister(firstName, lastName, emailAddress, false, referralCode);
