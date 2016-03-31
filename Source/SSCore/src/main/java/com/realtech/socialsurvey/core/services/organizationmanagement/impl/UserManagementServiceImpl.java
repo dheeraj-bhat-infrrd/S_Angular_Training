@@ -77,10 +77,12 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
+import com.realtech.socialsurvey.core.services.referral.ReferralService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.vo.UserList;
 
@@ -194,6 +196,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private SocialManagementService socialManagementService;
 
     @Autowired
+    private ReferralService referralService;
+
+    @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
 
     @Autowired
@@ -227,7 +232,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation )
+    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation, String referralCode )
         throws InvalidInputException, UndeliveredEmailException, NonFatalException
     {
         LOG.info( "Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName
@@ -239,6 +244,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         urlParams.put( CommonConstants.EMAIL_ID, emailId );
         urlParams.put( CommonConstants.CURRENT_TIMESTAMP, String.valueOf( System.currentTimeMillis() ) );
         urlParams.put( CommonConstants.UNIQUE_IDENTIFIER, generateUniqueIdentifier() );
+        if(referralCode != null && !referralCode.isEmpty()){
+            urlParams.put( CommonConstants.REFERRAL_CODE, referralCode );
+        }
         LOG.debug( "Generating URL" );
         String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl
             + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION );
@@ -246,6 +254,65 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         inviteUser( url, emailId, firstName, lastName, isReinvitation );
 
         LOG.info( "Successfully sent invitation to :" + emailId + " for registration" );
+    }
+
+
+    @Override
+    @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
+    public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId,
+        boolean isReinvitation, String referralCode ) throws InvalidInputException, UserAlreadyExistsException, NonFatalException
+    {
+        LOG.info( "Validating and inviting corporate to register. Details\t first name:" + firstName + "\t lastName: "
+            + lastName + "\t email id: " + emailId );
+        LOG.debug( "Validating form elements" );
+        validateFormParametersForInvitation( firstName, lastName, emailId );
+        LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName
+            + " and emailID: " + emailId );
+        // validating referral code if exists
+        if(referralCode != null && !referralCode.isEmpty()){
+            if(!referralService.validateReferralCode( referralCode )){
+                LOG.warn( "Invalid referral code" );
+                throw new InvalidInputException("Could not find referral code "+referralCode);
+            }
+        }
+        // check if email id already exists
+        if ( userExists( emailId.trim() ) ) {
+            LOG.warn( emailId + " is already present" );
+            throw new UserAlreadyExistsException( "Email address " + emailId + " already exists." );
+        }
+
+        // send verification mail and then redirect to index page
+        LOG.debug( "Calling service for sending the registration invitation" );
+        inviteCorporateToRegister( firstName, lastName, emailId, false, referralCode );
+        LOG.debug( "Service for sending the registration invitation excecuted successfully" );
+    }
+
+
+    @Override
+    public void validateFormParametersForInvitation( String firstName, String lastName, String emailId )
+        throws InvalidInputException
+    {
+        LOG.debug( "Validating invitation form parameters" );
+
+        // check if first name is null or empty and only contains alphabets
+        if ( firstName == null || firstName.isEmpty() || !firstName.matches( CommonConstants.FIRST_NAME_REGEX ) ) {
+            throw new InvalidInputException( "Firstname is invalid in registration", DisplayMessageConstants.INVALID_FIRSTNAME );
+        }
+
+        // check if last name only contains alphabets
+        if ( lastName != null && !lastName.isEmpty() ) {
+            if ( !( lastName.matches( CommonConstants.LAST_NAME_REGEX ) ) ) {
+                throw new InvalidInputException( "Last name is invalid in registration",
+                    DisplayMessageConstants.INVALID_LASTNAME );
+            }
+        }
+
+        // check if email Id isEmpty, null or whether it matches the regular expression or not
+        if ( emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId ) ) {
+            throw new InvalidInputException( "Email address is invalid in registration",
+                DisplayMessageConstants.INVALID_EMAILID );
+        }
+        LOG.debug( "Invitation form parameters validated successfully" );
     }
 
 

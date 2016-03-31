@@ -413,7 +413,7 @@ public class LoginController {
                     // if user is not active send verification link
                     LOG.info( "User found for " + emailId + " but not verified" );
                     LOG.info( "Resending verification mail to mail id : " + emailId );
-                    userManagementService.inviteCorporateToRegister( user.getFirstName(), user.getLastName(), emailId, false );
+                    userManagementService.inviteCorporateToRegister( user.getFirstName(), user.getLastName(), emailId, false, null );
                     LOG.info( "Sent successfully verification mail to mail id : " + emailId );
                     model.addAttribute( "message", messageUtils.getDisplayMessage(
                         DisplayMessageConstants.USER_PRESENT_NOT_REGISTERED, DisplayMessageType.ERROR_MESSAGE ) );
