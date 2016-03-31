@@ -104,4 +104,14 @@ public interface HierarchyStructureUploadService
      * @param uploadStatus
      */
     public void updateUploadStatusToNoUpload( UploadStatus uploadStatus );
+
+
+    /**
+     * Method to add an error upload status entry
+     * @param adminUser
+     * @param company
+     * @param errorStr
+     * @param uploadStatus
+     */
+    public void createErrorUploadStatusEntry( User adminUser, Company company, String errorStr, UploadStatus uploadStatus );
 }
