@@ -31,7 +31,7 @@ public class ReferralRestController
 	@Autowired
 	private ReferralService referralService;
 
-	@ExceptionHandler({ InvalidInputException.class, UserAlreadyExistsException.class })
+	@ExceptionHandler({ InvalidInputException.class, UserAlreadyExistsException.class, NonFatalException.class })
 	public ErrorResponse errorResponse(Exception exception) {
 		ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
