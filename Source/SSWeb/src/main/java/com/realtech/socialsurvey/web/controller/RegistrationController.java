@@ -330,6 +330,19 @@ public class RegistrationController
             LOG.debug( "Calling service for sending the registration invitation" );
             userManagementService.inviteCorporateToRegister( firstName, lastName, emailId, false );
             LOG.debug( "Service for sending the registration invitation excecuted successfully" );
+            
+            //Send mail to sales lead
+            String details = "First Name : " + firstName + "<br/>" +
+            "Last Name : " + lastName + "<br/>" + 
+            "Email Address : "  + emailId;
+            try {
+                emailServices.sendCompanyRegistrationStageMail( salesLeadEmail, CommonConstants.COMPANY_REGISTRATION_STAGE_STARTED,
+                    emailId, details, true );
+            } catch ( InvalidInputException e ) {
+                e.printStackTrace();
+            } catch ( UndeliveredEmailException e ) {
+                e.printStackTrace();
+            }
 
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -473,8 +486,7 @@ public class RegistrationController
             return "redirect:/" + JspResolver.REGISTRATION_PAGE + ".do";
         }
 
-        //specify details
-        String details = "First Name : " + firstName + "<br/>" +
+        /*String details = "First Name : " + firstName + "<br/>" +
             "Last Name : " + lastName + "<br/>" + 
             "Email Address : "  + emailId;
         try {
@@ -484,7 +496,7 @@ public class RegistrationController
             e.printStackTrace();
         } catch ( UndeliveredEmailException e ) {
             e.printStackTrace();
-        }
+        }*/
         
         LOG.info( "Method registerUser of Registration Controller finished" );
         return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
