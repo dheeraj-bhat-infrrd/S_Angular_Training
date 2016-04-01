@@ -2165,6 +2165,7 @@ function editEmailMap(response) {
         	  $('#mapped-emil-info').html(emailMap);
         	  $('#email-map-pop-up').show();
         	  $('#email-map-cancel').click(function(e){
+        		  enableBodyScroll();
         		  $('#email-form')[0].reset();
         		  $('#email1').nextAll().remove();
         		  $('#email-map-add').show();
@@ -2183,6 +2184,7 @@ function editEmailMap(response) {
         	  //save button
         	  $('#email-map-save').click(function(e) {
         		  		//check if ajax is already running
+        		  enableBodyScroll();
         		  		if(isSaveEmailForUserRunning)
         		  			return;
         		  		
