@@ -2184,6 +2184,7 @@ function editEmailMap(response) {
         	  //save button
         	  $('#email-map-save').click(function(e) {
         		  		//check if ajax is already running
+        		  enableBodyScroll();
         		  		if(isSaveEmailForUserRunning)
         		  			return;
         		  		
