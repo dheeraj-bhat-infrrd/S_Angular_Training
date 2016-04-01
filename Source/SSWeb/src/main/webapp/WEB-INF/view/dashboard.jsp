@@ -190,7 +190,7 @@
 	</div>
 </div>
 <script>
-var  is_dashboard_loaded = window.is_dashboard_loaded;
+/* var  is_dashboard_loaded = window.is_dashboard_loaded; */
 $(document).ready(function() {
 	$(document).attr("title", "Dashboard");
 

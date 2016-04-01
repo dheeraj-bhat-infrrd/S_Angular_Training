@@ -496,12 +496,12 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	bindDatePickerforIndividualSurveyDownload();
 	
 	getIncompleteSurveyCount(colName, colValue);
-	if(is_dashboard_loaded === undefined){ //file never entered. the global var was not set.
+	/*if(is_dashboard_loaded === undefined){ //file never entered. the global var was not set.
 		window.is_dashboard_loaded = 1;
 		fetchReviewsOnDashboard(false);
 	}else{
 		return;
-	}
+	}*/
 	fetchReviewsOnDashboard(false);
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-sel-item');
 	bindAutosuggestForIndividualRegionBranchSearch('dsh-grph-sel-item');
@@ -8352,14 +8352,19 @@ function initializeVerticalAutcomplete() {
 		$(this).autocomplete("search");	
 	});
 }
-
+var isfetchreview=false;
 function getIncompleteSurveyCount(colName, colValue){
+	if(isfetchreview==true){
+		return;
+	}
 	startIndexInc = 0;
 	var payload = {
 		"columnName" : colName,
 		"columnValue" : colValue
 	};
+	isfetchreview=true;
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
+		isfetchreview=false;
 		$('#icn-sur-popup-cont').attr("data-total", data);
 		$('#dsh-inc-srvey').attr("data-total", data);
 		var totalCount = parseInt(data);
