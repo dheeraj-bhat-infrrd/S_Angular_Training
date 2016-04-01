@@ -3722,9 +3722,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
 
         userEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setCreatedBy( "ADMIN" );
+        userEmailMapping.setCreatedBy( user.getCompany().getCompany() );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setModifiedBy( "ADMIN" );
+        userEmailMapping.setModifiedBy( user.getCompany().getCompany() );
 
         userEmailMappingDao.save( userEmailMapping );
         return user;
@@ -3747,17 +3747,32 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         CompanyIgnoredEmailMapping companyIgnoredEmailMapping = new CompanyIgnoredEmailMapping();
-        companyIgnoredEmailMapping.setCompany( company );
-        companyIgnoredEmailMapping.setEmailId( emailId );
-        companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
         
-        companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
-        companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        companyIgnoredEmailMapping.setModifiedBy( "ADMIN" );
-
-        companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.save( companyIgnoredEmailMapping );
-        return companyIgnoredEmailMapping;
+        
+        //check if entry is already there with the eamil id
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.EMAIL_ID, emailId );
+        queries.put( CommonConstants.COMPANY, company );
+        List<CompanyIgnoredEmailMapping> CompanyIgnoredEmailMappingList = companyIgnoredEmailMappingDao.findByKeyValue( CompanyIgnoredEmailMapping.class, queries );
+        
+        if(CompanyIgnoredEmailMappingList != null && CompanyIgnoredEmailMappingList.size() > 0 ){
+            companyIgnoredEmailMapping = CompanyIgnoredEmailMappingList.get( CommonConstants.INITIAL_INDEX );
+            companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
+            companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        }else{
+            companyIgnoredEmailMapping.setCompany( company );
+            companyIgnoredEmailMapping.setEmailId( emailId );
+            companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
+            
+            companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+            companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
+            companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            companyIgnoredEmailMapping.setModifiedBy( "ADMIN" );
+        }
+        
+        companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.saveOrUpdate( companyIgnoredEmailMapping );
+        
+                return companyIgnoredEmailMapping;
     }
 
 

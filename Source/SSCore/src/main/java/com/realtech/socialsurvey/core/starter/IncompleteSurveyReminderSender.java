@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.core.starter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -11,9 +13,11 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -36,6 +40,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.FileOperations;
 
 
 public class IncompleteSurveyReminderSender extends QuartzJobBean
@@ -53,7 +58,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
     private String applicationLogoUrl;
     private BatchTrackerService batchTrackerService;
     private UrlService urlService;
-
+    private FileOperations fileOperations;
+    private String paramOrderTakeSurveyReminder;
+    private String paramOrderTakeSurvey;
 
     @Override
     protected void executeInternal( JobExecutionContext jobExecutionContext )
@@ -180,6 +187,9 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         applicationLogoUrl = (String) jobMap.get( "applicationLogoUrl" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
         urlService = (UrlService) jobMap.get( "urlService" );
+        fileOperations = (FileOperations) jobMap.get( "fileOperations" );
+        paramOrderTakeSurveyReminder = (String) jobMap.get( "paramOrderTakeSurveyReminder" );
+        paramOrderTakeSurvey = (String) jobMap.get( "paramOrderTakeSurvey" );
     }
 
 
@@ -247,90 +257,95 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         String fullAddress = "";
 
         // Null check
+
+
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogoThumbnail();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+
+        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+            logoUrl = applicationLogoUrl;
+        }
+
+        //JIRA SS-1363 end
+
+        String mailBody = "";
+        String mailSubject = "";
         if ( companySettings != null && companySettings.getMail_content() != null
             && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
 
-            OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-            //JIRA SS-1363 begin
-            /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                logoUrl = companySettings.getLogoThumbnail();
-            } else if ( organizationUnit == OrganizationUnit.REGION ) {
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-                logoUrl = regionSettings.getLogoThumbnail();
-            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                OrganizationUnitSettings branchSettings = null;
-                try {
-                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                } catch ( NoRecordsFetchedException e ) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                if ( branchSettings != null ) {
-                    logoUrl = branchSettings.getLogoThumbnail();
-                }
-            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                logoUrl = agentSettings.getLogoThumbnail();
-            }*/
-            if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                logoUrl = companySettings.getLogo();
-            } else if ( organizationUnit == OrganizationUnit.REGION ) {
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-                logoUrl = regionSettings.getLogo();
-            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                OrganizationUnitSettings branchSettings = null;
-                try {
-                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                } catch ( NoRecordsFetchedException e ) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                if ( branchSettings != null ) {
-                    logoUrl = branchSettings.getLogo();
-                }
-            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                logoUrl = agentSettings.getLogo();
-            }
-            //JIRA SS-1363 end
-
             MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
 
-            String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
-                mailContent.getParam_order() );
-
-            if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                logoUrl = applicationLogoUrl;
-            }
-
-            mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
-                survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
-                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-                fullAddress, "", user.getProfileName() );
-            String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(), mailContent.getParam_order() );
+            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
             }
-            mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
-                survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
-                survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-                fullAddress, "", user.getProfileName() );
-            try {
-                emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
-                    user.getEmailId() );
-            } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ",
-                    e );
-            }
+
+
         } else {
-            try {
+            mailSubject = fileOperations.getContentFromFile( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+                + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT );
 
-                emailServices.sendDefaultSurveyReminderMail( survey.getCustomerEmailId(), logoUrl,
-                    survey.getCustomerFirstName(), agentName, agentEmailId, surveyLink, agentPhone,
-                    agentTitle, companyName );
+            mailBody = fileOperations.getContentFromFile( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+                + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY );
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
+        }
+        //replace legends
+        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+            survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+            fullAddress, "", user.getProfileName() );
 
-            } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
-                    + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
-            }
+        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+            survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+            fullAddress, "", user.getProfileName() );
+
+        //send mail
+        try {
+            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
+                user.getEmailId() );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
     }
 
@@ -399,72 +414,78 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         String fullAddress = "";
 
         // Null check
+
+
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogoThumbnail();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+        //JIRA SS-1363 end
+
+        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+            logoUrl = applicationLogoUrl;
+        }
+        LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+        try {
+            surveyLink = urlService.shortenUrl( surveyLink );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
+        }
+
+        //get mail subject and body
+        String mailBody = "";
+        String mailSubject = "";
         if ( companySettings != null && companySettings.getMail_content() != null
             && companySettings.getMail_content().getTake_survey_mail() != null ) {
 
-            OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
-            //JIRA SS-1363 begin
-            /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                logoUrl = companySettings.getLogoThumbnail();
-            } else if ( organizationUnit == OrganizationUnit.REGION ) {
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-                logoUrl = regionSettings.getLogoThumbnail();
-            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                OrganizationUnitSettings branchSettings = null;
-                try {
-                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                } catch ( NoRecordsFetchedException e ) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                if ( branchSettings != null ) {
-                    logoUrl = branchSettings.getLogoThumbnail();
-                }
-            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                logoUrl = agentSettings.getLogoThumbnail();
-            }*/
-            if ( organizationUnit == OrganizationUnit.COMPANY ) {
-                logoUrl = companySettings.getLogo();
-            } else if ( organizationUnit == OrganizationUnit.REGION ) {
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
-                logoUrl = regionSettings.getLogo();
-            } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
-                OrganizationUnitSettings branchSettings = null;
-                try {
-                    branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
-                } catch ( NoRecordsFetchedException e ) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                if ( branchSettings != null ) {
-                    logoUrl = branchSettings.getLogo();
-                }
-            } else if ( organizationUnit == OrganizationUnit.AGENT ) {
-                logoUrl = agentSettings.getLogo();
-            }
-            //JIRA SS-1363 end
-
             MailContent mailContent = companySettings.getMail_content().getTake_survey_mail();
 
-            String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
-                mailContent.getParam_order() );
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(), mailContent.getParam_order() );
 
-            if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-                logoUrl = applicationLogoUrl;
-            }
-            LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
-            try {
-                surveyLink = urlService.shortenUrl( surveyLink );
-            } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
-            }
+
             LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
 
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
                 survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
                 survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
                 fullAddress, "", user.getProfileName() );
-            String mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
+            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
             }
@@ -472,24 +493,37 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
                 survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
                 survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
                 fullAddress, "", user.getProfileName() );
-            try {
-                emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
-                    user.getEmailId() );
-            } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ",
-                    e );
-            }
-        } else {
-            try {
-                emailServices.sendDefaultSurveyInvitationMail( survey.getCustomerEmailId(), logoUrl,
-                    survey.getCustomerFirstName(), user.getFirstName()
-                        + ( user.getLastName() != null ? " " + user.getLastName() : "" ), surveyLink, user.getEmailId(),
-                    agentSignature, companyName, dateFormat.format( new Date() ), currentYear, fullAddress, user.getUserId() );
 
-            } catch ( InvalidInputException | UndeliveredEmailException e ) {
-                LOG.error( "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
-                    + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
-            }
+        } else {
+
+            mailSubject = fileOperations.getContentFromFile( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+                + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
+
+            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( agentName ) );
+
+            mailBody = fileOperations.getContentFromFile( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+                + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
+
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
+        }
+
+        //replace the legends
+        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink,
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+            survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+            fullAddress, "", user.getProfileName() );
+        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink,
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature,
+            survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+            fullAddress, "", user.getProfileName() );
+
+        //send the mail
+        try {
+            emailServices.sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName,
+                user.getEmailId() );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
     }
 }
