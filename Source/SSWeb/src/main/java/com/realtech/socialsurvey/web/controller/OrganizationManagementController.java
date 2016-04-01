@@ -348,8 +348,7 @@ public class OrganizationManagementController
             userManagementService.updateProfileCompletionStage( user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
                 CommonConstants.ADD_ACCOUNT_TYPE_STAGE );
 
-            //TODO: specify details
-            String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
+            /*String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
                 + "Email Address : " + user.getEmailId() + "<br/>" + "Company Name : " + companyName + "<br/>" + "Address1 : "
                 + address1 + "<br/>" + "Address2 : " + address2 + "<br/>" + "Country : " + country + "<br/>" + "Zipcode : "
                 + zipCode + "<br/>" + "State : " + state + "<br/>" + "City : " + city + "<br/>" + "Contact Info : "
@@ -362,7 +361,7 @@ public class OrganizationManagementController
                 e.printStackTrace();
             } catch ( UndeliveredEmailException e ) {
                 e.printStackTrace();
-            }
+            }*/
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding company information. Reason :" + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );

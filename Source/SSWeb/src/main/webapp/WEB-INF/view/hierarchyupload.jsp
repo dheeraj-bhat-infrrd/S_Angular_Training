@@ -46,7 +46,7 @@
 					<div data-type="replace" class="float-left bd-cust-rad-img"></div>
 					<div class="float-left bd-cust-rad-txt">Replace Mode</div>
 				</div>
-				<div class="float-right" style="margin-right: 45px;">
+				<div class="float-right hide" style="margin-right: 45px;">
 					<div id="dsh-ind-rep-bnt"
 						class="float-right dash-btn-dl-sd btn-wid-sm" style="width: 300px">
 						<div class="dsh-dwnld-btn float-left cursor-pointer"
@@ -102,8 +102,8 @@
 	style="width: 120px; margin: auto; color: #009FE0; font-size: 30px;"
 	class="hide">No Changes Made</div>
 
-<div id="lastUploadRunTimestamp" class="clearfix hide"
-	style="font-size: 14px; margin-right: 30px; margin-left: 45px; margin-bottom: 20px;">
+<div id="lastUploadRunTimestamp" class="rfr_lbl hide"
+	style="width: 22.2%; margin-bottom: 20px;">
 </div>
 
 <div id="uploadBatchStatus" class="hide"

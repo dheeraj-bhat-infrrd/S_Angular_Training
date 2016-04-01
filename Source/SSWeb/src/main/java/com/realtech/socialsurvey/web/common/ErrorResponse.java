@@ -1,9 +1,19 @@
 package com.realtech.socialsurvey.web.common;
 
-public class ErrorResponse {
+public class ErrorResponse
+{
 
+	private int status;
 	private String errCode;
 	private String errMessage;
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
 
 	public String getErrCode() {
 		return errCode;
