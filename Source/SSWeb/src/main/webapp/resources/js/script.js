@@ -3209,10 +3209,10 @@ var hierarchyUpload = {
 				} else {
 					if (response != undefined && response != null
 							&& response != '' && jsonResponse.response != []) {
+						$('#uploadBatchStatus').empty();
 						jsonResponse.response
 								.forEach(function(uploadStatus) {
-									if (jsonResponse.uploadStatus != 6
-											&& jsonResponse.uploadStatus == uploadStatus.status) {
+									if (jsonResponse.uploadStatus != 6) {
 										$(
 												'<div>' + uploadStatus.message
 														+ '</div>').appendTo(
