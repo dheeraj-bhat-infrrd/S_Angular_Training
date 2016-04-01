@@ -32,13 +32,11 @@
 		<hibernate.version>4.2.1.Final</hibernate.version>
 
 		<!-- Logging -->
-		<!-- <logback.version>1.0.13</logback.version>
-		<slf4j.version>1.7.5</slf4j.version>
-		-->
+		<!-- <logback.version>1.0.13</logback.version> <slf4j.version>1.7.5</slf4j.version> -->
 		<!-- Test -->
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
+
 	</properties>
 
 	<dependencies>
@@ -92,24 +90,12 @@
 		</dependency>
 
 		<!-- Logging with SLF4J & LogBack -->
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>${logback.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-core</artifactId>
-		    <version>${logback.version}</version>
-		</dependency>
-		-->
+		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
+			<version>${slf4j.version}</version> <scope>compile</scope> </dependency> 
+			<dependency> <groupId>ch.qos.logback</groupId> <artifactId>logback-classic</artifactId> 
+			<version>${logback.version}</version> </dependency> <dependency> <groupId>ch.qos.logback</groupId> 
+			<artifactId>logback-core</artifactId> <version>${logback.version}</version> 
+			</dependency> -->
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -139,16 +125,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.hamcrest</groupId>
-		    <artifactId>hamcrest-core</artifactId>
-		    <version>1.3</version>
-		    <scope>test</scope>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.hamcrest</groupId>
-		    <artifactId>hamcrest-library</artifactId>
-		    <version>1.3</version>
-		    <scope>test</scope>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Dependency of SSCore -->
@@ -226,14 +212,14 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- Dependency for writing data into excel file -->		
-		<dependency>		
-			<groupId>org.apache.poi</groupId>		
-			<artifactId>poi-ooxml</artifactId>		
-			<version>3.9</version>		
+		<!-- Dependency for writing data into excel file -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.9</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.java.openjfx.backport</groupId>
 			<artifactId>openjfx-78-backport-compat</artifactId>
@@ -244,10 +230,13 @@
 	</dependencies>
 
 	<profiles>
-	    <profile>
-	        <id>dev</id>
-	        <build>
-	            <filters>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<filters>
 					<filter>src/main/resources/web.filler.dev.properties</filter>
 				</filters>
 				<plugins>
@@ -255,25 +244,25 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
-						    <webResources>
-						        <resource>
-						            <filtering>true</filtering>
-						            <directory>src/main/webapp</directory>
-						            <includes>
-						                <include>**/web.xml</include>
-						            </includes>
-						        </resource>
-						    </webResources>
+							<webResources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>src/main/webapp</directory>
+									<includes>
+										<include>**/web.xml</include>
+									</includes>
+								</resource>
+							</webResources>
 							<outputDirectory>${dev.deployment.path}</outputDirectory>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
-	    </profile>
-	    <profile>
-	        <id>test</id>
-	        <build>
-	            <filters>
+		</profile>
+		<profile>
+			<id>test</id>
+			<build>
+				<filters>
 					<filter>src/main/resources/web.filler.test.properties</filter>
 				</filters>
 				<plugins>
@@ -281,24 +270,24 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
-						    <webResources>
-						        <resource>
-						            <filtering>true</filtering>
-						            <directory>src/main/webapp</directory>
-						            <includes>
-						                <include>**/web.xml</include>
-						            </includes>
-						        </resource>
-						    </webResources>
+							<webResources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>src/main/webapp</directory>
+									<includes>
+										<include>**/web.xml</include>
+									</includes>
+								</resource>
+							</webResources>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
-	    </profile>
-	    <profile>
-	        <id>prod</id>
-	        <build>
-	            <filters>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<build>
+				<filters>
 					<filter>src/main/resources/web.filler.prod.properties</filter>
 				</filters>
 				<plugins>
@@ -306,24 +295,24 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
-						    <webResources>
-						        <resource>
-						            <filtering>true</filtering>
-						            <directory>src/main/webapp</directory>
-						            <includes>
-						                <include>**/web.xml</include>
-						            </includes>
-						        </resource>
-						    </webResources>
+							<webResources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>src/main/webapp</directory>
+									<includes>
+										<include>**/web.xml</include>
+									</includes>
+								</resource>
+							</webResources>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
-	    </profile>
-	    <profile>
-	        <id>demo</id>
-	        <build>
-	            <filters>
+		</profile>
+		<profile>
+			<id>demo</id>
+			<build>
+				<filters>
 					<filter>src/main/resources/web.filler.demo.properties</filter>
 				</filters>
 				<plugins>
@@ -331,20 +320,20 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
-						    <webResources>
-						        <resource>
-						            <filtering>true</filtering>
-						            <directory>src/main/webapp</directory>
-						            <includes>
-						                <include>**/web.xml</include>
-						            </includes>
-						        </resource>
-						    </webResources>
+							<webResources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>src/main/webapp</directory>
+									<includes>
+										<include>**/web.xml</include>
+									</includes>
+								</resource>
+							</webResources>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
-	    </profile>
+		</profile>
 	</profiles>
 	<build>
 		<plugins>
