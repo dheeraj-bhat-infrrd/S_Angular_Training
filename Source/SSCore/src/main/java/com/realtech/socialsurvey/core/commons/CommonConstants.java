@@ -278,6 +278,7 @@ public interface CommonConstants
     public static final String CANONICAL_USERSETTINGS_IN_SESSION = "cannonicalusersettings";
     public static final String COMPANY_NAME = "companyName";
     public static final String UNIQUE_IDENTIFIER = "uniqueIdentifier";
+    public static final String REFERRAL_CODE = "referralcode";
     public static final String ADDRESS = "address";
     public static final String ZIPCODE = "zipCode";
     public static final String COMPANY_CONTACT_NUMBER = "companyContactNo";

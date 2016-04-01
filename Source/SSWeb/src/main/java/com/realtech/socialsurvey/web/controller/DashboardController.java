@@ -2247,7 +2247,7 @@ public class DashboardController
                     e );
                 throw e;
             }
-             adminReport.createEntryInFileUploadForCompanyHierarchyReport( mailId , companyId);
+             adminReport.createEntryInFileUploadForCompanyUserReport( mailId , companyId);
             
         }catch(NonFatalException e){
             status = CommonConstants.ERROR;

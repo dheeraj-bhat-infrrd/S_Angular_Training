@@ -61,8 +61,8 @@ public interface UserManagementService
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
      */
-    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail, boolean sendMail )
-        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
+    public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail,
+        boolean sendMail ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
 
 
     /**
@@ -213,8 +213,35 @@ public interface UserManagementService
      * 
      * @throws NonFatalException
      */
-    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation )
+    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation, String referralCode )
         throws InvalidInputException, UndeliveredEmailException, NonFatalException;
+
+
+    /**
+     * Validates the input and then invites corporate to register
+     * @param firstName
+     * @param lastName
+     * @param emailId
+     * @param isReinvitation
+     * @param referralCode
+     * @throws InvalidInputException
+     * @throws UserAlreadyExistsException
+     */
+    public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId,
+        boolean isReinvitation, String referralCode ) throws InvalidInputException, UserAlreadyExistsException,
+        NonFatalException;
+
+
+    /**
+     * Method to validate form parameters of invitation form
+     * 
+     * @param firstName
+     * @param lastName
+     * @param emailId
+     * @throws InvalidInputException
+     */
+    public void validateFormParametersForInvitation( String firstName, String lastName, String emailId )
+        throws InvalidInputException;
 
 
     public Map<String, String> validateRegistrationUrl( String encryptedUrlParameter ) throws InvalidInputException;
@@ -421,16 +448,20 @@ public interface UserManagementService
         ProfileNotFoundException;
 
 
-    void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings ) throws InvalidInputException;
+    void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings )
+        throws InvalidInputException;
 
 
-    void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings ) throws InvalidInputException;
+    void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings )
+        throws InvalidInputException;
 
 
-    void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings ) throws InvalidInputException;
+    void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings )
+        throws InvalidInputException;
 
 
-    void updateProfileUrlInCompanySettings( String profileName, String profileUrl, OrganizationUnitSettings companySettings ) throws InvalidInputException;
+    void updateProfileUrlInCompanySettings( String profileName, String profileUrl, OrganizationUnitSettings companySettings )
+        throws InvalidInputException;
 
 
     public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId ) throws InvalidInputException,
@@ -440,7 +471,7 @@ public interface UserManagementService
     void updatePrimaryProfileOfUser( User user ) throws InvalidInputException;
 
 
-    void removeUserProfile( long profileIdToDelete  ) throws InvalidInputException;
+    void removeUserProfile( long profileIdToDelete ) throws InvalidInputException;
 
 
     /**
@@ -478,7 +509,8 @@ public interface UserManagementService
 
 
     public void updateUser( User user );
-    
+
+
     public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
         NoRecordsFetchedException;
 
@@ -509,7 +541,7 @@ public interface UserManagementService
     public List<User> getUsersByEmailId( String emailId ) throws InvalidInputException;
 
 
-    public void restoreDeletedUser( long userId, boolean restoreSocial  ) throws InvalidInputException, SolrException;
+    public void restoreDeletedUser( long userId, boolean restoreSocial ) throws InvalidInputException, SolrException;
 
 
     public User getUserByEmailAddress( String emailId ) throws InvalidInputException, NoRecordsFetchedException;
@@ -525,12 +557,12 @@ public interface UserManagementService
     void deleteSSAdmin( User admin, long ssAdminId ) throws InvalidInputException;
 
 
-    User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId ) throws InvalidInputException,
         NoRecordsFetchedException;
+
 
     public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException;
 

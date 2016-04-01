@@ -2159,7 +2159,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 if ( obj instanceof Long )
                     cell.setCellValue( String.valueOf( (Long) obj ) );
                 //resize column 
-                sheet.autoSizeColumn( cellnum - 1 );
+                //sheet.autoSizeColumn( cellnum - 1 );
 
             }
 
