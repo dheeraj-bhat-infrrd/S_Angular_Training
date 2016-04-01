@@ -2165,6 +2165,7 @@ function editEmailMap(response) {
         	  $('#mapped-emil-info').html(emailMap);
         	  $('#email-map-pop-up').show();
         	  $('#email-map-cancel').click(function(e){
+        		  enableBodyScroll();
         		  $('#email-form')[0].reset();
         		  $('#email1').nextAll().remove();
         		  $('#email-map-add').show();
