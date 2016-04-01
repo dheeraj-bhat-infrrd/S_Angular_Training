@@ -2305,19 +2305,6 @@ public class SocialManagementController
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, unitSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
-                // Set IS_ZILLOW_CONNECTED to false
-                // if ( isZillow ) {
-                //    User agent = userManagementService.getUserByUserId( unitSettings.getIden() );
-                //    agent.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
-                //    agent.setZillowAverageScore( 0.0 );
-                //    agent.setZillowReviewCount( 0 );
-                //    userManagementService.updateUser( agent );
-                //    long reviewCount = profileManagementService.getReviewsCount( agent.getUserId(), -1, -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false,
-                //        false );
-                //    solrSearchService
-                //    .editUserInSolr( agent.getUserId(), CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
-                // }
-                
             }
             profileSettings.setSocialMediaTokens(unitSettings.getSocialMediaTokens());
             
@@ -2325,6 +2312,19 @@ public class SocialManagementController
             if(socialMedia.equals(CommonConstants.ZILLOW_SOCIAL_SITE)){
                  LOG.debug("Deleting zillow feed for agent ID : " + entityId);
                  surveyHandler.deleteExistingZillowSurveysByEntity( entityType, entityId);
+            }
+            
+            // Set IS_ZILLOW_CONNECTED to false
+            if ( isZillow ) {
+                //    User agent = userManagementService.getUserByUserId( unitSettings.getIden() );
+                //    agent.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
+                //    agent.setZillowAverageScore( 0.0 );
+                //    agent.setZillowReviewCount( 0 );
+                //    userManagementService.updateUser( agent );
+                long reviewCount = profileManagementService.getReviewsCount( entityId, -1, -1,
+                    CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
+                solrSearchService
+                    .editUserInSolr( entityId, CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
             }
             
             //Add action to social connection history

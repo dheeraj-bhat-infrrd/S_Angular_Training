@@ -2107,7 +2107,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 }
                 
                 if ( userToBeUploaded.isUserModified() ) {
-                    user = modifyUser( userToBeUploaded, adminUser, currentUserMap, currentUpload );
+                    user = modifyUser( userToBeUploaded, adminUser, currentUserMap, upload );
                     modifiedUsers += 1;
                 } else if ( userToBeUploaded.isUserAdded() ) {
                     // add user
