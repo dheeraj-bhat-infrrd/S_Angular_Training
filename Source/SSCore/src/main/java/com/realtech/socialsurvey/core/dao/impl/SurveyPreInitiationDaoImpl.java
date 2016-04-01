@@ -498,12 +498,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
                 CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
             
             //remove corrupted records
-            criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN));
+            /*criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN));
             criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN , ""));
            criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.CUSTOMER_FIRST_NAME_COLUMN));
             criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_FIRST_NAME_COLUMN , ""));
             criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN));
-           criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN , ""));
+           criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN , ""));*/
 
             criteria.addOrder( Order.desc( CommonConstants.ENGAGEMENT_CLOSED_TIME ) );
 
@@ -534,12 +534,12 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
                 CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) );
             
             //remove corrupted records
-            criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN));
+            /*criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN));
             criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN , ""));
             criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.CUSTOMER_FIRST_NAME_COLUMN));
             criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_FIRST_NAME_COLUMN , ""));
             criteria.add(Restrictions.isNotNull("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN));
-            criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN , ""));
+            criteria.add(Restrictions.ne("surveyPreInitiation." + CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN , ""));*/
             
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
