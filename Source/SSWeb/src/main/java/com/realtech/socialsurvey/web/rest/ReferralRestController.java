@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.referral.ReferralService;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 
 /**
@@ -26,8 +27,11 @@ public class ReferralRestController
 
 	@Autowired
 	private UserManagementService userManagementService;
+	
+	@Autowired
+	private ReferralService referralService;
 
-	@ExceptionHandler({ InvalidInputException.class, UserAlreadyExistsException.class })
+	@ExceptionHandler({ InvalidInputException.class, UserAlreadyExistsException.class, NonFatalException.class })
 	public ErrorResponse errorResponse(Exception exception) {
 		ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -37,10 +41,20 @@ public class ReferralRestController
 
 	@RequestMapping(value = "/register", method = RequestMethod.GET, produces = "application/json")
 	public String sendRegistrationMailUsingReferralCode(@RequestParam(value = "firstName") String firstName,
-			@RequestParam(value = "lastName", required = false, defaultValue = "") String lastName, @RequestParam(value = "emailAddress") String emailAddress,
-			@RequestParam(value = "referralcode") String referralCode) throws InvalidInputException, UserAlreadyExistsException, NonFatalException {
+			@RequestParam(value = "lastName", required = false, defaultValue = "") String lastName,
+			@RequestParam(value = "emailAddress") String emailAddress, @RequestParam(value = "referralcode") String referralCode)
+			throws InvalidInputException, UserAlreadyExistsException, NonFatalException {
 		LOG.info("Sending invitation mail through referral code");
 		userManagementService.validateAndInviteCorporateToRegister(firstName, lastName, emailAddress, false, referralCode);
+		return "success";
+	}
+
+	@RequestMapping(value = "/insertcode", method = RequestMethod.GET, produces = "application/json")
+	public String addReferralCode(@RequestParam(value = "referralcode") String referralCode,
+			@RequestParam(value = "referrer", required = false, defaultValue = "") String referrer,
+			@RequestParam(value = "description", required = false, defaultValue = "") String description) throws InvalidInputException, NonFatalException {
+		LOG.info("Inserting referral code "+referralCode);
+		referralService.addReferralCode(referralCode, referrer, description);
 		return "success";
 	}
 

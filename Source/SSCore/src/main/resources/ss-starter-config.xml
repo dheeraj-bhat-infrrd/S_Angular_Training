@@ -97,6 +97,9 @@
 				<entry key="applicationLogoUrl" value="${APPLICATION_LOGO_URL}" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 				<entry key="urlService" value-ref="urlService" />
+				<entry key="fileOperations" value-ref="fileOperations" />
+				<entry key="paramOrderTakeSurveyReminder" value="${PARAM_ORDER_TAKE_SURVEY_REMINDER}" />
+				<entry key="paramOrderTakeSurvey" value="${PARAM_ORDER_TAKE_SURVEY}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -700,6 +703,9 @@
 		class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
 	<bean id="usersFullImport"
 		class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
+	<bean id="fileOperations"
+		class="com.realtech.socialsurvey.core.utils.FileOperations" />	
+		
 
 
 	<!-- Posts to wall -->

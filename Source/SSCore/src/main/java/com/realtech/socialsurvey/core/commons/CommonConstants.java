@@ -168,6 +168,8 @@ public interface CommonConstants
     public static final String SURVEY_SOURCE_ID_COLUMN = "sourceId";
     public static final String VERTICAL_NAME = "verticalName";
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
+    public static final String CUSTOMER_FIRST_NAME_COLUMN = "customerFirstName";
+    public static final String ENGAGEMENT_CLOSED_TIME = "engagementClosedTime";
     public static final String BATCH_TYPE_COLUMN = "batchType";
     public static final String SOURCE_COLUMN = "source";
     public static final String SURVEY_PREINITIATION_ID_COLUMN = "surveyPreIntitiationId";
