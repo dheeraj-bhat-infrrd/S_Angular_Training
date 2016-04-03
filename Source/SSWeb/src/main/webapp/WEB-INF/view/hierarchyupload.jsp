@@ -39,12 +39,12 @@
 				<div class="float-left bd-cust-rad-item clearfix">
 					<div data-type="append"
 						class="float-left bd-cust-rad-img bd-cust-rad-img-checked"></div>
-					<div class="float-left bd-cust-rad-txt">Append Mode</div>
+					<div class="float-left bd-cust-rad-txt">Add and Update</div>
 				</div>
 				<div
 					class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix">
 					<div data-type="replace" class="float-left bd-cust-rad-img"></div>
-					<div class="float-left bd-cust-rad-txt">Replace Mode</div>
+					<div class="float-left bd-cust-rad-txt">Overwrite</div>
 				</div>
 				<div class="float-right hide" style="margin-right: 45px;">
 					<div id="dsh-ind-rep-bnt"
