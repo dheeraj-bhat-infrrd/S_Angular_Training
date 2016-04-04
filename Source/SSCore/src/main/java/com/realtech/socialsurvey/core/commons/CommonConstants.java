@@ -1034,6 +1034,15 @@ public interface CommonConstants
     public static final String CHR_ID_DESC = "Unique ID used for assignment.";
     public static final String CHR_BRANCH_REGION_ID_DESC = "Region ID from the Region sheet.";
     public static final String CHR_REGION_REGION_NAME_DESC = "Name to be displayed.";
+    public static final String CHR_FACEBOOK = "Facebook";
+    public static final String CHR_TWITTER = "Twitter";
+    public static final String CHR_LINKEDIN = "Linkedin";
+    public static final String CHR_GOOGLE = "Google";
+    public static final String CHR_ZILLOW = "Zillow";
+    public static final String CHR_YELP = "Yelp";
+    public static final String CHR_LENDING_TREE = "Lendingtree";
+    public static final String CHR_REALTOR = "Realtor";
+    
     public static final String SOCIAL_SURVEY_ACCESS_LAVEL = "SocialSurvey Access Level ";
     public static final String SOCIAL_SURVEY_INVITE_SENT = "SocialSurvey Invite sent";
     public static final String DATE_LAST_INVITE_SENT = "Date last invite sent";
