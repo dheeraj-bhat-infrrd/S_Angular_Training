@@ -2245,7 +2245,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         File file = null;
         String filePath = null;
         try {
-            file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+            file = new File( fileDirectoryLocation + File.separator + fileName + ".xlsx" );
             fileOutput = new FileOutputStream( file );
             file.createNewFile();
             workbook.write( fileOutput );

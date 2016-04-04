@@ -2,7 +2,11 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA: SS-15: By RM03
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,6 +71,9 @@ public class PaymentController {
 	
     @Value ( "${APPLICATION_SUPPORT_EMAIL}")
     private String supportMail;
+    
+    @Value("${SALES_LEAD_EMAIL_ADDRESS}")
+    private String salesLeadEmail;
 
 	/**
 	 * Method used to display the Braintree form to get card details.
@@ -181,14 +188,24 @@ public class PaymentController {
 			}
 		     
             //specify details
-            String details = "First Name : " + user.getFirstName() + "<br/>" +
-                "Last Name : " + user.getLastName() + "<br/>" + 
-                "Email Address : "  + user.getEmailId() + "<br/>" +               
-                "Company Name : " + user.getCompany().getCompany() + "<br/>" + 
-                "Account Type : " + strAccountType;
+            Date today = new Date( System.currentTimeMillis() );
+            SimpleDateFormat utcDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            utcDateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+
+            SimpleDateFormat pstDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            pstDateFormat.setTimeZone( TimeZone.getTimeZone( "PST" ) );
+
+            SimpleDateFormat estDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            estDateFormat.setTimeZone( TimeZone.getTimeZone( "EST" ) );
+
+            String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
+                + "Email Address : " + user.getEmailId() + "<br/>" + "Company Name : " + user.getCompany().getCompany()
+                + "<br/>" + "Account Type : " + strAccountType + "<br/>" + "Time : " + "<br/>" + utcDateFormat.format( today )
+                + "<br/>" + estDateFormat.format( today ) + "<br/>" + pstDateFormat.format( today );
             try {
-                emailServices.sendCompanyRegistrationStageMail( supportMail,
-                    CommonConstants.COMPANY_REGISTRATION_STAGE_COMPLETE, user.getCompany().getCompany(), details, false );
+                emailServices.sendCompanyRegistrationStageMail( user.getFirstName(), user.getLastName(), Arrays.asList(
+                    supportMail, salesLeadEmail ), CommonConstants.COMPANY_REGISTRATION_STAGE_COMPLETE, user.getCompany()
+                    .getCompany(), details, false );
             } catch ( InvalidInputException e ) {
                 e.printStackTrace();
             } catch ( UndeliveredEmailException e ) {
