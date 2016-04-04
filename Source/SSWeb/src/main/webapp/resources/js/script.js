@@ -3041,7 +3041,7 @@ var hierarchyUpload = {
 	
 	isModified : function(value){
 		if(value==true){
-			return "lgn-col-item hier-col-blue";
+			return "color-blue";
 		}else{
 			return "";
 		}
@@ -3462,61 +3462,61 @@ var hierarchyUpload = {
 											+ '</td><td><div class="hier-upload-td">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].rowNum)
-											+ '</div></td><td><div class="hier-upload-td" title="'
+											+ '</div></td><td><div class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isSourceRegionIdModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].sourceRegionId)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].sourceRegionId)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isSourceRegionIdModified) +'"></span> </div></td><td><div id="regionName-'
+											+ ' </div></td><td><div id="regionName-'
 											+ i
-											+ '" class="hier-upload-td " title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionNameModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionNameModified) +'"></span></div></td><td><div id="regionAddress1-'
+											+ '</div></td><td><div id="regionAddress1-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionAddress1Modified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress1)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionAddress1Modified) +'"></span></div></td><td><div id="regionAddress2-'
+											+ '</div></td><td><div id="regionAddress2-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionAddress2Modified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionAddress2)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionAddress2Modified) +'"></span></div></td><td><div id="regionCity-'
+											+ '</div></td><td><div id="regionCity-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionCityModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionCity)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionCityModified) +'"></span></div></td><td><div id="regionState-'
+											+ '</div></td><td><div id="regionState-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionStateModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionState)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionStateModified) +'"></span></div></td><td><div id="regionZipcode-'
+											+ '</div></td><td><div id="regionZipcode-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionZipcodeModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionZipcode)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionZipcodeModified) +'"></span></div></td></tr><tr class="hide hier-region-edit" style="background-color: #F9F9FB;" ><td colspan="9">'
+											+ '</div></td></tr><tr class="hide hier-region-edit" style="background-color: #F9F9FB;" ><td colspan="9">'
 											+ regionEdit + '</td></tr>')
 									.appendTo('#region-upload');
 
@@ -3666,69 +3666,69 @@ var hierarchyUpload = {
 											+ '</td><td><div class="hier-upload-td">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].rowNum)
-											+ '</div></td><td><div class="hier-upload-td" title="'
+											+ '</div></td><td><div class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isSourceBranchIdModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceBranchId)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceBranchId)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isSourceBranchIdModified) +'"></span></div></td><td><div id="branchName-'
+											+ '</div></td><td><div id="branchName-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchNameModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchName)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchNameModified) +'"></span></div></td><td><div id="sourceRegionId-'
+											+ '</div></td><td><div id="sourceRegionId-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isSourceRegionIdModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].sourceRegionId)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isSourceRegionIdModified) +'"></span></div></td><td><div id="branchAddress1-'
+											+ '</div></td><td><div id="branchAddress1-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchAddress1Modified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress1)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchAddress1Modified) +'"></span></div></td><td><div id="branchAddress2-'
+											+ '</div></td><td><div id="branchAddress2-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchAddress2Modified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchAddress2)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchAddress2Modified) +'"></span></div></td><td><div id="branchCity-'
+											+ '</div></td><td><div id="branchCity-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchCityModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchCity)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchCityModified) +'"></span></div></td><td><div id="branchState-'
+											+ '</div></td><td><div id="branchState-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchStateModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchState)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchStateModified) +'"></span></div></td><td><div id="branchZipcode-'
+											+ '</div></td><td><div id="branchZipcode-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchZipcodeModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.branches[i].branchZipcode)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.branches[i].isBranchZipcodeModified) +'"></span></div></td></tr><tr class="hide hier-branch-edit" style="background-color: #F9F9FB;" ><td colspan="10">'
+											+ '</div></td></tr><tr class="hide hier-branch-edit" style="background-color: #F9F9FB;" ><td colspan="10">'
 											+ branchEdit + '</td></tr>')
 									.appendTo('#branch-upload');
 
@@ -3991,117 +3991,117 @@ var hierarchyUpload = {
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].sourceUserId)
 											+ '</div></td><td><div id="firstName-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isFirstNameModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].firstName)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isFirstNameModified) +'"></span></div></td><td><div id="lastName-'
+											+ '</div></td><td><div id="lastName-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isLastNameModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].lastName)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isLastNameModified) +'"></span></div></td><td><div id="title-'
+											+ '</div></td><td><div id="title-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isTitleModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].title)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isTitleModified) +'"></span></div></td><td><div id="assignedBranches-'
+											+ '</div></td><td><div id="assignedBranches-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAssignedBranchesModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranches)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAssignedBranchesModified) +'"></span></div></td><td><div id="assignedRegions-'
+											+ '</div></td><td><div id="assignedRegions-'
 											+ i
-											+ '" ="hier-upload-td" title="'
+											+ '" ="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAssignedRegionsModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegions)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAssignedRegionsModified) +'"></span></div></td><td><div id="assignedBranchesAdmin-'
+											+ '</div></td><td><div id="assignedBranchesAdmin-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAssignedBrachesAdminModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedBranchesAdmin)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAssignedBrachesAdminModified) +'"></span></div></td><td><div id="assignedRegionsAdmin-'
+											+ '</div></td><td><div id="assignedRegionsAdmin-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAssignedRegionsAdminModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].assignedRegionsAdmin)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAssignedRegionsAdminModified) +'"></span></div></td><td><div id="emailId-'
+											+ '</div></td><td><div id="emailId-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isEmailIdModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].emailId)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isEmailIdModified) +'"></span></div></td><td><div id="phoneNumber-'
+											+ '</div></td><td><div id="phoneNumber-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isPhoneNumberModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].phoneNumber)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isPhoneNumberModified) +'"></span></div></td><td><div id="websiteUrl-'
+											+ '</div></td><td><div id="websiteUrl-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isWebsiteUrlModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].websiteUrl)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isWebsiteUrlModified) +'"></span></div></td><td><div id="license-'
+											+ '</div></td><td><div id="license-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isLicenseModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].license)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isLicenseModified) +'"></span></div></td><td><div id="legalDisclaimer-'
+											+ '</div></td><td><div id="legalDisclaimer-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isLegalDisclaimerModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].legalDisclaimer)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isLegalDisclaimerModified) +'"></span></div></td><td><div id="userPhotoUrl-'
+											+ '</div></td><td><div id="userPhotoUrl-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isUserPhotoUrlModified) +'" title="'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl)
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].userPhotoUrl)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isUserPhotoUrlModified) +'"></span></div></td><td><div id="aboutMeDescription-'
+											+ '</div></td><td><div id="aboutMeDescription-'
 											+ i
-											+ '" class="hier-upload-td" title="'
+											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAboutMeDescriptionModified) +'" title="'
 											+ escapeHtml(hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription))
 											+ '">'
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.users[i].aboutMeDescription)
-											+ '<span class="'+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.users[i].isAboutMeDescriptionModified) +'"></span></div></td></tr><tr class="hide hier-users-edit" style="background-color: #F9F9FB;" ><td colspan="17">'
+											+ '</div></td></tr><tr class="hide hier-users-edit" style="background-color: #F9F9FB;" ><td colspan="17">'
 											+ userEdit + '</td></tr>')
 									.appendTo('#user-upload');
 
