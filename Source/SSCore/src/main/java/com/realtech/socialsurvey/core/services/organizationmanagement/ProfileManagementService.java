@@ -633,4 +633,7 @@ public interface ProfileManagementService
     public List<SurveyDetails> getReviewsForReports( long iden, double startScore, double limitScore, int startIndex, int numOfRows,
         String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
         throws InvalidInputException;
+
+
+    void removeTokensFromProfile( OrganizationUnitSettings profile );
 }

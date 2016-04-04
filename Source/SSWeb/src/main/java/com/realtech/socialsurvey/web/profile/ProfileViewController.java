@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
@@ -132,6 +133,9 @@ public class ProfileViewController
                 && companyProfile.getSocialMediaTokens().getZillowToken() != null )
                 profileManagementService.updateZillowFeed( companyProfile, CommonConstants.COMPANY_SETTINGS_COLLECTION );*/
 
+            //remove sensitive info frm profile json
+            profileManagementService.removeTokensFromProfile(companyProfile);
+            
             String json = new Gson().toJson( companyProfile );
             model.addAttribute( "profileJson", json );
 
@@ -257,6 +261,9 @@ public class ProfileViewController
                 MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null, map,
                 true );
 
+            //remove sensitive info frm profile json
+            profileManagementService.removeTokensFromProfile(regionProfile);
+            
 
             /*if ( regionProfile.getSocialMediaTokens() != null && regionProfile.getSocialMediaTokens().getZillowToken() != null )
                 profileManagementService.updateZillowFeed( regionProfile, CommonConstants.REGION_SETTINGS_COLLECTION );*/
@@ -393,6 +400,9 @@ public class ProfileViewController
             branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
                 null, map, true );
+            
+            //remove sensitive info frm profile json
+            profileManagementService.removeTokensFromProfile(branchProfile);
 
             /*if ( branchProfile.getSocialMediaTokens() != null && branchProfile.getSocialMediaTokens().getZillowToken() != null )
                 profileManagementService.updateZillowFeed( branchProfile, CommonConstants.BRANCH_SETTINGS_COLLECTION );*/
@@ -573,6 +583,9 @@ public class ProfileViewController
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, individualProfile, settingsByOrganizationUnitMap, true );
+                
+                //remove sensitive info frm profile json
+                profileManagementService.removeTokensFromProfile(individualProfile);
                 LOG.debug( "Finished filling the unit settings in the profile" );
                 //TODO: delink the zillow call from here
                 /**LOG.debug("Getting zillow feed");
