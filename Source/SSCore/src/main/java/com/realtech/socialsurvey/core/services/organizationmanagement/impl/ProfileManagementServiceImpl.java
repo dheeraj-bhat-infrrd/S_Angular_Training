@@ -4623,4 +4623,38 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.error( "Exception occurred while pushing Zillow review into temp table. Reason :", e );
         }
     }
+    
+    
+    /**
+     * method to remove tokens from profile detail
+     * @param profile
+     */
+    @Override
+    public void removeTokensFromProfile( OrganizationUnitSettings profile )
+    {
+        LOG.debug( "Inside method removeTokensFromProfile" );
+        if ( profile != null ) {
+            if ( profile.getSocialMediaTokens() != null ) {
+                SocialMediaTokens socialMediaTokens = profile.getSocialMediaTokens();
+                if ( socialMediaTokens != null ) {
+                    if ( socialMediaTokens.getFacebookToken() != null ) {
+                        socialMediaTokens.getFacebookToken().setFacebookAccessToken( null );
+                        socialMediaTokens.getFacebookToken().setFacebookAccessTokenToPost( null );
+                        socialMediaTokens.getFacebookToken().setFacebookPages( null );
+                    }
+                    if ( socialMediaTokens.getLinkedInToken() != null ) {
+                        socialMediaTokens.getLinkedInToken().setLinkedInAccessToken( null );
+                    }
+                    if ( socialMediaTokens.getTwitterToken() != null ) {
+                        socialMediaTokens.getTwitterToken().setTwitterAccessToken( null );
+                        socialMediaTokens.getTwitterToken().setTwitterAccessTokenSecret( null );
+                    }
+                    if ( socialMediaTokens.getGoogleToken() != null ) {
+                        socialMediaTokens.getGoogleToken().setGoogleAccessToken( null );
+                        socialMediaTokens.getGoogleToken().setGoogleRefreshToken( null );
+                    }
+                }
+            }
+        }
+    }
 }
