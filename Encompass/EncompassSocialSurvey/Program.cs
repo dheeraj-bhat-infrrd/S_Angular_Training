@@ -52,15 +52,18 @@ namespace EncompassSocialSurvey
             {
                 LoanService loanSerivce = new LoanService();
 
-                if (loanSerivce.isCompanyActive(forCompCredential.EncompassCredential.CompanyId))
-                {
-                    Logger.Debug("Starting loan processing for company: " + forCompCredential.CompanyName + " " 
-                        + " companyId: " + forCompCredential.EncompassCredential.CompanyId
-                        + " : companyUserName : " + forCompCredential.EncompassCredential.UserName
-                        + " : companyURL : " + forCompCredential.EncompassCredential.EncompassUrl);
 
-                    try
-                    {
+                try
+                {
+
+                    if (loanSerivce.isCompanyActive(forCompCredential.EncompassCredential.CompanyId))
+                     {
+                        Logger.Debug("Starting loan processing for company: " + forCompCredential.CompanyName + " " 
+                           + " companyId: " + forCompCredential.EncompassCredential.CompanyId
+                           + " : companyUserName : " + forCompCredential.EncompassCredential.UserName
+                           + " : companyURL : " + forCompCredential.EncompassCredential.EncompassUrl);
+
+                    
                         Logger.Debug("Logging into encompass");
                         EncompassGlobal.GetUserLoginSesssion(forCompCredential);
 
@@ -130,27 +133,32 @@ namespace EncompassSocialSurvey
                         {
                             // If getting any exception here, don't throw, let's process the other folder's loan
                             Logger.Error("Caught an exception, loanFolder: Program.ProcessLoanForCompanies():", ex);
-                            // TODO: Log the exception
                         }
 
-                    }
-                    catch (System.Exception ex)
-                    {
-                        // Let's process the loan for other company
-                        Logger.Error("Caught an exception, companiesCredentials: Program.ProcessLoanForCompanies():", ex);
-                        // TODO: Log the exception
-                    }
-                    finally
-                    {
-                        // close the session
-                        if (null != EncompassGlobal.EncompassLoginSession)
-                            EncompassGlobal.EncompassLoginSession.End();
-                    }
-                    Logger.Info("Done loan processing for company: " + forCompCredential.CompanyName + " "
+
+                         Logger.Info("Done loan processing for company: " + forCompCredential.CompanyName + " "
                           + " companyId: " + forCompCredential.EncompassCredential.CompanyId
                           + " : companyUserName : " + forCompCredential.EncompassCredential.UserName
                           + " : companyURL : " + forCompCredential.EncompassCredential.EncompassUrl);
+                     }
+
                 }
+                catch (System.Exception ex)
+                {
+                        // Let's process the loan for other company
+                        Logger.Error("Caught an exception, companiesCredentials: Program.ProcessLoanForCompanies():", ex);
+                        String Subject = "Error while connecting to encompass";
+                        String BodyText = "An error has been occurred while connecting to encompass for company : " + forCompCredential.CompanyName + " with id : " + forCompCredential.EncompassCredential.CompanyId + " on " + DateTime.Now + ".";
+                        BodyText += ex.Message;
+                        CommonUtility.SendMailToAdmin(Subject, BodyText);
+                }
+                finally
+                {
+                    // close the session
+                    if (null != EncompassGlobal.EncompassLoginSession)
+                     EncompassGlobal.EncompassLoginSession.End();
+                }
+                   
             }
 
 
