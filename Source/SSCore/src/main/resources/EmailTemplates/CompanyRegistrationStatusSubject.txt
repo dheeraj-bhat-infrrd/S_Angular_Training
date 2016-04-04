@@ -1,1 +1,1 @@
-Company Registration Status
+Company Registration Status for %s
