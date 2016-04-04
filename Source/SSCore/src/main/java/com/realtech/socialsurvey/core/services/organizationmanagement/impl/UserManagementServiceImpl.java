@@ -3895,4 +3895,33 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         
         LOG.info( "method deleteIgnoredEmailMapping finished" );
     }
+    
+    /**
+     * 
+     * @param userId
+     * @return
+     * @throws InvalidInputException 
+     */
+    @Transactional
+    @Override
+    public boolean isUserSocialSurveyAdmin(long userId) throws InvalidInputException{
+        LOG.info( "method isUserIsSocialSurveyAdmin  started for userId : " + userId );
+        
+        User user = null;
+        user = userDao.findById( User.class, userId );
+        if ( user == null ) {
+            throw new InvalidInputException( "User not found for userId:" + userId );
+        }
+        
+        //get primary profile profile of user
+        List<UserProfile> userProfiles = user.getUserProfiles();
+            for ( UserProfile userProfile : userProfiles ) {
+                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
+                    // social survey admin
+                    return true;
+                }
+            }
+            
+            return false;
+    }
 }
