@@ -10,7 +10,7 @@
 				<div class="float-left hm-header-row-left text-center">
 					<spring:message code="label.header.usermanagement.key" />
 				</div>
-				<c:if test="${not empty realTechAdminId && entityType == 'companyId' }">
+				<c:if test="${not empty realTechAdminId }">
 					<div class="float-right hm-header-right text-center" onclick="javascript:showMainContent('./hierarchyupload.do')">
 						<spring:message code="label.header.Hierarchyupload.key" />
 					</div>
