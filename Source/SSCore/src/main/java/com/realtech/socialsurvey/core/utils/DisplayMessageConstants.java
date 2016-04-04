@@ -221,7 +221,7 @@ public final class DisplayMessageConstants
     public static final String DISCLAIMER_UPDATE_SUCCESSFUL = "DISCLAIMER_UPDATE_SUCCESSFUL";
     public static final String EMAIL_ID_UPDATE_UNSUCCESSFUL = "EMAIL_ID_UPDATE_UNSUCCESSFUL";
     public static final String ADD_EMAIL_ID_FOR_USER__SUCCESSFUL = "ADD_EMAIL_ID_FOR_USER__SUCCESSFUL";
-    public static final String DELETE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL = "DELETE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL";
+    public static final String UPDATE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL = "UPDATE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL";
 
     //Realtech admin module
     public static final String COMPANY_NOT_REGISTERD = "COMPANY_NOT_REGISTERD";

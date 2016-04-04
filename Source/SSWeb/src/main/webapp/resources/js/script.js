@@ -2149,15 +2149,31 @@ function editEmailMap(response) {
           var emails =reponseJson.length;
           if(emails>0){
         	  reponseJson.forEach(function(arrayEmail){
+        		  
+        		  var status = arrayEmail.status;
+        		  var statusDiv = "";
+        		  var actionDiv = '';
+        		  
+        		  if(status == 0){
+        			  statusDiv =  '<div style="width:15%" class="float-left unmatchtab email-status" status='+arrayEmail.status+'>Inactive</div>';        			  
+        			//  actionDiv = '<div style="width:20%" class="float-left unmatchtab"><div class="v-edt-tbl-status v-edt-tbl-icn v-edt-tbl-switch tbl-switch-off" title="Inactive"></div></div>';
+            		  actionDiv = '<div style="width:15%;height:38px;color: #009FE0;" class="float-left unmatchtab cursor-pointer" onclick="updateMappedEmail('+undefinedval(arrayEmail.userEmailMappingId)+',event , 1);">Active</div>';
+        		  }else if(status == 1){
+            		  statusDiv =  '<div style="width:15%" class="float-left unmatchtab email-status" status='+arrayEmail.status+'>Active</div>';
+        			//  actionDiv = '<div style="width:20%" class="float-left unmatchtab"><div class="v-edt-tbl-status v-edt-tbl-icn v-edt-tbl-switch tbl-switch-on" title="Active"></div></div>';
+            		  actionDiv = '<div style="width:15%;height:38px;color: #009FE0;" class="float-left unmatchtab cursor-pointer" onclick="updateMappedEmail('+undefinedval(arrayEmail.userEmailMappingId)+',event , 0);">Inactive</div>';
+        		  }
+        		  
         		  emailMap+='<div id="user-email-row-'+arrayEmail.userEmailMappingId+'" class="un-row">'
 						+ '						<div style="width:40%" class="float-left unmatchtab email-id">'
 						+ undefinedval(arrayEmail.emailId)
 						+ '</div>'
-						+ '						<div style="width:30%" class="float-left unmatchtab email-created">'
+						+ statusDiv
+						+ '			<div style="width:25%" class="float-left unmatchtab email-created">'
 						+ undefinedval(arrayEmail.createdOn)
 						+ '</div>'
-						+ '						<div style="width:20%;height:38px;" class="float-left unmatchtab email-map-remove cursor-pointer" onclick="emailDelete('+undefinedval(arrayEmail.userEmailMappingId)+',event);"></div>'
-						+'</div>'
+						+ actionDiv
+						+'</div>';
         	  });
         	  
 
@@ -2238,38 +2254,43 @@ function saveEmailMap(data){
 	 $('#overlay-toast').html(data);
 		showToast();
 }
-function emailDelete(emailMapId,e){
+function updateMappedEmail(emailMapId,e , updatedStatus){
 	e.stopPropagation();
-	 confirmDeleteEmailMap(emailMapId);
-/*	e.stopPropagation();
-	var url="deleteuseremailmapping.do?emailMappingId="+emailMapId;
-callAjaxGET(url, function(data) {
-var response = $.parseJSON(data);
-if(response.succeed==true){
-	$(deleteElement).closest('.un-row').remove();
-	$('#overlay-toast').html(response.message);
-	showToast();
-}
-}, false);*/
+	confirmUpdateEmailMap(emailMapId , updatedStatus);
 };
-function confirmDeleteEmailMap(emailMapId){
+function confirmUpdateEmailMap(emailMapId , updatedStatus){
 	$('#overlay-main').show();
 	$('#overlay-continue').show();
-	$('#overlay-continue').html("Delete");
-	$('#overlay-cancel').html("Cancel");
-	$('#overlay-header').html("Delete Email");
-	$('#overlay-text').html("Are you sure you want to delete user ?");
-	$('#overlay-continue').attr("onclick", "deleteEmailMap('" +emailMapId+ "');");
+	if(updatedStatus == 0 ){
+		$('#overlay-continue').html("Inactive");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-header').html("Inactive Email");
+		$('#overlay-text').html("Are you sure you want to inactive the email ?");
+	}else if(updatedStatus == 1){
+		$('#overlay-continue').html("Active");
+		$('#overlay-cancel').html("Cancel");
+		$('#overlay-header').html("Active Email");
+		$('#overlay-text').html("Are you sure you want to active the email ?");
+	}
+	
+	$('#overlay-continue').attr("onclick", "updateEmailMap(" +emailMapId+ ","+ updatedStatus +");");
 }
-function deleteEmailMap(id){
-	var url="deleteuseremailmapping.do?emailMappingId="+id;
+function updateEmailMap(id , status){
+	var url="updateuseremailmapping.do?emailMappingId="+id+"&status="+status;
 	callAjaxGET(url, function(data) {
+		$('#overlay-main').hide();
 		var response = $.parseJSON(data);
 		if(response.succeed==true){
-			$("#user-email-row-"+id).remove();
+			//repaint the data
+			var id = $('#current-user-id').val();
+			var	payload={
+					"agentId":id
+			};
+			callAjaxGetWithPayloadData("./getemailmappingsforuser.do",
+					editEmailMap,payload,true);
+			
 			$('#overlay-toast').html(response.message);
 			showToast();
-			$('#overlay-main').hide();
 		}
 		}, false);
 }
@@ -3039,6 +3060,7 @@ var hierarchyUpload = {
 		return hierval.trim();
 	},
 	
+	//Method that adds blue text colour to modified records
 	isModified : function(value){
 		if(value==true){
 			return "color-blue";
@@ -3471,6 +3493,7 @@ var hierarchyUpload = {
 											+ ' </div></td><td><div id="regionName-'
 											+ i
 											+ '" class="hier-upload-td '+ hierarchyUpload.isModified(hierarchyUpload.hierarchyJson.upload.regions[i].isRegionNameModified) +'" title="'
+
 											+ hierarchyUpload
 													.hierundefined(hierarchyUpload.hierarchyJson.upload.regions[i].regionName)
 											+ '">'

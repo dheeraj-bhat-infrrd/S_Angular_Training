@@ -10,3 +10,7 @@ Source/SSWeb/.settings
 Source/SSBatch/.settings
 .gitignore~
 Source/.settings/
+Source/.idea/
+Source/**/*.eml
+Source/**/*.iml
+Source/standalone/
