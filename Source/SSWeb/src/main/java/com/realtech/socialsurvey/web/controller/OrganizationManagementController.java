@@ -2879,6 +2879,14 @@ public class OrganizationManagementController
                     hierarchyStructureUploadService.updateUploadStatusToNoUpload( uploadStatus );
                     //Change status back to upload status for the json object
                     uploadStatus.setStatus( latestStatus );
+                    //TODO: Refresh session
+                    // get the user's canonical settings
+                    LOG.info("Fetching the user's canonical settings and setting it in session");
+                    HttpSession session = request.getSession( false );
+                    sessionHelper.getCanonicalSettings(session);
+                    // Set the session variables
+                    sessionHelper.setSettingVariablesInSession(session);
+                    sessionHelper.processAssignments( session, user );
                 }
             }
         } catch ( Exception e ) {
