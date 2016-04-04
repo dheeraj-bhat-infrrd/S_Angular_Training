@@ -205,17 +205,12 @@ public class LoginController {
 			    session.setAttribute("isSuperAdmin", false);
 			}
 			
-			user = userManagementService.getUserObjByUserId(user.getUserId());
 			
-			//get primary profile profile of user
-			List<UserProfile> userProfiles = user.getUserProfiles();
-	            for ( UserProfile userProfile : userProfiles ) {
-	                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
-	                    // social survey admin
-	                    model.addAttribute("isSuperAdmin", false);
-	                    return JspResolver.ADMIN_LANDING;
-	                }
-	            }
+			if(userManagementService.isUserSocialSurveyAdmin(user.getUserId())){
+			 // social survey admin
+                model.addAttribute("isSuperAdmin", false);
+                return JspResolver.ADMIN_LANDING;
+			}
 			
 			try {
 				long realtechUserId = (long) session.getAttribute(CommonConstants.REALTECH_USER_ID);

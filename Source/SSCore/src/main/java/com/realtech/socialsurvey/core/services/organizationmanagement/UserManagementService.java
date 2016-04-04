@@ -578,5 +578,8 @@ public interface UserManagementService
 
 
     void deleteIgnoredEmailMapping( String emailId ) throws InvalidInputException;
+
+
+    boolean isUserSocialSurveyAdmin( long userId ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
