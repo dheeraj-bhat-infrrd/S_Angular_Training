@@ -4,11 +4,17 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -306,18 +313,30 @@ public class RegistrationController
 				LOG.debug("Captcha validation complete!");
 			}
 
-			model.addAttribute("firstname", firstName);
-			model.addAttribute("lastname", lastName);
-			model.addAttribute("emailid", emailId);
-			model.addAttribute("isDirectRegistration", true);
-			// validate and invite corporate
-			userManagementService.validateAndInviteCorporateToRegister(firstName, lastName, emailId, false, null);
+            model.addAttribute( "firstname", firstName );
+            model.addAttribute( "lastname", lastName );
+            model.addAttribute( "emailid", emailId );
+            model.addAttribute( "isDirectRegistration", true );
+            // validate and invite corporate
+            userManagementService.validateAndInviteCorporateToRegister( firstName, lastName, emailId, false, null );
 
-			// Send mail to sales lead
-			String details = "First Name : " + firstName + "<br/>" + "Last Name : " + lastName + "<br/>" + "Email Address : " + emailId;
+            // Send mail to sales lead
+            Date today = new Date( System.currentTimeMillis() );
+            SimpleDateFormat utcDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            utcDateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+
+            SimpleDateFormat pstDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            pstDateFormat.setTimeZone( TimeZone.getTimeZone( "PST" ) );
+
+            SimpleDateFormat estDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            estDateFormat.setTimeZone( TimeZone.getTimeZone( "EST" ) );
+            String details = "First Name : " + firstName + "<br/>" + "Last Name : " + lastName + "<br/>" + "Email Address : "
+                + emailId + "<br/>" + "Time : " + "<br/>" + utcDateFormat.format( today ) + "<br/>"
+                + estDateFormat.format( today ) + "<br/>" + pstDateFormat.format( today );
+            
 			try {
-				emailServices.sendCompanyRegistrationStageMail(salesLeadEmail, CommonConstants.COMPANY_REGISTRATION_STAGE_STARTED, emailId, details,
-						true);
+                emailServices.sendCompanyRegistrationStageMail( firstName, lastName, Arrays.asList( salesLeadEmail ),
+                    CommonConstants.COMPANY_REGISTRATION_STAGE_STARTED, emailId, details, true );
 			}
 			catch (InvalidInputException e) {
 				e.printStackTrace();

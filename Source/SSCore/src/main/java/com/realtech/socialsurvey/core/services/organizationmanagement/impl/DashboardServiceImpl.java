@@ -2052,24 +2052,24 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         userReportToPopulate.add( CommonConstants.PROFILE_COMPLETE );
 
         userReportToPopulate.add( CommonConstants.SOCIALLY_CONNECTED );
-        userReportToPopulate.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+        userReportToPopulate.add( CommonConstants.CHR_FACEBOOK );
         userReportToPopulate.add( "" );
         userReportToPopulate.add( "" );
 
-        userReportToPopulate.add( CommonConstants.TWITTER_SOCIAL_SITE );
+        userReportToPopulate.add( CommonConstants.CHR_TWITTER );
         userReportToPopulate.add( "" );
         userReportToPopulate.add( "" );
 
-        userReportToPopulate.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+        userReportToPopulate.add( CommonConstants.CHR_LINKEDIN );
         userReportToPopulate.add( "" );
         userReportToPopulate.add( "" );
 
 
-        userReportToPopulate.add( CommonConstants.GOOGLE_SOCIAL_SITE );
-        userReportToPopulate.add( CommonConstants.ZILLOW_SOCIAL_SITE );
-        userReportToPopulate.add( CommonConstants.YELP_SOCIAL_SITE );
-        userReportToPopulate.add( CommonConstants.REALTOR_SOCIAL_SITE );
-        userReportToPopulate.add( CommonConstants.LENDINGTREE_SOCIAL_SITE );
+        userReportToPopulate.add( CommonConstants.CHR_GOOGLE );
+        userReportToPopulate.add( CommonConstants.CHR_ZILLOW );
+        userReportToPopulate.add( CommonConstants.CHR_YELP );
+        userReportToPopulate.add( CommonConstants.CHR_REALTOR );
+        userReportToPopulate.add( CommonConstants.CHR_LENDING_TREE );
 
         userReportToPopulate.add( CommonConstants.DATE_ADOPTION_COMPLETED );
         userReportToPopulate.add( CommonConstants.DATE_LAST_SURVEY_SENT );
@@ -2245,7 +2245,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         File file = null;
         String filePath = null;
         try {
-            file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+            file = new File( fileDirectoryLocation + File.separator + fileName + ".xlsx" );
             fileOutput = new FileOutputStream( file );
             file.createNewFile();
             workbook.write( fileOutput );

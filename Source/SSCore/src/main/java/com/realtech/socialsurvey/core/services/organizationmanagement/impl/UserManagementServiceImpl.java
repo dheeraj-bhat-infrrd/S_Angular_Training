@@ -3832,7 +3832,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "No user found for agent id : " + agentId );
         }
 
-        List<UserEmailMapping> emailMappings = userEmailMappingDao.getAciveUserEmailMappingForUser( user );
+        
+       
+        List<UserEmailMapping> emailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class, CommonConstants.USER_COLUMN, user );
         List<UserEmailMapping> emailMappingsVO = new ArrayList<UserEmailMapping>();
         for ( UserEmailMapping emailMapping : emailMappings ) {
             UserEmailMapping emailMappingVO = new UserEmailMapping();
@@ -3875,6 +3877,34 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
     
+    
+    @Transactional
+    @Override
+    public void updateUserEmailMapping( User agent , long emailMappingId , int status ) throws InvalidInputException
+    {
+        LOG.info( "Method to updateUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
+        if ( agent == null ) {
+            throw new InvalidInputException( "Passed parameter agent is null " );
+        }
+        
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( "userEmailMappingId", emailMappingId );
+        List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+       
+        
+        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null) {
+            throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + emailMappingId );
+        }
+
+        UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
+        userEmailMapping.setStatus( status );
+        userEmailMapping.setModifiedBy( String.valueOf(agent.getUserId() ));
+        userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        userEmailMappingDao.update( userEmailMapping );
+        
+        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
+    }
+    
     @Transactional
     @Override
     public void deleteIgnoredEmailMapping(String emailId) throws InvalidInputException{
@@ -3894,5 +3924,34 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         
         LOG.info( "method deleteIgnoredEmailMapping finished" );
+    }
+    
+    /**
+     * 
+     * @param userId
+     * @return
+     * @throws InvalidInputException 
+     */
+    @Transactional
+    @Override
+    public boolean isUserSocialSurveyAdmin(long userId) throws InvalidInputException{
+        LOG.info( "method isUserIsSocialSurveyAdmin  started for userId : " + userId );
+        
+        User user = null;
+        user = userDao.findById( User.class, userId );
+        if ( user == null ) {
+            throw new InvalidInputException( "User not found for userId:" + userId );
+        }
+        
+        //get primary profile profile of user
+        List<UserProfile> userProfiles = user.getUserProfiles();
+            for ( UserProfile userProfile : userProfiles ) {
+                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
+                    // social survey admin
+                    return true;
+                }
+            }
+            
+            return false;
     }
 }

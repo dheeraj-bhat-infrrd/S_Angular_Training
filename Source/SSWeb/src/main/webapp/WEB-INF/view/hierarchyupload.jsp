@@ -152,7 +152,9 @@
 
 			<table class="table" style="margin-top: 10px;">
 				<thead>
-					<tr>
+					<tr><th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Status</th>
 						<th
 							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
 							class="hier-upload-td">Edit</th>
@@ -215,7 +217,9 @@
 			</div>
 			<table class="table" style="margin-top: 10px;">
 				<thead>
-					<tr>
+					<tr><th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Status</th>
 						<th
 							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
 							class="hier-upload-td">Edit</th>
@@ -279,7 +283,9 @@
 			</div>
 			<table class="table" style="margin-top: 10px;">
 				<thead>
-					<tr>
+					<tr><th
+							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
+							class="hier-upload-td">Status</th>
 						<th
 							style="text-align: center; font-weight: 600 !important; font-size: 14px;"
 							class="hier-upload-td">Edit</th>

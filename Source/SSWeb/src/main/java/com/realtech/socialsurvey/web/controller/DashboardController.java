@@ -914,9 +914,16 @@ public class DashboardController
         User user = sessionHelper.getCurrentUser();
         long regionOrBranchId = 0;
         List<SolrDocument> result = null;
-        boolean isRealTechAdmin = user.isSuperAdmin();
+        boolean isRealTechOrSSAdmin = false;
+        
+       
 
         try {
+            
+            if(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())){
+                isRealTechOrSSAdmin = true;
+            }
+            
             String searchColumn = request.getParameter( "searchColumn" );
             if ( searchColumn == null || searchColumn.isEmpty() ) {
                 LOG.error( "Invalid value (null/empty) passed for search criteria." );
@@ -927,7 +934,7 @@ public class DashboardController
             String columnName = request.getParameter( "columnName" );
             String columnValueStr = request.getParameter( "columnValue" );
 
-            if ( !isRealTechAdmin ) {
+            if ( !isRealTechOrSSAdmin ) {
                 if ( columnName == null || columnName.isEmpty() ) {
                     LOG.error( "Invalid value (null/empty) passed for profile level." );
                     throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
@@ -944,7 +951,7 @@ public class DashboardController
                 searchKey = "";
             }
 
-            if ( isRealTechAdmin ) {
+            if ( isRealTechOrSSAdmin ) {
                 try {
                     if ( searchColumn.equalsIgnoreCase( "company" ) ) {
                         model.addAttribute( "results", organizationManagementService.getCompaniesByName( searchKey ) );
@@ -2196,12 +2203,14 @@ public class DashboardController
      * @param request
      * @param response
      */
+    @ResponseBody
     @RequestMapping ( value = "/downloadbillingreport")
-    public void getBillingReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
+    public String getBillingReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
     {
         LOG.info( "Method to get billing report file getBillingReportFile() started." );
+        try{
         User user = sessionHelper.getCurrentUser();
-        if ( !( user.isSuperAdmin() ) ) {
+        if ( !(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())) ) {
             throw new UnsupportedOperationException( "User is not authorized to perform this action" );
         }
         //Check if a request already exists
@@ -2216,7 +2225,13 @@ public class DashboardController
             String mailId = request.getParameter( "mailid" );
             adminReport.createEntryInFileUploadForBillingReport( mailId );
         }
+        
+        }catch(NonFatalException e){
+            LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
+            return CommonConstants.ERROR;
+        }
         LOG.info( "Method to get billing report file getBillingReportFile() finished." );
+        return CommonConstants.SUCCESS_ATTRIBUTE;
     }
 
     
@@ -2228,7 +2243,7 @@ public class DashboardController
         String status = CommonConstants.SUCCESS_ATTRIBUTE;
         try{
             User user = sessionHelper.getCurrentUser();
-            if ( !( user.isSuperAdmin() ) ) {
+            if ( !(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())) ) {
                 throw new UnsupportedOperationException( "User is not authorized to perform this action" );
             }
             
@@ -2271,7 +2286,7 @@ public class DashboardController
 
         try {
             User user = sessionHelper.getCurrentUser();
-            if ( !( user.isSuperAdmin() ) ) {
+            if ( !(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())) ) {
                 throw new UnsupportedOperationException( "User is not authorized to perform this action" );
             }
 

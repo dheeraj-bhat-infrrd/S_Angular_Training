@@ -102,8 +102,9 @@
 		<div class="clearfix"
 						style="border: #d2dedf 1px solid;">
 						<div style="width:40%" class="float-left unmatchtab unhr-row">Email</div>
-						<div style="width:30%" class="float-left unmatchtab unhr-row">Created</div>
-						<div style="width:20%" class="float-left unmatchtab unhr-row">Delete</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Status</div>
+						<div style="width:25%" class="float-left unmatchtab unhr-row">Created</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Action</div>
 		</div>
 			<div id="mapped-emil-info" style="border: 1px solid #dcdcdc;"></div>
 			<div id="input-email" class="hide">

@@ -148,28 +148,46 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendCompanyRegistrationStageMail( String recipientMailId, String registrationStage, String name,
-        String details, boolean isImmediate ) throws InvalidInputException, UndeliveredEmailException
+    public void sendCompanyRegistrationStageMail( String firstName, String lastName, List<String> recipientMailIds,
+        String registrationStage, String entityName, String details, boolean isImmediate ) throws InvalidInputException,
+        UndeliveredEmailException
     {
         LOG.info( "Method to send registration stage mail started" );
         if ( registrationStage == null || registrationStage.isEmpty() ) {
             throw new InvalidInputException( "Registration stage cannot be empty" );
         }
-        if ( name == null || name.isEmpty() ) {
+        if ( entityName == null || entityName.isEmpty() ) {
             throw new InvalidInputException( "Name cannot be null" );
         }
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        
+        if ( recipientMailIds == null || recipientMailIds.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending CompanyRegistrationStageMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending CompanyRegistrationStageMail " );
+        }
+        
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailIds );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_SUBJECT;
 
         if ( details == null ) {
             details = "";
         }
+        String agentName = "";
+        if ( firstName != null && !firstName.isEmpty() ) {
+            agentName += firstName;
+        }
+        if ( lastName != null && !lastName.isEmpty() ) {
+            agentName += " " + lastName;
+        }
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName( subjectFileName );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( agentName ) );
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, name, registrationStage, details ) );
-        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, isImmediate, false );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, entityName, registrationStage, details ) );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,
+            isImmediate, false );
     }
 
 
