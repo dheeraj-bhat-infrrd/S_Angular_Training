@@ -581,5 +581,8 @@ public interface UserManagementService
 
 
     boolean isUserSocialSurveyAdmin( long userId ) throws InvalidInputException;
+
+
+    void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

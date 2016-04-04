@@ -3151,20 +3151,23 @@ public class OrganizationManagementController
 
 
     @ResponseBody
-    @RequestMapping ( value = "/deleteuseremailmapping", method = RequestMethod.GET)
-    public String deleteUserEmailMapping( HttpServletRequest request, Model model )
+    @RequestMapping ( value = "/updateuseremailmapping", method = RequestMethod.GET)
+    public String updateUserEmailMapping( HttpServletRequest request, Model model )
     {
-        LOG.info( "Method to delete user email mapping started" );
+        LOG.info( "Method to update user email mapping started" );
         Map<String, Object> responseMap = new HashMap<String, Object>();
         boolean succeed;
         String message;
         String emailMappingIdStr = request.getParameter( "emailMappingId" );
+        String statusStr = request.getParameter( "status" );
         long emailMappingId;
+        int status;
 
         try {
 
             try {
                 emailMappingId = Integer.parseInt( emailMappingIdStr );
+                status = Integer.parseInt( statusStr );
             } catch ( NumberFormatException e ) {
                 LOG.error( "NumberFormatException caught while trying to convert emailMappingId Nested exception is ", e );
                 throw e;
@@ -3176,9 +3179,9 @@ public class OrganizationManagementController
                 throw new NonFatalException( "Insufficient permission for this process" );
             }
 
-            userManagementService.deleteUserEmailMapping( user, emailMappingId );
+            userManagementService.updateUserEmailMapping( user, emailMappingId , status);
 
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.DELETE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL,
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.UPDATE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             succeed = true;
 
