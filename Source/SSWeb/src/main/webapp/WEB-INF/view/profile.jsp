@@ -99,9 +99,9 @@
     		<c:if test="${integerAverageRating == 6}">
     			<c:set var="integerAverageRating" value="5"></c:set>
     		</c:if>
-    		<c:if test="${integerAverageRating == 0}">
+    		<%-- <c:if test="${integerAverageRating == 0}">
     			<c:set var="integerAverageRating" value="1"></c:set>
-    		</c:if>
+    		</c:if> --%>
     	</c:if>
     </c:if>
 </head>
@@ -236,7 +236,7 @@
 					<c:otherwise>
                 		<div class="prof-rating clearfix">
 						<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
-							<div class='rating-image float-left smiley-rat-1'></div>
+							<div class='rating-image float-left smiley-rat-0'></div>
 							<div class='rating-rounded float-left'><span>${floatingAverageRating}</span>  - </div>
 						</div>
 						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"><span>${reviewsCount}</span> Reviews(s)</div>

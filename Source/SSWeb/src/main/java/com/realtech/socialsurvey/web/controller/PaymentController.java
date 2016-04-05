@@ -2,18 +2,26 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA: SS-15: By RM03
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.TimeZone;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -22,6 +30,8 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
@@ -55,6 +65,15 @@ public class PaymentController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+	
+	@Autowired
+	private EmailServices emailServices;
+	
+    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String supportMail;
+    
+    @Value("${SALES_LEAD_EMAIL_ADDRESS}")
+    private String salesLeadEmail;
 
 	/**
 	 * Method used to display the Braintree form to get card details.
@@ -167,6 +186,31 @@ public class PaymentController {
 				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+		     
+            //specify details
+            Date today = new Date( System.currentTimeMillis() );
+            SimpleDateFormat utcDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            utcDateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+
+            SimpleDateFormat pstDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            pstDateFormat.setTimeZone( TimeZone.getTimeZone( "PST" ) );
+
+            SimpleDateFormat estDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            estDateFormat.setTimeZone( TimeZone.getTimeZone( "EST" ) );
+
+            String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
+                + "Email Address : " + user.getEmailId() + "<br/>" + "Company Name : " + user.getCompany().getCompany()
+                + "<br/>" + "Account Type : " + strAccountType + "<br/>" + "Time : " + "<br/>" + utcDateFormat.format( today )
+                + "<br/>" + estDateFormat.format( today ) + "<br/>" + pstDateFormat.format( today );
+            try {
+                emailServices.sendCompanyRegistrationStageMail( user.getFirstName(), user.getLastName(), Arrays.asList(
+                    supportMail, salesLeadEmail ), CommonConstants.COMPANY_REGISTRATION_STAGE_COMPLETE, user.getCompany()
+                    .getCompany(), details, false );
+            } catch ( InvalidInputException e ) {
+                e.printStackTrace();
+            } catch ( UndeliveredEmailException e ) {
+                e.printStackTrace();
+            }
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);

@@ -94,6 +94,39 @@
 			</div>
 		</div>
 	</div>
+	<div id="email-map-pop-up" class="bd-srv-email hide">
+	<input type="hidden" id="current-user-id">
+	<div class="container bd-q-container">
+	<div id="email-overlay">
+		<div id="user-email" class="bd-q-wrapper">
+		<div class="clearfix"
+						style="border: #d2dedf 1px solid;">
+						<div style="width:40%" class="float-left unmatchtab unhr-row">Email</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Status</div>
+						<div style="width:25%" class="float-left unmatchtab unhr-row">Created</div>
+						<div style="width:15%" class="float-left unmatchtab unhr-row">Action</div>
+		</div>
+			<div id="mapped-emil-info" style="border: 1px solid #dcdcdc;"></div>
+			<div id="input-email" class="hide">
+			<form method="post" id="email-form" style="border:1px solid #dcdcdc;">
+			<div class="email-map-add-txt">Add email(s)</div>
+			
+			<div id="new-email-wrapper">
+				 <span style="padding:5px">Enter another email-id </span><input type="email" name="email1" class="email-input-txt"
+					id="email1" placeholder="someone@example.com"/> <br /> 
+			</div>
+			</form>
+			</div>
+			<div class="email-map-wrapper clearfix">
+			 <div id="email-map-save" class="float-left hide">Save</div>
+			    <div id="email-map-add" class="float-left">Map new email</div>
+				<div id="email-map-cancel" class="float-left" style="margin-left:10px;"><spring:message code="label.cancel.key" /></div>
+			</div>
+		</div>
+		</div>
+	</div>
+</div> 
+	
 	
 	<div id="report-abuse-overlay" class="overlay-main hide">
     	<div id="report-abuse-pop-up" class="overlay-disable-wrapper">

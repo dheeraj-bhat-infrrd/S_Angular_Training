@@ -30,7 +30,7 @@ public interface HierarchyStructureUploadService
      * @return 
      * @throws InvalidInputException
      */
-    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user )
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user, boolean isAppend )
         throws InvalidInputException;
 
     public List<UploadStatus> findInitiatedHierarchyUploads() throws NoRecordsFetchedException;
@@ -51,7 +51,7 @@ public interface HierarchyStructureUploadService
      */
     public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException;
 
-    public void addNewUploadRequest( User adminUser );
+    public void addNewUploadRequest( User adminUser, boolean isAppend );
 
     public UploadStatus fetchLatestUploadStatus( Company company );
 
@@ -81,4 +81,37 @@ public interface HierarchyStructureUploadService
 
     public User assignUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
+
+    
+    /**
+     * Method to fetch all the upload statuses for a company
+     * @param company
+     * @return
+     */
+    public List<UploadStatus> fetchUploadStatusForCompany( Company company );
+
+    
+    /**
+     * Method to determine the latest status
+     * @param uploadStatuses
+     * @return
+     */
+    public UploadStatus highestStatus( List<UploadStatus> uploadStatuses );
+
+    
+    /**
+     * Method to set upload status to no upload pending
+     * @param uploadStatus
+     */
+    public void updateUploadStatusToNoUpload( UploadStatus uploadStatus );
+
+
+    /**
+     * Method to add an error upload status entry
+     * @param adminUser
+     * @param company
+     * @param errorStr
+     * @param uploadStatus
+     */
+    public void createErrorUploadStatusEntry( User adminUser, Company company, String errorStr, UploadStatus uploadStatus );
 }

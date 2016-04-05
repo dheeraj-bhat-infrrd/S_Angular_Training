@@ -91,7 +91,7 @@ public class EmailProcessor implements Runnable
                     EmailEntity emailEntity = null;
                     try {
                         emailEntity = (EmailEntity) utils.deserializeObject( emailObject.getEmailBinaryObject() );
-                        if ( !emailSender.sendEmailByEmailEntity( emailEntity ) ) {
+                        if ( !emailSender.sendEmailByEmailEntity( emailEntity, false ) ) {
                             LOG.warn( " Email Sending Failed, Trying again " );
                             errorEmails.put( emailEntity, "unable to send email" );
                             // TODO: deleting error email for now. Should be set as a different status

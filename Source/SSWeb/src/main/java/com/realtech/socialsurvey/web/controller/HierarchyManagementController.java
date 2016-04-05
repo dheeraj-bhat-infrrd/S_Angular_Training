@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -78,6 +79,8 @@ public class HierarchyManagementController {
 	private UserManagementService userManagementService;
 	@Autowired
 	private SocialManagementService socialManagementService;
+    @Autowired
+    private Utils utils;
 
 	/**
 	 * Method to call services for showing up the build hierarchy page
@@ -519,7 +522,7 @@ public class HierarchyManagementController {
 				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
 				addOrUpdateRegionInSession(region, session);
 				String invalidMessage = "These email address ";
-				if (invalidUserList != null) {
+				if (invalidUserList != null && invalidUserList.size() > 0) {
 					String emailaddressses = "";
 					for (User invalidUser : invalidUserList) {
 						emailaddressses = emailaddressses.concat(invalidUser.getEmailId()).concat(",");
@@ -535,11 +538,41 @@ public class HierarchyManagementController {
 						invalidMessage = invalidMessage + emailaddressses + " are invalid";
 					}
 				}
-				if (invalidUserList != null && !invalidUserList.isEmpty()) {
-					model.addAttribute("invalidEmailAddress", invalidMessage);
-				}
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				invalidMessage = invalidMessage.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+                List<User> invalidUserAssignList = (List<User>) map.get( CommonConstants.INVALID_USERS_ASSIGN_LIST );
+                String invalidUserAssignMessage = "These email address ";
+                if ( invalidUserAssignList != null && invalidUserAssignList.size() > 0 ) {
+                    String emailaddressses = "";
+                    for ( User invalidUserAssign : invalidUserAssignList ) {
+                        emailaddressses = emailaddressses + invalidUserAssign.getEmailId() + ",";
+                    }
+                    if ( emailaddressses.endsWith( "," ) ) {
+                        emailaddressses = emailaddressses.substring( 0, emailaddressses.length() - 1 );
+                    }
+
+                    if ( invalidUserAssignList.size() < 2 ) {
+                        invalidUserAssignMessage = "This email address " + emailaddressses
+                            + " is" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
+                    } else {
+                        invalidUserAssignMessage = invalidUserAssignMessage + emailaddressses
+                            + " are" +  CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
+                    }
+                }
+                DisplayMessage message = messageUtils.getDisplayMessage( DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE );
+                DisplayMessage invalidEmailAddressMessage = null;
+                DisplayMessage alreadyExistEmailAddress = null;
+
+                if ( invalidMessage.endsWith( "invalid" ) ) {
+                    invalidEmailAddressMessage = new DisplayMessage( invalidMessage,  DisplayMessageType.ERROR_MESSAGE  );
+                }
+
+                if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
+                    alreadyExistEmailAddress = new DisplayMessage( invalidUserAssignMessage,  DisplayMessageType.ERROR_MESSAGE  );
+                }
+                model.addAttribute( "message", message );
+                model.addAttribute( "invalidEmailAddressMessage", invalidEmailAddressMessage );
+                model.addAttribute( "alreadyExistEmailAddress", alreadyExistEmailAddress );
 			}
 			catch (UserAssignmentException e) {
 				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.REGION_USER_ASSIGNMENT_ERROR, e);
@@ -670,39 +703,69 @@ public class HierarchyManagementController {
 			}
 
 			User user = sessionHelper.getCurrentUser();
-			try {
-				LOG.debug("Calling service to add a new branch");
-				Map<String, Object> map = organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO,
-						branchAddress1, branchAddress2, branchCountry, branchCountryCode, branchState, branchCity, branchZipcode, selectedUserId,
-						assigneeEmailIds, isAdmin, false);
-				Branch branch = (Branch) map.get(CommonConstants.BRANCH_OBJECT);
-				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
-				LOG.debug("Successfully executed service to add a new branch");
-				String invalidMessage = "These email address ";
-				if (invalidUserList != null) {
-					String emailaddressses = "";
-					for (User invalidUser : invalidUserList) {
-						emailaddressses = emailaddressses.concat(invalidUser.getEmailId()).concat(",");
-					}
-					if (emailaddressses.endsWith(",")) {
-						emailaddressses = emailaddressses.substring(0, emailaddressses.length() - 1);
-					}
+            try {
+                LOG.debug( "Calling service to add a new branch" );
+                Map<String, Object> map = organizationManagementService.addNewBranchWithUser( user, branchName.trim(),
+                    regionId, CommonConstants.NO, branchAddress1, branchAddress2, branchCountry, branchCountryCode,
+                    branchState, branchCity, branchZipcode, selectedUserId, assigneeEmailIds, isAdmin, false );
+                Branch branch = (Branch) map.get( CommonConstants.BRANCH_OBJECT );
+                List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
+                LOG.debug( "Successfully executed service to add a new branch" );
+                String invalidMessage = "These email address ";
+                if ( invalidUserList != null && invalidUserList.size() > 0) {
+                    String emailaddressses = "";
+                    for ( User invalidUser : invalidUserList ) {
+                        emailaddressses = emailaddressses.concat( invalidUser.getEmailId() ).concat( "," );
+                    }
+                    if ( emailaddressses.endsWith( "," ) ) {
+                        emailaddressses = emailaddressses.substring( 0, emailaddressses.length() - 1 );
+                    }
 
-					if (invalidUserList.size() < 2) {
+                    if ( invalidUserList.size() < 2 ) {
 
-						invalidMessage = "This email address " + emailaddressses + " is invalid";
-					}
-					else {
-						invalidMessage = invalidMessage + emailaddressses + " are invalid";
-					}
-				}
-				addOrUpdateBranchInSession(branch, session);
-				if (invalidUserList != null && !invalidUserList.isEmpty()) {
-					model.addAttribute("invalidEmailAddress", invalidMessage);
-				}
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-			}
+                        invalidMessage = "This email address " + emailaddressses + " is invalid";
+                    } else {
+                        invalidMessage = invalidMessage + emailaddressses + " are invalid";
+                    }
+                }
+                invalidMessage = invalidMessage.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+                List<User> invalidUserAssignList = (List<User>) map.get( CommonConstants.INVALID_USERS_ASSIGN_LIST );
+                String invalidUserAssignMessage = "These email address ";
+                if ( invalidUserAssignList != null && invalidUserAssignList.size() > 0 ) {
+                    String emailaddressses = "";
+                    for ( User invalidUserAssign : invalidUserAssignList ) {
+                        emailaddressses = emailaddressses + invalidUserAssign.getEmailId() + ",";
+                    }
+                    if ( emailaddressses.endsWith( "," ) ) {
+                        emailaddressses = emailaddressses.substring( 0, emailaddressses.length() - 1 );
+                    }
+
+                    if ( invalidUserAssignList.size() < 2 ) {
+                        invalidUserAssignMessage = "This email address " + emailaddressses
+                            + " is" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
+                    } else {
+                        invalidUserAssignMessage = invalidUserAssignMessage + emailaddressses
+                            + " are" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
+                    }
+                }
+                addOrUpdateBranchInSession( branch, session );
+                DisplayMessage message = messageUtils.getDisplayMessage( DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE );
+                DisplayMessage invalidEmailAddressMessage = null;
+                DisplayMessage alreadyExistEmailAddress = null;
+
+                if ( invalidMessage.endsWith( "invalid" ) ) {
+                    invalidEmailAddressMessage = new DisplayMessage( invalidMessage, DisplayMessageType.ERROR_MESSAGE );
+                }
+
+                if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
+                    alreadyExistEmailAddress = new DisplayMessage( invalidUserAssignMessage, DisplayMessageType.ERROR_MESSAGE );
+                }
+
+                model.addAttribute( "message", message );
+                model.addAttribute( "invalidEmailAddressMessage", invalidEmailAddressMessage );
+                model.addAttribute( "alreadyExistEmailAddress", alreadyExistEmailAddress );
+            }
 			catch (UserAssignmentException e) {
 				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.BRANCH_USER_ASSIGNMENT_ERROR, e);
 			}
@@ -768,7 +831,12 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 
-			String[] assigneeEmailIds = validateAndParseIndividualDetails(user, selectedUserId, selectedUserEmail);
+            try {
+                validateAndParseIndividualDetails( user, selectedUserId, selectedUserEmail );
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException while parsing email ids", DisplayMessageConstants.GENERAL_ERROR, e );
+            }
+			String[] assigneeEmailIds = parseEmailIdsIntoArray( selectedUserEmail );
 
 			long regionId = 0l;
 			try {
@@ -797,78 +865,120 @@ public class HierarchyManagementController {
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("NumberFormatException while parsing branchId", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
-			//check if user is admin. if yes than not allow to assign
-			if(user.getUserId() == selectedUserId && isAdmin){
-				LOG.info("User is company admin so can't assign it.");
-				DisplayMessage message = messageUtils.getDisplayMessage(DisplayMessageConstants.REDUNDANT_ASSIGNMANT,
-						DisplayMessageType.ERROR_MESSAGE);				
-				model.addAttribute("message", message);
-				return JspResolver.MESSAGE_HEADER;
-			}
 
-			try {
-				LOG.debug("Calling service to add/assign invidual(s)");
-				Map<String, Object> map = organizationManagementService.addIndividual(user, selectedUserId, branchId, regionId, assigneeEmailIds,
-						isAdmin, false, true);
-				List<User> invalidUserList = (List<User>) map.get(CommonConstants.INVALID_USERS_LIST);
-				LOG.debug("Successfully executed service to add a new branch");
-				String invalidMessage = "These email address ";
-				if (invalidUserList != null) {
-					String emailaddressses = "";
-					for (User invalidUser : invalidUserList) {
-						emailaddressses = emailaddressses.concat(invalidUser.getEmailId()).concat(",");
-					}
-					if (emailaddressses.endsWith(",")) {
-						emailaddressses = emailaddressses.substring(0, emailaddressses.length() - 1);
-					}
+            //check if user is admin. if yes than not allow to assign
+            if ( user.getUserId() == selectedUserId && isAdmin ) {
+                LOG.info( "User is company admin so can't assign it." );
+                DisplayMessage message = messageUtils.getDisplayMessage( DisplayMessageConstants.REDUNDANT_ASSIGNMANT,
+                    DisplayMessageType.ERROR_MESSAGE );
+                model.addAttribute( "message", message );
+                return JspResolver.MESSAGE_HEADER;
+            }
 
-					if (invalidUserList.size() < 2) {
+            try {
+                LOG.debug( "Calling service to add/assign invidual(s)" );
+                Map<String, Object> map = organizationManagementService.addIndividual( user, selectedUserId, branchId,
+                    regionId, assigneeEmailIds, isAdmin, false, true );
+                List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
+                LOG.debug( "Successfully executed service to add a new branch" );
+                String invalidMessage = "These email address ";
+                if ( invalidUserList != null && invalidUserList.size() > 0 ) {
+                    String emailaddressses = "";
+                    for ( User invalidUser : invalidUserList ) {
+                        emailaddressses = emailaddressses.concat( invalidUser.getEmailId() ).concat( "," );
+                    }
+                    if ( emailaddressses.endsWith( "," ) ) {
+                        emailaddressses = emailaddressses.substring( 0, emailaddressses.length() - 1 );
+                    }
 
-						invalidMessage = "This email address " + emailaddressses + " is invalid";
-					}
-					else {
-						invalidMessage = invalidMessage + emailaddressses + " are invalid";
-					}
-				}
-				LOG.debug("Successfully executed service to add/assign an invidual(s)");
+                    if ( invalidUserList.size() < 2 ) {
 
-				DisplayMessage message = null;
-				if (selectedUserId > 0l) {
-					message = messageUtils.getDisplayMessage(DisplayMessageConstants.INDIVIDUAL_ADDITION_SUCCESSFUL,
-							DisplayMessageType.SUCCESS_MESSAGE);
-				}
-				else {
-					message = messageUtils.getDisplayMessage(DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_SUCCESSFUL,
-							DisplayMessageType.SUCCESS_MESSAGE);
-				}
-				if (invalidUserList != null && !invalidUserList.isEmpty()) {
-					model.addAttribute("invalidEmailAddress", invalidMessage);
-				}
-				model.addAttribute("message", message);
-			}
-			catch (UserAssignmentException e) {
-				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.BRANCH_USER_ASSIGNMENT_ERROR, e);
-			}
-			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-			}
+                        invalidMessage = "This email address " + emailaddressses + " is invalid";
+                    } else {
+                        invalidMessage = invalidMessage + emailaddressses + " are invalid";
+                    }
+                }
+                List<User> invalidUserAssignList = (List<User>) map.get( CommonConstants.INVALID_USERS_ASSIGN_LIST );
+                String invalidUserAssignMessage = "These email address ";
+                if ( invalidUserAssignList != null && invalidUserAssignList.size() > 0 ) {
+                    String emailaddressses = "";
+                    for ( User invalidUserAssign : invalidUserAssignList ) {
+                        emailaddressses = emailaddressses + invalidUserAssign.getEmailId() + ",";
+                    }
+                    if ( emailaddressses.endsWith( "," ) ) {
+                        emailaddressses = emailaddressses.substring( 0, emailaddressses.length() - 1 );
+                    }
 
-			// updating session with new assignment
-			if (user.getUserId() == selectedUserId) {
-				sessionHelper.getCanonicalSettings(session);
-			}
+                    if ( invalidUserAssignList.size() < 2 ) {
+                        invalidUserAssignMessage = "This email address " + emailaddressses
+                            + " is" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
+                    } else {
+                        invalidUserAssignMessage = invalidUserAssignMessage + emailaddressses
+                            + " are" + CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX;
+                    }
+                }
+                LOG.debug( "Successfully executed service to add/assign an invidual(s)" );
+                invalidMessage = invalidMessage.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+                DisplayMessage message = null;
+                if ( selectedUserId > 0l ) {
+                    message = messageUtils.getDisplayMessage( DisplayMessageConstants.INDIVIDUAL_ADDITION_SUCCESSFUL,
+                        DisplayMessageType.SUCCESS_MESSAGE );
+                } else {
+                    int invalidAddressCount = 0;
+                    if ( invalidUserList != null && invalidUserList.size() > 0 ) {
+                        invalidAddressCount = invalidUserList.size();
+                    }
+                    if ( invalidUserAssignList != null && invalidUserAssignList.size() > 0 ) {
+                        invalidAddressCount += invalidUserAssignList.size();
+                    }
+                    if ( invalidAddressCount == 0 ) {
+                        message = messageUtils
+                            .getDisplayMessage( DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_SUCCESSFUL,
+                                DisplayMessageType.SUCCESS_MESSAGE );
+                    } else {
+                        message = messageUtils
+                            .getDisplayMessage( DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_UNSUCCESSFUL,
+                                DisplayMessageType.SUCCESS_MESSAGE );
+                    }
+                    if ( invalidMessage.endsWith( "invalid" ) ) {
+                        message.setType( DisplayMessageType.ERROR_MESSAGE );
+                        if ( !message.getMessage().trim().isEmpty() ) {
+                            message.setMessage( message.getMessage() + "<br>" + invalidMessage );
+                        } else {
+                            message.setMessage( invalidMessage );
+                        }
+                    }
+                    if ( invalidUserAssignMessage.endsWith( CommonConstants.EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX ) ) {
+                        message.setType( DisplayMessageType.ERROR_MESSAGE );
+                        if ( !message.getMessage().trim().isEmpty() ) {
+                            message.setMessage( message.getMessage() + "<br>" + invalidUserAssignMessage );
+                        } else {
+                            message.setMessage( invalidUserAssignMessage );
+                        }
+                    }
+                }
 
-			sessionHelper.processAssignments(session, user);
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while adding an individual. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE));
-		}
+                model.addAttribute( "message", message );
+            } catch ( UserAssignmentException e ) {
+                throw new UserAssignmentException( e.getMessage(), DisplayMessageConstants.BRANCH_USER_ASSIGNMENT_ERROR, e );
+            } catch ( InvalidInputException | NoRecordsFetchedException | SolrException e ) {
+                throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
+            }
 
-		LOG.info("Successfully completed controller to add an individual");
-		return JspResolver.MESSAGE_HEADER;
-	}
+            // updating session with new assignment
+            if ( user.getUserId() == selectedUserId ) {
+                sessionHelper.getCanonicalSettings( session );
+            }
+
+            sessionHelper.processAssignments( session, user );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while adding an individual. Reason : " + e.getMessage(), e );
+            model.addAttribute( "message", new DisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
+        }
+
+        LOG.info( "Successfully completed controller to add an individual" );
+        return JspResolver.MESSAGE_HEADER;
+    }
 
 	/**
 	 * Method to update a branch and assign a user to branch if specified
@@ -1975,7 +2085,8 @@ public class HierarchyManagementController {
 
 			// Tokenizing the string input per individual
 			List<String> inputTokens = new ArrayList<String>();
-			StringTokenizer tokenizerIndiv = new StringTokenizer(selectedUserEmail, ",|;|\n");
+			selectedUserEmail = selectedUserEmail.replaceAll( ";|\\||\n|\r", "," ).replaceAll(",{2,}",",");
+			StringTokenizer tokenizerIndiv = new StringTokenizer(selectedUserEmail, ",");
 			while (tokenizerIndiv.hasMoreTokens()) {
 				String inputToken = tokenizerIndiv.nextToken();
 				if (tokenizerIndiv.countTokens() == 1 && (inputToken == null || inputToken.isEmpty())) {

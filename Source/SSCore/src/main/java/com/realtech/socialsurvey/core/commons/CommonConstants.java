@@ -125,6 +125,7 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_COMPLETE = 7;
     public static final int STATUS_SURVEYPREINITIATION_OLD_RECORD = 8;
     public static final int STATUS_SURVEYPREINITIATION_IGNORED_RECORD = 9;
+    public static final int STATUS_SURVEYPREINITIATION_DELETED = 0;
 
     /**
      * Hibernate entities and column name constants
@@ -167,6 +168,8 @@ public interface CommonConstants
     public static final String SURVEY_SOURCE_ID_COLUMN = "sourceId";
     public static final String VERTICAL_NAME = "verticalName";
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
+    public static final String CUSTOMER_FIRST_NAME_COLUMN = "customerFirstName";
+    public static final String ENGAGEMENT_CLOSED_TIME = "engagementClosedTime";
     public static final String BATCH_TYPE_COLUMN = "batchType";
     public static final String SOURCE_COLUMN = "source";
     public static final String SURVEY_PREINITIATION_ID_COLUMN = "surveyPreIntitiationId";
@@ -785,6 +788,8 @@ public interface CommonConstants
 
     public static final String INVALID_USERS_LIST = "invalidUsersList";
 
+    public static final String INVALID_USERS_ASSIGN_LIST = "invalidUsersAssignList";
+
     public static final String BRANCH_OBJECT = "branch";
 
     public static final String REGION_OBJECT = "region";
@@ -848,6 +853,8 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_HIERARCHY_TYPE = 1;
     public static final int FILE_UPLOAD_SURVEY_TYPE = 2;
     public static final int FILE_UPLOAD_BILLING_REPORT = 3;
+    public static final int FILE_UPLOAD_COMPANY_USERS_REPORT = 4;
+    public static final int FILE_UPLOAD_COMPANY_HIERARCHY_REPORT = 5;
 
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1019,17 +1026,48 @@ public interface CommonConstants
     public static final String CHR_REGION_REGION_NAME = "Region Name";
     public static final String CHR_ADDRESS_1 = "Address 1";
     public static final String CHR_ADDRESS_2 = "Address 2";
+    public static final String CHR_1 = "1";
+    public static final String CHR_2 = "2";
     public static final String CHR_CITY = "City";
     public static final String CHR_STATE = "State";
     public static final String CHR_ZIP = "Zip";
     public static final String CHR_ID_DESC = "Unique ID used for assignment.";
     public static final String CHR_BRANCH_REGION_ID_DESC = "Region ID from the Region sheet.";
     public static final String CHR_REGION_REGION_NAME_DESC = "Name to be displayed.";
+    public static final String CHR_FACEBOOK = "Facebook";
+    public static final String CHR_TWITTER = "Twitter";
+    public static final String CHR_LINKEDIN = "Linkedin";
+    public static final String CHR_GOOGLE = "Google";
+    public static final String CHR_ZILLOW = "Zillow";
+    public static final String CHR_YELP = "Yelp";
+    public static final String CHR_LENDING_TREE = "Lendingtree";
+    public static final String CHR_REALTOR = "Realtor";
+    
+    public static final String SOCIAL_SURVEY_ACCESS_LAVEL = "SocialSurvey Access Level ";
+    public static final String SOCIAL_SURVEY_INVITE_SENT = "SocialSurvey Invite sent";
+    public static final String DATE_LAST_INVITE_SENT = "Date last invite sent";
+    public static final String PROFILE_VERIFIED = "Profile Verified ";
+    public static final String DATE_OF_LAST_LOGIN = "Date of last log-in";
+    public static final String PROFILE_COMPLETE = "Profile Complete ";
+    public static final String SOCIALLY_CONNECTED = "Socially Connected";
+    public static final String DATE_CONNECTION_ESTABLISHED = "Date connection established";
+    public static final String CONNECTION_STATUS = "Connection Status";
+    public static final String DATE_OF_LAST_POST = "Date of last post";
+    public static final String DATE_ADOPTION_COMPLETED = "Date Adoption completed";
+    public static final String DATE_LAST_SURVEY_SENT = "Date last survey sent";
+    public static final String DATE_LAST_SURVEY_POSTED = "Date last survey posted";
+    
+    //user report mail subject and body
+    public static final String COMPANY_USERS_REPORT_MAIL_SUBJ = "Company Users Report for ";
+    public static final String COMPANY_USERS_REPORT_MAIL_BODY =  "Here is the company users report you requested. Please refer to the attachment for the report.";
     
     //API Call details constants
     public static final String EXTERNAL_API_CALL_DETAILS_COLLECTION = "EXTERNAL_API_CALL_DETAILS";
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
+    // Error Suffix for the email address already taken
+    public static final String EMAIL_ADDRESS_TAKEN_ERROR_SUFFIX = " already taken";
+
 
     //Hierarchy Upload constants
     public static final String HIERARCHY_UPLOAD_COLLECTION = "HIERARCHY_UPLOAD";
@@ -1062,17 +1100,17 @@ public interface CommonConstants
     public static final String REGION_DELETE_ERROR_LIST = "REGION_DELETE";
     
     //Hierarchy upload status constants
-    public static final int HIERARCHY_UPLOAD_INITIATED = 1;
-    public static final int HIERARCHY_UPLOAD_PROCESSING = 0;
-    public static final int HIERARCHY_UPLOAD_UPLOADING_REGIONS = 2;
-    public static final int HIERARCHY_UPLOAD_UPLOADING_BRANCHES = 3;
-    public static final int HIERARCHY_UPLOAD_UPLOADING_USERS = 4;
-    public static final int HIERARCHY_UPLOAD_DELETING_USERS = 5;
-    public static final int HIERARCHY_UPLOAD_DELETING_BRANCHES = 6;
-    public static final int HIERARCHY_UPLOAD_DELETING_REGIONS = 7;
-    public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 8;
-    public static final int HIERARCHY_UPLOAD_ERROR = 9;
-    public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 10;
+    
+    public static final int HIERARCHY_UPLOAD_ENTITY_INITIATED = 1;
+    public static final int HIERARCHY_UPLOAD_ENTITY_STARTED = 2;
+    public static final int HIERARCHY_UPLOAD_ENTITY_DONE = 0;
+    public static final int HIERARCHY_UPLOAD_ENTITY_ERROR = 3;
+    public static final int HIERARCHY_UPLOAD_UPLOAD_COMPLETE = 4;
+    public static final int HIERARCHY_UPLOAD_ERROR = 5;
+    public static final int HIERARCHY_UPLOAD_NO_UPLOAD = 6;
+    
+    public static final char UPLOAD_MODE_APPEND = 'A';
+    public static final char UPLOAD_MODE_REPLACE = 'R';
     
     //Hierarchy upload message constants
     public static final String UPLOAD_MSG_INITIATED = "Import initiated";
@@ -1084,7 +1122,23 @@ public interface CommonConstants
     public static final String UPLOAD_MSG_DELETING_BRANCHES = "Deleting removed offices";
     public static final String UPLOAD_MSG_DELETING_REGIONS = "Deleting removed regions";
     public static final String UPLOAD_MSG_UPLOAD_COMPLETE = "Import successful";
-    public static final String UPLOAD_MSG_UPLOAD_ERROR = "Error importing comany hierarchy";
+    public static final String UPLOAD_MSG_UPLOAD_ERROR = "Error importing company hierarchy";
     public static final String UPLOAD_MSG_NO_UPLOAD = "";
+    public static final String UPLOAD_ADDED_REGIONS = "No. of regions added : ";
+    public static final String UPLOAD_MODIFIED_REGIONS = "No. of regions modified : ";
+    public static final String UPLOAD_DELETED_REGIONS = "No. of regions deleted : ";
+    public static final String UPLOAD_ADDED_BRANCHES = "No. of offices added : ";
+    public static final String UPLOAD_MODIFIED_BRANCHES = "No. of offices modified : ";
+    public static final String UPLOAD_DELETED_BRANCHES = "No. of offices deleted : ";
+    public static final String UPLOAD_ADDED_USERS = "No. of users added : ";
+    public static final String UPLOAD_MODIFIED_USERS = "No. of users modified : ";
+    public static final String UPLOAD_DELETED_USERS = "No. of users deleted : ";
+    
+    
+    //Company registration stage
+    public static final String COMPANY_REGISTRATION_STAGE_STARTED = "The registration has been initiated";
+    public static final String COMPANY_REGISTRATION_STAGE_COMPLETE = "The registrtion has been completed successfully";
+    public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
+    
     
 }

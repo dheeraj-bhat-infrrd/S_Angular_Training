@@ -58,8 +58,9 @@
 					<select id="survey-count-days" class="float-left dash-sel-item">
 						<option value="30"><spring:message code="label.duration.one.key" /></option>
 						<option value="60"><spring:message code="label.duration.two.key" /></option>
-						<option value="90" selected><spring:message code="label.duration.three.key" /></option>
-						<option value="365"><spring:message code="label.duration.four.key" /></option>
+						<option value="90" ><spring:message code="label.duration.three.key" /></option>
+						<option value="365" selected><spring:message code="label.duration.four.key" /></option>
+						<option value="-1"><spring:message code="label.duration.five.key"/></option>
 					</select>
 				</div>
 			</div>
@@ -91,8 +92,8 @@
 					<select id="dsh-grph-format" class="float-left dash-sel-item">
 						<option value="30"><spring:message code="label.duration.one.key" /></option>
 						<option value="60"><spring:message code="label.duration.two.key" /></option>
-						<option value="90" selected><spring:message code="label.duration.three.key" /></option>
-						<option value="365"><spring:message code="label.duration.four.key" /></option>
+						<option value="90" ><spring:message code="label.duration.three.key" /></option>
+						<option value="365" selected><spring:message code="label.duration.four.key" /></option>
 					</select>
 				</div>
 				
@@ -142,7 +143,8 @@
 							<option value=4 data-report="incomplete-survey"><spring:message code="label.incompletesurveydata.key" /></option>
 							<c:if test="${profilemasterid == 1 || accounttype == 'COMPANY' }">
 							
-								<option value=6 data-report="company-hierarchy"><spring:message code="label.downloadcompanyhierarchydata.key" /></option>
+								<!--  <option value=6 data-report="company-hierarchy"><spring:message code="label.downloadcompanyhierarchydata.key" /></option>-->
+								<option value=7 data-report="user-list-report"><spring:message code="label.downloaduserlistdata.key" /></option>
 							</c:if>
 							<c:if test="${not empty realTechAdminId }">
 								<option value=5 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 
@@ -188,6 +190,7 @@
 	</div>
 </div>
 <script>
+/* var  is_dashboard_loaded = window.is_dashboard_loaded; */
 $(document).ready(function() {
 	$(document).attr("title", "Dashboard");
 

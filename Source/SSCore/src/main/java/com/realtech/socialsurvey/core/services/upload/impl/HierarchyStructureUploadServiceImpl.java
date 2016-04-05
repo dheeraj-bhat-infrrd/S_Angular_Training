@@ -117,7 +117,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
 
     @Override
-    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user ) throws InvalidInputException
+    public Map<String, List<String>> uploadHierarchy( HierarchyUpload upload, Company company, User user, boolean isAppend )
+        throws InvalidInputException
     {
         // the upload object should have the current value as well the changes made by the user in the sheet/ UI
         if ( upload == null ) {
@@ -151,12 +152,16 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadBranches( upload, user, company, branchUploadErrors );
         // Uploading users
         uploadUsers( upload, user, userUploadErrors );
-        // Delete users
-        deleteUsers( upload, user, company, userDeleteErrors );
-        // Delete branches
-        deleteBranches( upload, user, company, branchDeleteErrors );
-        // Delete regions
-        deleteRegions( upload, user, company, regionDeleteErrors );
+        
+        //Append mode doesn't deal with deletion, you can either add or delete users
+        if ( !isAppend ) {
+            // Delete users
+            deleteUsers( upload, user, company, userDeleteErrors );
+            // Delete branches
+            deleteBranches( upload, user, company, branchDeleteErrors );
+            // Delete regions
+            deleteRegions( upload, user, company, regionDeleteErrors );
+        }
 
         hierarchyUploadDao.saveHierarchyUploadObject( upload );
         
@@ -189,20 +194,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.debug( "Deleting removed users" );
         
-        //Add new upload status
-        UploadStatus userDeleteStatus = new UploadStatus();
-        userDeleteStatus.setAdminUserId( adminUser.getUserId() );
-        userDeleteStatus.setCompany( adminUser.getCompany() );
-        userDeleteStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_DELETING_USERS );
-        userDeleteStatus.setMessage( CommonConstants.UPLOAD_MSG_DELETING_USERS );
-        addUploadStatusEntry( userDeleteStatus );
+        //Keep a count of deleted users
+        int deletedUsers = 0;
+        int deletedUsersOldCount = 0;
+        Long nextTime = System.currentTimeMillis();
+        
+        UploadStatus deletedUsersStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_DELETED_USERS, deletedUsers );
         
         List<UserUploadVO> userList = upload.getUsers();
         if ( userList == null || userList.isEmpty() ) {
             LOG.warn( "Empty userList" );
             return;
         }
-        List<UserUploadVO> deletedUsers = new ArrayList<UserUploadVO>();
+        List<UserUploadVO> deletedUsersList = new ArrayList<UserUploadVO>();
         for ( UserUploadVO user : userList ) {
             if ( user.isDeletedRecord() ) {
                 // Delete the user
@@ -212,15 +216,27 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     userManagementService.updateUserCountModificationNotification( adminUser.getCompany() );
                     LOG.debug( "Removing user {} from solr.", user.getUserId() );
                     solrSearchService.removeUserFromSolr( user.getUserId() );
-                    deletedUsers.add( user );
+                    deletedUsersList.add( user );
                     upload.getUserSourceMapping().remove( user.getSourceUserId() );
+                    deletedUsers += 1;
+                    
+                    if ( deletedUsers > deletedUsersOldCount && System.currentTimeMillis() > nextTime ) {
+                        deletedUsersStatus = updateUploadStatus( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS,
+                            deletedUsers );
+                        deletedUsersOldCount = deletedUsers;
+                        nextTime = nextTime + 2*1000;
+                    }
                 } catch ( Exception e ) {
                     // process errors and return them to the user
                     errorList.add( e.getMessage() );
+                    deletedUsersStatus = updateUploadStatusForError( deletedUsersStatus,
+                        CommonConstants.UPLOAD_DELETED_USERS, deletedUsers );
                 }
             }
         }
-        upload.getUsers().removeAll( deletedUsers );
+        upload.getUsers().removeAll( deletedUsersList );
+        deletedUsersStatus = updateUploadStatusToDone( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS,
+            deletedUsers );
         LOG.debug( "Finished deleting removed users" );
     }
 
@@ -231,20 +247,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.info( "Deleting branches" );
         
-        //Add new upload status
-        UploadStatus branchDeleteStatus = new UploadStatus();
-        branchDeleteStatus.setAdminUserId( adminUser.getUserId() );
-        branchDeleteStatus.setCompany( adminUser.getCompany() );
-        branchDeleteStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_DELETING_BRANCHES );
-        branchDeleteStatus.setMessage( CommonConstants.UPLOAD_MSG_DELETING_BRANCHES );
-        addUploadStatusEntry( branchDeleteStatus );
+        //Keep a count of deleted users
+        int deletedBranches = 0;
+        int deletedBranchesOldCount = 0;
+        Long nextTime = System.currentTimeMillis();
+        
+        UploadStatus deletedBranchesStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_DELETED_BRANCHES, deletedBranches );
         
         List<BranchUploadVO> branches = upload.getBranches();
         if ( branches == null || branches.isEmpty() ) {
             LOG.warn( "Empty branch list" );
             return;
         }
-        List<BranchUploadVO> deletedBranches = new ArrayList<BranchUploadVO>();
+        List<BranchUploadVO> deletedBranchesList = new ArrayList<BranchUploadVO>();
 
         for ( BranchUploadVO branch : branches ) {
             if ( branch.isDeletedRecord() ) {
@@ -264,25 +279,37 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         LOG.debug( "Calling service to deactivate branch" );
                         organizationManagementService.updateBranchStatus( adminUser, branch.getBranchId(),
                             CommonConstants.STATUS_INACTIVE );
-                        //TODO: Remove branch from session?
                         //update profile name and url
                         organizationManagementService.updateProfileUrlAndStatusForDeletedEntity(
                             CommonConstants.BRANCH_ID_COLUMN, branch.getBranchId() );
                         //remove social media connections
                         socialManagementService.disconnectAllSocialConnections( CommonConstants.BRANCH_ID_COLUMN,
                             branch.getBranchId() );
-                        deletedBranches.add( branch );
+                        deletedBranchesList.add( branch );
                         upload.getBranchSourceMapping().remove( branch.getSourceBranchId() );
+                        deletedBranches += 1;
+                        
+                        if ( deletedBranches > deletedBranchesOldCount && System.currentTimeMillis() > nextTime ) {
+                            deletedBranchesStatus = updateUploadStatus( deletedBranchesStatus,
+                                CommonConstants.UPLOAD_DELETED_BRANCHES, deletedBranches );
+                            deletedBranchesOldCount = deletedBranches;
+                            nextTime = nextTime + 2*1000;
+                        }
                     }
 
                 } catch ( Exception e ) {
                     //process errors and return them to the user
                     e.printStackTrace();
                     errorList.add( e.getMessage() );
+                    deletedBranchesStatus = updateUploadStatusForError( deletedBranchesStatus,
+                        CommonConstants.UPLOAD_DELETED_BRANCHES, deletedBranches );
                 }
             }
         }
-        upload.getBranches().removeAll( deletedBranches );
+        upload.getBranches().removeAll( deletedBranchesList );
+        
+        deletedBranchesStatus = updateUploadStatusToDone( deletedBranchesStatus, CommonConstants.UPLOAD_DELETED_BRANCHES,
+            deletedBranches );
         LOG.info( "Finished deleting branches" );
     }
 
@@ -293,20 +320,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.info( "Deleting regions" );
         
-        //Add new upload status
-        UploadStatus regionDeleteStatus = new UploadStatus();
-        regionDeleteStatus.setAdminUserId( adminUser.getUserId() );
-        regionDeleteStatus.setCompany( adminUser.getCompany() );
-        regionDeleteStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_DELETING_REGIONS );
-        regionDeleteStatus.setMessage( CommonConstants.UPLOAD_MSG_DELETING_REGIONS );
-        addUploadStatusEntry( regionDeleteStatus );
+        //Keep a count of deleted users
+        int deletedRegions = 0;
+        int deletedRegionsOldCount = 0;
+        Long nextTime = System.currentTimeMillis();
+        
+        UploadStatus deletedRegionsStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_DELETED_REGIONS, deletedRegions );
         
         List<RegionUploadVO> regions = upload.getRegions();
         if ( regions == null || regions.isEmpty() ) {
             LOG.warn( "Empty region list" );
             return;
         }
-        List<RegionUploadVO> deletedRegions = new ArrayList<RegionUploadVO>();
+        List<RegionUploadVO> deletedRegionsList = new ArrayList<RegionUploadVO>();
 
         for ( RegionUploadVO region : regions ) {
             if ( region.isDeletedRecord() ) {
@@ -328,26 +354,36 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         organizationManagementService.updateRegionStatus( adminUser, region.getRegionId(),
                             CommonConstants.STATUS_INACTIVE );
 
-                        //TODO: Remove region from session?
-
                         //update profile name and url
                         organizationManagementService.updateProfileUrlAndStatusForDeletedEntity(
                             CommonConstants.REGION_ID_COLUMN, region.getRegionId() );
                         //remove social media connections
                         socialManagementService.disconnectAllSocialConnections( CommonConstants.REGION_ID_COLUMN,
                             region.getRegionId() );
-                        deletedRegions.add( region );
+                        deletedRegionsList.add( region );
                         upload.getRegionSourceMapping().remove( region.getSourceRegionId() );
+                        deletedRegions += 1;
+                        if ( deletedRegions > deletedRegionsOldCount && System.currentTimeMillis() > nextTime ) {
+                            deletedRegionsStatus = updateUploadStatus( deletedRegionsStatus,
+                                CommonConstants.UPLOAD_DELETED_REGIONS, deletedRegions );
+                            deletedRegionsOldCount = deletedRegions;
+                            nextTime = nextTime + 2*1000;
+                        }
                     }
 
                 } catch ( Exception e ) {
                     //process errors and return them to the user
                     e.printStackTrace();
                     errorList.add( e.getMessage() );
+                    deletedRegionsStatus = updateUploadStatusForError( deletedRegionsStatus,
+                        CommonConstants.UPLOAD_DELETED_REGIONS, deletedRegions );
                 }
             }
         }
-        upload.getRegions().removeAll( deletedRegions );
+        upload.getRegions().removeAll( deletedRegionsList );
+        
+        deletedRegionsStatus = updateUploadStatusToDone( deletedRegionsStatus, CommonConstants.UPLOAD_DELETED_REGIONS,
+            deletedRegions );
     }
 
 
@@ -357,13 +393,16 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.debug( "Uploading new branches" );
         
-        //Add new upload status
-        UploadStatus branchUploadStatus = new UploadStatus();
-        branchUploadStatus.setAdminUserId( user.getUserId() );
-        branchUploadStatus.setCompany( company );
-        branchUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_UPLOADING_BRANCHES );
-        branchUploadStatus.setMessage( CommonConstants.UPLOAD_MSG_UPLOADING_BRANCHES );
-        addUploadStatusEntry( branchUploadStatus );
+        //Keep a count of added and modified regions
+        int addedBranches = 0;
+        int modifiedBranches = 0;
+        int addedBranchesOldCount = 0;
+        int modifiedBranchesOldCount = 0;
+        Long nextTime = System.currentTimeMillis();
+        
+        UploadStatus addedBranchesStatus = createUploadStatus( user, CommonConstants.UPLOAD_ADDED_BRANCHES, addedBranches );
+        
+        UploadStatus modifiedBranchesStatus = createUploadStatus( user, CommonConstants.UPLOAD_MODIFIED_BRANCHES, modifiedBranches );
         
         List<BranchUploadVO> branchesToBeUploaded = upload.getBranches();
         if ( branchesToBeUploaded != null && !branchesToBeUploaded.isEmpty() ) {
@@ -389,14 +428,17 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         // Add branch
                         branch = createBranch( user, branchUpload, upload );
                         branchUpload.setBranchId( branch.getBranchId() );
+                        addedBranches += 1;
                     } else if ( branchUpload.isBranchModified() ) {
                         // Modify branch
                         branch = modifyBranch( user, branchUpload );
-
+                        modifiedBranches += 1;
                     }
 
                     // map the history records
                     mapBranchModificationHistory( branchUpload, branch );
+                    //Reset inAppendMode flag
+                    branchUpload.setInAppendMode( false );
 
                     // map the id mapping
                     /*if ( branchUpload.getSourceRegionId() != null && !branchUpload.getSourceRegionId().isEmpty() ) {
@@ -407,15 +449,40 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     }
 
                     upload.setBranches( branchesToBeUploaded );
-
+                    if ( System.currentTimeMillis() > nextTime ) {
+                        //Update count in upload_status
+                        if ( addedBranches > addedBranchesOldCount ) {
+                            addedBranchesStatus = updateUploadStatus( addedBranchesStatus,
+                                CommonConstants.UPLOAD_ADDED_BRANCHES, addedBranches );
+                            addedBranchesOldCount = addedBranches;
+                        }
+                        if ( modifiedBranches > modifiedBranchesOldCount ) {
+                            modifiedBranchesStatus = updateUploadStatus( modifiedBranchesStatus,
+                                CommonConstants.UPLOAD_MODIFIED_BRANCHES, modifiedBranches );
+                            modifiedBranchesOldCount = modifiedBranches;
+                        }
+                        nextTime = nextTime + 2*1000;
+                    }
                 } catch ( InvalidInputException | BranchAdditionException | SolrException | NoRecordsFetchedException
                     | UserAssignmentException e ) {
                     //Add error records
                     errorList.add( e.getMessage() );
                     e.printStackTrace();
+
+                    //Update upload status to show the latest counts
+                    addedBranchesStatus = updateUploadStatusForError( addedBranchesStatus,
+                        CommonConstants.UPLOAD_ADDED_BRANCHES, addedBranches );
+
+                    modifiedBranchesStatus = updateUploadStatusForError( modifiedBranchesStatus,
+                        CommonConstants.UPLOAD_MODIFIED_BRANCHES, modifiedBranches );
                 }
             }
         }
+        //Update upload status to show the latest counts
+        addedBranchesStatus = updateUploadStatusToDone( addedBranchesStatus, CommonConstants.UPLOAD_ADDED_BRANCHES,
+            addedBranches );
+        modifiedBranchesStatus = updateUploadStatusToDone( modifiedBranchesStatus,
+            CommonConstants.UPLOAD_MODIFIED_BRANCHES, modifiedBranches );
     }
 
 
@@ -524,13 +591,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.debug( "Uploading new regions." );
         
-        //Add new upload status
-        UploadStatus regionUploadStatus = new UploadStatus();
-        regionUploadStatus.setAdminUserId( user.getUserId() );
-        regionUploadStatus.setCompany( company );
-        regionUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_UPLOADING_REGIONS );
-        regionUploadStatus.setMessage( CommonConstants.UPLOAD_MSG_UPLOADING_REGIONS );
-        addUploadStatusEntry( regionUploadStatus );
+        //Keep a count of added and modified regions
+        int addedRegions = 0;
+        int modifiedRegions = 0;
+        int addedRegionsOldCount = 0;
+        int modifiedRegionsOldCount = 0;
+        Long nextTime = System.currentTimeMillis();
+        
+        UploadStatus addedRegionsStatus = createUploadStatus( user, CommonConstants.UPLOAD_ADDED_REGIONS, addedRegions );
+        UploadStatus modifiedRegionsStatus = createUploadStatus( user, CommonConstants.UPLOAD_MODIFIED_REGIONS, modifiedRegions );
         
         
         List<RegionUploadVO> regionsToBeUploaded = upload.getRegions();
@@ -547,13 +616,16 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     if ( regionUpload.isRegionAdded() ) {
                         region = createRegion( user, regionUpload );
                         regionUpload.setRegionId( region.getRegionId() );
-
+                        addedRegions += 1;
                     } else if ( regionUpload.isRegionModified() ) {
                         //process modified records
                         region = modifyRegion( user, regionUpload );
+                        modifiedRegions += 1;
                     }
                     // map the history records
                     mapRegionModificationHistory( regionUpload, region );
+                    //Reset inAppendMode flag
+                    regionUpload.setInAppendMode( false );
                     // map the id mapping
                     if ( regionUpload.getSourceRegionId() != null && !regionUpload.getSourceRegionId().isEmpty() ) {
                         upload.getRegionSourceMapping().put( regionUpload.getSourceRegionId(), region.getRegionId() );
@@ -561,13 +633,39 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
                     //Store the updated regionUploads in upload
                     upload.setRegions( regionsToBeUploaded );
+                    
+                    if ( System.currentTimeMillis() > nextTime ) {
+                        //Update count in upload_status
+                        if ( addedRegions > addedRegionsOldCount ) {
+                            addedRegionsStatus = updateUploadStatus( addedRegionsStatus,
+                                CommonConstants.UPLOAD_ADDED_REGIONS, addedRegions );
+                            addedRegionsOldCount = addedRegions;
+                        }
+                        if ( modifiedRegions > modifiedRegionsOldCount ) {
+                            modifiedRegionsStatus = updateUploadStatus( modifiedRegionsStatus,
+                                CommonConstants.UPLOAD_MODIFIED_REGIONS, modifiedRegions );
+                            modifiedRegionsOldCount = modifiedRegions;
+                        }
+                        nextTime = nextTime + 2 * 1000;
+                    }
                 } catch ( InvalidInputException | SolrException | NoRecordsFetchedException | UserAssignmentException e ) {
                     // Add error records
                     errorList.add( e.getMessage() );
                     e.printStackTrace();
+                    //Update upload status to show the latest counts
+                    addedRegionsStatus = updateUploadStatusForError( addedRegionsStatus,
+                        CommonConstants.UPLOAD_ADDED_REGIONS, addedRegions );
+
+                    modifiedRegionsStatus = updateUploadStatusForError( modifiedRegionsStatus,
+                        CommonConstants.UPLOAD_MODIFIED_REGIONS, modifiedRegions );
                 }
             }
         }
+        //Update upload status to show the latest counts
+        addedRegionsStatus = updateUploadStatusToDone( addedRegionsStatus, CommonConstants.UPLOAD_ADDED_REGIONS,
+            addedRegions );
+        modifiedRegionsStatus = updateUploadStatusToDone( modifiedRegionsStatus, CommonConstants.UPLOAD_MODIFIED_REGIONS,
+            modifiedRegions );
     }
 
 
@@ -1968,13 +2066,17 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     {
         LOG.debug( "Uploading users to database" );
         
-        //Add new upload status
-        UploadStatus userUploadStatus = new UploadStatus();
-        userUploadStatus.setAdminUserId( adminUser.getUserId() );
-        userUploadStatus.setCompany( adminUser.getCompany() );
-        userUploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_UPLOADING_USERS );
-        userUploadStatus.setMessage( CommonConstants.UPLOAD_MSG_UPLOADING_USERS );
-        addUploadStatusEntry( userUploadStatus );
+        //Keep a count of added and modified regions
+        int addedUsers = 0;
+        int modifiedUsers = 0;
+        int addedUsersOldCount = 0;
+        int modifiedUsersOldCount = 0;
+        Long nextTime = System.currentTimeMillis();
+        
+        UploadStatus addedUsersStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_ADDED_USERS, addedUsers );
+        
+        
+        UploadStatus modifiedUsersStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_MODIFIED_USERS, modifiedUsers );
         
         Map<String, UserUploadVO> currentUserMap = new HashMap<String, UserUploadVO>();
         try {
@@ -2005,34 +2107,55 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 }
                 
                 if ( userToBeUploaded.isUserModified() ) {
-                    user = modifyUser( userToBeUploaded, adminUser, currentUserMap, currentUpload );
+                    user = modifyUser( userToBeUploaded, adminUser, currentUserMap, upload );
+                    modifiedUsers += 1;
                 } else if ( userToBeUploaded.isUserAdded() ) {
                     // add user
                     user = addUser( userToBeUploaded, adminUser, currentUserMap, upload );
+                    addedUsers += 1;
                 }
                 userToBeUploaded.setUserId( user.getUserId() );
                 updateUserSettingsInMongo( user, userToBeUploaded );
                 //map the history records
                 mapUserModificationHistory( userToBeUploaded, user );
+                //Reset inAppendMode flag
+                userToBeUploaded.setInAppendMode( false );
                 //map the id mapping
-                /*if ( userToBeUploaded.getSourceRegionId() != null && !userToBeUploaded.getSourceRegionId().isEmpty() ) {
-                    upload.getRegionSourceMapping().put( userToBeUploaded.getSourceRegionId(), userToBeUploaded.getRegionId() );
-                }
-                if ( userToBeUploaded.getSourceBranchId() != null && !userToBeUploaded.getSourceBranchId().isEmpty() ) {
-                    upload.getBranchSourceMapping().put( userToBeUploaded.getSourceBranchId(), userToBeUploaded.getBranchId() );
-                }*/
                 if ( userToBeUploaded.getSourceUserId() != null && !userToBeUploaded.getSourceUserId().isEmpty() ) {
                     upload.getUserSourceMapping().put( userToBeUploaded.getSourceUserId(), userToBeUploaded.getUserId() );
                 }
                 //Store the updated userUploads in upload
                 upload.setUsers( usersToUpload );
+                
+                if ( System.currentTimeMillis() > nextTime ) {
+                    //Update count in upload_status
+                    if ( addedUsers > addedUsersOldCount ) {
+                        addedUsersStatus = updateUploadStatus( addedUsersStatus, CommonConstants.UPLOAD_ADDED_USERS,
+                            addedUsers );
+                        addedUsersOldCount = addedUsers;
+                    }
+                    if ( modifiedUsers > modifiedUsersOldCount ) {
+                        modifiedUsersStatus = updateUploadStatus( modifiedUsersStatus,
+                            CommonConstants.UPLOAD_MODIFIED_USERS, modifiedUsers );
+                        modifiedUsersOldCount = modifiedUsers;
+                    }
+                    nextTime = nextTime + 2 * 1000;
+                }
             }
         } catch ( Exception e ) {
             // Add error records
             e.printStackTrace();
             errorList.add( e.getMessage() );
-            
+            //Update upload status to show the latest counts
+            addedUsersStatus = updateUploadStatusForError( addedUsersStatus, CommonConstants.UPLOAD_ADDED_USERS,
+                addedUsers );
+            modifiedUsersStatus = updateUploadStatusForError( modifiedUsersStatus, CommonConstants.UPLOAD_MODIFIED_USERS,
+                modifiedUsers );
         }
+        //Update upload status to show the latest counts
+        addedUsersStatus = updateUploadStatusToDone( addedUsersStatus, CommonConstants.UPLOAD_ADDED_USERS, addedUsers );
+        modifiedUsersStatus = updateUploadStatusToDone( modifiedUsersStatus, CommonConstants.UPLOAD_MODIFIED_USERS,
+            modifiedUsers );
         LOG.debug( "Finished uploading users to the database" );
     }
 
@@ -2229,8 +2352,10 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     public List<UploadStatus> findInitiatedHierarchyUploads() throws NoRecordsFetchedException
     {
         LOG.info( "Searching for initiated hierarchy upload entries" );
-        List<UploadStatus> initiatedUploads = uploadStatusDao.findByColumn( UploadStatus.class, CommonConstants.STATUS_COLUMN,
-            CommonConstants.STATUS_ACTIVE );
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.HIERARCHY_UPLOAD_ENTITY_INITIATED );
+        queries.put( CommonConstants.MESSAGE, CommonConstants.UPLOAD_MSG_INITIATED );
+        List<UploadStatus> initiatedUploads = uploadStatusDao.findByKeyValue( UploadStatus.class, queries );
         if ( initiatedUploads == null || initiatedUploads.isEmpty() ) {
             throw new NoRecordsFetchedException( "No hierarchy upload entries found" );
         }
@@ -2253,6 +2378,17 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
     
     
+    
+    @Override
+    @Transactional
+    public void updateUploadStatusToNoUpload(UploadStatus uploadStatus)
+    {
+        LOG.info( "Upadting uploadStatus to no upload" );
+        uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_NO_UPLOAD );
+        uploadStatusDao.update( uploadStatus );
+    }
+    
+    
     /**
      * Method to add an uploadStatus entry
      * @param uploadStatus
@@ -2266,6 +2402,27 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadStatus.setModifiedOn( currentTime );
         uploadStatus.setCreatedOn( currentTime );
         uploadStatusDao.save( uploadStatus );
+    }
+    
+    
+    /**
+     * Method to add an error upload status entry
+     * @param adminUser
+     * @param company
+     * @param errorStr
+     * @param uploadStatus
+     */
+    @Override
+    @Transactional
+    public void createErrorUploadStatusEntry( User adminUser, Company company, String errorStr, UploadStatus uploadStatus )
+    {
+        UploadStatus errorStatus = new UploadStatus();
+        errorStatus.setAdminUserId( adminUser.getUserId() );
+        errorStatus.setCompany( company );
+        errorStatus.setMessage( errorStr );
+        errorStatus.setUploadMode( uploadStatus.getUploadMode() );
+        errorStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_ERROR );
+        addUploadStatusEntry( errorStatus );
     }
     
     
@@ -2292,6 +2449,32 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         return latestStatus;
     }
     
+    
+    /**
+     * Method to fetch all the upload statuses for a company
+     * @param company
+     * @return
+     */
+    @Override
+    public List<UploadStatus> fetchUploadStatusForCompany( Company company )
+    {
+        LOG.info( "Method to fetch all the upload statuses for company : " + company.getCompany() + " started" );
+
+        //Get a list of all the statuses
+        List<UploadStatus> uploadStatuses = uploadStatusDao.findByColumn( UploadStatus.class, "company.companyId",
+            company.getCompanyId() );
+        List<UploadStatus> returnedStatuses = null;
+        if ( uploadStatuses != null && !uploadStatuses.isEmpty() ) {
+            returnedStatuses = new ArrayList<UploadStatus>();
+            for ( UploadStatus uploadStatus : uploadStatuses ) {
+                if ( !uploadStatus.getMessage().endsWith( "0" ) ) {
+                    returnedStatuses.add( uploadStatus );
+                }
+            }
+        }
+        return returnedStatuses;
+    }
+    
 
     /**
      * Method to select the newer status
@@ -2316,11 +2499,32 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     
     
     /**
+     * Method to determine the latest status
+     * @param uploadStatuses
+     * @return
+     */
+    @Override
+    public UploadStatus highestStatus( List<UploadStatus> uploadStatuses )
+    {
+        UploadStatus latestStatus = null;
+        if ( uploadStatuses != null && !uploadStatuses.isEmpty() ) {
+            latestStatus = uploadStatuses.get( 0 );
+            for ( UploadStatus uploadStatus : uploadStatuses ) {
+                latestStatus = newerStatus( latestStatus, uploadStatus );
+            }
+            return latestStatus;
+        }
+        return null;
+    }
+    
+    
+    
+    /**
      * Method to initiate hierarchy upload
      * @param adminUser
      */
     @Override
-    public void addNewUploadRequest( User adminUser )
+    public void addNewUploadRequest( User adminUser, boolean isAppend )
     {
         //Remove old records for the company
         List<String> conditions = new ArrayList<String>();
@@ -2332,8 +2536,76 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         newStatus.setAdminUserId( adminUser.getUserId() );
         newStatus.setCompany( adminUser.getCompany() );
         newStatus.setMessage( CommonConstants.UPLOAD_MSG_INITIATED );
-        newStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_INITIATED );
+        newStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_INITIATED );
+        if ( isAppend ) {
+            newStatus.setUploadMode( CommonConstants.UPLOAD_MODE_APPEND );
+        }
         addUploadStatusEntry( newStatus );
+    }
+    
+    
+    /**
+     * Method to create an upload status initiated entry
+     * @param adminUser
+     * @param message
+     * @param value
+     * @return
+     */
+    UploadStatus createUploadStatus(User adminUser, String message, int value)
+    {
+        UploadStatus status = new UploadStatus();
+        status.setAdminUserId( adminUser.getUserId() );
+        status.setCompany( adminUser.getCompany() );
+        status.setMessage( message + value );
+        status.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_INITIATED );
+        addUploadStatusEntry( status );
+        return status;
+    }
+    
+    
+    /**
+     * Method to update the message of an existing upload status entry
+     * @param status
+     * @param message
+     * @param value
+     * @return
+     */
+    UploadStatus updateUploadStatus( UploadStatus status, String message, int value )
+    {
+        status.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_STARTED );
+        status.setMessage( message + value );
+        updateUploadStatus( status );
+        return status;
+    }
+    
+    
+    /**
+     * Method to update the message on error for an upload status entry
+     * @param status
+     * @param value
+     * @return
+     */
+    UploadStatus updateUploadStatusForError( UploadStatus status, String message, int value )
+    {
+        status.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_ERROR );
+        status.setMessage( message + value );
+        updateUploadStatus( status );
+        return status;
+    }
+    
+    
+    /**
+     * Method to update an upload status entry to done
+     * @param status
+     * @param value
+     * @return
+     */
+    UploadStatus updateUploadStatusToDone( UploadStatus status, String message, int value )
+    {
+        status.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_DONE );
+        status.setMessage( message + value );
+        updateUploadStatus( status );
+        return status;
     }
     
     

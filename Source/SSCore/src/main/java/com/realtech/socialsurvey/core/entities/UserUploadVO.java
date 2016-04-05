@@ -100,6 +100,19 @@ public class UserUploadVO
     private List<String> validationWarnings = new ArrayList<String>();
     private boolean sendMail;
     private boolean isUserVerified;
+    private boolean isInAppendMode;
+
+
+    public boolean isInAppendMode()
+    {
+        return isInAppendMode;
+    }
+
+
+    public void setInAppendMode( boolean isInAppendMode )
+    {
+        this.isInAppendMode = isInAppendMode;
+    }
 
 
     public boolean isWarningRecord()

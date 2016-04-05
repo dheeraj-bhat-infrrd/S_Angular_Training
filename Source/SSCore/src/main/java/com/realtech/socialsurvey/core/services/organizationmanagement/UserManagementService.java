@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -24,6 +25,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.vo.UserList;
 
 
 // JIRA SS-34 BY RM02 BOC
@@ -563,5 +565,24 @@ public interface UserManagementService
 
 
     public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException;
+
+
+    UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize ) throws InvalidInputException,
+        NoRecordsFetchedException;
+
+
+    List<UserEmailMapping> getUserEmailMappingsForUser( long agentId ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    void deleteUserEmailMapping( User agent, long emailMappingId ) throws InvalidInputException;
+
+
+    void deleteIgnoredEmailMapping( String emailId ) throws InvalidInputException;
+
+
+    boolean isUserSocialSurveyAdmin( long userId ) throws InvalidInputException;
+
+
+    void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

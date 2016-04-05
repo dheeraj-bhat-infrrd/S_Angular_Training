@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -45,7 +46,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
 
     private static final String getUserProfileByUserIdsQuery = "select UP.USER_PROFILE_ID , UP.STATUS  , UP.AGENT_ID , UP.BRANCH_ID , UP.REGION_ID ,  "
-        + " UP.PROFILES_MASTER_ID  from " + "USER_PROFILE UP where UP.AGENT_ID IN (:userIds)";
+        + " UP.PROFILES_MASTER_ID , B.BRANCH , R.REGION from " + "USER_PROFILE UP JOIN BRANCH B ON UP.BRANCH_ID = B.BRANCH_ID JOIN REGION R ON UP.REGION_ID = R.REGION_ID where UP.AGENT_ID IN (:userIds)";
 
 
     /*
@@ -570,6 +571,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
      * @throws InvalidInputException
      */
     @Override
+    @Transactional
     public void updateEmailIdForUserProfile( long userId, String emailId ) throws InvalidInputException
     {
         LOG.info( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " started." );
@@ -620,6 +622,14 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             ProfilesMaster profilesMaster = new ProfilesMaster();
             profilesMaster.setProfileId( Integer.parseInt( String.valueOf( row[5] ) ) );
             userProfile.setProfilesMaster( profilesMaster );
+            
+            if(row[6] != null){
+                userProfile.setBranchName( String.valueOf( row[6] ) );
+            }
+            
+            if(row[7] != null){
+                userProfile.setRegionName( String.valueOf( row[7] ) );
+            }
 
             List<UserProfile> profileListForUser = userUserProfileMap.get( userId );
 

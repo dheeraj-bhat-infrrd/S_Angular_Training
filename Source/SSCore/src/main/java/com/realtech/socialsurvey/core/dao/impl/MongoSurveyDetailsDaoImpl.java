@@ -82,6 +82,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Value ( "${CONSIDER_ONLY_LATEST_SURVEYS}")
     private String considerOnlyLatestSurveys;
 
+
     /*
      * Method to fetch survey details on the basis of agentId and customer email.
      */
@@ -294,8 +295,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getClickedSurveyCount( String columnName, long columnValue, int noOfDays, boolean filterAbusive )
     {
         LOG.info( "Method to get count of total number of surveys clicked so far, getClickedSurveyCount() started." );
+        Date startDate = null;
+        /**
+         * if days is not set, take the start date as 1 jan 1970
+         */
+        if ( noOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( noOfDays );
+        }
+
         Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( noOfDays );
         Query query = new Query( Criteria.where( CommonConstants.SURVEY_CLICKED_COLUMN ).is( true ) );
         /*query.addCriteria(Criteria.where("surveyResponse").size(0));*/
         if ( columnName != null ) {
@@ -322,8 +332,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getCompletedSurveyCount( String columnName, long columnValue, int noOfDays )
     {
         LOG.info( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
+        Date startDate = null;
+        /**
+         * if days is not set, take the start date as 1 jan 1970
+         */
+        if ( noOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( noOfDays );
+        }
+
         Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( noOfDays );
         Query query = new Query( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
@@ -346,8 +365,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getIncompleteSurveyCount( String columnName, long columnValue, int noOfDays )
     {
         LOG.info( "Method to get count of surveys which are not yet completed, getIncompleteSurveyCount() started." );
+        Date startDate = null;
+        /**
+         * if days is not set, take the start date as 1 jan 1970
+         */
+        if ( noOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( noOfDays );
+        }
+
         Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( noOfDays );
         Query query = new Query( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
@@ -650,8 +678,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getSocialPostsCount( String columnName, long columnValue, int numberOfDays )
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
+        Date startDate = null;
+        /**
+         * if days is not set, take the start date as 1 jan 1970
+         */
+        if ( numberOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( numberOfDays );
+        }
+
         Date endDate = Calendar.getInstance().getTime();
-        Date startDate = getNdaysBackDate( numberOfDays );
         TypedAggregation<SurveyDetails> aggregation;
         if ( columnName == null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria
@@ -676,7 +713,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue, boolean fetchAbusive, boolean forStatistics )
+    public long getSocialPostsCountBasedOnHierarchy( int numberOfDays, String columnName, long columnValue,
+        boolean fetchAbusive, boolean forStatistics )
     {
         LOG.info( "Method to count number of social posts by customers, getSocialPostsCount() started." );
         long socialPostCount = 0;
@@ -700,9 +738,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
-        
+
         if ( forStatistics ) {
-            query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+            query
+                .addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
         }
 
         if ( columnName == null ) {
@@ -996,9 +1035,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return surveysWithReviews;
     }
 
+
     @Override
-    public List<SurveyDetails> getFeedbacksForReports( String columnName, long columnValue, int start, int rows, double startScore,
-        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+    public List<SurveyDetails> getFeedbacksForReports( String columnName, long columnValue, int start, int rows,
+        double startScore, double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
     {
         LOG.info( "Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started." );
 
@@ -1060,6 +1100,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() finished." );
         return surveysWithReviews;
     }
+
 
     @Override
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
@@ -1186,7 +1227,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( organizationUnitColumn ).is( organizationUnitColumnValue ) );
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-        
+
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
@@ -1214,8 +1255,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public long getCompletedSurveyCountForStatistics( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
-        Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
+    public long getCompletedSurveyCountForStatistics( String organizationUnitColumn, long organizationUnitColumnValue,
+        Timestamp startDate, Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
     {
         LOG.info( "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
         if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
@@ -1253,6 +1294,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Found " + count + " completed surveys" );
         return count;
     }
+
 
     @Override
     public long getZillowImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
@@ -1294,6 +1336,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.info( "Found " + count + " completed surveys" );
         return count;
     }
+
 
     @SuppressWarnings ( "unchecked")
     @Override
@@ -1496,7 +1539,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN, true ) ) );
         }
-        
+
         // exclude zillow surveys
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_SOURCE_COLUMN, new BasicDBObject(
             "$ne", CommonConstants.SURVEY_SOURCE_ZILLOW ) ) ) );
@@ -1696,8 +1739,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Date cutOffDate = getNdaysBackDateForIncompleteSocialPostSurveys( surveyReminderInterval );
         Query query = new Query();
 
-        query.addCriteria( new Criteria().andOperator(
-            Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
+        query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
             Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( cutOffCompletionDate ).lt( cutOffDate ),
             Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ),
             Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
@@ -1707,7 +1749,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method to get list of customers who have not yet completed their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() finished." );
         return surveys;
-    }   
+    }
 
 
     @Override
@@ -2166,7 +2208,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
         Update update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, surveyDetails.getSocialMediaPostDetails() );
-        update.set( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN, surveyDetails.getSocialMediaPostResponseDetails() );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN,
+            surveyDetails.getSocialMediaPostResponseDetails() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
@@ -2617,5 +2660,42 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.REVIEW_COLUMN, surveyDetails.getReview() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
+    }
+
+    /**
+     * 
+     * @param companyId
+     * @return
+     */
+    @Override
+    public Map<Long, Date> getLatestCompletedSurveyDateForAgents( long companyId )
+    {
+
+        LOG.info( "Method getLatestCompletedSurveyDateForAgents started." );
+        
+        TypedAggregation<SurveyDetails> aggregation;
+        aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, Aggregation.match( Criteria.where(
+            CommonConstants.COMPANY_ID ).is( companyId ) ), Aggregation.match( Criteria.where( CommonConstants.STAGE_COLUMN )
+            .is( CommonConstants.SURVEY_STAGE_COMPLETE ) ), Aggregation.group( CommonConstants.AGENT_ID )
+            .first( CommonConstants.MODIFIED_ON_COLUMN ).as( "lastModifiedDate" ) );
+
+        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
+            SurveyDetails.class );
+        
+        Map<Long, Date> agentLastCompltedSurveyDate = new HashMap<Long, Date>();
+        
+        if(result != null && result.getRawResults() != null){
+            @SuppressWarnings ( "unchecked")
+            List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get( "result" );
+            
+            for(DBObject row : basicDBObject){
+                Date lastDate = (Date) row.get( "lastModifiedDate" );
+                Long agentId = (Long) row.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+                agentLastCompltedSurveyDate.put( agentId, lastDate );
+            }
+        }
+        
+        LOG.info( "Method getLatestCompletedSurveyDateForAgents ended." );
+        return agentLastCompltedSurveyDate;
     }
 }

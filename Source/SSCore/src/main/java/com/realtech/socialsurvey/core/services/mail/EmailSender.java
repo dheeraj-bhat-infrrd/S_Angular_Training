@@ -66,5 +66,10 @@ public interface EmailSender
     public void saveEmailInDb( EmailObject emailObject );
 
 
-    boolean sendEmailByEmailEntity( EmailEntity emailEntity ) throws InvalidInputException;
+    boolean sendEmailByEmailEntity( EmailEntity emailEntity, boolean sendMailToSalesLead ) throws InvalidInputException;
+
+
+    public void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
+        FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail,
+        boolean sendMailToSalesLead ) throws InvalidInputException, UndeliveredEmailException;
 }

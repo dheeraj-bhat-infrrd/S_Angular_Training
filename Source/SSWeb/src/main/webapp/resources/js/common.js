@@ -402,10 +402,10 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 		ratingIntVal = parseInt(rating) + 1;
 	}
 
-	if (ratingIntVal == 0) {
+	/*if (ratingIntVal == 0) {
 		ratingIntVal = 1;
 	}
-
+*/
 	var roundedFloatingVal = parseFloat(rating).toFixed(1);
 	var ratingImgHtml = "";
 	

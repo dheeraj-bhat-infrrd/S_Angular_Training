@@ -62,6 +62,9 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
     @Value ( "${SENDGRID_SENDER_PASSWORD}")
     private String sendGridPassword;
+    
+    @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
+    private String salesLeadEmail;
 
     @Autowired
     private FileOperations fileOperations;
@@ -79,7 +82,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
 
     @Override
-    public boolean sendEmailByEmailEntity( EmailEntity emailEntity ) throws InvalidInputException
+    public boolean sendEmailByEmailEntity( EmailEntity emailEntity, boolean sendMailToSalesLead ) throws InvalidInputException
     {
         LOG.debug( "metod sendEmail started" );
 
@@ -109,11 +112,15 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         boolean mailSent = true;
         Email email = new Email();
         email.addTo( emailEntity.getRecipients().toArray( new String[emailEntity.getRecipients().size()] ) );
-        email.setFrom( emailEntity.getSenderEmailId() );
+        String encryptedFromId = utils.encryptUserEmailId( emailEntity.getSenderEmailId() );
+        email.setFrom( encryptedFromId );
         email.setFromName( emailEntity.getSenderName() );
         email.setSubject( emailEntity.getSubject() );
         email.setHtml( emailEntity.getBody() );
         email.setText( emailFormatHelper.getEmailTextFormat( emailEntity.getBody() ) );
+        if ( sendMailToSalesLead ) {
+            email.addBcc( salesLeadEmail );
+        }
 
         if ( emailEntity.getAttachmentDetail() != null ) {
             Iterator<Map.Entry<String, String>> entries = emailEntity.getAttachmentDetail().entrySet().iterator();
@@ -215,7 +222,17 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
     @Override
     public void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
-        FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail ) throws InvalidInputException,
+        FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, isImmediate, holdSendingMail,
+            false );
+    }
+    
+    
+    @Override
+    public void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
+        FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail, boolean sendMailToSalesLead ) throws InvalidInputException,
         UndeliveredEmailException
     {
         LOG.info( "Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectFileName : "
@@ -245,7 +262,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
             // Send the mail
             if ( isImmediate ) {
-                sendEmailByEmailEntity( emailEntity );
+                sendEmailByEmailEntity( emailEntity, sendMailToSalesLead );
             } else {
                 saveEmail( emailEntity, holdSendingMail );
             }
@@ -287,7 +304,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
             // Send the mail
             if ( isImmediate ) {
-                sendEmailByEmailEntity( emailEntity );
+                sendEmailByEmailEntity( emailEntity, false );
             } else {
                 saveEmail( emailEntity, holdSendingMail );
             }
@@ -315,7 +332,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
             // Send the mail
             if ( isImmediate ) {
-                sendEmailByEmailEntity( emailEntity );
+                sendEmailByEmailEntity( emailEntity, false );
             } else {
                 saveEmail( emailEntity, holdSendingMail );
             }

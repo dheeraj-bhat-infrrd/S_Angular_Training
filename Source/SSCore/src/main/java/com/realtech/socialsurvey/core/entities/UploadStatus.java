@@ -30,6 +30,9 @@ public class UploadStatus
 
     @Column ( name = "STATUS")
     private int status;
+    
+    @Column ( name = "UPLOAD_MODE" )
+    private char uploadMode;
 
     @Column ( name = "CREATED_ON")
     private Timestamp createdOn;
@@ -165,5 +168,23 @@ public class UploadStatus
     public void setCompany( Company company )
     {
         this.company = company;
+    }
+
+
+    /**
+     * @return the uploadMode
+     */
+    public char getUploadMode()
+    {
+        return uploadMode;
+    }
+
+
+    /**
+     * @param uploadMode the uploadMode to set
+     */
+    public void setUploadMode( char uploadMode )
+    {
+        this.uploadMode = uploadMode;
     }
 }

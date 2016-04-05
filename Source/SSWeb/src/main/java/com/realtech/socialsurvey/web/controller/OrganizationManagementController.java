@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
@@ -63,6 +65,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -88,6 +91,7 @@ import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
+import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 
@@ -151,6 +155,9 @@ public class OrganizationManagementController
     @Autowired
     private UploadValidationService uploadValidationService;
 
+    @Autowired
+    private EmailServices emailServices;
+
     @Value ( "${CDN_PATH}")
     private String endpoint;
 
@@ -179,6 +186,9 @@ public class OrganizationManagementController
     private String sadTextComplete;
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
+
+    @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
+    private String salesLeadEmail;
 
 
     /**
@@ -337,6 +347,21 @@ public class OrganizationManagementController
             LOG.debug( "Updating profile completion stage" );
             userManagementService.updateProfileCompletionStage( user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
                 CommonConstants.ADD_ACCOUNT_TYPE_STAGE );
+
+            /*String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
+                + "Email Address : " + user.getEmailId() + "<br/>" + "Company Name : " + companyName + "<br/>" + "Address1 : "
+                + address1 + "<br/>" + "Address2 : " + address2 + "<br/>" + "Country : " + country + "<br/>" + "Zipcode : "
+                + zipCode + "<br/>" + "State : " + state + "<br/>" + "City : " + city + "<br/>" + "Contact Info : "
+                + companyContactNo + "<br/>" + "Vertical : " + vertical;
+            ;
+            try {
+                emailServices.sendCompanyRegistrationStageMail( salesLeadEmail,
+                    CommonConstants.COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING, companyName, details, true );
+            } catch ( InvalidInputException e ) {
+                e.printStackTrace();
+            } catch ( UndeliveredEmailException e ) {
+                e.printStackTrace();
+            }*/
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding company information. Reason :" + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
@@ -2740,12 +2765,18 @@ public class OrganizationManagementController
         UploadValidation uploadValidation = null;
         LOG.info( "Validating the hierarchy file" );
         String fileUrl = request.getParameter( "fileUrl" );
+        boolean isAppend = false;
+        if ( request.getParameter( "uploadType" ) != null && !request.getParameter( "uploadType" ).isEmpty() ) {
+            if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+                isAppend = true;
+            }
+        }
         try {
             if ( fileUrl == null || fileUrl.isEmpty() ) {
                 throw new InvalidInputException( "File URL cannot be empty" );
             }
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl );
+            uploadValidation = hierarchyUploadService.validateUserUploadFile( user.getCompany(), fileUrl, isAppend );
             response = uploadValidation;
         } catch ( InvalidInputException ex ) {
             status = false;
@@ -2767,50 +2798,24 @@ public class OrganizationManagementController
         boolean status = true;
         Object response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
+        boolean isAppend = false;
+        if ( request.getParameter( "uploadType" ) != null && !request.getParameter( "uploadType" ).isEmpty() ) {
+            if ( "append".equals( request.getParameter( "uploadType" ) ) ) {
+                isAppend = true;
+            }
+        }
         LOG.info( hierarchyJson );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
         try {
             User user = sessionHelper.getCurrentUser();
-            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation );
+            uploadValidation = hierarchyUploadService.validateHierarchyUploadJson( user.getCompany(), uploadValidation,
+                isAppend );
             response = uploadValidation;
         } catch ( Exception ex ) {
             status = false;
             response = ex.getMessage();
         }
 
-        Map<String, Object> responseMap = new HashMap<String, Object>();
-        responseMap.put( "status", status );
-        responseMap.put( "response", response );
-        return new Gson().toJson( responseMap );
-    }
-
-
-    @ResponseBody
-    @RequestMapping ( value = "/uploadxlsxfile", method = RequestMethod.POST)
-    public String saveHierarchyFileData( Model model, HttpServletRequest request ) throws InvalidInputException
-    {
-        LOG.info( "Saving the hierarchy file data" );
-        boolean status = true;
-        String response = null;
-        String hierarchyJson = request.getParameter( "hierarchyJson" );
-        UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
-        User user = sessionHelper.getCurrentUser();
-        Map<String, List<String>> map = new HashMap<String, List<String>>();
-        List<String> value = new ArrayList<String>();
-        try {
-            map = hierarchyStructureUploadService.uploadHierarchy( uploadValidation.getUpload(), user.getCompany(), user );
-            if ( map == null || map.isEmpty() ) {
-                value.add( "Data uploaded successfully." );
-                map.put( "UPLOAD_SUCCESS", value );
-            } else {
-                status = false;
-            }
-        } catch ( Exception ex ) {
-            status = false;
-            value.add( ex.getMessage() );
-            map.put( "UPLOAD_FAILED", value );
-        }
-        response = new Gson().toJson( map );
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
         responseMap.put( "response", response );
@@ -2827,13 +2832,17 @@ public class OrganizationManagementController
         String response = null;
         String hierarchyJson = request.getParameter( "hierarchyJson" );
         UploadValidation uploadValidation = new Gson().fromJson( hierarchyJson, UploadValidation.class );
+        boolean isAppend = false;
+        if ( request.getParameter( "append" ) != null && !request.getParameter( "append" ).isEmpty() ) {
+            isAppend = Boolean.parseBoolean( request.getParameter( "append" ) );
+        }
         try {
             User user = sessionHelper.getCurrentUser();
-            //Insert hieararchy upload in UPLOAD_HIERARCHY_DETAILS collections
+            //Insert hierarchy upload in UPLOAD_HIERARCHY_DETAILS collections
             hierarchyStructureUploadService.saveHierarchyUploadInMongo( uploadValidation.getUpload() );
 
             //Initiate upload by adding entry in upload status table
-            hierarchyStructureUploadService.addNewUploadRequest( user );
+            hierarchyStructureUploadService.addNewUploadRequest( user, isAppend );
             response = "Hierarchy upload batch is initialized successfully";
         } catch ( Exception ex ) {
             status = false;
@@ -2846,26 +2855,39 @@ public class OrganizationManagementController
     }
 
 
-
     @ResponseBody
     @RequestMapping ( value = "/fetchUploadBatchStatus", method = RequestMethod.POST)
     public String fetchUploadBatchStatus( Model model, HttpServletRequest request ) throws InvalidInputException
     {
         LOG.info( "Fetching the latest batch processing message" );
-        //TODO: Get the actual stuff instead
         User user = sessionHelper.getCurrentUser();
         boolean status = true;
         String response = null;
-        UploadStatus latestStatus = hierarchyStructureUploadService.fetchLatestUploadStatus( user.getCompany() );
-        int uploadStatus = -1;
-        String lastUploadRunTimestamp = null;
+        int latestStatus = -1;
+        Timestamp lastUploadTime = null;
+        List<UploadStatus> latestStatuses = hierarchyStructureUploadService.fetchUploadStatusForCompany( user.getCompany() );
         try {
-            if ( latestStatus == null ) {
+            if ( latestStatuses == null || latestStatuses.isEmpty() ) {
                 response = CommonConstants.UPLOAD_MSG_NO_UPLOAD;
             } else {
-                response = latestStatus.getMessage();
-                lastUploadRunTimestamp = latestStatus.getModifiedOn().toString();
-                uploadStatus = latestStatus.getStatus();
+                UploadStatus uploadStatus = hierarchyStructureUploadService.highestStatus( latestStatuses );
+                latestStatus = uploadStatus.getStatus();
+                lastUploadTime = uploadStatus.getModifiedOn();
+
+                //So that this is shown only once, if hierarchy upload status is 4, set it to 6 and update
+                if ( latestStatus == CommonConstants.HIERARCHY_UPLOAD_UPLOAD_COMPLETE ) {
+                    hierarchyStructureUploadService.updateUploadStatusToNoUpload( uploadStatus );
+                    //Change status back to upload status for the json object
+                    uploadStatus.setStatus( latestStatus );
+                    //TODO: Refresh session
+                    // get the user's canonical settings
+                    LOG.info("Fetching the user's canonical settings and setting it in session");
+                    HttpSession session = request.getSession( false );
+                    sessionHelper.getCanonicalSettings(session);
+                    // Set the session variables
+                    sessionHelper.setSettingVariablesInSession(session);
+                    sessionHelper.processAssignments( session, user );
+                }
             }
         } catch ( Exception e ) {
             status = false;
@@ -2873,10 +2895,13 @@ public class OrganizationManagementController
         }
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put( "status", status );
-        responseMap.put( "response", response );
-        responseMap.put( "uploadStatus", uploadStatus );
-        // Fetch the last uploaded timestamp from db and put it in responseMap
-        responseMap.put( "lastUploadRunTimestamp", lastUploadRunTimestamp );
+        if ( latestStatuses == null || latestStatuses.isEmpty() ) {
+            responseMap.put( "response", response );
+        } else {
+            responseMap.put( "response", latestStatuses );
+        }
+        responseMap.put( "uploadStatus", latestStatus );
+        responseMap.put( "lastUploadRunTimestamp", lastUploadTime );
         return new Gson().toJson( responseMap );
     }
 
@@ -2943,8 +2968,8 @@ public class OrganizationManagementController
                 startIndex, batchSize );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, getUnmatchedPreinitiatedSurveys() finished" );
         return new Gson().toJson( surveyPreInitiationList );
@@ -2986,8 +3011,8 @@ public class OrganizationManagementController
                 startIndex, batchSize );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, getProcessedPreInitiatedSurveys() finished" );
         return new Gson().toJson( surveyPreInitiationList );
@@ -3053,6 +3078,208 @@ public class OrganizationManagementController
             .getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
             .getMessage();
     }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/getuserwithaliasedemails", method = RequestMethod.GET)
+    public String getUserWithAliasedEmails( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to get getUserWithAliasedEmails started" );
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+
+        if ( startIndexStr == null || batchSizeStr == null ) {
+            LOG.error( "Null value found for startIndex or batch size." );
+            return "Null value found for startIndex or batch size.";
+        }
+
+        UserList userList = new UserList();
+        int startIndex;
+        int batchSize;
+        try {
+
+            User user = sessionHelper.getCurrentUser();
+            if ( user == null || user.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
+
+            try {
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException caught while trying to convert startIndex or batchSize  Nested exception is ",
+                    e );
+                throw e;
+            }
+
+
+            userList = userManagementService.getUsersAndEmailMappingForCompany( user.getCompany().getCompanyId(), startIndex,
+                batchSize );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching UserWithAliasedEmails. Reason :" + nonFatalException.getMessage(),
+                nonFatalException );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_USER_FOR_EMAIL_MAPPING_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        LOG.info( "Method to get posts for the user, getUserWithAliasedEmails() finished" );
+        return new Gson().toJson( userList );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/getemailmappingsforuser", method = RequestMethod.GET)
+    public String getEmailMappingsForUser( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to get getEmailMappingsForUser started" );
+
+        String agentIdStr = request.getParameter( "agentId" );
+        long agentId;
+        List<UserEmailMapping> userEmailMappings = new ArrayList<UserEmailMapping>();
+
+        try {
+
+            try {
+                agentId = Integer.parseInt( agentIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException caught while trying to convert agentId Nested exception is ", e );
+                throw e;
+            }
+
+            userEmailMappings = userManagementService.getUserEmailMappingsForUser( agentId );
+
+
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while getting EmailMappingsForUser. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            return messageUtils.getDisplayMessage(
+                DisplayMessageConstants.FETCH_EMAIL_MAPPINGS_FOR_USER_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        LOG.info( "Method getEmailMappingsForUser() finished" );
+        return new Gson().toJson( userEmailMappings );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/updateuseremailmapping", method = RequestMethod.GET)
+    public String updateUserEmailMapping( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to update user email mapping started" );
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        boolean succeed;
+        String message;
+        String emailMappingIdStr = request.getParameter( "emailMappingId" );
+        String statusStr = request.getParameter( "status" );
+        long emailMappingId;
+        int status;
+
+        try {
+
+            try {
+                emailMappingId = Integer.parseInt( emailMappingIdStr );
+                status = Integer.parseInt( statusStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException caught while trying to convert emailMappingId Nested exception is ", e );
+                throw e;
+            }
+
+
+            User user = sessionHelper.getCurrentUser();
+            if ( user == null || user.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
+
+            userManagementService.updateUserEmailMapping( user, emailMappingId , status);
+
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.UPDATE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            succeed = true;
+
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            succeed = false;
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        LOG.info( "Method to get posts for the user, getUnmatchedPreinitiatedSurveys() finished" );
+
+        responseMap.put( "succeed", succeed );
+        responseMap.put( "message", message );
+        return new Gson().toJson( responseMap );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/saveemailmappingsforuser", method = RequestMethod.POST)
+    public String saveUserEmailMappingsForUser( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to get saveUserEmailMappingsForUser started" );
+        String emailIds = request.getParameter( "emailIds" );
+        String agentIdStr = request.getParameter( "agentId" );
+
+        try {
+            long agentId;
+
+            try {
+                agentId = Integer.parseInt( agentIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException caught while trying to convert agentId Nested exception is ", e );
+                throw e;
+            }
+            if ( emailIds == null || emailIds.isEmpty() ) {
+                throw new InvalidInputException( "Email Id can't be null or empty" );
+            }
+            //parse email ids
+            List<String> emailIdList = new ArrayList<String>();
+            if ( emailIds != null && !emailIds.isEmpty() ) {
+
+                if ( !emailIds.contains( "," ) ) {
+                    if ( !organizationManagementService.validateEmail( emailIds.trim() ) )
+                        throw new InvalidInputException( "Mail id - " + emailIds + " entered as send alert to input is invalid",
+                            DisplayMessageConstants.GENERAL_ERROR );
+                    else
+                        emailIdList.add( emailIds.trim() );
+                } else {
+                    String mailIds[] = emailIds.split( "," );
+
+                    for ( String mailID : mailIds ) {
+                        if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                            throw new InvalidInputException(
+                                "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else
+                            emailIdList.add( mailID.trim() );
+                    }
+                }
+
+            }
+
+
+            for ( String emailId : emailIdList ) {
+                try {
+                    User existingUser = userManagementService.getUserByEmailAddress( emailId );
+                    if ( existingUser != null )
+                        throw new UserAlreadyExistsException(
+                            "The email addresss " + emailId + " is already present in our database." );
+                } catch ( NoRecordsFetchedException e ) {
+                    User user = userManagementService.saveEmailUserMapping( emailId, agentId );
+                    socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailId );
+
+                }
+            }
+
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            if ( nonFatalException.getMessage() != null && !nonFatalException.getMessage().isEmpty() ) {
+                return nonFatalException.getMessage();
+            }
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        LOG.info( "Method to get posts for the user, saveUserEmailMapping() finished" );
+        return messageUtils
+            .getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+            .getMessage();
+    }
+
 
 }
 // JIRA: SS-24 BY RM02 EOC

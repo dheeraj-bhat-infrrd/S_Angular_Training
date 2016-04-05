@@ -106,6 +106,9 @@
 						<a id="invite-link" href="javascript:showMainContent('./adminusermanagement.do')" onclick="showOverlay();"><spring:message code="label.usermanagement.header.key" /></a>
 					</div>
 				</c:if>
+				<div class="hdr-link-item hdr-link-active">
+					<a id="invite-link" href="javascript:showMainContent('./admindownloadreports.do')" onclick="showOverlay();"><spring:message code="label.downloadreport.header.key" /></a>
+				</div>
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">

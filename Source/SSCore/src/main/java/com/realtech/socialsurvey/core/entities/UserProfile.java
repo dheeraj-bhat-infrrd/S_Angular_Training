@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * The persistent class for the user_profile database table.
@@ -86,6 +88,12 @@ public class UserProfile implements Serializable {
 	@JoinColumn(name = "USER_ID")
 	private User user;
 
+	@Transient
+	private String branchName;
+	
+	@Transient
+	private String regionName;
+	
 	public UserProfile() {}
 
 	public long getUserProfileId() {
@@ -223,5 +231,25 @@ public class UserProfile implements Serializable {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
+    public String getBranchName()
+    {
+        return branchName;
+    }
+
+    public void setBranchName( String branchName )
+    {
+        this.branchName = branchName;
+    }
+
+    public String getRegionName()
+    {
+        return regionName;
+    }
+
+    public void setRegionName( String regionName )
+    {
+        this.regionName = regionName;
+    }
 
 }

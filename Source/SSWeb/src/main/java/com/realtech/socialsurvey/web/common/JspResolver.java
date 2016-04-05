@@ -145,6 +145,7 @@ public interface JspResolver {
 	public static final String ADMIN_USER_MANAGEMENT = "admin/admin_user_management";
 	public static final String ADMIN_ADD_SS_ADMIN = "admin/admin_add_ss_admin";
 	public static final String ADMIN_SS_ADMIN_LIST = "admin/admin_ss_admin_list";
+	public static final String ADMIN_DOWNLOAD_REPORTS = "admin/admin_download_reports";
 	
 	
 	//config settngs

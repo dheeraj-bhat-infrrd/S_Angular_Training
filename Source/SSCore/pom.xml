@@ -444,6 +444,9 @@
 	<profiles>
 		<profile>
 			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<build>
 				<filters>
 					<filter>src/main/resources/filler.dev.properties</filter>

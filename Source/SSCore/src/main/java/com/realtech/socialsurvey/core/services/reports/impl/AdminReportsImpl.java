@@ -125,8 +125,7 @@ public class AdminReportsImpl implements AdminReports
             } else {
                 entity.setFileName( mailId );
             }
-            entity.setFileName( "" );
-            Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+           Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
             entity.setCreatedOn( currentTime );
             entity.setModifiedOn( currentTime );
             fileUploadDao.save( entity );
@@ -145,4 +144,79 @@ public class AdminReportsImpl implements AdminReports
         }
         LOG.info( "Method createEntryInFileUploadForBillingReport() finished" );
     }
+    
+    
+    /**
+     * Method to create an entry in the file upload table for company user report
+     * @throws InvalidInputException 
+     */
+    @Override
+    @Transactional
+    public void createEntryInFileUploadForCompanyUserReport( String mailId, long companyId ) throws InvalidInputException
+    {
+        LOG.info( "Method createEntryInFileUploadForCompanyUserReport() started" );
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null || company.getCompanyId() <= 0 ) {
+            throw new InvalidInputException( "Invalid companyId passed" );
+        }
+
+
+        LOG.debug( "Entry does not exist. Creating one." );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( CommonConstants.REALTECH_ADMIN_ID );
+        entity.setCompany( company );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_COMPANY_USERS_REPORT);
+        if ( mailId == null || mailId.isEmpty() ) {
+            entity.setFileName( "" );
+        } else {
+            entity.setFileName( mailId );
+        }
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+        fileUploadDao.save( entity );
+
+        LOG.info( "Method createEntryInFileUploadForCompanyUserReport() finished" );
+    }
+    
+
+    /**
+     * Method to create an entry in the file upload table for company hierarchy report
+     * @throws InvalidInputException 
+     */
+    @Override
+    @Transactional
+    public void createEntryInFileUploadForCompanyHierarchyReport( String mailId, long companyId ) throws InvalidInputException
+    {
+        LOG.info( "Method createEntryInFileUploadForCompanyHierarchyReport() started" );
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null || company.getCompanyId() <= 0 ) {
+            throw new InvalidInputException( "Invalid companyId passed" );
+        }
+
+
+        LOG.debug( "Entry does not exist. Creating one." );
+        FileUpload entity = new FileUpload();
+        entity.setAdminUserId( CommonConstants.REALTECH_ADMIN_ID );
+        entity.setCompany( company );
+        entity.setStatus( CommonConstants.STATUS_ACTIVE );
+        entity.setUploadType( CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT );
+        if ( mailId == null || mailId.isEmpty() ) {
+            entity.setFileName( "" );
+        } else {
+            entity.setFileName( mailId );
+        }
+        Timestamp currentTime = new Timestamp( System.currentTimeMillis() );
+        entity.setCreatedOn( currentTime );
+        entity.setModifiedOn( currentTime );
+        fileUploadDao.save( entity );
+
+        LOG.info( "Method createEntryInFileUploadForCompanyHierarchyReport() finished" );
+    }
+    
+    
 }
+

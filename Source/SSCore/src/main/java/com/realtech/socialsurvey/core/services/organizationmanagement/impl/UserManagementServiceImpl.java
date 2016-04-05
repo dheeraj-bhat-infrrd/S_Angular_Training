@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -83,6 +84,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSe
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.vo.UserList;
 
 
 /**
@@ -121,6 +123,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private UserInviteDao userInviteDao;
 
     @Autowired
+    private GenericDao<LicenseDetail, Long> licenseDetailsDao;
+
+    @Autowired
     private GenericDao<Company, Long> companyDao;
 
     @Autowired
@@ -146,8 +151,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Qualifier ( "userProfile")
     private UserProfileDao userProfileDao;
 
-    @Autowired
-    private GenericDao<LicenseDetail, Long> licenseDetailsDao;
+    @Resource
+    @Qualifier ( "userEmailMapping")
+    private UserEmailMappingDao userEmailMappingDao;
 
     @Resource
     @Qualifier ( "branch")
@@ -188,15 +194,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private SocialManagementService socialManagementService;
-    
+
     @Autowired
     private ReferralService referralService;
 
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
-
-    @Autowired
-    private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
 
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
@@ -403,6 +406,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             status, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
+        //delete the record if marked as ignored
+        deleteIgnoredEmailMapping( user.getEmailId() );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
+        
 
         LOG.debug( "Creating user profile for :" + emailId + " with profile completion stage : "
             + CommonConstants.ADD_COMPANY_STAGE );
@@ -531,6 +539,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
+      //delete the record if marked as ignored
+        deleteIgnoredEmailMapping( user.getEmailId() );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
         LOG.debug( "Inserting agent settings for the user:" + user );
         insertAgentSettings( user );
@@ -568,6 +580,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, String.valueOf( admin.getUserId() ) );
         user = userDao.save( user );
+      //delete the record if marked as ignored
+        deleteIgnoredEmailMapping( user.getEmailId() );
+        //update the corrupted record for newly registered user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
         LOG.info( "Method to add a new user, inviteNewUser() finished for email id : " + emailId );
         return user;
@@ -3706,9 +3722,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
 
         userEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setCreatedBy( "ADMIN" );
+        userEmailMapping.setCreatedBy( user.getCompany().getCompany() );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setModifiedBy( "ADMIN" );
+        userEmailMapping.setModifiedBy( user.getCompany().getCompany() );
 
         userEmailMappingDao.save( userEmailMapping );
         return user;
@@ -3731,15 +3747,211 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         CompanyIgnoredEmailMapping companyIgnoredEmailMapping = new CompanyIgnoredEmailMapping();
-        companyIgnoredEmailMapping.setCompany( company );
-        companyIgnoredEmailMapping.setEmailId( emailId );
+        
+        
+        //check if entry is already there with the eamil id
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.EMAIL_ID, emailId );
+        queries.put( CommonConstants.COMPANY, company );
+        List<CompanyIgnoredEmailMapping> CompanyIgnoredEmailMappingList = companyIgnoredEmailMappingDao.findByKeyValue( CompanyIgnoredEmailMapping.class, queries );
+        
+        if(CompanyIgnoredEmailMappingList != null && CompanyIgnoredEmailMappingList.size() > 0 ){
+            companyIgnoredEmailMapping = CompanyIgnoredEmailMappingList.get( CommonConstants.INITIAL_INDEX );
+            companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
+            companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        }else{
+            companyIgnoredEmailMapping.setCompany( company );
+            companyIgnoredEmailMapping.setEmailId( emailId );
+            companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
+            
+            companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+            companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
+            companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            companyIgnoredEmailMapping.setModifiedBy( "ADMIN" );
+        }
+        
+        companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.saveOrUpdate( companyIgnoredEmailMapping );
+        
+                return companyIgnoredEmailMapping;
+    }
 
-        companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
-        companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        companyIgnoredEmailMapping.setModifiedBy( "ADMIN" );
 
-        companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.save( companyIgnoredEmailMapping );
-        return companyIgnoredEmailMapping;
+    @Transactional
+    @Override
+    public UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Method to getUsersAndEmailMappingForCompant for  companyId : " + companyId + " started." );
+        UserList userList = new UserList();
+        Company company = companyDao.findById( Company.class, companyId );
+
+        if ( company == null ) {
+            throw new InvalidInputException( "No company found for company id : " + companyId );
+        }
+        List<User> usersFromSearch = userDao.getUsersAndEmailMappingForCompany( company, startIndex, batchSize );
+        List<User> users = new ArrayList<User>();
+        for ( User user : usersFromSearch ) {
+            User userVO = new User();
+            userVO.setUserId( user.getUserId() );
+            userVO.setFirstName( user.getFirstName() );
+            userVO.setLastName( user.getLastName() );
+            userVO.setEmailId( user.getEmailId() );
+            userVO.setLoginName( user.getLoginName() );
+
+            StringBuilder mappedEmails = new StringBuilder();
+            for ( UserEmailMapping emailMapping : user.getUserEmailMappings() ) {
+            	if(emailMapping.getStatus() == CommonConstants.STATUS_ACTIVE){
+            		mappedEmails.append( emailMapping.getEmailId() );
+                    mappedEmails.append( ", " );
+            	}             
+            }
+            String mappedEmailsString = mappedEmails.toString();
+            if ( mappedEmailsString != null && mappedEmailsString.contains( "," ) )
+                mappedEmailsString = mappedEmailsString.substring( 0, mappedEmailsString.lastIndexOf( "," ) );
+            userVO.setMappedEmails( mappedEmailsString );
+
+            users.add( userVO );
+        }
+        userList.setUsers( users );
+        userList.setTotalRecord( userDao.getCountOfUsersAndEmailMappingForCompany( company ) );
+
+        return userList;
+    }
+
+
+    @Transactional
+    @Override
+    public List<UserEmailMapping> getUserEmailMappingsForUser( long agentId ) throws InvalidInputException,
+        NoRecordsFetchedException
+    {
+        LOG.info( "Method to getUserEmailMappingsForUser for  agentId : " + agentId + " started." );
+
+        User user = userDao.findById( User.class, agentId );
+
+        if ( user == null ) {
+            throw new InvalidInputException( "No user found for agent id : " + agentId );
+        }
+
+        
+       
+        List<UserEmailMapping> emailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class, CommonConstants.USER_COLUMN, user );
+        List<UserEmailMapping> emailMappingsVO = new ArrayList<UserEmailMapping>();
+        for ( UserEmailMapping emailMapping : emailMappings ) {
+            UserEmailMapping emailMappingVO = new UserEmailMapping();
+            emailMappingVO.setUserEmailMappingId( emailMapping.getUserEmailMappingId() );
+            emailMappingVO.setEmailId( emailMapping.getEmailId() );
+            emailMappingVO.setCreatedOn( emailMapping.getCreatedOn() );
+            emailMappingVO.setStatus( emailMapping.getStatus() );
+
+            emailMappingsVO.add( emailMappingVO );
+        }
+
+        return emailMappingsVO;
+    }
+    
+    
+    @Transactional
+    @Override
+    public void deleteUserEmailMapping( User agent , long emailMappingId ) throws InvalidInputException
+    {
+        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
+        if ( agent == null ) {
+            throw new InvalidInputException( "Passed parameter agent is null " );
+        }
+        
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( "userEmailMappingId", emailMappingId );
+        List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+       
+        
+        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null) {
+            throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + emailMappingId );
+        }
+
+        UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
+        userEmailMapping.setStatus( CommonConstants.STATUS_INACTIVE );
+        userEmailMapping.setModifiedBy( String.valueOf(agent.getUserId() ));
+        userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        userEmailMappingDao.update( userEmailMapping );
+        
+        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
+    }
+    
+    
+    @Transactional
+    @Override
+    public void updateUserEmailMapping( User agent , long emailMappingId , int status ) throws InvalidInputException
+    {
+        LOG.info( "Method to updateUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
+        if ( agent == null ) {
+            throw new InvalidInputException( "Passed parameter agent is null " );
+        }
+        
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( "userEmailMappingId", emailMappingId );
+        List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+       
+        
+        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null) {
+            throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + emailMappingId );
+        }
+
+        UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
+        userEmailMapping.setStatus( status );
+        userEmailMapping.setModifiedBy( String.valueOf(agent.getUserId() ));
+        userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        userEmailMappingDao.update( userEmailMapping );
+        
+        LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
+    }
+    
+    @Transactional
+    @Override
+    public void deleteIgnoredEmailMapping(String emailId) throws InvalidInputException{
+        LOG.info( "method deleteIgnoredEmailMapping  started for email id : " + emailId );
+        
+        if(emailId == null || emailId.isEmpty()){
+            throw new InvalidInputException("Passed parameter emailId is invalid");
+        }
+        
+        List<CompanyIgnoredEmailMapping> ignoredEmails = companyIgnoredEmailMappingDao.findByColumn( CompanyIgnoredEmailMapping.class, CommonConstants.EMAIL_ID, emailId );
+        if(ignoredEmails != null && !ignoredEmails.isEmpty()){
+            for(CompanyIgnoredEmailMapping ignoredEmail : ignoredEmails){
+                ignoredEmail.setStatus( CommonConstants.STATUS_INACTIVE );
+                ignoredEmail.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                companyIgnoredEmailMappingDao.update( ignoredEmail );
+            }
+        }
+        
+        LOG.info( "method deleteIgnoredEmailMapping finished" );
+    }
+    
+    /**
+     * 
+     * @param userId
+     * @return
+     * @throws InvalidInputException 
+     */
+    @Transactional
+    @Override
+    public boolean isUserSocialSurveyAdmin(long userId) throws InvalidInputException{
+        LOG.info( "method isUserIsSocialSurveyAdmin  started for userId : " + userId );
+        
+        User user = null;
+        user = userDao.findById( User.class, userId );
+        if ( user == null ) {
+            throw new InvalidInputException( "User not found for userId:" + userId );
+        }
+        
+        //get primary profile profile of user
+        List<UserProfile> userProfiles = user.getUserProfiles();
+            for ( UserProfile userProfile : userProfiles ) {
+                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
+                    // social survey admin
+                    return true;
+                }
+            }
+            
+            return false;
     }
 }
