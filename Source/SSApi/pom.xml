@@ -70,6 +70,13 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 
+		<!-- Swagger -->
+		<dependency>
+			<groupId>com.mangofactory</groupId>
+			<artifactId>swagger-springmvc</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+
 		<!-- Test Artifacts -->
 		<dependency>
 			<groupId>org.springframework</groupId>
