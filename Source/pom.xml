@@ -14,11 +14,12 @@
 		<!-- Web -->
 		<jsp.version>2.2</jsp.version>
 		<jstl.version>1.2</jstl.version>
-		<servlet.version>2.5</servlet.version>
+		<servlet.version>3.0.1</servlet.version>
 
 		<!-- Spring -->
 		<spring-framework.version>4.1.4.RELEASE</spring-framework.version>
 		<spring.security>3.2.3.RELEASE</spring.security>
+		<org.springframework.security.oauth-version>2.0.7.RELEASE</org.springframework.security.oauth-version>
 
 		<!-- Hibernate / JPA -->
 		<hibernate.version>4.2.1.Final</hibernate.version>
