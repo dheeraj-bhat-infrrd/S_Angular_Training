@@ -217,7 +217,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_SET_COMPANY_ID_IN_SOCIAL_POSTS = "Set Company Id In Social Posts Stored In Database";
     public static final String BATCH_NAME_IMAGE_PROCESSING_STARTER = "Image Processing Starter";
     public static final String BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR = "Hierarchy Settings Corrector For Old Records";
-    public static final String BILLING_REPORT_GENERATOR = "Billing Report Generator";
+    public static final String FILE_UPLOAD_REPORTS_GENERATOR = "File Upload And Reports Generator";
     public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
     public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
