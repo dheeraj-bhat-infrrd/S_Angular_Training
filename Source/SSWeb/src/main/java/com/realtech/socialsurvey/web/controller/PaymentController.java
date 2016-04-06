@@ -189,13 +189,13 @@ public class PaymentController {
 		     
             //specify details
             Date today = new Date( System.currentTimeMillis() );
-            SimpleDateFormat utcDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            SimpleDateFormat utcDateFormat = new SimpleDateFormat( CommonConstants.DATE_FORMAT_WITH_TZ );
             utcDateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
 
-            SimpleDateFormat pstDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            SimpleDateFormat pstDateFormat = new SimpleDateFormat( CommonConstants.DATE_FORMAT_WITH_TZ );
             pstDateFormat.setTimeZone( TimeZone.getTimeZone( "PST" ) );
 
-            SimpleDateFormat estDateFormat = new SimpleDateFormat( "MM/DD/YYYY HH:MM:SS z" );
+            SimpleDateFormat estDateFormat = new SimpleDateFormat( CommonConstants.DATE_FORMAT_WITH_TZ );
             estDateFormat.setTimeZone( TimeZone.getTimeZone( "EST" ) );
 
             String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
