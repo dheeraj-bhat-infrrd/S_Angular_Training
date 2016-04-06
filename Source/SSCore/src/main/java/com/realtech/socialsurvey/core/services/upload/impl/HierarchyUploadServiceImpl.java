@@ -216,20 +216,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         List<RegionUploadVO> uploadedRegions = new ArrayList<RegionUploadVO>();
         Map<String, Integer> regionMap = null;
         if ( validationObject != null && validationObject.getUpload() != null ) {
-            regionMap = generateRegionIndexMap( validationObject.getUpload().getRegions() );
+            regionMap = generateRegionIndexMap( validationObject.getUpload().getRegions(), true );
         }
         if ( regionMap == null ) {
             regionMap = new HashMap<String, Integer>();
         }
 
         for ( RegionUploadVO uploadedRegion : inputRegions ) {
-            if ( isRegionUploadEmpty( uploadedRegion ) ) {
+            if ( isRegionUploadEmpty( uploadedRegion ) || !uploadedRegion.isInAppendMode() ) {
                 continue;
-            }
-            if ( isAppend ) {
-                uploadedRegion.setInAppendMode( true );
-            } else {
-                uploadedRegion.setInAppendMode( false );
             }
             // check if region is added or modified
             if ( isNewRegion( uploadedRegion, validationObject.getUpload().getRegions(), uploadedRegions ) ) {
@@ -265,11 +260,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param regions
      * @return
      */
-    Map<String, Integer> generateRegionIndexMap( List<RegionUploadVO> regions )
+    Map<String, Integer> generateRegionIndexMap( List<RegionUploadVO> regions, boolean isFromUI )
     {
         Map<String, Integer> regionMap = new HashMap<String, Integer>();
         if ( regions != null && !regions.isEmpty() ) {
             for ( RegionUploadVO region : regions ) {
+                if ( !isFromUI ) {
+                    // Reset inAppendMode flag
+                    region.setInAppendMode( false );
+                }
                 if ( region.getSourceRegionId() == null || region.getSourceRegionId().isEmpty() ) {
                     continue;
                 }
@@ -285,11 +284,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param branches
      * @return
      */
-    Map<String, Integer> generateBranchIndexMap( List<BranchUploadVO> branches )
+    Map<String, Integer> generateBranchIndexMap( List<BranchUploadVO> branches, boolean isFromUI )
     {
         Map<String, Integer> branchMap = new HashMap<String, Integer>();
         if ( branches != null && !branches.isEmpty() ) {
             for ( BranchUploadVO branch : branches ) {
+                if ( !isFromUI ) {
+                    // Reset inAppendMode flag
+                    branch.setInAppendMode( false );
+                }
                 if ( branch.getSourceBranchId() == null || branch.getSourceBranchId().isEmpty() ) {
                     continue;
                 }
@@ -305,11 +308,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param users
      * @return
      */
-    Map<String, Integer> generateUserIndexMap( List<UserUploadVO> users )
+    Map<String, Integer> generateUserIndexMap( List<UserUploadVO> users, boolean isFromUI )
     {
         Map<String, Integer> userMap = new HashMap<String, Integer>();
         if ( users != null && !users.isEmpty() ) {
             for ( UserUploadVO user : users ) {
+                if ( !isFromUI ) {
+                    // Reset inAppendMode flag
+                    user.setInAppendMode( false );
+                }
                 if ( user.getSourceUserId() == null || user.getSourceUserId().isEmpty() ) {
                     continue;
                 }
@@ -335,20 +342,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         Map<String, Integer> branchMap = null;
         List<BranchUploadVO> uploadedBranches = new ArrayList<BranchUploadVO>();
         if ( validationObject != null && validationObject.getUpload() != null ) {
-            branchMap = generateBranchIndexMap( validationObject.getUpload().getBranches() );
+            branchMap = generateBranchIndexMap( validationObject.getUpload().getBranches(), true );
         }
         if ( branchMap == null ) {
             branchMap = new HashMap<String, Integer>();
         }
 
         for ( BranchUploadVO uploadedBranch : inputBranches ) {
-            if ( isBranchUploadEmpty( uploadedBranch ) ) {
+            if ( isBranchUploadEmpty( uploadedBranch ) || !uploadedBranch.isInAppendMode() ) {
                 continue;
-            }
-            if ( isAppend ) {
-                uploadedBranch.setInAppendMode( true );
-            } else {
-                uploadedBranch.setInAppendMode( false );
             }
             // check if branch is added or modified
             if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches(), uploadedBranches ) ) {
@@ -388,7 +390,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
         Map<String, Integer> userMap = null;
         if ( validationObject != null && validationObject.getUpload() != null ) {
-            userMap = generateUserIndexMap( validationObject.getUpload().getUsers() );
+            userMap = generateUserIndexMap( validationObject.getUpload().getUsers(), true );
         }
         if ( userMap == null ) {
             userMap = new HashMap<String, Integer>();
@@ -399,13 +401,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         Set<String> emailSet = new HashSet<String>();
 
         for ( UserUploadVO uploadedUser : uploadedUsers ) {
-            if ( isUserUploadEmpty( uploadedUser ) ) {
+            if ( isUserUploadEmpty( uploadedUser ) || !uploadedUser.isInAppendMode() ) {
                 continue;
-            }
-            if ( isAppend ) {
-                uploadedUser.setInAppendMode( true );
-            } else {
-                uploadedUser.setInAppendMode( false );
             }
             if ( uploadedUser.getSourceBranchId() == null && uploadedUser.getSourceRegionId() == null
                 && ( uploadedUser.getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() )
@@ -497,7 +494,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         Map<String, Integer> regionMap = null;
         try {
             if ( validationObject != null && validationObject.getUpload() != null ) {
-                regionMap = generateRegionIndexMap( validationObject.getUpload().getRegions() );
+                regionMap = generateRegionIndexMap( validationObject.getUpload().getRegions(), false );
             }
             if ( regionMap == null ) {
                 regionMap = new HashMap<String, Integer>();
@@ -558,10 +555,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( isRegionUploadEmpty( uploadedRegion ) ) {
                     continue;
                 }
+                uploadedRegion.setInAppendMode( false );
                 if ( isAppend ) {
                     uploadedRegion.setInAppendMode( true );
-                } else {
-                    uploadedRegion.setInAppendMode( false );
                 }
                 // check if region is added or modified
                 // if duplicate record
@@ -633,7 +629,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
         try {
             if ( validationObject != null && validationObject.getUpload() != null ) {
-                branchMap = generateBranchIndexMap( validationObject.getUpload().getBranches() );
+                branchMap = generateBranchIndexMap( validationObject.getUpload().getBranches(), false );
             }
             if ( branchMap == null ) {
                 branchMap = new HashMap<String, Integer>();
@@ -702,10 +698,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( isBranchUploadEmpty( uploadedBranch ) ) {
                     continue;
                 }
+                uploadedBranch.setInAppendMode( false );
                 if ( isAppend ) {
                     uploadedBranch.setInAppendMode( true );
-                } else {
-                    uploadedBranch.setInAppendMode( false );
                 }
                 // check if branch is added or modified
                 if ( isNewBranch( uploadedBranch, validationObject.getUpload().getBranches(), uploadedBranches ) ) {
@@ -787,7 +782,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         Map<String, Integer> userMap = null;
         try {
             if ( validationObject != null && validationObject.getUpload() != null ) {
-                userMap = generateUserIndexMap( validationObject.getUpload().getUsers() );
+                userMap = generateUserIndexMap( validationObject.getUpload().getUsers(), false );
             }
             if ( userMap == null ) {
                 userMap = new HashMap<String, Integer>();
@@ -872,10 +867,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( isUserUploadEmpty( uploadedUser ) ) {
                     continue;
                 }
+                uploadedUser.setInAppendMode( false );
                 if ( isAppend ) {
                     uploadedUser.setInAppendMode( true );
-                } else {
-                    uploadedUser.setInAppendMode( false );
                 }
                 if ( uploadedUser.getSourceBranchId() == null && uploadedUser.getSourceRegionId() == null
                     && ( uploadedUser.getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() )
