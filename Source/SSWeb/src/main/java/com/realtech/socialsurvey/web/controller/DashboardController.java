@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -115,7 +114,7 @@ public class DashboardController
 
     @Autowired
     private SurveyPreInitiationService surveyPreInitiationService;
-
+    
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
@@ -301,17 +300,10 @@ public class DashboardController
             if ( realtechAdmin ) {
                 columnName = null;
             }
-            LOG.debug( "Getting the survey score." );
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
+            LOG.debug( "Getting the survey score." );;
             double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
-            try {
-                //get formatted survey score using rating format
-                surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
-            }
+            //get formatted survey score using rating format  
+            surveyScore = surveyHandler.getFormattedSurveyScore( surveyScore );
             LOG.debug( "Getting the sent surveys count." );
             int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
             LOG.debug( "Getting the social posts count with hierarchy." );
