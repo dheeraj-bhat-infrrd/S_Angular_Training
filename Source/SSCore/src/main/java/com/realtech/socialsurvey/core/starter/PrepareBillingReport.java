@@ -86,7 +86,7 @@ public class PrepareBillingReport implements Runnable
                     } catch ( InvalidInputException | UndeliveredEmailException | ProfileNotFoundException e ) {
                         LOG.error( "Error in generating billing report generator " , e );
                         try {
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BILLING_REPORT_GENERATOR,
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.FILE_UPLOAD_REPORTS_GENERATOR,
                                 System.currentTimeMillis(), e );
                         } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
                             LOG.error( "error while sende report bug mail to admin " , e1 );

@@ -1322,8 +1322,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT );
         Criterion fileUploadTypeCriteria = Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, uploadTypeList );
         List<Integer> statusList = new ArrayList<Integer>();
+        //get only active records
         statusList.add( CommonConstants.STATUS_ACTIVE );
-        statusList.add( CommonConstants.STATUS_UNDER_PROCESSING );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN, statusList );
         List<FileUpload> filesToBeUploaded = fileUploadDao.findByCriteria( FileUpload.class, fileUploadTypeCriteria,
             statusCriteria );
@@ -1346,6 +1346,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
         Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
         List<Integer> statusList = new ArrayList<Integer>();
+        //get only active records
         statusList.add( CommonConstants.STATUS_ACTIVE );
         statusList.add( CommonConstants.STATUS_UNDER_PROCESSING );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN, statusList );
@@ -1527,6 +1528,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         Map<Long, String> userIdBranchAsAdminIdsMap = new HashMap<Long, String>();
         List<Long> agentIds = new ArrayList<Long>();
         Map<Long, AgentSettings> userIdSettingsMap = new HashMap<Long, AgentSettings>();
+        Map<Long, List<SocialUpdateAction>> socialMediaActionMap = new HashMap<Long, List<SocialUpdateAction>>();
+        Map<Long, Date> latestSurveySentForAgent = new HashMap<Long, Date>();
+        Map<Long, Date> latestSurveyCompletedForAgent = new HashMap<Long, Date>();
         User companyAdmin = null;
         if ( userList != null && userList.size() > 0 ) {
             for ( User user : userList ) {
@@ -1623,13 +1627,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     userIdSettingsMap.put( agentSettings.getIden(), agentSettings );
                 }
             }
+            
+          //get user social media action detail
+            socialMediaActionMap = socialManagementService
+                .getSocialConnectionsHistoryForEntities( CommonConstants.AGENT_ID_COLUMN, userIdList );
         }
 
-        //get user social media action detail
-        Map<Long, List<SocialUpdateAction>> socialMediaActionMap = socialManagementService
-            .getSocialConnectionsHistoryForEntities( CommonConstants.AGENT_ID_COLUMN, userIdList );
-        Map<Long, Date> latestSurveyCompletedForAgent = surveyDetailsDao.getLatestCompletedSurveyDateForAgents( companyId );
-        Map<Long, Date> latestSurveySentForAgent = surveyPreInitiationDao.getLatestSurveySentForAgent( companyId );
+        
+        latestSurveyCompletedForAgent = surveyDetailsDao.getLatestCompletedSurveyDateForAgents( companyId );
+        latestSurveySentForAgent = surveyPreInitiationDao.getLatestSurveySentForAgent( companyId );
 
         //get user data map to craete excel from available users details
         Map<Integer, List<Object>> usersData = createUserDataForCompnyUserReport( userList, agentIds, companyAdmin,
