@@ -144,7 +144,6 @@
 							<c:if test="${profilemasterid == 1 || accounttype == 'COMPANY' }">
 							
 								<!--  <option value=6 data-report="company-hierarchy"><spring:message code="label.downloadcompanyhierarchydata.key" /></option>-->
-								<option value=7 data-report="user-list-report"><spring:message code="label.downloaduserlistdata.key" /></option>
 							</c:if>
 							<c:if test="${not empty realTechAdminId }">
 								<option value=5 data-report="user-adoption"><spring:message code="label.downloaduseradoptiondata.key" /></option> 

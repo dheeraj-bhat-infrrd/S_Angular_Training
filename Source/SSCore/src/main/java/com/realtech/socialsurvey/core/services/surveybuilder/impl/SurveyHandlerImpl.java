@@ -161,6 +161,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private int maxSocialPostReminderInterval;
 
 
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
+    String paramOrderTakeSurveySubject;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
     String paramOrderTakeSurvey;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
@@ -1711,8 +1713,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             mailSubject = fileOperations.getContentFromFile( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
                 + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
-
-            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( agentName ) );
+            
+            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( paramOrderTakeSurveySubject.split( "," ) ) );
 
             mailBody = fileOperations.getContentFromFile( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
                 + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
