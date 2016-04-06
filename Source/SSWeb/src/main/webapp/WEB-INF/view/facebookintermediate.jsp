@@ -16,7 +16,10 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 </head>
 <body>
-<div id="overlay-toast" class="overlay-toast"></div>
+<div id="toast-container" class="toast-container">
+	   <span id="overlay-toast" class="overlay-toast"></span>
+    </div>
+<!-- <div id="overlay-toast" class="overlay-toast"></div> -->
 <div class="overlay-loader hide"></div>
 <div class="login-main-wrapper padding-001 login-wrapper-min-height">
 	<div class="container login-container">
@@ -93,6 +96,8 @@ $(document).ready(function() {
 		disable(this);
 		var selectedPage=$('input:radio[name=pageselection]:checked').val();
 		if(selectedPage == undefined){
+			$('#overlay-toast').html("Please select an account");
+			showToast();
 			enable(this);
 			return;
 		}
