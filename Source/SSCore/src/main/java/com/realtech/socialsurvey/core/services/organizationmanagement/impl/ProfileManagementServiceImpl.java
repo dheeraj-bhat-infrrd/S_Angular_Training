@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -144,7 +143,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
-
+    
     @Autowired
     private UserProfileDao userProfileDao;
 
@@ -1872,16 +1871,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         double averageRating = surveyDetailsDao.getRatingForPastNdays( idenColumnName, iden, -1, aggregateAbusive, false,
             includeZillow, zillowReviewCount, zillowTotalScore );
-        //format review count
-        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-        ratingFormat.setMinimumFractionDigits( 1 );
-        ratingFormat.setMaximumFractionDigits( 1 );
-        try {
-            //get formatted survey score using rating format
-            averageRating = Double.parseDouble( ratingFormat.format( averageRating ) );
-        } catch ( NumberFormatException e ) {
-            LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
-        }
+        
+      //get formatted survey score using rating format  
+        averageRating = surveyHandler.getFormattedSurveyScore( averageRating );
+        
         LOG.info( "Method getAverageRatings executed successfully.Returning: " + averageRating );
         return averageRating;
     }
@@ -4621,6 +4614,40 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             pushToZillowPostTemp( profile, collectionName, surveyDetails, review );
         } catch ( Exception e ) {
             LOG.error( "Exception occurred while pushing Zillow review into temp table. Reason :", e );
+        }
+    }
+    
+    
+    /**
+     * method to remove tokens from profile detail
+     * @param profile
+     */
+    @Override
+    public void removeTokensFromProfile( OrganizationUnitSettings profile )
+    {
+        LOG.debug( "Inside method removeTokensFromProfile" );
+        if ( profile != null ) {
+            if ( profile.getSocialMediaTokens() != null ) {
+                SocialMediaTokens socialMediaTokens = profile.getSocialMediaTokens();
+                if ( socialMediaTokens != null ) {
+                    if ( socialMediaTokens.getFacebookToken() != null ) {
+                        socialMediaTokens.getFacebookToken().setFacebookAccessToken( null );
+                        socialMediaTokens.getFacebookToken().setFacebookAccessTokenToPost( null );
+                        socialMediaTokens.getFacebookToken().setFacebookPages( null );
+                    }
+                    if ( socialMediaTokens.getLinkedInToken() != null ) {
+                        socialMediaTokens.getLinkedInToken().setLinkedInAccessToken( null );
+                    }
+                    if ( socialMediaTokens.getTwitterToken() != null ) {
+                        socialMediaTokens.getTwitterToken().setTwitterAccessToken( null );
+                        socialMediaTokens.getTwitterToken().setTwitterAccessTokenSecret( null );
+                    }
+                    if ( socialMediaTokens.getGoogleToken() != null ) {
+                        socialMediaTokens.getGoogleToken().setGoogleAccessToken( null );
+                        socialMediaTokens.getGoogleToken().setGoogleRefreshToken( null );
+                    }
+                }
+            }
         }
     }
 }

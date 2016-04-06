@@ -286,7 +286,7 @@ public class SurveyManagementController
                 }
                 // Generate the text as in mail
                 String surveyDetail = generateSurveyTextForMail( customerName, mood, survey, isAbusive, allowCheckBox );
-                String surveyScore = String.valueOf( survey.getScore() );
+                String surveyScore = String.valueOf(surveyHandler.getFormattedSurveyScore( survey.getScore() ));
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
                         customerName, surveyScore, logoUrl );
@@ -675,14 +675,6 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            /*if ( rating % 1 == 0 ) {
-                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }*/
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
-
-
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -717,7 +709,7 @@ public class SurveyManagementController
             List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
             List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
 
-            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+            String facebookMessage = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + customerDisplayName
                 + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
                 + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             facebookMessage += "\n Feedback : " + feedback;
@@ -836,14 +828,6 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
-
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            /*if ( rating % 1 == 0 ) {
-                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }*/
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
-
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -884,7 +868,7 @@ public class SurveyManagementController
              * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
              * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
              */
-            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
+            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, surveyHandler.getFormattedSurveyScore( rating ),
                 customerDisplayName, agentName, "@SocialSurveyMe" )
                 + getApplicationBaseUrl()
                 + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
@@ -994,13 +978,6 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
-
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            /*if ( rating % 1 == 0 ) {
-                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }*/
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -1037,7 +1014,7 @@ public class SurveyManagementController
             }
 
 
-            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for "
+            String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + customerDisplayName + " for "
                 + agentName + " on SocialSurvey ";
 
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
