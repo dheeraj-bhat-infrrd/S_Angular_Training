@@ -2279,7 +2279,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         // Mail the report to the admin
         if ( excelCreated ) {
             Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName + ".xls", filePath );
+            attachmentsDetails.put( fileName + ".xlsx", filePath );
             String mailId = null;
             if ( recipientMailId == null || recipientMailId.isEmpty() ) {
                 mailId = adminEmailId;
