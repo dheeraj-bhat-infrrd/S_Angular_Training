@@ -12,6 +12,8 @@ namespace EncompassSocialSurvey.DAL
     {
         EncompassSocialSurveryContext _socialSurveryContext = new EncompassSocialSurveryContext();
 
+        #region Read only props
+
         static readonly DateTime EPOCH_TIME = new DateTime(1970, 1, 2, 0, 0, 0);
 
         static readonly int DEFAULT_REGION_ID = 0;
@@ -19,6 +21,10 @@ namespace EncompassSocialSurvey.DAL
         static readonly int DEFAULT_BRANCH_ID = 0;
 
         static readonly int DEFAULT_AGENT_ID = 0;
+
+        #endregion
+
+        #region Constants
 
         // select spi.SURVEY_SOURCE_ID, spi.CUSTOMER_EMAIL_ID, spi.CUSTOMER_FIRST_NAME from survey_pre_initiation as spi
         private const string SELECT_QUERY = @"SELECT spi.SURVEY_PRE_INITIATION_ID, spi.SURVEY_SOURCE_ID FROM SURVEY_PRE_INITIATION as  spi
@@ -28,7 +34,7 @@ namespace EncompassSocialSurvey.DAL
 
         private const string COMPANY_SELECT_QUERY = @"SELECT comp.COMPANY_ID, comp.COMPANY, comp.STATUS FROM COMPANY as  comp WHERE comp.COMPANY_ID = ?COMPANY_ID;";
 
-        private const string CRM_BATCH_TRACKER_UPDATE_QUERY = @"UPDATE CRM_BATCH_TRACKER SET LAST_RUN_START_DATE = ?LAST_RUN_START_DATE, LAST_RUN_END_DATE = ?LAST_RUN_END_DATE, RECENT_RECORD_FETCHED_DATE = ?RECENT_RECORD_FETCHED_DATE, ERROR = ?ERROR, MODIFIED_ON = ?MODIFIED_ON WHERE ID = ?ID";
+        private const string CRM_BATCH_TRACKER_UPDATE_QUERY = @"UPDATE CRM_BATCH_TRACKER SET LAST_RUN_START_DATE = ?LAST_RUN_START_DATE, LAST_RUN_END_DATE = ?LAST_RUN_END_DATE, RECENT_RECORD_FETCHED_DATE = ?RECENT_RECORD_FETCHED_DATE, LAST_RUN_RECORD_FETCHED_COUNT=?LAST_RUN_RECORD_FETCHED_COUNT, ERROR = ?ERROR, MODIFIED_ON = ?MODIFIED_ON WHERE ID = ?ID";
 
         private const string CRM_BATCH_TRACKER_INSERT_QUERY = @"INSERT INTO CRM_BATCH_TRACKER(  
                                          
@@ -97,6 +103,36 @@ namespace EncompassSocialSurvey.DAL
 										, ?COLLECTION_NAME
                                         ) ;";
 
+        
+         private const string CRM_BATCH_TRACKER_HISTORY_INSERT_QUERY = @"INSERT INTO CRM_BATCH_TRACKER_HISTORY(  
+                                         
+                                         CRM_BATCH_TRACKER_ID
+                                        , STATUS
+                                        , COUNT_OF_RECORDS_FETCHED
+                                        , CREATED_ON
+                                        , CREATED_BY
+                                        , MODIFIED_ON
+                                        , MODIFIED_BY
+                                          )
+                                        VALUES(
+                                          ?CRM_BATCH_TRACKER_ID
+                                        , ?STATUS
+                                        , ?COUNT_OF_RECORDS_FETCHED
+                                        , ?CREATED_ON
+                                        , ?CREATED_BY
+                                        , ?MODIFIED_ON
+                                        , ?MODIFIED_BY
+                                        ) ;";
+
+        #endregion
+
+        #region public methods
+
+        /// <summary>
+        /// Updates crm batch tracker table in db
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public bool UpdateCrmBatchTracker(CRMBatchTrackerEntity entity)
         {
             Logger.Info("Inside method UpdateCrmBatchTracker");
@@ -115,6 +151,7 @@ namespace EncompassSocialSurvey.DAL
                 commandToUpdate.Parameters.Add("?LAST_RUN_START_DATE", MySqlDbType.DateTime).Value = entity.LastRunStartDate;
                 commandToUpdate.Parameters.Add("?LAST_RUN_END_DATE", MySqlDbType.DateTime).Value = entity.LastRunEndDate;
                 commandToUpdate.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
+                commandToUpdate.Parameters.Add("?LAST_RUN_RECORD_FETCHED_COUNT", MySqlDbType.Int32).Value = entity.LastRunRecordFetchedCount;
                 commandToUpdate.Parameters.Add("?ERROR", MySqlDbType.String).Value = entity.error;
                 commandToUpdate.ExecuteNonQuery();
             }
@@ -133,48 +170,58 @@ namespace EncompassSocialSurvey.DAL
 
         }
 
+        /// <summary>
+        /// insert in crm batch tracker table in db if any new data if found
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public bool InsertCRMBatchTracker(CRMBatchTrackerEntity entity)
         {
             Logger.Info("Inside method InsertCRMBatchTracker");
             bool returnValue = false;
             string insertQuery = CRM_BATCH_TRACKER_INSERT_QUERY;
-            MySqlConnection mySqlDbConnection = null;
-            MySqlCommand commandToInsert = null;
+      
             try
             {
-                mySqlDbConnection = _socialSurveryContext.DBConnnection;
-                commandToInsert = new MySqlCommand(insertQuery, mySqlDbConnection);
+                using (MySqlConnection mySqlDbConnection = _socialSurveryContext.DBConnnection)
+                {
+                    using (MySqlCommand commandToInsert = new MySqlCommand(insertQuery, mySqlDbConnection))
+                    {
 
-                // set the parameters
-                commandToInsert.Parameters.Add("?SOURCE", MySqlDbType.VarChar, 100).Value = entity.Source;
-                commandToInsert.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = entity.CompanyId;
-                commandToInsert.Parameters.Add("?REGION_ID", MySqlDbType.Int32).Value = DEFAULT_REGION_ID;
-                commandToInsert.Parameters.Add("?BRANCH_ID", MySqlDbType.Int32).Value = DEFAULT_BRANCH_ID;
-                commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.Int32).Value = DEFAULT_AGENT_ID;
-                commandToInsert.Parameters.Add("?LAST_RUN_START_DATE", MySqlDbType.DateTime).Value = entity.LastRunStartDate;
-                commandToInsert.Parameters.Add("?LAST_RUN_END_DATE", MySqlDbType.DateTime).Value = entity.LastRunEndDate;
-                commandToInsert.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
-                commandToInsert.Parameters.Add("?ERROR", MySqlDbType.DateTime).Value = entity.error;
+                        // set the parameters
+                        commandToInsert.Parameters.Add("?SOURCE", MySqlDbType.VarChar, 100).Value = entity.Source;
+                        commandToInsert.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = entity.CompanyId;
+                        commandToInsert.Parameters.Add("?REGION_ID", MySqlDbType.Int32).Value = DEFAULT_REGION_ID;
+                        commandToInsert.Parameters.Add("?BRANCH_ID", MySqlDbType.Int32).Value = DEFAULT_BRANCH_ID;
+                        commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.Int32).Value = DEFAULT_AGENT_ID;
+                        commandToInsert.Parameters.Add("?LAST_RUN_START_DATE", MySqlDbType.DateTime).Value = entity.LastRunStartDate;
+                        commandToInsert.Parameters.Add("?LAST_RUN_END_DATE", MySqlDbType.DateTime).Value = entity.LastRunEndDate;
+                        commandToInsert.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
+                        commandToInsert.Parameters.Add("?ERROR", MySqlDbType.DateTime).Value = entity.error;
 
-                commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = entity.CreatedOn;
-                commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
+                        commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = entity.CreatedOn;
+                        commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
 
-                //
-                commandToInsert.ExecuteNonQuery();
+                        //
+                        commandToInsert.ExecuteNonQuery();
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error("Caught an exception: LoanRepository.InsertLoan()", ex);
                 throw ex;
             }
-            finally
-            {
-                if (null != commandToInsert) { commandToInsert.Dispose(); }
-                if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
-            }
+          
             return returnValue;
         }
 
+        /// <summary>
+        /// Insert loan in db
+        /// </summary>
+        /// <param name="loan"></param>
+        /// <param name="mySqlDbConnection"></param>
+        /// <returns></returns>
         public bool InsertLoan(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(): LoanId:" + loan.SurveySourceId + " : CustomerEmailId : " + loan.CustomerEmailId);
@@ -228,7 +275,53 @@ namespace EncompassSocialSurvey.DAL
             return returnValue;
         }
 
+        /// <summary>
+        /// Insert in crm batch tracker history table in db with no of records fetched
+        /// </summary>
+        /// <param name="entity"></param>
+        public void InsertCRMBatchTrackerHistory(CrmBatchTrackerHistory entity)
+        {
+            Logger.Info("Inside method InsertCRMBatchTrackerHistory");
+            #region insert in db   
+                    
+            string insertQuery = CRM_BATCH_TRACKER_HISTORY_INSERT_QUERY;
+            
+            try
+            {
+                using (MySqlConnection mySqlDbConnection = _socialSurveryContext.DBConnnection)
+                {
+                    using (MySqlCommand commandToInsert = new MySqlCommand(insertQuery, mySqlDbConnection))
+                    {
 
+                        #region set the command parameters
+                        commandToInsert.Parameters.Add("?CRM_BATCH_TRACKER_ID", MySqlDbType.Int32, 100).Value = entity.CrmBatchTrackerID;
+                        commandToInsert.Parameters.Add("?STATUS", MySqlDbType.Int32).Value = entity.Status;
+                        commandToInsert.Parameters.Add("?COUNT_OF_RECORDS_FETCHED", MySqlDbType.Int32).Value = entity.CountOfRecordsFetched;
+                        commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = entity.CreatedOn;
+                        commandToInsert.Parameters.Add("?CREATED_BY", MySqlDbType.VarChar).Value = entity.CreatedBy;
+                        commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = entity.ModifiedOn;
+                        commandToInsert.Parameters.Add("?MODIFIED_BY", MySqlDbType.VarChar).Value = entity.ModifiedBy;
+
+                        #endregion
+                        commandToInsert.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanRepository.InsertCRMBatchTrackerHistory()", ex);
+                throw ex;
+            }
+         
+            #endregion
+            Logger.Info("Exit method LoanRepository.InsertCRMBatchTrackerHistory");
+        }
+
+        /// <summary>
+        /// insert loan in db
+        /// </summary>
+        /// <param name="loans"></param>
+        /// <returns></returns>
         public bool InserLoan(List<LoanEntity> loans)
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(List<>)");
@@ -265,6 +358,12 @@ namespace EncompassSocialSurvey.DAL
             return returnValue;
         }
 
+        /// <summary>
+        /// Retrieve crm batch tracker from db by company id and source
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public CRMBatchTrackerEntity getCrmBatchTrackerByCompanyAndSource(long companyId, string source)
         {
             Logger.Debug("Inside method getCrmBatchTrackerByCompanyAndSource");
@@ -314,6 +413,11 @@ namespace EncompassSocialSurvey.DAL
             return crmBatchTracker;
         }
 
+        /// <summary>
+        /// retrieve company data from db by company id
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
         public Company getCompanyById(long companyId)
         {
             Logger.Debug("Inside method getCompanyById");
@@ -354,6 +458,12 @@ namespace EncompassSocialSurvey.DAL
             return company;
         }
 
+        /// <summary>
+        /// Checks if survey exist
+        /// </summary>
+        /// <param name="loan"></param>
+        /// <param name="mySqlDbConnection"></param>
+        /// <returns></returns>
         public bool IsSurveySourceIdExists(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
             Logger.Info("Entering the method LoanRepository.IsSurveySourceIdExists(): SURVEY_SOURCE_ID: " + loan.SurveySourceId
@@ -404,5 +514,7 @@ namespace EncompassSocialSurvey.DAL
             }
             return returnValue;
         }
+
+        #endregion
     }
 }
