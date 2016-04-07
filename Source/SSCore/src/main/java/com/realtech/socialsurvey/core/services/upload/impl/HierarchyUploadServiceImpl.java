@@ -527,8 +527,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
                         if ( cellIndex == REGION_ID_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                                && !String.valueOf( cell.getNumericCellValue() ).trim().isEmpty() ) {
-                                uploadedRegion.setSourceRegionId( String.valueOf( cell.getNumericCellValue() ).trim() );
+                                && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                uploadedRegion.setSourceRegionId( String.valueOf( (long) cell.getNumericCellValue() ).trim() );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
                                 uploadedRegion.setSourceRegionId( cell.getStringCellValue().trim() );
                             }
@@ -663,8 +663,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
                         if ( cellIndex == BRANCH_ID_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                                && !String.valueOf( cell.getNumericCellValue() ).trim().isEmpty() ) {
-                                uploadedBranch.setSourceBranchId( String.valueOf( cell.getNumericCellValue() ).trim() );
+                                && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                uploadedBranch.setSourceBranchId( String.valueOf( (long) cell.getNumericCellValue() ).trim() );
                             } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
                                 uploadedBranch.setSourceBranchId( cell.getStringCellValue().trim() );
                             }
@@ -672,8 +672,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                             uploadedBranch.setBranchName( cell.getStringCellValue().trim() );
                         } else if ( cellIndex == BRANCH_REGION_ID_INDEX ) {
                             if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                                && !String.valueOf( cell.getNumericCellValue() ).trim().isEmpty() ) {
-                                uploadedBranch.setSourceRegionId( String.valueOf( cell.getNumericCellValue() ).trim() );
+                                && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                uploadedBranch.setSourceRegionId( String.valueOf( (long) cell.getNumericCellValue() ).trim() );
                             } else if ( cell.getCellType() == XSSFCell.CELL_TYPE_STRING
                                 && !cell.getStringCellValue().trim().isEmpty() ) {
                                 uploadedBranch.setSourceRegionId( cell.getStringCellValue().trim() );
@@ -693,7 +693,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                                 && !cell.getStringCellValue().trim().isEmpty() ) {
                                 uploadedBranch.setBranchZipcode( cell.getStringCellValue().trim() );
                             } else if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                                && !String.valueOf( cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                && !String.valueOf( (int) cell.getNumericCellValue() ).trim().isEmpty() ) {
                                 uploadedBranch.setBranchZipcode( String.valueOf( (int) cell.getNumericCellValue() ).trim() );
                             }
                         }
@@ -814,34 +814,56 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     cell = (XSSFCell) cells.next();
                     cellIndex = cell.getColumnIndex();
                     if ( cell.getCellType() != XSSFCell.CELL_TYPE_BLANK ) {
-                        if ( cellIndex == USER_ID_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
-                            uploadedUser.setSourceUserId( cell.getStringCellValue().trim() );
+                        
+                        if ( cellIndex == USER_ID_INDEX ) {
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
+                                && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                uploadedUser.setSourceUserId( String.valueOf( (long) cell.getNumericCellValue() ).trim() );
+                            } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
+                                uploadedUser.setSourceUserId( cell.getStringCellValue().trim() );
+                            }
                         } else if ( cellIndex == USER_FIRST_NAME_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                             uploadedUser.setFirstName( cell.getStringCellValue().trim() );
                         } else if ( cellIndex == USER_LAST_NAME_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                             uploadedUser.setLastName( cell.getStringCellValue().trim() );
                         } else if ( cellIndex == USER_TITLE_INDEX && !cell.getStringCellValue().trim().isEmpty() ) {
                             uploadedUser.setTitle( cell.getStringCellValue().trim() );
-                        } else if ( cellIndex == USER_BRANCH_ID_INDEX
-                            && !cell.getStringCellValue().replaceAll( " ", "" ).isEmpty() ) {
-                            //set assigned branches instead
-                            //uploadedUser.setSourceBranchId( cell.getStringCellValue().trim() );
-                            uploadedUser.setAssignedBranches(
-                                Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
-                        } else if ( cellIndex == USER_REGION_ID_INDEX
-                            && !cell.getStringCellValue().replaceAll( " ", "" ).isEmpty() ) {
-                            //set assigned regions instead
-                            //uploadedUser.setSourceRegionId( cell.getStringCellValue().trim() );
-                            uploadedUser.setAssignedRegions(
-                                Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
-                        } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX
-                            && !cell.getStringCellValue().replaceAll( " ", "" ).isEmpty() ) {
-                            uploadedUser.setAssignedBranchesAdmin(
-                                Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
-                        } else if ( cellIndex == USER_REGION_ID_ADMIN_INDEX
-                            && !cell.getStringCellValue().replaceAll( " ", "" ).isEmpty() ) {
-                            uploadedUser.setAssignedRegionsAdmin(
-                                Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
+                        } else if ( cellIndex == USER_BRANCH_ID_INDEX ) {
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
+                                && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                uploadedUser.setAssignedBranches( Arrays.asList( String.valueOf( (long) cell.getNumericCellValue() )
+                                    .replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
+                            } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
+                                uploadedUser.setAssignedBranches( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" )
+                                    .split( "\\s*,\\s*" ) ) );
+                            }
+                        } else if ( cellIndex == USER_REGION_ID_INDEX ) {
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
+                                && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                uploadedUser.setAssignedRegions( Arrays.asList( String.valueOf( (long) cell.getNumericCellValue() )
+                                    .replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
+                            } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
+                                uploadedUser.setAssignedRegions( Arrays.asList( cell.getStringCellValue().replaceAll( " ", "" )
+                                    .split( "\\s*,\\s*" ) ) );
+                            }
+                        } else if ( cellIndex == USER_BRANCH_ID_ADMIN_INDEX ) {
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
+                                && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                uploadedUser.setAssignedBranchesAdmin( Arrays.asList( String
+                                    .valueOf( (long) cell.getNumericCellValue() ).replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
+                            } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
+                                uploadedUser.setAssignedBranchesAdmin( Arrays.asList( cell.getStringCellValue()
+                                    .replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
+                            }
+                        } else if ( cellIndex == USER_REGION_ID_ADMIN_INDEX ) {
+                            if ( cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
+                                && !String.valueOf( (long) cell.getNumericCellValue() ).trim().isEmpty() ) {
+                                uploadedUser.setAssignedRegionsAdmin( Arrays.asList( String.valueOf( (long) (long) cell.getNumericCellValue() )
+                                    .replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
+                            } else if ( !cell.getStringCellValue().trim().isEmpty() ) {
+                                uploadedUser.setAssignedRegionsAdmin( Arrays.asList( cell.getStringCellValue()
+                                    .replaceAll( " ", "" ).split( "\\s*,\\s*" ) ) );
+                            }
                         } else if ( cellIndex == USER_EMAIL_INDEX ) {
                             String emailId = cell.getStringCellValue().trim();
                             if ( emailId != null && !emailId.isEmpty() ) {
