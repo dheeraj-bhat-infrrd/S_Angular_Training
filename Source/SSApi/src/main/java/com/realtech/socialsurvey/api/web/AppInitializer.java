@@ -23,7 +23,8 @@ public class AppInitializer implements WebApplicationInitializer {
 		defaultServlet.addMapping("/doc/lib/*");
 		defaultServlet.addMapping("*.js");
 
-		ServletRegistration.Dynamic dispatcher = servletContext.addServlet("DispatcherServlet", new DispatcherServlet(context));
+		ServletRegistration.Dynamic dispatcher = servletContext.addServlet("DispatcherServlet",
+				new DispatcherServlet(context));
 
 		dispatcher.setLoadOnStartup(1);
 		dispatcher.addMapping("/");

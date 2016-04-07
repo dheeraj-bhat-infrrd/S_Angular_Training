@@ -9,6 +9,11 @@
 	<artifactId>SSApi</artifactId>
 	<packaging>war</packaging>
 
+	<properties>
+		<jackson.version>2.6.1</jackson.version>
+		<swagger.version>1.0.2</swagger.version>
+	</properties>
+
 	<dependencies>
 		<!-- Spring MVC -->
 		<dependency>
@@ -74,7 +79,24 @@
 		<dependency>
 			<groupId>com.mangofactory</groupId>
 			<artifactId>swagger-springmvc</artifactId>
-			<version>1.0.2</version>
+			<version>${swagger.version}</version>
+		</dependency>
+
+		<!-- Jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-hibernate4</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<!-- Test Artifacts -->
