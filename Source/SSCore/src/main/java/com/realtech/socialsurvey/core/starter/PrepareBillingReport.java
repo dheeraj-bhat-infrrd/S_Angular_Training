@@ -94,7 +94,7 @@ public class PrepareBillingReport implements Runnable
                             }else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT ){
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_HIERARCHY_REPORT;
                             }
-                            String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For reprot " + reportType;
+                            String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For " + reportType;
                             
                             batchTrackerService.sendMailToAdminRegardingBatchError( batchName,
                                 System.currentTimeMillis(), e );
