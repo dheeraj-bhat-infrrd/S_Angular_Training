@@ -86,7 +86,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardS
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
@@ -1163,8 +1162,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             surveyDetailsToPopulate.add( agentDetail.getAgentFirstName() );
             surveyDetailsToPopulate.add( agentDetail.getAgentLastName() );
             surveyDetailsToPopulate.add( agentDetail.getAverageScore() );
+            surveyDetailsToPopulate.add( agentDetail.getCompletedSurveys() );
+            surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() );
             surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() + agentDetail.getCompletedSurveys() );
-
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis( agentDetail.getRegistrationDate() );
             surveyDetailsToPopulate.add( DATE_FORMATTER.format( calendar.getTime() ) );
@@ -1178,6 +1178,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         surveyDetailsToPopulate.add( CommonConstants.HEADER_FIRST_NAME );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_LAST_NAME );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_AVG_SCORE );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_COMPLETED_SURVEY_COUNT );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_INCOMPLTE_SURVEY_COUNT );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SUM_SURVEYS );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_REGISTRATION_DATE );
 

@@ -2690,6 +2690,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Invalid value passed for iden of profile level." );
         }
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
+        // Generate entries for all active users in the company
+        initializeAgentReportData( agentReportData, columnName, iden );
         surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden, false );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden, false );
         // FIX for JIRA: SS-1112: BOC
@@ -2699,6 +2701,33 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         LOG.info( "Method to get Agent's Report for a specific time and all time finished." );
         return new ArrayList<>( agentReportData.values() );
+    }
+    
+    
+    /**
+     * Method to initialize agent report data(to include all active agent in the company)
+     * @param agentReportData
+     * @param columnName
+     * @param iden
+     */
+    void initializeAgentReportData( Map<Long, AgentRankingReport> agentReportData, String columnName, long iden )
+    {
+        Set<Long> agentIds = new HashSet<Long>();
+        switch ( columnName ) {
+            case CommonConstants.COMPANY_ID_COLUMN:
+                Company company = companyDao.findById( Company.class, iden );
+                agentIds = usersDao.getActiveUserIdsForCompany( company );
+                break;
+            case CommonConstants.REGION_ID_COLUMN:
+                agentIds = userProfileDao.findUserIdsByRegion( iden );
+                break;
+            case CommonConstants.BRANCH_ID_COLUMN:
+                agentIds = userProfileDao.findUserIdsByBranch( iden );
+                break;
+        }
+        for ( Long agentId : agentIds ) {
+            agentReportData.put( agentId, new AgentRankingReport() );
+        }
     }
 
 
