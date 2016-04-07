@@ -703,6 +703,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
+    //TODO: Remove history update from here?
     RegionUploadVO mapRegionModificationHistory( RegionUploadVO regionUpload, Region region )
     {
         LOG.debug( "mapping region history" );

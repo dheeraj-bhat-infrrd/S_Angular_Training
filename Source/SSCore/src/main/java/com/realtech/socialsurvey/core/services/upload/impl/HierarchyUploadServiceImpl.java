@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,10 +29,12 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
+import com.realtech.socialsurvey.core.entities.StringUploadHistory;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
+import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
 import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 
@@ -84,6 +87,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
     @Autowired
     private HierarchyDownloadService hierarchyDownloadService;
+    
+    @Autowired
+    private HierarchyStructureUploadService hierarchyStructureUploadService;
 
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
@@ -1001,6 +1007,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
 
+    //TODO: pass the history objects to the method instead
     void updateUploadValidationWithModifiedRegion( RegionUploadVO uploadedRegion, UploadValidation validationObject,
         Map<String, Integer> regionMap )
     {
@@ -1012,8 +1019,16 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( !region.isRegionAdded() ) {
                     if ( ( region.getRegionName() != null && uploadedRegion.getRegionName() == null )
                         || ( region.getRegionName() == null && uploadedRegion.getRegionName() != null )
-                        || ( region.getRegionName() != null && uploadedRegion.getRegionName() != null
-                            && !region.getRegionName().equalsIgnoreCase( uploadedRegion.getRegionName() ) ) ) {
+                        || ( region.getRegionName() != null && uploadedRegion.getRegionName() != null && !region
+                            .getRegionName().equalsIgnoreCase( uploadedRegion.getRegionName() ) ) ) {
+                        //Update history
+                        if ( region.getRegionNameHistory() == null ) {
+                            region.setRegionNameHistory( new ArrayList<StringUploadHistory>() );
+                        }
+
+                        updateRegionHistory( region.getRegionNameHistory(), uploadedRegion.getRegionName(),
+                            region.getRegionName() );
+
                         region.setRegionName( uploadedRegion.getRegionName() );
                         region.setRegionNameModified( true );
                     } else {
@@ -1021,17 +1036,36 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( region.getRegionAddress1() != null && uploadedRegion.getRegionAddress1() == null )
                         || ( region.getRegionAddress1() == null && uploadedRegion.getRegionAddress1() != null )
-                        || ( region.getRegionAddress1() != null && uploadedRegion.getRegionAddress1() != null
-                            && !region.getRegionAddress1().equalsIgnoreCase( uploadedRegion.getRegionAddress1() ) ) ) {
+                        || ( region.getRegionAddress1() != null && uploadedRegion.getRegionAddress1() != null && !region
+                            .getRegionAddress1().equalsIgnoreCase( uploadedRegion.getRegionAddress1() ) ) ) {
+
+                        //Update history
+                        if ( region.getRegionAddress1History() == null ) {
+                            region.setRegionAddress1History( new ArrayList<StringUploadHistory>() );
+                        }
+
+                        updateRegionHistory( region.getRegionAddress1History(), uploadedRegion.getRegionAddress1(),
+                            region.getRegionAddress1() );
+                        
                         region.setRegionAddress1( uploadedRegion.getRegionAddress1() );
                         region.setRegionAddress1Modified( true );
+
                     } else {
                         region.setRegionAddress1Modified( false );
                     }
                     if ( ( region.getRegionAddress2() != null && uploadedRegion.getRegionAddress2() == null )
                         || ( region.getRegionAddress2() == null && uploadedRegion.getRegionAddress2() != null )
-                        || ( region.getRegionAddress2() != null && uploadedRegion.getRegionAddress2() != null
-                            && !region.getRegionAddress2().equalsIgnoreCase( uploadedRegion.getRegionAddress2() ) ) ) {
+                        || ( region.getRegionAddress2() != null && uploadedRegion.getRegionAddress2() != null && !region
+                            .getRegionAddress2().equalsIgnoreCase( uploadedRegion.getRegionAddress2() ) ) ) {
+
+                        //Update history
+                        if ( region.getRegionAddress2History() == null ) {
+                            region.setRegionAddress2History( new ArrayList<StringUploadHistory>() );
+                        }
+
+                        updateRegionHistory( region.getRegionAddress2History(), uploadedRegion.getRegionAddress2(),
+                            region.getRegionAddress2() );
+
                         region.setRegionAddress2( uploadedRegion.getRegionAddress2() );
                         region.setRegionAddress2Modified( true );
                     } else {
@@ -1039,8 +1073,17 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( region.getRegionCity() != null && uploadedRegion.getRegionCity() == null )
                         || ( region.getRegionCity() == null && uploadedRegion.getRegionCity() != null )
-                        || ( region.getRegionCity() != null && uploadedRegion.getRegionCity() != null
-                            && !region.getRegionCity().equalsIgnoreCase( uploadedRegion.getRegionCity() ) ) ) {
+                        || ( region.getRegionCity() != null && uploadedRegion.getRegionCity() != null && !region
+                            .getRegionCity().equalsIgnoreCase( uploadedRegion.getRegionCity() ) ) ) {
+
+                        //Update history
+                        if ( region.getRegionCityHistory() == null ) {
+                            region.setRegionCityHistory( new ArrayList<StringUploadHistory>() );
+                        }
+
+                        updateRegionHistory( region.getRegionCityHistory(), uploadedRegion.getRegionCity(),
+                            region.getRegionCity() );
+
                         region.setRegionCity( uploadedRegion.getRegionCity() );
                         region.setRegionCityModified( true );
                     } else {
@@ -1048,8 +1091,17 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( region.getRegionState() != null && uploadedRegion.getRegionState() == null )
                         || ( region.getRegionState() == null && uploadedRegion.getRegionState() != null )
-                        || ( region.getRegionState() != null && uploadedRegion.getRegionState() != null
-                            && !region.getRegionState().equalsIgnoreCase( uploadedRegion.getRegionState() ) ) ) {
+                        || ( region.getRegionState() != null && uploadedRegion.getRegionState() != null && !region
+                            .getRegionState().equalsIgnoreCase( uploadedRegion.getRegionState() ) ) ) {
+
+                        //Update history
+                        if ( region.getRegionStateHistory() == null ) {
+                            region.setRegionStateHistory( new ArrayList<StringUploadHistory>() );
+                        }
+
+                        updateRegionHistory( region.getRegionStateHistory(),
+                            uploadedRegion.getRegionState(), region.getRegionState() );
+
                         region.setRegionState( uploadedRegion.getRegionState() );
                         region.setRegionStateModified( true );
                     } else {
@@ -1057,15 +1109,24 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                     if ( ( region.getRegionZipcode() != null && uploadedRegion.getRegionZipcode() == null )
                         || ( region.getRegionZipcode() == null && uploadedRegion.getRegionZipcode() != null )
-                        || ( region.getRegionZipcode() != null && uploadedRegion.getRegionZipcode() != null
-                            && !region.getRegionZipcode().equalsIgnoreCase( uploadedRegion.getRegionZipcode() ) ) ) {
+                        || ( region.getRegionZipcode() != null && uploadedRegion.getRegionZipcode() != null && !region
+                            .getRegionZipcode().equalsIgnoreCase( uploadedRegion.getRegionZipcode() ) ) ) {
+
+                        //Update history
+                        if ( region.getRegionZipcodeHistory() == null ) {
+                            region.setRegionZipcodeHistory( new ArrayList<StringUploadHistory>() );
+                        }
+
+                        updateRegionHistory( region.getRegionZipcodeHistory(), uploadedRegion.getRegionZipcode(),
+                            region.getRegionZipcode() );
+
                         region.setRegionZipcode( uploadedRegion.getRegionZipcode() );
                         region.setRegionZipcodeModified( true );
                     } else {
                         region.setRegionZipcodeModified( false );
                     }
-                    if ( region.isRegionNameModified() || region.isRegionAddress1Modified() || region.isRegionAddress2Modified()
-                        || region.isRegionCityModified() || region.isRegionStateModified()
+                    if ( region.isRegionNameModified() || region.isRegionAddress1Modified()
+                        || region.isRegionAddress2Modified() || region.isRegionCityModified() || region.isRegionStateModified()
                         || region.isRegionZipcodeModified() ) {
                         validationObject.setNumberOfRegionsModified( validationObject.getNumberOfRegionsModified() + 1 );
                         region.setRegionModified( true );
@@ -1079,8 +1140,54 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
         }
     }
+    
+    
+    /**
+     * Method to get the latest history entry from a list of upload histories
+     * @param uploadHistories
+     * @return
+     */
+    StringUploadHistory getLatestHistoryEntry( List<StringUploadHistory> uploadHistories )
+    {
+        StringUploadHistory latestEntry = null;
+        for ( StringUploadHistory stringUploadHistory : uploadHistories ) {
+            if ( latestEntry == null ) {
+                latestEntry = stringUploadHistory;
+            } else if ( latestEntry.getTime().before( stringUploadHistory.getTime() ) ) {
+                latestEntry = stringUploadHistory;
+            }
+        }
+        return latestEntry;
+    }
+    
+    
+    /**
+     * Returns StringUploadHistory object if history needs to be updated
+     * Returns null otherwise
+     * @param historyList
+     * @param latestValue
+     * @param oldValue
+     * @param uploadedRegion
+     * @return
+     */
+    void updateRegionHistory( List<StringUploadHistory> historyList, String latestValue, String oldValue )
+    {
+        if ( historyList == null ) {
+            historyList = new ArrayList<StringUploadHistory>();
+        }
+        //check if current value is already the latest value in history
+        StringUploadHistory latestHistoryEntry = getLatestHistoryEntry( historyList );
+        StringUploadHistory history = null;
+        if ( latestHistoryEntry == null || !latestHistoryEntry.getValue().equals( latestValue ) ) {
+            history = new StringUploadHistory();
+            history.setTime( new Date( System.currentTimeMillis() ) );
+            history.setValue( oldValue );
+            historyList.add( history );
+        }
+    }
 
 
+    //TODO: Update history
     void updateUploadValidationWithModifiedBranch( BranchUploadVO uploadedBranch, UploadValidation validationObject,
         Map<String, Integer> branchMap )
     {
@@ -1176,6 +1283,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
 
+    //TODO: Update history
     void updateUploadValidationWithModifiedUser( UserUploadVO uploadedUser, UploadValidation validationObject,
         Map<String, Integer> userMap )
     {
