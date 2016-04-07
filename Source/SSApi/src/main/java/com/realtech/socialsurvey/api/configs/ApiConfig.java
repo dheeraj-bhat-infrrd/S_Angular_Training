@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = { "com.realtech.socialsurvey.api" })
+@ComponentScan(basePackages = { "com.realtech.socialsurvey.api.controllers" })
 @Import({ SwaggerConfig.class, SecurityConfig.class })
 public class ApiConfig {
 
