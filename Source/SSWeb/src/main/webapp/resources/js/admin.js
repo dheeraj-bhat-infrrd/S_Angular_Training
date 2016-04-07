@@ -425,9 +425,8 @@ function downloadBillingReport() {
 	var mailId = $("#dsh-mail-id").val();
 	if (emailRegex.test(mailId) || mailId == "") {
 		payload = { "mailid" : mailId };
-		callAjaxGetWithPayloadData("./downloadbillingreport.do", function() {
-			$('#overlay-toast').html(
-			'The Billing Report will be mailed to you shortly');
+		callAjaxGetWithPayloadData("./downloadbillingreport.do", function(data) {
+			$('#overlay-toast').html(data);
 			showToast();
 		}, payload, true);
 	} else {
