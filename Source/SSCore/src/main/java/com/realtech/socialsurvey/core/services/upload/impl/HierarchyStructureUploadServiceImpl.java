@@ -408,6 +408,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         if ( branchesToBeUploaded != null && !branchesToBeUploaded.isEmpty() ) {
             Branch branch = null;
             for ( BranchUploadVO branchUpload : branchesToBeUploaded ) {
+                //Reset inAppendMode flag
+                branchUpload.setInAppendMode( false );
 
                 try {
                     //If branch waasn't added, modified, nor deleted, skip to the next step
@@ -437,8 +439,6 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
                     // map the history records
                     mapBranchModificationHistory( branchUpload, branch );
-                    //Reset inAppendMode flag
-                    branchUpload.setInAppendMode( false );
 
                     // map the id mapping
                     /*if ( branchUpload.getSourceRegionId() != null && !branchUpload.getSourceRegionId().isEmpty() ) {
@@ -607,6 +607,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             Region region = null;
             for ( RegionUploadVO regionUpload : regionsToBeUploaded ) {
 
+                //Reset inAppendMode flag
+                regionUpload.setInAppendMode( false );
+                
                 // create the region. add the field to history for all fields as its new region and map source id to the id mapping list
                 try {
                     //If the region wasn't added, modified nor deleted, skip the next step
@@ -624,8 +627,6 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     }
                     // map the history records
                     mapRegionModificationHistory( regionUpload, region );
-                    //Reset inAppendMode flag
-                    regionUpload.setInAppendMode( false );
                     // map the id mapping
                     if ( regionUpload.getSourceRegionId() != null && !regionUpload.getSourceRegionId().isEmpty() ) {
                         upload.getRegionSourceMapping().put( regionUpload.getSourceRegionId(), region.getRegionId() );
@@ -2092,6 +2093,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 return;
             }
             for ( UserUploadVO userToBeUploaded : usersToUpload ) {
+                //Reset inAppendMode flag
+                userToBeUploaded.setInAppendMode( false );
                 User user = null;
                 //Mask email ID if necessary
                 String emailId = userToBeUploaded.getEmailId();
@@ -2118,8 +2121,6 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 updateUserSettingsInMongo( user, userToBeUploaded );
                 //map the history records
                 mapUserModificationHistory( userToBeUploaded, user );
-                //Reset inAppendMode flag
-                userToBeUploaded.setInAppendMode( false );
                 //map the id mapping
                 if ( userToBeUploaded.getSourceUserId() != null && !userToBeUploaded.getSourceUserId().isEmpty() ) {
                     upload.getUserSourceMapping().put( userToBeUploaded.getSourceUserId(), userToBeUploaded.getUserId() );
