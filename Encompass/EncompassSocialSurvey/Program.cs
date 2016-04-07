@@ -14,7 +14,6 @@ namespace EncompassSocialSurvey
             log4net.Config.BasicConfigurator.Configure();
 
             Logger.Info("Entering into method: Program.Main()");
-            System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
             #region get company credentials and process loan
             try
             {
@@ -45,7 +44,6 @@ namespace EncompassSocialSurvey
 
             #endregion
 
-            Logger.Info(watch.ElapsedMilliseconds.ToString());
             Logger.Info("Exiting the method Program.Main()");
         }
 
