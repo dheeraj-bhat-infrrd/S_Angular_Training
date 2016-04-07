@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,6 +40,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -115,7 +115,7 @@ public class DashboardController
 
     @Autowired
     private SurveyPreInitiationService surveyPreInitiationService;
-
+    
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
@@ -301,17 +301,10 @@ public class DashboardController
             if ( realtechAdmin ) {
                 columnName = null;
             }
-            LOG.debug( "Getting the survey score." );
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
+            LOG.debug( "Getting the survey score." );;
             double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
-            try {
-                //get formatted survey score using rating format
-                surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
-            }
+            //get formatted survey score using rating format  
+            surveyScore = surveyHandler.getFormattedSurveyScore( surveyScore );
             LOG.debug( "Getting the sent surveys count." );
             int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
             LOG.debug( "Getting the social posts count with hierarchy." );
@@ -2208,6 +2201,7 @@ public class DashboardController
     public String getBillingReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
     {
         LOG.info( "Method to get billing report file getBillingReportFile() started." );
+        String message = "";
         try{
         User user = sessionHelper.getCurrentUser();
         if ( !(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())) ) {
@@ -2215,8 +2209,15 @@ public class DashboardController
         }
         //Check if a request already exists
         try {
-            dashboardService.getActiveBillingReports();
-            LOG.info( "A request already exists for getting the billing report" );
+            List<FileUpload> fileUpload = dashboardService.getActiveBillingReports();
+            LOG.info( "A request already exists for getting the billing report." );
+            
+            message = "A request already exists for getting the billing report.";
+            if(fileUpload != null && fileUpload.size() > 0)
+                if( fileUpload.get( 0 ) != null && fileUpload.get( 0 ).getFileName() != null && ! fileUpload.get( 0 ).getFileName().isEmpty())
+                    message += " Mail Address is : " + fileUpload.get( 0 ).getFileName();
+             
+            
         } catch ( NoRecordsFetchedException e ) {
             //Request doesn't already exist. Create one.
             LOG.info( "There is no existing request for getting the billing report" );
@@ -2224,14 +2225,15 @@ public class DashboardController
             //Get value from Mail ID column
             String mailId = request.getParameter( "mailid" );
             adminReport.createEntryInFileUploadForBillingReport( mailId );
+            message = "The Billing Report will be mailed to you shortly";
         }
         
         }catch(NonFatalException e){
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
-            return CommonConstants.ERROR;
+            message = "Error while generating billing report request";
         }
         LOG.info( "Method to get billing report file getBillingReportFile() finished." );
-        return CommonConstants.SUCCESS_ATTRIBUTE;
+        return message;
     }
 
     

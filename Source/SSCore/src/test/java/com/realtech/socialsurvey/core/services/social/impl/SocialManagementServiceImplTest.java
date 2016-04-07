@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 import facebook4j.FacebookException;
@@ -41,6 +42,9 @@ public class SocialManagementServiceImplTest
 
     @Mock
     private EmailFormatHelper emailFormatHelper;
+    
+    @Mock
+    private SurveyHandler surveyHandler;
 
     @Mock
     private OrganizationManagementService organizationManagementService;
