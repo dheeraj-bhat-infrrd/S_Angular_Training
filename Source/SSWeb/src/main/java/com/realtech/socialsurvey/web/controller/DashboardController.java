@@ -41,6 +41,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -2208,6 +2209,7 @@ public class DashboardController
     public String getBillingReportFile( Model model, HttpServletRequest request, HttpServletResponse response )
     {
         LOG.info( "Method to get billing report file getBillingReportFile() started." );
+        String message = "";
         try{
         User user = sessionHelper.getCurrentUser();
         if ( !(user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(user.getUserId())) ) {
@@ -2215,8 +2217,15 @@ public class DashboardController
         }
         //Check if a request already exists
         try {
-            dashboardService.getActiveBillingReports();
-            LOG.info( "A request already exists for getting the billing report" );
+            List<FileUpload> fileUpload = dashboardService.getActiveBillingReports();
+            LOG.info( "A request already exists for getting the billing report." );
+            
+            message = "A request already exists for getting the billing report.";
+            if(fileUpload != null && fileUpload.size() > 0)
+                if( fileUpload.get( 0 ) != null && fileUpload.get( 0 ).getFileName() != null && ! fileUpload.get( 0 ).getFileName().isEmpty())
+                    message += " Mail Address is : " + fileUpload.get( 0 ).getFileName();
+             
+            
         } catch ( NoRecordsFetchedException e ) {
             //Request doesn't already exist. Create one.
             LOG.info( "There is no existing request for getting the billing report" );
@@ -2224,14 +2233,15 @@ public class DashboardController
             //Get value from Mail ID column
             String mailId = request.getParameter( "mailid" );
             adminReport.createEntryInFileUploadForBillingReport( mailId );
+            message = "The Billing Report will be mailed to you shortly";
         }
         
         }catch(NonFatalException e){
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
-            return CommonConstants.ERROR;
+            message = "Error while generating billing report request";
         }
         LOG.info( "Method to get billing report file getBillingReportFile() finished." );
-        return CommonConstants.SUCCESS_ATTRIBUTE;
+        return message;
     }
 
     
