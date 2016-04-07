@@ -209,15 +209,15 @@ public interface SocialManagementService
 
 
     public String buildFacebookAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow );
+        String feedback, String linkUrl, boolean isZillow );
 
 
     public String buildLinkedInAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow );
+        String feedback, String linkUrl, boolean isZillow );
 
 
     public String buildTwitterAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        DecimalFormat ratingFormat, String feedback, String linkUrl, boolean isZillow );
+        String feedback, String linkUrl, boolean isZillow );
 
 
     Map<Long, List<SocialUpdateAction>> getSocialConnectionsHistoryForEntities( String entityType, List<Long> entityIds )

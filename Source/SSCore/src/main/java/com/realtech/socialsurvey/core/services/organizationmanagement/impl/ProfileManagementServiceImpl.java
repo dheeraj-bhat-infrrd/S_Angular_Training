@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -144,7 +143,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
-
+    
     @Autowired
     private UserProfileDao userProfileDao;
 
@@ -1872,16 +1871,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         double averageRating = surveyDetailsDao.getRatingForPastNdays( idenColumnName, iden, -1, aggregateAbusive, false,
             includeZillow, zillowReviewCount, zillowTotalScore );
-        //format review count
-        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-        ratingFormat.setMinimumFractionDigits( 1 );
-        ratingFormat.setMaximumFractionDigits( 1 );
-        try {
-            //get formatted survey score using rating format
-            averageRating = Double.parseDouble( ratingFormat.format( averageRating ) );
-        } catch ( NumberFormatException e ) {
-            LOG.error( "Exception caught while formatting survey ratting using rattingformat" );
-        }
+        
+      //get formatted survey score using rating format  
+        averageRating = surveyHandler.getFormattedSurveyScore( averageRating );
+        
         LOG.info( "Method getAverageRatings executed successfully.Returning: " + averageRating );
         return averageRating;
     }
@@ -2697,6 +2690,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Invalid value passed for iden of profile level." );
         }
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
+        // Generate entries for all active users in the company
+        initializeAgentReportData( agentReportData, columnName, iden );
         surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden, false );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden, false );
         // FIX for JIRA: SS-1112: BOC
@@ -2706,6 +2701,33 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         LOG.info( "Method to get Agent's Report for a specific time and all time finished." );
         return new ArrayList<>( agentReportData.values() );
+    }
+    
+    
+    /**
+     * Method to initialize agent report data(to include all active agent in the company)
+     * @param agentReportData
+     * @param columnName
+     * @param iden
+     */
+    void initializeAgentReportData( Map<Long, AgentRankingReport> agentReportData, String columnName, long iden )
+    {
+        Set<Long> agentIds = new HashSet<Long>();
+        switch ( columnName ) {
+            case CommonConstants.COMPANY_ID_COLUMN:
+                Company company = companyDao.findById( Company.class, iden );
+                agentIds = usersDao.getActiveUserIdsForCompany( company );
+                break;
+            case CommonConstants.REGION_ID_COLUMN:
+                agentIds = userProfileDao.findUserIdsByRegion( iden );
+                break;
+            case CommonConstants.BRANCH_ID_COLUMN:
+                agentIds = userProfileDao.findUserIdsByBranch( iden );
+                break;
+        }
+        for ( Long agentId : agentIds ) {
+            agentReportData.put( agentId, new AgentRankingReport() );
+        }
     }
 
 

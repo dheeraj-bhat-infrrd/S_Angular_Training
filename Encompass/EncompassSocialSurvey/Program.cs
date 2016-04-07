@@ -14,6 +14,7 @@ namespace EncompassSocialSurvey
             log4net.Config.BasicConfigurator.Configure();
 
             Logger.Info("Entering into method: Program.Main()");
+            #region get company credentials and process loan
             try
             {
                 CompanyCredentialService _ccService = new CompanyCredentialService();
@@ -40,9 +41,19 @@ namespace EncompassSocialSurvey
                 if (null != EncompassGlobal.EncompassLoginSession && EncompassGlobal.EncompassLoginSession.IsConnected)
                     EncompassGlobal.EncompassLoginSession.End();
             }
+
+            #endregion
+
             Logger.Info("Exiting the method Program.Main()");
         }
 
+        #region private methods
+       
+        /// <summary>
+        /// process loan for companies
+        /// </summary>
+        /// <param name="companyCredentials"></param>
+        /// <param name="isProductionRun"></param>
         private static void ProcessLoanForCompanies(List<CompanyCredential> companyCredentials , Boolean isProductionRun)
         {
             Logger.Info("Entering the method ProcessLoanForCompanies.ProcessLoanForCompanies()");
@@ -164,5 +175,8 @@ namespace EncompassSocialSurvey
 
             Logger.Info("Exiting the method ProcessLoanForCompanies.ProcessLoanForCompanies()");
         }
+
+       
+        #endregion
     }
 }

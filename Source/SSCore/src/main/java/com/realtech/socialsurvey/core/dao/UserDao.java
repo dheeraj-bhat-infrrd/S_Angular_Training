@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
@@ -39,5 +40,12 @@ public interface UserDao extends GenericDao<User, Long> {
     List<User> getUsersAndEmailMappingForCompany( Company company, int start, int batch ) throws InvalidInputException;
 
     Long getCountOfUsersAndEmailMappingForCompany( Company company ) throws InvalidInputException;
+
+    /**
+     * Method to get a list of all the active users' IDs in a company
+     * @param company
+     * @return
+     */
+    public Set<Long> getActiveUserIdsForCompany( Company company );
 
 }
