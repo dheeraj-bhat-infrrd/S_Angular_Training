@@ -86,6 +86,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardS
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
@@ -853,11 +854,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         // Sorting SurveyResults
         Collections.sort( surveyDetails, new SurveyResultsComparator() );
 
-        //create rating format to format survey score
-        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-        ratingFormat.setMinimumFractionDigits( 1 );
-        ratingFormat.setMaximumFractionDigits( 1 );
-
         // Finding max questions
         int max = 0;
         int internalMax = 0;
@@ -926,7 +922,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 }
 
                 //add score
-                surveyDetailsToPopulate.add( ratingFormat.format( survey.getScore() ) );
+                surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ));
                 for ( SurveyResponse response : survey.getSurveyResponse() ) {
                     surveyDetailsToPopulate.add( response.getAnswer() );
                 }
@@ -1026,7 +1022,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     surveyDetailsToPopulate.add( survey.getSource() );
 
                     //add score
-                    surveyDetailsToPopulate.add( ratingFormat.format( survey.getScore() ) );
+                    surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ));
 
                     // Since Zillow reviews have no Survey Response Data, push empty data
                     for ( int i = 1; i <= max; i++ ) {

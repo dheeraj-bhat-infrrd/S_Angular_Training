@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.net.MalformedURLException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -1425,9 +1424,6 @@ public class SocialManagementController
                 "Number format exception caught in postToFacebook() while trying to convert agent Id. Nested exception is ", e );
             return e.getMessage();
         }
-        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-        ratingFormat.setMinimumFractionDigits( 1 );
-        ratingFormat.setMaximumFractionDigits( 1 );
         /*if ( rating % 1 == 0 ) {
             ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
         }*/
@@ -1448,7 +1444,7 @@ public class SocialManagementController
             LOG.error( "InvalidInputException caught in postToFacebook(). Nested exception is ", e );
         }
 
-        String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for "
+        String facebookMessage = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + custDisplayName + " for "
             + agentName + " on Social Survey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
             + agentProfileLink;
         facebookMessage = facebookMessage.replaceAll( "null", "" );
@@ -1495,12 +1491,6 @@ public class SocialManagementController
                     e );
                 return e.getMessage();
             }
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            /*if ( rating % 1 == 0 ) {
-                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }*/
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
             String agentProfileLink = "";
             AgentSettings agentSettings;
             try {
@@ -1519,7 +1509,7 @@ public class SocialManagementController
             /*String twitterMessage = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
                 + " on @SocialSurveyMe - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
                 + agentProfileLink;*/
-            String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE, ratingFormat.format(rating), custDisplayName, agentName, "@SocialSurveyMe") + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
+            String twitterMessage = String.format(CommonConstants.TWITTER_MESSAGE, surveyHandler.getFormattedSurveyScore( rating ), custDisplayName, agentName, "@SocialSurveyMe") + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             twitterMessage = twitterMessage.replaceAll( "null", "" );
 
             for ( OrganizationUnitSettings setting : settings ) {
@@ -1571,12 +1561,6 @@ public class SocialManagementController
                 "Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ", e );
             return e.getMessage();
         }
-        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-        /*if ( rating % 1 == 0 ) {
-            ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-        }*/
-        ratingFormat.setMinimumFractionDigits( 1 );
-        ratingFormat.setMaximumFractionDigits( 1 );
         String agentProfileLink = "";
         String custDisplayName = null;
         AgentSettings agentSettings = new AgentSettings();
@@ -1596,7 +1580,7 @@ public class SocialManagementController
                 .getCompanyId() );
             List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user
                 .getUserId() );
-            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + custDisplayName + " for "
+            String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + custDisplayName + " for "
                 + agentName + " on SocialSurvey ";
             String linkedinProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             message += linkedinProfileUrl;
