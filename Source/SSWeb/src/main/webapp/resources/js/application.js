@@ -8282,9 +8282,6 @@ $(document).on('click','#dsh-dwnld-report-btn',function(){
 	case 6:
 		window.location.href = "/downloadcompanyhierarchyreport.do?columnName=" + colName + "&columnValue=" + colValue;
 		break;
-	case 7:
-		window.location.href = "/downloadcompanyusersreport.do?columnName=" + colName + "&columnValue=" + colValue;
-		break;
 	default:
 		break;
 	}

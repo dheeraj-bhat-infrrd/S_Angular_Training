@@ -9,36 +9,6 @@
 	<artifactId>SSWeb</artifactId>
 	<packaging>war</packaging>
 
-	<properties>
-
-		<!-- Generic properties -->
-		<java.version>1.7</java.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-		<!-- Web -->
-		<jsp.version>2.2</jsp.version>
-		<jstl.version>1.2</jstl.version>
-		<servlet.version>2.5</servlet.version>
-
-		<dev.deployment.path>/Users/nishit/work/apps/jboss/jboss-eap-6.3/standalone/deployments</dev.deployment.path>
-
-
-		<!-- Spring -->
-		<spring-framework.version>4.1.4.RELEASE</spring-framework.version>
-		<spring.security>3.2.3.RELEASE</spring.security>
-
-		<!-- Hibernate / JPA -->
-		<hibernate.version>4.2.1.Final</hibernate.version>
-
-		<!-- Logging -->
-		<!-- <logback.version>1.0.13</logback.version> <slf4j.version>1.7.5</slf4j.version> -->
-		<!-- Test -->
-		<junit.version>4.11</junit.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-	</properties>
-
 	<dependencies>
 
 		<!-- Spring MVC -->
@@ -58,7 +28,7 @@
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<artifactId>javax.servlet-api</artifactId>
 			<version>${servlet.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -88,22 +58,6 @@
 			<version>${spring-framework.version}</version>
 			<scope>compile</scope>
 		</dependency>
-
-		<!-- Logging with SLF4J & LogBack -->
-		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
-			<version>${slf4j.version}</version> <scope>compile</scope> </dependency> 
-			<dependency> <groupId>ch.qos.logback</groupId> <artifactId>logback-classic</artifactId> 
-			<version>${logback.version}</version> </dependency> <dependency> <groupId>ch.qos.logback</groupId> 
-			<artifactId>logback-core</artifactId> <version>${logback.version}</version> 
-			</dependency> -->
-		<!-- Hibernate -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
 
 		<!-- Test Artifacts -->
 		<dependency>

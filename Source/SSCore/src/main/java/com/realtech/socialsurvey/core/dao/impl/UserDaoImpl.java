@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -15,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import scala.Array;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
@@ -116,6 +116,39 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         }
         LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
         return (List<User>) criteria.list();
+    }
+    
+    
+    /**
+     * Method to get a list of all the active users' IDs in a company
+     * @param company
+     * @return
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Set<Long> getActiveUserIdsForCompany( Company company )
+    {
+        LOG.info( "Method getActiveUserIdsForCompany started for company : " + company.getCompany() );
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY, company ) );
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ) );
+            criteria.add( criterion );
+            criteria.addOrder( Order.asc( "firstName" ) );
+            criteria.addOrder( Order.asc( "lastName" ) );
+            criteria.setProjection( Projections.property( CommonConstants.USER_ID ) );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
+        }
+        List<Long> agentIds = (List<Long>) criteria.list();
+        if ( agentIds == null ) {
+            return new HashSet<Long>();
+        }
+        return new HashSet<Long>( agentIds );
     }
 
 
