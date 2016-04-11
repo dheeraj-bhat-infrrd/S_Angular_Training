@@ -5669,7 +5669,7 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
-function updateCustomerResponse(feedback, agreedToShare , isAbusive) {
+function updateCustomerResponse(feedback, agreedToShare , isAbusive, isIsoEncoded) {
 	var success = false;
 	
 	var payload = {
@@ -5680,7 +5680,8 @@ function updateCustomerResponse(feedback, agreedToShare , isAbusive) {
 		"firstName" : firstName,
 		"lastName" : lastName,
 		"isAbusive" : isAbusive,
-		"agreedToShare" : agreedToShare
+		"agreedToShare" : agreedToShare,
+		"isIsoEncoded" : isIsoEncoded
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -5862,10 +5863,18 @@ function showMasterQuestionPage(){
 			
 		}
 		
-		//call method to post the review and update the review count
-		postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey);
+		//Check character encoding
+		var isIsoEncoded = false;
+		try{
+			feedback = decodeURIComponent(escape(feedback));
+		} catch(err){
+			isIsoEncoded = true;
+		}
 		
-		updateCustomerResponse(feedback, $('#shr-pst-cb').val() , isAbusive);
+		//call method to post the review and update the review count
+		postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey, isIsoEncoded);
+		
+		updateCustomerResponse(feedback, $('#shr-pst-cb').val() , isAbusive, isIsoEncoded);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
@@ -5886,7 +5895,7 @@ function showMasterQuestionPage(){
 	return;
 }
 
-function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey){
+function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey, isIsoEncoded){
 	var success = false;
 	var payload = {
 		"agentId" : agentId,
@@ -5898,7 +5907,8 @@ function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey){
 		"customerEmail" : customerEmail,
 		"feedback" : feedback,
 		"agentProfileLink" : agentProfileLink,
-		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey
+		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey,
+		"isIsoEncoded" : isIsoEncoded
 	};
 	$.ajax({
 		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
