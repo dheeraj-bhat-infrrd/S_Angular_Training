@@ -39,7 +39,7 @@
 			<spring:message code="label.widgetheader.key" />
 		</div>
 		<div class="clearfix st-score-wrapper" style="height: 600px">
-			<div id="basic-widget-view" class="float-left st-score-txt widget-display" ></div>
+			<div id="basic-widget-view" class="float-left wd-score-txt widget-display" ></div>
 			<div class="clearfix float-right st-score-rt pos-relative widget-code" style="width: 40%;">
 				<div style="padding:5px">
 					<div class="st-widget-txt" style="font-weight: 600 !important;">
