@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -86,12 +86,11 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.vo.UserList;
 
-
 /**
  * JIRA:SS-34 BY RM02 Implementation for User management services
  */
 @DependsOn ( "generic")
-@Component
+@Service
 public class UserManagementServiceImpl implements UserManagementService, InitializingBean
 {
 
@@ -130,9 +129,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
-
-    @Autowired
-    private GenericDao<UserApiKey, Long> userApiKeyDao;
 
     @Autowired
     private GenericDao<UsercountModificationNotification, Long> userCountModificationDao;
@@ -3056,14 +3052,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
 
         LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
-        try {
-            solrSearchService.addUserToSolr( user );
-        } catch ( SolrException e ) {
-            LOG.error( "SolrException caught in addCorporateAdmin(). Nested exception is ", e );
-            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(),
-                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-            throw e;
-        }
+//        try {
+//            solrSearchService.addUserToSolr( user );
+//        } catch ( SolrException e ) {
+//            LOG.error( "SolrException caught in addCorporateAdmin(). Nested exception is ", e );
+//            organizationManagementService.removeOrganizationUnitSettings( user.getUserId(),
+//                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+//            throw e;
+//        }
         LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
 
         return user;

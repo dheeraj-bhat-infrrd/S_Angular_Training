@@ -17,7 +17,7 @@ import com.realtech.socialsurvey.api.web.SimpleCORSFilter;
 @EnableResourceServer
 public class SecurityConfig extends ResourceServerConfigurerAdapter {
 
-	private static final String RESOURCE_ID = "SocialSurvey";
+	private static final String RESOURCE_ID = "socialsecurity";
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
@@ -37,7 +37,7 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
 		RemoteTokenServices rts = new RemoteTokenServices();
 		rts.setClientId(RESOURCE_ID);
 		rts.setClientSecret("secret");
-		rts.setCheckTokenEndpointUrl("http://auth.socialsurvey.com:8082" + "/oauth/check_token");
+		rts.setCheckTokenEndpointUrl("http://localhost:8082" + "/oauth/check_token");
 
 		return rts;
 	}
