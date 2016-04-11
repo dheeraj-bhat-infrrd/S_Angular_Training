@@ -96,6 +96,7 @@ import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
@@ -231,6 +232,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
+    
+    @Autowired
+    GenericDao<UploadStatus, Long> uploadStatusDao;
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
@@ -4986,6 +4990,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveyCompanyMappingDao.deleteByCondition( "SurveyCompanyMapping", conditions );
 
         fileUploadDao.deleteByCondition( "FileUpload", conditions );
+        
+        //Delete entries from UPLOAD_STATUS table
+        List<String> deletionConditions = new ArrayList<String>();
+        deletionConditions.add( "company.companyId = " + companyId );
+        uploadStatusDao.deleteByCondition( "UploadStatus", deletionConditions );
 
         List<CrmBatchTracker> crmBatchTrackerList = crmBatchTrackerDao.findByColumn( CrmBatchTracker.class, "companyId",
             companyId );
