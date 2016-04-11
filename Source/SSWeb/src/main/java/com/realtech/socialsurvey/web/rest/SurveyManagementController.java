@@ -1,7 +1,8 @@
 package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -201,6 +202,11 @@ public class SurveyManagementController
             String firstName = request.getParameter( "firstName" );
             String lastName = request.getParameter( "lastName" );
             String agreedToShare = request.getParameter( "agreedToShare" );
+            String strIsIsoEncoded = request.getParameter( "isIsoEncoded" );
+            boolean isIsoEncoded = Boolean.parseBoolean( strIsIsoEncoded );
+            if ( isIsoEncoded ) {
+                feedback = new String(feedback.getBytes( Charset.forName( "ISO-8859-1" ) ), "UTF-8");
+            }
 
             long agentId = 0;
             try {
@@ -323,6 +329,8 @@ public class SurveyManagementController
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in storeFeedback(). Nested exception is ", e );
             return e.getMessage();
+        } catch ( UnsupportedEncodingException e ) {
+            LOG.error( "An exception occured while changing the character encoding of the feedback" );
         }
         LOG.info( "Method storeFeedback() finished to store response of customer." );
         return "Survey stored successfully";
@@ -609,6 +617,11 @@ public class SurveyManagementController
             String isAbusiveStr = request.getParameter( "isAbusive" );
             String serverBaseUrl = requestUtils.getRequestServerName( request );
             String onlyPostToSocialSurveyStr = request.getParameter( "onlyPostToSocialSurvey" );
+            String strIsIsoEncoded = request.getParameter( "isIsoEncoded" );
+            boolean isIsoEncoded = Boolean.parseBoolean( strIsIsoEncoded );
+            if ( isIsoEncoded ) {
+                feedback = new String(feedback.getBytes( Charset.forName( "ISO-8859-1" ) ), "UTF-8");
+            }
 
             long agentId = 0;
             double rating = 0;
@@ -636,6 +649,8 @@ public class SurveyManagementController
                 "Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
                 e );
             return e.getMessage();
+        } catch ( UnsupportedEncodingException e ) {
+            LOG.error( "An exception occured while changing the character encoding of the feedback" );
         }
         LOG.info( "Method to post feedback of customer to various pages of social networking sites finished." );
         return "Error while posting on social media";
