@@ -1,38 +1,51 @@
-﻿using EncompassSocialSurvey.DAL;
-using EncompassSocialSurvey.Entity;
+﻿using EncompassSocialSurvey.Entity;
 using EncompassSocialSurvey.Service;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EncompassSocialSurvey
 {
     class Program
     {
+        #region static variables declaration
+
+        static readonly int MAX_DEGREE_OF_PARALLELISM = 10;
+
+        #endregion
+
         static void Main(string[] args)
         {
             log4net.Config.BasicConfigurator.Configure();
 
             Logger.Info("Entering into method: Program.Main()");
+
             #region get company credentials and process loan
             try
             {
+                #region For Production run 
+
                 CompanyCredentialService _ccService = new CompanyCredentialService();
-               
                 Logger.Debug("Getting company details for production run");
                 var companyCredentialsProd = _ccService.GetCompanyCredentials(EncompassSocialSurveyConstant.companyRecordTypeSaveData);
                 Logger.Info("Company credentials count for production run: " + companyCredentialsProd.Count);
                 Logger.Debug("Processing loans for companies ");
-                ProcessLoanForCompanies(companyCredentialsProd , true); 
+                ProcessLoanForCompanies(companyCredentialsProd, true, _ccService);
+
+                #endregion
+
+                #region For Generating report
 
                 Logger.Debug("Getting company details for generating report");
                 var companyCredentialsGenerateReport = _ccService.GetCompanyCredentials(EncompassSocialSurveyConstant.companyRecordTypeGenerateReport);
                 Logger.Info("Company credentials count for generating report: " + companyCredentialsGenerateReport.Count);
                 Logger.Debug("Processing loans for companies ");
-                ProcessLoanForCompanies(companyCredentialsGenerateReport , false);
+                ProcessLoanForCompanies(companyCredentialsGenerateReport , false, _ccService);
+
+                #endregion
 
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Logger.Error("Caught an exception: Program.Main()", ex);
             }
@@ -54,27 +67,27 @@ namespace EncompassSocialSurvey
         /// </summary>
         /// <param name="companyCredentials"></param>
         /// <param name="isProductionRun"></param>
-        private static void ProcessLoanForCompanies(List<CompanyCredential> companyCredentials , Boolean isProductionRun)
+        private static void ProcessLoanForCompanies(List<CompanyCredential> companyCredentials , Boolean isProductionRun, CompanyCredentialService _ccService)
         {
             Logger.Info("Entering the method ProcessLoanForCompanies.ProcessLoanForCompanies()");
-            CompanyCredentialService _ccService = new CompanyCredentialService();
+         
+            #region Processing each company loans in parallel
 
-            foreach (var forCompCredential in companyCredentials)
+            Parallel.ForEach(companyCredentials,new ParallelOptions { MaxDegreeOfParallelism = MAX_DEGREE_OF_PARALLELISM }, (forCompCredential) =>
+            
             {
                 LoanService loanSerivce = new LoanService();
-
-
                 try
                 {
 
                     if (loanSerivce.isCompanyActive(forCompCredential.EncompassCredential.CompanyId))
-                     {
-                        Logger.Debug("Starting loan processing for company: " + forCompCredential.CompanyName + " " 
+                    {
+                        Logger.Debug("Starting loan processing for company: " + forCompCredential.CompanyName + " "
                            + " companyId: " + forCompCredential.EncompassCredential.CompanyId
                            + " : companyUserName : " + forCompCredential.EncompassCredential.UserName
                            + " : companyURL : " + forCompCredential.EncompassCredential.EncompassUrl);
 
-                    
+
                         Logger.Debug("Logging into encompass");
                         EncompassGlobal.GetUserLoginSesssion(forCompCredential);
 
@@ -101,13 +114,15 @@ namespace EncompassSocialSurvey
                             {
                                 try
                                 {
-                                    if (null == loansVM) continue;
-                                    if (loansVM.Count <= 0) continue;
-                                    Logger.Debug("Saving loans for company : " + forCompCredential.CompanyName + " id : "  + forCompCredential.EncompassCredential.CompanyId);
+                                    //if (null == loansVM) continue;
+                                    //if (loansVM.Count <= 0) continue;
+                                    Logger.Debug("Saving loans for company : " + forCompCredential.CompanyName + " id : " + forCompCredential.EncompassCredential.CompanyId);
                                     // process for insert
-                                    loanSerivce.InsertLoans(loansVM);
+                                    if (loansVM != null && loansVM.Count > 0)
+                                        loanSerivce.InsertLoans(loansVM);
                                 }
-                                catch (Exception ex) {
+                                catch (Exception ex)
+                                {
                                     string Subject = "Exception While processing encompass records";
                                     String BodyText = "An error has been occurred while storing the encompass record for company : " + forCompCredential.CompanyName + " id : " + forCompCredential.EncompassCredential.CompanyId + " on " + DateTime.Now + ".";
                                     BodyText += ex.Message;
@@ -115,15 +130,15 @@ namespace EncompassSocialSurvey
                                     throw ex;
                                 }
                             }
-                            else 
+                            else
                             {
                                 try
                                 {
 
                                     Logger.Debug("Generating report for company : " + forCompCredential.CompanyName);
                                     //generate report and send it
-                                    var createdFilePath = loanSerivce.createLoanListCSV(loansVM, forCompCredential.CompanyName);
-                                    loanSerivce.sendLoanReportToEmailAddresses(createdFilePath, forCompCredential.EncompassCredential.emailAddressForReport, forCompCredential.EncompassCredential.numberOfDays);
+                                    var createdFilePath = loanSerivce.CreateLoanListCSV(loansVM, forCompCredential.CompanyName);
+                                    loanSerivce.SendLoanReportToEmailAddresses(createdFilePath, forCompCredential.EncompassCredential.emailAddressForReport, forCompCredential.EncompassCredential.numberOfDays);
                                     //disable generate report for company
                                     Logger.Debug("Disabling generate report for company " + forCompCredential.CompanyName);
                                     _ccService.DisableReportGenerationForCompany(forCompCredential.EncompassCredential.CompanyId);
@@ -137,8 +152,8 @@ namespace EncompassSocialSurvey
                                     throw ex;
                                 }
                             }
-                                      
-                            
+
+
                         }
                         catch (System.Exception ex)
                         {
@@ -147,31 +162,33 @@ namespace EncompassSocialSurvey
                         }
 
 
-                         Logger.Info("Done loan processing for company: " + forCompCredential.CompanyName + " "
-                          + " companyId: " + forCompCredential.EncompassCredential.CompanyId
-                          + " : companyUserName : " + forCompCredential.EncompassCredential.UserName
-                          + " : companyURL : " + forCompCredential.EncompassCredential.EncompassUrl);
-                     }
+                        Logger.Info("Done loan processing for company: " + forCompCredential.CompanyName + " "
+                         + " companyId: " + forCompCredential.EncompassCredential.CompanyId
+                         + " : companyUserName : " + forCompCredential.EncompassCredential.UserName
+                         + " : companyURL : " + forCompCredential.EncompassCredential.EncompassUrl);
+                    }
 
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
-                        // Let's process the loan for other company
-                        Logger.Error("Caught an exception, companiesCredentials: Program.ProcessLoanForCompanies():", ex);
-                        String Subject = "Error while connecting to encompass";
-                        String BodyText = "An error has been occurred while connecting to encompass for company : " + forCompCredential.CompanyName + " with id : " + forCompCredential.EncompassCredential.CompanyId + " on " + DateTime.Now + ".";
-                        BodyText += ex.Message;
-                        CommonUtility.SendMailToAdmin(Subject, BodyText);
+                    // Let's process the loan for other company
+                    Logger.Error("Caught an exception, companiesCredentials: Program.ProcessLoanForCompanies():", ex);
+                    String Subject = "Error while connecting to encompass";
+                    String BodyText = "An error has been occurred while connecting to encompass for company : " + forCompCredential.CompanyName + " with id : " + forCompCredential.EncompassCredential.CompanyId + " on " + DateTime.Now + ".";
+                    BodyText += ex.Message;
+                    CommonUtility.SendMailToAdmin(Subject, BodyText);
                 }
                 finally
                 {
                     // close the session
                     if (null != EncompassGlobal.EncompassLoginSession)
-                     EncompassGlobal.EncompassLoginSession.End();
+                        EncompassGlobal.EncompassLoginSession.End();
                 }
-                   
-            }
 
+            }
+            );
+
+            #endregion
 
             Logger.Info("Exiting the method ProcessLoanForCompanies.ProcessLoanForCompanies()");
         }
