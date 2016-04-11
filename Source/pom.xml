@@ -19,7 +19,7 @@
 		<!-- Spring -->
 		<spring-framework.version>4.1.4.RELEASE</spring-framework.version>
 		<spring.security>3.2.3.RELEASE</spring.security>
-		<org.springframework.security.oauth-version>2.0.7.RELEASE</org.springframework.security.oauth-version>
+		<org.springframework.security.oauth-version>2.0.9.RELEASE</org.springframework.security.oauth-version>
 
 		<!-- Hibernate / JPA -->
 		<hibernate.version>4.2.1.Final</hibernate.version>

@@ -1430,3 +1430,8 @@ span.footer-ul a:hover {
 	height: 30px;
     width: 90px;
 }
+
+.swagger-ui-wrap {
+	margin-left: 100px !important;
+    margin-right: 0 !important;
+}
