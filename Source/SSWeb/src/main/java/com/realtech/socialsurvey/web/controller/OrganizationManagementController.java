@@ -633,6 +633,15 @@ public class OrganizationManagementController
             }
             model.addAttribute( CommonConstants.USER_APP_SETTINGS, unitSettings );
 
+            //REALTECH_USER_ID is set only for real tech and SS admin
+            boolean isRealTechOrSSAdmin = false;
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null ) {
+                isRealTechOrSSAdmin = true;
+            }
+            model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
+
+
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException while showing app settings. Reason: " + e.getMessage(), e );
             model.addAttribute( "message",
@@ -2881,11 +2890,11 @@ public class OrganizationManagementController
                     uploadStatus.setStatus( latestStatus );
                     //TODO: Refresh session
                     // get the user's canonical settings
-                    LOG.info("Fetching the user's canonical settings and setting it in session");
+                    LOG.info( "Fetching the user's canonical settings and setting it in session" );
                     HttpSession session = request.getSession( false );
-                    sessionHelper.getCanonicalSettings(session);
+                    sessionHelper.getCanonicalSettings( session );
                     // Set the session variables
-                    sessionHelper.setSettingVariablesInSession(session);
+                    sessionHelper.setSettingVariablesInSession( session );
                     sessionHelper.processAssignments( session, user );
                 }
             }
@@ -3149,9 +3158,10 @@ public class OrganizationManagementController
 
 
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while getting EmailMappingsForUser. Reason :" + nonFatalException.getMessage(), nonFatalException );
-            return messageUtils.getDisplayMessage(
-                DisplayMessageConstants.FETCH_EMAIL_MAPPINGS_FOR_USER_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            LOG.error( "NonFatalException while getting EmailMappingsForUser. Reason :" + nonFatalException.getMessage(),
+                nonFatalException );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_EMAIL_MAPPINGS_FOR_USER_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method getEmailMappingsForUser() finished" );
         return new Gson().toJson( userEmailMappings );
@@ -3187,7 +3197,7 @@ public class OrganizationManagementController
                 throw new NonFatalException( "Insufficient permission for this process" );
             }
 
-            userManagementService.updateUserEmailMapping( user, emailMappingId , status);
+            userManagementService.updateUserEmailMapping( user, emailMappingId, status );
 
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.UPDATE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
