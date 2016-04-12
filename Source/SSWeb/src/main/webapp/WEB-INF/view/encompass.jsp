@@ -105,19 +105,29 @@
 							class="float-left enc-state-icon cursor-pointer hide"
 							style="display: none;">Enable</div>
 						<div id="en-disconnect"
-							class="float-left enc-state-icon cursor-pointer hide"
+							class="float-left enc-state-icon cursor-pointer hide" 
 							style="display: none;">Disconnect</div>
 					</div>
-					<div id="en-test-connection" class="float-left enc-state-icon cursor-pointer" onclick="encompassCretentials();">Test Connection</div>
-					<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" >Generate Report</div>
+					
+					<c:if test = "${isRealTechOrSSAdmin}">
+						<div id="en-test-connection" class="float-left enc-state-icon cursor-pointer" onclick="encompassCretentials();">Test Connection</div>
+						<div id="en-generate-report" class="float-left enc-state-icon cursor-pointer hide" >Generate Report</div>
+					</c:if>
+					
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
 </div>
+
+<div id="toast-container" class="toast-container">
+   <span id="overlay-toast" class="overlay-toast"></span>
+</div>
+
 <script>
 		$(document).ready(function() {
 			showEncompassButtons();
+			isRealTechOrSSAdmin = ${isRealTechOrSSAdmin};
 		});
 </script>

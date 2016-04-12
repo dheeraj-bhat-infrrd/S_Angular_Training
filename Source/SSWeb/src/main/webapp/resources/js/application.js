@@ -10762,10 +10762,13 @@ function showEncompassButtons(){
 	}
 }
 $(document).on('click','#en-disconnect',function(){
-   
-    callAjaxPOST("/disableencompassdetails.do",
-			testDisconnectCompassCallBack,true,'#en-disconnect');
-    
+    if(isRealTechOrSSAdmin) {
+    	callAjaxPOST("/disableencompassdetails.do",
+    			testDisconnectCompassCallBack,true,'#en-disconnect');
+    } else {
+    	$('#overlay-toast').html('Please contact SuccessTeam@SocialSurvey.com or call 1-888-701-4512.');
+		showToast();
+    }
 });
 
 function testDisconnectCompassCallBack(response){
