@@ -37,6 +37,8 @@ namespace EncompassSocialSurvey
 
         public const string DISABLE_GENERATE_REPORT_URL = "disable_generate_report_url";
 
+        public const string MAX_NO_OF_PARALLEL_THREADS = "MaxNoOfParallelThreads";
+
         private static StringList fieldIds = null;
         
         // MM/dd/yyyy

@@ -10,7 +10,7 @@ namespace EncompassSocialSurvey
     {
         #region static variables declaration
 
-        static readonly int MAX_DEGREE_OF_PARALLELISM = 10;
+        private static readonly int MAX_DEGREE_OF_PARALLELISM = EncompassSocialSurveyConfiguration.MaxNoOfParallelThreads;
 
         #endregion
 
