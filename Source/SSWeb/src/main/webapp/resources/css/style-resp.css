@@ -337,7 +337,7 @@
     .um-bottom-content{
         padding: 0 !important;
     }
-    .st-score-txt, .st-score-rt{
+    .st-score-txt, .st-score-rt,.wd-score-txt{
         padding: 10px;
     }
     .st-score-txt {
@@ -346,6 +346,12 @@
 		float: none;
 		width: 100%;
 		border-right: none;
+	}
+	.wd-score-txt {
+		height: auto;
+		margin-bottom: 20px;
+		float: none;
+		width: 100%;
 	}
 	.score-rt-post {
         width: 260px;
@@ -1780,6 +1786,9 @@
         width: 100%;
         border-right: 0;
     }
+    .wd-score-txt {
+		width: 100%;
+	}
     .score-rt-post-OR {
         padding-left: 55px;
     }
@@ -2105,7 +2114,7 @@
     .um-item-row-txt-OR{
         width: 200px;
     }
-    .st-score-txt{
+    .st-score-txt,.wd-score-txt{
         width: 50%;
     }
     .st-score-rt {

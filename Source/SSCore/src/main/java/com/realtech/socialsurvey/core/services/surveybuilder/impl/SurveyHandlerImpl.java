@@ -566,10 +566,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
 
         LOG.debug( "Now fetching survey which are already processed " );
-        HashMap<String, Object> queries = new HashMap<>();
-        queries.put( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
-        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
-        incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class, queries );
+        Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+        Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
+            Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
+        incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
+            statusCriteria );
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
     }
