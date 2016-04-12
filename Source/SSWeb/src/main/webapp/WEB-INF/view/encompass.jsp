@@ -105,7 +105,7 @@
 							class="float-left enc-state-icon cursor-pointer hide"
 							style="display: none;">Enable</div>
 						<div id="en-disconnect"
-							class="float-left enc-state-icon cursor-pointer hide"
+							class="float-left enc-state-icon cursor-pointer hide" 
 							style="display: none;">Disconnect</div>
 					</div>
 					
@@ -120,8 +120,14 @@
 		</div>
 	</div>
 </div>
+
+<div id="toast-container" class="toast-container">
+   <span id="overlay-toast" class="overlay-toast"></span>
+</div>
+
 <script>
 		$(document).ready(function() {
 			showEncompassButtons();
+			isRealTechOrSSAdmin = ${isRealTechOrSSAdmin};
 		});
 </script>
