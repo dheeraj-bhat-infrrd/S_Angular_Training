@@ -2975,6 +2975,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return isApiKeyValid;
     }
+    
+
+    /**
+     * Method to get user api key
+     * @return
+     */
+    @Transactional
+    @Override
+    public UserApiKey getApiKey()
+    {
+        LOG.info( "Method to get user api key started" );
+        List<UserApiKey> keys = apiKeyDao.findByColumn( UserApiKey.class, CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE );
+        if ( keys == null || keys.isEmpty() ) {
+            return null;
+        }
+        LOG.info( "Method to get user api key finished" );
+        return keys.get( 0 );
+    }
 
 
     /*
