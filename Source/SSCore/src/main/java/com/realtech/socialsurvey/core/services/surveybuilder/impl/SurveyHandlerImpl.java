@@ -1882,6 +1882,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.warn( "Survey initiated for self." );
             throw new SelfSurveyInitiationException( "Survey cannot be initiated for self" );
         }
+        
+        //Trim all the details
+        recipientEmailId = recipientEmailId.trim();
+        recipientFirstname = recipientFirstname.trim();
+        if ( recipientLastname != null ) {
+            recipientLastname = recipientLastname.trim();
+        }
+        
+        
         // check if survey has already been sent to the email id
         // check the pre-initiation and then the survey table
         /*HashMap<String, Object> queries = new HashMap<>();
