@@ -2695,7 +2695,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         surveyDetailsDao.getAverageScore( startDate, endDate, agentReportData, columnName, iden, false );
         surveyDetailsDao.getCompletedSurveysCount( startDate, endDate, agentReportData, columnName, iden, false );
         // FIX for JIRA: SS-1112: BOC
-        // surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
+        surveyPreInitiationDao.getIncompleteSurveysCount( startDate, endDate, agentReportData );
         // FIX for JIRA: SS-1112: EOC
         organizationUnitSettingsDao.setAgentDetails( agentReportData );
 

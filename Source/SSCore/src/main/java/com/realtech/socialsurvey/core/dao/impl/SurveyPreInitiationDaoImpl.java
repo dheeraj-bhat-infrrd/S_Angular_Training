@@ -200,7 +200,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
 
         for ( SurveyPreInitiation survey : surveys ) {
-            if ( survey.getStatus() != CommonConstants.SURVEY_STATUS_PRE_INITIATED ) {
+            if ( survey.getStatus() != CommonConstants.SURVEY_STATUS_PRE_INITIATED
+                && survey.getStatus() != CommonConstants.SURVEY_STATUS_INITIATED ) {
                 continue;
             }
 
