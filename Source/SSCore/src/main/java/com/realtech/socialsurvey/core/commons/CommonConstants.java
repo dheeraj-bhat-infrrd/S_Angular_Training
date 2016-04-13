@@ -993,6 +993,7 @@ public interface CommonConstants
     // Status in mongo for active and inactive records
     public static final String STATUS_ACTIVE_MONGO = "A";
     public static final String STATUS_DELETED_MONGO = "D";
+    public static final String STATUS_INCOMPLETE_MONGO = "I";
 
     // Company Hierarchy Report Headers
     public static final String CHR_YES = "Yes";
