@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import scala.util.continuations.cpsSym;
 import sun.misc.BASE64Decoder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -505,6 +504,7 @@ public class ProfileManagementController
         boolean isLogoSetByEntity;
         boolean isContactNoSetByEntity;
         boolean isWebAddressSetByEntity;
+        boolean isWorkEmailSetByEntity;
 
         if ( entitySetting == null ) {
             throw new InvalidInputException( "Passed entity setting is null" );
@@ -531,9 +531,19 @@ public class ProfileManagementController
         } else {
             isContactNoSetByEntity = false;
         }
+        
+        if ( entitySetting.getContact_details() != null && entitySetting.getContact_details().getMail_ids() != null
+            && entitySetting.getContact_details().getMail_ids().getWork() != null
+            && !entitySetting.getContact_details().getMail_ids().getWork().isEmpty() ) {
+            isWorkEmailSetByEntity = true;
+        } else {
+            isWorkEmailSetByEntity = false;
+        }
+        
         model.addAttribute( "isLogoSetByEntity", isLogoSetByEntity );
         model.addAttribute( "isWebAddressSetByEntity", isWebAddressSetByEntity );
         model.addAttribute( "isContactNoSetByEntity", isContactNoSetByEntity );
+        model.addAttribute( "isWorkEmailSetByEntity", isWorkEmailSetByEntity );
 
         LOG.debug( "method setSettingSetByEntityInModel() ended " );
     }
@@ -699,6 +709,14 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.ABOUT_ME, false );
                         }
                     }
+                    
+                    if ( fieldId.equalsIgnoreCase( "email-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_WORK, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_WORK, false );
+                        }
+                    }
                     userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -741,6 +759,14 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.ABOUT_ME, true );
                         } else {
                             settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.ABOUT_ME, false );
+                        }
+                    }
+                    
+                    if ( fieldId.equalsIgnoreCase( "email-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_WORK, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_WORK, false );
                         }
                     }
                     userManagementService.updateRegion( region );
@@ -787,6 +813,15 @@ public class ProfileManagementController
                             settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.ABOUT_ME, false );
                         }
                     }
+                    
+                    if ( fieldId.equalsIgnoreCase( "email-work-lock" ) ) {
+                        if ( fieldState ) {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_WORK, true );
+                        } else {
+                            settingsLocker.lockSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_WORK, false );
+                        }
+                    }
+                    
                     userManagementService.updateBranch( branch );
                 }
             } else {
@@ -855,6 +890,10 @@ public class ProfileManagementController
                     lockSettings.setAboutMeLocked( status );
                 }
                 break;
+            case "email-work-lock":
+                if ( !parentLock.getIsWorkEmailLocked() ) {
+                    lockSettings.setWorkEmailLocked( status );
+                }
         }
         LOG.debug( "Method updateLockSettings() finished from ProfileManagementController" );
         return lockSettings;
@@ -1927,6 +1966,14 @@ public class ProfileManagementController
             UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
                 .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+            
+            ContactDetailsSettings sessionContactDetail =  profileSettings.getContact_details();
+            if(sessionContactDetail.getMail_ids() == null)
+                sessionContactDetail.setMail_ids( new MailIdSettings() );
+            
+            boolean isWorkEmailLockedByCompany = settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY , Long.parseLong(user.getCompany().getSettingsLockStatus() ) , SettingsForApplication.EMAIL_ID_WORK );
+            
+            
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
@@ -1947,6 +1994,16 @@ public class ProfileManagementController
                     if ( mailid.getKey().equalsIgnoreCase( "work" ) ) {
                         primaryMailId = mailid.getValue();
                     }
+                    //update detail in session
+                    MailIdSettings mailIdSettings = sessionContactDetail.getMail_ids();
+                    if ( mailid.getKey().equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
+                        mailIdSettings.setWorkEmailToVerify( mailid.getValue() );
+                        mailIdSettings.setWorkEmailVerified( false );
+                    }else if(mailid.getKey().equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ){
+                        mailIdSettings.setPersonalEmailToVerify( mailid.getValue() );
+                        mailIdSettings.setPersonalEmailVerified( false );
+                    }
+                    sessionContactDetail.setMail_ids( mailIdSettings );
                 }
                 try {
                     userManagementService.getUserByEmailAddress( primaryMailId );
@@ -1968,7 +2025,7 @@ public class ProfileManagementController
                 contactDetailsSettings = companySettings.getContact_details();
 
                 // Send verification Links
-                sendVerificationLinks( contactDetailsSettings, mailIds,
+                sendVerificationLinks( mailIds,
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
 
                 contactDetailsSettings = updateMailSettings( companySettings.getIden(), contactDetailsSettings, mailIds,
@@ -1977,18 +2034,7 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
                 userSettings.setCompanySettings( companySettings );
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    for ( MiscValues mailId : mailIds ) {
-                        String key = mailId.getKey();
-                        if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
-                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_WORK, true );
-                        } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
-                            settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_PERSONAL, true );
-                        }
-                    }
-                    userManagementService.updateCompany( company );
-                }
+                
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -1997,8 +2043,13 @@ public class ProfileManagementController
                 contactDetailsSettings = regionSettings.getContact_details();
 
                 // Send verification Links
-                sendVerificationLinks( contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
+                if(isWorkEmailLockedByCompany){
+                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds, user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );                    
+                }else{
+                    sendVerificationLinks( mailIds,
+                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
+                }
+                
 
                 contactDetailsSettings = updateMailSettings( regionSettings.getIden(), contactDetailsSettings, mailIds,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
@@ -2006,18 +2057,7 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    for ( MiscValues mailId : mailIds ) {
-                        String key = mailId.getKey();
-                        if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
-                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_WORK, true );
-                        } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
-                            settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_PERSONAL, true );
-                        }
-                    }
-                    userManagementService.updateRegion( region );
-                }
+                
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -2026,8 +2066,12 @@ public class ProfileManagementController
                 contactDetailsSettings = branchSettings.getContact_details();
 
                 // Send verification Links
-                sendVerificationLinks( contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
+                if(isWorkEmailLockedByCompany){
+                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds, user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );                    
+                }else{
+                    sendVerificationLinks( mailIds,
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
+                }
 
                 contactDetailsSettings = updateMailSettings( branchSettings.getIden(), contactDetailsSettings, mailIds,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
@@ -2035,18 +2079,7 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    for ( MiscValues mailId : mailIds ) {
-                        String key = mailId.getKey();
-                        if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
-                            settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_WORK, true );
-                        } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
-                            settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_PERSONAL, true );
-                        }
-                    }
-                    userManagementService.updateBranch( branch );
-                }
+                
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
@@ -2055,8 +2088,12 @@ public class ProfileManagementController
                 contactDetailsSettings = agentSettings.getContact_details();
 
                 // Send verification Links
-                sendVerificationLinks( contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings );
+                if(isWorkEmailLockedByCompany){
+                    profileManagementService.generateAndSendEmailVerificationRequestLinkToAdmin( mailIds, user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings );                    
+                }else{
+                    sendVerificationLinks( mailIds,
+                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings );
+                }
 
                 contactDetailsSettings = updateMailSettings( agentSettings.getIden(), contactDetailsSettings, mailIds,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
@@ -2069,11 +2106,19 @@ public class ProfileManagementController
                     DisplayMessageConstants.GENERAL_ERROR );
             }
 
-            profileSettings.setContact_details( contactDetailsSettings );
+            //update settings in session
+            profileSettings.setContact_details( sessionContactDetail );
 
             LOG.info( "Maild ids updated successfully" );
-            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ) );
+            
+            if(isWorkEmailLockedByCompany){
+                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.MAIL_IDS_UPDATE_REQUEST_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ) );
+            }else{
+                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ) );
+            }
+            
         } catch ( UserAlreadyExistsException userAlreadyExistsException ) {
             LOG.error(
                 "UserAlreadyExistsException while updating Mail ids. Reason :" + userAlreadyExistsException.getMessage(),
@@ -2092,21 +2137,20 @@ public class ProfileManagementController
     }
 
 
+    /**
+     * 
+     * @param mailIds
+     * @param entityType
+     * @param userSettings
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
     // send verification links
-    private void sendVerificationLinks( ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String entityType,
+    private void sendVerificationLinks( List<MiscValues> mailIds, String entityType,
         OrganizationUnitSettings userSettings ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "Method sendVerificationLinks() called from ProfileManagementController" );
         Map<String, String> urlParams = null;
-
-        if ( oldSettings == null ) {
-            throw new InvalidInputException( "No contact details object found for user" );
-        }
-        MailIdSettings mailIdSettings = oldSettings.getMail_ids();
-        if ( mailIdSettings == null ) {
-            LOG.debug( "No maild ids added, create new mail id object in contact details" );
-            mailIdSettings = new MailIdSettings();
-        }
 
         for ( MiscValues mailId : mailIds ) {
             String key = mailId.getKey();
@@ -2117,6 +2161,7 @@ public class ProfileManagementController
                 urlParams.put( CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK );
                 urlParams.put( CommonConstants.ENTITY_ID_COLUMN, userSettings.getIden() + "" );
                 urlParams.put( CommonConstants.ENTITY_TYPE_COLUMN, entityType );
+                urlParams.put( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE, CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER );
 
                 profileManagementService.generateVerificationUrl( urlParams, applicationBaseUrl
                     + CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId, userSettings.getContact_details()
@@ -4779,9 +4824,15 @@ public class ProfileManagementController
         }
 
         try {
-            profileManagementService.updateEmailVerificationStatus( encryptedUrlParams );
-            model.addAttribute( "message", messageUtils.getDisplayMessage(
-                DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+            String verificationType = profileManagementService.updateEmailVerificationStatus( encryptedUrlParams );
+            if(verificationType.equals( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN )){
+                model.addAttribute( "message", messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.EMAIL_VERIFICATION_BY_ADMIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+            }else if(verificationType.equals( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER )){
+                model.addAttribute( "message", messageUtils.getDisplayMessage(
+                    DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+            }
+            
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while verifying email. Reason : " + e.getMessage(), e );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_VERIFICATION_URL,
