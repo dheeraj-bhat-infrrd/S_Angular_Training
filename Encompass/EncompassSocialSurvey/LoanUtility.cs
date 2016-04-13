@@ -17,7 +17,7 @@ namespace EncompassSocialSurvey
         #region static members
 
         private static int DAYS_INTERVAL = EncompassSocialSurveyConfiguration.DefaultDaysIntervalToFetch; // should not get loans older than DAYS_INTERVAL from NOW
-        private static DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurveyConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
+        private DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurveyConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
 
         #endregion
 
@@ -96,7 +96,7 @@ namespace EncompassSocialSurvey
         /// <param name="emailDomain"></param>
         /// <param name="emailPrefix"></param>
         /// <returns></returns>
-        public List<LoanViewModel> PopulateLoanList(long runningCompanyId, string fieldid, Boolean isProductionRun, int noOfDaysToFetch, string emailDomain, string emailPrefix)
+        public List<LoanViewModel> PopulateLoanList(EncompassGlobal encompassGlobal, long runningCompanyId, string fieldid, Boolean isProductionRun, int noOfDaysToFetch, string emailDomain, string emailPrefix)
         {
             Logger.Info("Entering the method LoanUtility.PopulateLoanList() ");
             int noOfDays = 0;
@@ -108,7 +108,7 @@ namespace EncompassSocialSurvey
 
                 #region Popualted FieldIds // list of ids to get the details from loan
 
-                StringList fieldIds = EncompassSocialSurveyConstant.initialFieldList();
+                StringList fieldIds = encompassGlobal.InitialFieldList();
                 fieldIds = AppendInitialFieldIdList(fieldIds, fieldid);
 
                 #endregion
@@ -150,7 +150,7 @@ namespace EncompassSocialSurvey
                 Logger.Info("Company Id  " + runningCompanyId);
 
                 //fieldIds[8] is the loan closed date
-                LoanIdentityList loanIdentityList = EncompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(noOfDays, fieldIds[8]));
+                LoanIdentityList loanIdentityList = encompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(noOfDays, fieldIds[8]));
 
                 #region Load the list
 
@@ -159,12 +159,12 @@ namespace EncompassSocialSurvey
                     try
                     {
                         Logger.Debug("Fetching loan from loanid " + id.Guid);
-                        StringList fieldValues = EncompassGlobal.EncompassLoginSession.Loans.SelectFields(id.Guid, fieldIds);
+                        StringList fieldValues = encompassGlobal.EncompassLoginSession.Loans.SelectFields(id.Guid, fieldIds);
 
-                        Loan runningLoan = EncompassGlobal.EncompassLoginSession.Loans.Open(id.Guid);
+                        Loan runningLoan = encompassGlobal.EncompassLoginSession.Loans.Open(id.Guid);
                         User loanOfficer = null;
                         if (false == string.IsNullOrWhiteSpace(runningLoan.LoanOfficerID))
-                            loanOfficer = EncompassGlobal.EncompassLoginSession.Users.GetUser(runningLoan.LoanOfficerID);
+                            loanOfficer = encompassGlobal.EncompassLoginSession.Users.GetUser(runningLoan.LoanOfficerID);
 
                         LoanViewModel forLoanVM_Borrower = new LoanViewModel();
 
@@ -201,8 +201,8 @@ namespace EncompassSocialSurvey
                         }
                         else
                         {
-                            forLoanVM_Borrower.CustomerEmailId = replaceEmailAddress(emailId, emailDomain, emailPrefix);
-                            forLoanVM_Borrower.AgentEmailId = replaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
+                            forLoanVM_Borrower.CustomerEmailId = ReplaceEmailAddress(emailId, emailDomain, emailPrefix);
+                            forLoanVM_Borrower.AgentEmailId = ReplaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
                         }
 
                         forLoanVM_Borrower.ReminderCounts = EncompassSocialSurveyConstant.REMINDER_COUNT;
@@ -237,8 +237,8 @@ namespace EncompassSocialSurvey
                             }
                             else
                             {
-                                forLoanVM_Co_Borrower.CustomerEmailId = replaceEmailAddress(coborrowerEmailId, emailDomain, emailPrefix);
-                                forLoanVM_Co_Borrower.AgentEmailId = replaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
+                                forLoanVM_Co_Borrower.CustomerEmailId = ReplaceEmailAddress(coborrowerEmailId, emailDomain, emailPrefix);
+                                forLoanVM_Co_Borrower.AgentEmailId = ReplaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
                             }
 
 
@@ -482,7 +482,7 @@ namespace EncompassSocialSurvey
         /// <param name="emailDomain"></param>
         /// <param name="emailPrefix"></param>
         /// <returns></returns>
-        private string replaceEmailAddress(string email, string emailDomain, string emailPrefix)
+        private string ReplaceEmailAddress(string email, string emailDomain, string emailPrefix)
         {
             Logger.Debug("Inside method replaceEmailAddress");
             if (string.IsNullOrWhiteSpace(email))

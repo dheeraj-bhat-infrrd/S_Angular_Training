@@ -49,11 +49,7 @@ namespace EncompassSocialSurvey
             {
                 Logger.Error("Caught an exception: Program.Main()", ex);
             }
-            finally
-            {
-                if (null != EncompassGlobal.EncompassLoginSession && EncompassGlobal.EncompassLoginSession.IsConnected)
-                    EncompassGlobal.EncompassLoginSession.End();
-            }
+            
 
             #endregion
 
@@ -77,6 +73,7 @@ namespace EncompassSocialSurvey
             
             {
                 LoanService loanSerivce = new LoanService();
+                EncompassGlobal encompassGlobal = new EncompassGlobal();
                 try
                 {
 
@@ -89,7 +86,7 @@ namespace EncompassSocialSurvey
 
 
                         Logger.Debug("Logging into encompass");
-                        EncompassGlobal.GetUserLoginSesssion(forCompCredential);
+                        encompassGlobal.GetUserLoginSesssion(forCompCredential);
 
                         var ssEnv = System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SETUP_ENVIRONMENT];
                         Logger.Debug("SSEnv = " + ssEnv);
@@ -108,7 +105,7 @@ namespace EncompassSocialSurvey
                         {
                             LoanUtility _loanUtility = new LoanUtility();
 
-                            var loansVM = _loanUtility.PopulateLoanList(forCompCredential.EncompassCredential.CompanyId, fieldId, isProductionRun, forCompCredential.EncompassCredential.numberOfDays, emailDomain, emailPrefix);
+                            var loansVM = _loanUtility.PopulateLoanList(encompassGlobal,forCompCredential.EncompassCredential.CompanyId, fieldId, isProductionRun, forCompCredential.EncompassCredential.numberOfDays, emailDomain, emailPrefix);
 
                             if (isProductionRun)
                             {
@@ -181,8 +178,8 @@ namespace EncompassSocialSurvey
                 finally
                 {
                     // close the session
-                    if (null != EncompassGlobal.EncompassLoginSession)
-                        EncompassGlobal.EncompassLoginSession.End();
+                    if (null != encompassGlobal.EncompassLoginSession)
+                        encompassGlobal.EncompassLoginSession.End();
                 }
 
             }
