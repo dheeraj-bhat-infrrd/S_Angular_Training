@@ -4,14 +4,10 @@ using EllieMae.Encompass.Query;
 using EllieMae.Encompass.BusinessObjects.Users;
 using EllieMae.Encompass.Collections;
 using EncompassSocialSurvey.ViewModel;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 using EncompassSocialSurvey.Service;
 using EncompassSocialSurvey.Entity;
-using System.Net;
-using System.Net.Mail;
-using SendGrid;
 
 namespace EncompassSocialSurvey
 {
@@ -21,7 +17,7 @@ namespace EncompassSocialSurvey
         #region static members
 
         private static int DAYS_INTERVAL = EncompassSocialSurveyConfiguration.DefaultDaysIntervalToFetch; // should not get loans older than DAYS_INTERVAL from NOW
-        private static DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurveyConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
+        private DateTime lastFetchedTime = Convert.ToDateTime(EncompassSocialSurveyConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME);
 
         #endregion
 
@@ -35,7 +31,7 @@ namespace EncompassSocialSurvey
         /// <param name="fieldIds"></param>
         /// <param name="fieldId"></param>
         /// <returns></returns>
-        private StringList appendInitialFieldIdList(StringList fieldIds, string fieldId)
+        private StringList AppendInitialFieldIdList(StringList fieldIds, string fieldId)
         {
             if (!string.IsNullOrWhiteSpace(fieldId))
             {
@@ -100,7 +96,7 @@ namespace EncompassSocialSurvey
         /// <param name="emailDomain"></param>
         /// <param name="emailPrefix"></param>
         /// <returns></returns>
-        public List<LoanViewModel> PopulateLoanList(long runningCompanyId, string fieldid, Boolean isProductionRun, int noOfDaysToFetch, string emailDomain, string emailPrefix)
+        public List<LoanViewModel> PopulateLoanList(EncompassGlobal encompassGlobal, long runningCompanyId, string fieldid, Boolean isProductionRun, int noOfDaysToFetch, string emailDomain, string emailPrefix)
         {
             Logger.Info("Entering the method LoanUtility.PopulateLoanList() ");
             int noOfDays = 0;
@@ -112,8 +108,8 @@ namespace EncompassSocialSurvey
 
                 #region Popualted FieldIds // list of ids to get the details from loan
 
-                StringList fieldIds = EncompassSocialSurveyConstant.initialFieldList();
-                fieldIds = appendInitialFieldIdList(fieldIds, fieldid);
+                StringList fieldIds = encompassGlobal.InitialFieldList();
+                fieldIds = AppendInitialFieldIdList(fieldIds, fieldid);
 
                 #endregion
 
@@ -124,7 +120,7 @@ namespace EncompassSocialSurvey
                 {
                     crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
                     //update the recent record fetch start date or if crm batch tracker is null than insert new entry
-                    insertOrUpdateLastRunStartTime(crmBatchTracker, runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
+                    InsertOrUpdateLastRunStartTime(crmBatchTracker,loanService, runningCompanyId,EncompassSocialSurveyConstant.SURVEY_SOURCE);
                     if (crmBatchTracker == null)
                     {
                         crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
@@ -154,7 +150,7 @@ namespace EncompassSocialSurvey
                 Logger.Info("Company Id  " + runningCompanyId);
 
                 //fieldIds[8] is the loan closed date
-                LoanIdentityList loanIdentityList = EncompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(noOfDays, fieldIds[8]));
+                LoanIdentityList loanIdentityList = encompassGlobal.EncompassLoginSession.Loans.Query(createCriteria(noOfDays, fieldIds[8]));
 
                 #region Load the list
 
@@ -163,12 +159,12 @@ namespace EncompassSocialSurvey
                     try
                     {
                         Logger.Debug("Fetching loan from loanid " + id.Guid);
-                        StringList fieldValues = EncompassGlobal.EncompassLoginSession.Loans.SelectFields(id.Guid, fieldIds);
+                        StringList fieldValues = encompassGlobal.EncompassLoginSession.Loans.SelectFields(id.Guid, fieldIds);
 
-                        Loan runningLoan = EncompassGlobal.EncompassLoginSession.Loans.Open(id.Guid);
+                        Loan runningLoan = encompassGlobal.EncompassLoginSession.Loans.Open(id.Guid);
                         User loanOfficer = null;
                         if (false == string.IsNullOrWhiteSpace(runningLoan.LoanOfficerID))
-                            loanOfficer = EncompassGlobal.EncompassLoginSession.Users.GetUser(runningLoan.LoanOfficerID);
+                            loanOfficer = encompassGlobal.EncompassLoginSession.Users.GetUser(runningLoan.LoanOfficerID);
 
                         LoanViewModel forLoanVM_Borrower = new LoanViewModel();
 
@@ -205,8 +201,8 @@ namespace EncompassSocialSurvey
                         }
                         else
                         {
-                            forLoanVM_Borrower.CustomerEmailId = replaceEmailAddress(emailId, emailDomain, emailPrefix);
-                            forLoanVM_Borrower.AgentEmailId = replaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
+                            forLoanVM_Borrower.CustomerEmailId = ReplaceEmailAddress(emailId, emailDomain, emailPrefix);
+                            forLoanVM_Borrower.AgentEmailId = ReplaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
                         }
 
                         forLoanVM_Borrower.ReminderCounts = EncompassSocialSurveyConstant.REMINDER_COUNT;
@@ -241,8 +237,8 @@ namespace EncompassSocialSurvey
                             }
                             else
                             {
-                                forLoanVM_Co_Borrower.CustomerEmailId = replaceEmailAddress(coborrowerEmailId, emailDomain, emailPrefix);
-                                forLoanVM_Co_Borrower.AgentEmailId = replaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
+                                forLoanVM_Co_Borrower.CustomerEmailId = ReplaceEmailAddress(coborrowerEmailId, emailDomain, emailPrefix);
+                                forLoanVM_Co_Borrower.AgentEmailId = ReplaceEmailAddress(agentEmailId, emailDomain, emailPrefix);
                             }
 
 
@@ -264,7 +260,7 @@ namespace EncompassSocialSurvey
                         if (isProductionRun)
                         {
                             Logger.Debug("Updating last fetched time");
-                            updateLastFetchedTime(fieldValues[8]);
+                            UpdateLastFetchedTime(fieldValues[8]);
                         }
 
                     }
@@ -283,12 +279,12 @@ namespace EncompassSocialSurvey
                     if (returnLoansViewModel.Count <= 0)
                     {
                         Logger.Debug("Notifying admin no records were fetched in this run ");
-                        sendMailToAdminForNoRecordFetched(runningCompanyId);
+                        SendMailToAdminForNoRecordFetched(runningCompanyId);
                     }
                     else
                     {
                         //update last record fetch time if new records has been fetched
-                        updateRecentRecordFetchTimeInCrmBatchTracker(crmBatchTracker);
+                        UpdateRecentRecordFetchTimeInCrmBatchTracker(crmBatchTracker,loanService);
                     }
 
                     //update recent records fetched count in crm batch tracker
@@ -297,7 +293,7 @@ namespace EncompassSocialSurvey
                     //insert count of records fetched in crm batch tracker history  
                     InsertCrmBatchTrackerHistory(loanService, crmBatchTracker.Id, returnLoansViewModel.Count);
                     //update last run end date
-                    updateLastRunEndTimeInCrmBatchTracker(crmBatchTracker);
+                    UpdateLastRunEndTimeInCrmBatchTracker(crmBatchTracker,loanService);
                 }
 
 
@@ -312,7 +308,7 @@ namespace EncompassSocialSurvey
                 if (isProductionRun)
                 {
                     //update error in crm batch tracker
-                    updateErrorInCrmBatchTracker(crmBatchTracker, ex.Message);
+                    UpdateErrorInCrmBatchTracker(crmBatchTracker,ex.Message);
                 }
 
                 throw;
@@ -372,7 +368,7 @@ namespace EncompassSocialSurvey
         /// sends mail to admin
         /// </summary>
         /// <param name="runningCompanyId"></param>
-        public void sendMailToAdminForNoRecordFetched(long runningCompanyId)
+        public void SendMailToAdminForNoRecordFetched(long runningCompanyId)
         {
             var Subject = "No Records Fetched In This Run !!!";
             var BodyText = "Encompass was not able to fetch any new records for company id " + runningCompanyId + " which ran on " + DateTime.Now;
@@ -383,7 +379,7 @@ namespace EncompassSocialSurvey
         /// updates last record fetched time 
         /// </summary>
         /// <param name="field"></param>
-        private void updateLastFetchedTime(string field)
+        private void UpdateLastFetchedTime(string field)
         {
             DateTime loanCloseTime = Convert.ToDateTime(field);
             if (DateTime.Compare(loanCloseTime, DateTime.Now) < 0)
@@ -402,9 +398,9 @@ namespace EncompassSocialSurvey
         /// <param name="entity"></param>
         /// <param name="companyId"></param>
         /// <param name="source"></param>
-        private void insertOrUpdateLastRunStartTime(CRMBatchTrackerEntity entity, long companyId, string source)
+        private void InsertOrUpdateLastRunStartTime(CRMBatchTrackerEntity entity, LoanService loanService,long companyId, string source)
         {
-            LoanService loanService = new LoanService();
+            
             Logger.Debug("Inside method insertOrUpdateLastRunStartTime() ");
             if (entity == null)
             {
@@ -434,7 +430,7 @@ namespace EncompassSocialSurvey
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="error"></param>
-        private void updateErrorInCrmBatchTracker(CRMBatchTrackerEntity entity, String error)
+        private void UpdateErrorInCrmBatchTracker(CRMBatchTrackerEntity entity, String error)
         {
             LoanService loanService = new LoanService();
             Logger.Debug("Inside method updateErrorInCrmBatchTracker() ");
@@ -451,9 +447,8 @@ namespace EncompassSocialSurvey
         /// updates recent record fetch time in crm batch tracker
         /// </summary>
         /// <param name="entity"></param>
-        private void updateRecentRecordFetchTimeInCrmBatchTracker(CRMBatchTrackerEntity entity)
+        private void UpdateRecentRecordFetchTimeInCrmBatchTracker(CRMBatchTrackerEntity entity,LoanService loanService)
         {
-            LoanService loanService = new LoanService();
             Logger.Debug("Inside method updateRecentRecordFetchTimeInCrmBatchTracker() ");
             if (entity != null)
             {
@@ -468,9 +463,8 @@ namespace EncompassSocialSurvey
         /// updates last run end time in crm batch tracker
         /// </summary>
         /// <param name="entity"></param>
-        private void updateLastRunEndTimeInCrmBatchTracker(CRMBatchTrackerEntity entity)
+        private void UpdateLastRunEndTimeInCrmBatchTracker(CRMBatchTrackerEntity entity,LoanService loanService)
         {
-            LoanService loanService = new LoanService();
             Logger.Debug("Inside method updateLastRunEndTimeInCrmBatchTracker() ");
             if (entity != null)
             {
@@ -488,7 +482,7 @@ namespace EncompassSocialSurvey
         /// <param name="emailDomain"></param>
         /// <param name="emailPrefix"></param>
         /// <returns></returns>
-        private string replaceEmailAddress(string email, string emailDomain, string emailPrefix)
+        private string ReplaceEmailAddress(string email, string emailDomain, string emailPrefix)
         {
             Logger.Debug("Inside method replaceEmailAddress");
             if (string.IsNullOrWhiteSpace(email))

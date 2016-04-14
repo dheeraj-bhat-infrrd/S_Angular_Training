@@ -91,6 +91,14 @@ namespace EncompassSocialSurvey
                 return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.DISABLE_GENERATE_REPORT_URL];
             }
         }
-        
+
+        public static int MaxNoOfParallelThreads
+        { 
+            get
+            {
+               return Int32.Parse(System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.MAX_NO_OF_PARALLEL_THREADS]);
+            }
+        }
+
     }
 }
