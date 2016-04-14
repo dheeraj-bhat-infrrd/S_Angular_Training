@@ -204,8 +204,8 @@ public class UserManagementController
                         LOG.debug( "No records exist with the email id passed, inviting the new user" );
                         user = userManagementService.inviteUser( admin, firstName, lastName, emailId );
                         String profileName = userManagementService.getUserSettings( user.getUserId() ).getProfileName();
-                        userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, admin.getCompany()
-                            .getCompanyId(), profileName, user.getLoginName(), false );
+                        userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName,
+                            admin.getCompany().getCompanyId(), profileName, user.getLoginName(), false );
 
                         // If account type is team assign user to default branch
                         if ( accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM ) {
@@ -350,7 +350,8 @@ public class UserManagementController
             }
 
             if ( admin.isCompanyAdmin() ) {
-                List<UserFromSearch> usersList = userManagementService.getUsersUnderCompanyAdmin( admin, startIndex, batchSize );
+                List<UserFromSearch> usersList = userManagementService.getUsersUnderCompanyAdmin( admin, startIndex,
+                    batchSize );
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
                 model.addAttribute( "userslist", usersList );
                 model.addAttribute( "numFound", userManagementService.getUsersUnderCompanyAdminCount( admin ) );
@@ -412,8 +413,8 @@ public class UserManagementController
             }
 
             try {
-                SolrDocumentList usersResult = solrSearchService.searchUsersByLoginNameOrName( searchKey, user.getCompany()
-                    .getCompanyId(), startIndex, batchSize );
+                SolrDocumentList usersResult = solrSearchService.searchUsersByLoginNameOrName( searchKey,
+                    user.getCompany().getCompanyId(), startIndex, batchSize );
                 users = new Gson().toJson( solrSearchService.getUsersWithMetaDataFromSolrDocuments( usersResult ) );
                 LOG.trace( "User search result is : " + usersResult );
                 model.addAttribute( "numFound", usersResult.getNumFound() );
@@ -473,8 +474,8 @@ public class UserManagementController
             model.addAttribute( "userslist", usersList );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException in findusers. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
         return JspResolver.USER_LIST_FOR_MANAGEMENT;
@@ -523,8 +524,8 @@ public class UserManagementController
                 throw new NonFatalException( "SolrException while searching for user id.Reason:" + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            SolrDocumentList userIdList = solrSearchService.searchUsersByLoginNameOrNameUnderAdmin( searchKey, admin,
-                adminUser, startIndex, batchSize );
+            SolrDocumentList userIdList = solrSearchService.searchUsersByLoginNameOrNameUnderAdmin( searchKey, admin, adminUser,
+                startIndex, batchSize );
             if ( userIdList != null && userIdList.size() != 0 ) {
                 Set<Long> userIds = solrSearchService.getUserIdsFromSolrDocumentList( userIdList );
                 List<UserFromSearch> usersList = userManagementService.getUsersByUserIds( userIds );
@@ -536,8 +537,8 @@ public class UserManagementController
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException in findusers. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         } catch ( MalformedURLException e ) {
             LOG.error( "Error occured while searching for users in findUsersUnderAdminAndRedirectToPage(). Reason is ", e );
@@ -584,12 +585,7 @@ public class UserManagementController
 
             try {
                 if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
-                    userManagementService.removeExistingUser( loggedInUser, userIdToRemove );
-                    // update the user count modificaiton notification
-                    userManagementService.updateUserCountModificationNotification( loggedInUser.getCompany() );
-                    LOG.debug( "Removing user {} from solr.", userIdToRemove );
-                    solrSearchService.removeUserFromSolr( userIdToRemove );
-
+                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove );
                 } else {
                     statusMap.put( "status", CommonConstants.ERROR );
                 }
@@ -597,9 +593,9 @@ public class UserManagementController
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e );
             }
 
-
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.USER_DELETE_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.USER_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
             statusMap.put( "status", CommonConstants.SUCCESS_ATTRIBUTE );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while removing user. Reason : " + nonFatalException.getMessage(), nonFatalException );
@@ -680,8 +676,8 @@ public class UserManagementController
             }
             try {
                 userManagementService.assignUserToBranch( admin, userId, branchId );
-                model.addAttribute( "message", messageUtils.getDisplayMessage(
-                    DisplayMessageConstants.BRANCH_ASSIGN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+                model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.BRANCH_ASSIGN_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ) );
             } catch ( InvalidInputException e ) {
                 model.addAttribute( "message", messageUtils.getDisplayMessage(
                     DisplayMessageConstants.BRANCH_ASSIGNING_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE ) );
@@ -689,8 +685,8 @@ public class UserManagementController
             }
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured while assigning user to a branch. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         LOG.info( "Method to assign user to branch is finished for user " + userIdStr );
@@ -735,8 +731,8 @@ public class UserManagementController
                 DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured while unassigning user from a branch. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Method to unassign user from branch is finished for user " + userIdStr );
         return JspResolver.MESSAGE_HEADER;
@@ -795,9 +791,8 @@ public class UserManagementController
         }
         // TODO add success message.
         catch ( NonFatalException nonFatalException ) {
-            LOG.error(
-                "NonFatalException while trying to assign or unassign a user to branch. Reason : "
-                    + nonFatalException.getMessage(), nonFatalException );
+            LOG.error( "NonFatalException while trying to assign or unassign a user to branch. Reason : "
+                + nonFatalException.getMessage(), nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -860,8 +855,8 @@ public class UserManagementController
         // TODO add success message.
         catch ( NonFatalException e ) {
             LOG.error( "Exception occured while assigning region admin. Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Successfully completed method to assign region admin" );
         return JspResolver.MESSAGE_HEADER;
@@ -917,8 +912,8 @@ public class UserManagementController
         // TODO add success message.
         catch ( NonFatalException e ) {
             LOG.error( "Exception occured while assigning region admin.Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Successfully completed method to remove region admin" );
         return JspResolver.MESSAGE_HEADER;
@@ -1121,7 +1116,8 @@ public class UserManagementController
 
             // check if email address entered matches with the one in the encrypted url
             if ( !urlParams.get( "emailId" ).equalsIgnoreCase( emailId ) ) {
-                LOG.error( "Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent" );
+                LOG.error(
+                    "Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent" );
                 throw new InvalidInputException( "Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID );
             }
 
@@ -1237,7 +1233,8 @@ public class UserManagementController
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             if ( hierarchyDetails == null ) {
                 LOG.error( "Unable to fetch primary profile for this user " );
-                throw new FatalException( "Unable to fetch primary profile for type : " + entityType + " and ID : " + entityId );
+                throw new FatalException(
+                    "Unable to fetch primary profile for type : " + entityType + " and ID : " + entityId );
             }
             branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
             regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
@@ -1247,8 +1244,8 @@ public class UserManagementController
                 + agentId );
         } catch ( InvalidInputException | ProfileNotFoundException e ) {
             LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
 
         int profilesMaster = 0;
@@ -1286,7 +1283,7 @@ public class UserManagementController
                 }
                 regionProfile = profileManagementService.fillUnitSettings( regionProfile,
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyProfile, regionProfile, null, null,
-                    map , true);
+                    map, true );
             } catch ( InvalidInputException e ) {
                 LOG.error( "Error occured while fetching region profile", e );
             }
@@ -1318,7 +1315,7 @@ public class UserManagementController
                 }
                 branchProfile = profileManagementService.fillUnitSettings( branchProfile,
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, null, map , true);
+                    branchProfile, null, map, true );
             } catch ( InvalidInputException e ) {
                 LOG.error( "Error occured while fetching branch profile", e );
             } catch ( NoRecordsFetchedException e ) {
@@ -1358,8 +1355,8 @@ public class UserManagementController
                 }
 
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
-                    branchProfile, individualProfile, map , true );
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
+                    individualProfile, map, true );
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
             } catch ( NoRecordsFetchedException e ) {
@@ -1390,8 +1387,8 @@ public class UserManagementController
     public String fetchProfileImage( Model model, HttpServletRequest request )
     {
         LOG.info( "Fetching profile image" );
-        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) request.getSession( false ).getAttribute(
-            CommonConstants.USER_PROFILE_SETTINGS );
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) request.getSession( false )
+            .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
         return profileSettings.getProfileImageUrlThumbnail();
     }
 
@@ -1490,8 +1487,8 @@ public class UserManagementController
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while changing password. Reason : " + e.getMessage(), e );
             model.addAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
         return JspResolver.CHANGE_PASSWORD;
     }
@@ -1633,8 +1630,8 @@ public class UserManagementController
             model.addAttribute( "profiles", userAssignments );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while finding user assignments Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
 
@@ -1707,8 +1704,8 @@ public class UserManagementController
 
                 String profileUrl = utils.generateAgentProfileUrl( profileName );
                 agentSettings.setProfileUrl( profileUrl );
-                userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, user.getCompany()
-                    .getCompanyId(), profileName, user.getLoginName(), false );
+                userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName,
+                    user.getCompany().getCompanyId(), profileName, user.getLoginName(), false );
 
                 // Update the profile pic URL
                 organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -1748,8 +1745,9 @@ public class UserManagementController
             userManagementService.updateUserProfile( user, profileId, status );
             userManagementService.updateUserProfilesStatus( user, profileId );
 
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
             statusMap.put( "status", CommonConstants.SUCCESS_ATTRIBUTE );
 
             // update user profiles in session if current user
@@ -1799,18 +1797,18 @@ public class UserManagementController
 
                 userManagementService.updateUserProfile( user, profileId, status );
                 userManagementService.updateUserProfilesStatus( user, profileId );
-                userManagementService.removeUserProfile( profileId  );
-                
+                userManagementService.removeUserProfile( profileId );
+
                 userManagementService.updatePrimaryProfileOfUser( updatedUser );
                 updatedUser = userManagementService.getUserByUserId( updatedUser.getUserId() );
                 userManagementService.updateUserInSolr( updatedUser );
-                
+
                 if ( user.getUserId() == updatedUser.getUserId() ) {
                     try {
                         sessionHelper.processAssignments( request.getSession( false ), user );
                     } catch ( NonFatalException e ) {
-                        throw new NonFatalException( "Exception occurred while processing user assignments in. Reason : "
-                            + e.getMessage(), e );
+                        throw new NonFatalException(
+                            "Exception occurred while processing user assignments in. Reason : " + e.getMessage(), e );
                     }
                 }
             } catch ( NumberFormatException e ) {
@@ -1858,11 +1856,12 @@ public class UserManagementController
             LOG.debug( "Sending invitation..." );
             User invitedUser = userManagementService.getUserByEmail( emailId );
             String profileName = userManagementService.getUserSettings( invitedUser.getUserId() ).getProfileName();
-            userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName, user.getCompany()
-                .getCompanyId(), profileName, invitedUser.getLoginName(), false );
+            userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName,
+                user.getCompany().getCompanyId(), profileName, invitedUser.getLoginName(), false );
 
-            message = messageUtils.getDisplayMessage( DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL,
-                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
             statusMap.put( "status", CommonConstants.SUCCESS_ATTRIBUTE );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while reinviting user. Reason : " + e.getMessage(), e );

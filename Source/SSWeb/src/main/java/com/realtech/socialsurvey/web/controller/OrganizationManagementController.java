@@ -2222,9 +2222,9 @@ public class OrganizationManagementController
     }
 
 
-    // Method to delete all the records of a company.
-    @RequestMapping ( value = "/deletecompany", method = RequestMethod.GET)
-    public String deleteCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
+    // Method to deactivate company.
+    @RequestMapping ( value = "/deactivatecompany", method = RequestMethod.GET)
+    public String deactivateCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
         throws NonFatalException
     {
         User user = sessionHelper.getCurrentUser();
@@ -2237,7 +2237,8 @@ public class OrganizationManagementController
                 try {
                     organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true );
                 } catch ( NoRecordsFetchedException | PaymentException e ) {
-                    LOG.error( "Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ",
+                    LOG.error(
+                        "Exception caught in deactivateCompany() of OrganizationManagementController. Nested exception is ",
                         e );
                     throw e;
                 }
@@ -2254,7 +2255,7 @@ public class OrganizationManagementController
                     DisplayMessageType.SUCCESS_MESSAGE ).toString();
             }
         } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
+            LOG.error( "InvalidInputException caught in deactivateCompany(). Nested exception is ", e );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
                 .toString();
