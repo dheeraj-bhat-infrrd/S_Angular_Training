@@ -124,13 +124,21 @@ $(document).on('click','.hr-dd-item',function(e){
 	$('#hr-comp-sel').attr("srch-type" , $(this).attr("srch-type"));
 	$('#hr-comp-sel').val('');
 	$('#srch-crtria-list').slideToggle(200);
+	if( $(this).attr("srch-type") == "company"){
+		$("#company-criterial-interval-wrapper").show();
+		$("#srchcmpnyalldays").addClass('bd-cust-rad-img-checked');
+		$("#srchcmpnythirtydays").removeClass('bd-cust-rad-img-checked');
+	}else{
+		$("#company-criterial-interval-wrapper").hide();
+	}
 });
 
 function searchAndDisplayCompanies(key) {
 	var filterValue = $('#com-filter').val();
 	var accountType = $('#com-type-filter').val();
+	var noOfDays = $(".bd-cust-rad-img-checked").attr('data-type');
 	showOverlay();
-	callAjaxGETAndAbortLastRequest("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue+"&accountType="+accountType, function(data) {
+	callAjaxGETAndAbortLastRequest("/fetchcompaniesbykey.do?searchKey="+key+"&comSelFilter="+filterValue+"&accountType="+accountType+"&noOfDays="+noOfDays, function(data) {
 		$('#admin-com-list').html(data);
 	}, true);
 }
@@ -425,9 +433,8 @@ function downloadBillingReport() {
 	var mailId = $("#dsh-mail-id").val();
 	if (emailRegex.test(mailId) || mailId == "") {
 		payload = { "mailid" : mailId };
-		callAjaxGetWithPayloadData("./downloadbillingreport.do", function() {
-			$('#overlay-toast').html(
-			'The Billing Report will be mailed to you shortly');
+		callAjaxGetWithPayloadData("./downloadbillingreport.do", function(data) {
+			$('#overlay-toast').html(data);
 			showToast();
 		}, payload, true);
 	} else {
@@ -578,6 +585,21 @@ function deleteSSAdmin(ssAdminId) {
 		displayMessage(data);
 		$("#user-row-"+ssAdminId).hide();
 	}, true);
+}
+
+function bindCompanyIntervalCriteriaSelection() {
+	$('.bd-cust-rad-img').click(function(e) {
+        $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
+        $(this).toggleClass('bd-cust-rad-img-checked');
+        $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
+        
+        var key = "";
+    	$('#hr-comp-sel').val(key);
+    	$('#hr-comp-sel').attr("placeholder" , "Search Company");
+    	$('#hr-comp-sel').attr("srch-type" , "company");
+    	
+    	searchAndDisplayCompanies(key);
+    });
 }
 
 

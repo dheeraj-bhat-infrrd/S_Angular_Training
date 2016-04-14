@@ -395,6 +395,41 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sent verification mail" );
     }
 
+    
+    @Async
+    @Override
+    public void sendEmailVerificationRequestMailToAdmin( String url, String recipientMailId, String recipientName , String emailToVerify,  String entityName )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method to send verification mail called for url : " + url + " recipientMailId : " + recipientMailId );
+        if ( url == null || url.isEmpty() ) {
+            throw new InvalidInputException( "URL generated can not be null or empty" );
+        }
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            throw new InvalidInputException( "Recipients Email Id can not be null or empty" );
+        }
+        if ( recipientName == null || recipientName.isEmpty() ) {
+            throw new InvalidInputException( "Recipients Name can not be null or empty" );
+        }
+
+        LOG.info( "Initiating URL Service to shorten the url " + url );
+        url = urlService.shortenUrl( url );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.EMAIL_VERIFICATION_TO_ADMIN_MAIL_SUBJECT;
+
+        FileContentReplacements fileContentReplacements = new FileContentReplacements();
+        fileContentReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.EMAIL_VERIFICATION_TO_ADMIN_MAIL_BODY );
+        fileContentReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, emailToVerify, entityName , url, url, url, appBaseUrl,
+            appBaseUrl ) );
+
+        LOG.debug( "Calling email sender to send verification mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, fileContentReplacements, false, false );
+        LOG.info( "Successfully sent verification mail" );
+    }
 
     /**
      * Method to send mail with verification link to verify the account

@@ -853,11 +853,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         // Sorting SurveyResults
         Collections.sort( surveyDetails, new SurveyResultsComparator() );
 
-        //create rating format to format survey score
-        DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-        ratingFormat.setMinimumFractionDigits( 1 );
-        ratingFormat.setMaximumFractionDigits( 1 );
-
         // Finding max questions
         int max = 0;
         int internalMax = 0;
@@ -926,7 +921,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 }
 
                 //add score
-                surveyDetailsToPopulate.add( ratingFormat.format( survey.getScore() ) );
+                surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ));
                 for ( SurveyResponse response : survey.getSurveyResponse() ) {
                     surveyDetailsToPopulate.add( response.getAnswer() );
                 }
@@ -1026,7 +1021,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     surveyDetailsToPopulate.add( survey.getSource() );
 
                     //add score
-                    surveyDetailsToPopulate.add( ratingFormat.format( survey.getScore() ) );
+                    surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ));
 
                     // Since Zillow reviews have no Survey Response Data, push empty data
                     for ( int i = 1; i <= max; i++ ) {
@@ -1167,8 +1162,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             surveyDetailsToPopulate.add( agentDetail.getAgentFirstName() );
             surveyDetailsToPopulate.add( agentDetail.getAgentLastName() );
             surveyDetailsToPopulate.add( agentDetail.getAverageScore() );
+            surveyDetailsToPopulate.add( agentDetail.getCompletedSurveys() );
+            surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() );
             surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() + agentDetail.getCompletedSurveys() );
-
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis( agentDetail.getRegistrationDate() );
             surveyDetailsToPopulate.add( DATE_FORMATTER.format( calendar.getTime() ) );
@@ -1182,6 +1178,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         surveyDetailsToPopulate.add( CommonConstants.HEADER_FIRST_NAME );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_LAST_NAME );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_AVG_SCORE );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_COMPLETED_SURVEY_COUNT );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_INCOMPLTE_SURVEY_COUNT );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SUM_SURVEYS );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_REGISTRATION_DATE );
 
@@ -1322,8 +1320,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_COMPANY_HIERARCHY_REPORT );
         Criterion fileUploadTypeCriteria = Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, uploadTypeList );
         List<Integer> statusList = new ArrayList<Integer>();
+        //get only active records
         statusList.add( CommonConstants.STATUS_ACTIVE );
-        statusList.add( CommonConstants.STATUS_UNDER_PROCESSING );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN, statusList );
         List<FileUpload> filesToBeUploaded = fileUploadDao.findByCriteria( FileUpload.class, fileUploadTypeCriteria,
             statusCriteria );
@@ -1346,6 +1344,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
         Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
         List<Integer> statusList = new ArrayList<Integer>();
+        //get only active records
         statusList.add( CommonConstants.STATUS_ACTIVE );
         statusList.add( CommonConstants.STATUS_UNDER_PROCESSING );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN, statusList );
@@ -1527,6 +1526,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         Map<Long, String> userIdBranchAsAdminIdsMap = new HashMap<Long, String>();
         List<Long> agentIds = new ArrayList<Long>();
         Map<Long, AgentSettings> userIdSettingsMap = new HashMap<Long, AgentSettings>();
+        Map<Long, List<SocialUpdateAction>> socialMediaActionMap = new HashMap<Long, List<SocialUpdateAction>>();
+        Map<Long, Date> latestSurveySentForAgent = new HashMap<Long, Date>();
+        Map<Long, Date> latestSurveyCompletedForAgent = new HashMap<Long, Date>();
         User companyAdmin = null;
         if ( userList != null && userList.size() > 0 ) {
             for ( User user : userList ) {
@@ -1623,13 +1625,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     userIdSettingsMap.put( agentSettings.getIden(), agentSettings );
                 }
             }
+            
+          //get user social media action detail
+            socialMediaActionMap = socialManagementService
+                .getSocialConnectionsHistoryForEntities( CommonConstants.AGENT_ID_COLUMN, userIdList );
         }
 
-        //get user social media action detail
-        Map<Long, List<SocialUpdateAction>> socialMediaActionMap = socialManagementService
-            .getSocialConnectionsHistoryForEntities( CommonConstants.AGENT_ID_COLUMN, userIdList );
-        Map<Long, Date> latestSurveyCompletedForAgent = surveyDetailsDao.getLatestCompletedSurveyDateForAgents( companyId );
-        Map<Long, Date> latestSurveySentForAgent = surveyPreInitiationDao.getLatestSurveySentForAgent( companyId );
+        
+        latestSurveyCompletedForAgent = surveyDetailsDao.getLatestCompletedSurveyDateForAgents( companyId );
+        latestSurveySentForAgent = surveyPreInitiationDao.getLatestSurveySentForAgent( companyId );
 
         //get user data map to craete excel from available users details
         Map<Integer, List<Object>> usersData = createUserDataForCompnyUserReport( userList, agentIds, companyAdmin,

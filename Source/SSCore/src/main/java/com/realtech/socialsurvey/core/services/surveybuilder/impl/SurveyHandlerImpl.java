@@ -566,10 +566,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> incompleteSurveyCustomers = new ArrayList<>();
 
         LOG.debug( "Now fetching survey which are already processed " );
-        HashMap<String, Object> queries = new HashMap<>();
-        queries.put( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
-        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
-        incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class, queries );
+        Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+        Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
+            Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
+        incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
+            statusCriteria );
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
     }
@@ -1881,6 +1882,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.warn( "Survey initiated for self." );
             throw new SelfSurveyInitiationException( "Survey cannot be initiated for self" );
         }
+        
+        //Trim all the details
+        recipientEmailId = recipientEmailId.trim();
+        recipientFirstname = recipientFirstname.trim();
+        if ( recipientLastname != null ) {
+            recipientLastname = recipientLastname.trim();
+        }
+        
+        
         // check if survey has already been sent to the email id
         // check the pre-initiation and then the survey table
         /*HashMap<String, Object> queries = new HashMap<>();

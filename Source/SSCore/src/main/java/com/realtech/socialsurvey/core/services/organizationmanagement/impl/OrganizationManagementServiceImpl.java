@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -96,6 +97,7 @@ import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserApiKey;
@@ -231,6 +233,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
+    
+    @Autowired
+    GenericDao<UploadStatus, Long> uploadStatusDao;
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
@@ -4986,6 +4991,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveyCompanyMappingDao.deleteByCondition( "SurveyCompanyMapping", conditions );
 
         fileUploadDao.deleteByCondition( "FileUpload", conditions );
+        
+        //Delete entries from UPLOAD_STATUS table
+        List<String> deletionConditions = new ArrayList<String>();
+        deletionConditions.add( "company.companyId = " + companyId );
+        uploadStatusDao.deleteByCondition( "UploadStatus", deletionConditions );
 
         List<CrmBatchTracker> crmBatchTrackerList = crmBatchTrackerDao.findByColumn( CrmBatchTracker.class, "companyId",
             companyId );
@@ -5159,15 +5169,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Transactional
     @Override
-    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status , boolean inCompleteCompany )
+    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status , boolean inCompleteCompany ,int noOfDays )
     {
+        LOG.debug( "Method getCompaniesByNameFromMongo() called" );
+        Calendar startTime = Calendar.getInstance();
+        startTime.add( Calendar.DATE, -1 * noOfDays );
+        // strip the time component of start time
+        startTime.set( Calendar.HOUR_OF_DAY, 0 );
+        startTime.set( Calendar.MINUTE, 0 );
+        startTime.set( Calendar.SECOND, 0 );
+        startTime.set( Calendar.MILLISECOND, 0 );
 
-        List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status, inCompleteCompany );
+        Timestamp startDate = null;
+        if ( noOfDays >= 0 )
+            startDate = new Timestamp( startTime.getTimeInMillis() );
+            
+        List<Company> companyList = companyDao.searchCompaniesByNameAndKeyValue( searchKey, accountType, status, inCompleteCompany , startDate );
         Set<Long> companyIds = new HashSet<>();
         for ( Company company : companyList ) {
             companyIds.add( company.getCompanyId() );
         }
-        LOG.debug( "Method getCompaniesByNameFromMongo() called" );
+        
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
         Collections.sort( unitSettings,   new OrganizationUnitSettingsComparator() );
         return unitSettings;

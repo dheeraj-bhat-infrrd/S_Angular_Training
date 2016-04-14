@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -584,5 +585,12 @@ public interface UserManagementService
 
 
     void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
+
+
+    /**
+     * Method to get user api key
+     * @return
+     */
+    public UserApiKey getApiKey();
 }
 // JIRA SS-34 BY RM02 BOC

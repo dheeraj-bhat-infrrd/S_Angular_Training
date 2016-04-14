@@ -32,6 +32,20 @@
 				<option value="enterprise">Enterprise</option>
 			</select>
 		</div>
+		
+		
+		<div id="company-criterial-interval-wrapper" class="float-left margin-left-50">
+				<input type="hidden" class="hide" name="companyCriteriaInterval">
+	            <div class="float-left bd-cust-rad-item clearfix">
+	                <div id="srchcmpnyalldays" data-type="-1" class="float-left bd-cust-rad-img bd-cust-rad-img-checked"></div>
+	                <div class="float-left bd-cust-rad-txt">All</div>
+	            </div>
+	            <div class="float-left bd-cust-rad-item bd-cust-rad-item-adj clearfix">
+	                <div id="srchcmpnythirtydays" data-type="30" class="float-left bd-cust-rad-img"></div>
+	                <div class="float-left bd-cust-rad-txt">Past 30 days</div>
+	            </div>
+	        </div>
+		
 		<div class="v-um-hdr-right float-right">
 			<div style="position: relative;">
 				<div style="float: left;">
@@ -68,6 +82,7 @@
 <script>
 	$(document).ready(function(){
 		$(document).attr("title", "Hierarchy");
+		bindCompanyIntervalCriteriaSelection();
 		searchAndDisplayCompanies("");
 	});
 </script>

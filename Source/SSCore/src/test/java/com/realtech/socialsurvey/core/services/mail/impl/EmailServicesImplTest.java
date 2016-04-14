@@ -1498,4 +1498,44 @@ public class EmailServicesImplTest
     {
         emailServicesImpl.sendZillowReviewComplaintHandleMail( "test", "", "" + 0, "http://www.test.com" );
     }
+    
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerificationRequestMailToAdminNullUrl() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerificationRequestMailToAdmin( null, "test", "test", "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerificationRequestMailToAdminEmptyUrl() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "", "test", "test", "test", "test" );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerificationRequestMailToAdminNullRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", null, "test", "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerificationRequestMailToAdminEmptyRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", "", "test", "test", "test" );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerificationRequestMailToAdminNullRcepientName() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", "test", null, "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerificationRequestMailToAdminEmptyRcepientName() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", "test", "", "test", "test" );
+    }
 }

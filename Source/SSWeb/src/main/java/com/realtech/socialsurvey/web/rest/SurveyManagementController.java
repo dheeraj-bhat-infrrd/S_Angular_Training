@@ -1,7 +1,8 @@
 package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -201,6 +202,11 @@ public class SurveyManagementController
             String firstName = request.getParameter( "firstName" );
             String lastName = request.getParameter( "lastName" );
             String agreedToShare = request.getParameter( "agreedToShare" );
+            String strIsIsoEncoded = request.getParameter( "isIsoEncoded" );
+            boolean isIsoEncoded = Boolean.parseBoolean( strIsIsoEncoded );
+            if ( isIsoEncoded ) {
+                feedback = new String(feedback.getBytes( Charset.forName( "ISO-8859-1" ) ), "UTF-8");
+            }
 
             long agentId = 0;
             try {
@@ -286,7 +292,7 @@ public class SurveyManagementController
                 }
                 // Generate the text as in mail
                 String surveyDetail = generateSurveyTextForMail( customerName, mood, survey, isAbusive, allowCheckBox );
-                String surveyScore = String.valueOf( survey.getScore() );
+                String surveyScore = String.valueOf(surveyHandler.getFormattedSurveyScore( survey.getScore() ));
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( admin.getValue(), admin.getKey(), surveyDetail,
                         customerName, surveyScore, logoUrl );
@@ -323,6 +329,8 @@ public class SurveyManagementController
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in storeFeedback(). Nested exception is ", e );
             return e.getMessage();
+        } catch ( UnsupportedEncodingException e ) {
+            LOG.error( "An exception occured while changing the character encoding of the feedback" );
         }
         LOG.info( "Method storeFeedback() finished to store response of customer." );
         return "Survey stored successfully";
@@ -609,6 +617,11 @@ public class SurveyManagementController
             String isAbusiveStr = request.getParameter( "isAbusive" );
             String serverBaseUrl = requestUtils.getRequestServerName( request );
             String onlyPostToSocialSurveyStr = request.getParameter( "onlyPostToSocialSurvey" );
+            String strIsIsoEncoded = request.getParameter( "isIsoEncoded" );
+            boolean isIsoEncoded = Boolean.parseBoolean( strIsIsoEncoded );
+            if ( isIsoEncoded ) {
+                feedback = new String(feedback.getBytes( Charset.forName( "ISO-8859-1" ) ), "UTF-8");
+            }
 
             long agentId = 0;
             double rating = 0;
@@ -636,6 +649,8 @@ public class SurveyManagementController
                 "Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
                 e );
             return e.getMessage();
+        } catch ( UnsupportedEncodingException e ) {
+            LOG.error( "An exception occured while changing the character encoding of the feedback" );
         }
         LOG.info( "Method to post feedback of customer to various pages of social networking sites finished." );
         return "Error while posting on social media";
@@ -675,14 +690,6 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            /*if ( rating % 1 == 0 ) {
-                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }*/
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
-
-
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -717,7 +724,7 @@ public class SurveyManagementController
             List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
             List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
 
-            String facebookMessage = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName
+            String facebookMessage = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + customerDisplayName
                 + " for " + agentName + " on Social Survey - view at " + getApplicationBaseUrl()
                 + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             facebookMessage += "\n Feedback : " + feedback;
@@ -836,14 +843,6 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
-
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            /*if ( rating % 1 == 0 ) {
-                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }*/
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
-
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -884,7 +883,7 @@ public class SurveyManagementController
              * + " for " + agentName + " on @SocialSurveyMe - view at " + getApplicationBaseUrl() +
              * CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
              */
-            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, ratingFormat.format( rating ),
+            String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE, surveyHandler.getFormattedSurveyScore( rating ),
                 customerDisplayName, agentName, "@SocialSurveyMe" )
                 + getApplicationBaseUrl()
                 + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
@@ -994,13 +993,6 @@ public class SurveyManagementController
                 return e.getMessage();
             }
 
-
-            DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
-            /*if ( rating % 1 == 0 ) {
-                ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-            }*/
-            ratingFormat.setMinimumFractionDigits( 1 );
-            ratingFormat.setMaximumFractionDigits( 1 );
             Map<String, List<OrganizationUnitSettings>> settingsMap = socialManagementService
                 .getSettingsForBranchesAndRegionsInHierarchy( agentId );
             List<OrganizationUnitSettings> companySettings = settingsMap
@@ -1037,7 +1029,7 @@ public class SurveyManagementController
             }
 
 
-            String message = ratingFormat.format( rating ) + "-Star Survey Response from " + customerDisplayName + " for "
+            String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + customerDisplayName + " for "
                 + agentName + " on SocialSurvey ";
 
             String linkedinProfileUrl = getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
