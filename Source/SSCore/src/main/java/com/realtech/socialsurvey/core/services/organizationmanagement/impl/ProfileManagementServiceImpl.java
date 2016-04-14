@@ -76,6 +76,7 @@ import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.RealtorToken;
@@ -116,6 +117,7 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsManager;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -143,7 +145,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
-    
+
+    @Autowired
+    private SettingsSetter settingsSetter;
+
     @Autowired
     private UserProfileDao userProfileDao;
 
@@ -229,8 +234,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Autowired
     private EmailFormatHelper emailFormatHelper;
 
-//    @Autowired
-//    private ZillowUpdateService zillowUpdateService;
+    //    @Autowired
+    //    private ZillowUpdateService zillowUpdateService;
 
     @Autowired
     private ZillowHierarchyDao zillowHierarchyDao;
@@ -244,7 +249,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Value ( "${ZILLOW_ENDPOINT}")
     private String zillowEndpoint;
-    
+
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
 
@@ -1622,7 +1627,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValueAscendingWithAlias( UserProfile.class, queries,
-            Arrays.asList(new String [] { "firstName", "lastName" } ) , "user" );
+            Arrays.asList( new String[] { "firstName", "lastName" } ), "user" );
         if ( userProfiles != null && !userProfiles.isEmpty() ) {
             users = new ArrayList<AgentSettings>();
             for ( UserProfile userProfile : userProfiles ) {
@@ -1817,10 +1822,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         return surveyDetails;
     }
 
-    
+
     @Override
-    public List<SurveyDetails> getReviewsForReports( long iden, double startScore, double limitScore, int startIndex, int numOfRows,
-        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+    public List<SurveyDetails> getReviewsForReports( long iden, double startScore, double limitScore, int startIndex,
+        int numOfRows, String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
         throws InvalidInputException
     {
         LOG.info( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
@@ -1843,11 +1848,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
-        surveyDetails = surveyDetailsDao.getFeedbacksForReports( idenColumnName, iden, startIndex, numOfRows, startScore, limitScore,
-            fetchAbusive, startDate, endDate, sortCriteria );
+        surveyDetails = surveyDetailsDao.getFeedbacksForReports( idenColumnName, iden, startIndex, numOfRows, startScore,
+            limitScore, fetchAbusive, startDate, endDate, sortCriteria );
 
         return surveyDetails;
     }
+
 
     /**
      * Method to get average ratings based on the profile level specified, iden is one of
@@ -1871,10 +1877,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         double averageRating = surveyDetailsDao.getRatingForPastNdays( idenColumnName, iden, -1, aggregateAbusive, false,
             includeZillow, zillowReviewCount, zillowTotalScore );
-        
-      //get formatted survey score using rating format  
+
+        //get formatted survey score using rating format  
         averageRating = surveyHandler.getFormattedSurveyScore( averageRating );
-        
+
         LOG.info( "Method getAverageRatings executed successfully.Returning: " + averageRating );
         return averageRating;
     }
@@ -1997,9 +2003,62 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
+    /**
+     * 
+     * @param mailIds
+     * @param entityType
+     * @param userSettings
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    @Override
+    public void generateAndSendEmailVerificationRequestLinkToAdmin( List<MiscValues> mailIds, long companyId,
+        String entityType, OrganizationUnitSettings entitySettings ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method generateAndSendEmailVerificationRequestLinkToAdmin started " );
+        Map<String, String> urlParams = null;
+
+        if(entitySettings == null){
+            throw new InvalidInputException( "Invalid argument passed , passed entity setting is null: " );
+        }
+
+        
+        User companyAdmin = userManagementService.getCompanyAdmin( companyId );
+        if ( companyAdmin == null ) {
+            throw new InvalidInputException( "No admin found for passed company id : " + companyId );
+        }
+        
+        String adminName = companyAdmin.getFirstName();
+        if ( companyAdmin.getLastName() != null && !companyAdmin.getLastName().isEmpty() ) {
+            adminName = companyAdmin.getFirstName() + " " + companyAdmin.getLastName();
+        }
+
+        for ( MiscValues mailId : mailIds ) {
+            String key = mailId.getKey();
+            String emailId = mailId.getValue();
+            if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
+                urlParams = new HashMap<String, String>();
+                urlParams.put( CommonConstants.EMAIL_ID, emailId );
+                urlParams.put( CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK );
+                urlParams.put( CommonConstants.ENTITY_ID_COLUMN, entitySettings.getIden() + "" );
+                urlParams.put( CommonConstants.ENTITY_TYPE_COLUMN, entityType );
+                urlParams.put( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE,
+                    CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN );
+
+                String verficationUrl = urlGenerator.generateUrl( urlParams, applicationBaseUrl
+                    + CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION );
+                emailServices.sendEmailVerificationRequestMailToAdmin( verficationUrl, companyAdmin.getEmailId(), adminName,
+                    emailId, entitySettings.getContact_details().getName() );
+            }
+        }
+
+
+    }
+
+
     @Override
     @Transactional
-    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException, NonFatalException
+    public String updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException, NonFatalException
     {
         Map<String, String> urlParams = urlGenerator.decryptParameters( urlParamsStr );
         if ( urlParams == null || urlParams.isEmpty() ) {
@@ -2010,11 +2069,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String emailType = urlParams.get( CommonConstants.EMAIL_TYPE );
         long iden = Long.parseLong( urlParams.get( CommonConstants.ENTITY_ID_COLUMN ) );
         String collection = urlParams.get( CommonConstants.ENTITY_TYPE_COLUMN );
+        String verificationType = urlParams.get( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE );
 
         OrganizationUnitSettings unitSettings = organizationUnitSettingsDao
             .fetchOrganizationUnitSettingsById( iden, collection );
         ContactDetailsSettings contactDetails = unitSettings.getContact_details();
         MailIdSettings mailIds = contactDetails.getMail_ids();
+
+        if ( verificationType == null || verificationType.isEmpty() ) {
+            throw new InvalidInputException(
+                "Url params are invalid for email verification. Parameter Verification type missing" );
+        }
 
         if ( emailType.equals( CommonConstants.EMAIL_TYPE_WORK ) ) {
             String emailVerified = mailIds.getWorkEmailToVerify();
@@ -2029,6 +2094,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
             if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                 updateCompanyEmail( iden, emailVerified );
+
+                Company company = userManagementService.getCompanyById( iden );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_WORK, true );
+                    userManagementService.updateCompany( company );
+                }
+
+            } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+
+                Region region = userManagementService.getRegionById( iden );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_WORK, true );
+                    userManagementService.updateRegion( region );
+
+                }
+
+            } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                Branch branch = userManagementService.getBranchById( iden );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_WORK, true );
+                    userManagementService.updateBranch( branch );
+                }
             } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
 
                 // Update User login name and email id
@@ -2052,6 +2139,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 throw new InvalidInputException( "Email Id to verify does not match with our records" );
             }
 
+            if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+                Company company = userManagementService.getCompanyById( iden );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.EMAIL_ID_PERSONAL, true );
+                    userManagementService.updateCompany( company );
+                }
+            } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+                Region region = userManagementService.getRegionById( iden );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_PERSONAL, true );
+                    userManagementService.updateRegion( region );
+                }
+            } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+                Branch branch = userManagementService.getBranchById( iden );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_PERSONAL, true );
+                    userManagementService.updateBranch( branch );
+                }
+            }
+
             mailIds.setPersonal( mailIds.getPersonalEmailToVerify() );
             mailIds.setPersonalEmailToVerify( null );
             mailIds.setPersonalEmailVerified( true );
@@ -2060,6 +2167,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contactDetails, unitSettings, collection );
+
+        return verificationType;
     }
 
 
@@ -3332,8 +3441,32 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 LOG.error( "unit settings is null" );
             }
         }
+
+
+        //check if work email is locked by company
+        if ( settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
+            SettingsForApplication.EMAIL_ID_WORK ) ) {
+            //update currentLockAggregateValue
+            String sCurrentLockValue = String.valueOf( currentLockAggregateValue );
+            if ( sCurrentLockValue.length() >= SettingsForApplication.EMAIL_ID_WORK.getIndex() ) {
+                String preIndexLockValueSubString = sCurrentLockValue.substring( 0, sCurrentLockValue.length()
+                    - SettingsForApplication.EMAIL_ID_WORK.getIndex() );
+                String indexLockValueSubString = String.valueOf( CommonConstants.LOCKED_BY_NONE );
+                String postIndexLockValueSubString = sCurrentLockValue.substring( sCurrentLockValue.length()
+                    - SettingsForApplication.EMAIL_ID_WORK.getIndex() + 1 );
+
+                sCurrentLockValue = preIndexLockValueSubString + indexLockValueSubString + postIndexLockValueSubString;
+                currentLockAggregateValue = Long.parseLong( sCurrentLockValue );
+
+            }
+
+        }
+
+
         Map<SettingsForApplication, OrganizationUnit> closestSettings = settingsManager.getClosestSettingLevel(
             String.valueOf( currentSetAggregateValue ), String.valueOf( currentLockAggregateValue ) );
+
+
         if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
             if ( unitSettings != null ) {
                 if ( !logoLocked ) {
@@ -4169,6 +4302,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         boolean logoLocked = true;
         boolean webAddressLocked = true;
         boolean phoneNumberLocked = true;
+        boolean workEmailLocked = true;
         List<SettingsDetails> settingsDetailsList = settingsManager
             .getScoreForCompleteHeirarchy( companyId, branchId, regionId );
         Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
@@ -4179,6 +4313,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             logoLocked = false;
             webAddressLocked = false;
             phoneNumberLocked = false;
+            workEmailLocked = false;
         } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
             if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
                 currentLockAggregateValue ) ) {
@@ -4192,7 +4327,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 currentLockAggregateValue ) ) {
                 phoneNumberLocked = false;
             }
+            if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.EMAIL_ID_WORK,
+                currentLockAggregateValue ) ) {
+                workEmailLocked = false;
+            }
 
+            //check only for company
+            if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.EMAIL_ID_WORK,
+                currentLockAggregateValue ) ) {
+                workEmailLocked = false;
+            }
         } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
 
             if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
@@ -4227,6 +4371,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
             }
 
+            //check only for company
+            if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.EMAIL_ID_WORK,
+                currentLockAggregateValue ) ) {
+                workEmailLocked = false;
+            }
         } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
             if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.LOGO,
                 currentLockAggregateValue ) ) {
@@ -4283,10 +4432,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
             }
 
+            //check only if company locked
+            if ( !checkIfSettingLockedByOrganization( OrganizationUnit.COMPANY, SettingsForApplication.EMAIL_ID_WORK,
+                currentLockAggregateValue ) ) {
+                workEmailLocked = false;
+            }
         }
         parentLock.setLogoLocked( logoLocked );
         parentLock.setWebAddressLocked( webAddressLocked );
         parentLock.setWorkPhoneLocked( phoneNumberLocked );
+        parentLock.setWorkEmailLocked( workEmailLocked );
 
         return parentLock;
     }
@@ -4346,7 +4501,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null ) {
             // fetching zillow feed
             LOG.debug( "Fetching zillow feed for " + profile.getId() + " from " + collection );
-            List<SurveyDetails> surveyDetailsList = fetchAndSaveZillowFeeds( profile, collection, companyId, fromBatch, fromPublicPage );
+            List<SurveyDetails> surveyDetailsList = fetchAndSaveZillowFeeds( profile, collection, companyId, fromBatch,
+                fromPublicPage );
             LOG.info( "Method to fetch zillow feed finished." );
             return surveyDetailsList;
         } else {
@@ -4380,7 +4536,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     User user = userDao.findById( User.class, iden );
                     long zillowReviewCount = 0;
                     long zillowTotalScore = 0;
-                    if ( user != null &&  user.getIsZillowConnected() == CommonConstants.YES ) {
+                    if ( user != null && user.getIsZillowConnected() == CommonConstants.YES ) {
                         zillowReviewCount = user.getZillowReviewCount();
                         zillowTotalScore = (long) ( user.getZillowAverageScore() * zillowReviewCount );
                     }
@@ -4442,7 +4598,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Override
     public List<SurveyDetails> buildSurveyDetailsFromReviewMap( List<HashMap<String, Object>> reviews, String collectionName,
-        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException
+        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage )
+        throws InvalidInputException
     {
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
         String idenColumnName = "";
@@ -4636,8 +4793,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Transactional
-    public void postToTempTable( String collectionName, OrganizationUnitSettings profile,
-        SurveyDetails surveyDetails, Map<String, Object> review )
+    public void postToTempTable( String collectionName, OrganizationUnitSettings profile, SurveyDetails surveyDetails,
+        Map<String, Object> review )
     {
         try {
             pushToZillowPostTemp( profile, collectionName, surveyDetails, review );
@@ -4645,8 +4802,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.error( "Exception occurred while pushing Zillow review into temp table. Reason :", e );
         }
     }
-    
-    
+
+
     /**
      * method to remove tokens from profile detail
      * @param profile

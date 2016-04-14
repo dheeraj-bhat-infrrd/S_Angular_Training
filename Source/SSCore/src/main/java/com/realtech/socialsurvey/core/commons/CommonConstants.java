@@ -913,6 +913,10 @@ public interface CommonConstants
     public static final String URL_PARAM_RESETORSET_VALUE_RESET = "reset";
     public static final String URL_PARAM_RESETORSET_VALUE_SET = "set";
     
+    public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE = "verificationRequestType";
+    public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN = "admin";
+    public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER = "user";
+    
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";

@@ -4,13 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.UnavailableException;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -22,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -39,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -59,6 +64,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
@@ -70,6 +76,9 @@ public class ProfileManagementServiceImplTest
 
     @Mock
     private OrganizationManagementService organizationManagementService;
+    
+    @Mock
+    private UserManagementService userManagementService;
 
     @Mock
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -1830,4 +1839,21 @@ public class ProfileManagementServiceImplTest
     {
         profileManagementServiceImpl.getReviewsForReports( 0, 0, 0, 0, 0, "test", false, null, null, null );
     }
+    
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testgenerateAndSendEmailVerificationRequestLinkToAdminForNullSettings() throws InvalidInputException, UndeliveredEmailException
+    {
+        profileManagementServiceImpl.generateAndSendEmailVerificationRequestLinkToAdmin( new ArrayList<MiscValues>(), 1, "test", null );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testgenerateAndSendEmailVerificationRequestLinkToAdminForInvalidCompany() throws InvalidInputException, UndeliveredEmailException
+    {
+        Mockito.when( userManagementService.getCompanyAdmin(Mockito.anyLong()) ).thenReturn( null );
+        profileManagementServiceImpl.generateAndSendEmailVerificationRequestLinkToAdmin( new ArrayList<MiscValues>(), 1, "test", new OrganizationUnitSettings() );
+    }
+    
 }
