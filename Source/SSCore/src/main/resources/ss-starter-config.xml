@@ -194,9 +194,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="solrSearchService" value-ref="solrSearchService" />
-				<entry key="emailServices" value-ref="emailServices" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
