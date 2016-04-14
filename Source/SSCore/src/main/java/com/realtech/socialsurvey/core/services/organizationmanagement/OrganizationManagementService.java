@@ -1297,4 +1297,10 @@ public interface OrganizationManagementService
 
     public void pushZillowReviews( List<HashMap<String, Object>> reviews, String collectionName,
         OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException;
+
+
+    /**
+     * Method to deactivate accounts
+     */
+    public void accountDeactivator();
 }
