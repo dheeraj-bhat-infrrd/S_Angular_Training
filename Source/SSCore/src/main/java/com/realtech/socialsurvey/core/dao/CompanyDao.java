@@ -16,7 +16,7 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 	
 	public List<Company> searchCompaniesByName(String namePattern);
 
-	public List<Company> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status , boolean inCompleteCompany);
+	public List<Company> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status , boolean inCompleteCompany , Timestamp startDate);
 
 	public List<Company> getCompaniesByDateRange(Timestamp startTime, Timestamp endTime);
 
