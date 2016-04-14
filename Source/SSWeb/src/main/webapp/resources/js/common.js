@@ -416,23 +416,25 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	}*/
 	
 	if(source != undefined && source == "Zillow"){
-		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
+		ratingImgHtml = "<div class='rating-image  star-rating-green' title='"+ roundedFloatingVal+ "/5.0'></div>";
+		ratingImgHtml += "<div class='rating-image  zillow-badge' title='Zillow'></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml+="<div class='verified-badge float-left verify-image' title='Click here to know more'></div>";
-		ratingImgHtml += "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";	
+		ratingImgHtml = "<div class='rating-image  star-rating'  title='"+ roundedFloatingVal+ "/5.0'></div>";
+		ratingImgHtml+="<div class='verified-badge  verify-image' title='Click here to know more'></div>";
 		
 	}
 		else {
-		ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";		
+		ratingImgHtml = "<div class='rating-image  star-rating'  title='"+ roundedFloatingVal+ "/5.0'></div>";		
 	}
 	
-	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
+	/*var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
 	if (isOverallRating) {
 		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
-	}
+	}*/
 
 	ratingParent.html('');
-	ratingParent.append(ratingImgHtml).append(ratingValHtml);
+	ratingParent.append(ratingImgHtml);
+	/*ratingParent.append(ratingImgHtml).append(ratingValHtml);*/
 }
 $(document).on('click','.verified-badge',function(e){
 	window.open("https://socialsurvey.zendesk.com/hc/en-us/articles/216454118-Added-Verified-Customer-badge");

@@ -705,7 +705,7 @@ function paintReviews(result){
 	//Check if there are more reviews left
 	if(reviewsNextBatch == undefined || reviewsNextBatch.length <= numOfRows)
 		fetchReviewsScroll(true);
-	
+	var profileLevel = $("#profile-fetch-info").attr('profile-level');
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 	
@@ -737,17 +737,67 @@ function paintReviews(result){
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
-		reviewsHtml += '			<div class="ppl-head-1">'+custDispName+'</div>';
+		reviewsHtml += '			<div class="ppl-head-1"><span>Reviewed by </span>'+custDispName;
+		if(profileLevel!= 'INDIVIDUAL'){
+			reviewsHtml +='<span> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
+		}
+		reviewsHtml +='</div>';
 		if (date != null) {
 			date = convertUserDateToLocale(date);
-			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
+			reviewsHtml += '		<div class="ppl-head-2 ">' + date.toString("MMMM d, yyyy") ; 
 		}
-		
+		if(reviewItem.source=="agent" || reviewItem.source=="admin"){
+			reviewsHtml += '<span  style="font-family: opensanslight;"> - sourced by SocialSurvey</span>';
+		}else if(reviewItem.source=="Zillow"){
+			reviewsHtml += '<span  style="font-family: opensanslight;"> - sourced by <span style="color:#009FE0;"> Zillow.com</span></span>';
+		}else {
+			reviewsHtml +='<span  style="font-family: opensanslight;"> - sourced by '+reviewItem.source+' </span>';
+		}
+		reviewsHtml += '		</div>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '    	<div class="float-right ppl-header-right">';
 		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '	</div>';
+		
+		
+			
+		
+		/*reviewsHtml += '	</div>';
+		
+		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height">';
+		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
+		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
+		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' +reviewItem.completeProfileUrl.replace("localhost","127.0.0.1")+ '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
+		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		reviewsHtml += '		</div>';
+		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
+		if(reviewItem.source != "Zillow")
+			reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
+		reviewsHtml += '		</div>';
+		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
+		reviewsHtml += '	</div>';
+		reviewsHtml += '</div>';*/
+
+
+
+		
+		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height" style="visibility: hidden;">';
+		reviewsHtml += '		<div class="float-left clearfix ppl-share-social ">';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' +reviewItem.completeProfileUrl.replace("localhost","127.0.0.1")+ '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
+		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		reviewsHtml += '		</div>';
+		if(reviewItem.source != "Zillow")
+		reviewsHtml += '		<span class="icn-flag float-right report-abuse-txt prof-report-abuse-txt cursor-pointer " title="Report Abuse"></span> ';
+		reviewsHtml += '	</div>';
+		
 		
 		if(reviewItem.summary != null && reviewItem.summary.length > 0){
 			reviewsHtml += '<div class="ppl-content">'+reviewItem.summary+'</div>';
@@ -767,27 +817,9 @@ function paintReviews(result){
 			reviewItem.customerLastName = "";
 		if(reviewItem.agentName == undefined || reviewItem.agentName == null)
 			reviewItem.agentName = "us";
-		
-			
-		
 		reviewsHtml += '	</div>';
 		
-		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height">';
-		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
-		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
-		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' +reviewItem.completeProfileUrl.replace("localhost","127.0.0.1")+ '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
-		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
-		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
-		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
-		reviewsHtml += '		</div>';
-		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
-		if(reviewItem.source != "Zillow")
-			reviewsHtml += '			<div class="report-abuse-txt report-txt prof-report-abuse-txt">Report Abuse</div>';
-		reviewsHtml += '		</div>';
-		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
-		reviewsHtml += '	</div>';
+		
 		reviewsHtml += '</div>';
 	});
 	
@@ -812,6 +844,18 @@ function paintReviews(result){
 	}, 100);
 }
 
+$(document).on('mouseover','.ppl-review-item ',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','visible');
+});
+$(document).on('mouseleave','.ppl-review-item ',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','hidden');;
+});
+$(document).on('mouseover','.ppl-review-item-last ',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','visible');
+});
+$(document).on('mouseleave','.ppl-review-item-last',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','hidden');
+});
 $(document).on('click','.review-more-button',function(){
 	$(this).parent().find('.review-less-text').hide();
 	$(this).parent().find('.review-complete-txt').show();
@@ -824,7 +868,7 @@ $(document).on('click', '#report-abuse-pop-up', function(e){
 // Report abuse click event.
 $(document).on('click', '.prof-report-abuse-txt', function(e) {
 	e.stopPropagation();
-	var reviewElement = $(this).parent().parent().parent();
+	var reviewElement = $(this).parent().parent();
 	var payload = {
 		"customerEmail" : reviewElement.attr('data-customeremail'),
 		"agentId" : reviewElement.attr('data-agentid'),
@@ -834,6 +878,7 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 		"review" : reviewElement.attr('data-review'),
 		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
+	
 	$("#report-abuse-txtbox").val('');
 	$('#report-abuse-cus-name').val('');
 	$('#report-abuse-cus-email').val('');

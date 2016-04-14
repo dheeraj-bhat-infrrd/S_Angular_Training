@@ -387,7 +387,7 @@ function retakeSurveyReminderMail(element) {
 	}, payload, true);
 }
 
-$(document).on('click', '.report-abuse-txt', function(e) {
+/*$(document).on('click', '.report-abuse-txt', function(e) {
 	disableBodyScroll();
 	e.stopPropagation();
 	var reviewElement = $(this).parent().parent().parent().parent();
@@ -402,6 +402,31 @@ $(document).on('click', '.report-abuse-txt', function(e) {
 	};
 	$("#report-abuse-txtbox").val('');
 	
+	// Unbind click events for button
+	$('.rpa-cancel-btn').off('click');
+	$('.rpa-report-btn').off('click');
+	//disableBodyScroll();
+	$('#report-abuse-overlay').show();
+	$('.rpa-cancel-btn').on('click', function() {
+		$('#report-abuse-overlay').hide();
+		enableBodyScroll();
+	}); */
+$(document).on('click', '.report-abuse-txt', function(e) {
+	disableBodyScroll();
+	e.stopPropagation();
+	var reviewElement = $(this).closest('.dsh-review-cont');
+	var payload = {
+		"customerEmail" : reviewElement.attr('data-customeremail'),
+		"agentId" : reviewElement.attr('data-agentid'),
+		"firstName" : reviewElement.attr('data-firstname'),
+		"lastName" : reviewElement.attr('data-lastname'),
+		"agentName" : reviewElement.attr('data-agentname'),
+		"review" : reviewElement.attr('data-review'),
+		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
+	};
+	var r=reviewElement.attr('data-firstname');
+	$("#report-abuse-txtbox").val('');
+	console.log(r);
 	// Unbind click events for button
 	$('.rpa-cancel-btn').off('click');
 	$('.rpa-report-btn').off('click');
@@ -447,6 +472,7 @@ function confirmUserReportAbuse(payload) {
 		}
 		hideOverlay();
 		showToast();
+		enableBodyScroll();
 	}, payload, true);
 }
 
@@ -9978,11 +10004,11 @@ $(document).on('click', '#prof-post-btn', function() {
 	}, payload, true,'#prof-post-btn');
 });
 
-$(document).on('click', '.ppl-share-wrapper .icn-remove', function() {
+/*$(document).on('click', '.ppl-share-wrapper .icn-remove', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social').hide();
 	$(this).parent().find('.icn-plus-open').show();
-});
+});*/
 
 $(document).on('click touchstart', '.icn-person', function() {
 	$('.mob-icn').removeClass('mob-icn-active');
@@ -10042,7 +10068,12 @@ $(document).on('mouseover', '#prof-posts .tweet-panel-item' , function(e){
 $(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
 	$(this).find('.dlt-survey-wrapper').addClass('hide');
 });
-
+$(document).on('mouseover','.dsh-review-cont ',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','visible');
+});
+$(document).on('mouseleave','.dsh-review-cont ',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','hidden');;
+});
 
 $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
 	e.stopPropagation();
@@ -10057,11 +10088,11 @@ $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
 
 });
 
-$(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
+/*$(document).on('click', '.ppl-share-wrapper .icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
 });
-
+*/
 function getRelevantEntities(){
 	//Remove pre-existing options
 	$('#select-entity-id').val("");
