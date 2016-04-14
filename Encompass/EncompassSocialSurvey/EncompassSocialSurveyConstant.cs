@@ -37,7 +37,8 @@ namespace EncompassSocialSurvey
 
         public const string DISABLE_GENERATE_REPORT_URL = "disable_generate_report_url";
 
-        private static StringList fieldIds = null;
+        public const string MAX_NO_OF_PARALLEL_THREADS = "MaxNoOfParallelThreads";
+
         
         // MM/dd/yyyy
         public const string LAST_REMINDER_TIME = "01/01/1970";
@@ -65,25 +66,6 @@ namespace EncompassSocialSurvey
 
         public const string fetchCompaniesUrlParameterStateDryRun = "dryrun";
 
-        public static StringList initialFieldList()
-        {
-            if (fieldIds == null)
-            {
-                Logger.Debug("Initializing initialFieldList");
-                fieldIds = new StringList();
-                fieldIds.Add("364");         // Loan Number
-                fieldIds.Add("LoanTeamMember.Name.Loan Officer"); // Loan Processor Name
-                fieldIds.Add("36");          // Customer First Name
-                fieldIds.Add("37");          // Customer Last Name
-                fieldIds.Add("1240");        // CustomerEmailId
-
-                fieldIds.Add("68");    // Co-BorrowerFirstName
-                fieldIds.Add("69");    // Co-BorrowerLastName
-                fieldIds.Add("1268");  // Co-BorrowerEmailId
-                fieldIds.Add("748"); // closed date
-            }
-            return fieldIds;
-        }
 
         public static string GetAppSettingsValue(string key)
         {
