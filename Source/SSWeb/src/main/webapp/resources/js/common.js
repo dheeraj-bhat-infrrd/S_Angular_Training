@@ -366,7 +366,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
-	$.ajax({
+	return $.ajax({
 		url : url,
 		headers: {          
             Accept : "text/plain; charset=utf-8"   
@@ -386,6 +386,9 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			if(e.status == 0) {
 				return;
 			}
 			redirectErrorpage();

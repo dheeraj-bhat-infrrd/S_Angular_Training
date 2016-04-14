@@ -913,6 +913,10 @@ public interface CommonConstants
     public static final String URL_PARAM_RESETORSET_VALUE_RESET = "reset";
     public static final String URL_PARAM_RESETORSET_VALUE_SET = "set";
     
+    public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE = "verificationRequestType";
+    public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN = "admin";
+    public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER = "user";
+    
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";
@@ -993,6 +997,7 @@ public interface CommonConstants
     // Status in mongo for active and inactive records
     public static final String STATUS_ACTIVE_MONGO = "A";
     public static final String STATUS_DELETED_MONGO = "D";
+    public static final String STATUS_INCOMPLETE_MONGO = "I";
 
     // Company Hierarchy Report Headers
     public static final String CHR_YES = "Yes";

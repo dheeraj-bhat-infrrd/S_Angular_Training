@@ -689,8 +689,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //Start restoring the user
         //Set status = 1 if password field is present, 2 otherwise, and loginId = emailId
+        boolean isVerified = true;
         if ( user.getLoginPassword() == null || user.getLoginPassword().isEmpty() ) {
             user.setStatus( CommonConstants.STATUS_NOT_VERIFIED );
+            isVerified = false;
         } else {
             user.setStatus( CommonConstants.STATUS_ACTIVE );
         }
@@ -743,7 +745,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
 
-        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings, restoreSocial );
+        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings, restoreSocial, isVerified );
 
         //Add user to Solr
         solrSearchService.addUserToSolr( user );
@@ -2542,6 +2544,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         agentSettings.setModifiedBy( user.getModifiedBy() );
         agentSettings.setModifiedOn( System.currentTimeMillis() );
         agentSettings.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
+        
+        //Set status to incomplete
+        agentSettings.setStatus( CommonConstants.STATUS_INCOMPLETE_MONGO );
 
         // set the seo flag to true
         agentSettings.setSeoContentModified( true );
@@ -2832,6 +2837,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         String profileUrl = utils.generateAgentProfileUrl( profileName );
         agentSettings.setProfileName( profileName );
         agentSettings.setProfileUrl( profileUrl );
+        //Update status from incomplete to active
+        agentSettings.setStatus( CommonConstants.STATUS_ACTIVE_MONGO );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE_MONGO, agentSettings );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
             profileName, agentSettings );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
@@ -2974,6 +2983,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             isApiKeyValid = true;
         }
         return isApiKeyValid;
+    }
+    
+
+    /**
+     * Method to get user api key
+     * @return
+     */
+    @Transactional
+    @Override
+    public UserApiKey getApiKey()
+    {
+        LOG.info( "Method to get user api key started" );
+        List<UserApiKey> keys = apiKeyDao.findByColumn( UserApiKey.class, CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE );
+        if ( keys == null || keys.isEmpty() ) {
+            return null;
+        }
+        LOG.info( "Method to get user api key finished" );
+        return keys.get( 0 );
     }
 
 

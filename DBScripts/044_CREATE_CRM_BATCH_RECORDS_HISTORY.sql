@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `ss_user`.`CRM_BATCH_TRACKER_HISTORY` (
   PRIMARY KEY (`HISTORY_ID`),
   CONSTRAINT `fk_History_Crm_batch_tracker`
     FOREIGN KEY (`CRM_BATCH_TRACKER_ID`)
-    REFERENCES `ss_user`.`crm_batch_tracker` (`ID`)
+    REFERENCES `ss_user`.`CRM_BATCH_TRACKER` (`ID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

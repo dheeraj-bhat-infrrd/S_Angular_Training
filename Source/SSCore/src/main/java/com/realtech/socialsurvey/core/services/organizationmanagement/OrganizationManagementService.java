@@ -962,7 +962,7 @@ public interface OrganizationManagementService
      * @param status
      * @return
      */
-    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status , boolean inCompleteCompany );
+    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status , boolean inCompleteCompany , int noOfDays);
 
 
     /**

@@ -720,9 +720,9 @@ function paintReviews(result){
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		var custName = reviewItem.customerFirstName;
+		var custName = reviewItem.customerFirstName.trim();
 		if(reviewItem.customerLastName != undefined){
-			custName += ' ' + reviewItem.customerLastName;
+			custName += ' ' + reviewItem.customerLastName.trim();
 		}
 		custName = custName || "";
 		var custNameArray = custName.split(' ');

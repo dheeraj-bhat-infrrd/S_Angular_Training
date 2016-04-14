@@ -287,35 +287,53 @@ public class AdminController
 
         LOG.info( "Inside fetchCompaniesByKey() method" );
 
-        String searchKey = request.getParameter( "searchKey" );
-        String filerValue = request.getParameter( "comSelFilter" );
-        String accountTypeStr = request.getParameter( "accountType" );
-        List<OrganizationUnitSettings> unitSettings = null;
-        int accountType = -1;
-        int status = CommonConstants.STATUS_ACTIVE;
-        String companyStatus = filerValue; // to add attribute in model for providing company type
-        boolean searchInCompleteCompany = false;
-        // Check for company status filer
-        if ( filerValue != null && filerValue.equals( "inactive" ) ) {
-            status = CommonConstants.STATUS_INACTIVE;
-        } else if ( filerValue.equals( "incomplete" ) ) {
-            searchInCompleteCompany = true;
-        }
+        try {
 
-        // Check for account type filter
-        if ( accountTypeStr != null && accountTypeStr != "all" ) {
-            if ( accountTypeStr.equals( "individual" ) ) {
-                accountType = CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL;
-            } else if ( accountTypeStr.equals( "enterprise" ) ) {
-                accountType = CommonConstants.ACCOUNTS_MASTER_ENTERPRISE;
+            String searchKey = request.getParameter( "searchKey" );
+            String filerValue = request.getParameter( "comSelFilter" );
+            String accountTypeStr = request.getParameter( "accountType" );
+            String noOfDaysStr = request.getParameter( "noOfDays" );
+            List<OrganizationUnitSettings> unitSettings = null;
+            int accountType = -1;
+            int status = CommonConstants.STATUS_ACTIVE;
+            int noOfDays = 0;
+            String companyStatus = filerValue; // to add attribute in model for providing company type
+            boolean searchInCompleteCompany = false;
+            // Check for company status filer
+            if ( filerValue != null && filerValue.equals( "inactive" ) ) {
+                status = CommonConstants.STATUS_INACTIVE;
+            } else if ( filerValue.equals( "incomplete" ) ) {
+                searchInCompleteCompany = true;
             }
+
+            // Check for account type filter
+            if ( accountTypeStr != null && accountTypeStr != "all" ) {
+                if ( accountTypeStr.equals( "individual" ) ) {
+                    accountType = CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL;
+                } else if ( accountTypeStr.equals( "enterprise" ) ) {
+                    accountType = CommonConstants.ACCOUNTS_MASTER_ENTERPRISE;
+                }
+            }
+
+            //check no of days
+            try {
+                noOfDays = Integer.parseInt( noOfDaysStr );
+            } catch ( NumberFormatException e ) {
+                throw new NonFatalException( "Invalid company id was passed", e );
+            }
+
+            unitSettings = organizationManagementService.getCompaniesByKeyValueFromMongo( searchKey, accountType, status,
+                searchInCompleteCompany , noOfDays);
+
+            model.addAttribute( "companyList", unitSettings );
+            model.addAttribute( "companyStatus", companyStatus );
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            model
+                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
         }
-
-        unitSettings = organizationManagementService.getCompaniesByKeyValueFromMongo( searchKey, accountType, status,
-            searchInCompleteCompany );
-
-        model.addAttribute( "companyList", unitSettings );
-        model.addAttribute( "companyStatus", companyStatus );
 
         return JspResolver.ADMIN_COMPANY_LIST;
     }

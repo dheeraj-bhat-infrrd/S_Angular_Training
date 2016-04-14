@@ -416,4 +416,18 @@ public interface EmailServices
      */
     public void sendCustomMail( String recipientName, String recipientMailId, String subject, String body,
         Map<String, String> attachmentsDetails ) throws InvalidInputException, UndeliveredEmailException;
+
+    /**
+     * 
+     * @param url
+     * @param recipientMailId
+     * @param recipientName
+     * @param emailToVerify
+     * @param entityType
+     * @param entityName
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    void sendEmailVerificationRequestMailToAdmin( String url, String recipientMailId, String recipientName,
+        String emailToVerify , String entityName ) throws InvalidInputException, UndeliveredEmailException;
 }

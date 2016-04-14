@@ -46,26 +46,6 @@
 				</div>
 			</div>
 			<div class="reg_form_row clearfix">
-				<div class="float-left rfr_lbl"><spring:message code="label.adminemail.key" /></div>
-				<div class="float-left rfr_txt">
-					<div class="rfr_icn icn-email"></div>
-					<div class="rfr_txt_fld">
-						<input type="email" class="rfr_input_fld" id="admin-email" data-non-empty="true"
-							name="creatorEmailId" placeholder='<spring:message code="label.adminemail.key"/>'>
-					</div>
-				</div>
-			</div>
-			<div class="reg_form_row clearfix">
-				<div class="float-left rfr_lbl"><spring:message code="label.apikey.key" /></div>
-				<div class="float-left rfr_txt">
-					<div class="rfr_icn icn-pwd"></div>
-					<div class="rfr_txt_fld">
-						<input class="rfr_input_fld" id="api_key" data-non-empty="true" name="api_key"
-							placeholder='<spring:message code="label.apikey.key"/>'>
-					</div>
-				</div>
-			</div>
-			<div class="reg_form_row clearfix">
 				<div class="reg_btn" id="send-invite-form-submit"><spring:message code="label.done.key" /></div>
 			</div>
 		</div>

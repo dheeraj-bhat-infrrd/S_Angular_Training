@@ -116,7 +116,8 @@ var defaultCountry = "United States";
 var fb_app_id;
 var google_plus_app_id;
 var isZillowReviewsCallRunning = false;
-var zillowCallBreak = false
+var zillowCallBreak = false;
+var existingCall;
 
 /**
  * js functions for landing page
@@ -540,6 +541,12 @@ function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 		var prevVal = $(this).attr('data-prev-val');
 		
 		if(value != prevVal){
+			if ( value === undefined || value == null || value.length <= 0 ) {
+				$('#dsh-srch-res').removeClass('dsh-sb-dd');
+				$('#dsh-srch-res').hide();
+				$('#dsh-srch-res').empty();
+				return;
+			}
 			$(this).attr('data-prev-val', value);
 			searchBranchRegionOrAgent(value, $(this).attr('data-search-target'));			
 		}
@@ -1435,7 +1442,6 @@ $(document).mousedown(function(event) {
 //Being called from dashboard.jsp on key up event.
 function searchBranchRegionOrAgent(searchKeyword, flow) {
 	var e;
-	
 	if(flow == 'icons') {
 		e = document.getElementById("selection-list");
 	} else if (flow == 'graph'){
@@ -1452,8 +1458,10 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 		"searchColumn" : searchColumn,
 		"searchKey" : searchKeyword
 	};
-	
-	callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
+	if(existingCall != undefined && existingCall != null){
+		existingCall.abort();
+	}
+	existingCall = callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
 		if (flow == 'icons'){
 			$('#dsh-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-srch-res').html(data).show().perfectScrollbar();
@@ -10238,6 +10246,9 @@ $(document).on("keyup", "#post-search-query", function(e) {
 function attachAutocompleteAgentSurveyInviteDropdown(){
 	$('.wc-review-agentname[data-name="agent-name"]').autocomplete({
 		source : function(request, response) {
+			if((request.term).trim().length==0){
+				return;
+			}
 			callAjaxGetWithPayloadData("/fetchagentsforadmin.do", function(data) {
 					var responseData = JSON.parse(data);
 					response($.map(responseData, function(item) {
@@ -10249,7 +10260,7 @@ function attachAutocompleteAgentSurveyInviteDropdown(){
 						};
 		 	       }));
 				}, {
-					"searchKey" : request.term,
+					"searchKey" : (request.term).trim(),
 					"columnName" : colName,
 					"columnValue" : colValue
 				}, true);
@@ -10782,10 +10793,13 @@ function showEncompassButtons(){
 	}
 }
 $(document).on('click','#en-disconnect',function(){
-   
-    callAjaxPOST("/disableencompassdetails.do",
-			testDisconnectCompassCallBack,true,'#en-disconnect');
-    
+    if(isRealTechOrSSAdmin) {
+    	callAjaxPOST("/disableencompassdetails.do",
+    			testDisconnectCompassCallBack,true,'#en-disconnect');
+    } else {
+    	$('#overlay-toast').html('Please contact SuccessTeam@SocialSurvey.com or call 1-888-701-4512.');
+		showToast();
+    }
 });
 
 function testDisconnectCompassCallBack(response){
