@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.realtech.socialsurvey.core.entities.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -26,12 +27,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.BranchUploadVO;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.RegionUploadVO;
-import com.realtech.socialsurvey.core.entities.StringUploadHistory;
-import com.realtech.socialsurvey.core.entities.UploadValidation;
-import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
@@ -1007,127 +1002,108 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
 
-    //TODO: pass the history objects to the method instead
     void updateUploadValidationWithModifiedRegion( RegionUploadVO uploadedRegion, UploadValidation validationObject,
         Map<String, Integer> regionMap )
     {
-        if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null
-            && !validationObject.getUpload().getRegions().isEmpty() ) {
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null && !validationObject
+            .getUpload().getRegions().isEmpty() ) {
             if ( regionMap.containsKey( uploadedRegion.getSourceRegionId() ) ) {
                 int index = regionMap.get( uploadedRegion.getSourceRegionId() );
                 RegionUploadVO region = validationObject.getUpload().getRegions().get( index );
                 if ( !region.isRegionAdded() ) {
-                    if ( ( region.getRegionName() != null && uploadedRegion.getRegionName() == null )
-                        || ( region.getRegionName() == null && uploadedRegion.getRegionName() != null )
-                        || ( region.getRegionName() != null && uploadedRegion.getRegionName() != null && !region
-                            .getRegionName().equalsIgnoreCase( uploadedRegion.getRegionName() ) ) ) {
+                    if ( ( region.getRegionName() != null && uploadedRegion.getRegionName() == null ) || (
+                        region.getRegionName() == null && uploadedRegion.getRegionName() != null ) || (
+                        region.getRegionName() != null && uploadedRegion.getRegionName() != null && !region.getRegionName()
+                            .equalsIgnoreCase( uploadedRegion.getRegionName() ) ) ) {
                         //Update history
-                        if ( region.getRegionNameHistory() == null ) {
-                            region.setRegionNameHistory( new ArrayList<StringUploadHistory>() );
-                        }
-
-                        updateRegionHistory( region.getRegionNameHistory(), uploadedRegion.getRegionName(),
-                            region.getRegionName() );
+                        region.setRegionNameHistory(
+                            updateHistory( region.getRegionNameHistory(), uploadedRegion.getRegionName(),
+                                region.getRegionName() ) );
 
                         region.setRegionName( uploadedRegion.getRegionName() );
                         region.setRegionNameModified( true );
                     } else {
                         region.setRegionNameModified( false );
                     }
-                    if ( ( region.getRegionAddress1() != null && uploadedRegion.getRegionAddress1() == null )
-                        || ( region.getRegionAddress1() == null && uploadedRegion.getRegionAddress1() != null )
-                        || ( region.getRegionAddress1() != null && uploadedRegion.getRegionAddress1() != null && !region
+                    if ( ( region.getRegionAddress1() != null && uploadedRegion.getRegionAddress1() == null ) || (
+                        region.getRegionAddress1() == null && uploadedRegion.getRegionAddress1() != null ) || (
+                        region.getRegionAddress1() != null && uploadedRegion.getRegionAddress1() != null && !region
                             .getRegionAddress1().equalsIgnoreCase( uploadedRegion.getRegionAddress1() ) ) ) {
 
                         //Update history
-                        if ( region.getRegionAddress1History() == null ) {
-                            region.setRegionAddress1History( new ArrayList<StringUploadHistory>() );
-                        }
+                        region.setRegionAddress1History(
+                            updateHistory( region.getRegionAddress1History(), uploadedRegion.getRegionAddress1(),
+                                region.getRegionAddress1() ) );
 
-                        updateRegionHistory( region.getRegionAddress1History(), uploadedRegion.getRegionAddress1(),
-                            region.getRegionAddress1() );
-                        
                         region.setRegionAddress1( uploadedRegion.getRegionAddress1() );
                         region.setRegionAddress1Modified( true );
 
                     } else {
                         region.setRegionAddress1Modified( false );
                     }
-                    if ( ( region.getRegionAddress2() != null && uploadedRegion.getRegionAddress2() == null )
-                        || ( region.getRegionAddress2() == null && uploadedRegion.getRegionAddress2() != null )
-                        || ( region.getRegionAddress2() != null && uploadedRegion.getRegionAddress2() != null && !region
+                    if ( ( region.getRegionAddress2() != null && uploadedRegion.getRegionAddress2() == null ) || (
+                        region.getRegionAddress2() == null && uploadedRegion.getRegionAddress2() != null ) || (
+                        region.getRegionAddress2() != null && uploadedRegion.getRegionAddress2() != null && !region
                             .getRegionAddress2().equalsIgnoreCase( uploadedRegion.getRegionAddress2() ) ) ) {
 
                         //Update history
-                        if ( region.getRegionAddress2History() == null ) {
-                            region.setRegionAddress2History( new ArrayList<StringUploadHistory>() );
-                        }
-
-                        updateRegionHistory( region.getRegionAddress2History(), uploadedRegion.getRegionAddress2(),
-                            region.getRegionAddress2() );
+                        region.setRegionAddress2History(
+                            updateHistory( region.getRegionAddress2History(), uploadedRegion.getRegionAddress2(),
+                                region.getRegionAddress2() ) );
 
                         region.setRegionAddress2( uploadedRegion.getRegionAddress2() );
                         region.setRegionAddress2Modified( true );
                     } else {
                         region.setRegionAddress2Modified( false );
                     }
-                    if ( ( region.getRegionCity() != null && uploadedRegion.getRegionCity() == null )
-                        || ( region.getRegionCity() == null && uploadedRegion.getRegionCity() != null )
-                        || ( region.getRegionCity() != null && uploadedRegion.getRegionCity() != null && !region
-                            .getRegionCity().equalsIgnoreCase( uploadedRegion.getRegionCity() ) ) ) {
+                    if ( ( region.getRegionCity() != null && uploadedRegion.getRegionCity() == null ) || (
+                        region.getRegionCity() == null && uploadedRegion.getRegionCity() != null ) || (
+                        region.getRegionCity() != null && uploadedRegion.getRegionCity() != null && !region.getRegionCity()
+                            .equalsIgnoreCase( uploadedRegion.getRegionCity() ) ) ) {
 
                         //Update history
-                        if ( region.getRegionCityHistory() == null ) {
-                            region.setRegionCityHistory( new ArrayList<StringUploadHistory>() );
-                        }
-
-                        updateRegionHistory( region.getRegionCityHistory(), uploadedRegion.getRegionCity(),
-                            region.getRegionCity() );
+                        region.setRegionCityHistory(
+                            updateHistory( region.getRegionCityHistory(), uploadedRegion.getRegionCity(),
+                                region.getRegionCity() ) );
 
                         region.setRegionCity( uploadedRegion.getRegionCity() );
                         region.setRegionCityModified( true );
                     } else {
                         region.setRegionCityModified( false );
                     }
-                    if ( ( region.getRegionState() != null && uploadedRegion.getRegionState() == null )
-                        || ( region.getRegionState() == null && uploadedRegion.getRegionState() != null )
-                        || ( region.getRegionState() != null && uploadedRegion.getRegionState() != null && !region
-                            .getRegionState().equalsIgnoreCase( uploadedRegion.getRegionState() ) ) ) {
+                    if ( ( region.getRegionState() != null && uploadedRegion.getRegionState() == null ) || (
+                        region.getRegionState() == null && uploadedRegion.getRegionState() != null ) || (
+                        region.getRegionState() != null && uploadedRegion.getRegionState() != null && !region.getRegionState()
+                            .equalsIgnoreCase( uploadedRegion.getRegionState() ) ) ) {
 
                         //Update history
-                        if ( region.getRegionStateHistory() == null ) {
-                            region.setRegionStateHistory( new ArrayList<StringUploadHistory>() );
-                        }
-
-                        updateRegionHistory( region.getRegionStateHistory(),
-                            uploadedRegion.getRegionState(), region.getRegionState() );
+                        region.setRegionStateHistory(
+                            updateHistory( region.getRegionStateHistory(), uploadedRegion.getRegionState(),
+                                region.getRegionState() ) );
 
                         region.setRegionState( uploadedRegion.getRegionState() );
                         region.setRegionStateModified( true );
                     } else {
                         region.setRegionStateModified( false );
                     }
-                    if ( ( region.getRegionZipcode() != null && uploadedRegion.getRegionZipcode() == null )
-                        || ( region.getRegionZipcode() == null && uploadedRegion.getRegionZipcode() != null )
-                        || ( region.getRegionZipcode() != null && uploadedRegion.getRegionZipcode() != null && !region
+                    if ( ( region.getRegionZipcode() != null && uploadedRegion.getRegionZipcode() == null ) || (
+                        region.getRegionZipcode() == null && uploadedRegion.getRegionZipcode() != null ) || (
+                        region.getRegionZipcode() != null && uploadedRegion.getRegionZipcode() != null && !region
                             .getRegionZipcode().equalsIgnoreCase( uploadedRegion.getRegionZipcode() ) ) ) {
 
                         //Update history
-                        if ( region.getRegionZipcodeHistory() == null ) {
-                            region.setRegionZipcodeHistory( new ArrayList<StringUploadHistory>() );
-                        }
-
-                        updateRegionHistory( region.getRegionZipcodeHistory(), uploadedRegion.getRegionZipcode(),
-                            region.getRegionZipcode() );
+                        region.setRegionZipcodeHistory(
+                            updateHistory( region.getRegionZipcodeHistory(), uploadedRegion.getRegionZipcode(),
+                                region.getRegionZipcode() ) );
 
                         region.setRegionZipcode( uploadedRegion.getRegionZipcode() );
                         region.setRegionZipcodeModified( true );
                     } else {
                         region.setRegionZipcodeModified( false );
                     }
-                    if ( region.isRegionNameModified() || region.isRegionAddress1Modified()
-                        || region.isRegionAddress2Modified() || region.isRegionCityModified() || region.isRegionStateModified()
-                        || region.isRegionZipcodeModified() ) {
+                    if ( region.isRegionNameModified() || region.isRegionAddress1Modified() || region.isRegionAddress2Modified()
+                        || region.isRegionCityModified() || region.isRegionStateModified() || region
+                        .isRegionZipcodeModified() ) {
                         validationObject.setNumberOfRegionsModified( validationObject.getNumberOfRegionsModified() + 1 );
                         region.setRegionModified( true );
                     } else {
@@ -1143,11 +1119,11 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     
     
     /**
-     * Method to get the latest history entry from a list of upload histories
+     * Method to get the latest history entry from a list of StringUploadHistory
      * @param uploadHistories
      * @return
      */
-    StringUploadHistory getLatestHistoryEntry( List<StringUploadHistory> uploadHistories )
+    StringUploadHistory getLatestStringUploadHistoryEntry( List<StringUploadHistory> uploadHistories )
     {
         StringUploadHistory latestEntry = null;
         for ( StringUploadHistory stringUploadHistory : uploadHistories ) {
@@ -1155,6 +1131,25 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 latestEntry = stringUploadHistory;
             } else if ( latestEntry.getTime().before( stringUploadHistory.getTime() ) ) {
                 latestEntry = stringUploadHistory;
+            }
+        }
+        return latestEntry;
+    }
+
+
+    /**
+     * Method to get the latest history entry from a list of StringListUploadHistory
+     * @param uploadHistories
+     * @return
+     */
+    StringListUploadHistory getLatestStringListUploadHistoryEntry( List<StringListUploadHistory> uploadHistories )
+    {
+        StringListUploadHistory latestEntry = null;
+        for ( StringListUploadHistory stringListUploadHistory: uploadHistories ) {
+            if ( latestEntry == null ) {
+                latestEntry = stringListUploadHistory;
+            } else if ( latestEntry.getTime().before( stringListUploadHistory.getTime() ) ) {
+                latestEntry = stringListUploadHistory;
             }
         }
         return latestEntry;
@@ -1167,50 +1162,86 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
      * @param historyList
      * @param latestValue
      * @param oldValue
-     * @param uploadedRegion
      * @return
      */
-    void updateRegionHistory( List<StringUploadHistory> historyList, String latestValue, String oldValue )
+    List<StringUploadHistory> updateHistory( List<StringUploadHistory> historyList, String latestValue, String oldValue )
     {
         if ( historyList == null ) {
             historyList = new ArrayList<StringUploadHistory>();
         }
         //check if current value is already the latest value in history
-        StringUploadHistory latestHistoryEntry = getLatestHistoryEntry( historyList );
+        StringUploadHistory latestHistoryEntry = getLatestStringUploadHistoryEntry( historyList );
         StringUploadHistory history = null;
-        if ( latestHistoryEntry == null || !latestHistoryEntry.getValue().equals( latestValue ) ) {
+        if ( latestHistoryEntry == null || !latestHistoryEntry.getValue().equals( oldValue ) ) {
             history = new StringUploadHistory();
             history.setTime( new Date( System.currentTimeMillis() ) );
             history.setValue( oldValue );
             historyList.add( history );
         }
+        return historyList;
     }
 
 
-    //TODO: Update history
+    /**
+     * Returns StringListUploadHistory object if history needs to be updated
+     * Returns null otherwise
+     * @param historyList
+     * @param latestValue
+     * @param oldValue
+     */
+    List<StringListUploadHistory> updateHistory( List<StringListUploadHistory> historyList, List<String> latestValue, List<String> oldValue )
+    {
+        if ( historyList == null ) {
+            historyList = new ArrayList<>();
+        }
+        //Check if current value is already the latest value in history
+        StringListUploadHistory latestHistoryEntry = getLatestStringListUploadHistoryEntry( historyList );
+        StringListUploadHistory history = null;
+        if ( latestHistoryEntry == null || !latestHistoryEntry.getValue().equals( oldValue ) ) {
+            history = new StringListUploadHistory();
+            history.setTime( new Date( System.currentTimeMillis() ) );
+            history.setValue( oldValue );
+            historyList.add( history );
+        }
+        return historyList;
+    }
+
+
     void updateUploadValidationWithModifiedBranch( BranchUploadVO uploadedBranch, UploadValidation validationObject,
         Map<String, Integer> branchMap )
     {
 
-        if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null
-            && !validationObject.getUpload().getBranches().isEmpty() ) {
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getRegions() != null && !validationObject
+            .getUpload().getBranches().isEmpty() ) {
             if ( branchMap.containsKey( uploadedBranch.getSourceBranchId() ) ) {
                 int index = branchMap.get( uploadedBranch.getSourceBranchId() );
                 BranchUploadVO branch = validationObject.getUpload().getBranches().get( index );
                 if ( !branch.isBranchAdded() ) {
-                    if ( ( branch.getBranchName() == null && uploadedBranch.getBranchName() != null )
-                        || ( branch.getBranchName() != null && uploadedBranch.getBranchName() == null )
-                        || ( branch.getBranchName() != null && uploadedBranch.getBranchName() != null
-                            && !branch.getBranchName().equalsIgnoreCase( uploadedBranch.getBranchName() ) ) ) {
+                    if ( ( branch.getBranchName() == null && uploadedBranch.getBranchName() != null ) || (
+                        branch.getBranchName() != null && uploadedBranch.getBranchName() == null ) || (
+                        branch.getBranchName() != null && uploadedBranch.getBranchName() != null && !branch.getBranchName()
+                            .equalsIgnoreCase( uploadedBranch.getBranchName() ) ) ) {
+
+                        //Update branch name history
+                        branch.setBranchNameHistory(
+                            updateHistory( branch.getBranchNameHistory(), uploadedBranch.getBranchName(),
+                                branch.getBranchName() ) );
+
                         branch.setBranchName( uploadedBranch.getBranchName() );
                         branch.setBranchNameModified( true );
                     } else {
                         branch.setBranchNameModified( false );
                     }
-                    if ( ( branch.getBranchAddress1() == null && uploadedBranch.getBranchAddress1() != null )
-                        || ( branch.getBranchAddress1() != null && uploadedBranch.getBranchAddress1() == null )
-                        || ( branch.getBranchAddress1() != null && uploadedBranch.getBranchAddress1() != null
-                            && !branch.getBranchAddress1().equalsIgnoreCase( uploadedBranch.getBranchAddress1() ) ) ) {
+                    if ( ( branch.getBranchAddress1() == null && uploadedBranch.getBranchAddress1() != null ) || (
+                        branch.getBranchAddress1() != null && uploadedBranch.getBranchAddress1() == null ) || (
+                        branch.getBranchAddress1() != null && uploadedBranch.getBranchAddress1() != null && !branch
+                            .getBranchAddress1().equalsIgnoreCase( uploadedBranch.getBranchAddress1() ) ) ) {
+
+                        //Update branch address 1 history
+                        branch.setBranchAddress1History(
+                            updateHistory( branch.getBranchAddress1History(), uploadedBranch.getBranchAddress1(),
+                                branch.getBranchAddress1() ) );
+
                         branch.setBranchAddress1( uploadedBranch.getBranchAddress1() );
                         branch.setBranchAddress1Modified( true );
                     } else {
@@ -1221,46 +1252,76 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else {
                         branch.setAddressSet( false );
                     }
-                    if ( ( branch.getBranchAddress2() == null && uploadedBranch.getBranchAddress2() != null )
-                        || ( branch.getBranchAddress2() != null && uploadedBranch.getBranchAddress2() == null )
-                        || ( branch.getBranchAddress2() != null && uploadedBranch.getBranchAddress2() != null
-                            && !branch.getBranchAddress2().equalsIgnoreCase( uploadedBranch.getBranchAddress2() ) ) ) {
+                    if ( ( branch.getBranchAddress2() == null && uploadedBranch.getBranchAddress2() != null ) || (
+                        branch.getBranchAddress2() != null && uploadedBranch.getBranchAddress2() == null ) || (
+                        branch.getBranchAddress2() != null && uploadedBranch.getBranchAddress2() != null && !branch
+                            .getBranchAddress2().equalsIgnoreCase( uploadedBranch.getBranchAddress2() ) ) ) {
+
+                        //Update branch address 2 history
+                        branch.setBranchAddress2History(
+                            updateHistory( branch.getBranchAddress2History(), uploadedBranch.getBranchAddress2(),
+                                branch.getBranchAddress2() ) );
+
                         branch.setBranchAddress2( uploadedBranch.getBranchAddress2() );
                         branch.setBranchAddress2Modified( true );
                     } else {
                         branch.setBranchAddress2Modified( false );
                     }
-                    if ( ( branch.getBranchCity() == null && uploadedBranch.getBranchCity() != null )
-                        || ( branch.getBranchCity() != null && uploadedBranch.getBranchCity() == null )
-                        || ( branch.getBranchCity() != null && uploadedBranch.getBranchCity() != null
-                            && !branch.getBranchCity().equalsIgnoreCase( uploadedBranch.getBranchCity() ) ) ) {
+                    if ( ( branch.getBranchCity() == null && uploadedBranch.getBranchCity() != null ) || (
+                        branch.getBranchCity() != null && uploadedBranch.getBranchCity() == null ) || (
+                        branch.getBranchCity() != null && uploadedBranch.getBranchCity() != null && !branch.getBranchCity()
+                            .equalsIgnoreCase( uploadedBranch.getBranchCity() ) ) ) {
+
+                        //Update branch city history
+                        branch.setBranchCityHistory(
+                            updateHistory( branch.getBranchCityHistory(), uploadedBranch.getBranchCity(),
+                                branch.getBranchCity() ) );
+
                         branch.setBranchCity( uploadedBranch.getBranchCity() );
                         branch.setBranchCityModified( true );
                     } else {
                         branch.setBranchCityModified( false );
                     }
-                    if ( ( branch.getBranchState() == null && uploadedBranch.getBranchState() != null )
-                        || ( branch.getBranchState() != null && uploadedBranch.getBranchState() == null )
-                        || ( branch.getBranchState() != null && uploadedBranch.getBranchState() != null
-                            && !branch.getBranchState().equalsIgnoreCase( uploadedBranch.getBranchState() ) ) ) {
+                    if ( ( branch.getBranchState() == null && uploadedBranch.getBranchState() != null ) || (
+                        branch.getBranchState() != null && uploadedBranch.getBranchState() == null ) || (
+                        branch.getBranchState() != null && uploadedBranch.getBranchState() != null && !branch.getBranchState()
+                            .equalsIgnoreCase( uploadedBranch.getBranchState() ) ) ) {
+
+                        //Update branch state history
+                        branch.setBranchStateHistory(
+                            updateHistory( branch.getBranchStateHistory(), uploadedBranch.getBranchState(),
+                                branch.getBranchState() ) );
+
                         branch.setBranchState( uploadedBranch.getBranchState() );
                         branch.setBranchStateModified( true );
                     } else {
                         branch.setBranchStateModified( false );
                     }
-                    if ( ( branch.getBranchZipcode() == null && uploadedBranch.getBranchZipcode() != null )
-                        || ( branch.getBranchZipcode() != null && uploadedBranch.getBranchZipcode() == null )
-                        || ( branch.getBranchZipcode() != null && uploadedBranch.getBranchZipcode() != null
-                            && !branch.getBranchZipcode().equalsIgnoreCase( uploadedBranch.getBranchZipcode() ) ) ) {
+                    if ( ( branch.getBranchZipcode() == null && uploadedBranch.getBranchZipcode() != null ) || (
+                        branch.getBranchZipcode() != null && uploadedBranch.getBranchZipcode() == null ) || (
+                        branch.getBranchZipcode() != null && uploadedBranch.getBranchZipcode() != null && !branch
+                            .getBranchZipcode().equalsIgnoreCase( uploadedBranch.getBranchZipcode() ) ) ) {
+
+                        //Update branch zipcode history
+                        branch.setBranchZipcodeHistory(
+                            updateHistory( branch.getBranchZipcodeHistory(), uploadedBranch.getBranchZipcode(),
+                                branch.getBranchZipcode() ) );
+
                         branch.setBranchZipcode( uploadedBranch.getBranchZipcode() );
                         branch.setBranchZipcodeModified( true );
                     } else {
                         branch.setBranchZipcodeModified( false );
                     }
-                    if ( ( branch.getSourceRegionId() == null && uploadedBranch.getSourceRegionId() != null )
-                        || ( branch.getSourceRegionId() != null && uploadedBranch.getSourceRegionId() == null )
-                        || ( branch.getSourceRegionId() != null && uploadedBranch.getSourceRegionId() != null
-                            && !branch.getSourceRegionId().equalsIgnoreCase( uploadedBranch.getSourceRegionId() ) ) ) {
+                    if ( ( branch.getSourceRegionId() == null && uploadedBranch.getSourceRegionId() != null ) || (
+                        branch.getSourceRegionId() != null && uploadedBranch.getSourceRegionId() == null ) || (
+                        branch.getSourceRegionId() != null && uploadedBranch.getSourceRegionId() != null && !branch
+                            .getSourceRegionId().equalsIgnoreCase( uploadedBranch.getSourceRegionId() ) ) ) {
+
+                        //Update branch sourceRegionId history
+                        branch.setSourceBranchIdHistory(
+                            updateHistory( branch.getSourceRegionIdHistory(), uploadedBranch.getSourceRegionId(),
+                                branch.getSourceRegionId() ) );
+
                         branch.setSourceRegionId( uploadedBranch.getSourceRegionId() );
                         branch.setSourceRegionIdModified( true );
                     } else {
@@ -1283,170 +1344,246 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     }
 
 
-    //TODO: Update history
     void updateUploadValidationWithModifiedUser( UserUploadVO uploadedUser, UploadValidation validationObject,
         Map<String, Integer> userMap )
     {
-        if ( validationObject.getUpload() != null && validationObject.getUpload().getUsers() != null
-            && !validationObject.getUpload().getUsers().isEmpty() ) {
+        if ( validationObject.getUpload() != null && validationObject.getUpload().getUsers() != null && !validationObject
+            .getUpload().getUsers().isEmpty() ) {
             if ( userMap.containsKey( uploadedUser.getSourceUserId() ) ) {
                 int index = userMap.get( uploadedUser.getSourceUserId() );
                 UserUploadVO user = validationObject.getUpload().getUsers().get( index );
                 if ( !user.isUserAdded() ) {
-                    if ( ( user.getFirstName() == null && uploadedUser.getFirstName() != null )
-                        || ( user.getFirstName() != null && uploadedUser.getFirstName() == null )
-                        || ( user.getFirstName() != null && uploadedUser.getFirstName() != null
-                            && !user.getFirstName().equalsIgnoreCase( uploadedUser.getFirstName() ) ) ) {
+                    if ( ( user.getFirstName() == null && uploadedUser.getFirstName() != null ) || ( user.getFirstName() != null
+                        && uploadedUser.getFirstName() == null ) || ( user.getFirstName() != null
+                        && uploadedUser.getFirstName() != null && !user.getFirstName()
+                        .equalsIgnoreCase( uploadedUser.getFirstName() ) ) ) {
+
+
+                        //Update first name history
+                        user.setFirstNameHistory(
+                            updateHistory( user.getFirstNameHistory(), uploadedUser.getFirstName(), user.getFirstName() ) );
+
                         user.setFirstName( uploadedUser.getFirstName() );
                         user.setFirstNameModified( true );
                     } else {
                         user.setFirstNameModified( false );
                     }
-                    if ( ( user.getLastName() == null && uploadedUser.getLastName() != null )
-                        || ( user.getLastName() != null && uploadedUser.getLastName() == null )
-                        || ( user.getLastName() != null && uploadedUser.getLastName() != null
-                            && !user.getLastName().equalsIgnoreCase( uploadedUser.getLastName() ) ) ) {
+                    if ( ( user.getLastName() == null && uploadedUser.getLastName() != null ) || ( user.getLastName() != null
+                        && uploadedUser.getLastName() == null ) || ( user.getLastName() != null
+                        && uploadedUser.getLastName() != null && !user.getLastName()
+                        .equalsIgnoreCase( uploadedUser.getLastName() ) ) ) {
+
+                        //Update last name history
+                        user.setLastNameHistory(
+                            updateHistory( user.getLastNameHistory(), uploadedUser.getLastName(), user.getLastName() ) );
+
                         user.setLastName( uploadedUser.getLastName() );
                         user.setLastNameModified( true );
                     } else {
                         user.setLastNameModified( false );
                     }
-                    if ( ( user.getTitle() == null && uploadedUser.getTitle() != null )
-                        || ( user.getTitle() != null && uploadedUser.getTitle() == null )
-                        || ( user.getTitle() != null && uploadedUser.getTitle() != null
-                            && !user.getTitle().equalsIgnoreCase( uploadedUser.getTitle() ) ) ) {
+                    if ( ( user.getTitle() == null && uploadedUser.getTitle() != null ) || ( user.getTitle() != null
+                        && uploadedUser.getTitle() == null ) || ( user.getTitle() != null && uploadedUser.getTitle() != null
+                        && !user.getTitle().equalsIgnoreCase( uploadedUser.getTitle() ) ) ) {
+
+                        //Update title history
+                        user.setTitleHistory(
+                            updateHistory( user.getTitleHistory(), uploadedUser.getTitle(), user.getTitle() ) );
+
                         user.setTitle( uploadedUser.getTitle() );
                         user.setTitleModified( true );
                     } else {
                         user.setTitleModified( false );
                     }
-                    if ( ( ( user.getAssignedBranchesAdmin() != null && !user.getAssignedBranchesAdmin().isEmpty() )
-                        && ( uploadedUser.getAssignedBranchesAdmin() == null
-                            || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
-                        || ( ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() )
-                            && ( uploadedUser.getAssignedBranchesAdmin() != null
-                                && !uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
-                        || ( user.getAssignedBranchesAdmin() != null && uploadedUser.getAssignedBranchesAdmin() != null
-                            && !( user.getAssignedBranchesAdmin().containsAll( uploadedUser.getAssignedBranchesAdmin() )
-                                && uploadedUser.getAssignedBranchesAdmin()
-                                    .containsAll( user.getAssignedBranchesAdmin() ) ) ) ) {
+                    if ( ( ( user.getAssignedBranchesAdmin() != null && !user.getAssignedBranchesAdmin().isEmpty() ) && (
+                        uploadedUser.getAssignedBranchesAdmin() == null || uploadedUser.getAssignedBranchesAdmin().isEmpty() ) )
+                        || ( ( user.getAssignedBranchesAdmin() == null || user.getAssignedBranchesAdmin().isEmpty() ) && (
+                        uploadedUser.getAssignedBranchesAdmin() != null && !uploadedUser.getAssignedBranchesAdmin()
+                            .isEmpty() ) ) || ( user.getAssignedBranchesAdmin() != null
+                        && uploadedUser.getAssignedBranchesAdmin() != null && !(
+                        user.getAssignedBranchesAdmin().containsAll( uploadedUser.getAssignedBranchesAdmin() ) && uploadedUser
+                            .getAssignedBranchesAdmin().containsAll( user.getAssignedBranchesAdmin() ) ) ) ) {
+
+                        //Update assignedBranchesAdmin history
+                        user.setAssignedBrachesAdminHistory(
+                            updateHistory( user.getAssignedBrachesAdminHistory(), uploadedUser.getAssignedBranchesAdmin(),
+                                user.getAssignedBranchesAdmin() ) );
+
                         user.setAssignedBranchesAdmin( uploadedUser.getAssignedBranchesAdmin() );
                         user.setAssignedBrachesAdminModified( true );
                     } else {
                         user.setAssignedBrachesAdminModified( false );
                     }
-                    if ( ( ( user.getAssignedRegionsAdmin() != null && !user.getAssignedRegionsAdmin().isEmpty() )
-                        && ( uploadedUser.getAssignedRegionsAdmin() == null
-                            || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
-                        || ( ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() )
-                            && ( uploadedUser.getAssignedRegionsAdmin() != null
-                                && !uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
-                        || ( user.getAssignedRegionsAdmin() != null && uploadedUser.getAssignedRegionsAdmin() != null
-                            && !( user.getAssignedRegionsAdmin().containsAll( uploadedUser.getAssignedRegionsAdmin() )
-                                && uploadedUser.getAssignedRegionsAdmin().containsAll( user.getAssignedRegionsAdmin() ) ) ) ) {
+                    if ( ( ( user.getAssignedRegionsAdmin() != null && !user.getAssignedRegionsAdmin().isEmpty() ) && (
+                        uploadedUser.getAssignedRegionsAdmin() == null || uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
+                        || ( ( user.getAssignedRegionsAdmin() == null || user.getAssignedRegionsAdmin().isEmpty() ) && (
+                        uploadedUser.getAssignedRegionsAdmin() != null && !uploadedUser.getAssignedRegionsAdmin().isEmpty() ) )
+                        || ( user.getAssignedRegionsAdmin() != null && uploadedUser.getAssignedRegionsAdmin() != null && !(
+                        user.getAssignedRegionsAdmin().containsAll( uploadedUser.getAssignedRegionsAdmin() ) && uploadedUser
+                            .getAssignedRegionsAdmin().containsAll( user.getAssignedRegionsAdmin() ) ) ) ) {
+
+                        //Update assignedRegionsAdmin history
+                        user.setAssignedRegionsAdminHistory(
+                            updateHistory( user.getAssignedRegionsAdminHistory(), uploadedUser.getAssignedRegionsAdmin(),
+                                user.getAssignedRegionsAdmin() ) );
+
                         user.setAssignedRegionsAdmin( uploadedUser.getAssignedRegionsAdmin() );
                         user.setAssignedRegionsAdminModified( true );
                     } else {
                         user.setAssignedRegionsAdminModified( false );
                     }
-                    if ( ( ( user.getAssignedBranches() != null && !user.getAssignedBranches().isEmpty() )
-                        && ( uploadedUser.getAssignedBranches() == null || uploadedUser.getAssignedBranches().isEmpty() ) )
-                        || ( ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() )
-                            && ( uploadedUser.getAssignedBranches() != null && !uploadedUser.getAssignedBranches().isEmpty() ) )
-                        || ( user.getAssignedBranches() != null && uploadedUser.getAssignedBranches() != null
-                            && !( uploadedUser.getAssignedBranches().containsAll( user.getAssignedBranches() )
-                                && user.getAssignedBranches().containsAll( uploadedUser.getAssignedBranches() ) ) ) ) {
+                    if ( ( ( user.getAssignedBranches() != null && !user.getAssignedBranches().isEmpty() ) && (
+                        uploadedUser.getAssignedBranches() == null || uploadedUser.getAssignedBranches().isEmpty() ) ) || (
+                        ( user.getAssignedBranches() == null || user.getAssignedBranches().isEmpty() ) && (
+                            uploadedUser.getAssignedBranches() != null && !uploadedUser.getAssignedBranches().isEmpty() ) ) || (
+                        user.getAssignedBranches() != null && uploadedUser.getAssignedBranches() != null && !(
+                            uploadedUser.getAssignedBranches().containsAll( user.getAssignedBranches() ) && user
+                                .getAssignedBranches().containsAll( uploadedUser.getAssignedBranches() ) ) ) ) {
+
+                        //Update assignedBranches history
+                        user.setAssignedBranchesHistory(
+                            updateHistory( user.getAssignedBranchesHistory(), uploadedUser.getAssignedBranches(),
+                                user.getAssignedBranches() ) );
+
                         user.setAssignedBranches( uploadedUser.getAssignedBranches() );
                         user.setAssignedBranchesModified( true );
                     } else {
                         user.setAssignedBranchesModified( false );
                     }
-                    if ( ( ( user.getAssignedRegions() != null && !user.getAssignedRegions().isEmpty() )
-                        && ( uploadedUser.getAssignedRegions() == null || uploadedUser.getAssignedRegions().isEmpty() ) )
-                        || ( ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() )
-                            && ( uploadedUser.getAssignedRegions() != null && !uploadedUser.getAssignedRegions().isEmpty() ) )
-                        || ( user.getAssignedRegions() != null && uploadedUser.getAssignedRegions() != null
-                            && !( user.getAssignedRegions().containsAll( uploadedUser.getAssignedRegions() )
-                                && uploadedUser.getAssignedRegions().containsAll( user.getAssignedRegions() ) ) ) ) {
+                    if ( ( ( user.getAssignedRegions() != null && !user.getAssignedRegions().isEmpty() ) && (
+                        uploadedUser.getAssignedRegions() == null || uploadedUser.getAssignedRegions().isEmpty() ) ) || (
+                        ( user.getAssignedRegions() == null || user.getAssignedRegions().isEmpty() ) && (
+                            uploadedUser.getAssignedRegions() != null && !uploadedUser.getAssignedRegions().isEmpty() ) ) || (
+                        user.getAssignedRegions() != null && uploadedUser.getAssignedRegions() != null && !(
+                            user.getAssignedRegions().containsAll( uploadedUser.getAssignedRegions() ) && uploadedUser
+                                .getAssignedRegions().containsAll( user.getAssignedRegions() ) ) ) ) {
+
+                        //Update assignedRegions history
+                        user.setAssignedRegionsHistory(
+                            updateHistory( user.getAssignedRegionsHistory(), uploadedUser.getAssignedRegions(),
+                                user.getAssignedRegions() ) );
+
                         user.setAssignedRegions( uploadedUser.getAssignedRegions() );
                         user.setAssignedRegionsModified( true );
                     } else {
                         user.setAssignedRegionsModified( false );
                     }
-                    if ( ( user.getEmailId() != null && uploadedUser.getEmailId() == null )
-                        || ( user.getEmailId() == null && uploadedUser.getEmailId() != null ) ) {
+                    if ( ( user.getEmailId() != null && uploadedUser.getEmailId() == null ) || ( user.getEmailId() == null
+                        && uploadedUser.getEmailId() != null ) ) {
+
+                        //Update emailId history
+                        user.setEmailIdHistory(
+                            updateHistory( user.getEmailIdHistory(), uploadedUser.getEmailId(), user.getEmailId() ) );
+
                         user.setEmailId( uploadedUser.getEmailId() );
                         user.setEmailIdModified( true );
                     } else {
                         String emailId = uploadedUser.getEmailId();
-                        if ( ( user.getEmailId() != null && emailId != null
-                            && !user.getEmailId().equalsIgnoreCase( emailId ) ) ) {
+                        if ( ( user.getEmailId() != null && emailId != null && !user.getEmailId()
+                            .equalsIgnoreCase( emailId ) ) ) {
+
+                            //Update emailId history
+                            user.setEmailIdHistory(
+                                updateHistory( user.getEmailIdHistory(), uploadedUser.getEmailId(), user.getEmailId() ) );
+
                             user.setEmailId( uploadedUser.getEmailId() );
                             user.setEmailIdModified( true );
                         } else {
                             user.setEmailIdModified( false );
                         }
                     }
-                    if ( ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() == null )
-                        || ( user.getPhoneNumber() == null && uploadedUser.getPhoneNumber() != null )
-                        || ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() != null
-                            && !user.getPhoneNumber().equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) ) {
+                    if ( ( user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() == null ) || (
+                        user.getPhoneNumber() == null && uploadedUser.getPhoneNumber() != null ) || (
+                        user.getPhoneNumber() != null && uploadedUser.getPhoneNumber() != null && !user.getPhoneNumber()
+                            .equalsIgnoreCase( uploadedUser.getPhoneNumber() ) ) ) {
+
+                        //Update phone number history
+                        user.setPhoneNumberHistory( updateHistory( user.getPhoneNumberHistory(), uploadedUser.getPhoneNumber(),
+                            user.getPhoneNumber() ) );
+
                         user.setPhoneNumber( uploadedUser.getPhoneNumber() );
                         user.setPhoneNumberModified( true );
                     } else {
                         user.setPhoneNumberModified( false );
                     }
-                    if ( ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() == null )
-                        || ( user.getWebsiteUrl() == null && uploadedUser.getWebsiteUrl() != null )
-                        || ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() != null
-                            && !user.getWebsiteUrl().equalsIgnoreCase( uploadedUser.getWebsiteUrl() ) ) ) {
+                    if ( ( user.getWebsiteUrl() != null && uploadedUser.getWebsiteUrl() == null ) || (
+                        user.getWebsiteUrl() == null && uploadedUser.getWebsiteUrl() != null ) || ( user.getWebsiteUrl() != null
+                        && uploadedUser.getWebsiteUrl() != null && !user.getWebsiteUrl()
+                        .equalsIgnoreCase( uploadedUser.getWebsiteUrl() ) ) ) {
+
+                        //Update websiteUrl history
+                        user.setWebsiteUrlHistory(
+                            updateHistory( user.getWebsiteUrlHistory(), uploadedUser.getWebsiteUrl(), user.getWebsiteUrl() ) );
+
                         user.setWebsiteUrl( uploadedUser.getWebsiteUrl() );
                         user.setWebsiteUrlModified( true );
                     } else {
                         user.setWebsiteUrlModified( false );
                     }
-                    if ( ( user.getLicense() != null && uploadedUser.getLicense() == null )
-                        || ( user.getLicense() == null && uploadedUser.getLicense() != null )
-                        || ( user.getLicense() != null && uploadedUser.getLicense() != null
-                            && !user.getLicense().equalsIgnoreCase( uploadedUser.getLicense() ) ) ) {
+                    if ( ( user.getLicense() != null && uploadedUser.getLicense() == null ) || ( user.getLicense() == null
+                        && uploadedUser.getLicense() != null ) || ( user.getLicense() != null
+                        && uploadedUser.getLicense() != null && !user.getLicense()
+                        .equalsIgnoreCase( uploadedUser.getLicense() ) ) ) {
+
+                        //Update license history
+                        user.setLicenseHistory(
+                            updateHistory( user.getLicenseHistory(), uploadedUser.getLicense(), user.getLicense() ) );
+
                         user.setLicense( uploadedUser.getLicense() );
                         user.setLicenseModified( true );
                     } else {
                         user.setLicenseModified( false );
                     }
-                    if ( ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() == null )
-                        || ( user.getLegalDisclaimer() == null && uploadedUser.getLegalDisclaimer() != null )
-                        || ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() != null
-                            && !user.getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() ) ) ) {
+                    if ( ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() == null ) || (
+                        user.getLegalDisclaimer() == null && uploadedUser.getLegalDisclaimer() != null ) || (
+                        user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() != null && !user
+                            .getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() ) ) ) {
+
+                        //Update legalDisclaimer history
+                        user.setLegalDisclaimerHistory(
+                            updateHistory( user.getLegalDisclaimerHistory(), uploadedUser.getLegalDisclaimer(),
+                                user.getLegalDisclaimer() ) );
+
                         user.setLegalDisclaimer( uploadedUser.getLegalDisclaimer() );
                         user.setLegalDisclaimerModified( true );
                     } else {
                         user.setLegalDisclaimerModified( false );
                     }
-                    if ( ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() == null )
-                        || ( user.getUserPhotoUrl() == null && uploadedUser.getUserPhotoUrl() != null )
-                        || ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() != null
-                            && !user.getUserPhotoUrl().equalsIgnoreCase( uploadedUser.getUserPhotoUrl() ) ) ) {
+                    if ( ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() == null ) || (
+                        user.getUserPhotoUrl() == null && uploadedUser.getUserPhotoUrl() != null ) || (
+                        user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() != null && !user.getUserPhotoUrl()
+                            .equalsIgnoreCase( uploadedUser.getUserPhotoUrl() ) ) ) {
+
+                        //Update userPhotoUrl history
+                        user.setUserPhotoUrlHistory(
+                            updateHistory( user.getUserPhotoUrlHistory(), uploadedUser.getUserPhotoUrl(),
+                                user.getUserPhotoUrl() ) );
+
                         user.setUserPhotoUrl( uploadedUser.getUserPhotoUrl() );
                         user.setUserPhotoUrlModified( true );
                     } else {
                         user.setUserPhotoUrlModified( false );
                     }
-                    if ( ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() == null )
-                        || ( user.getAboutMeDescription() == null && uploadedUser.getAboutMeDescription() != null )
-                        || ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() != null
-                            && !user.getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() ) ) ) {
+                    if ( ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() == null ) || (
+                        user.getAboutMeDescription() == null && uploadedUser.getAboutMeDescription() != null ) || (
+                        user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() != null && !user
+                            .getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() ) ) ) {
+
+                        //Update aboutMe history
+                        user.setAboutMeDescriptionHistory(
+                            updateHistory( user.getAboutMeDescriptionHistory(), uploadedUser.getAboutMeDescription(),
+                                user.getAboutMeDescription() ) );
+
                         user.setAboutMeDescription( uploadedUser.getAboutMeDescription() );
                         user.setAboutMeDescriptionModified( true );
                     } else {
                         user.setAboutMeDescriptionModified( false );
                     }
-                    if ( user.isFirstNameModified() || user.isLastNameModified() || user.isTitleModified()
-                        || user.isAssignedBranchesModified() || user.isAssignedRegionsModified()
-                        || user.isAssignedBrachesAdminModified() || user.isAssignedRegionsAdminModified()
-                        || user.isEmailIdModified() || user.isPhoneNumberModified() || user.isWebsiteUrlModified()
-                        || user.isLicenseModified() || user.isLegalDisclaimerModified() || user.isUserPhotoUrlModified()
-                        || user.isAboutMeDescriptionModified() ) {
+                    if ( user.isFirstNameModified() || user.isLastNameModified() || user.isTitleModified() || user
+                        .isAssignedBranchesModified() || user.isAssignedRegionsModified() || user
+                        .isAssignedBrachesAdminModified() || user.isAssignedRegionsAdminModified() || user.isEmailIdModified()
+                        || user.isPhoneNumberModified() || user.isWebsiteUrlModified() || user.isLicenseModified() || user
+                        .isLegalDisclaimerModified() || user.isUserPhotoUrlModified() || user.isAboutMeDescriptionModified() ) {
                         validationObject.setNumberOfUsersModified( validationObject.getNumberOfUsersModified() + 1 );
                         user.setUserModified( true );
                     } else {
