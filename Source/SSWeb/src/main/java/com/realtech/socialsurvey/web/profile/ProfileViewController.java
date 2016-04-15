@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.realtech.socialsurvey.core.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,6 @@ import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -583,7 +576,7 @@ public class ProfileViewController
                 individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile,
                     branchProfile, individualProfile, settingsByOrganizationUnitMap, true );
-                
+
                 //remove sensitive info frm profile json
                 profileManagementService.removeTokensFromProfile(individualProfile);
                 LOG.debug( "Finished filling the unit settings in the profile" );
@@ -612,6 +605,12 @@ public class ProfileViewController
                 if ( individualProfile.getSurvey_settings() == null )
                     individualProfile.setSurvey_settings( companyProfile.getSurvey_settings() );
 
+                //Aggregate agent details
+                LockSettings lockSettings = individualProfile.getLockSettings();
+                if ( lockSettings == null )
+                    lockSettings = new LockSettings();
+                individualProfile = (AgentSettings) profileManagementService
+                    .aggregateAgentDetails( user, individualProfile, lockSettings );
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
 
