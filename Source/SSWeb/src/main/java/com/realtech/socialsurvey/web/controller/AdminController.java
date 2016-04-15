@@ -293,8 +293,10 @@ public class AdminController
             // Check for company status filer
             if ( filerValue != null && filerValue.equals( "inactive" ) ) {
                 status = CommonConstants.STATUS_INACTIVE;
-            } else if ( filerValue.equals( "incomplete" ) ) {
+            } else if ( filerValue != null && filerValue.equals( "incomplete" ) ) {
                 searchInCompleteCompany = true;
+            } else if ( filerValue != null && filerValue.equals( "deleted" ) ) {
+                status = CommonConstants.STATUS_COMPANY_DELETED;
             }
 
             // Check for account type filter

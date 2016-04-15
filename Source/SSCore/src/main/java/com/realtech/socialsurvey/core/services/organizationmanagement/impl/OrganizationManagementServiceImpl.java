@@ -56,7 +56,6 @@ import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
-import com.realtech.socialsurvey.core.dao.EventDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
@@ -305,7 +304,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private EmailServices emailServices;
 
     @Autowired
-    private EventDao eventDao;
+    private GenericDao<Event, Long> eventDao;
 
 
     /**
@@ -5011,31 +5010,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 throw new InvalidInputException( "Null value passed for company in deleteCompany()." );
             }
 
-            List<Long> userIds = getListOfUsersDeletedFromSolr( company );
+            // Deleting users
+            List<Long> userIds = solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
             if ( userIds != null && !userIds.isEmpty() ) {
                 for ( Long userId : userIds ) {
-                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userId );
+                    //userManagementService.deleteUserDataFromAllSources( loggedInUser, userId );
                 }
             }
 
-            List<Long> branchIds = getListOfBranchesDeletedFromSolr( company );
+            // Deleting branches
+            List<Long> branchIds = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
             if ( branchIds != null && !branchIds.isEmpty() ) {
                 for ( Long branchId : branchIds ) {
-                    this.deleteBranchDataFromAllSources( branchId, loggedInUser, null );
+                    //this.deleteBranchDataFromAllSources( branchId, loggedInUser, null );
                 }
             }
 
-            List<Long> regionIds = getListOfRegionsDeletedFromSolr( company );
+            // Deleting regions
+            List<Long> regionIds = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
             if ( regionIds != null && !regionIds.isEmpty() ) {
                 for ( Long regionId : regionIds ) {
-                    this.deleteRegionDataFromAllSources( regionId, loggedInUser, null );
+                    //this.deleteRegionDataFromAllSources( regionId, loggedInUser, null );
                 }
             }
 
-            List<Long> companyIds = new ArrayList<>();
-            companyIds.add( company.getCompanyId() );
-            organizationUnitSettingsDao.removeOganizationUnitSettings( companyIds,
-                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            //Update profile name and url
+            this.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+
+            //Remove social media connections
+            socialManagementService.disconnectAllSocialConnections( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
 
             // Delete all the details from tables which are related to current company.
             performPreCompanyDeletions( company.getCompanyId() );
@@ -5116,6 +5119,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         //Remove social media connections
         socialManagementService.disconnectAllSocialConnections( CommonConstants.BRANCH_ID_COLUMN, branchId );
 
+        // Removing branch data from solr.
+        solrSearchService.removeBranchFromSolr( branchId );
+
         LOG.info( "Method deleteBranchDataFromAllSources executed successfully" );
     }
 
@@ -5140,6 +5146,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         //Remove social media connections
         socialManagementService.disconnectAllSocialConnections( CommonConstants.REGION_ID_COLUMN, regionId );
+
+        // Removing region data from solr.
+        solrSearchService.removeRegionFromSolr( regionId );
 
         LOG.info( "Method deleteRegionDataFromAllSources executed successfully" );
     }
@@ -5923,6 +5932,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         String collectionName = null;
         OrganizationUnitSettings unitSettings = null;
         switch ( entityType ) {
+            case CommonConstants.COMPANY_ID_COLUMN:
+                unitSettings = getCompanySettings( entityId );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                break;
             case CommonConstants.AGENT_ID_COLUMN:
                 unitSettings = userManagementService.getUserSettings( entityId );
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
