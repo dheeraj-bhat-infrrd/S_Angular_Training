@@ -862,6 +862,9 @@ public class OrganizationManagementController
     {
         LOG.info( "Updating encompass details to 'Enabled'" );
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        String eventFiredBy = adminUserid != null ? CommonConstants.ADMIN_USER_NAME : String.valueOf( user.getUserId() );
         String message;
 
         try {
@@ -874,6 +877,8 @@ public class OrganizationManagementController
             encompassCrmInfo.setGenerateReport( false );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_ENABLED,
+                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
@@ -898,6 +903,9 @@ public class OrganizationManagementController
     {
         LOG.info( "Updating encompass details to 'Disabled'" );
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        String eventFiredBy = adminUserid != null ? CommonConstants.ADMIN_USER_NAME : String.valueOf( user.getUserId() );
         String message;
 
         try {
@@ -907,6 +915,8 @@ public class OrganizationManagementController
             encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_DISABLED,
+                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();

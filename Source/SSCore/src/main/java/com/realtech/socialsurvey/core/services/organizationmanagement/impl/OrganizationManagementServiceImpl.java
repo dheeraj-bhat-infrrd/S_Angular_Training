@@ -56,6 +56,7 @@ import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
+import com.realtech.socialsurvey.core.dao.EventDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
@@ -78,6 +79,7 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
@@ -301,6 +303,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private EmailServices emailServices;
+
+    @Autowired
+    private EventDao eventDao;
 
 
     /**
@@ -6874,6 +6879,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ",
                 e );
         }
+    }
+
+
+    @Override
+    @Transactional
+    public void logEvent( String eventType, String action, String modifiedBy, long companyId, int agentId, int regionId,
+        int branchId )
+    {
+        LOG.info( "Logging connection event in event table" );
+        Event event = new Event();
+        event.setAction( action );
+        event.setAgentId( agentId );
+        event.setBranchId( branchId );
+        event.setCompanyId( companyId );
+        event.setEventType( eventType );
+        event.setModifiedBy( modifiedBy );
+        event.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        event.setRegionId( regionId );
+        eventDao.save( event );
+        LOG.info( "Logging connection event in event table completes successfully" );
     }
 }
 // JIRA: SS-27: By RM05: EOC

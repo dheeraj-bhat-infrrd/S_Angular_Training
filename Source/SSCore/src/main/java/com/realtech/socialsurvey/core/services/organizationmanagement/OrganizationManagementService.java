@@ -893,6 +893,7 @@ public interface OrganizationManagementService
     public void deleteBranchDataFromAllSources( long branchId, User user, UserHierarchyAssignments assignments )
         throws InvalidInputException, SolrException;
 
+
     /**
      * @param regionId
      * @param user
@@ -1342,4 +1343,8 @@ public interface OrganizationManagementService
      * Method to deactivate accounts
      */
     public void accountDeactivator();
+
+
+    public void logEvent( String eventType, String action, String modifiedBy, long companyId, int agentId, int regionId,
+        int branchId );
 }

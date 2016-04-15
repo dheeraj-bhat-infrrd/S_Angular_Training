@@ -1153,5 +1153,8 @@ public interface CommonConstants
     public static final String COMPANY_REGISTRATION_STAGE_COMPLETE = "The registrtion has been completed successfully";
     public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
     
+    public static final String ENCOMPASS_CONNECTION = "ENCOMPASS_CONNECTION";
+    public static final String ACTION_ENABLED = "ENABLED";
+    public static final String ACTION_DISABLED = "DISABLED";
     
 }
