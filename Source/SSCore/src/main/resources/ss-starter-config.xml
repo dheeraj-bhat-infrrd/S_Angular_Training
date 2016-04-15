@@ -42,18 +42,7 @@
 			value="com.realtech.socialsurvey.core.starter.ApplicationSiteMapGenerator" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="companySiteMapGenerator" value-ref="sitemapgenerator" />
-				<entry key="regionSiteMapGenerator" value-ref="sitemapgenerator" />
-				<entry key="branchSiteMapGenerator" value-ref="sitemapgenerator" />
-				<entry key="agentSiteMapGenerator" value-ref="sitemapgenerator" />
-				<entry key="uploadService" value-ref="uploadService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="envPrefix" value="${AMAZON_ENV_PREFIX}" />
-				<entry key="companySiteMapPath" value="${COMPANY_SITEMAP_PATH}" />
-				<entry key="regionSiteMapPath" value="${REGION_SITEMAP_PATH}" />
-				<entry key="branchSiteMapPath" value="${BRANCH_SITEMAP_PATH}" />
-				<entry key="individualSiteMapPath" value="${INDIVIDUAL_SITEMAP_PATH}" />
-				<entry key="siteMapBucket" value="${SITEMAP_BUCKET}" />
+				<entry key="siteMapService" value-ref="siteMapService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -194,9 +183,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="solrSearchService" value-ref="solrSearchService" />
-				<entry key="emailServices" value-ref="emailServices" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -631,9 +617,11 @@
 
 	<!-- Bean definitions -->
 	<!-- Site map generetor dependencies -->
-	<bean id="sitemapgenerator"
+<!--	<bean id="sitemapgenerator"
 		class=" com.realtech.socialsurvey.core.utils.sitemap.SiteMapGenerator"
-		scope="prototype" />
+		scope="prototype" />-->
+	<bean id="siteMapService"
+		class="com.realtech.socialsurvey.core.services.generator.impl.SiteMapServiceImpl" />
 	<bean id="uploadService"
 		class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
 

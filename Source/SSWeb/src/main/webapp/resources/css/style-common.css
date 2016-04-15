@@ -1934,6 +1934,12 @@ button.paypal.is-active {
 .icn-realtor {
 	background: url(../csssprites/icons_social.png) no-repeat -200px 0;
 }
+.icn-flag {
+	background: url(../csssprites/hover-icons.png) no-repeat -84px  0;
+	margin-top: 7px;
+    height: 28px;
+    width: 19px;
+}
 
 .icn-tele-blue {
 	background: url(../images/tele_blue.png) no-repeat center;
@@ -2013,7 +2019,7 @@ button.paypal.is-active {
 }
 
 .ppl-share-wrapper {
-	margin-top: 10px;
+	margin: 10px 0 10px 0;
 	line-height: 36px;
 }
 
@@ -6839,8 +6845,21 @@ tr.u-tbl-header td {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 .verified-badge {
-	background: url(../images/ss-verified-customer-badge.png) no-repeat;
+	background: url(../images/ss-badge.png) no-repeat;
 	cursor: pointer;
+}
+.star-rating{
+	background: url(../images/ss-stars.png) no-repeat;
+	width: 97px;
+}
+.star-rating-green{
+	background: url(../images/zillow-stars.png) no-repeat;
+	width: 97px;
+}
+.zillow-badge{
+	background: url(../images/zillow-badge.png) no-repeat;
+	width: 26px;
+    float: right;
 }
 .smiley-bg-rat-1 {
 	background: url(../images/smiley-bg-rat-1.png) no-repeat center;

@@ -3,7 +3,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-
+<c:choose>
+	<c:when test="${entityType == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${entityType == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
 <c:if test="${not empty reviews}">
 	<c:forEach var="feedback" varStatus="loop" items="${reviews}">
 		<c:set value="#.#" var="scoreformat"></c:set>
@@ -25,7 +38,7 @@
 			data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
 			data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
 			
-			<div class="ppl-header-wrapper clearfix">
+			<%-- <div class="ppl-header-wrapper clearfix">
 				<div class="float-left ppl-header-left">
 					<div class="ppl-head-1">
 						<c:choose>
@@ -46,8 +59,50 @@
 					</div>
 					<c:if test="${feedback.source != 'Zillow'}">
 						<div class="report-resend-icn-container clearfix float-right">
-							<div class="report-abuse-txt report-txt">Report</div>
-							|
+							<!-- <div class="report-abuse-txt report-txt">Report</div> -->
+							
+							<div class="restart-survey-mail-txt report-txt">Retake</div>
+						</div>
+					</c:if>
+				</div>
+			</div> --%>
+			<div class="ppl-header-wrapper clearfix">
+				<div class="float-left ppl-header-left">
+					<div class="ppl-head-1">
+					<span>Reviewed by</span>
+						<c:choose>
+							<c:when test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
+								${feedback.customerFirstName}
+							</c:when>
+							<c:otherwise>
+								${feedback.customerFirstName} ${feedback.customerLastName}
+							</c:otherwise>
+						</c:choose>
+						<c:if test="${profilemasterid !=4}">
+					<span>for<a style="color:#236CAF;font-weight: 600 !important;" href="${feedback.completeProfileUrl}"> ${feedback.agentName}</a></span>
+					</c:if>
+					
+					</div>
+					<div class="ppl-head-2 float-left" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
+						value="${feedback.modifiedOn}" />"> 
+					</div>
+					 <c:choose>
+					 <c:when test="${feedback.source=='agent' || feedback.source=='admin'}">
+					  <span class="float-left" style="font-family: opensanslight;"> - sourced by SocialSurvey</span>
+					 </c:when>
+					 <c:when test="${feedback.source=='Zillow'}">
+					  <span class="float-left" style="font-family: opensanslight;"> - sourced by <span style="color:#009FE0;">Zillow.com</span></span>
+					 </c:when>
+					 <c:otherwise>
+					 <span class="float-left" style="font-family: opensanslight;"> - sourced by ${feedback.source} </span>
+					 </c:otherwise>
+					 </c:choose>
+				</div>
+				<div class="float-right ppl-header-right">
+					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
+					</div>
+					<c:if test="${feedback.source != 'Zillow'}">
+						<div class="report-resend-icn-container clearfix float-right">	
 							<div class="restart-survey-mail-txt report-txt">Retake</div>
 						</div>
 					</c:if>
@@ -56,11 +111,11 @@
 			<c:if test="${ not empty feedback.summary }">
 				<div class="ppl-content">${feedback.summary}</div>
 			</c:if>
-			<div class="ppl-content">${feedback.review}</div>
-			<div class="ppl-share-wrapper clearfix share-plus-height">
-				<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div>
-				<div class="float-left icn-share icn-plus-open" style="display: block;"></div>
-				<div class="float-left clearfix ppl-share-social hide" style="display: none;">
+			<%-- <div class="ppl-content">${feedback.review}</div> --%>
+			<div class="ppl-share-wrapper clearfix share-plus-height" style="visibility:hidden;">
+				<%-- <div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div> --%>
+				<!-- <div class="float-left icn-share icn-plus-open" style="display: block;"></div> -->
+				<div class="float-left clearfix ppl-share-social hide" style="display: block;">
 				
 					<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick ="getDashboardImageandCaption(${loop.index})" data-link="https://www.facebook.com/dialog/feed?${feedback.faceBookShareUrl}&link=${fn:replace(feedback.completeProfileUrl, 'localhost', '127.0.0.1')}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)} .&redirect_uri=https://www.facebook.com"></span>
 					
@@ -82,9 +137,12 @@
                           <span class="label">share</span>
                       </button>
                        </span>
+                       
 				</div>
-				<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
+				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div> -->
+				<span class="icn-flag float-right report-abuse-txt cursor-pointer " title="Report"></span> 
 			</div>
+			<div class="ppl-content">${feedback.review}</div>
 		</div>
 	</c:forEach>
 </c:if>
