@@ -1206,8 +1206,7 @@ span.wc-highlight {
 }
 
 .report-resend-icn-container {
-    clear: both;
-    margin: 3px -5px 0;
+    /* margin: 3px -5px 0; */
 }
 
 .report-txt {
