@@ -116,6 +116,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
@@ -293,6 +295,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private SocialManagementService socialManagementService;
+
+    @Autowired
+    private BatchTrackerService batchTrackerService;
+
+    @Autowired
+    private EmailServices emailServices;
 
 
     /**
@@ -6805,6 +6813,67 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings profileSettings, long companyId ) throws InvalidInputException
     {
         zillowUpdateService.pushZillowReviews( reviews, collectionName, profileSettings, companyId );
+    }
+
+
+    @Override
+    @Transactional
+    public void accountDeactivator()
+    {
+        try {
+            // update last start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_ACCOUNT_DEACTIVATOR, CommonConstants.BATCH_NAME_ACCOUNT_DEACTIVATOR );
+
+            List<DisabledAccount> disabledAccounts = disableAccounts( new Date() );
+            for ( DisabledAccount account : disabledAccounts ) {
+                try {
+                    sendAccountDisabledNotificationMail( account );
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Invalid Input Exception caught while sending email to the company admin. Nested exception is ",
+                        e );
+                }
+            }
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_ACCOUNT_DEACTIVATOR );
+            LOG.info( "Completed AccountDeactivator" );
+        } catch ( Exception e ) {
+            LOG.error( "Error in AccountDeactivator", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_ACCOUNT_DEACTIVATOR,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_ACCOUNT_DEACTIVATOR,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in AccountDeactivator " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+
+    private void sendAccountDisabledNotificationMail( DisabledAccount disabledAccount ) throws InvalidInputException
+    {
+        // Send email to notify each company admin that the company account will be deactivated after 30 days so that they can take required steps.
+        Company company = disabledAccount.getCompany();
+        Map<String, String> companyAdmin = new HashMap<String, String>();
+        try {
+            companyAdmin = solrSearchService.getCompanyAdmin( company.getCompanyId() );
+        } catch ( SolrException e1 ) {
+            LOG.error(
+                "SolrException caught in sendAccountDisabledNotificationMail() while trying to send mail to the company admin ." );
+        }
+        try {
+            if ( companyAdmin != null && companyAdmin.get( "emailId" ) != null )
+                emailServices.sendAccountDisabledMail( companyAdmin.get( "emailId" ), companyAdmin.get( "displayName" ),
+                    companyAdmin.get( "loginName" ) );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ",
+                e );
+        }
     }
 }
 // JIRA: SS-27: By RM05: EOC
