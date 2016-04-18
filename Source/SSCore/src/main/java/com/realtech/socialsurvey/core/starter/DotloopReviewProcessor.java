@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.DotLoopParticipant;
 import com.realtech.socialsurvey.core.entities.DotLoopProfileEntity;
@@ -41,6 +42,7 @@ import com.realtech.socialsurvey.core.integration.dotloop.DotloopIntergrationApi
 import com.realtech.socialsurvey.core.integration.pos.errorhandlers.DotLoopAccessForbiddenException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.crmbatchtracker.CRMBatchTrackerService;
+import com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.CRMBatchTrackerHistoryService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -78,6 +80,8 @@ public class DotloopReviewProcessor extends QuartzJobBean
     private BatchTrackerService batchTrackerService;
 
     private CRMBatchTrackerService crmBatchTrackerService;
+    
+    private CRMBatchTrackerHistoryService crmBatchTrackerHistoryService;
 
     private EmailServices emailServices;
 
@@ -92,6 +96,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
     
     private boolean newLoopFound = false;
     private boolean newRecordFound = false;
+    private int newRecordFoundCount=0;
 
 
     @Override
@@ -135,6 +140,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
 
         try {
             String entityType = null; // to maintain entry in crm batch tracker
+            CrmBatchTracker crmBatchTracker=null;
             //get entity type and id
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                 entityType = CommonConstants.COMPANY_ID_COLUMN;
@@ -166,10 +172,12 @@ public class DotloopReviewProcessor extends QuartzJobBean
                                 dotLoopCrmInfo.setRecordsBeenFetched( true );
                                 updateDotLoopCrmInfo( collectionName, organizationUnitSettings, dotLoopCrmInfo );
                             }
-
-                            // update  last run end time in crm batch tracker 
+                            //insert crmbatchTrackerHistory with count of Records Fetched
+                            crmBatchTracker=crmBatchTrackerService.getCrmBatchTracker(entityType, entityId, CommonConstants.CRM_SOURCE_DOTLOOP);
+                            crmBatchTrackerHistoryService.insertCrmBatchTrackerHistory(newRecordFoundCount,crmBatchTracker.getCrmBatchTrackerId());
+                            // update  last run end time and count of new records found in crm batch tracker
                             crmBatchTrackerService.updateLastRunEndTimeByEntityTypeAndSourceType( entityType, entityId,
-                                CommonConstants.CRM_SOURCE_DOTLOOP );
+                                CommonConstants.CRM_SOURCE_DOTLOOP,newRecordFoundCount );
 
                         } catch ( Exception e ) {
                             LOG.error( "Exception caught for collection " + collectionName + "having iden as "
@@ -412,6 +420,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
                             //update the flag
                             newRecordFound = true;
+                            newRecordFoundCount++;
                         } catch ( InvalidInputException e ) {
                             LOG.error( "Unable to insert this record ", e );
                         }
@@ -504,11 +513,13 @@ public class DotloopReviewProcessor extends QuartzJobBean
         //re initialize the flag;
         newLoopFound = false;
         newRecordFound = false;
+        newRecordFoundCount=0;
         // get list of profiles
         List<DotLoopProfileEntity> profileList = getDotLoopProfiles( authorizationHeader, apiKey );
         if ( profileList != null && !profileList.isEmpty() ) {
             LOG.debug( "Got " + profileList.size() + " profiles." );
             for ( DotLoopProfileEntity profile : profileList ) {
+            	
                 String profileId = String.valueOf( profile.getProfileId() );
                 try {
                     if ( profile.isActive() && !isProfilePresentAsInactive( collectionName, unitSettings, profile ) ) {
@@ -606,6 +617,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
         emailServices = (EmailServices) jobMap.get( "emailServices" );
         batchTrackerService = (BatchTrackerService) jobMap.get( "batchTrackerService" );
         crmBatchTrackerService = (CRMBatchTrackerService) jobMap.get( "crmBatchTrackerService" );
+        crmBatchTrackerHistoryService = (CRMBatchTrackerHistoryService) jobMap.get( "crmBatchTrackerHistoryService" );
     }
 
 }

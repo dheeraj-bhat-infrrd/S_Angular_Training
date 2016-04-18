@@ -125,7 +125,7 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
 
     @Override
     @Transactional
-    public void updateLastRunEndTimeByEntityTypeAndSourceType( String entityType, long entityId, String source )
+    public void updateLastRunEndTimeByEntityTypeAndSourceType( String entityType, long entityId, String source,int lastRunRecordFetchedCount )
         throws NoRecordsFetchedException, InvalidInputException
     {
         LOG.debug( "method updateLastRunEndTimeByEntityTypeAndSourceType started" );
@@ -150,10 +150,41 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
         }
         CrmBatchTracker crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
         crmBatchTracker.setLastRunEndDate( new Timestamp( System.currentTimeMillis() ) );
+        crmBatchTracker.setLastRunRecordFetchedCount(lastRunRecordFetchedCount);
         crmBatchTracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         crmBatchTracker.setError( null );
         crmBatchTrackerDao.update( crmBatchTracker );
         LOG.debug( "method updateLastRunEndTimeByEntityTypeAndSourceType ended" );
 
     }
+
+	@Override
+	@Transactional
+	public CrmBatchTracker getCrmBatchTracker(String entityType, long entityId,
+			String source)throws InvalidInputException,NoRecordsFetchedException {
+		// TODO Auto-generated method stub
+		
+		LOG.debug( "method getCrmBatchTracker started" );
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "passed parameter entityType is null or empty" );
+        }
+        if ( source == null || source.isEmpty() ) {
+            throw new InvalidInputException( "passed parameter source is null or empty" );
+        }
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "passed parameter entityId is incorrect" );
+        }
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.SOURCE_COLUMN, source );
+        queries.put( entityType, entityId );
+        List<CrmBatchTracker> crmBatchTrackerList = crmBatchTrackerDao.findByKeyValue( CrmBatchTracker.class, queries );
+        if ( crmBatchTrackerList == null || crmBatchTrackerList.size() <= 0
+            || crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
+            throw new NoRecordsFetchedException( "No record Fatched For entity type : " + entityType + " with entity id : "
+                + entityId );
+        }
+        CrmBatchTracker crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
+        LOG.debug( "method getCrmBatchTracker ended" );
+		return crmBatchTracker;
+	}
 }
