@@ -6,6 +6,7 @@ var is_Opera = navigator.userAgent.indexOf("Presto") > -1;
 var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]\.[0-9]\.[0-9]\.[0-9]\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]+))$/;
 var zipcodeRegex = /^\d{5}([\-]?\d{4})?$/;
 var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
+var ausPhoneRegex = /^\+?[0-9]{0,2}[-\s\.]{0,1}[(]{0,1}[0-9]{4}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{3}$/;
 var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
 var nameRegex = /^[a-zA-Z ]*$/;
 var lastNameRegEx = /^[a-zA-Z0-9 ]*$/;
@@ -227,7 +228,7 @@ function validateForm(id) {
 
 		if ($(this).data('phone') == true) {
 			if ($(this).val() != "") {
-				if (phoneRegex.test($(this).val()) == true) {
+				if (phoneRegex.test($(this).val()) == true || ausPhoneRegex.test($(this).val()) == true ) {
 					$(this).parent().removeClass('input-error');
 				} else {
 					validate = false;
