@@ -398,19 +398,17 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 
 function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	var ratingIntVal = 0;
-
+/*
 	if (ratingIntVal % 1 == 0) {
 		ratingIntVal = parseInt(rating);
 	} else {
 		ratingIntVal = parseInt(rating) + 1;
 	}
 
-	/*if (ratingIntVal == 0) {
-		ratingIntVal = 1;
-	}
-*/
-	var roundedFloatingVal = parseFloat(rating).toFixed(1);
-	var ratingImgHtml = "";
+	var roundedFloatingVal = parseFloat(rating).toFixed(2);
+	var ratingImgHtml = "";*/
+	
+	ratingIntVal= (Math.round(rating * 4) / 4).toFixed(2);
 	
 	/*if(source =="encompass" || source == "DOTLOOP"){
 		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
@@ -419,15 +417,15 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	}*/
 	
 	if(source != undefined && source == "Zillow"){
-		ratingImgHtml = "<div class='rating-image  star-rating-green' title='"+ roundedFloatingVal+ "/5.0'></div>";
+		ratingImgHtml = "<div class='rating-image  star-rating-green-"+ ratingIntVal +"' title='"+ ratingIntVal+ "/5.00'></div>";
 		ratingImgHtml += "<div class='rating-image  zillow-badge' title='Zillow'></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml = "<div class='rating-image  star-rating'  title='"+ roundedFloatingVal+ "/5.0'></div>";
+		ratingImgHtml = "<div class='rating-image  star-rating-"+ ratingIntVal +"'  title='"+ ratingIntVal+ "/5.00'></div>";
 		ratingImgHtml+="<div class='verified-badge  verify-image' title='Click here to know more'></div>";
 		
 	}
 		else {
-		ratingImgHtml = "<div class='rating-image  star-rating'  title='"+ roundedFloatingVal+ "/5.0'></div>";		
+		ratingImgHtml = "<div class='rating-image  star-rating-"+ratingIntVal+"'  title='"+ ratingIntVal+ "/5.00'></div>";		
 	}
 	
 	/*var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";

@@ -379,6 +379,7 @@ function retakeSurveyReminderMail(element) {
 			"lastName" : lastName,
 			"agentName" : agentName
 	};
+	
 	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
 		$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
 		showToast();

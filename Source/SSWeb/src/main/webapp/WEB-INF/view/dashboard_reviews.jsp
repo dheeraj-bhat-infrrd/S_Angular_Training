@@ -101,11 +101,11 @@
 				<div class="float-right ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
 					</div>
-					<c:if test="${feedback.source != 'Zillow'}">
+					<%-- <c:if test="${feedback.source != 'Zillow'}">
 						<div class="report-resend-icn-container clearfix float-right">	
 							<div class="restart-survey-mail-txt report-txt">Retake</div>
 						</div>
-					</c:if>
+					</c:if>  --%>
 				</div>
 			</div>
 			<c:if test="${ not empty feedback.summary }">
@@ -140,7 +140,17 @@
                        
 				</div>
 				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div> -->
-				<span class="icn-flag float-right report-abuse-txt cursor-pointer " title="Report"></span> 
+				<div class="float-right">
+					<div class="clearfix">
+						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
+							title="Report"></div>
+						<c:if test="${feedback.source != 'Zillow'}">
+							<!-- <span class="report-resend-icn-container clearfix float-right"> -->
+								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
+							
+						</c:if>
+					</div>
+				</div>
 			</div>
 			<div class="ppl-content">${feedback.review}</div>
 		</div>
