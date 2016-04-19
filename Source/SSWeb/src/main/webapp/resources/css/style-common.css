@@ -8835,3 +8835,6 @@ label.url-change-input-label {
 	font-size: 18px;
     padding: 5px;
 }
+.reg-ss-logo{
+	background:url(../images/ss-logo-blue.png) no-repeat;
+}

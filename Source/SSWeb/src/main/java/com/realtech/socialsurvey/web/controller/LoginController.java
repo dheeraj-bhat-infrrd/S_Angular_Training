@@ -83,6 +83,11 @@ public class LoginController {
 		LOG.info("Method initIndexPage() called from LoginController");
 		return JspResolver.INDEX;
 	}
+	@RequestMapping(value = "/newregistration")
+	public String initRegistration(HttpServletResponse response) {
+		LOG.info("Method initIndexPage() called from LoginController");
+		return JspResolver.NEWREGISTRATION;
+	}
 
 	@RequestMapping(value = "/noactiveprofiles")
 	public String initNoProfilesFoundPage(HttpServletResponse response) {

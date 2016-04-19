@@ -349,3 +349,25 @@
     line-height: 26px;
     width: 100%;
 }
+/* new registration style*/
+
+.reg-wrapper{
+	width:100%;
+}
+.reg-left-container{
+	width:50%;
+	height:100%;
+}
+.reg-ss-logo{
+	width:160px;
+	height:30px;
+	margin:20px 0 0 20px;
+}
+.reg-right-container{
+	background-color:#326AAD;
+	width:50%;
+	height:100%;
+}
+.reg-info{
+	
+}
