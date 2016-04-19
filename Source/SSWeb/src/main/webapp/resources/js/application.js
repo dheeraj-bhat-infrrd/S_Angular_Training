@@ -3399,8 +3399,9 @@ function bindRegionListClicks() {
 			 $(this).attr('clicked','true');
 		}
 		else {
-			$("tr[class*='sel-r"+regionId+"'").html("").hide();
+			$("tr[class*='sel-r"+regionId+"']").html("").hide();
             $(this).attr('clicked','false');
+   
 		}
 	});
 	$(".region-edit-icn").click(function(e){
