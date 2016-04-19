@@ -101,7 +101,7 @@ function deleteCompany(companyId){
 	};
 	//close the popup
 	$('#overlay-cancel').click();
-	callAjaxPostWithPayloadData("./purgeCompany.do", function(data) {
+	callAjaxPostWithPayloadData("./deletecompany.do", function(data) {
 		
 		if (data == "success") {
 			// remove the tab from UI

@@ -862,6 +862,9 @@ public class OrganizationManagementController
     {
         LOG.info( "Updating encompass details to 'Enabled'" );
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        String eventFiredBy = adminUserid != null ? CommonConstants.ADMIN_USER_NAME : String.valueOf( user.getUserId() );
         String message;
 
         try {
@@ -874,6 +877,8 @@ public class OrganizationManagementController
             encompassCrmInfo.setGenerateReport( false );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_ENABLED,
+                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
@@ -898,6 +903,9 @@ public class OrganizationManagementController
     {
         LOG.info( "Updating encompass details to 'Disabled'" );
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        String eventFiredBy = adminUserid != null ? CommonConstants.ADMIN_USER_NAME : String.valueOf( user.getUserId() );
         String message;
 
         try {
@@ -907,6 +915,8 @@ public class OrganizationManagementController
             encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_DISABLED,
+                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
@@ -2222,9 +2232,9 @@ public class OrganizationManagementController
     }
 
 
-    // Method to delete all the records of a company.
-    @RequestMapping ( value = "/deletecompany", method = RequestMethod.GET)
-    public String deleteCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
+    // Method to deactivate company.
+    @RequestMapping ( value = "/deactivatecompany", method = RequestMethod.GET)
+    public String deactivateCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
         throws NonFatalException
     {
         User user = sessionHelper.getCurrentUser();
@@ -2237,7 +2247,8 @@ public class OrganizationManagementController
                 try {
                     organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true );
                 } catch ( NoRecordsFetchedException | PaymentException e ) {
-                    LOG.error( "Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ",
+                    LOG.error(
+                        "Exception caught in deactivateCompany() of OrganizationManagementController. Nested exception is ",
                         e );
                     throw e;
                 }
@@ -2254,7 +2265,7 @@ public class OrganizationManagementController
                     DisplayMessageType.SUCCESS_MESSAGE ).toString();
             }
         } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
+            LOG.error( "InvalidInputException caught in deactivateCompany(). Nested exception is ", e );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
                 .toString();

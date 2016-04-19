@@ -132,9 +132,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
     @Autowired
-    private GenericDao<UserApiKey, Long> userApiKeyDao;
-
-    @Autowired
     private GenericDao<UsercountModificationNotification, Long> userCountModificationDao;
 
     @Autowired
@@ -232,8 +229,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation, String referralCode )
-        throws InvalidInputException, UndeliveredEmailException, NonFatalException
+    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation,
+        String referralCode ) throws InvalidInputException, UndeliveredEmailException, NonFatalException
     {
         LOG.info( "Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName
             + "\t email id: " + emailId );
@@ -244,12 +241,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         urlParams.put( CommonConstants.EMAIL_ID, emailId );
         urlParams.put( CommonConstants.CURRENT_TIMESTAMP, String.valueOf( System.currentTimeMillis() ) );
         urlParams.put( CommonConstants.UNIQUE_IDENTIFIER, generateUniqueIdentifier() );
-        if(referralCode != null && !referralCode.isEmpty()){
+        if ( referralCode != null && !referralCode.isEmpty() ) {
             urlParams.put( CommonConstants.REFERRAL_CODE, referralCode );
         }
         LOG.debug( "Generating URL" );
-        String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl
-            + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION );
+        String url = urlGenerator.generateUrl( urlParams,
+            applicationBaseUrl + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION );
         LOG.debug( "Sending invitation for registration" );
         inviteUser( url, emailId, firstName, lastName, isReinvitation );
 
@@ -259,20 +256,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId,
-        boolean isReinvitation, String referralCode ) throws InvalidInputException, UserAlreadyExistsException, NonFatalException
+    public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation,
+        String referralCode ) throws InvalidInputException, UserAlreadyExistsException, NonFatalException
     {
         LOG.info( "Validating and inviting corporate to register. Details\t first name:" + firstName + "\t lastName: "
             + lastName + "\t email id: " + emailId );
         LOG.debug( "Validating form elements" );
         validateFormParametersForInvitation( firstName, lastName, emailId );
-        LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName
-            + " and emailID: " + emailId );
+        LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: "
+            + emailId );
         // validating referral code if exists
-        if(referralCode != null && !referralCode.isEmpty()){
-            if(!referralService.validateReferralCode( referralCode )){
+        if ( referralCode != null && !referralCode.isEmpty() ) {
+            if ( !referralService.validateReferralCode( referralCode ) ) {
                 LOG.warn( "Invalid referral code" );
-                throw new InvalidInputException("Could not find referral code "+referralCode);
+                throw new InvalidInputException( "Could not find referral code " + referralCode );
             }
         }
         // check if email id already exists
@@ -296,7 +293,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         // check if first name is null or empty and only contains alphabets
         if ( firstName == null || firstName.isEmpty() || !firstName.matches( CommonConstants.FIRST_NAME_REGEX ) ) {
-            throw new InvalidInputException( "Firstname is invalid in registration", DisplayMessageConstants.INVALID_FIRSTNAME );
+            throw new InvalidInputException( "Firstname is invalid in registration",
+                DisplayMessageConstants.INVALID_FIRSTNAME );
         }
 
         // check if last name only contains alphabets
@@ -403,17 +401,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // set the status as active as with the new sign up path, validation is not required.
         status = CommonConstants.STATUS_ACTIVE;
         LOG.debug( "Creating new user with emailId : " + emailId + " and verification status : " + status );
-        User user = createUser( company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
-            status, CommonConstants.ADMIN_USER_NAME );
+        User user = createUser( company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE, status,
+            CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
         //delete the record if marked as ignored
         deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
-        
 
-        LOG.debug( "Creating user profile for :" + emailId + " with profile completion stage : "
-            + CommonConstants.ADD_COMPANY_STAGE );
+
+        LOG.debug(
+            "Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE );
         //the newlely creted profile will be primary because this is will be the first profile of user
         UserProfile userProfile = createUserProfile( user, company, emailId, CommonConstants.DEFAULT_AGENT_ID,
             CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID,
@@ -539,7 +537,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
-      //delete the record if marked as ignored
+        //delete the record if marked as ignored
         deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
@@ -562,8 +560,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Override
     @Transactional
-    public User inviteNewUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
-        UserAlreadyExistsException, UndeliveredEmailException
+    public User inviteNewUser( User admin, String firstName, String lastName, String emailId )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
     {
         if ( firstName == null || firstName.isEmpty() ) {
             throw new InvalidInputException( "First name is either null or empty in inviteUserToRegister()." );
@@ -580,7 +578,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, String.valueOf( admin.getUserId() ) );
         user = userDao.save( user );
-      //delete the record if marked as ignored
+        //delete the record if marked as ignored
         deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
@@ -680,8 +678,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         try {
             User userWithSameEmail = getUserByEmailAddress( user.getEmailId() );
             if ( user.getUserId() != userWithSameEmail.getUserId() ) {
-                throw new InvalidInputException( "Another User exists with the same Email ID. UserId : "
-                    + userWithSameEmail.getUserId() );
+                throw new InvalidInputException(
+                    "Another User exists with the same Email ID. UserId : " + userWithSameEmail.getUserId() );
             }
         } catch ( NoRecordsFetchedException e1 ) {
             LOG.debug( "No existing user found. Restoring." );
@@ -745,7 +743,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
 
-        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings, restoreSocial, isVerified );
+        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings, restoreSocial,
+            isVerified );
 
         //Add user to Solr
         solrSearchService.addUserToSolr( user );
@@ -759,8 +758,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             agentsReviewCount = batchTrackerService.getReviewCountForAgents( userIdList );
         } catch ( ParseException e ) {
             LOG.error( "Error while parsing the data fetched from mongo for survey count", e );
-            throw new InvalidInputException( "Error while parsing the data fetched from mongo for survey count. Reason :"
-                + e.getMessage() );
+            throw new InvalidInputException(
+                "Error while parsing the data fetched from mongo for survey count. Reason :" + e.getMessage() );
         }
         if ( agentsReviewCount != null && !agentsReviewCount.isEmpty() )
             solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
@@ -848,8 +847,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // Method to return user with provided email and company
     @Transactional
     @Override
-    public User getUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public User getUserByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
 
@@ -936,8 +935,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         if ( licenseDetails == null || licenseDetails.isEmpty() ) {
             LOG.error( "Could not find any record in License_Details for : " + user.getCompany().getCompany() );
-            throw new NoRecordsFetchedException( "Could not find any record in License_Details for : "
-                + user.getCompany().getCompany() );
+            throw new NoRecordsFetchedException(
+                "Could not find any record in License_Details for : " + user.getCompany().getCompany() );
         }
 
         int maxUsersAllowed = licenseDetails.get( CommonConstants.INITIAL_INDEX ).getAccountsMaster().getMaxUsersAllowed();
@@ -1341,8 +1340,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void updateUserStatus( long userId, int status ) throws InvalidInputException, SolrException
     {
-        LOG.info( "Method updateUserStatus of user management services called for userId : " + userId + " and status :"
-            + status );
+        LOG.info(
+            "Method updateUserStatus of user management services called for userId : " + userId + " and status :" + status );
         User user = getUserByUserId( userId );
         if ( user == null ) {
             throw new InvalidInputException( "No user present for the specified userId" );
@@ -1406,8 +1405,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userProfile = userProfiles.get( CommonConstants.INITIAL_INDEX );
             if ( userProfile.getStatus() == CommonConstants.STATUS_INACTIVE ) {
                 userProfile.setStatus( CommonConstants.STATUS_ACTIVE );
-                userProfile.setProfilesMaster( profilesMasterDao.findById( ProfilesMaster.class,
-                    CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+                userProfile.setProfilesMaster(
+                    profilesMasterDao.findById( ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
                 userProfile.setModifiedBy( String.valueOf( admin.getUserId() ) );
                 userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             }
@@ -1454,8 +1453,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         UserProfile userProfile = null;
         if ( userProfiles == null || userProfiles.isEmpty() ) {
             LOG.error( "No user profile present for the user with user Id " + userId + " with the branch " + branchId );
-            throw new InvalidInputException( "No user profile present for the user with user Id " + userId
-                + " with the branch " + branchId );
+            throw new InvalidInputException(
+                "No user profile present for the user with user Id " + userId + " with the branch " + branchId );
         } else {
             userProfile = userProfiles.get( CommonConstants.INITIAL_INDEX );
             if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
@@ -1666,14 +1665,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                         && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
                         agentProfileWithoutDefaultBranch = currentProfile;
-                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                    } else if ( currentProfile.getProfilesMaster()
+                        .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                         && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
                         agentProfileWithDefaultBranch = currentProfile;
-                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                    } else if ( currentProfile.getProfilesMaster()
+                        .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                         branchAdminProfile = currentProfile;
-                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                    } else if ( currentProfile.getProfilesMaster()
+                        .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                         regionAdminProfile = currentProfile;
-                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                    } else if ( currentProfile.getProfilesMaster()
+                        .getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
                         companyAdminProfile = currentProfile;
                     }
                 }
@@ -1733,7 +1736,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         urlParams.put( CommonConstants.COMPANY, String.valueOf( companyId ) );
 
         LOG.info( "Generating URL" );
-        String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE );
+        String url = urlGenerator.generateUrl( urlParams,
+            applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE );
         String name = firstName;
         if ( lastName != null && !lastName.isEmpty() ) {
             name = name + " " + lastName;
@@ -1750,7 +1754,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void setProfilesOfUser( User user )
     {
-        LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started." );
+        LOG.debug(
+            "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started." );
         if ( user != null ) {
             List<UserProfile> userProfiles = user.getUserProfiles();
             if ( userProfiles != null ) {
@@ -1770,14 +1775,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                                 user.setAgent( true );
                                 continue;
                             default:
-                                LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName() );
+                                LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().",
+                                    user.getFirstName() );
                         }
                     }
                 }
             }
         }
 
-        LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user finished." );
+        LOG.debug(
+            "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user finished." );
     }
 
 
@@ -1825,8 +1832,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             params.put( CommonConstants.USER_ID, String.valueOf( user.getUserId() ) );
 
             LOG.debug( "Calling url generator to generate verification link" );
-            verificationUrl = urlGenerator.generateUrl( params, applicationBaseUrl
-                + CommonConstants.REQUEST_MAPPING_MAIL_VERIFICATION );
+            verificationUrl = urlGenerator.generateUrl( params,
+                applicationBaseUrl + CommonConstants.REQUEST_MAPPING_MAIL_VERIFICATION );
         } catch ( InvalidInputException e ) {
             throw new InvalidInputException( "Could not generate url for verification.Reason : " + e.getMessage(), e );
         }
@@ -2106,8 +2113,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // JIRA: SS-27: By RM05: EOC
 
     @Override
-    public UserSettings getCanonicalUserSettings( User user, AccountType accountType ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public UserSettings getCanonicalUserSettings( User user, AccountType accountType )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         if ( user == null ) {
             throw new InvalidInputException( "User is not set." );
@@ -2160,7 +2167,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( branchesSettings != null && branchesSettings.size() > 0 ) {
             LOG.debug( "Resolving regions settings for branch profiles" );
             for ( UserProfile userProfile : userProfiles ) {
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                     // get the branch profile if it is not present in the branch settings
                     if ( userProfile.getRegionId() > 0l ) {
                         if ( regionsSettings == null ) {
@@ -2201,8 +2209,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                             branchesSettings = new HashMap<Long, OrganizationUnitSettings>();
                         }
                         if ( !branchesSettings.containsKey( userProfile.getBranchId() ) ) {
-                            BranchSettings branchSetting = organizationManagementService.getBranchSettings( userProfile
-                                .getBranchId() );
+                            BranchSettings branchSetting = organizationManagementService
+                                .getBranchSettings( userProfile.getBranchId() );
                             branchesSettings.put( userProfile.getBranchId(), branchSetting.getOrganizationUnitSettings() );
                         }
                     }
@@ -2222,7 +2230,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( agentId );
         if ( agentSettings != null && agentSettings.getProfileStages() != null ) {
-            agentSettings.setProfileStages( profileCompletionList.getProfileCompletionList( agentSettings.getProfileStages() ) );
+            agentSettings
+                .setProfileStages( profileCompletionList.getProfileCompletionList( agentSettings.getProfileStages() ) );
         }
         return agentSettings;
     }
@@ -2242,7 +2251,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     private boolean isAssigningAllowed( long branchId, User admin )
     {
-        LOG.debug( "Method isAssigningAllowed() started to check if current user is authorized to assign a user to the given branch" );
+        LOG.debug(
+            "Method isAssigningAllowed() started to check if current user is authorized to assign a user to the given branch" );
         Branch branch = branchDao.findById( Branch.class, branchId );
         if ( admin.isCompanyAdmin() )
             return true;
@@ -2338,8 +2348,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @throws SolrException
      */
     @Override
-    public void assignUserToCompany( User admin, long userId ) throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void assignUserToCompany( User admin, long userId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         if ( admin == null ) {
             LOG.error( "assignUserToCompany : admin parameter is null" );
@@ -2410,7 +2420,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private boolean canAddUsersToRegion( User admin, long regionId ) throws InvalidInputException
     {
 
-        LOG.debug( "Method canAddUsersToRegion() called to check if current user is authorized to assign a user to the given region" );
+        LOG.debug(
+            "Method canAddUsersToRegion() called to check if current user is authorized to assign a user to the given region" );
 
         if ( admin == null ) {
             LOG.error( "canAddUsersToRegion : admin parameter is null" );
@@ -2452,8 +2463,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @throws SolrException
      */
     @Override
-    public void assignUserToRegion( User admin, long userId, long regionId ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException
+    public void assignUserToRegion( User admin, long userId, long regionId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
 
         if ( admin == null ) {
@@ -2483,8 +2494,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Checking if admin can assign a user to the given region.
         if ( !canAddUsersToRegion( admin, regionId ) ) {
             LOG.error( "User : " + admin.getUserId() + " is not authorized to assign users to region " + regionId );
-            throw new InvalidInputException( "User : " + admin.getUserId() + " is not authorized to assign users to region "
-                + regionId );
+            throw new InvalidInputException(
+                "User : " + admin.getUserId() + " is not authorized to assign users to region " + regionId );
         }
 
         // Get the region from the database
@@ -2544,7 +2555,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         agentSettings.setModifiedBy( user.getModifiedBy() );
         agentSettings.setModifiedOn( System.currentTimeMillis() );
         agentSettings.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
-        
+
         //Set status to incomplete
         agentSettings.setStatus( CommonConstants.STATUS_INCOMPLETE_MONGO );
 
@@ -2672,8 +2683,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param branchSettings
      */
     @Override
-    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings )
-        throws InvalidInputException
+    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl,
+        OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in BRANCH SETTINGS started" );
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
@@ -2700,8 +2711,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param regionSettings
      */
     @Override
-    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings )
-        throws InvalidInputException
+    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl,
+        OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in REGION SETTINGS started" );
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
@@ -2860,8 +2871,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName() );
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR,
             ( user.getLastName() != null ? user.getLastName() : "" ) );
-        solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " "
-            + ( user.getLastName() != null ? user.getLastName() : "" ) );
+        solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR,
+            user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.PROFILE_URL_SOLR, profileUrl );
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.PROFILE_NAME_SOLR, profileName );
         LOG.debug( "Successfully modified user detail in solr" );
@@ -2932,8 +2943,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         LOG.info( "Adding a record in user count modification notification table for company " + company.getCompany() );
         // search for the record in the table. it might be possible that record is already present.
-        List<UsercountModificationNotification> userCountNotifications = userCountModificationDao.findByColumn(
-            UsercountModificationNotification.class, CommonConstants.COMPANY_COLUMN, company );
+        List<UsercountModificationNotification> userCountNotifications = userCountModificationDao
+            .findByColumn( UsercountModificationNotification.class, CommonConstants.COMPANY_COLUMN, company );
         UsercountModificationNotification userCountNotification = null;
         if ( userCountNotifications != null && !userCountNotifications.isEmpty() ) {
             // record is already present. if the status is active do nothing. if status is under
@@ -2954,7 +2965,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userCountModificationDao.save( userCountNotification );
         }
 
-        LOG.info( "Finished adding a record in user count modification notification table for company " + company.getCompany() );
+        LOG.info(
+            "Finished adding a record in user count modification notification table for company " + company.getCompany() );
     }
 
 
@@ -2984,7 +2996,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return isApiKeyValid;
     }
-    
+
 
     /**
      * Method to get user api key
@@ -3044,8 +3056,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // Moved user addition from Controller.
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public User inviteUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
-        UserAlreadyExistsException, UndeliveredEmailException, SolrException
+    public User inviteUser( User admin, String firstName, String lastName, String emailId )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException
     {
         User user = inviteNewUser( admin, firstName, lastName, emailId );
         LOG.debug( "Adding user {} to solr server.", user.getFirstName() );
@@ -3072,8 +3084,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
-        boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
-        SolrException
+        boolean isDirectRegistration )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException
     {
 
         User user = addCorporateAdminAndUpdateStage( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
@@ -3107,8 +3119,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
     {
 
-        LOG.debug( "Method checkWillNewProfileBePrimary called in UserManagementService for email id"
-            + userProfileNew.getEmailId() );
+        LOG.debug(
+            "Method checkWillNewProfileBePrimary called in UserManagementService for email id" + userProfileNew.getEmailId() );
 
         int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
         boolean noOldProfileIsPrimary = true;
@@ -3144,7 +3156,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         //if new profile's branch is default than new profile will not be primary
                         if ( newProfileBranch != null
                             && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
-                            && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            && userProfileNew.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
 
                             Region newProfileRegion = regionDao.findById( Region.class, userProfileNew.getRegionId() );
 
@@ -3163,10 +3176,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         }
 
                     } else if ( isOldProfileAdmin ) {
-                        LOG.debug( "Old primary profile is an admin profile of type "
-                            + profile.getProfilesMaster().getProfile() );
+                        LOG.debug(
+                            "Old primary profile is an admin profile of type " + profile.getProfilesMaster().getProfile() );
                         //if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
-                        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                        if ( userProfileNew.getProfilesMaster()
+                            .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
                             profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
                             userProfileDao.update( profile );
                             isPrimary = CommonConstants.IS_PRIMARY_TRUE;
@@ -3198,8 +3212,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException
+    public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
 
     {
 
@@ -3296,11 +3310,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                 && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
                 agentProfileWithDefaultBranch = currentProfile;
-            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+            } else if ( currentProfile.getProfilesMaster()
+                .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                 branchAdminProfile = currentProfile;
-            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+            } else if ( currentProfile.getProfilesMaster()
+                .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                 regionAdminProfile = currentProfile;
-            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+            } else if ( currentProfile.getProfilesMaster()
+                .getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
                 companyAdminProfile = currentProfile;
             }
         }
@@ -3331,7 +3348,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId )
     {
-        LOG.info( "Inside method getSettingScoresById for company " + companyId + " region " + regionId + " branch " + branchId );
+        LOG.info(
+            "Inside method getSettingScoresById for company " + companyId + " region " + regionId + " branch " + branchId );
         return settingsSetterDao.getScoresById( companyId, regionId, branchId );
     }
 
@@ -3401,8 +3419,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId ) throws InvalidInputException,
-        ProfileNotFoundException
+    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
+        throws InvalidInputException, ProfileNotFoundException
     {
         LOG.debug( "method getPrimaryUserProfileByAgentId started with user id " + entityId );
         Map<String, Long> userProfileDetailMap = userProfileDao.findPrimaryUserProfileByAgentId( entityId );
@@ -3509,8 +3527,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // Method to return active user with provided email and company
     @Transactional
     @Override
-    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
 
@@ -3565,8 +3583,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Override
     @Transactional
-    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method searchUsersInCompanyByMultipleCriteria started." );
 
@@ -3649,8 +3667,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             String.valueOf( admin.getUserId() ) );
 
         userProfileDao.save( userProfileNew );
-        sendInviteMailToSocialSurveyAdmin( emailId, user.getFirstName() + " " + user.getLastName(), admin.getCompany()
-            .getCompanyId() );
+        sendInviteMailToSocialSurveyAdmin( emailId, user.getFirstName() + " " + user.getLastName(),
+            admin.getCompany().getCompanyId() );
 
 
         LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
@@ -3658,8 +3676,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
-    private void sendInviteMailToSocialSurveyAdmin( String emailId, String name, long companyId ) throws InvalidInputException,
-        UndeliveredEmailException
+    private void sendInviteMailToSocialSurveyAdmin( String emailId, String name, long companyId )
+        throws InvalidInputException, UndeliveredEmailException
     {
         Map<String, String> urlParams = new HashMap<String, String>();
         urlParams.put( CommonConstants.EMAIL_ID, emailId );
@@ -3775,32 +3793,33 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         CompanyIgnoredEmailMapping companyIgnoredEmailMapping = new CompanyIgnoredEmailMapping();
-        
-        
+
+
         //check if entry is already there with the eamil id
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( CommonConstants.EMAIL_ID, emailId );
         queries.put( CommonConstants.COMPANY, company );
-        List<CompanyIgnoredEmailMapping> CompanyIgnoredEmailMappingList = companyIgnoredEmailMappingDao.findByKeyValue( CompanyIgnoredEmailMapping.class, queries );
-        
-        if(CompanyIgnoredEmailMappingList != null && CompanyIgnoredEmailMappingList.size() > 0 ){
+        List<CompanyIgnoredEmailMapping> CompanyIgnoredEmailMappingList = companyIgnoredEmailMappingDao
+            .findByKeyValue( CompanyIgnoredEmailMapping.class, queries );
+
+        if ( CompanyIgnoredEmailMappingList != null && CompanyIgnoredEmailMappingList.size() > 0 ) {
             companyIgnoredEmailMapping = CompanyIgnoredEmailMappingList.get( CommonConstants.INITIAL_INDEX );
             companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
             companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        }else{
+        } else {
             companyIgnoredEmailMapping.setCompany( company );
             companyIgnoredEmailMapping.setEmailId( emailId );
             companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
-            
+
             companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
             companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
             companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             companyIgnoredEmailMapping.setModifiedBy( "ADMIN" );
         }
-        
+
         companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.saveOrUpdate( companyIgnoredEmailMapping );
-        
-                return companyIgnoredEmailMapping;
+
+        return companyIgnoredEmailMapping;
     }
 
 
@@ -3828,10 +3847,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             StringBuilder mappedEmails = new StringBuilder();
             for ( UserEmailMapping emailMapping : user.getUserEmailMappings() ) {
-            	if(emailMapping.getStatus() == CommonConstants.STATUS_ACTIVE){
-            		mappedEmails.append( emailMapping.getEmailId() );
+                if ( emailMapping.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    mappedEmails.append( emailMapping.getEmailId() );
                     mappedEmails.append( ", " );
-            	}             
+                }
             }
             String mappedEmailsString = mappedEmails.toString();
             if ( mappedEmailsString != null && mappedEmailsString.contains( "," ) )
@@ -3849,8 +3868,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public List<UserEmailMapping> getUserEmailMappingsForUser( long agentId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<UserEmailMapping> getUserEmailMappingsForUser( long agentId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method to getUserEmailMappingsForUser for  agentId : " + agentId + " started." );
 
@@ -3860,9 +3879,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "No user found for agent id : " + agentId );
         }
 
-        
-       
-        List<UserEmailMapping> emailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class, CommonConstants.USER_COLUMN, user );
+
+        List<UserEmailMapping> emailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class,
+            CommonConstants.USER_COLUMN, user );
         List<UserEmailMapping> emailMappingsVO = new ArrayList<UserEmailMapping>();
         for ( UserEmailMapping emailMapping : emailMappings ) {
             UserEmailMapping emailMappingVO = new UserEmailMapping();
@@ -3876,110 +3895,129 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         return emailMappingsVO;
     }
-    
-    
+
+
     @Transactional
     @Override
-    public void deleteUserEmailMapping( User agent , long emailMappingId ) throws InvalidInputException
+    public void deleteUserEmailMapping( User agent, long emailMappingId ) throws InvalidInputException
     {
         LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
         if ( agent == null ) {
             throw new InvalidInputException( "Passed parameter agent is null " );
         }
-        
+
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( "userEmailMappingId", emailMappingId );
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
-       
-        
-        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null) {
+
+
+        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null ) {
             throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + emailMappingId );
         }
 
         UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
         userEmailMapping.setStatus( CommonConstants.STATUS_INACTIVE );
-        userEmailMapping.setModifiedBy( String.valueOf(agent.getUserId() ));
+        userEmailMapping.setModifiedBy( String.valueOf( agent.getUserId() ) );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMappingDao.update( userEmailMapping );
-        
+
         LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
-    
-    
+
+
     @Transactional
     @Override
-    public void updateUserEmailMapping( User agent , long emailMappingId , int status ) throws InvalidInputException
+    public void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException
     {
         LOG.info( "Method to updateUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
         if ( agent == null ) {
             throw new InvalidInputException( "Passed parameter agent is null " );
         }
-        
+
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( "userEmailMappingId", emailMappingId );
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
-       
-        
-        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null) {
+
+
+        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null ) {
             throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + emailMappingId );
         }
 
         UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
         userEmailMapping.setStatus( status );
-        userEmailMapping.setModifiedBy( String.valueOf(agent.getUserId() ));
+        userEmailMapping.setModifiedBy( String.valueOf( agent.getUserId() ) );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMappingDao.update( userEmailMapping );
-        
+
         LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
-    
+
+
     @Transactional
     @Override
-    public void deleteIgnoredEmailMapping(String emailId) throws InvalidInputException{
+    public void deleteIgnoredEmailMapping( String emailId ) throws InvalidInputException
+    {
         LOG.info( "method deleteIgnoredEmailMapping  started for email id : " + emailId );
-        
-        if(emailId == null || emailId.isEmpty()){
-            throw new InvalidInputException("Passed parameter emailId is invalid");
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Passed parameter emailId is invalid" );
         }
-        
-        List<CompanyIgnoredEmailMapping> ignoredEmails = companyIgnoredEmailMappingDao.findByColumn( CompanyIgnoredEmailMapping.class, CommonConstants.EMAIL_ID, emailId );
-        if(ignoredEmails != null && !ignoredEmails.isEmpty()){
-            for(CompanyIgnoredEmailMapping ignoredEmail : ignoredEmails){
+
+        List<CompanyIgnoredEmailMapping> ignoredEmails = companyIgnoredEmailMappingDao
+            .findByColumn( CompanyIgnoredEmailMapping.class, CommonConstants.EMAIL_ID, emailId );
+        if ( ignoredEmails != null && !ignoredEmails.isEmpty() ) {
+            for ( CompanyIgnoredEmailMapping ignoredEmail : ignoredEmails ) {
                 ignoredEmail.setStatus( CommonConstants.STATUS_INACTIVE );
                 ignoredEmail.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                 companyIgnoredEmailMappingDao.update( ignoredEmail );
             }
         }
-        
+
         LOG.info( "method deleteIgnoredEmailMapping finished" );
     }
-    
-    /**
-     * 
-     * @param userId
-     * @return
-     * @throws InvalidInputException 
-     */
+
+
     @Transactional
     @Override
-    public boolean isUserSocialSurveyAdmin(long userId) throws InvalidInputException{
+    public boolean isUserSocialSurveyAdmin( long userId ) throws InvalidInputException
+    {
         LOG.info( "method isUserIsSocialSurveyAdmin  started for userId : " + userId );
-        
+
         User user = null;
         user = userDao.findById( User.class, userId );
         if ( user == null ) {
             throw new InvalidInputException( "User not found for userId:" + userId );
         }
-        
+
         //get primary profile profile of user
         List<UserProfile> userProfiles = user.getUserProfiles();
-            for ( UserProfile userProfile : userProfiles ) {
-                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
-                    // social survey admin
-                    return true;
-                }
+        for ( UserProfile userProfile : userProfiles ) {
+            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID ) {
+                // social survey admin
+                return true;
             }
-            
-            return false;
+        }
+
+        return false;
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted )
+        throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
+
+        // Removing user data from MySql DB & MongoDB.
+        this.removeExistingUser( loggedInUser, userIdToBeDeleted );
+
+        // Updating user count modification notification.
+        this.updateUserCountModificationNotification( loggedInUser.getCompany() );
+
+        // Removing user data from solr.
+        solrSearchService.removeUserFromSolr( userIdToBeDeleted );
+
+        LOG.info( "Method deleteUserDataFromAllSources executed successfully" );
     }
 }

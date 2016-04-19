@@ -91,6 +91,7 @@ public interface CommonConstants
     public static final int STATUS_UNDER_PROCESSING = 2;
     public static final int STATUS_ACCOUNT_DISABLED = 2;
     public static final int STATUS_COMPANY_DISABLED = 2;
+    public static final int STATUS_COMPANY_DELETED = 3;
     public static final int STATUS_TEMPORARILY_INACTIVE = 3;
     public static final int PROCESS_COMPLETE = 1;
     public static final int PROCESS_NOT_STARTED = 0;
@@ -1152,5 +1153,8 @@ public interface CommonConstants
     public static final String COMPANY_REGISTRATION_STAGE_COMPLETE = "The registrtion has been completed successfully";
     public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
     
+    public static final String ENCOMPASS_CONNECTION = "ENCOMPASS_CONNECTION";
+    public static final String ACTION_ENABLED = "ENABLED";
+    public static final String ACTION_DISABLED = "DISABLED";
     
 }
