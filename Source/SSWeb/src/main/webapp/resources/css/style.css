@@ -349,13 +349,9 @@
     line-height: 26px;
     width: 100%;
 }
-/* new registration style*/
+/* ============== new registration style==============*/
 
-.reg-wrapper{
-	width:100%;
-}
 .reg-left-container{
-	width:50%;
 	height:100%;
 }
 .reg-ss-logo{
@@ -365,9 +361,25 @@
 }
 .reg-right-container{
 	background-color:#326AAD;
-	width:50%;
 	height:100%;
 }
-.reg-info{
-	
+
+.reg-create-account{
+	font-size: 30px;
+    width: 265px;
+    margin: auto;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.reg-name{
+	width: 35%;
+    height: 40px;
+    border-radius: 3px;
+    border: 1px solid #dcdcdc;
+    padding: 0 10px;
+    min-width: 180px;
+}
+.reg-big-input{
+	margin-top: 15px;
 }
