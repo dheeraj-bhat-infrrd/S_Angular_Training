@@ -1194,9 +1194,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         LOG.info( "Updating companySettings: " + companySettings + " with AccountDisabled: " + isAccountDisabled );
+        //Set isAccountDisabled in mongo
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ACCOUNT_DISABLED, isAccountDisabled, companySettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        //Set status to Deleted if isAccountDisabled is true, Active otherwise
+        if ( isAccountDisabled ) {
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN,
+                CommonConstants.STATUS_DELETED_MONGO, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        } else {
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN,
+                CommonConstants.STATUS_ACTIVE_MONGO, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        }
+
         LOG.info( "Updated the isAccountDisabled successfully" );
     }
 
