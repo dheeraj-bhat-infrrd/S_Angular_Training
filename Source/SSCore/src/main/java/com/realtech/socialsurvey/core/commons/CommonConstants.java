@@ -91,7 +91,7 @@ public interface CommonConstants
     public static final int STATUS_UNDER_PROCESSING = 2;
     public static final int STATUS_ACCOUNT_DISABLED = 2;
     public static final int STATUS_COMPANY_DISABLED = 2;
-    public static final int STATUS_COMPANY_DELETED = 3;
+    public static final int STATUS_COMPANY_DELETED = 11;
     public static final int STATUS_TEMPORARILY_INACTIVE = 3;
     public static final int PROCESS_COMPLETE = 1;
     public static final int PROCESS_NOT_STARTED = 0;
@@ -999,6 +999,7 @@ public interface CommonConstants
     public static final String STATUS_ACTIVE_MONGO = "A";
     public static final String STATUS_DELETED_MONGO = "D";
     public static final String STATUS_INCOMPLETE_MONGO = "I";
+    public static final String STATUS_COMPANY_DELETED_MONGO = "CD";
 
     // Company Hierarchy Report Headers
     public static final String CHR_YES = "Yes";

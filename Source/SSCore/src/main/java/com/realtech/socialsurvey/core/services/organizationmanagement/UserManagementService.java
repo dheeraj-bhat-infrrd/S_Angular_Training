@@ -83,7 +83,7 @@ public interface UserManagementService
 
 
     // Method to remove an existing user. Soft deletion is done.
-    public void removeExistingUser( User admin, long userIdToBeDeactivated ) throws InvalidInputException;
+    public void removeExistingUser( User admin, long userIdToBeDeactivated, int status ) throws InvalidInputException;
 
 
     // Method to remove profile of a branch admin.
@@ -593,7 +593,7 @@ public interface UserManagementService
     public UserApiKey getApiKey();
 
 
-    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted )
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
         throws InvalidInputException, SolrException;
 }
 // JIRA SS-34 BY RM02 BOC

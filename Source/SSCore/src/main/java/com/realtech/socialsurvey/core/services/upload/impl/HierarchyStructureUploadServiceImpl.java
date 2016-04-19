@@ -207,7 +207,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             if ( user.isDeletedRecord() ) {
                 // Delete the user
                 try {
-                    userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId() );
+                    userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId(), CommonConstants.STATUS_INACTIVE );
                     deletedUsersList.add( user );
                     upload.getUserSourceMapping().remove( user.getSourceUserId() );
                     deletedUsers += 1;
@@ -268,7 +268,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                             "Cannot delete branch : " + branch.getBranchName() + ". There are active users in the branch." );
                     } else {
                         //Delete the branch
-                        organizationManagementService.deleteBranchDataFromAllSources( branch.getBranchId(), adminUser, null );
+                        organizationManagementService.deleteBranchDataFromAllSources( branch.getBranchId(), adminUser, null, CommonConstants.STATUS_INACTIVE );
                         deletedBranchesList.add( branch );
                         upload.getBranchSourceMapping().remove( branch.getSourceBranchId() );
                         deletedBranches += 1;
@@ -335,7 +335,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                             "Cannot delete region: " + region.getRegionName() + ". There are active branches in the region." );
                     } else {
                         // Delete the region
-                        organizationManagementService.deleteRegionDataFromAllSources( region.getRegionId(), adminUser, null );
+                        organizationManagementService.deleteRegionDataFromAllSources( region.getRegionId(), adminUser, null, CommonConstants.STATUS_INACTIVE );
                         deletedRegionsList.add( region );
                         upload.getRegionSourceMapping().remove( region.getSourceRegionId() );
                         deletedRegions += 1;

@@ -279,7 +279,7 @@ public class HierarchyManagementController
             try {
                 regionId = Long.parseLong( request.getParameter( "regionId" ) );
                 assignments = (UserHierarchyAssignments) session.getAttribute( CommonConstants.USER_ASSIGNMENTS );
-                organizationManagementService.deleteRegionDataFromAllSources( regionId, user, assignments );
+                organizationManagementService.deleteRegionDataFromAllSources( regionId, user, assignments, CommonConstants.STATUS_INACTIVE );
             } catch ( NumberFormatException e ) {
                 LOG.error( "Number format exception occurred while parsing the region id.Reason :" + e.getMessage(), e );
                 throw new InvalidInputException( "Number format exception occurred while parsing the region id",
@@ -366,7 +366,7 @@ public class HierarchyManagementController
             try {
                 branchId = Long.parseLong( request.getParameter( "branchId" ) );
                 assignments = (UserHierarchyAssignments) session.getAttribute( CommonConstants.USER_ASSIGNMENTS );
-                organizationManagementService.deleteBranchDataFromAllSources( branchId, user, assignments );
+                organizationManagementService.deleteBranchDataFromAllSources( branchId, user, assignments, CommonConstants.STATUS_INACTIVE );
             } catch ( NumberFormatException e ) {
                 LOG.error( "Number format exception occurred while parsing branch id", e );
                 throw new InvalidInputException( "Number format exception occurred while parsing branch id",
