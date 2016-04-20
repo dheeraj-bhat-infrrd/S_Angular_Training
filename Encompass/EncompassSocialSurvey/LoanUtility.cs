@@ -67,7 +67,7 @@ namespace EncompassSocialSurvey
 
             DateFieldCriterion lowerLimitCriteria = new DateFieldCriterion();
             lowerLimitCriteria.FieldName = "Fields." + field;
-            lowerLimitCriteria.Value = DateTime.Now.AddDays(-1 * noOfDays);
+            lowerLimitCriteria.Value = DateTime.Today.AddDays(-1 * noOfDays);
             lowerLimitCriteria.MatchType = OrdinalFieldMatchType.GreaterThanOrEquals;
             return upperLimitCriteria.And(lowerLimitCriteria);
         }
