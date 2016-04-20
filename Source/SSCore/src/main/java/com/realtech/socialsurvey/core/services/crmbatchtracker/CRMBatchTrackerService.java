@@ -19,6 +19,6 @@ public interface CRMBatchTrackerService
     void updateLastRunEndTimeByEntityTypeAndSourceType( String entityType, long entityId, String source,int lastRunRecordFetchedCount )
         throws NoRecordsFetchedException, InvalidInputException;
     
-    public CrmBatchTracker getCrmBatchTracker(String entityType, long entityId, String source)throws NoRecordsFetchedException,InvalidInputException;
+    public CrmBatchTracker getCrmBatchTracker(String entityType, long entityId, String source)throws InvalidInputException;
 
 }

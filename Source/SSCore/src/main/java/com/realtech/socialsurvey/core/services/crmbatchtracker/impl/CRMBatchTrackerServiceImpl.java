@@ -48,16 +48,11 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
             throw new InvalidInputException( "passed parameter entityId is incorrect" );
         }
 
-
-        Map<String, Object> queries = new HashMap<String, Object>();
-        queries.put( CommonConstants.SOURCE_COLUMN, source );
-        queries.put( entityType, entityId );
-        List<CrmBatchTracker> crmBatchTrackerList = crmBatchTrackerDao.findByKeyValue( CrmBatchTracker.class, queries );
-
-        CrmBatchTracker crmBatchTracker;
+        CrmBatchTracker crmBatchTracker=getCrmBatchTracker(entityType,entityId,source);
+        
         long lastEndTime;
         long currentTime = System.currentTimeMillis();
-        if ( crmBatchTrackerList == null || crmBatchTrackerList.isEmpty() ) {
+        if ( crmBatchTracker == null) {
             LOG.debug( "No entry found in crm batch tracker for entity type : " + entityType + " with id : " + entityId );
             //create new crm batch tracker for the record
             crmBatchTracker = new CrmBatchTracker();
@@ -76,7 +71,7 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
             crmBatchTracker.setRecentRecordFetchedDate( new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS ) );
             lastEndTime = CommonConstants.EPOCH_TIME_IN_MILLIS;
         } else {
-            crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
+            
             lastEndTime = crmBatchTracker.getLastRunEndDate().getTime();
         }
 
@@ -105,17 +100,13 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
             throw new InvalidInputException( "passed parameter entityId is incorrect" );
         }
 
-        Map<String, Object> queries = new HashMap<String, Object>();
-        queries.put( CommonConstants.SOURCE_COLUMN, source );
-        queries.put( entityType, entityId );
-        List<CrmBatchTracker> crmBatchTrackerList = crmBatchTrackerDao.findByKeyValue( CrmBatchTracker.class, queries );
-        if ( crmBatchTrackerList == null || crmBatchTrackerList.size() <= 0
-            || crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
-            throw new NoRecordsFetchedException( "No record Fatched For entity type : " + entityType + " with entity id : "
-                + entityId );
+        
+        CrmBatchTracker crmBatchTracker=getCrmBatchTracker(entityType,entityId,source);
+        if(crmBatchTracker==null)
+        {
+        	 throw new NoRecordsFetchedException( "No record Fatched For entity type : " + entityType + " with entity id : "
+                     + entityId );	
         }
-
-        CrmBatchTracker crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
         crmBatchTracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         crmBatchTracker.setError( "Error : " + error );
         crmBatchTrackerDao.update( crmBatchTracker );
@@ -139,16 +130,12 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
             throw new InvalidInputException( "passed parameter entityId is incorrect" );
         }
 
-        Map<String, Object> queries = new HashMap<String, Object>();
-        queries.put( CommonConstants.SOURCE_COLUMN, source );
-        queries.put( entityType, entityId );
-        List<CrmBatchTracker> crmBatchTrackerList = crmBatchTrackerDao.findByKeyValue( CrmBatchTracker.class, queries );
-        if ( crmBatchTrackerList == null || crmBatchTrackerList.size() <= 0
-            || crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
-            throw new NoRecordsFetchedException( "No record Fatched For entity type : " + entityType + " with entity id : "
-                + entityId );
+        CrmBatchTracker crmBatchTracker=getCrmBatchTracker(entityType,entityId,source);
+        if(crmBatchTracker==null)
+        {
+        	 throw new NoRecordsFetchedException( "No record Fatched For entity type : " + entityType + " with entity id : "
+                     + entityId );	
         }
-        CrmBatchTracker crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
         crmBatchTracker.setLastRunEndDate( new Timestamp( System.currentTimeMillis() ) );
         crmBatchTracker.setLastRunRecordFetchedCount(lastRunRecordFetchedCount);
         crmBatchTracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -161,10 +148,11 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
 	@Override
 	@Transactional
 	public CrmBatchTracker getCrmBatchTracker(String entityType, long entityId,
-			String source)throws InvalidInputException,NoRecordsFetchedException {
+			String source)throws InvalidInputException {
 		// TODO Auto-generated method stub
 		
 		LOG.debug( "method getCrmBatchTracker started" );
+		CrmBatchTracker crmBatchTracker=null;
         if ( entityType == null || entityType.isEmpty() ) {
             throw new InvalidInputException( "passed parameter entityType is null or empty" );
         }
@@ -178,12 +166,12 @@ public class CRMBatchTrackerServiceImpl implements CRMBatchTrackerService
         queries.put( CommonConstants.SOURCE_COLUMN, source );
         queries.put( entityType, entityId );
         List<CrmBatchTracker> crmBatchTrackerList = crmBatchTrackerDao.findByKeyValue( CrmBatchTracker.class, queries );
-        if ( crmBatchTrackerList == null || crmBatchTrackerList.size() <= 0
-            || crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX ) == null ) {
-            throw new NoRecordsFetchedException( "No record Fatched For entity type : " + entityType + " with entity id : "
-                + entityId );
+        if ( crmBatchTrackerList != null && crmBatchTrackerList.size() > 0)
+        {
+        	crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
+            
         }
-        CrmBatchTracker crmBatchTracker = crmBatchTrackerList.get( CommonConstants.INITIAL_INDEX );
+        
         LOG.debug( "method getCrmBatchTracker ended" );
 		return crmBatchTracker;
 	}
