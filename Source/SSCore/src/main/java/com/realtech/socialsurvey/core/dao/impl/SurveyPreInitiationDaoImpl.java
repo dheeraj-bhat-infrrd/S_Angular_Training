@@ -438,17 +438,18 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
      * @throws InvalidInputException
      */
     @Override
-    public void deletePreInitiatedSurveysForAgent( long agentId ) throws InvalidInputException
+    public void deletePreInitiatedSurveysForAgent( long agentId, int status ) throws InvalidInputException
     {
         LOG.info( "Method to delete SurveyPreInitiation records for agent ID : " + agentId + " started." );
         //Check if the ID is valid
         if ( agentId <= 0l ) {
             throw new InvalidInputException( "Invalid agent ID : " + agentId );
         }
-        String deleteQuery = "update SurveyPreInitiation set status=0, modifiedOn=(:modifiedOnTime) where agentId = (:deletedAgentId) and status in (:statuses)";
+        String deleteQuery = "update SurveyPreInitiation set status=(:status), modifiedOn=(:modifiedOnTime) where agentId = (:deletedAgentId) and status in (:statuses)";
         Query query = getSession().createQuery( deleteQuery );
         query.setParameter( "modifiedOnTime", new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( "deletedAgentId", agentId );
+        query.setParameter( "status", status );
         query.setParameterList( "statuses", new Integer[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED,
             CommonConstants.SURVEY_STATUS_INITIATED } );
         query.executeUpdate();

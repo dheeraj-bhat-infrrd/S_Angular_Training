@@ -103,11 +103,11 @@
 	class="hide">No Changes Made</div>
 
 <div id="lastUploadRunTimestamp" class="rfr_lbl hide"
-	style="width: 22.2%; margin-bottom: 20px;">
+	style="width: 22.2%; margin-bottom: 20px; text-align: left; margin-left: 40px;"> 
 </div>
 
 <div id="uploadBatchStatus" class="hide"
-	style="font-size: 14px; margin-right: 30px; margin-left: 45px; margin-bottom: 20px;"></div>
+	style="font-size: 14px; margin-right: 30px; margin-left: 40px; margin-bottom: 20px;"></div>
 
 <div class="container hide" id="summary" style="margin-top: 10px;">
 	<!-- Nav tabs -->

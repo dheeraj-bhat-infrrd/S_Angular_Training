@@ -1589,7 +1589,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao
             .fetchOrganizationUnitSettingsByProfileName( agentProfileName,
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-        if ( organizationUnitSettings != null ) {
+        if ( organizationUnitSettings == null
+            || ( organizationUnitSettings.getStatus() != null && organizationUnitSettings.getStatus().equalsIgnoreCase(
+                CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+            LOG.warn( "No profile found with profile name: " + agentProfileName );
+            throw new ProfileNotFoundException( "No profile found with profile name: " + agentProfileName );
+        } else {
             LOG.debug( "Found the setting. Converting into agent settings" );
             agentSettings = (AgentSettings) organizationUnitSettings;
             // handle the cases where record is present in the mongo but not in SQL
@@ -1606,9 +1611,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             compositeUserObject = new UserCompositeEntity();
             compositeUserObject.setUser( user );
             compositeUserObject.setAgentSettings( agentSettings );
-        } else {
-            LOG.warn( "No profile found with profile name: " + agentProfileName );
-            throw new ProfileNotFoundException( "No profile found with profile name: " + agentProfileName );
         }
         LOG.info( "Returning the user composite object." );
         return compositeUserObject;
