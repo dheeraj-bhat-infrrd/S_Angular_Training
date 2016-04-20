@@ -48,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
@@ -3035,6 +3036,47 @@ public class OrganizationManagementController
                 DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, getProcessedPreInitiatedSurveys() finished" );
+        return new Gson().toJson( surveyPreInitiationList );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/getcorruptpreinitiatedsurveys", method = RequestMethod.GET)
+    public String getCorruptPreInitiatedSurveys( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to getCorruptPreInitiatedSurveys started" );
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+        if ( startIndexStr == null || batchSizeStr == null ) {
+            LOG.error( "Null value found for startIndex or batch size." );
+            return "Null value found for startIndex or batch size.";
+        }
+        
+        SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
+        int startIndex;
+        int batchSize;
+        try {
+            User user = sessionHelper.getCurrentUser();
+            if ( user == null || user.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
+            try {
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while trying to convert startIndex or batchSize or companyId  Nested exception is ",
+                    e );
+                throw e;
+            }
+            surveyPreInitiationList = socialManagementService.getCorruptPreInitiatedSurveys( user.getCompany().getCompanyId(),
+                startIndex, batchSize );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_CORRUPT_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        LOG.info( "Method to getCorruptPreInitiatedSurveys() finished" );
         return new Gson().toJson( surveyPreInitiationList );
     }
 
