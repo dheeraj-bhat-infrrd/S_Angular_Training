@@ -1232,10 +1232,9 @@ public interface OrganizationManagementService
      * 
      * @param entityType
      * @param entityId
-     * @param status
      * @throws InvalidInputException
      */
-    void updateProfileUrlAndStatusForDeletedEntity( String entityType, long entityId, String status ) throws InvalidInputException;
+    void updateProfileUrlAndStatusForDeletedEntity( String entityType, long entityId ) throws InvalidInputException;
 
     //    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
 

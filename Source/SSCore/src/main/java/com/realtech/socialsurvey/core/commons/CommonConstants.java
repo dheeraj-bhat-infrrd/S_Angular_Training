@@ -999,7 +999,6 @@ public interface CommonConstants
     public static final String STATUS_ACTIVE_MONGO = "A";
     public static final String STATUS_DELETED_MONGO = "D";
     public static final String STATUS_INCOMPLETE_MONGO = "I";
-    public static final String STATUS_COMPANY_DELETED_MONGO = "CD";
 
     // Company Hierarchy Report Headers
     public static final String CHR_YES = "Yes";

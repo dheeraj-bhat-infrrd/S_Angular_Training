@@ -5023,39 +5023,40 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
 
             // Deleting users
-            List<Long> userIds = solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
-            if ( userIds != null && !userIds.isEmpty() ) {
-                for ( Long userId : userIds ) {
-                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userId,
-                        CommonConstants.STATUS_COMPANY_DELETED );
+            if ( company.getUsers() != null && !company.getUsers().isEmpty() ) {
+                for ( User user : company.getUsers() ) {
+                    if ( CommonConstants.STATUS_INACTIVE != user.getStatus() ) {
+                        userManagementService.deleteUserDataFromAllSources( loggedInUser, user.getUserId(),
+                            CommonConstants.STATUS_COMPANY_DELETED );
+                    }
                 }
             }
 
             // Deleting branches
-            List<Long> branchIds = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
-            if ( branchIds != null && !branchIds.isEmpty() ) {
-                for ( Long branchId : branchIds ) {
-                    this.deleteBranchDataFromAllSources( branchId, loggedInUser, null, CommonConstants.STATUS_COMPANY_DELETED );
+            if ( company.getBranches() != null && !company.getBranches().isEmpty() ) {
+                for ( Branch branch : company.getBranches() ) {
+                    if ( CommonConstants.STATUS_INACTIVE != branch.getStatus() ) {
+                        this.deleteBranchDataFromAllSources( branch.getBranchId(), loggedInUser, null,
+                            CommonConstants.STATUS_COMPANY_DELETED );
+                    }
                 }
             }
 
             // Deleting regions
-            List<Long> regionIds = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
-            if ( regionIds != null && !regionIds.isEmpty() ) {
-                for ( Long regionId : regionIds ) {
-                    this.deleteRegionDataFromAllSources( regionId, loggedInUser, null, CommonConstants.STATUS_COMPANY_DELETED );
+            if ( company.getRegions() != null && !company.getRegions().isEmpty() ) {
+                for ( Region region : company.getRegions() ) {
+                    if ( CommonConstants.STATUS_INACTIVE != region.getStatus() ) {
+                        this.deleteRegionDataFromAllSources( region.getRegionId(), loggedInUser, null,
+                            CommonConstants.STATUS_COMPANY_DELETED );
+                    }
                 }
             }
 
             //Update profile name and url
-            this.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId(),
-                CommonConstants.STATUS_COMPANY_DELETED_MONGO );
+            this.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
 
             //Remove social media connections
             socialManagementService.disconnectAllSocialConnections( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
-
-            // Delete all the details from tables which are related to current company.
-            // performPreCompanyDeletions( company.getCompanyId() );
 
             // Deleting company from MySQL
             company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
@@ -5083,9 +5084,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         //Update profile name and url
-        String mongoStatus = status == CommonConstants.STATUS_INACTIVE ? CommonConstants.STATUS_DELETED_MONGO
-            : ( status == CommonConstants.STATUS_COMPANY_DELETED ? CommonConstants.STATUS_COMPANY_DELETED_MONGO : "" );
-        this.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.BRANCH_ID_COLUMN, branchId, mongoStatus );
+        this.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.BRANCH_ID_COLUMN, branchId );
 
         //Remove social media connections
         socialManagementService.disconnectAllSocialConnections( CommonConstants.BRANCH_ID_COLUMN, branchId );
@@ -5113,9 +5112,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         //Update profile name and url
-        String mongoStatus = status == CommonConstants.STATUS_INACTIVE ? CommonConstants.STATUS_DELETED_MONGO
-            : ( status == CommonConstants.STATUS_COMPANY_DELETED ? CommonConstants.STATUS_COMPANY_DELETED_MONGO : "" );
-        this.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.REGION_ID_COLUMN, regionId, mongoStatus );
+        this.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.REGION_ID_COLUMN, regionId );
 
         //Remove social media connections
         socialManagementService.disconnectAllSocialConnections( CommonConstants.REGION_ID_COLUMN, regionId );
@@ -5892,8 +5889,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void updateProfileUrlAndStatusForDeletedEntity( String entityType, long entityId, String status )
-        throws InvalidInputException
+    public void updateProfileUrlAndStatusForDeletedEntity( String entityType, long entityId ) throws InvalidInputException
     {
         LOG.info( "Updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
 
@@ -5976,7 +5972,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         // update the isActive status to false
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
-            status, unitSettings, collectionName );
+            CommonConstants.STATUS_DELETED_MONGO, unitSettings, collectionName );
 
         LOG.info( "Finished updating profile url for deleted entity type : " + entityType + " with ID : " + entityId );
     }
