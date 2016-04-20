@@ -379,6 +379,7 @@ function retakeSurveyReminderMail(element) {
 			"lastName" : lastName,
 			"agentName" : agentName
 	};
+	
 	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
 		$('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.');
 		showToast();
@@ -6606,7 +6607,7 @@ $(document).on(
 					|| $(this).is('[readonly]')) {
 				return;
 			}
-			if (!phoneRegex.test(this.value)) {
+			if (!phoneRegex.test(this.value) && !ausPhoneRegex.test(this.value) ) {
 				$('#overlay-toast').html("Please add a valid phone number");
 				showToast();
 				return;
@@ -6616,7 +6617,7 @@ $(document).on(
 				var phoneNumbers = [];
 				$('#contant-info-container input[data-phone-number]').each(
 						function() {
-							if (this.value != "" && phoneRegex.test(this.value)
+							if (this.value != "" && (phoneRegex.test(this.value) || ausPhoneRegex.test(this.value))
 									&& !$(this).is('[readonly]')) {
 								var phoneNumber = {};
 								phoneNumber.key = $(this).attr(

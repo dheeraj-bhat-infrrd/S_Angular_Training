@@ -108,6 +108,5 @@
 		</div>
 	</c:forEach>
 </c:if>
-<script>console.log("${profilemasterid}");</script>
 <script type="text/javascript" src="//apis.google.com/js/client:plusone.js" async="async"></script>
 <script type="text/javascript" src="//apis.google.com/js/plusone.js" async="async"></script>
