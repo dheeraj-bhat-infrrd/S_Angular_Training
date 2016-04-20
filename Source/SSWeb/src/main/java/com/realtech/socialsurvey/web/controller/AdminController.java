@@ -52,7 +52,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -124,22 +124,21 @@ public class AdminController
             if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || licenseDetails.size() == 0 ) {
                 try {
                     if ( licenseDetails.size() > 0 ) {
-                        // delete company from braintree
+                        // Unsubscribing company from braintree
                         LicenseDetail licenseDetail = licenseDetails.get( 0 );
                         if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
-                            LOG.debug( "Deleting company from braintree " );
-                            payment.deleteCustomer( Long.toString( company.getCompanyId() ) );
+                            LOG.debug( "Unsubscribing company from braintree " );
+                            payment.unsubscribe( licenseDetail.getSubscriptionId() );
                         }
                     }
 
-                } catch ( CustomerDeletionUnsuccessfulException | InvalidInputException e ) {
+                } catch ( InvalidInputException | SubscriptionCancellationUnsuccessfulException e ) {
                     LOG.error( "Exception Caught " + e.getMessage() );
                     message = CommonConstants.ERROR;
                 }
 
                 try {
-                    // organizationManagementService.deleteCompany( company, loggedInUser );
-                    organizationManagementService.purgeCompany( company );
+                    organizationManagementService.deleteCompany( company, loggedInUser );
                 } catch ( InvalidInputException e ) {
                     LOG.error( "Exception Caught " + e.getMessage() );
                     message = CommonConstants.ERROR;

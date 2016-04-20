@@ -593,7 +593,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public void removeExistingUser( User admin, long userIdToRemove ) throws InvalidInputException
+    public void removeExistingUser( User admin, long userIdToRemove, int status ) throws InvalidInputException
     {
         if ( admin == null ) {
             throw new InvalidInputException( "Admin user is null in deactivateExistingUser" );
@@ -609,7 +609,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
-        userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
+        userToBeDeactivated.setStatus( status );
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
         userToBeDeactivated.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
@@ -627,12 +627,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Deactivate all email addresses for the user
         List<UserEmailMapping> userEmailMappings = userToBeDeactivated.getUserEmailMappings();
         for ( UserEmailMapping userEmailMapping : userEmailMappings ) {
-            userEmailMapping.setStatus( CommonConstants.STATUS_INACTIVE );
+            userEmailMapping.setStatus( status );
             userEmailMappingDao.update( userEmailMapping );
         }
 
         // Marks all the user profiles for given user as inactive.
-        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
+        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated, status );
 
         //update profile url in mongo if needed
         organizationManagementService.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN,
@@ -642,7 +642,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
 
         //Delete entries from SurveyPreInitiation table
-        surveyPreInitiationDao.deletePreInitiatedSurveysForAgent( userIdToRemove );
+        surveyPreInitiationDao.deletePreInitiatedSurveysForAgent( userIdToRemove, status );
 
         //Delete entries from the Survey Details Collection
         surveyDetailsDao.deleteIncompleteSurveysForAgent( userIdToRemove );
@@ -3735,7 +3735,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         removedUser.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         removedUserDao.save( removedUser );
 
-        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
+        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated, CommonConstants.STATUS_INACTIVE );
 
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
         userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -4004,13 +4004,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted )
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
         throws InvalidInputException, SolrException
     {
         LOG.info( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
 
         // Removing user data from MySql DB & MongoDB.
-        this.removeExistingUser( loggedInUser, userIdToBeDeleted );
+        this.removeExistingUser( loggedInUser, userIdToBeDeleted, status );
 
         // Updating user count modification notification.
         this.updateUserCountModificationNotification( loggedInUser.getCompany() );

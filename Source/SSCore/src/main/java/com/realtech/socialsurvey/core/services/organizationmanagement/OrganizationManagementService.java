@@ -890,7 +890,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws SolrException
      */
-    public void deleteBranchDataFromAllSources( long branchId, User user, UserHierarchyAssignments assignments )
+    public void deleteBranchDataFromAllSources( long branchId, User user, UserHierarchyAssignments assignments, int status )
         throws InvalidInputException, SolrException;
 
 
@@ -901,7 +901,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws SolrException
      */
-    public void deleteRegionDataFromAllSources( long regionId, User user, UserHierarchyAssignments assignments )
+    public void deleteRegionDataFromAllSources( long regionId, User user, UserHierarchyAssignments assignments, int status )
         throws InvalidInputException, SolrException;
 
 

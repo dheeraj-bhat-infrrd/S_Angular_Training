@@ -585,7 +585,7 @@ public class UserManagementController
 
             try {
                 if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
-                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove );
+                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove, CommonConstants.STATUS_INACTIVE );
                 } else {
                     statusMap.put( "status", CommonConstants.ERROR );
                 }

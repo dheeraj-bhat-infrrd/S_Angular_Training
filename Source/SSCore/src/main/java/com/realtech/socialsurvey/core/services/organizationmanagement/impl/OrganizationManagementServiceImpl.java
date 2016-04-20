@@ -5023,26 +5023,32 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
 
             // Deleting users
-            List<Long> userIds = solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
-            if ( userIds != null && !userIds.isEmpty() ) {
-                for ( Long userId : userIds ) {
-                    //userManagementService.deleteUserDataFromAllSources( loggedInUser, userId );
+            if ( company.getUsers() != null && !company.getUsers().isEmpty() ) {
+                for ( User user : company.getUsers() ) {
+                    if ( CommonConstants.STATUS_INACTIVE != user.getStatus() ) {
+                        userManagementService.deleteUserDataFromAllSources( loggedInUser, user.getUserId(),
+                            CommonConstants.STATUS_COMPANY_DELETED );
+                    }
                 }
             }
 
             // Deleting branches
-            List<Long> branchIds = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
-            if ( branchIds != null && !branchIds.isEmpty() ) {
-                for ( Long branchId : branchIds ) {
-                    //this.deleteBranchDataFromAllSources( branchId, loggedInUser, null );
+            if ( company.getBranches() != null && !company.getBranches().isEmpty() ) {
+                for ( Branch branch : company.getBranches() ) {
+                    if ( CommonConstants.STATUS_INACTIVE != branch.getStatus() ) {
+                        this.deleteBranchDataFromAllSources( branch.getBranchId(), loggedInUser, null,
+                            CommonConstants.STATUS_COMPANY_DELETED );
+                    }
                 }
             }
 
             // Deleting regions
-            List<Long> regionIds = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
-            if ( regionIds != null && !regionIds.isEmpty() ) {
-                for ( Long regionId : regionIds ) {
-                    //this.deleteRegionDataFromAllSources( regionId, loggedInUser, null );
+            if ( company.getRegions() != null && !company.getRegions().isEmpty() ) {
+                for ( Region region : company.getRegions() ) {
+                    if ( CommonConstants.STATUS_INACTIVE != region.getStatus() ) {
+                        this.deleteRegionDataFromAllSources( region.getRegionId(), loggedInUser, null,
+                            CommonConstants.STATUS_COMPANY_DELETED );
+                    }
                 }
             }
 
@@ -5051,9 +5057,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             //Remove social media connections
             socialManagementService.disconnectAllSocialConnections( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
-
-            // Delete all the details from tables which are related to current company.
-            performPreCompanyDeletions( company.getCompanyId() );
 
             // Deleting company from MySQL
             company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
@@ -5065,60 +5068,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    private List<Long> getListOfUsersDeletedFromSolr( Company company ) throws InvalidInputException, SolrException
-    {
-        List<Long> userIds = new ArrayList<Long>();
-        do {
-            List<Long> agentIds = solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
-            if ( agentIds == null || agentIds.isEmpty() ) {
-                break;
-            }
-            solrSearchService.removeUsersFromSolr( agentIds );
-            userIds.addAll( agentIds );
-        } while ( true );
-        return userIds;
-    }
-
-
-    private List<Long> getListOfBranchesDeletedFromSolr( Company company ) throws InvalidInputException, SolrException
-    {
-        List<Long> branchIds = new ArrayList<Long>();
-        do {
-            List<Long> branches = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
-            if ( branches == null || branches.isEmpty() ) {
-                break;
-            }
-            solrSearchService.removeBranchesFromSolr( branches );
-            branchIds.addAll( branches );
-        } while ( true );
-        return branchIds;
-    }
-
-
-    private List<Long> getListOfRegionsDeletedFromSolr( Company company ) throws InvalidInputException, SolrException
-    {
-        List<Long> regionIds = new ArrayList<Long>();
-        do {
-            List<Long> regions = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
-            if ( regions == null || regions.isEmpty() ) {
-                break;
-            }
-            solrSearchService.removeRegionsFromSolr( regions );
-            regionIds.addAll( regions );
-        } while ( true );
-        return regionIds;
-    }
-
-
     @Override
     @Transactional
-    public void deleteBranchDataFromAllSources( long branchId, User user, UserHierarchyAssignments assignments )
+    public void deleteBranchDataFromAllSources( long branchId, User user, UserHierarchyAssignments assignments, int status )
         throws InvalidInputException, SolrException
     {
         LOG.info( "Method deleteBranchDataFromAllSources called for branchId:" + branchId );
 
         // Deactivating branch in MySql db.
-        this.updateBranchStatus( user, branchId, CommonConstants.STATUS_INACTIVE );
+        this.updateBranchStatus( user, branchId, status );
 
         // Removing the branch from user hierarchy assignments being stored in session
         if ( assignments != null ) {
@@ -5140,13 +5098,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public void deleteRegionDataFromAllSources( long regionId, User user, UserHierarchyAssignments assignments )
+    public void deleteRegionDataFromAllSources( long regionId, User user, UserHierarchyAssignments assignments, int status )
         throws InvalidInputException, SolrException
     {
         LOG.info( "Method deleteRegionDataFromAllSources called for branchId:" + regionId );
 
         // Deactivating region in MySql db.
-        this.updateRegionStatus( user, regionId, CommonConstants.STATUS_INACTIVE );
+        this.updateRegionStatus( user, regionId, status );
 
         // Removing the region from user hierarchy assignments being stored in session
         if ( assignments != null ) {
