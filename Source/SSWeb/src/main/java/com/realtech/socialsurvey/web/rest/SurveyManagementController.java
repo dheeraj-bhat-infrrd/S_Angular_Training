@@ -593,10 +593,14 @@ public class SurveyManagementController
                 //first get the survey from mmongo
                 SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
                 String surveySource;
-                if(surveyDetails != null)
+                if(surveyPreInitiation != null)
+                    surveySource = surveyPreInitiation.getSurveySource();
+                else if(surveyDetails != null)
                     surveySource = surveyDetails.getSource();
                 else
                     surveySource = MongoSocialPostDaoImpl.KEY_SOURCE_SS;
+                
+                
                 if ( surveyPreInitiation == null ) {
                     surveyPreInitiation = surveyHandler.preInitiateSurvey( user, customerEmail, custFirstName, custLastName, 0, null, surveySource );
 

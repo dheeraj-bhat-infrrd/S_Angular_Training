@@ -234,24 +234,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
         surveyDetails.setCustRelationWithAgent( custRelationWithAgent );
 
-        String surveyUrl = ( baseUrl.contains( "\\?q=" ) ) ? baseUrl : getSurveyUrl( agentId, customerEmail, baseUrl );
+        String surveyUrl = baseUrl;
         surveyDetails.setUrl( surveyUrl );
         surveyDetails.setEditable( true );
         surveyDetails.setSource( source );
         surveyDetails.setShowSurveyOnUI( true );
         
-        surveyDetails.setNewSurvey( retakeSurvey );
+        surveyDetails.setRetakeSurvey( retakeSurvey );
         surveyDetails.setSurveyPreIntitiationId( surveyPreIntitiationId );
 
         SurveyDetails survey = null;
         //if survey request is old get survey by agent id and customer email
         if( isOldRecord){
             survey =surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
-            //update survey PreIntitiation Id for survey
-            if(survey != null){
-                survey.setSurveyPreIntitiationId( surveyPreIntitiationId );
-                surveyDetailsDao.updateSurveyDetails( surveyDetails );
-            }
         }else{
             survey = surveyDetailsDao.getSurveyBySurveyPreIntitiationId( surveyPreIntitiationId );
         }
@@ -263,6 +258,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             // updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
+          //update survey PreIntitiation Id for survey
+            survey.setSurveyPreIntitiationId( surveyPreIntitiationId );
+            survey.setRetakeSurvey( retakeSurvey );
+            surveyDetailsDao.updateSurveyDetails( survey );
             return survey;
         }
     }
