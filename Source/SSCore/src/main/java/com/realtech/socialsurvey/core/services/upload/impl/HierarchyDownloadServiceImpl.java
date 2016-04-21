@@ -489,9 +489,10 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     }
 
 
-    public String generateSourceId( char entityType )
+    public String generateSourceId( char entityType, long iden )
     {
-        return entityType + Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() );
+        return entityType + Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() )
+            + Integer.toHexString( String.valueOf( iden ).hashCode() );
     }
 
 
@@ -637,7 +638,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         List<String> assignedRegionsAdmin = new ArrayList<String>();
 
         if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( userUploadVO.getUserId() ) ) ) {
-            String sourceId = generateSourceId( TYPE_USER );
+            String sourceId = generateSourceId( TYPE_USER, user.getUserId() );
             userUploadVO.setSourceUserId( sourceId );
             newSourceMap.put( sourceId, userUploadVO.getUserId() );
         } else {
@@ -848,7 +849,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 branchUploadVO.setBranchZipcode( branchSettings.getContact_details().getZipcode() );
             }
             if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( branchUploadVO.getBranchId() ) ) ) {
-                String sourceId = generateSourceId( TYPE_BRANCH );
+                String sourceId = generateSourceId( TYPE_BRANCH, branch.getBranchId() );
                 branchUploadVO.setSourceBranchId( sourceId );
                 newSourceMap.put( sourceId, branchUploadVO.getBranchId() );
             } else {
@@ -977,7 +978,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 regionUploadVO.setRegionZipcode( regionSettings.getContact_details().getZipcode() );
             }
             if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( regionUploadVO.getRegionId() ) ) ) {
-                String sourceId = generateSourceId( TYPE_REGION );
+                String sourceId = generateSourceId( TYPE_REGION, region.getRegionId() );
                 regionUploadVO.setSourceRegionId( sourceId );
                 newSourceMap.put( sourceId, regionUploadVO.getRegionId() );
             } else {
