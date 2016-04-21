@@ -290,8 +290,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="billingReportsService" value-ref="billingReportsService" />
-				<entry key="userManagementService" value-ref="userManagementService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
