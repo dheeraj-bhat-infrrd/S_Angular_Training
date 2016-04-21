@@ -1530,7 +1530,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public void addDisabledAccount( long companyId, boolean forceDisable )
+    public void addDisabledAccount( long companyId, boolean forceDisable, long userId )
         throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         LOG.info( "Adding the disabled account to the database for company id : " + companyId );
@@ -1568,9 +1568,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
             disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
         }
-        disabledAccount.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
+        disabledAccount.setCreatedBy( String.valueOf( userId ) );
         disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        disabledAccount.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
+        disabledAccount.setModifiedBy( String.valueOf( userId ) );
         disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
         LOG.info( "Adding the Disabled Account entity to the database" );
@@ -5057,6 +5057,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             //Remove social media connections
             socialManagementService.disconnectAllSocialConnections( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+            
+            // Remove from disabled account
+            List<String> conditions = new ArrayList<>();
+            conditions.add( "company.companyId = " + company.getCompanyId() );
+            disabledAccountDao.deleteByCondition( "DisabledAccount", conditions );
 
             // Deleting company from MySQL
             company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
@@ -6882,6 +6887,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         event.setRegionId( regionId );
         eventDao.save( event );
         LOG.info( "Logging connection event in event table completes successfully" );
+    }
+
+
+    @Override
+    @Transactional
+    public void forceDeleteDisabledAccount( long companyId, long userId )
+    {
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( "company.companyId", companyId );
+        List<DisabledAccount> accounts = disabledAccountDao.findByKeyValue( DisabledAccount.class, queries );
+        if ( accounts != null && !accounts.isEmpty() ) {
+            DisabledAccount account = accounts.get( 0 );
+            account.setForceDelete( true );
+            account.setModifiedBy( String.valueOf( userId ) );
+            disabledAccountDao.update( account );
+        }
     }
 }
 // JIRA: SS-27: By RM05: EOC

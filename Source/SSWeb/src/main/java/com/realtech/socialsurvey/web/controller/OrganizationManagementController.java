@@ -1749,7 +1749,7 @@ public class OrganizationManagementController
                 // Calling services to update DB
                 organizationManagementService.updateAccountDisabled( companySettings, isAccountDisabled );
                 if ( isAccountDisabled ) {
-                    organizationManagementService.addDisabledAccount( companySettings.getIden(), false );
+                    organizationManagementService.addDisabledAccount( companySettings.getIden(), false, user.getUserId() );
                 } else {
                     organizationManagementService.deleteDisabledAccount( companySettings.getIden() );
                 }
@@ -2246,7 +2246,7 @@ public class OrganizationManagementController
                 // Add an entry into Disabled_Accounts table with disable_date as current date
                 // and status as inactive.
                 try {
-                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true );
+                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true, user.getUserId() );
                 } catch ( NoRecordsFetchedException | PaymentException e ) {
                     LOG.error(
                         "Exception caught in deactivateCompany() of OrganizationManagementController. Nested exception is ",

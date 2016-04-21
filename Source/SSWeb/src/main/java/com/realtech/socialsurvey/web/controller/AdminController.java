@@ -54,7 +54,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -122,30 +121,21 @@ public class AdminController
         if ( company != null && company.getCompanyId() > 0 ) {
             List<LicenseDetail> licenseDetails = company.getLicenseDetails();
             if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || licenseDetails.size() == 0 ) {
-                try {
-                    if ( licenseDetails.size() > 0 ) {
-                        // Unsubscribing company from braintree
-                        LicenseDetail licenseDetail = licenseDetails.get( 0 );
-                        if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
-                            LOG.debug( "Unsubscribing company from braintree " );
-                            payment.unsubscribe( licenseDetail.getSubscriptionId() );
-                        }
-                    }
-
-                } catch ( InvalidInputException | SubscriptionCancellationUnsuccessfulException e ) {
-                    LOG.error( "Exception Caught " + e.getMessage() );
-                    message = CommonConstants.ERROR;
-                }
-
-                try {
-                    organizationManagementService.deleteCompany( company, loggedInUser );
-                } catch ( InvalidInputException e ) {
-                    LOG.error( "Exception Caught " + e.getMessage() );
-                    message = CommonConstants.ERROR;
-                } catch ( SolrException e ) {
-                    LOG.error( "Exception Caught " + e.getMessage() );
-                    message = CommonConstants.ERROR;
-                }
+//                try {
+//                    if ( licenseDetails.size() > 0 ) {
+//                        // Unsubscribing company from braintree
+//                        LicenseDetail licenseDetail = licenseDetails.get( 0 );
+//                        if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+//                            LOG.debug( "Unsubscribing company from braintree " );
+//                            payment.unsubscribe( licenseDetail.getSubscriptionId() );
+//                        }
+//                    }
+//
+//                } catch ( InvalidInputException | SubscriptionCancellationUnsuccessfulException e ) {
+//                    LOG.error( "Exception Caught " + e.getMessage() );
+//                    message = CommonConstants.ERROR;
+//                }
+                organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
             }
         }
         return message;
