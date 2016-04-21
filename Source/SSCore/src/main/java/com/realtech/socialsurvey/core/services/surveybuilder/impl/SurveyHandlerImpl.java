@@ -863,8 +863,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
+
+        //Set the source of survey as it was in the initial survey
+        //Get the survey object
+        SurveyDetails survey = getSurveyDetails( user.getUserId(), custEmail, custFirstName, custLastName );
+        String surveySource = CommonConstants.SURVEY_REQUEST_AGENT;
+        if (survey != null && survey.getSource() != null)
+            surveySource = survey.getSource();
         preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent,
-            CommonConstants.SURVEY_REQUEST_AGENT );
+            surveySource );
 
         //get mail subject and body
         String mailBody = "";

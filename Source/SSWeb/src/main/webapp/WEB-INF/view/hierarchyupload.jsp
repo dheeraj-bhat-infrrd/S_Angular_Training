@@ -103,7 +103,7 @@
 	class="hide">No Changes Made</div>
 
 <div id="lastUploadRunTimestamp" class="rfr_lbl hide"
-	style="width: 22.2%; margin-bottom: 20px; text-align: left; margin-left: 40px;"> 
+	style="width: 22.2%; margin-bottom: 20px; margin-left: 40px; text-align:left;">
 </div>
 
 <div id="uploadBatchStatus" class="hide"

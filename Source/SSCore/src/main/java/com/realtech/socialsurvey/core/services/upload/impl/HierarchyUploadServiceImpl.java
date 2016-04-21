@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -1384,19 +1386,26 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else {
                         user.setFirstNameModified( false );
                     }
-                    if ( ( user.getLastName() == null && uploadedUser.getLastName() != null )
-                        || ( user.getLastName() != null && uploadedUser.getLastName() == null )
-                        || ( user.getLastName() != null && uploadedUser.getLastName() != null
-                            && !user.getLastName().equalsIgnoreCase( uploadedUser.getLastName() ) ) ) {
 
-                        //Update last name history
-                        user.setLastNameHistory(
-                            updateHistory( user.getLastNameHistory(), uploadedUser.getLastName(), user.getLastName() ) );
-
-                        user.setLastName( uploadedUser.getLastName() );
-                        user.setLastNameModified( true );
-                    } else {
-                        user.setLastNameModified( false );
+                    try {
+                        if ( ( user.getLastName() == null && uploadedUser.getLastName() != null )
+                            || ( user.getLastName() != null && uploadedUser.getLastName() == null )
+                            || ( user.getLastName() != null
+                                && uploadedUser.getLastName() != null
+                                && !user.getLastName().equalsIgnoreCase( uploadedUser.getLastName() )
+                                && !user.getLastName()
+                                    .equalsIgnoreCase(
+                                        new String( uploadedUser.getLastName().getBytes( Charset.forName( "ISO-8859-1" ) ),
+                                            "UTF-8" ) ) && !new String( user.getLastName().getBytes(
+                                Charset.forName( "ISO-8859-1" ) ), "UTF-8" ).equalsIgnoreCase( uploadedUser.getLastName() ) ) ) {
+                            user.setLastName( uploadedUser.getLastName() );
+                            user.setLastNameModified( true );
+                        } else {
+                            user.setLastNameModified( false );
+                        }
+                    } catch ( UnsupportedEncodingException e1 ) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
                     }
                     if ( ( user.getTitle() == null && uploadedUser.getTitle() != null )
                         || ( user.getTitle() != null && uploadedUser.getTitle() == null )
@@ -1551,19 +1560,26 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else {
                         user.setLicenseModified( false );
                     }
-                    if ( ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() == null )
-                        || ( user.getLegalDisclaimer() == null && uploadedUser.getLegalDisclaimer() != null )
-                        || ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() != null
-                            && !user.getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() ) ) ) {
 
-                        //Update legalDisclaimer history
-                        user.setLegalDisclaimerHistory( updateHistory( user.getLegalDisclaimerHistory(),
-                            uploadedUser.getLegalDisclaimer(), user.getLegalDisclaimer() ) );
-
-                        user.setLegalDisclaimer( uploadedUser.getLegalDisclaimer() );
-                        user.setLegalDisclaimerModified( true );
-                    } else {
-                        user.setLegalDisclaimerModified( false );
+                    try {
+                        if ( ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() == null )
+                            || ( user.getLegalDisclaimer() == null && uploadedUser.getLegalDisclaimer() != null )
+                            || ( user.getLegalDisclaimer() != null
+                                && uploadedUser.getLegalDisclaimer() != null
+                                && !user.getLegalDisclaimer().equalsIgnoreCase( uploadedUser.getLegalDisclaimer() )
+                                && !user.getLegalDisclaimer().equalsIgnoreCase(
+                                    new String( uploadedUser.getLegalDisclaimer().getBytes( Charset.forName( "ISO-8859-1" ) ),
+                                        "UTF-8" ) ) && !new String( user.getLegalDisclaimer().getBytes(
+                                Charset.forName( "ISO-8859-1" ) ), "UTF-8" ).equalsIgnoreCase( uploadedUser
+                                .getLegalDisclaimer() ) ) ) {
+                            user.setLegalDisclaimer( uploadedUser.getLegalDisclaimer() );
+                            user.setLegalDisclaimerModified( true );
+                        } else {
+                            user.setLegalDisclaimerModified( false );
+                        }
+                    } catch ( UnsupportedEncodingException e ) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
                     if ( ( user.getUserPhotoUrl() != null && uploadedUser.getUserPhotoUrl() == null )
                         || ( user.getUserPhotoUrl() == null && uploadedUser.getUserPhotoUrl() != null )
@@ -1579,19 +1595,26 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else {
                         user.setUserPhotoUrlModified( false );
                     }
-                    if ( ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() == null )
-                        || ( user.getAboutMeDescription() == null && uploadedUser.getAboutMeDescription() != null )
-                        || ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() != null
-                            && !user.getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() ) ) ) {
-
-                        //Update aboutMe history
-                        user.setAboutMeDescriptionHistory( updateHistory( user.getAboutMeDescriptionHistory(),
-                            uploadedUser.getAboutMeDescription(), user.getAboutMeDescription() ) );
-
-                        user.setAboutMeDescription( uploadedUser.getAboutMeDescription() );
-                        user.setAboutMeDescriptionModified( true );
-                    } else {
-                        user.setAboutMeDescriptionModified( false );
+                    try {
+                        if ( ( user.getAboutMeDescription() != null && uploadedUser.getAboutMeDescription() == null )
+                            || ( user.getAboutMeDescription() == null && uploadedUser.getAboutMeDescription() != null )
+                            || ( user.getAboutMeDescription() != null
+                                && uploadedUser.getAboutMeDescription() != null
+                                && !user.getAboutMeDescription().equalsIgnoreCase( uploadedUser.getAboutMeDescription() )
+                                && !user.getAboutMeDescription().equalsIgnoreCase(
+                                    new String(
+                                        uploadedUser.getAboutMeDescription().getBytes( Charset.forName( "ISO-8859-1" ) ),
+                                        "UTF-8" ) ) && !new String( user.getAboutMeDescription().getBytes(
+                                Charset.forName( "ISO-8859-1" ) ), "UTF-8" ).equalsIgnoreCase( uploadedUser
+                                .getAboutMeDescription() ) ) ) {
+                            user.setAboutMeDescription( uploadedUser.getAboutMeDescription() );
+                            user.setAboutMeDescriptionModified( true );
+                        } else {
+                            user.setAboutMeDescriptionModified( false );
+                        }
+                    } catch ( UnsupportedEncodingException e ) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
                     if ( user.isFirstNameModified() || user.isLastNameModified() || user.isTitleModified()
                         || user.isAssignedBranchesModified() || user.isAssignedRegionsModified()
