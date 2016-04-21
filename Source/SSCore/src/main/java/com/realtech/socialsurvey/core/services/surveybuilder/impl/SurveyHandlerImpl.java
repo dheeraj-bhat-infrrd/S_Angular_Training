@@ -863,8 +863,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany()
             .getCompanyId() );
+
+        //Set the source of survey as it was in the initial survey
+        //Get the survey object
+        SurveyDetails survey = getSurveyDetails( user.getUserId(), custEmail, custFirstName, custLastName );
+        String surveySource = CommonConstants.SURVEY_REQUEST_AGENT;
+        if (survey != null && survey.getSource() != null)
+            surveySource = survey.getSource();
         preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent,
-            CommonConstants.SURVEY_REQUEST_AGENT );
+            surveySource );
 
         //get mail subject and body
         String mailBody = "";
@@ -1531,22 +1538,23 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 companies.add( survey.getCompanyId() );
             } else if ( user == null ) {
                 LOG.error( "no agent found with this email id" );
-                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD;
                 invalidAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             } else if ( user.getCompany() == null ) {
                 LOG.error( "Agent doesnt have an company associated with it " );
-                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD;
                 invalidAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
-                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
-                unavailableAgents.add( survey );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD;
+                invalidAgents.add( survey );
                 companies.add( survey.getCompanyId() );
             }
             if ( status != CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD
                 && status != CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD
-                && status != CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD ) {
+                && status != CommonConstants.STATUS_SURVEYPREINITIATION_OLD_RECORD
+                && status != CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD) {
                 if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
                     status = validateUnitsettingsForDotloop( user, survey );
                     if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD ) {
@@ -1557,7 +1565,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
             survey.setStatus( status );
             survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-            surveyPreInitiationDao.merge( survey );
+            //surveyPreInitiationDao.merge( survey );
         }
 
         Map<String, Object> corruptRecords = new HashMap<>();

@@ -1,0 +1,1 @@
+update ss_user.survey_pre_initiation set status = 10 where agent_id = 0;

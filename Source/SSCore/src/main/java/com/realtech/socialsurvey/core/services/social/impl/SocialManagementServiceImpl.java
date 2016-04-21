@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,14 +30,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import twitter4j.StatusUpdate;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.RequestToken;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.ExternalSurveyTrackerDao;
@@ -99,6 +90,13 @@ import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.PostUpdate;
 import facebook4j.auth.AccessToken;
+import twitter4j.StatusUpdate;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 
 
 /**
@@ -141,8 +139,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Autowired
     private ProfileManagementService profileManagementService;
 
-//    @Autowired
-//    private ZillowUpdateService zillowUpdateService;
+    //    @Autowired
+    //    private ZillowUpdateService zillowUpdateService;
 
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
@@ -300,11 +298,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( settings.getSocialMediaTokens().getFacebookToken() != null
                     && settings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() != null ) {
                     if ( settings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() != null )
-                        facebook.setOAuthAccessToken( new AccessToken( settings.getSocialMediaTokens().getFacebookToken()
-                            .getFacebookAccessTokenToPost(), null ) );
+                        facebook.setOAuthAccessToken( new AccessToken(
+                            settings.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost(), null ) );
                     else
-                        facebook.setOAuthAccessToken( new AccessToken( settings.getSocialMediaTokens().getFacebookToken()
-                            .getFacebookAccessToken(), null ) );
+                        facebook.setOAuthAccessToken( new AccessToken(
+                            settings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(), null ) );
                     try {
                         facebookNotSetup = false;
 
@@ -355,9 +353,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( agentSettings.getSocialMediaTokens().getTwitterToken() != null
                     && agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret() != null ) {
                     Twitter twitter = getTwitterInstance();
-                    twitter.setOAuthAccessToken( new twitter4j.auth.AccessToken( agentSettings.getSocialMediaTokens()
-                        .getTwitterToken().getTwitterAccessToken(), agentSettings.getSocialMediaTokens().getTwitterToken()
-                        .getTwitterAccessTokenSecret() ) );
+                    twitter.setOAuthAccessToken( new twitter4j.auth.AccessToken(
+                        agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken(),
+                        agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret() ) );
                     try {
                         twitterNotSetup = false;
                         // TODO: Hard coded bad code: DELETE: BEGIN
@@ -369,8 +367,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         // TODO: Hard coded bad code: DELETE: BEGIN
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
                             try {
-                                statusUpdate.setMedia( "Picture", new URL(
-                                    "https://don7n2as2v6aa.cloudfront.net/remax-twitter-image.jpg?imgmax=800" ).openStream() );
+                                statusUpdate.setMedia( "Picture",
+                                    new URL( "https://don7n2as2v6aa.cloudfront.net/remax-twitter-image.jpg?imgmax=800" )
+                                        .openStream() );
                             } catch ( MalformedURLException e ) {
                                 LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
                             } catch ( IOException e ) {
@@ -392,8 +391,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     public boolean updateLinkedin( OrganizationUnitSettings settings, String message, String linkedinProfileUrl,
-        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow,
-        AgentSettings agentSettings, SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException
+        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow, AgentSettings agentSettings,
+        SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException
     {
         if ( settings == null ) {
             throw new InvalidInputException( "AgentSettings can not be null" );
@@ -405,8 +404,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 if ( settings.getSocialMediaTokens().getLinkedInToken() != null
                     && settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null ) {
                     linkedinNotSetup = false;
-                    String linkedInPost = new StringBuilder( linkedInRestApiUri )
-                        .substring( 0, linkedInRestApiUri.length() - 1 );
+                    String linkedInPost = new StringBuilder( linkedInRestApiUri ).substring( 0,
+                        linkedInRestApiUri.length() - 1 );
                     linkedInPost += "/shares?oauth2_access_token="
                         + settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
                     linkedInPost += "&format=json";
@@ -474,8 +473,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             } else {
                                 linkedinPostResponse.setResponseMessage( (String) entityUpdateResponseObj.get( "message" ) );
                             }
-                            linkedinPostResponse.setAccessToken( settings.getSocialMediaTokens().getLinkedInToken()
-                                .getLinkedInAccessToken() );
+                            linkedinPostResponse
+                                .setAccessToken( settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
                         } catch ( RuntimeException e ) {
                             LOG.error(
                                 "Runtime exception caught while trying to add an update on linkedin. Nested exception is ", e );
@@ -496,7 +495,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesAndRegionsInHierarchy( long agentId )
         throws InvalidInputException
     {
-        LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started." );
+        LOG.info(
+            "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started." );
         User user = userDao.findById( User.class, agentId );
         Map<String, List<OrganizationUnitSettings>> map = new HashMap<String, List<OrganizationUnitSettings>>();
         List<OrganizationUnitSettings> companySettings = new ArrayList<>();
@@ -551,7 +551,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         map.put( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
         map.put( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
         map.put( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
-        LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished." );
+        LOG.info(
+            "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished." );
 
         return map;
     }
@@ -565,7 +566,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( long agentId )
         throws InvalidInputException
     {
-        LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started." );
+        LOG.info(
+            "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started." );
         User user = userDao.findById( User.class, agentId );
         Map<String, List<OrganizationUnitSettings>> map = new HashMap<String, List<OrganizationUnitSettings>>();
         List<OrganizationUnitSettings> companySettings = new ArrayList<>();
@@ -619,7 +621,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         map.put( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
         map.put( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings );
         map.put( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings );
-        LOG.info( "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished." );
+        LOG.info(
+            "Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished." );
 
         return map;
     }
@@ -652,8 +655,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     break;
 
                 case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-                    settings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( profile.getCompany()
-                        .getCompanyId(), CommonConstants.REGION_NAME_COLUMN ) );
+                    settings.add( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                        profile.getCompany().getCompanyId(), CommonConstants.REGION_NAME_COLUMN ) );
                     break;
             }
         }
@@ -743,8 +746,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 throw new InvalidInputException( "Invalid social media token entered" );
         }
 
-        OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao.removeKeyInOrganizationSettings(
-            unitSettings, keyToUpdate, collectionName );
+        OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao
+            .removeKeyInOrganizationSettings( unitSettings, keyToUpdate, collectionName );
 
         if ( !ignore ) {
             profileStage.setStatus( CommonConstants.STATUS_ACTIVE );
@@ -817,7 +820,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @return
      */
     @Override
-    public RegionMediaPostResponseDetails getRMPRDFromRMPRDList(List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList , long regionId)
+    public RegionMediaPostResponseDetails getRMPRDFromRMPRDList(
+        List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList, long regionId )
     {
         LOG.debug( "Inside method getRMPRDFromRMPRDList()" );
         if ( regionMediaPostResponseDetailsList == null || regionMediaPostResponseDetailsList.isEmpty() ) {
@@ -839,7 +843,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @return
      */
     @Override
-    public BranchMediaPostResponseDetails getBMPRDFromBMPRDList(List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList , long branchId)
+    public BranchMediaPostResponseDetails getBMPRDFromBMPRDList(
+        List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList, long branchId )
     {
         LOG.debug( "Inside method getBMPRDFromBMPRDList()" );
         if ( branchMediaPostResponseDetailsList == null || branchMediaPostResponseDetailsList.isEmpty() ) {
@@ -892,15 +897,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         String updatedFacebookMessage = facebookMessage;
 
-        AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails()
-            .getAgentId() );
+        AgentSettings agentSettings = userManagementService
+            .getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
 
         //Post for agent
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
 
             if ( agentSettings != null ) {
-                postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating, serverBaseUrl,
-                    agentSettings, socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails, isZillow );
+                postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
+                    serverBaseUrl, agentSettings, socialMediaPostDetails.getAgentMediaPostDetails(),
+                    agentMediaPostResponseDetails, isZillow );
             }
         }
 
@@ -912,9 +918,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 OrganizationUnitSettings companySetting = organizationManagementService
                     .getCompanySettings( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
                 if ( companySetting != null ) {
-                    postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating, serverBaseUrl,
-                        companySetting, socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails,
-                        isZillow );
+                    postToFacebookForAHierarchy( companyId, agentSettings, facebookMessage, updatedFacebookMessage, rating,
+                        serverBaseUrl, companySetting, socialMediaPostDetails.getCompanyMediaPostDetails(),
+                        companyMediaPostResponseDetails, isZillow );
                 }
             }
 
@@ -923,8 +929,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                 if ( regionMediaPostDetails != null ) {
 
-                    OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
-                        .getRegionId() );
+                    OrganizationUnitSettings setting = organizationManagementService
+                        .getRegionSettings( regionMediaPostDetails.getRegionId() );
                     if ( setting != null ) {
                         RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
@@ -955,11 +961,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         LOG.debug( "Method postToFacebookForHierarchy() ended" );
     }
-    
-    
-    void postToFacebookForAHierarchy( long companyId, AgentSettings agentSettings, String facebookMessage, String updatedFacebookMessage,
-        double rating, String serverBaseUrl, OrganizationUnitSettings setting, MediaPostDetails mediaPostDetails,
-        EntityMediaPostResponseDetails mediaPostResponseDetails, boolean isZillow ) throws InvalidInputException
+
+
+    void postToFacebookForAHierarchy( long companyId, AgentSettings agentSettings, String facebookMessage,
+        String updatedFacebookMessage, double rating, String serverBaseUrl, OrganizationUnitSettings setting,
+        MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails, boolean isZillow )
+        throws InvalidInputException
     {
         try {
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
@@ -975,8 +982,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     mediaPostDetails.setSharedOn( socialList );
 
                     SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-                    facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                        .getFacebookAccessTokenToPost() );
+                    facebookPostResponse
+                        .setAccessToken( setting.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() );
                     facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                     facebookPostResponse.setResponseMessage( "Ok" );
                     if ( mediaPostResponseDetails.getFacebookPostResponseList() == null ) {
@@ -989,8 +996,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             LOG.error( "FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ",
                 e );
             SocialMediaPostResponse facebookPostResponse = new SocialMediaPostResponse();
-            facebookPostResponse.setAccessToken( setting.getSocialMediaTokens().getFacebookToken()
-                .getFacebookAccessTokenToPost() );
+            facebookPostResponse
+                .setAccessToken( setting.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() );
             facebookPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
             facebookPostResponse.setResponseMessage( e.getMessage() );
             if ( mediaPostResponseDetails.getFacebookPostResponseList() == null )
@@ -1038,8 +1045,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         String updatedLinkedInMessage = linkedinMessage;
 
-        AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails()
-            .getAgentId() );
+        AgentSettings agentSettings = userManagementService
+            .getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
 
         //Post for agent
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
@@ -1068,15 +1075,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             //Post for regions
             for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                 if ( regionMediaPostDetails != null ) {
-                    OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
-                        .getRegionId() );
+                    OrganizationUnitSettings setting = organizationManagementService
+                        .getRegionSettings( regionMediaPostDetails.getRegionId() );
 
                     if ( setting != null ) {
                         RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
                         postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
-                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
-                            regionMediaPostDetails, regionMediaPostResponseDetails );
+                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, regionMediaPostDetails,
+                            regionMediaPostResponseDetails );
                     }
                 }
             }
@@ -1090,8 +1097,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         BranchMediaPostResponseDetails branchMediaPostResponseDetails = getBMPRDFromBMPRDList(
                             branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() );
                         postToLinkedInForAHierarchy( setting, rating, isZillow, updatedLinkedInMessage, linkedinMessage,
-                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings,
-                            branchMediaPostDetails, branchMediaPostResponseDetails );
+                            linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, branchMediaPostDetails,
+                            branchMediaPostResponseDetails );
                     }
                 }
             }
@@ -1099,8 +1106,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         LOG.debug( "Method postToLinkedInForHierarchy() ended" );
     }
-    
-    
+
+
     void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
@@ -1179,8 +1186,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         //Post for agent
         if ( socialMediaPostDetails.getAgentMediaPostDetails() != null ) {
-            AgentSettings agentSettings = userManagementService.getUserSettings( socialMediaPostDetails
-                .getAgentMediaPostDetails().getAgentId() );
+            AgentSettings agentSettings = userManagementService
+                .getUserSettings( socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
             if ( agentSettings != null ) {
                 postToTwitterForAHierarchy( agentSettings, rating, companyId, twitterMessage,
                     socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
@@ -1205,8 +1212,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             //post for regions
             for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
                 if ( regionMediaPostDetails != null ) {
-                    OrganizationUnitSettings setting = organizationManagementService.getRegionSettings( regionMediaPostDetails
-                        .getRegionId() );
+                    OrganizationUnitSettings setting = organizationManagementService
+                        .getRegionSettings( regionMediaPostDetails.getRegionId() );
                     if ( setting != null ) {
                         RegionMediaPostResponseDetails regionMediaPostResponseDetails = getRMPRDFromRMPRDList(
                             regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() );
@@ -1237,8 +1244,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         LOG.debug( "Method postToTwitterForHierarchy() ended" );
     }
-    
-    
+
+
     public void postToTwitterForAHierarchy( OrganizationUnitSettings setting, Double rating, long companyId,
         String twitterMessage, MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails )
         throws InvalidInputException
@@ -1252,8 +1259,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     mediaPostDetails.setSharedOn( socialList );
 
                     SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
-                    twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken()
-                        .getTwitterAccessToken() );
+                    twitterPostResponse
+                        .setAccessToken( setting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
                     twitterPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
                     twitterPostResponse.setResponseMessage( "Ok" );
                     if ( mediaPostResponseDetails.getTwitterPostResponseList() == null )
@@ -1262,7 +1269,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 }
             }
         } catch ( TwitterException e ) {
-            LOG.error( "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e );
+            LOG.error( "TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ",
+                e );
 
             SocialMediaPostResponse twitterPostResponse = new SocialMediaPostResponse();
             twitterPostResponse.setAccessToken( setting.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken() );
@@ -1289,7 +1297,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         LOG.info( "Method to post feedback of customer to various pages of social networking sites started." );
         boolean successfullyPosted = true;
-        
+
         //format rating
         rating = surveyHandler.getFormattedSurveyScore( rating );
 
@@ -1339,8 +1347,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 .getCompanyMediaPostResponseDetails();
             if ( companyMediaPostResponseDetails == null ) {
                 companyMediaPostResponseDetails = new CompanyMediaPostResponseDetails();
-                companyMediaPostResponseDetails.setCompanyId( socialMediaPostDetails.getCompanyMediaPostDetails()
-                    .getCompanyId() );
+                companyMediaPostResponseDetails
+                    .setCompanyId( socialMediaPostDetails.getCompanyMediaPostDetails().getCompanyId() );
             }
             List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList = socialMediaPostResponseDetails
                 .getRegionMediaPostResponseDetailsList();
@@ -1373,7 +1381,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 BranchMediaPostResponseDetails branchMediaPostResponseDetails = new BranchMediaPostResponseDetails();
                 branchMediaPostResponseDetails.setBranchId( branchMediaPostDetails.getBranchId() );
                 branchMediaPostResponseDetails.setRegionId( branchMediaPostDetails.getRegionId() );
-                if ( getBMPRDFromBMPRDList( branchMediaPostResponseDetailsList, branchMediaPostDetails.getBranchId() ) == null ) {
+                if ( getBMPRDFromBMPRDList( branchMediaPostResponseDetailsList,
+                    branchMediaPostDetails.getBranchId() ) == null ) {
                     branchMediaPostResponseDetailsList.add( branchMediaPostResponseDetails );
                 }
             }
@@ -1384,7 +1393,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 //create RegionMediaPostResponseDetails 
                 RegionMediaPostResponseDetails regionMediaPostResponseDetails = new RegionMediaPostResponseDetails();
                 regionMediaPostResponseDetails.setRegionId( regionMediaPostDetails.getRegionId() );
-                if ( getRMPRDFromRMPRDList( regionMediaPostResponseDetailsList, regionMediaPostDetails.getRegionId() ) == null ) {
+                if ( getRMPRDFromRMPRDList( regionMediaPostResponseDetailsList,
+                    regionMediaPostDetails.getRegionId() ) == null ) {
                     regionMediaPostResponseDetailsList.add( regionMediaPostResponseDetails );
                 }
             }
@@ -1429,9 +1439,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 //    + "-star review on SocialSurvey saying : \"" + feedback + "\".\nView this and more at "
                 //    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink+"/";
 
-                String facebookMessage = buildFacebookAutoPostMessage( customerDisplayName, agentName, rating,
-                    feedback, surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                        + agentProfileLink + "/", false );
+                String facebookMessage = buildFacebookAutoPostMessage( customerDisplayName, agentName, rating, feedback,
+                    surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink + "/",
+                    false );
 
                 postToFacebookForHierarchy( facebookMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails, false );
@@ -1441,9 +1451,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 //    + "-star review on SocialSurvey saying : \"" + feedback + "\". View this and more at "
                 //    + surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 
-                String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating,
-                    feedback, surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                        + agentProfileLink, false );
+                String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating, feedback,
+                    surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink, false );
 
                 String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                     + agentProfileLink;
@@ -1461,9 +1470,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 // String twitterMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
                 //    + "-star review @SocialSurveyMe. " + surveyHandler.getApplicationBaseUrl()
                 //    + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
-                String twitterMessage = buildTwitterAutoPostMessage( customerDisplayName, agentName, rating,
-                    feedback, surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                        + agentProfileLink, false );
+                String twitterMessage = buildTwitterAutoPostMessage( customerDisplayName, agentName, rating, feedback,
+                    surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink, false );
                 postToTwitterForHierarchy( twitterMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails );
 
@@ -1781,7 +1789,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             removeSocialMediaTokens( unitSettings, collection );
 
         } catch ( ProfileNotFoundException e ) {
-            throw new InvalidInputException( "Profile not found for entityType : " + entityType + " and entityID : " + entityId );
+            throw new InvalidInputException(
+                "Profile not found for entityType : " + entityType + " and entityID : " + entityId );
         }
     }
 
@@ -1864,10 +1873,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate, String postedOn )
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate,
+        String postedOn )
     {
-        externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating, autoPostStatus,
-            complaintResolutionStatus, reviewDate, postedOn );
+        externalSurveyTrackerDao.saveExternalSurveyTracker( entityColumnName, entityId, source, sourceLink, reviewUrl, rating,
+            autoPostStatus, complaintResolutionStatus, reviewDate, postedOn );
     }
 
 
@@ -1918,8 +1928,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Transactional
     @Override
-    public void updateAgentIdOfSurveyPreinitiationRecordsForEmail( User user, String emailAddress )
-        throws InvalidInputException
+    public void updateAgentIdOfSurveyPreinitiationRecordsForEmail( User user, String emailAddress ) throws InvalidInputException
     {
         if ( user == null ) {
             throw new InvalidInputException( " Wrong parameter passed : user is null " );
@@ -1946,52 +1955,51 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public String buildFacebookAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        String feedback, String linkUrl, boolean isZillow )
+    public String buildFacebookAutoPostMessage( String customerDisplayName, String agentName, double rating, String feedback,
+        String linkUrl, boolean isZillow )
     {
         // String facebookMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
         //    + "-star review on" + ( isZillow ? " Zillow via" : " " ) + "SocialSurvey saying : \"" + feedback
         //    + "\".\nView this and more at " + linkUrl + "/";
-        String facebookMessage = rating  + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
-            + " \u2014 " + feedback + " by " + customerDisplayName + " for " + agentName + "\n" + ( isZillow ? linkUrl : "" );
+        String facebookMessage = rating + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" ) + " \u2014 " + feedback
+            + " by " + customerDisplayName + " for " + agentName + "\n" + ( isZillow ? linkUrl : "" );
         return facebookMessage;
     }
 
 
     @Override
-    public String buildLinkedInAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        String feedback, String linkUrl, boolean isZillow )
+    public String buildLinkedInAutoPostMessage( String customerDisplayName, String agentName, double rating, String feedback,
+        String linkUrl, boolean isZillow )
     {
         String linkedInComment = feedback != null && feedback.length() > 500 ? feedback.substring( 0, 500 ) : feedback;
-        linkedInComment = feedback != null && feedback.length() > 500 ? ( linkedInComment.substring( 0,
-            linkedInComment.lastIndexOf( " " ) ) + " ..." ) : linkedInComment;
+        linkedInComment = feedback != null && feedback.length() > 500
+            ? ( linkedInComment.substring( 0, linkedInComment.lastIndexOf( " " ) ) + " ..." ) : linkedInComment;
 
         // String linkedinMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
         //    + "-star review on" + ( isZillow ? " Zillow via " : " " ) + "SocialSurvey saying : \"" + linkedInComment
         //    + "\". View this and more at " + linkUrl;
-        String linkedinMessage = rating + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" )
-            + " &dash; " + linkedInComment + " by " + customerDisplayName + " for " + agentName + "&lmnlf;" + ( isZillow ? linkUrl : "" );
+        String linkedinMessage = rating + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" ) + " &dash; "
+            + linkedInComment + " by " + customerDisplayName + " for " + agentName + "&lmnlf;" + ( isZillow ? linkUrl : "" );
         return linkedinMessage;
     }
 
 
     @Override
-    public String buildTwitterAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        String feedback, String linkUrl, boolean isZillow )
+    public String buildTwitterAutoPostMessage( String customerDisplayName, String agentName, double rating, String feedback,
+        String linkUrl, boolean isZillow )
     {
         // String twitterMessage = customerDisplayName + " gave " + agentName + " a " + ratingFormat.format( rating )
         //    + "-star review" + ( isZillow ? " @Zillow via " : " " ) + "@SocialSurveyMe. "
         //    + linkUrl;
-        String twitterMessage = rating + " Star Review on " + ( isZillow ? "#Zillow" : "#SocialSurvey" )
-            + " by " + customerDisplayName + " for " + agentName + "\n"+ linkUrl;
+        String twitterMessage = rating + " Star Review on " + ( isZillow ? "#Zillow" : "#SocialSurvey" ) + " by "
+            + customerDisplayName + " for " + agentName + "\n" + linkUrl;
         return twitterMessage;
     }
-    
-    
-    
-    
+
+
     @Override
-    public  Map<Long, List<SocialUpdateAction>> getSocialConnectionsHistoryForEntities( String entityType,  List<Long>  entityIds ) throws InvalidInputException, ProfileNotFoundException
+    public Map<Long, List<SocialUpdateAction>> getSocialConnectionsHistoryForEntities( String entityType, List<Long> entityIds )
+        throws InvalidInputException, ProfileNotFoundException
     {
         //Check if any of the parameters are null or empty
         if ( entityType == null || entityType.isEmpty() ) {
@@ -2001,19 +2009,39 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         if ( entityIds == null || entityIds.isEmpty() ) {
             throw new InvalidInputException( "Invalid entity ID. Entity ID : " + entityIds );
         }
-        
+
         Map<Long, List<SocialUpdateAction>> socialUpdatesMap = new HashMap<Long, List<SocialUpdateAction>>();
-       
-        List<SocialUpdateAction> socialUpdatesList =  socialPostDao.getSocialConnectionHistoryByEntityIds(entityType, entityIds );
+
+        List<SocialUpdateAction> socialUpdatesList = socialPostDao.getSocialConnectionHistoryByEntityIds( entityType,
+            entityIds );
         for ( Long entityId : entityIds ) {
             socialUpdatesMap.put( entityId, new ArrayList<SocialUpdateAction>() );
         }
         List<SocialUpdateAction> curSocialUpdateList;
-        for(SocialUpdateAction curSocialUpdate : socialUpdatesList){
+        for ( SocialUpdateAction curSocialUpdate : socialUpdatesList ) {
             curSocialUpdateList = socialUpdatesMap.get( curSocialUpdate.getAgentId() );
             curSocialUpdateList.add( curSocialUpdate );
         }
-        
+
         return socialUpdatesMap;
+    }
+
+
+    @Override
+    @Transactional
+    public SurveyPreInitiationList getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException
+    {
+        LOG.debug( "method getCorruptPreInitiatedSurveys called for company id : " + companyId );
+        SurveyPreInitiationList surveyPreInitiationListVO = new SurveyPreInitiationList();
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( " Wrong parameter passed : companyId is invalid " );
+        }
+
+        List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getCorruptPreInitiatedSurveys( companyId,
+            startIndex, batchSize );
+        surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
+        surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getCorruptPreInitiatedSurveyCount( companyId ) );
+        return surveyPreInitiationListVO;
     }
 }

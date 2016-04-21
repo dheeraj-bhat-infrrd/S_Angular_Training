@@ -1386,6 +1386,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else {
                         user.setFirstNameModified( false );
                     }
+
                     try {
                         if ( ( user.getLastName() == null && uploadedUser.getLastName() != null )
                             || ( user.getLastName() != null && uploadedUser.getLastName() == null )
@@ -1559,6 +1560,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     } else {
                         user.setLicenseModified( false );
                     }
+
                     try {
                         if ( ( user.getLegalDisclaimer() != null && uploadedUser.getLegalDisclaimer() == null )
                             || ( user.getLegalDisclaimer() == null && uploadedUser.getLegalDisclaimer() != null )
