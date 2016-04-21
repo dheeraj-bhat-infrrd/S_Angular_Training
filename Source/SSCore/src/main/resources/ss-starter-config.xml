@@ -212,14 +212,7 @@
 			value="com.realtech.socialsurvey.core.starter.CrmDataAgentIdMapper" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="emailServices" value-ref="emailServices" />
-				<entry key="surveyHandler" value-ref="surveyHandler" />
 				<entry key="userManagementService" value-ref="userManagementService" />
-				<entry key="companyAdminEnabled" value="${BATCH_COMPANY_ADMIN_ENABLED}" />
-				<entry key="adminEmailId" value="${APPLICATION_ADMIN_EMAIL}" />
-				<entry key="adminName" value="${APPLICATION_ADMIN_NAME}" />
-				<entry key="fileDirectoryLocation" value="${FILE_DIRECTORY_LOCATION}" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />

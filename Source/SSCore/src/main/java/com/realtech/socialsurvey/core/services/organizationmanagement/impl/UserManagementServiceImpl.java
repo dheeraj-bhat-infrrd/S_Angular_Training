@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.io.*;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -11,6 +12,12 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -35,29 +42,6 @@ import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.MailIdSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProListUser;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RemovedUser;
-import com.realtech.socialsurvey.core.entities.SettingsDetails;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserApiKey;
-import com.realtech.socialsurvey.core.entities.UserEmailMapping;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserInvite;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -99,12 +83,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     private static final Logger LOG = LoggerFactory.getLogger( UserManagementServiceImpl.class );
     private static Map<Integer, ProfilesMaster> profileMasters = new HashMap<Integer, ProfilesMaster>();
+    private String companyAdminEnabled;
+    private String adminEmailId;
+    private String adminName;
+    private String fileDirectoryLocation;
 
     @Autowired
     private URLGenerator urlGenerator;
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
+
+    @Autowired
+    private SurveyHandler surveyHandler;
 
     @Autowired
     private EmailServices emailServices;
@@ -1996,7 +1987,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param company
      * @param password
      * @param emailId
-     * @param displayName
      * @return
      */
     private User createUser( Company company, String password, String emailId, String firstName, String lastName,
@@ -4019,5 +4009,211 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         solrSearchService.removeUserFromSolr( userIdToBeDeleted );
 
         LOG.info( "Method deleteUserDataFromAllSources executed successfully" );
+    }
+
+
+    @Override
+    public void crmDataAgentIdMApper()
+    {
+        try {
+            // update last start time
+            batchTrackerService
+                .getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER,
+                    CommonConstants.BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER );
+
+            Map<String, Object> corruptRecords = surveyHandler.mapAgentsInSurveyPreInitiation();
+            sendCorruptDataFromCrmNotificationMail( corruptRecords );
+
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER );
+            LOG.info( "Completed CrmDataAgentIdMapper" );
+        } catch ( Exception e ) {
+            LOG.error( "Error in CrmDataAgentIdMapper", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in CrmDataAgentIdMapper " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+
+    private void sendCorruptDataFromCrmNotificationMail( Map<String, Object> corruptRecords )
+    {
+        List<SurveyPreInitiation> unavailableAgents = (List<SurveyPreInitiation>) corruptRecords.get( "unavailableAgents" );
+        List<SurveyPreInitiation> invalidAgents = (List<SurveyPreInitiation>) corruptRecords.get( "invalidAgents" );
+        List<SurveyPreInitiation> customersWithoutName = (List<SurveyPreInitiation>) corruptRecords
+            .get( "customersWithoutName" );
+        List<SurveyPreInitiation> customersWithoutEmailId = (List<SurveyPreInitiation>) corruptRecords
+            .get( "customersWithoutEmailId" );
+
+        List<SurveyPreInitiation> ignoredEmailRecords = (List<SurveyPreInitiation>) corruptRecords.get( "ignoredEmailRecords" );
+        List<SurveyPreInitiation> oldRecords = (List<SurveyPreInitiation>) corruptRecords.get( "oldRecords" );
+
+        Set<Long> companies = (Set<Long>) corruptRecords.get( "companies" );
+
+        for ( Long companyId : companies ) {
+            int rownum = 1;
+            int count = 1;
+            boolean excelCreated = false;
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet = workbook.createSheet( "Corrupt Records" );
+            sheet = fillHeaders( sheet );
+
+            for ( SurveyPreInitiation survey : unavailableAgents ) {
+
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Agent Not Available For This Organization " );
+                }
+            }
+            for ( SurveyPreInitiation survey : invalidAgents ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Agent Does Not Exist" );
+                }
+            }
+            for ( SurveyPreInitiation survey : customersWithoutName ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Customer Name Is Not Present" );
+                }
+            }
+            for ( SurveyPreInitiation survey : customersWithoutEmailId ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Customer Email Id Is Not Present" );
+                }
+            }
+
+            for ( SurveyPreInitiation survey : ignoredEmailRecords ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Agent Email Id is ignored" );
+                }
+            }
+
+            for ( SurveyPreInitiation survey : oldRecords ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Old record" );
+                }
+            }
+
+            String fileName = companyId + "_" + System.currentTimeMillis();
+            FileOutputStream fileOutput = null;
+            InputStream inputStream = null;
+            File file = null;
+            String filePath = null;
+            try {
+                file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+                fileOutput = new FileOutputStream( file );
+                file.createNewFile();
+                workbook.write( fileOutput );
+                filePath = file.getPath();
+                excelCreated = true;
+            } catch ( FileNotFoundException fe ) {
+                LOG.error( "Exception caught " + fe.getMessage() );
+                excelCreated = false;
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught " + e.getMessage() );
+                excelCreated = false;
+            } finally {
+                try {
+                    fileOutput.close();
+                    if ( inputStream != null ) {
+                        inputStream.close();
+                    }
+                } catch ( IOException e ) {
+                    LOG.error( "Exception caught " + e.getMessage() );
+                    excelCreated = false;
+                }
+            }
+            try {
+                if ( excelCreated ) {
+                    Map<String, String> attachmentsDetails = new HashMap<String, String>();
+                    attachmentsDetails.put( "CorruptRecords.xls", filePath );
+
+                    if ( companyAdminEnabled == "1" ) {
+                        User companyAdmin = getCompanyAdmin( companyId );
+                        if ( companyAdmin != null ) {
+                            emailServices.sendCorruptDataFromCrmNotificationMail( companyAdmin.getFirstName(),
+                                companyAdmin.getLastName(), companyAdmin.getEmailId(), attachmentsDetails );
+                        }
+                    } else {
+                        emailServices.sendCorruptDataFromCrmNotificationMail( adminName, "", adminEmailId, attachmentsDetails );
+                    }
+                }
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Exception caught in sendCorruptDataFromCrmNotificationMail() while sending mail to company admin" );
+            }
+        }
+    }
+
+
+    private Row fillCellsInRow( Row row, SurveyPreInitiation survey, int counter, String reasonForFailure )
+    {
+        int cellnum = 0;
+        Cell cell1 = row.createCell( cellnum++ );
+        cell1.setCellValue( counter );
+        Cell cell2 = row.createCell( cellnum++ );
+        cell2.setCellValue( survey.getSurveySource() );
+        Cell cell3 = row.createCell( cellnum++ );
+        if ( survey.getAgentEmailId() != null ) {
+            cell3.setCellValue( survey.getAgentEmailId() );
+        } else {
+            cell3.setCellValue( "" );
+        }
+        Cell cell4 = row.createCell( cellnum++ );
+        if ( survey.getCustomerFirstName() != null ) {
+            cell4.setCellValue( survey.getCustomerFirstName() );
+        } else {
+            cell4.setCellValue( "" );
+        }
+        Cell cell5 = row.createCell( cellnum++ );
+        if ( survey.getCustomerLastName() != null ) {
+            cell5.setCellValue( survey.getCustomerLastName() );
+        } else {
+            cell5.setCellValue( "" );
+        }
+        Cell cell6 = row.createCell( cellnum++ );
+        if ( survey.getCustomerEmailId() != null ) {
+            cell6.setCellValue( survey.getCustomerEmailId() );
+        } else {
+            cell6.setCellValue( "" );
+        }
+        Cell cell7 = row.createCell( cellnum++ );
+        cell7.setCellValue( reasonForFailure );
+        return row;
+
+    }
+
+
+    public HSSFSheet fillHeaders( HSSFSheet sheet )
+    {
+        int cellnum = 0;
+        Row row = sheet.createRow( 0 );
+        Cell cell1 = row.createCell( cellnum++ );
+        cell1.setCellValue( "S.No" );
+        Cell cell2 = row.createCell( cellnum++ );
+        cell2.setCellValue( "Source" );
+        Cell cell3 = row.createCell( cellnum++ );
+        cell3.setCellValue( "Agent Email Id" );
+        Cell cell4 = row.createCell( cellnum++ );
+        cell4.setCellValue( "Customer First Name" );
+        Cell cell5 = row.createCell( cellnum++ );
+        cell5.setCellValue( "Customer Last Name" );
+        Cell cell6 = row.createCell( cellnum++ );
+        cell6.setCellValue( "Customer Email Id" );
+        Cell cell7 = row.createCell( cellnum++ );
+        cell7.setCellValue( "Reason For Failure" );
+        return sheet;
     }
 }
