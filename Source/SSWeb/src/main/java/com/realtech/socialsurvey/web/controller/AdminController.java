@@ -54,7 +54,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -136,16 +135,13 @@ public class AdminController
                     LOG.error( "Exception Caught " + e.getMessage() );
                     message = CommonConstants.ERROR;
                 }
-
-                try {
-                    organizationManagementService.deleteCompany( company, loggedInUser );
-                } catch ( InvalidInputException e ) {
-                    LOG.error( "Exception Caught " + e.getMessage() );
-                    message = CommonConstants.ERROR;
-                } catch ( SolrException e ) {
-                    LOG.error( "Exception Caught " + e.getMessage() );
-                    message = CommonConstants.ERROR;
-                }
+                
+                // Deleting company from MySQL
+                company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
+                organizationManagementService.updateCompany( company );
+                
+                // marking comapny to be deleted forcefully during purge batch
+                organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
             }
         }
         return message;
