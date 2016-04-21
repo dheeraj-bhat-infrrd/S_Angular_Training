@@ -539,7 +539,7 @@
 	<bean id="dotloopcron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="dotloopjobdetail" />
-		<property name="cronExpression" value="0 15 11 * * ?" />
+		<property name="cronExpression" value="0 0 1 * * ?" />
 	</bean>
 
 	<bean id="imageprocessingcron"
