@@ -24,8 +24,20 @@ public class SurveySettings {
 	private String neutralTextComplete;
 	private String sadTextComplete;
 	private ComplaintResolutionSettings complaint_res_settings;
+	
+	private int duplicateSurveyInterval;
 
-	public float getAuto_post_score() {
+	public int getDuplicateSurveyInterval()
+    {
+        return duplicateSurveyInterval;
+    }
+
+    public void setDuplicateSurveyInterval( int duplicateSurveyInterval )
+    {
+        this.duplicateSurveyInterval = duplicateSurveyInterval;
+    }
+
+    public float getAuto_post_score() {
 		return auto_post_score;
 	}
 

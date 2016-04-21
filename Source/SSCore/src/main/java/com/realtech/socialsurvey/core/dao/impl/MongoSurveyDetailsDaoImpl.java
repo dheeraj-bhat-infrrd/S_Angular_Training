@@ -82,6 +82,24 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Value ( "${CONSIDER_ONLY_LATEST_SURVEYS}")
     private String considerOnlyLatestSurveys;
 
+    
+    /*
+     * Method to fetch survey details on the basis of survey preinitiated id.
+     */
+    @Override
+    public SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId )
+    {
+        LOG.info( "Method getSurveyBySurveyPreIntitiationId() to insert details of survey started." );
+        Query query = new Query( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN ).is( surveyPreIntitiationId ) );
+       
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+        LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
+        return surveys.get( CommonConstants.INITIAL_INDEX );
+    }
+
+    
 
     /*
      * Method to fetch survey details on the basis of agentId and customer email.
@@ -99,6 +117,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( lastName != null && !lastName.isEmpty() ) {
             query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
         }
+        //get the oldest record
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         if ( surveys == null || surveys.size() == 0 )
             return null;
@@ -106,6 +126,39 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return surveys.get( CommonConstants.INITIAL_INDEX );
     }
 
+    
+    @Override
+    public SurveyDetails getSurveyByAgentIdAndCustomerEmailAndNoOfDays( long agentId, String customerEmail, String firstName,
+        String lastName , int noOfDays )
+    {
+        LOG.info( "Method getSurveyByAgentIdAndCustomerEmailAndNoOfDays()  started." );
+        
+        Date startDate = null;
+        if ( noOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( noOfDays );
+        }
+
+        
+        Query query = new Query( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
+        if ( firstName != null && !firstName.isEmpty() ) {
+            query.addCriteria( Criteria.where( "customerFirstName" ).is( firstName ) );
+        }
+        if ( lastName != null && !lastName.isEmpty() ) {
+            query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
+        }
+        
+        query.addCriteria( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ));
+        
+            
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+        LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
+        return surveys.get( CommonConstants.INITIAL_INDEX );
+    }
 
     @Override
     public SurveyDetails getSurveyBySurveyMongoId( String surveyMongoId )
@@ -152,12 +205,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to update questions for survey in SURVEY_DETAILS collection.
      */
     @Override
-    public void updateCustomerResponse( long agentId, String customerEmail, SurveyResponse surveyResponse, int stage )
+    public void updateCustomerResponse( String surveyId , SurveyResponse surveyResponse, int stage )
     {
         LOG.info( "Method updateCustomerResponse() to update response provided by customer started." );
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
         update.set( "stage", stage );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
@@ -173,13 +225,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * collection.
      */
     @Override
-    public void updateGatewayAnswer( long agentId, String customerEmail, String mood, String review, boolean isAbusive,
+    public void updateGatewayAnswer(String surveyId, String mood, String review, boolean isAbusive,
         String agreedToShare )
     {
         LOG.info( "Method updateGatewayAnswer() to update review provided by customer started." );
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
         update.set( CommonConstants.STAGE_COLUMN, CommonConstants.SURVEY_STAGE_COMPLETE );
         update.set( CommonConstants.MOOD_COLUMN, mood );
@@ -197,7 +248,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to calculate and update final score based upon rating questions.
      */
     @Override
-    public void updateFinalScore( long agentId, String customerEmail )
+    public void updateFinalScore( String surveyId )
     {
         LOG.info( "Method to calculate and update final score based upon rating questions started." );
         Query query = new Query();
@@ -205,8 +256,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         ratingType.add( "sb-range-smiles" );
         ratingType.add( "sb-range-scale" );
         ratingType.add( "sb-range-star" );
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         query.addCriteria( Criteria.where( "surveyResponse.questionType" ).in( ratingType ) );
         List<SurveyResponse> surveyResponse = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION )
             .get( CommonConstants.INITIAL_INDEX ).getSurveyResponse();
@@ -1753,14 +1803,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable )
+    public void changeStatusOfSurvey( String surveyId, boolean editable )
     {
         LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
-        query.addCriteria( Criteria.where( "customerFirstName" ).is( firstName ) );
-        query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
         update.set( CommonConstants.EDITABLE_SURVEY_COLUMN, editable );
         update.set( CommonConstants.STAGE_COLUMN, 0 );

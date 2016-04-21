@@ -50,7 +50,10 @@ public class SurveyDetails
     private SocialMediaPostResponseDetails socialMediaPostResponseDetails;
     private boolean showSurveyOnUI;
     private String summary;
-
+    
+    private long surveyPreIntitiationId;
+    private boolean newSurvey;
+    
     public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
     {
         return socialMediaPostResponseDetails;
@@ -574,5 +577,29 @@ public class SurveyDetails
     public void setSummary( String summary )
     {
         this.summary = summary;
+    }
+
+
+    public long getSurveyPreIntitiationId()
+    {
+        return surveyPreIntitiationId;
+    }
+
+
+    public void setSurveyPreIntitiationId( long surveyPreIntitiationId )
+    {
+        this.surveyPreIntitiationId = surveyPreIntitiationId;
+    }
+
+
+    public boolean isNewSurvey()
+    {
+        return newSurvey;
+    }
+
+
+    public void setNewSurvey( boolean newSurvey )
+    {
+        this.newSurvey = newSurvey;
     }
 }

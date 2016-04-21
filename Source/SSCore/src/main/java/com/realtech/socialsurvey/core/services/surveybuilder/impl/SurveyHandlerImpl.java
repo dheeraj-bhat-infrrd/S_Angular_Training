@@ -198,7 +198,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     @Transactional
     public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String baseUrl, String source ) throws SolrException,
+        int reminderCount, String custRelationWithAgent, String baseUrl, String source , long surveyPreIntitiationId , boolean isOldRecord , boolean retakeSurvey ) throws SolrException,
         NoRecordsFetchedException, InvalidInputException
     {
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() started." );
@@ -239,14 +239,27 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setEditable( true );
         surveyDetails.setSource( source );
         surveyDetails.setShowSurveyOnUI( true );
+        
+        surveyDetails.setNewSurvey( retakeSurvey );
+        surveyDetails.setSurveyPreIntitiationId( surveyPreIntitiationId );
 
-        SurveyDetails survey = surveyDetailsDao
-            .getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
+        SurveyDetails survey = null;
+        //if survey request is old get survey by agent id and customer email
+        if( isOldRecord){
+            survey =surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, customerEmail, firstName, lastName );
+            //update survey PreIntitiation Id for survey
+            if(survey != null){
+                survey.setSurveyPreIntitiationId( surveyPreIntitiationId );
+                surveyDetailsDao.updateSurveyDetails( surveyDetails );
+            }
+        }else{
+            survey = surveyDetailsDao.getSurveyBySurveyPreIntitiationId( surveyPreIntitiationId );
+        }
         LOG.info( "Method to store initial details of survey, storeInitialSurveyAnswers() finished." );
 
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
-            // LOG.info( "Updating modified on column in aagent hierarchy fro agent " );
+            // LOG.info( "Updating modified on column in agent hierarchy fro agent " );
             // updateModifiedOnColumnForAgentHierachy( agentId );
             return null;
         } else {
@@ -295,7 +308,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @throws Exception
      */
     @Override
-    public void updateCustomerAnswersInSurvey( long agentId, String customerEmail, String question, String questionType,
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType,
         String answer, int stage )
     {
         LOG.info( "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
@@ -303,7 +316,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyResponse.setAnswer( answer );
         surveyResponse.setQuestion( question );
         surveyResponse.setQuestionType( questionType );
-        surveyDetailsDao.updateCustomerResponse( agentId, customerEmail, surveyResponse, stage );
+        surveyDetailsDao.updateCustomerResponse( surveyId, surveyResponse, stage );
         LOG.info( "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
 
@@ -313,12 +326,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * SURVEY_DETAILS.
      */
     @Override
-    public void updateGatewayQuestionResponseAndScore( long agentId, String customerEmail, String mood, String review,
+    public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review,
         boolean isAbusive, String agreedToShare )
     {
         LOG.info( "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
-        surveyDetailsDao.updateGatewayAnswer( agentId, customerEmail, mood, review, isAbusive, agreedToShare );
-        surveyDetailsDao.updateFinalScore( agentId, customerEmail );
+        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare );
+        surveyDetailsDao.updateFinalScore( surveyId );
         LOG.info( "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
 
@@ -672,10 +685,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable )
+    public void changeStatusOfSurvey( String surveyId, boolean editable )
     {
         LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
-        surveyDetailsDao.changeStatusOfSurvey( agentId, customerEmail, firstName, lastName, editable );
+        surveyDetailsDao.changeStatusOfSurvey( surveyId , editable );
         LOG.info( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished." );
     }
 
@@ -706,8 +719,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             throw new InvalidInputException( "Null/Empty value found for customer's email id." );
         }
 
-        String link = composeLink( user.getUserId(), custEmail, custFirstName, custLastName );
-        preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, source );
+        SurveyPreInitiation surveyPreInitiation = preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, source );
+
+        String link = composeLink( user.getUserId(), custEmail, custFirstName, custLastName , surveyPreInitiation.getSurveyPreIntitiationId() , false );
+
         // storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0,
         // custRelationWithAgent, link);
 
@@ -1379,14 +1394,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyPreInitiations = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, agentIdCriteria,
                 emailCriteria, statusCriteria );
         }
-
-        /*List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
-            queries );*/
-        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
+        
+        //get the oldest record
+        SurveyPreInitiation surveyPreInitiation =null;
         if ( surveyPreInitiations != null && !surveyPreInitiations.isEmpty() ) {
-            return surveyPreInitiations.get( CommonConstants.INITIAL_INDEX );
+            for(SurveyPreInitiation currentSurveyPreInitiation : surveyPreInitiations){
+                if(surveyPreInitiation == null || surveyPreInitiation.getCreatedOn().after( currentSurveyPreInitiation.getCreatedOn() ))
+                    surveyPreInitiation = currentSurveyPreInitiation;
+            }
         }
-        return null;
+        
+        LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() finished. " );
+        return surveyPreInitiation;
     }
 
 
@@ -1420,7 +1439,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * Method to compose link for sending to a user to start survey started.
      */
     @Override
-    public String composeLink( long userId, String custEmail, String custFirstName, String custLastName )
+    public String composeLink( long userId, String custEmail, String custFirstName, String custLastName , long surveyPreInitiationId , boolean retakeSurvey )
         throws InvalidInputException
     {
         LOG.debug( "Method composeLink() started" );
@@ -1429,6 +1448,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         urlParams.put( CommonConstants.CUSTOMER_EMAIL_COLUMN, custEmail );
         urlParams.put( CommonConstants.FIRST_NAME, custFirstName );
         urlParams.put( CommonConstants.LAST_NAME, custLastName );
+        urlParams.put( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, surveyPreInitiationId + "" );
+        urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, retakeSurvey + "" );
         LOG.debug( "Method composeLink() finished" );
         return urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
     }
@@ -1477,20 +1498,36 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                 if ( user != null ) {
                     // check if survey has already been sent to the email id
+                    int duplicateSurveyInterval = 0;
+                    OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                        user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    if ( companySettings != null && companySettings.getSurvey_settings() != null
+                        && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 )
+                        duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+                
                     // check the pre-initiation and then the survey table
-                    HashMap<String, Object> queries = new HashMap<>();
-                    queries.put( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
-                    queries.put( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, survey.getCustomerEmailId() );
-                    List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue(
-                        SurveyPreInitiation.class, queries );
+                    List<SurveyPreInitiation> incompleteSurveyCustomers = null;
+                    if(duplicateSurveyInterval > 0){
+                        incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( user.getUserId(), survey.getCustomerEmailId(), duplicateSurveyInterval );
+                    }else{
+                        incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(), survey.getCustomerEmailId() );
+                    }
+                    
                     if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
                         LOG.warn( "Survey request already sent" );
                         status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
                         survey.setStatus( status );
                     }
                     // check the survey collection
-                    SurveyDetails surveyDetail = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( user.getUserId(),
-                        survey.getCustomerEmailId(), null, null );
+                    SurveyDetails surveyDetail = null;
+                    if(duplicateSurveyInterval > 0){
+                        surveyDetail = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmailAndNoOfDays( user.getUserId(),
+                            survey.getCustomerEmailId(), null, null , duplicateSurveyInterval );
+                    }else{
+                        surveyDetail = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( user.getUserId(),
+                            survey.getCustomerEmailId(), null, null );
+                    }
+                    
                     if ( surveyDetail != null ) {
                         LOG.warn( "Survey request already sent and completed" );
                         status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
@@ -1804,7 +1841,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     // Method to store details of a customer in mysql at the time of sending invite.
-    void preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
+    @Override
+    public SurveyPreInitiation preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
         String custRelationWithAgent, String source )
     {
         LOG.debug( "Method preInitiateSurvey() started to store details of a customer in mysql at the time of  sending invite" );
@@ -1822,9 +1860,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiation.setReminderCounts( 0 );
         surveyPreInitiation.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
         surveyPreInitiation.setSurveySource( source );
-        surveyPreInitiationDao.save( surveyPreInitiation );
+        surveyPreInitiation = surveyPreInitiationDao.save( surveyPreInitiation );
 
         LOG.debug( "Method preInitiateSurvey() finished." );
+        return surveyPreInitiation;
     }
 
 
@@ -1907,20 +1946,37 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByKeyValue( SurveyPreInitiation.class,
             queries );*/
 
-        Criterion agentIdCriteria = Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId );
-        Criterion emailCriteria = Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, recipientEmailId );
-        Criterion statusCriteria = Restrictions.and(
-            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ),
-            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) );
-        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class,
-            agentIdCriteria, emailCriteria, statusCriteria );
-
+        //check if already an incomplete
+        
+        int duplicateSurveyInterval = 0;
+        User user = userDao.findById( User.class, agentId );
+        if ( user != null && user.getCompany() != null ) {
+            OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            if ( companySettings != null && companySettings.getSurvey_settings() != null
+                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 )
+                duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+        }
+        
+        
+        List<SurveyPreInitiation> incompleteSurveyCustomers = null;
+        if(duplicateSurveyInterval > 0){
+            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( agentId, recipientEmailId, duplicateSurveyInterval );
+        }else{
+            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( agentId, recipientEmailId );
+        }
+        
         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
             LOG.warn( "Survey request already sent" );
             throw new DuplicateSurveyRequestException( "Survey request already sent" );
         }
         // check the survey collection
-        SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, recipientEmailId, null, null );
+        SurveyDetails survey;
+        if(duplicateSurveyInterval > 0){
+             survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmailAndNoOfDays( agentId, recipientEmailId, null, null , duplicateSurveyInterval );
+        }else{
+            survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( agentId, recipientEmailId, null, null );
+        }
         if ( survey != null ) {
             LOG.warn( "Survey request already sent and completed" );
             throw new DuplicateSurveyRequestException( "Survey request already sent and completed" );
