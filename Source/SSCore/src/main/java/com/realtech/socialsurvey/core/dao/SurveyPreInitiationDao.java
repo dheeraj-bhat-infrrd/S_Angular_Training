@@ -120,4 +120,10 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     Map<Long, Date> getLatestSurveySentForAgent( long companyId );
+
+
+    List<SurveyPreInitiation> getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize );
+
+
+    long getCorruptPreInitiatedSurveyCount( long companyId );
 }

@@ -117,6 +117,7 @@ public interface CommonConstants
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
 
+    // Survey pre initiation deleted as part company deletion, status is set to 11.
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
     public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
@@ -127,6 +128,7 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_OLD_RECORD = 8;
     public static final int STATUS_SURVEYPREINITIATION_IGNORED_RECORD = 9;
     public static final int STATUS_SURVEYPREINITIATION_DELETED = 0;
+    public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
 
     /**
      * Hibernate entities and column name constants
