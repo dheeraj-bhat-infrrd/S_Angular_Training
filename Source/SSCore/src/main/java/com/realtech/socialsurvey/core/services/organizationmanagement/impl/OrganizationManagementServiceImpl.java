@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -146,6 +148,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     private static final Logger LOG = LoggerFactory.getLogger( OrganizationManagementServiceImpl.class );
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
+
+    @Autowired
+    private MessageUtils messageUtils;
 
     @Autowired
     private CompanyDao companyDao;
@@ -2881,7 +2886,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     && profile.getBranchId() == userProfileNew.getBranchId()
                     && profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
                     && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                    throw new InvalidInputException( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS );
+                    throw new InvalidInputException( messageUtils.getDisplayMessage(
+                        DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS, DisplayMessageType.ERROR_MESSAGE )
+                        .getMessage() );
                 }
 
                 // Updating existing assignment
@@ -3045,7 +3052,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 if ( profile.getBranchId() == userProfileNew.getBranchId()
                     && profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
                     && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                    throw new InvalidInputException( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS );
+                    throw new InvalidInputException( messageUtils.getDisplayMessage(
+                        DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS, DisplayMessageType.ERROR_MESSAGE )
+                        .getMessage() );
                 }
 
                 // Updating existing assignment
