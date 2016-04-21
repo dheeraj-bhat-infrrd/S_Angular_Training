@@ -1411,9 +1411,17 @@ function initializeUnmatchedUserPage() {
 	$('#un-new-paginate-btn').attr("data-start", 0);
 	UnmatchedUserStartIndex = 0;
 	fetchUnmatchedUsers(UnmatchedUserStartIndex);
-	
-
 }
+
+var CorruptRecordsSize = 10;
+var CorruptRecordsStartIndex = 0;
+function initializeCorrupRecordsPage(){
+	$('#corrupt').html('');
+	$('#corrupt-paginate-btn').attr("data-start", 0);
+	CorruptRecordsStartIndex = 0;
+	fetchCorruptRecords(CorruptRecordsStartIndex);
+}
+
 function  bindEventForMappedUserPage(){
 	// Click events proList pagination buttons
 	$('#mapped-paginate-btn').on(
@@ -1685,6 +1693,19 @@ function fetchUnmatchedUsers(newIndex) {
 			paginateUnmatchedUser, payload, true);
 
 }
+
+function fetchCorruptRecords(newIndex){
+	showOverlay();
+	var payload = {
+		"batchSize" : CorruptRecordsSize,
+		"startIndex" : newIndex
+
+	};
+
+	callAjaxGetWithPayloadData("./getcorruptpreinitiatedsurveys.do",
+			paginateCorruptRecords, payload, true);
+}
+
 function fetchProcessedUsers(newIndex) {
 	showOverlay();
 	var payload = {
@@ -1820,6 +1841,40 @@ function updatePaginationBtnsForUnmatchedUser() {
 		pageNo = 1;
 	}
 	$('#sel-page-un-new-list').val(pageNo);
+}
+function updatePaginationBtnsForCorruptRecords(){
+	var start = parseInt($('#corrupt-paginate-btn').attr("data-start"));
+	var total = parseInt($('#corrupt-paginate-btn').attr("data-total"));
+	var batch = parseInt($('#corrupt-paginate-btn').attr("data-batch"));
+
+	// update previous button
+	if (start == 0) {
+		$('#corrupt-prev').removeClass('paginate-button');
+	} else {
+		$('#corrupt-prev').addClass('paginate-button');
+	}
+
+	// update next button
+	if (start + batch >= total) {
+		$('#corrupt-next').removeClass('paginate-button');
+	} else {
+		$('#corrupt-next').addClass('paginate-button');
+	}
+
+	// update page no
+	var pageNo = 0;
+	if (start < total) {
+		pageNo = (start / batch) + 1;
+	} else {
+		pageNo = start / batch;
+	}
+	var emptyPageNo = isNaN(pageNo);
+	if (emptyPageNo) {
+		$('#corrupt-paginate-btn').attr("data-start", 0);
+		$('#corrupt-prev').removeClass('paginate-button');
+		pageNo = 1;
+	}
+	$('#sel-page-corrupt-list').val(pageNo);
 }
 function updatePaginationBtnsForProcessedUser() {
 	var startProcess = parseInt($('#un-processed-paginate-btn').attr(
@@ -1957,6 +2012,40 @@ function paginateUnmatchedUser(response) {
 		paintUnmatchedUser(reponseJson);
 	}
 	updatePaginationBtnsForUnmatchedUser();
+	hideOverlay();
+}
+function paginateCorruptRecords(response){
+	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#corrupt-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#corrupt-paginate-btn').attr("data-batch"));
+
+	// error message
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#corrupt').append("No Data found");
+		hideOverlay();
+	} else {
+		if (start == 0) {
+			var usersSize = reponseJson.totalRecord;
+			if (usersSize > 0) {
+				$('#corrupt-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+
+				$('#corrupt-total-pages').text(totalPage);
+			}else if(usersSize ==0){
+				$('#corrupt-no-data').html("No data found");
+				$('#corrupt-no-data').show();
+			}
+
+		}
+		paintCorruptRecords(reponseJson);
+	}
+	updatePaginationBtnsForCorruptRecords();
 	hideOverlay();
 }
 function paginateProcessedUser(response) {
@@ -2340,8 +2429,8 @@ function paintUnmatchedUser(usersList) {
 					.forEach(function(arrayItem) {
 
 						untrack += '<div class="un-row">'
-								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.surveySourceId) + '">'
-								+ undefinedval(arrayItem.surveySourceId)
+								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.agentName) + '">'
+								+ undefinedval(arrayItem.agentName)
 								+ '</div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="'+ undefinedval(arrayItem.agentEmailId) + '">'
 								+ undefinedval(arrayItem.agentEmailId)
@@ -2367,6 +2456,42 @@ function paintUnmatchedUser(usersList) {
 		}
 	}
 }
+function paintCorruptRecords(usersList){
+	if (usersList != undefined) {
+		var usersSize = usersList.surveyPreInitiationList.length;
+
+		var untrack = "";
+		if (usersSize > 0) {
+			usersList.surveyPreInitiationList
+					.forEach(function(arrayItem) {
+
+						untrack += '<div class="un-row">'
+								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.agentName) + '">'
+								+ undefinedval(arrayItem.agentName)
+								+ '</div>'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="'+ undefinedval(arrayItem.agentEmailId) + '">'
+								+ undefinedval(arrayItem.agentEmailId)
+								+ '</div>'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="'+ undefinedval(arrayItem.customerFirstName) + '">'
+								+ undefinedval(arrayItem.customerFirstName)
+								+ '<span style="margin-left:2px;">'
+								+ undefinedval(arrayItem.customerLastName)
+								+ '</span> <br> <span style="margin-left:2px;" title="'+ undefinedval(arrayItem.customerEmailId) + '"> < '
+								+ undefinedval(arrayItem.customerEmailId)
+								+ ' > </span></div>'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.engagementClosedTime) + '">'
+								+ undefinedval(arrayItem.engagementClosedTime)
+								+ '</div>'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.reason) + '">'
+								+ undefinedval(arrayItem.reason)
+								+ '</div></div>';
+
+					});
+
+			$('#corrupt').html(untrack);
+		}
+	}
+}
 function paintProcessedUser(usersList) {
 	if (usersList != undefined) {
 		var usersSize = usersList.surveyPreInitiationList.length;
@@ -2384,8 +2509,8 @@ function paintProcessedUser(usersList) {
 								action += "<br><span title="+ arrayItem.user.loginName + ">" + arrayItem.user.loginName +"</span> " 
 						}
 						unprocess += '<div class="un-row">'
-								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.surveySourceId) + '">'
-								+ undefinedval(arrayItem.surveySourceId)
+								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.agentName) + '">'
+								+ undefinedval(arrayItem.agentName)
 								+ '</div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="'+ undefinedval(arrayItem.agentEmailId) + '">'
 								+ undefinedval(arrayItem.agentEmailId)

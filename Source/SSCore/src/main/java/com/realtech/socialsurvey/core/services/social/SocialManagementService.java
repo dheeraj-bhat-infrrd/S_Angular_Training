@@ -200,6 +200,10 @@ public interface SocialManagementService
 
     SurveyPreInitiationList getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
         throws InvalidInputException;
+    
+    
+    SurveyPreInitiationList getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException;
 
 
     void updateAgentIdOfSurveyPreinitiationRecordsForEmail( User user, String emailAddress ) throws InvalidInputException;
