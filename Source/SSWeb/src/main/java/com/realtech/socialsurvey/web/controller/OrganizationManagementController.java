@@ -1629,6 +1629,13 @@ public class OrganizationManagementController
                 companySettings.setSurvey_settings( originalSurveySettings );
                 LOG.info( "Updated Survey Settings" );
             }
+         // Updating settings in session
+            HttpSession session = request.getSession();
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            if ( userSettings != null )
+                userSettings.setCompanySettings( companySettings );
+            
         } catch ( NumberFormatException e ) {
             LOG.error( "NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e );
             message = messageUtils
