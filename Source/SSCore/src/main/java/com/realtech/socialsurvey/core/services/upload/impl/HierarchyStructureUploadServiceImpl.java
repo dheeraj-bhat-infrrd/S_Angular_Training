@@ -11,6 +11,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +71,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 {
 
     private static Logger LOG = LoggerFactory.getLogger( HierarchyStructureUploadServiceImpl.class );
+
+    @Autowired
+    private MessageUtils messageUtils;
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
@@ -1852,9 +1857,12 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 user.setRegionAdmin( false );
                 assigneeUser.setBranchAdmin( false );
                 assigneeUser.setRegionAdmin( false );
-            } catch ( InvalidInputException e ) {
-                if ( e.getMessage() == DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS ) {
-                    LOG.debug( "User assignment already exists" );
+            } catch (InvalidInputException e) {
+                if (e.getMessage().equals(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS)
+                    || e.getMessage().equals(messageUtils
+                    .getDisplayMessage(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
+                        DisplayMessageType.ERROR_MESSAGE).getMessage())) {
+                    LOG.debug("User assignment already exists");
                 }
             }
         }
