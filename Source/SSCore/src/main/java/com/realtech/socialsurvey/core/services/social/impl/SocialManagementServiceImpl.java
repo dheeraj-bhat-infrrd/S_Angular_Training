@@ -1291,7 +1291,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      */
     @Override
     public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl,
+        long agentId, double rating, String surveyId, String feedback, boolean isAbusive, String serverBaseUrl,
         boolean onlyPostToSocialSurvey ) throws NonFatalException
     {
 
@@ -1328,7 +1328,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             List<OrganizationUnitSettings> branchSettings = settingsMap
                 .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
-            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyId );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
 

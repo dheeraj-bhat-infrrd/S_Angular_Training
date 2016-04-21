@@ -923,6 +923,9 @@ public interface CommonConstants
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN = "admin";
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER = "user";
     
+    
+    public static final String URL_PARAM_RETAKE_SURVEY = "retakeSurvey";
+    
 
     //Url Details Mongo Column constants
     public static final String URL_COLUMN = "url";

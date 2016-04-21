@@ -211,7 +211,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         }
 
         String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
-            survey.getCustomerFirstName(), survey.getCustomerLastName() );
+            survey.getCustomerFirstName(), survey.getCustomerLastName() , survey.getSurveyPreIntitiationId() , false );
         try {
             companySettings = organizationManagementService.getCompanySettings( companyId );
         } catch ( InvalidInputException e ) {
@@ -368,7 +368,7 @@ public class IncompleteSurveyReminderSender extends QuartzJobBean
         }
 
         String surveyLink = surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
-            survey.getCustomerFirstName(), survey.getCustomerLastName() );
+            survey.getCustomerFirstName(), survey.getCustomerLastName() , survey.getSurveyPreIntitiationId() , false);
         try {
             companySettings = organizationManagementService.getCompanySettings( companyId );
         } catch ( InvalidInputException e ) {

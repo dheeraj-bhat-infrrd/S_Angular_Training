@@ -720,7 +720,7 @@ public class AdminController
                     String serverBaseUrl = requestUtils.getRequestServerName( request );
                     socialManagementService.postToSocialMedia( surveyDetails.getAgentName(), user.getProfileUrl(),
                         surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName(), surveyDetails.getAgentId(),
-                        surveyDetails.getScore(), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), false,
+                        surveyDetails.getScore(), surveyDetails.get_id(), surveyDetails.getReview(), false,
                         serverBaseUrl, false );
                 }
             }
