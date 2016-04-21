@@ -121,20 +121,26 @@ public class AdminController
         if ( company != null && company.getCompanyId() > 0 ) {
             List<LicenseDetail> licenseDetails = company.getLicenseDetails();
             if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || licenseDetails.size() == 0 ) {
-//                try {
-//                    if ( licenseDetails.size() > 0 ) {
-//                        // Unsubscribing company from braintree
-//                        LicenseDetail licenseDetail = licenseDetails.get( 0 );
-//                        if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
-//                            LOG.debug( "Unsubscribing company from braintree " );
-//                            payment.unsubscribe( licenseDetail.getSubscriptionId() );
-//                        }
-//                    }
-//
-//                } catch ( InvalidInputException | SubscriptionCancellationUnsuccessfulException e ) {
-//                    LOG.error( "Exception Caught " + e.getMessage() );
-//                    message = CommonConstants.ERROR;
-//                }
+                try {
+                    if ( licenseDetails.size() > 0 ) {
+                        // Unsubscribing company from braintree
+                        LicenseDetail licenseDetail = licenseDetails.get( 0 );
+                        if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
+                            LOG.debug( "Unsubscribing company from braintree " );
+                            payment.unsubscribe( licenseDetail.getSubscriptionId() );
+                        }
+                    }
+
+                } catch ( InvalidInputException | SubscriptionCancellationUnsuccessfulException e ) {
+                    LOG.error( "Exception Caught " + e.getMessage() );
+                    message = CommonConstants.ERROR;
+                }
+                
+                // Deleting company from MySQL
+                company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
+                organizationManagementService.updateCompany( company );
+                
+                // marking comapny to be deleted forcefully during purge batch
                 organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
             }
         }
