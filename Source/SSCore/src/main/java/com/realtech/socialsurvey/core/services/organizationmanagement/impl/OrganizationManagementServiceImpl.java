@@ -1203,16 +1203,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ACCOUNT_DISABLED, isAccountDisabled, companySettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        //Set status to Deleted if isAccountDisabled is true, Active otherwise
-        if ( isAccountDisabled ) {
-            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN,
-                CommonConstants.STATUS_DELETED_MONGO, companySettings,
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        } else {
-            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN,
-                CommonConstants.STATUS_ACTIVE_MONGO, companySettings,
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        }
 
         LOG.info( "Updated the isAccountDisabled successfully" );
     }
@@ -5168,6 +5158,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method to change company details updateCompany() started." );
         companyDao.merge( company );
         LOG.info( "Method to change company details updateCompany() finished." );
+    }
+
+
+    @Override
+    public void deactivateCompanyInMongo( Company company ) throws InvalidInputException
+    {
+        LOG.info( "Method to deactivate company in mongo started" );
+        if ( company == null ) {
+            throw new InvalidInputException( "Company object is null" );
+        }
+        OrganizationUnitSettings companySettings = getCompanySettings( company.getCompanyId() );
+
+        //Set status of company setting to DELETED
+        organizationUnitSettingsDao
+            .updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_DELETED_MONGO,
+                companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOG.info( "Method to deactivate company in mongo finished" );
     }
 
 
