@@ -39,7 +39,7 @@ public interface SurveyDetailsDao
     public void updateFinalScore( String surveyId );
 
 
-    public void updateSurveyAsClicked( long agentId, String customerEmail );
+    public void updateSurveyAsClicked( String surveyMongoId);
 
 
     public Map<String, Long> getCountOfCustomersByMood( String columnName, long columnValue );
@@ -260,4 +260,7 @@ public interface SurveyDetailsDao
 
 
     SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
+
+
+    void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 }

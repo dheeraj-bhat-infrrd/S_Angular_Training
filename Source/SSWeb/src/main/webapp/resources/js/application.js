@@ -373,7 +373,7 @@ function retakeSurveyReminderMail(element) {
 	var agentName = $(element).parent().parent().parent().parent().attr('data-agentname');
 	var customerEmail = $(element).parent().parent().parent().parent().attr('data-customeremail');
 	var agentId = $(element).parent().parent().parent().parent().attr('data-agentid');
-	var agentId = $(element).parent().parent().parent().parent().attr('survey-mongo-id');
+	var surveyId = $(element).parent().parent().parent().parent().attr('survey-mongo-id');
 	
 	var payload = {
 			"customerEmail" : customerEmail,
