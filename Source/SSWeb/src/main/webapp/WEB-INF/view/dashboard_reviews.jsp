@@ -67,26 +67,36 @@
 				</div>
 			</div> --%>
 			<div class="ppl-header-wrapper clearfix">
+			<div class="float-left ppl-header-right">
+					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
+					</div>
+					<%-- <c:if test="${feedback.source != 'Zillow'}">
+						<div class="report-resend-icn-container clearfix float-right">	
+							<div class="restart-survey-mail-txt report-txt">Retake</div>
+						</div>
+					</c:if>  --%>
+				</div>
 				<div class="float-left ppl-header-left">
 					<div class="ppl-head-1">
-					<span>Reviewed by</span>
+					<span class="float-left"> &#8212; Reviewed by </span>
 						<c:choose>
 							<c:when test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
-								${feedback.customerFirstName}
+								<span class="float-left" style="margin-left:5px;font-weight:600 !important;"> ${feedback.customerFirstName} </span >
 							</c:when>
 							<c:otherwise>
-								${feedback.customerFirstName} ${feedback.customerLastName}
+								<span class="float-left" style="margin-left:5px;font-weight:600 !important;"> ${feedback.customerFirstName} ${feedback.customerLastName}</span>
 							</c:otherwise>
 						</c:choose>
 						<c:if test="${profilemasterid !=4}">
-					<span>for<a style="color:#236CAF;font-weight: 600 !important;" href="${feedback.completeProfileUrl}"> ${feedback.agentName}</a></span>
+					<span class="float-left" style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${feedback.completeProfileUrl}"> ${feedback.agentName}</a></span>
 					</c:if>
-					
-					</div>
+					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
 					<div class="ppl-head-2 float-left" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 						value="${feedback.modifiedOn}" />"> 
 					</div>
-					 <c:choose>
+					</div>
+					
+					<%--  <c:choose>
 					 <c:when test="${feedback.source=='agent' || feedback.source=='admin'}">
 					  <span class="float-left" style="font-family: opensanslight;"> - sourced by SocialSurvey</span>
 					 </c:when>
@@ -96,17 +106,14 @@
 					 <c:otherwise>
 					 <span class="float-left" style="font-family: opensanslight;"> - sourced by ${feedback.source} </span>
 					 </c:otherwise>
-					 </c:choose>
+					 </c:choose> --%>
 				</div>
-				<div class="float-right ppl-header-right">
-					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
-					</div>
-					<%-- <c:if test="${feedback.source != 'Zillow'}">
-						<div class="report-resend-icn-container clearfix float-right">	
-							<div class="restart-survey-mail-txt report-txt">Retake</div>
-						</div>
-					</c:if>  --%>
-				</div>
+				<c:if test="${feedback.source =='encompass'}">
+				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+				</c:if>
+				<c:if test="${feedback.source =='DOTLOOP'}">
+				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+				</c:if>
 			</div>
 			<c:if test="${ not empty feedback.summary }">
 				<div class="ppl-content">${feedback.summary}</div>
