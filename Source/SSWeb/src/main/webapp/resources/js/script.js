@@ -1422,6 +1422,73 @@ function initializeCorrupRecordsPage(){
 	fetchCorruptRecords(CorruptRecordsStartIndex);
 }
 
+function bindEventForCorruptRecordPage() {
+
+	// Click events proList pagination buttons
+	$('#corrupt-paginate-btn').on(
+			'click',
+			'#corrupt-next.paginate-button',
+			function(e) {
+				var start = parseInt($('#corrupt-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#corrupt-paginate-btn').attr(
+						"data-batch"));
+
+				start += batch;
+				$('#corrupt-paginate-btn').attr("data-start", start);
+				fetchCorruptRecords(start);
+			});
+
+	$('#corrupt-paginate-btn').on(
+			'click',
+			'#corrupt-prev.paginate-button',
+			function(e) {
+				var start = parseInt($('#corrupt-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#corrupt-paginate-btn').attr(
+						"data-batch"));
+
+				start -= batch;
+				$('#corrupt-paginate-btn').attr("data-start", start);
+				fetchCorruptRecords(start);
+			});
+
+	$('#corrupt-paginate-btn').on(
+			'keypress',
+			'#sel-page-corrupt-list',
+			function(e) {
+				// if the letter is not digit then don't type anything
+				if (e.which != 8 && e.which != 0
+						&& (e.which < 48 || e.which > 57)) {
+					return false;
+				}
+				var totalPage = parseInt($('#corrupt-total-pages').text());
+				var prevPageNoVal = parseInt($('#sel-page-corrupt-list').val());
+				if (prevPageNoVal == NaN) {
+					prevPageNoVal = 0;
+				}
+				var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+				pageNo = parseInt(pageNo);
+				if (pageNo >= totalPage || pageNo <= 0) {
+					return false;
+				}
+			});
+
+	$('#corrupt-paginate-btn').on('keyup', '#sel-page-corrupt-list', function(e) {
+		if (e.which == 13) {
+			$(this).trigger('blur');
+		}
+	});
+
+	$('#corrupt-paginate-btn').on('blur', '#sel-page-corrupt-list', function(e) {
+		var batch = parseInt($('#corrupt-paginate-btn').attr("data-batch"));
+		var pageNoVal = parseInt($('#sel-page-corrupt-list').val());
+		UnmatchedUserStartIndex = (pageNoVal - 1) * batch;
+		$('#corrupt-paginate-btn').attr("data-start", UnmatchedUserStartIndex);
+		fetchUnmatchedUsers(UnmatchedUserStartIndex);
+	});
+}
+
 function  bindEventForMappedUserPage(){
 	// Click events proList pagination buttons
 	$('#mapped-paginate-btn').on(
@@ -2482,10 +2549,9 @@ function paintCorruptRecords(usersList){
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.engagementClosedTime) + '">'
 								+ undefinedval(arrayItem.engagementClosedTime)
 								+ '</div>'
-								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.reason) + '">'
-								+ undefinedval(arrayItem.reason)
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.errorCodeDescription) + '">'
+								+ undefinedval(arrayItem.errorCodeDescription)
 								+ '</div></div>';
-
 					});
 
 			$('#corrupt').html(untrack);
