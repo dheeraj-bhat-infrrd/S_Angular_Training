@@ -2017,9 +2017,11 @@ public class DashboardController
             surveyHandler.changeStatusOfSurvey( surveyId , true );
             SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
             User user = userManagementService.getUserByUserId( agentId );
-            surveyHandler.decreaseSurveyCountForAgent( agentId );
+            Map<String , String> urlParams  = urlGenerator.decryptUrl( survey.getUrl() );
+            urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
+            String updatedUrl = urlGenerator.generateUrl( urlParams, surveyHandler.getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
             surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
-                survey.getUrl() );
+                updatedUrl);
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
         }

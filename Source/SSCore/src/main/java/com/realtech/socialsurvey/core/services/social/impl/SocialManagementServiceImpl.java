@@ -1483,7 +1483,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( agentSocialList );
             socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( companySocialList );
             surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
-            surveyHandler.updateSurveyDetails( surveyDetails );
+            surveyHandler.updateSurveyDetailsBySurveyId( surveyDetails );
 
 
         } catch ( NonFatalException e ) {
