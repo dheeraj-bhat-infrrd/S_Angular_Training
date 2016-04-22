@@ -121,6 +121,7 @@ $(document).ready(function(){
 	bindEventForUnmatchedUserPage();
 	bindEventsForProcessUserPage();
 	bindEventForMappedUserPage();
+	bindEventForCorruptRecordPage();
 	initializeUnmatchedUserPage();
 	initializeProcesedUserPage();
 	initializeMapped();
