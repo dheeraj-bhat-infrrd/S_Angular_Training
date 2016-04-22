@@ -225,7 +225,7 @@ public interface OrganizationManagementService
      * @throws NoRecordsFetchedException
      * @throws PaymentException
      */
-    public void addDisabledAccount( long companyId, boolean forceDisable )
+    public void addDisabledAccount( long companyId, boolean forceDisable, long modifiedBy )
         throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 
 
@@ -1347,4 +1347,7 @@ public interface OrganizationManagementService
 
     public void logEvent( String eventType, String action, String modifiedBy, long companyId, int agentId, int regionId,
         int branchId );
+
+
+    public void forceDeleteDisabledAccount( long companyId, long userId );
 }

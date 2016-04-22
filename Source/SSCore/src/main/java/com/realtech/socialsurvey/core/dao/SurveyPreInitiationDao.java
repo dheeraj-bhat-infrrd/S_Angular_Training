@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -121,9 +122,22 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
     Map<Long, Date> getLatestSurveySentForAgent( long companyId );
 
+    /**
+     * 
+     * @param agentId
+     * @param customerEmail
+     * @param noOfDays
+     * @return
+     * @throws DatabaseException
+     */
+    List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail, int noOfDays )
+        throws DatabaseException;
 
     List<SurveyPreInitiation> getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize );
 
 
     long getCorruptPreInitiatedSurveyCount( long companyId );
+
+
+    List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmail( long agentId, String customerEmail ) throws DatabaseException;
 }

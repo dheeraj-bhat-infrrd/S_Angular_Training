@@ -277,6 +277,7 @@ public interface CommonConstants
     public static final String SHOW_SURVEY_ON_UI_COLUMN = "showSurveyOnUI";
     public static final String SUMMARY_COLUMN = "summary";
     public static final String REVIEW_COLUMN = "review";
+    public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -780,7 +781,10 @@ public interface CommonConstants
     public static final String HEADER_SURVEY_GATEWAY = "Gateway";
     public static final String HEADER_CUSTOMER_COMMENTS = "Customer Comments";
     public static final String HEADER_AGREED_SHARE = "Agreed to Share";
-    public static final String HEADER_CLICK_THROUGH = "Click through";
+    public static final String HEADER_CLICK_THROUGH_FOR_COMPANY = "Click through for company";
+    public static final String HEADER_CLICK_THROUGH_FOR_AGENT = "Click through for agent";
+    public static final String HEADER_CLICK_THROUGH_FOR_REGIONS = "Click through for regions";
+    public static final String HEADER_CLICK_THROUGH_FOR_BRANCHES = "Click through for branches";
     public static final String STATUS_YES = "Yes";
     public static final String STATUS_NO = "No";
 
@@ -919,6 +923,9 @@ public interface CommonConstants
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE = "verificationRequestType";
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN = "admin";
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER = "user";
+    
+    
+    public static final String URL_PARAM_RETAKE_SURVEY = "retakeSurvey";
     
 
     //Url Details Mongo Column constants

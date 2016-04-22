@@ -951,37 +951,75 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 } else {
                     surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
                 }*/
+                
+                
+                Map<Long,Branch> cashedBranches = new HashMap<Long, Branch>();
+                Map<Long,Region> cashedRegions = new HashMap<Long, Region>();
+                
                 if ( survey.getSocialMediaPostDetails() != null ) {
-                    Set<String> socialMedia = new HashSet<>();
+                    
+                    //for company
+                    Set<String> companySocialMedia = new HashSet<>();
                     if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null
                         && survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() != null
                         && !survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn().isEmpty() ) {
-                        socialMedia.addAll( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() );
+                        companySocialMedia.addAll( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() );
                     }
+                    surveyDetailsToPopulate.add( StringUtils.join( companySocialMedia, "," ) );
+                    
+                    //for agent
+                    Set<String> agentSocialMedia = new HashSet<>();
                     if ( survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
                         && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null
                         && !survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn().isEmpty() ) {
-                        socialMedia.addAll( survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() );
+                        agentSocialMedia.addAll( survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() );
                     }
+                    surveyDetailsToPopulate.add( StringUtils.join( agentSocialMedia, "," ) );
+                    
+                    
+                    //for region
+                    String regionShared = "";
                     if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null
                         && !survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList().isEmpty() ) {
                         for ( RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails()
                             .getRegionMediaPostDetailsList() ) {
+                            //get region
+                            Region region = cashedRegions.get(regionMediaDetail.getRegionId()); 
+                            if(region == null){
+                                region = regionDao.findById( Region.class, regionMediaDetail.getRegionId() );
+                                cashedRegions.put( regionMediaDetail.getRegionId(), region );
+                            }
+                            //get shared on for region
                             if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() ) {
-                                socialMedia.addAll( regionMediaDetail.getSharedOn() );
+                                regionShared += region.getRegion() + ": { " + StringUtils.join( regionMediaDetail.getSharedOn(), "," )  +" }, ";
                             }
                         }
                     }
+                    if ( regionShared.contains( "}," ) )
+                        regionShared = regionShared.substring( 0, regionShared.lastIndexOf( "," ) );
+                    surveyDetailsToPopulate.add( regionShared );
+                    
+                    //for branch
+                    String branchShared = "";
                     if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null
                         && !survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList().isEmpty() ) {
                         for ( BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails()
                             .getBranchMediaPostDetailsList() ) {
+                            //get branch
+                            Branch branch= cashedBranches.get( branchMediaDetail.getBranchId() );
+                            if(branch == null){
+                                branch = branchDao.findById( Branch.class, branchMediaDetail.getBranchId() );
+                                cashedBranches.put( branchMediaDetail.getBranchId(), branch );
+                            }
+                            //get shared on for region
                             if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() ) {
-                                socialMedia.addAll( branchMediaDetail.getSharedOn() );
+                                branchShared += branch.getBranch() + ": { " + StringUtils.join( branchMediaDetail.getSharedOn(), "," )  +"}, ";
                             }
                         }
                     }
-                    surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
+                    if ( branchShared.contains( "}," ) )
+                        branchShared = branchShared.substring( 0, branchShared.lastIndexOf( "," ) );
+                    surveyDetailsToPopulate.add( branchShared );
                 }
 
                 data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
@@ -1094,7 +1132,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_GATEWAY );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_CUSTOMER_COMMENTS );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_AGREED_SHARE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_COMPANY );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_AGENT );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_REGIONS );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_BRANCHES );
 
         data.put( "1", surveyDetailsToPopulate );
 

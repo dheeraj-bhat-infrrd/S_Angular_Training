@@ -4020,4 +4020,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.info( "Method deleteUserDataFromAllSources executed successfully" );
     }
+
+
+    @Override
+    @Transactional
+    public User getAdminUserByCompanyId( long companyId )
+    {
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( "company.companyId", companyId );
+        queries.put( "isOwner", CommonConstants.STATUS_ACTIVE );
+        List<User> user = userDao.findByKeyValue( User.class, queries );
+        if ( user != null && !user.isEmpty() ) {
+            return user.get( CommonConstants.INITIAL_INDEX );
+        }
+        return null;
+    }
 }
