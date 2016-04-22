@@ -101,12 +101,12 @@ function deleteCompany(companyId){
 	};
 	//close the popup
 	$('#overlay-cancel').click();
-	callAjaxPostWithPayloadData("./purgeCompany.do", function(data) {
+	callAjaxPostWithPayloadData("./deletecompany.do", function(data) {
 		
 		if (data == "success") {
 			// remove the tab from UI
 			$('#tr-comp-' + companyId).remove();
-			$('#overlay-toast').html("Company successfully deleted");
+			$('#overlay-toast').html("Company successfully deleted. Clean up is in progress.");
 		}else{
 			$('#overlay-toast').html(data);
 			showToast();

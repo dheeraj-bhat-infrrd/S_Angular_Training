@@ -34,6 +34,7 @@ import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
@@ -53,8 +54,8 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 public interface OrganizationManagementService
 {
 
-    public User addCompanyInformation( User user, Map<String, String> organizationalDetails ) throws SolrException,
-        InvalidInputException;
+    public User addCompanyInformation( User user, Map<String, String> organizationalDetails )
+        throws SolrException, InvalidInputException;
 
 
     public AccountType addAccountTypeForCompany( User user, String accountType ) throws InvalidInputException, SolrException;
@@ -137,8 +138,8 @@ public interface OrganizationManagementService
     public BranchSettings getBranchSettings( long branchId ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public OrganizationUnitSettings getBranchSettingsDefault( long branchId ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public OrganizationUnitSettings getBranchSettingsDefault( long branchId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     /**
@@ -209,8 +210,8 @@ public interface OrganizationManagementService
         String mailBody, String mailCategory ) throws InvalidInputException;
 
 
-    public MailContentSettings revertSurveyParticipationMailBody( OrganizationUnitSettings companySettings, String mailCategory )
-        throws NonFatalException;
+    public MailContentSettings revertSurveyParticipationMailBody( OrganizationUnitSettings companySettings,
+        String mailCategory ) throws NonFatalException;
 
 
     public ArrayList<String> getSurveyParamOrder( String category ) throws InvalidInputException;
@@ -224,8 +225,8 @@ public interface OrganizationManagementService
      * @throws NoRecordsFetchedException
      * @throws PaymentException
      */
-    public void addDisabledAccount( long companyId, boolean forceDisable ) throws InvalidInputException,
-        NoRecordsFetchedException, PaymentException;
+    public void addDisabledAccount( long companyId, boolean forceDisable, long modifiedBy )
+        throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 
 
     /**
@@ -248,8 +249,8 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws SolrException
      */
-    public void upgradeAccount( Company company, int newAccountsMasterPlanId ) throws NoRecordsFetchedException,
-        InvalidInputException, SolrException;
+    public void upgradeAccount( Company company, int newAccountsMasterPlanId )
+        throws NoRecordsFetchedException, InvalidInputException, SolrException;
 
 
     /**
@@ -269,8 +270,8 @@ public interface OrganizationManagementService
      * @return
      * @throws InvalidInputException
      */
-    public List<Region> getRegionsForCompany( String companyProfileName ) throws InvalidInputException,
-        ProfileNotFoundException;
+    public List<Region> getRegionsForCompany( String companyProfileName )
+        throws InvalidInputException, ProfileNotFoundException;
 
 
     /**
@@ -281,8 +282,8 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public List<Branch> getBranchesUnderCompany( String companyProfileName ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException;
+    public List<Branch> getBranchesUnderCompany( String companyProfileName )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 
     /**
@@ -389,8 +390,8 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException;
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 
     /**
@@ -417,8 +418,8 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> updateRegion( User user, long regionId, String regionName, String address1, String address2,
         String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException;
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 
     /**
@@ -446,8 +447,8 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException;
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 
     /**
@@ -492,8 +493,8 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem,
         String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
-        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail ) throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException;
+        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 
     /**
@@ -529,8 +530,8 @@ public interface OrganizationManagementService
      * @throws UserAssignmentException
      */
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException, UserAssignmentException;
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 
     /**
@@ -689,8 +690,8 @@ public interface OrganizationManagementService
      * @throws SolrException
      */
     public Region addNewRegion( User user, String regionName, int isDefaultBySystem, String address1, String address2,
-        String country, String countryCode, String state, String city, String zipcode ) throws InvalidInputException,
-        SolrException;
+        String country, String countryCode, String state, String city, String zipcode )
+        throws InvalidInputException, SolrException;
 
 
     /**
@@ -756,8 +757,8 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public Set<Long> getRegionIdsForUser( User user, int profileMasterId ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public Set<Long> getRegionIdsForUser( User user, int profileMasterId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     /**
@@ -769,8 +770,8 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public Set<Long> getBranchIdsForUser( User user, int profileMasterId ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public Set<Long> getBranchIdsForUser( User user, int profileMasterId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     /**
@@ -779,15 +780,15 @@ public interface OrganizationManagementService
     public Set<Company> getAllCompanies();
 
 
-    public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId ) throws InvalidInputException, SolrException,
-        MalformedURLException;
+    public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId )
+        throws InvalidInputException, SolrException, MalformedURLException;
 
 
     public String fetchBranchesByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
 
 
-    public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId ) throws InvalidInputException, SolrException,
-        MalformedURLException;
+    public Map<Long, RegionFromSearch> fetchRegionsMapByCompany( long companyId )
+        throws InvalidInputException, SolrException, MalformedURLException;
 
 
     public String fetchRegionsByCompany( long companyId ) throws InvalidInputException, SolrException, MalformedURLException;
@@ -803,8 +804,8 @@ public interface OrganizationManagementService
      * @throws NoRecordsFetchedException
      * @throws SolrException
      */
-    public List<BranchFromSearch> getBranchesUnderCompanyFromSolr( Company company, int start ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException;
+    public List<BranchFromSearch> getBranchesUnderCompanyFromSolr( Company company, int start )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 
     /**
@@ -818,8 +819,8 @@ public interface OrganizationManagementService
      * @throws NoRecordsFetchedException
      * @throws SolrException
      */
-    public List<UserFromSearch> getUsersUnderCompanyFromSolr( Company company, int start ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException;
+    public List<UserFromSearch> getUsersUnderCompanyFromSolr( Company company, int start )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 
     /**
@@ -871,6 +872,37 @@ public interface OrganizationManagementService
      * @throws SolrException
      */
     public void purgeCompany( Company company ) throws InvalidInputException, SolrException;
+
+
+    /**
+     * @param company
+     * @param loggedInUser 
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    public void deleteCompany( Company company, User loggedInUser ) throws InvalidInputException, SolrException;
+
+
+    /**
+     * @param branchId
+     * @param user
+     * @param assignments
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    public void deleteBranchDataFromAllSources( long branchId, User user, UserHierarchyAssignments assignments, int status )
+        throws InvalidInputException, SolrException;
+
+
+    /**
+     * @param regionId
+     * @param user
+     * @param assignments
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    public void deleteRegionDataFromAllSources( long regionId, User user, UserHierarchyAssignments assignments, int status )
+        throws InvalidInputException, SolrException;
 
 
     /**
@@ -962,7 +994,8 @@ public interface OrganizationManagementService
      * @param status
      * @return
      */
-    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status , boolean inCompleteCompany , int noOfDays);
+    public List<OrganizationUnitSettings> getCompaniesByKeyValueFromMongo( String searchKey, int accountType, int status,
+        boolean inCompleteCompany, int noOfDays );
 
 
     /**
@@ -1068,7 +1101,6 @@ public interface OrganizationManagementService
     public void saveLoopsForProfile( LoopProfileMapping loopProfileMapping ) throws InvalidInputException;
 
 
-
     /**
      * @param profileId
      * @param loopId
@@ -1157,8 +1189,8 @@ public interface OrganizationManagementService
     public Boolean validateEmail( String emailId ) throws InvalidInputException;
 
 
-    String getAllUsersUnderCompanyFromSolr( Company company ) throws InvalidInputException, NoRecordsFetchedException,
-        SolrException;
+    String getAllUsersUnderCompanyFromSolr( Company company )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 
     List<ProfileImageUrlData> fetchProfileImageUrlsForEntityList( String entityType, HashSet<Long> entityList )
@@ -1184,14 +1216,15 @@ public interface OrganizationManagementService
     public List<Region> getRegionsForCompany( long companyId ) throws InvalidInputException, ProfileNotFoundException;
 
 
-    public List<Branch> getBranchesUnderCompany( long companyId ) throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException;
+    public List<Branch> getBranchesUnderCompany( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 
     public List<Region> getRegionsForRegionIds( Set<Long> regionIds ) throws InvalidInputException;
 
 
     public List<Branch> getBranchesForBranchIds( Set<Long> branchIds ) throws InvalidInputException;
+
 
     /**
      * Method to change profileurl of entity on delete
@@ -1203,71 +1236,78 @@ public interface OrganizationManagementService
      */
     void updateProfileUrlAndStatusForDeletedEntity( String entityType, long entityId ) throws InvalidInputException;
 
-//    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
+    //    public Set<Long> getRegionsConnectedToZillow( Set<Long> regionIds );
 
 
-//    public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException;
+    //    public Set<Long> getIndividualsForBranchesConnectedWithZillow( Set<Long> branchIds ) throws InvalidInputException;
 
 
-//    public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException, NoRecordsFetchedException;
+    //    public Set<Long> getIndividualsForRegionsConnectedWithZillow( Set<Long> regionIds ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-//    public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException;
+    //    public Set<Long> getBranchesConnectedToZillow( Set<Long> branchIds ) throws InvalidInputException;
 
 
-//    public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
-//        NoRecordsFetchedException, ProfileNotFoundException;
+    //    public Set<Long> getIndividualsForCompanyConnectedWithZillow( long companyId ) throws InvalidInputException,
+    //        NoRecordsFetchedException, ProfileNotFoundException;
 
 
-//    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds );
+    //    public Map<String, Set<Long>> getAllIdsUnderRegionsConnectedToZillow( Set<Long> regionIds );
 
-    public Set<Long> getAllRegionsUnderCompanyConnectedToZillow( long iden, int start_index, int batch_size ) throws InvalidInputException;
-
-
-    public Set<Long> getAllBranchesUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index, int batch_size )
+    public Set<Long> getAllRegionsUnderCompanyConnectedToZillow( long iden, int start_index, int batch_size )
         throws InvalidInputException;
+
+
+    public Set<Long> getAllBranchesUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index,
+        int batch_size ) throws InvalidInputException;
 
 
     public Set<Long> getAllUsersUnderProfileTypeConnectedToZillow( String profileType, long iden, int start_index,
         int batch_size ) throws InvalidInputException;
 
 
-    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state ) throws InvalidInputException, NoRecordsFetchedException;
-    
+    public List<OrganizationUnitSettings> getCompanyListForEncompass( String state )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+
     /**
      * Get a list of non default active branches
      * @return
      * @throws NoRecordsFetchedException
      */
     public List<Branch> getAllNonDefaultBranches() throws NoRecordsFetchedException;
-    
+
+
     /**
      * Get a list of non default active regions
      * @return
      * @throws NoRecordsFetchedException
      */
     public List<Region> getAllNonDefaultRegions() throws NoRecordsFetchedException;
-    
+
+
     /**
      * Get the compare objects for mismatched branch hierarchy settings
      * @param branches
      * @return
      */
-    public List<HierarchySettingsCompare> mismatchBranchHierarchySettings(List<Branch> branches);
-    
+    public List<HierarchySettingsCompare> mismatchBranchHierarchySettings( List<Branch> branches );
+
+
     /**
      * Get the compare objects for mismatched region hierarchy settings
      * @param regions
      * @return
      */
-    public List<HierarchySettingsCompare> mismatchRegionHierarchySettings(List<Region> regions);
-    
+    public List<HierarchySettingsCompare> mismatchRegionHierarchySettings( List<Region> regions );
+
+
     /**
      * Validates the upload file
      * @param uploadFileName
      * @return
      */
-    public UploadValidation validateUserUploadSheet(String uploadFileName) throws InvalidInputException;
+    public UploadValidation validateUserUploadSheet( String uploadFileName ) throws InvalidInputException;
 
 
     List<Region> getRegionsBySearchKey( String searchKey ) throws InvalidInputException, SolrException;
@@ -1303,4 +1343,11 @@ public interface OrganizationManagementService
      * Method to deactivate accounts
      */
     public void accountDeactivator();
+
+
+    public void logEvent( String eventType, String action, String modifiedBy, long companyId, int agentId, int regionId,
+        int branchId );
+
+
+    public void forceDeleteDisabledAccount( long companyId, long userId );
 }

@@ -48,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
@@ -862,6 +863,9 @@ public class OrganizationManagementController
     {
         LOG.info( "Updating encompass details to 'Enabled'" );
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        String eventFiredBy = adminUserid != null ? CommonConstants.ADMIN_USER_NAME : String.valueOf( user.getUserId() );
         String message;
 
         try {
@@ -874,6 +878,8 @@ public class OrganizationManagementController
             encompassCrmInfo.setGenerateReport( false );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_ENABLED,
+                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
@@ -898,6 +904,9 @@ public class OrganizationManagementController
     {
         LOG.info( "Updating encompass details to 'Disabled'" );
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        String eventFiredBy = adminUserid != null ? CommonConstants.ADMIN_USER_NAME : String.valueOf( user.getUserId() );
         String message;
 
         try {
@@ -907,6 +916,8 @@ public class OrganizationManagementController
             encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_DISABLED,
+                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
@@ -1618,6 +1629,13 @@ public class OrganizationManagementController
                 companySettings.setSurvey_settings( originalSurveySettings );
                 LOG.info( "Updated Survey Settings" );
             }
+         // Updating settings in session
+            HttpSession session = request.getSession();
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            if ( userSettings != null )
+                userSettings.setCompanySettings( companySettings );
+            
         } catch ( NumberFormatException e ) {
             LOG.error( "NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e );
             message = messageUtils
@@ -1738,7 +1756,7 @@ public class OrganizationManagementController
                 // Calling services to update DB
                 organizationManagementService.updateAccountDisabled( companySettings, isAccountDisabled );
                 if ( isAccountDisabled ) {
-                    organizationManagementService.addDisabledAccount( companySettings.getIden(), false );
+                    organizationManagementService.addDisabledAccount( companySettings.getIden(), false, user.getUserId() );
                 } else {
                     organizationManagementService.deleteDisabledAccount( companySettings.getIden() );
                 }
@@ -2222,9 +2240,9 @@ public class OrganizationManagementController
     }
 
 
-    // Method to delete all the records of a company.
-    @RequestMapping ( value = "/deletecompany", method = RequestMethod.GET)
-    public String deleteCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
+    // Method to deactivate company.
+    @RequestMapping ( value = "/deactivatecompany", method = RequestMethod.GET)
+    public String deactivateCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
         throws NonFatalException
     {
         User user = sessionHelper.getCurrentUser();
@@ -2235,9 +2253,10 @@ public class OrganizationManagementController
                 // Add an entry into Disabled_Accounts table with disable_date as current date
                 // and status as inactive.
                 try {
-                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true );
+                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true, user.getUserId() );
                 } catch ( NoRecordsFetchedException | PaymentException e ) {
-                    LOG.error( "Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ",
+                    LOG.error(
+                        "Exception caught in deactivateCompany() of OrganizationManagementController. Nested exception is ",
                         e );
                     throw e;
                 }
@@ -2254,7 +2273,7 @@ public class OrganizationManagementController
                     DisplayMessageType.SUCCESS_MESSAGE ).toString();
             }
         } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
+            LOG.error( "InvalidInputException caught in deactivateCompany(). Nested exception is ", e );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
                 .toString();
@@ -3024,6 +3043,47 @@ public class OrganizationManagementController
                 DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method to get posts for the user, getProcessedPreInitiatedSurveys() finished" );
+        return new Gson().toJson( surveyPreInitiationList );
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/getcorruptpreinitiatedsurveys", method = RequestMethod.GET)
+    public String getCorruptPreInitiatedSurveys( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to getCorruptPreInitiatedSurveys started" );
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+        if ( startIndexStr == null || batchSizeStr == null ) {
+            LOG.error( "Null value found for startIndex or batch size." );
+            return "Null value found for startIndex or batch size.";
+        }
+        
+        SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
+        int startIndex;
+        int batchSize;
+        try {
+            User user = sessionHelper.getCurrentUser();
+            if ( user == null || user.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
+            try {
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while trying to convert startIndex or batchSize or companyId  Nested exception is ",
+                    e );
+                throw e;
+            }
+            surveyPreInitiationList = socialManagementService.getCorruptPreInitiatedSurveys( user.getCompany().getCompanyId(),
+                startIndex, batchSize );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_CORRUPT_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        LOG.info( "Method to getCorruptPreInitiatedSurveys() finished" );
         return new Gson().toJson( surveyPreInitiationList );
     }
 

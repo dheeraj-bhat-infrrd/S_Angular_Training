@@ -91,6 +91,7 @@ public interface CommonConstants
     public static final int STATUS_UNDER_PROCESSING = 2;
     public static final int STATUS_ACCOUNT_DISABLED = 2;
     public static final int STATUS_COMPANY_DISABLED = 2;
+    public static final int STATUS_COMPANY_DELETED = 11;
     public static final int STATUS_TEMPORARILY_INACTIVE = 3;
     public static final int PROCESS_COMPLETE = 1;
     public static final int PROCESS_NOT_STARTED = 0;
@@ -116,6 +117,7 @@ public interface CommonConstants
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
 
+    // Survey pre initiation deleted as part company deletion, status is set to 11.
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
     public static final int STATUS_SURVEYPREINITIATION_PROCESSED = 1;
     public static final int SURVEY_STATUS_INITIATED = 2;
@@ -126,6 +128,7 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_OLD_RECORD = 8;
     public static final int STATUS_SURVEYPREINITIATION_IGNORED_RECORD = 9;
     public static final int STATUS_SURVEYPREINITIATION_DELETED = 0;
+    public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
 
     /**
      * Hibernate entities and column name constants
@@ -274,6 +277,7 @@ public interface CommonConstants
     public static final String SHOW_SURVEY_ON_UI_COLUMN = "showSurveyOnUI";
     public static final String SUMMARY_COLUMN = "summary";
     public static final String REVIEW_COLUMN = "review";
+    public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -777,7 +781,10 @@ public interface CommonConstants
     public static final String HEADER_SURVEY_GATEWAY = "Gateway";
     public static final String HEADER_CUSTOMER_COMMENTS = "Customer Comments";
     public static final String HEADER_AGREED_SHARE = "Agreed to Share";
-    public static final String HEADER_CLICK_THROUGH = "Click through";
+    public static final String HEADER_CLICK_THROUGH_FOR_COMPANY = "Click through for company";
+    public static final String HEADER_CLICK_THROUGH_FOR_AGENT = "Click through for agent";
+    public static final String HEADER_CLICK_THROUGH_FOR_REGIONS = "Click through for regions";
+    public static final String HEADER_CLICK_THROUGH_FOR_BRANCHES = "Click through for branches";
     public static final String STATUS_YES = "Yes";
     public static final String STATUS_NO = "No";
 
@@ -916,6 +923,9 @@ public interface CommonConstants
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE = "verificationRequestType";
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN = "admin";
     public static final String URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER = "user";
+    
+    
+    public static final String URL_PARAM_RETAKE_SURVEY = "retakeSurvey";
     
 
     //Url Details Mongo Column constants
@@ -1152,5 +1162,8 @@ public interface CommonConstants
     public static final String COMPANY_REGISTRATION_STAGE_COMPLETE = "The registrtion has been completed successfully";
     public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
     
+    public static final String ENCOMPASS_CONNECTION = "ENCOMPASS_CONNECTION";
+    public static final String ACTION_ENABLED = "ENABLED";
+    public static final String ACTION_DISABLED = "DISABLED";
     
 }

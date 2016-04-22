@@ -125,7 +125,7 @@ public interface SocialManagementService
 
 
     public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl,
+        long agentId, double rating, String surveyId, String feedback, boolean isAbusive, String serverBaseUrl,
         boolean onlyPostToSocialSurvey ) throws NonFatalException;
 
 
@@ -199,6 +199,10 @@ public interface SocialManagementService
 
 
     SurveyPreInitiationList getProcessedPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException;
+    
+    
+    SurveyPreInitiationList getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
         throws InvalidInputException;
 
 

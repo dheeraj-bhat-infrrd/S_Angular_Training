@@ -11,7 +11,7 @@ var phoneFormatList = {
   'AR': 'dddddddddd',
   'AM': '0dd dddddd',
   'AW': 'ddd dddd',
-  'AU': 'dddd ddd ddd',
+  'AU': '+dd dddd ddd ddd',
   'AT': '0dddd dddddddddd',
   'AZ': 'dddddddddd',
   'BH': 'dddddddddd',

@@ -75,6 +75,7 @@ var agentId;
 var agentName;
 var customerResponse;
 var customerEmail;
+var surveyId;
 var mood;
 var stage;
 var isSmileTypeQuestion=true;
@@ -372,12 +373,15 @@ function retakeSurveyReminderMail(element) {
 	var agentName = $(element).parent().parent().parent().parent().attr('data-agentname');
 	var customerEmail = $(element).parent().parent().parent().parent().attr('data-customeremail');
 	var agentId = $(element).parent().parent().parent().parent().attr('data-agentid');
+	var agentId = $(element).parent().parent().parent().parent().attr('survey-mongo-id');
+	
 	var payload = {
 			"customerEmail" : customerEmail,
 			"agentId" : agentId,
 			"firstName" : firstName,
 			"lastName" : lastName,
-			"agentName" : agentName
+			"agentName" : agentName,
+			"surveyId" : surveyId
 	};
 	
 	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
@@ -3434,8 +3438,9 @@ function bindRegionListClicks() {
 			 $(this).attr('clicked','true');
 		}
 		else {
-			$("tr[class*='sel-r"+regionId+"'").html("").hide();
+			$("tr[class*='sel-r"+regionId+"']").html("").hide();
             $(this).attr('clicked','false');
+   
 		}
 	});
 	$(".region-edit-icn").click(function(e){
@@ -5401,6 +5406,7 @@ function initSurveyWithUrl(q) {
 				customerEmail = data.responseJSON.customerEmail;
 				firstName = data.responseJSON.customerFirstName;
 				lastName = data.responseJSON.customerLastName;
+				surveyId = data.responseJSON.surveyId;
 				paintSurveyPage(data);
 			}
 		},
@@ -5653,7 +5659,8 @@ function retakeSurveyRequest(){
 			"agentId" : agentId,
 			"firstName" : firstName,
 			"lastName" : lastName,
-			"agentName" : agentName
+			"agentName" : agentName,
+			"surveyId" : surveyId
 	};
 	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true);
 	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
@@ -5671,8 +5678,7 @@ function storeCustomerAnswer(customerResponse) {
 		"question" : questionDetails.question,
 		"questionType" : questionDetails.questionType,
 		"stage" : qno + 1,
-		"agentId" : agentId,
-		"customerEmail" : customerEmail
+		"surveyId" : surveyId
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -5716,7 +5722,8 @@ function updateCustomerResponse(feedback, agreedToShare , isAbusive, isIsoEncode
 		"lastName" : lastName,
 		"isAbusive" : isAbusive,
 		"agreedToShare" : agreedToShare,
-		"isIsoEncoded" : isIsoEncoded
+		"isIsoEncoded" : isIsoEncoded,
+		"surveyId" : surveyId
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -5943,7 +5950,8 @@ function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey, isIsoE
 		"feedback" : feedback,
 		"agentProfileLink" : agentProfileLink,
 		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey,
-		"isIsoEncoded" : isIsoEncoded
+		"isIsoEncoded" : isIsoEncoded,
+		"surveyId" : surveyId
 	};
 	$.ajax({
 		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
@@ -6607,7 +6615,7 @@ $(document).on(
 					|| $(this).is('[readonly]')) {
 				return;
 			}
-			if (!phoneRegex.test(this.value)) {
+			if (!phoneRegex.test(this.value) && !ausPhoneRegex.test(this.value) ) {
 				$('#overlay-toast').html("Please add a valid phone number");
 				showToast();
 				return;
@@ -6617,7 +6625,7 @@ $(document).on(
 				var phoneNumbers = [];
 				$('#contant-info-container input[data-phone-number]').each(
 						function() {
-							if (this.value != "" && phoneRegex.test(this.value)
+							if (this.value != "" && (phoneRegex.test(this.value) || ausPhoneRegex.test(this.value))
 									&& !$(this).is('[readonly]')) {
 								var phoneNumber = {};
 								phoneNumber.key = $(this).attr(

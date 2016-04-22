@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -50,14 +49,11 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
-import com.realtech.socialsurvey.core.services.admin.AdminService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.CustomerDeletionUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -75,12 +71,6 @@ public class AdminController
 
     @Autowired
     private MessageUtils messageUtils;
-
-    @Autowired
-    private CompanyDao companyDao;
-
-    @Autowired
-    private AdminAuthenticationService adminAuthenticationService;
 
     @Autowired
     private SolrSearchService solrSearchService;
@@ -109,9 +99,6 @@ public class AdminController
     @Autowired
     private RequestUtils requestUtils;
 
-    @Autowired
-    private AdminService adminService;
-
 
     @RequestMapping ( value = "/admindashboard")
     public String adminDashboard( Model model, HttpServletRequest request )
@@ -123,39 +110,38 @@ public class AdminController
     }
 
 
-    @RequestMapping ( value = "/purgeCompany")
-    public @ResponseBody String purgeCompanyInformation( @RequestParam long companyId )
+    @RequestMapping ( value = "/deletecompany")
+    public @ResponseBody String deleteCompanyInformation( @RequestParam long companyId )
     {
         Company company = organizationManagementService.getCompanyById( companyId );
         String message = CommonConstants.SUCCESS_ATTRIBUTE;
+
+        User loggedInUser = sessionHelper.getCurrentUser();
 
         if ( company != null && company.getCompanyId() > 0 ) {
             List<LicenseDetail> licenseDetails = company.getLicenseDetails();
             if ( company.getStatus() == CommonConstants.STATUS_INACTIVE || licenseDetails.size() == 0 ) {
                 try {
                     if ( licenseDetails.size() > 0 ) {
-                        // delete company from braintree
+                        // Unsubscribing company from braintree
                         LicenseDetail licenseDetail = licenseDetails.get( 0 );
                         if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
-                            LOG.debug( "Deleting company from braintree " );
-                            payment.deleteCustomer( Long.toString( company.getCompanyId() ) );
+                            LOG.debug( "Unsubscribing company from braintree " );
+                            payment.unsubscribe( licenseDetail.getSubscriptionId() );
                         }
                     }
 
-                } catch ( CustomerDeletionUnsuccessfulException | InvalidInputException e ) {
+                } catch ( InvalidInputException | SubscriptionCancellationUnsuccessfulException e ) {
                     LOG.error( "Exception Caught " + e.getMessage() );
                     message = CommonConstants.ERROR;
                 }
-
-                try {
-                    organizationManagementService.purgeCompany( company );
-                } catch ( InvalidInputException e ) {
-                    LOG.error( "Exception Caught " + e.getMessage() );
-                    message = CommonConstants.ERROR;
-                } catch ( SolrException e ) {
-                    LOG.error( "Exception Caught " + e.getMessage() );
-                    message = CommonConstants.ERROR;
-                }
+                
+                // Deleting company from MySQL
+                company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
+                organizationManagementService.updateCompany( company );
+                
+                // marking comapny to be deleted forcefully during purge batch
+                organizationManagementService.forceDeleteDisabledAccount( company.getCompanyId(), loggedInUser.getUserId() );
             }
         }
         return message;
@@ -180,8 +166,8 @@ public class AdminController
         LOG.info( "Inside adminUserManagementPage() method in admin controller" );
         return JspResolver.ADMIN_USER_MANAGEMENT;
     }
-    
-    
+
+
     @RequestMapping ( value = "/admindownloadreports")
     public String adminDownloadReports( Model model, HttpServletRequest request )
     {
@@ -242,10 +228,10 @@ public class AdminController
                     }
                 }
                 LOG.error( "No records found for company branch or region, reason : " + e.getMessage() );
-                model.addAttribute(
-                    "message",
-                    messageUtils.getDisplayMessage( DisplayMessageConstants.COMPANY_NOT_REGISTERD,
-                        DisplayMessageType.SUCCESS_MESSAGE ).getMessage() );
+                model.addAttribute( "message",
+                    messageUtils
+                        .getDisplayMessage( DisplayMessageConstants.COMPANY_NOT_REGISTERD, DisplayMessageType.SUCCESS_MESSAGE )
+                        .getMessage() );
 
                 return JspResolver.ADMIN_COMPANY_NOT_REGISTERED;
             }
@@ -273,8 +259,8 @@ public class AdminController
 
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
         return JspResolver.ADMIN_COMPANY_HIERARCHY;
@@ -302,8 +288,10 @@ public class AdminController
             // Check for company status filer
             if ( filerValue != null && filerValue.equals( "inactive" ) ) {
                 status = CommonConstants.STATUS_INACTIVE;
-            } else if ( filerValue.equals( "incomplete" ) ) {
+            } else if ( filerValue != null && filerValue.equals( "incomplete" ) ) {
                 searchInCompleteCompany = true;
+            } else if ( filerValue != null && filerValue.equals( "deleted" ) ) {
+                status = CommonConstants.STATUS_COMPANY_DELETED;
             }
 
             // Check for account type filter
@@ -323,15 +311,15 @@ public class AdminController
             }
 
             unitSettings = organizationManagementService.getCompaniesByKeyValueFromMongo( searchKey, accountType, status,
-                searchInCompleteCompany , noOfDays);
+                searchInCompleteCompany, noOfDays );
 
             model.addAttribute( "companyList", unitSettings );
             model.addAttribute( "companyStatus", companyStatus );
 
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
 
@@ -359,8 +347,8 @@ public class AdminController
 
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
         return JspResolver.ADMIN_COMPANY_HIERARCHY;
@@ -387,8 +375,8 @@ public class AdminController
 
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
         return JspResolver.ADMIN_REGION_HIERARCHY;
@@ -415,8 +403,8 @@ public class AdminController
 
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
         return JspResolver.ADMIN_BRANCH_HIERARCHY;
@@ -436,8 +424,9 @@ public class AdminController
             try {
                 regionId = Long.parseLong( strRegionId );
             } catch ( NumberFormatException e ) {
-                throw new InvalidInputException( "Error while parsing regionId in fetchHierarchyViewBranches.Reason : "
-                    + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
+                throw new InvalidInputException(
+                    "Error while parsing regionId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
+                    DisplayMessageConstants.GENERAL_ERROR, e );
             }
             LOG.debug( "Fetching branches for region id : " + regionId );
             branches = organizationManagementService.getBranchesByRegionId( regionId );
@@ -452,8 +441,8 @@ public class AdminController
             model.addAttribute( "regionId", regionId );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching branches in a region . Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
         LOG.info( "Method fetchHierarchyViewBranches finished in controller. Returning : " + branches );
@@ -473,8 +462,9 @@ public class AdminController
             try {
                 branchId = Long.parseLong( strBranchId );
             } catch ( NumberFormatException e ) {
-                throw new InvalidInputException( "Error while parsing branchId in fetchHierarchyViewBranches.Reason : "
-                    + e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e );
+                throw new InvalidInputException(
+                    "Error while parsing branchId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
+                    DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
             int userCount = (int) solrSearchService.getUsersCountByIden( branchId, CommonConstants.BRANCHES_SOLR, false );
@@ -493,8 +483,8 @@ public class AdminController
             model.addAttribute( "regionId", strRegionId );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching users in a branch . Reason : " + e.getMessage(), e );
-            model
-                .addAttribute( "message", messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
 
@@ -692,7 +682,8 @@ public class AdminController
             model.addAttribute( "abusiveReviewReportList", abusiveSurveyReports );
         } catch ( NumberFormatException e ) {
             LOG.error(
-                "NumberFormat exception caught in fetchSurveyByAbuse() while fetching abusive reviews. Nested exception is ", e );
+                "NumberFormat exception caught in fetchSurveyByAbuse() while fetching abusive reviews. Nested exception is ",
+                e );
             model.addAttribute( "message", e.getMessage() );
         }
         LOG.info( "Method to get abusive surveys fetchSurveyByAbuse() finished." );
@@ -729,7 +720,7 @@ public class AdminController
                     String serverBaseUrl = requestUtils.getRequestServerName( request );
                     socialManagementService.postToSocialMedia( surveyDetails.getAgentName(), user.getProfileUrl(),
                         surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName(), surveyDetails.getAgentId(),
-                        surveyDetails.getScore(), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), false,
+                        surveyDetails.getScore(), surveyDetails.get_id(), surveyDetails.getReview(), false,
                         serverBaseUrl, false );
                 }
             }
@@ -742,8 +733,8 @@ public class AdminController
             model.addAttribute( "message", messageUtils.getDisplayMessage( e.getMessage(), DisplayMessageType.ERROR_MESSAGE ) );
         }
         LOG.info( "Method unmarkAbusiveReview finished." );
-        model.addAttribute( "message", messageUtils.getDisplayMessage(
-            DisplayMessageConstants.UNMARK_ABUSIVE_SURVEY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+        model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.UNMARK_ABUSIVE_SURVEY_SUCCESSFUL,
+            DisplayMessageType.SUCCESS_MESSAGE ) );
         return JspResolver.MESSAGE_HEADER;
     }
 
@@ -815,13 +806,13 @@ public class AdminController
     @ResponseBody
     @RequestMapping ( value = "/createsocialsurveyadmin", method = RequestMethod.POST)
     public String createSocialSurveyAdmin( @RequestParam ( "firstName") String firstName,
-        @RequestParam ( "lastName") String lastName, @RequestParam ( "emailId") String emailId  )
+        @RequestParam ( "lastName") String lastName, @RequestParam ( "emailId") String emailId )
     {
 
         LOG.info( "Method to fetch createSocialSurveyAdmin started." );
-        boolean isCreated = true; 
+        boolean isCreated = true;
         String message = "";
-        Map<Object,Object> returnData = new HashMap<Object,Object>();
+        Map<Object, Object> returnData = new HashMap<Object, Object>();
         try {
             if ( firstName == null || firstName.isEmpty() ) {
                 throw new InvalidInputException( "First Name can't be empty" );
@@ -839,8 +830,9 @@ public class AdminController
             admin = userManagementService.getUserObjByUserId( admin.getUserId() );
 
             userManagementService.createSocialSurveyAdmin( admin, firstName, lastName, emailId );
-            message =  messageUtils.getDisplayMessage( DisplayMessageConstants.SUCCESSFULLY_CREATED_SS_ADMIN,
-                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            message = messageUtils
+                .getDisplayMessage( DisplayMessageConstants.SUCCESSFULLY_CREATED_SS_ADMIN, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while adding a social survey admin. Reason : " + e.getMessage(), e );
             isCreated = false;
@@ -848,12 +840,12 @@ public class AdminController
         }
 
         LOG.info( "Successfully completed controller to add a social survey admin" );
-        
+
         returnData.put( "isCreated", isCreated );
         returnData.put( "message", message );
-        Gson gson = new Gson(); 
-        
-        return gson.toJson(returnData); 
+        Gson gson = new Gson();
+
+        return gson.toJson( returnData );
 
     }
 

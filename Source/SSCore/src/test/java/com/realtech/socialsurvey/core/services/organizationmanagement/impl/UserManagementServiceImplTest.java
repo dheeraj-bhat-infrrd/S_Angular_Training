@@ -200,14 +200,14 @@ public class UserManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testRemoveExistingUserForNullAdmin() throws InvalidInputException
     {
-        userManagementServiceImpl.removeExistingUser( null, 2 );
+        userManagementServiceImpl.removeExistingUser( null, 2, CommonConstants.STATUS_INACTIVE  );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testRemoveExistingUserForInvalidUserId() throws InvalidInputException
     {
-        userManagementServiceImpl.removeExistingUser( null, 0l );
+        userManagementServiceImpl.removeExistingUser( null, 0l, CommonConstants.STATUS_INACTIVE  );
     }
 
 
@@ -215,7 +215,7 @@ public class UserManagementServiceImplTest
     public void testRemoveExistingUserForNoUserFound() throws InvalidInputException
     {
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-        userManagementServiceImpl.removeExistingUser( new User(), 2l );
+        userManagementServiceImpl.removeExistingUser( new User(), 2l, CommonConstants.STATUS_INACTIVE  );
     }
 
 

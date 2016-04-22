@@ -201,7 +201,7 @@
 		
 	</div>
 </div>
-<div style="display: none"><form id='deleteAccountForm' action="./deletecompany.do" method="get"></form></div>
+<div style="display: none"><form id='deleteAccountForm' action="./deactivatecompany.do" method="get"></form></div>
 
 <script>
 $(document).ready(function() {

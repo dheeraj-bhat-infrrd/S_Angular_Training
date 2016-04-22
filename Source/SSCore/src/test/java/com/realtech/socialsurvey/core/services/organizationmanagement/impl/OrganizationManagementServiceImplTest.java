@@ -66,6 +66,7 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
+
 public class OrganizationManagementServiceImplTest
 {
     @Spy
@@ -117,22 +118,27 @@ public class OrganizationManagementServiceImplTest
     @Mock
     private UserProfileDao userProfileDao;
 
+
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
+    public static void setUpBeforeClass() throws Exception
+    {}
 
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
+    public static void tearDownAfterClass() throws Exception
+    {}
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
         MockitoAnnotations.initMocks( this );
     }
 
 
     @After
-    public void tearDown() throws Exception {}
+    public void tearDown() throws Exception
+    {}
 
 
     @Test ( expected = InvalidInputException.class)
@@ -152,23 +158,18 @@ public class OrganizationManagementServiceImplTest
     @Test
     public void testFetchAccountTypeMasterIdForCompanyWhenLicenseDetailListIsNull() throws InvalidInputException, SolrException
     {
-        Mockito
-            .when(
-                licenceDetailDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(),
-                    Mockito.any( Company.class ) ) ).thenReturn( null );
+        Mockito.when( licenceDetailDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(),
+            Mockito.any( Company.class ) ) ).thenReturn( null );
         assertEquals( "Return value does not match expected", 0,
             organizationManagementServiceImpl.fetchAccountTypeMasterIdForCompany( new Company() ) );
     }
 
 
     @Test
-    public void testFetchAccountTypeMasterIdForCompanyWhenLicenseDetailListIsEmpty() throws InvalidInputException,
-        SolrException
+    public void testFetchAccountTypeMasterIdForCompanyWhenLicenseDetailListIsEmpty() throws InvalidInputException, SolrException
     {
-        Mockito
-            .when(
-                licenceDetailDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(),
-                    Mockito.any( Company.class ) ) ).thenReturn( new ArrayList<LicenseDetail>() );
+        Mockito.when( licenceDetailDao.findByColumn( Mockito.eq( LicenseDetail.class ), Mockito.anyString(),
+            Mockito.any( Company.class ) ) ).thenReturn( new ArrayList<LicenseDetail>() );
         assertEquals( "Return value does not match expected", 0,
             organizationManagementServiceImpl.fetchAccountTypeMasterIdForCompany( new Company() ) );
     }
@@ -203,16 +204,16 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchSettingsForUserProfilesWithNullUserProfileList() throws InvalidInputException,
-        NoRecordsFetchedException
+    public void testGetBranchSettingsForUserProfilesWithNullUserProfileList()
+        throws InvalidInputException, NoRecordsFetchedException
     {
         organizationManagementServiceImpl.getBranchSettingsForUserProfiles( null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchSettingsForUserProfilesWithEmptyUserProfileList() throws InvalidInputException,
-        NoRecordsFetchedException
+    public void testGetBranchSettingsForUserProfilesWithEmptyUserProfileList()
+        throws InvalidInputException, NoRecordsFetchedException
     {
         organizationManagementServiceImpl.getBranchSettingsForUserProfiles( new ArrayList<UserProfile>() );
     }
@@ -374,7 +375,8 @@ public class OrganizationManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testDeleteMailBodyFromSettingWithInvalidMailCategory() throws NonFatalException
     {
-        organizationManagementServiceImpl.deleteMailBodyFromSetting( new OrganizationUnitSettings(), TestConstants.TEST_STRING );
+        organizationManagementServiceImpl.deleteMailBodyFromSetting( new OrganizationUnitSettings(),
+            TestConstants.TEST_STRING );
     }
 
 
@@ -401,67 +403,61 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testAddDisabledAccountWithInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException,
-        PaymentException
+    public void testAddDisabledAccountWithInvalidCompanyId()
+        throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
-        organizationManagementServiceImpl.addDisabledAccount( 0, false );
+        organizationManagementServiceImpl.addDisabledAccount( 0, false, 1 );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testAddDisabledAccountWhenLicenseDetailListIsNull() throws InvalidInputException, NoRecordsFetchedException,
-        PaymentException
+    public void testAddDisabledAccountWhenLicenseDetailListIsNull()
+        throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
-        organizationManagementServiceImpl.addDisabledAccount( 1, false );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
+        organizationManagementServiceImpl.addDisabledAccount( 1, false, 1 );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testAddDisabledAccountWhenLicenseDetailListIsEmpty() throws InvalidInputException, NoRecordsFetchedException,
-        PaymentException
+    public void testAddDisabledAccountWhenLicenseDetailListIsEmpty()
+        throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( new ArrayList<LicenseDetail>() );
-        organizationManagementServiceImpl.addDisabledAccount( 1, false );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( new ArrayList<LicenseDetail>() );
+        organizationManagementServiceImpl.addDisabledAccount( 1, false, 1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testDeleteDisabledAccountWithInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException,
-        PaymentException
+    public void testDeleteDisabledAccountWithInvalidCompanyId()
+        throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         organizationManagementServiceImpl.deleteDisabledAccount( 0 );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testDeleteDisabledAccountWhenDisabledAccountsListIsNull() throws InvalidInputException,
-        NoRecordsFetchedException, PaymentException
+    public void testDeleteDisabledAccountWhenDisabledAccountsListIsNull()
+        throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
-        Mockito.when(
-            disabledAccountDao.findByKeyValue( Mockito.eq( DisabledAccount.class ),
-                Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
+        Mockito.when( disabledAccountDao.findByKeyValue( Mockito.eq( DisabledAccount.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
         organizationManagementServiceImpl.deleteDisabledAccount( 1 );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testDeleteDisabledAccountWhenDisabledAccountsListIsEmpty() throws InvalidInputException,
-        NoRecordsFetchedException, PaymentException
+    public void testDeleteDisabledAccountWhenDisabledAccountsListIsEmpty()
+        throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         Mockito.when( companyDao.findById( Mockito.eq( Company.class ), Mockito.anyLong() ) ).thenReturn( new Company() );
-        Mockito.when(
-            disabledAccountDao.findByKeyValue( Mockito.eq( DisabledAccount.class ),
-                Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( new ArrayList<DisabledAccount>() );
+        Mockito.when( disabledAccountDao.findByKeyValue( Mockito.eq( DisabledAccount.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( new ArrayList<DisabledAccount>() );
         organizationManagementServiceImpl.deleteDisabledAccount( 1 );
     }
 
@@ -588,8 +584,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpgradeToCompanyWithWhenDefaultBranchIsNull() throws InvalidInputException, SolrException,
-        NoRecordsFetchedException
+    public void testUpgradeToCompanyWithWhenDefaultBranchIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
         Mockito.doReturn( null ).when( organizationManagementServiceImpl ).fetchDefaultBranch( Matchers.any( Company.class ) );
         organizationManagementServiceImpl.upgradeToCompany( new Company() );
@@ -604,16 +600,16 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testUpgradeToEnterpriseWithInvalidAccountMasterId() throws InvalidInputException, SolrException,
-        NoRecordsFetchedException
+    public void testUpgradeToEnterpriseWithInvalidAccountMasterId()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
         organizationManagementServiceImpl.upgradeToEnterprise( new Company(), 0 );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpgradeToEnterpriseWithWhenDefaultBranchIsNotNullAndDefaultRegionIsNull() throws InvalidInputException,
-        SolrException, NoRecordsFetchedException
+    public void testUpgradeToEnterpriseWithWhenDefaultBranchIsNotNullAndDefaultRegionIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
         Mockito.doReturn( new Branch() ).when( organizationManagementServiceImpl )
             .fetchDefaultBranch( Matchers.any( Company.class ) );
@@ -627,8 +623,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpgradeToEnterpriseWhenDefaultBranchIsNullAndAccountMasterIdIsNot3() throws InvalidInputException,
-        SolrException, NoRecordsFetchedException
+    public void testUpgradeToEnterpriseWhenDefaultBranchIsNullAndAccountMasterIdIsNot3()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
         Mockito.doReturn( null ).when( organizationManagementServiceImpl ).fetchDefaultBranch( Matchers.any( Company.class ) );
         organizationManagementServiceImpl.upgradeToEnterprise( new Company(), 1 );
@@ -653,49 +649,43 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testUpgradeAccountWithInvalidAccountMasterId() throws NoRecordsFetchedException, InvalidInputException,
-        SolrException
+    public void testUpgradeAccountWithInvalidAccountMasterId()
+        throws NoRecordsFetchedException, InvalidInputException, SolrException
     {
         organizationManagementServiceImpl.upgradeAccount( new Company(), 0 );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpgradeAccountWhenLicenseDetailListIsNull() throws NoRecordsFetchedException, InvalidInputException,
-        SolrException
+    public void testUpgradeAccountWhenLicenseDetailListIsNull()
+        throws NoRecordsFetchedException, InvalidInputException, SolrException
     {
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
         organizationManagementServiceImpl.upgradeAccount( new Company(), 1 );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpgradeAccountWhenLicenseDetailListIsEmpty() throws NoRecordsFetchedException, InvalidInputException,
-        SolrException
+    public void testUpgradeAccountWhenLicenseDetailListIsEmpty()
+        throws NoRecordsFetchedException, InvalidInputException, SolrException
     {
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( new ArrayList<LicenseDetail>() );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( new ArrayList<LicenseDetail>() );
         organizationManagementServiceImpl.upgradeAccount( new Company(), 1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testUpgradeAccountWithInvalidNewMasterAccountId() throws NoRecordsFetchedException, InvalidInputException,
-        SolrException
+    public void testUpgradeAccountWithInvalidNewMasterAccountId()
+        throws NoRecordsFetchedException, InvalidInputException, SolrException
     {
         LicenseDetail licenseDetail = new LicenseDetail();
         licenseDetail.setAccountsMaster( new AccountsMaster() );
         List<LicenseDetail> licenseDetailList = new ArrayList<LicenseDetail>();
         licenseDetailList.add( licenseDetail );
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
         organizationManagementServiceImpl.upgradeAccount( new Company(), 5 );
     }
 
@@ -710,10 +700,8 @@ public class OrganizationManagementServiceImplTest
         licenseDetail.setAccountsMaster( accountsMaster );
         List<LicenseDetail> licenseDetailList = new ArrayList<LicenseDetail>();
         licenseDetailList.add( licenseDetail );
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
         organizationManagementServiceImpl.upgradeAccount( new Company(), CommonConstants.ACCOUNTS_MASTER_TEAM );
     }
 
@@ -728,10 +716,8 @@ public class OrganizationManagementServiceImplTest
         licenseDetail.setAccountsMaster( accountsMaster );
         List<LicenseDetail> licenseDetailList = new ArrayList<LicenseDetail>();
         licenseDetailList.add( licenseDetail );
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
         organizationManagementServiceImpl.upgradeAccount( new Company(), CommonConstants.ACCOUNTS_MASTER_COMPANY );
     }
 
@@ -746,10 +732,8 @@ public class OrganizationManagementServiceImplTest
         licenseDetail.setAccountsMaster( accountsMaster );
         List<LicenseDetail> licenseDetailList = new ArrayList<LicenseDetail>();
         licenseDetailList.add( licenseDetail );
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
         organizationManagementServiceImpl.upgradeAccount( new Company(), CommonConstants.ACCOUNTS_MASTER_ENTERPRISE );
     }
 
@@ -764,10 +748,8 @@ public class OrganizationManagementServiceImplTest
         licenseDetail.setAccountsMaster( accountsMaster );
         List<LicenseDetail> licenseDetailList = new ArrayList<LicenseDetail>();
         licenseDetailList.add( licenseDetail );
-        Mockito
-            .when(
-                licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
-                    Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
+        Mockito.when( licenceDetailDao.findByKeyValue( Mockito.eq( LicenseDetail.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( licenseDetailList );
         Mockito.doReturn( null ).when( organizationManagementServiceImpl ).fetchDefaultBranch( Mockito.any( Company.class ) );
         organizationManagementServiceImpl.upgradeAccount( new Company(), CommonConstants.ACCOUNTS_MASTER_TEAM );
     }
@@ -779,25 +761,28 @@ public class OrganizationManagementServiceImplTest
         organizationManagementServiceImpl.getRegionsForCompany( TestConstants.TEST_INT );
     }
 
+
     @Test ( expected = InvalidInputException.class)
     public void testGetBranchesBySearchKey() throws InvalidInputException, ProfileNotFoundException, SolrException
     {
         organizationManagementServiceImpl.getRegionsBySearchKey( null );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testGetRegionsBySearchKey() throws InvalidInputException, ProfileNotFoundException, SolrException
     {
         organizationManagementServiceImpl.getBranchesBySearchKey( null );
     }
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testGetUsersBySearchKey() throws InvalidInputException, ProfileNotFoundException, SolrException
     {
         organizationManagementServiceImpl.getUsersBySearchKey( null );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testGetAllVerticalsMasterWhenVerticalsMastersListIsEmpty() throws InvalidInputException
     {
@@ -806,24 +791,24 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchesUnderCompanyWithNullCompanyProfileName() throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException
+    public void testGetBranchesUnderCompanyWithNullCompanyProfileName()
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         organizationManagementServiceImpl.getBranchesUnderCompany( null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchesUnderCompanyWithEmptyCompanyProfileName() throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException
+    public void testGetBranchesUnderCompanyWithEmptyCompanyProfileName()
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         organizationManagementServiceImpl.getBranchesUnderCompany( TestConstants.TEST_EMPTY_STRING );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchesUnderCompanyWithInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public void testGetBranchesUnderCompanyWithInvalidCompanyId()
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         organizationManagementServiceImpl.getBranchesUnderCompany( TestConstants.TEST_INT );
     }
@@ -873,43 +858,43 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchesForRegionWithNullCompanyProfileName() throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public void testGetBranchesForRegionWithNullCompanyProfileName()
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         organizationManagementServiceImpl.getBranchesForRegion( null, TestConstants.TEST_STRING );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchesForRegionWithNEmptyCompanyProfileName() throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public void testGetBranchesForRegionWithNEmptyCompanyProfileName()
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         organizationManagementServiceImpl.getBranchesForRegion( TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchesForRegionWithNullRegionProfileName() throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public void testGetBranchesForRegionWithNullRegionProfileName()
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         organizationManagementServiceImpl.getBranchesForRegion( TestConstants.TEST_STRING, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchesForRegionWithEmptyRegionProfileName() throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public void testGetBranchesForRegionWithEmptyRegionProfileName()
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         organizationManagementServiceImpl.getBranchesForRegion( TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testGetBranchesForRegionWithNullRegionSettings() throws InvalidInputException, NoRecordsFetchedException,
-        ProfileNotFoundException
+    public void testGetBranchesForRegionWithNullRegionSettings()
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
-        Mockito.when( profileManagementService.getRegionByProfileName( Mockito.anyString(), Mockito.anyString() ) ).thenReturn(
-            null );
+        Mockito.when( profileManagementService.getRegionByProfileName( Mockito.anyString(), Mockito.anyString() ) )
+            .thenReturn( null );
         organizationManagementServiceImpl.getBranchesForRegion( TestConstants.TEST_STRING, TestConstants.TEST_STRING );
     }
 
@@ -922,22 +907,16 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testAddNewRegionWithUserWhenAssignedUserIsNull() throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+    public void testAddNewRegionWithUserWhenAssignedUserIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         User user = new User();
-        Mockito
-            .doReturn( new Region() )
-            .when( organizationManagementServiceImpl )
-            .addNewRegion( Mockito.any( User.class ), Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-                Mockito.anyString() );
-        Mockito
-            .doReturn( new Branch() )
-            .when( organizationManagementServiceImpl )
-            .addNewBranch( Mockito.any( User.class ), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-                Mockito.anyString(), Mockito.anyString() );
+        Mockito.doReturn( new Region() ).when( organizationManagementServiceImpl ).addNewRegion( Mockito.any( User.class ),
+            Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString() );
+        Mockito.doReturn( new Branch() ).when( organizationManagementServiceImpl ).addNewBranch( Mockito.any( User.class ),
+            Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString() );
 
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.addNewRegionWithUser( user, TestConstants.TEST_STRING, 0, "Pago Pago", "",
@@ -947,32 +926,32 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testAssignRegionToUserWithNullAdminUser() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testAssignRegionToUserWithNullAdminUser() throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.assignRegionToUser( null, 1, new User(), false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testAssignRegionToUserWithInvalidRegionId() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testAssignRegionToUserWithInvalidRegionId()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.assignRegionToUser( new User(), 0, new User(), false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testAssignRegionToUserWithNullAssigneeUser() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testAssignRegionToUserWithNullAssigneeUser()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.assignRegionToUser( new User(), 1, null, false );
     }
 
 
-    @Test ( expected = InvalidInputException.class)
-    public void testAssignRegionToUserWhenSameUserProfileExist() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    //Unable to mock messageUtils. (It's a static class)
+/*    @Test ( expected = InvalidInputException.class)
+    public void testAssignRegionToUserWhenSameUserProfileExist()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         UserProfile userProfile = new UserProfile();
         userProfile.setRegionId( 1 );
@@ -984,27 +963,22 @@ public class OrganizationManagementServiceImplTest
 
         Mockito.doReturn( new Branch() ).when( organizationManagementServiceImpl )
             .getDefaultBranchForRegion( Mockito.anyLong() );
-        Mockito
-            .doReturn( userProfile )
-            .when( userManagementService )
-            .createUserProfile( Mockito.any( User.class ), Mockito.any( Company.class ), Mockito.anyString(),
-                Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt(),
-                Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString() );
+        Mockito.doReturn( userProfile ).when( userManagementService ).createUserProfile( Mockito.any( User.class ),
+            Mockito.any( Company.class ), Mockito.anyString(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong(),
+            Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(),
+            Mockito.anyString() );
 
         organizationManagementServiceImpl.assignRegionToUser( new User(), 1, assigneeUser, false );
-    }
+    }*/
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testAddNewBranchWithUserWhenAssigneeUserIsNull() throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+    public void testAddNewBranchWithUserWhenAssigneeUserIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
-        Mockito
-            .doReturn( new Branch() )
-            .when( organizationManagementServiceImpl )
-            .addNewBranch( Mockito.any( User.class ), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-                Mockito.anyString(), Mockito.anyString() );
+        Mockito.doReturn( new Branch() ).when( organizationManagementServiceImpl ).addNewBranch( Mockito.any( User.class ),
+            Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString() );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.addNewBranchWithUser( new User(), TestConstants.TEST_STRING, 1, 0, "Pago Pago", "",
             "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
@@ -1013,40 +987,39 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testAssignBranchToUserWithNullAdminUser() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testAssignBranchToUserWithNullAdminUser() throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.assignBranchToUser( null, 1, 1, new User(), false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testAssignBranchToUserWithInvalidBranchId() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testAssignBranchToUserWithInvalidBranchId()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.assignBranchToUser( new User(), 0, 1, new User(), false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testAssignBranchToUserWithInvalidRegionId() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testAssignBranchToUserWithInvalidRegionId()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.assignBranchToUser( new User(), 1, 0, new User(), false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testAssignBranchToUserWithNullAssigneeUser() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testAssignBranchToUserWithNullAssigneeUser()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.assignBranchToUser( new User(), 1, 1, null, false );
     }
 
-
-    @Test ( expected = InvalidInputException.class)
-    public void testAssignBranchToUserWhenSameUserProfileExist() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    //Unable to mock messageUtils. (It's a static class)
+/*    @Test ( expected = InvalidInputException.class)
+    public void testAssignBranchToUserWhenSameUserProfileExist()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         UserProfile userProfile = new UserProfile();
         userProfile.setRegionId( 1 );
@@ -1056,34 +1029,34 @@ public class OrganizationManagementServiceImplTest
         User assigneeUser = new User();
         assigneeUser.setUserProfiles( Arrays.asList( new UserProfile[] { userProfile } ) );
 
-        Mockito
-            .doReturn( userProfile )
-            .when( userManagementService )
-            .createUserProfile( Mockito.any( User.class ), Mockito.any( Company.class ), Mockito.anyString(),
-                Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt(),
-                Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString() );
+        Mockito.doReturn( userProfile ).when( userManagementService ).createUserProfile( Mockito.any( User.class ),
+            Mockito.any( Company.class ), Mockito.anyString(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong(),
+            Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(),
+            Mockito.anyString() );
 
         organizationManagementServiceImpl.assignBranchToUser( new User(), 1, 1, assigneeUser, false );
-    }
+    }*/
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testAddIndividualWhenAssigneeUserIsNull() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException, UserAssignmentException
+    public void testAddIndividualWhenAssigneeUserIsNull()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
     {
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-        organizationManagementServiceImpl.addIndividual( new User(), 1, 1, 1, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
+        organizationManagementServiceImpl.addIndividual( new User(), 1, 1, 1, TestConstants.TEST_EMPTY_ARRAY, false, true,
+            true );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testAddIndividualWhenDefaultRegionIsNull() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException, UserAssignmentException
+    public void testAddIndividualWhenDefaultRegionIsNull()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
     {
         Mockito.doReturn( null ).when( organizationManagementServiceImpl )
             .getDefaultRegionForCompany( Mockito.any( Company.class ) );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
-        organizationManagementServiceImpl.addIndividual( new User(), 1, 0, 0, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
+        organizationManagementServiceImpl.addIndividual( new User(), 1, 0, 0, TestConstants.TEST_EMPTY_ARRAY, false, true,
+            true );
     }
 
 
@@ -1526,48 +1499,48 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetBranchesUnderCompanyFromSolrWithNullCompany() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testGetBranchesUnderCompanyFromSolrWithNullCompany()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.getBranchesUnderCompanyFromSolr( null, 1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetUsersUnderCompanyFromSolrWithNullCompany() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testGetUsersUnderCompanyFromSolrWithNullCompany()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.getUsersUnderCompanyFromSolr( null, 1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetAllUsersUnderCompanyFromSolrWithNullCompany() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testGetAllUsersUnderCompanyFromSolrWithNullCompany()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.getAllUsersUnderCompanyFromSolr( null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetUsersUnderRegionFromSolrWithNullRegionIdsList() throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void testGetUsersUnderRegionFromSolrWithNullRegionIdsList()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.getUsersUnderRegionFromSolr( null, 1, 10 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testGetUsersUnderRegionFromSolrWithEmptyRegionIdsList() throws InvalidInputException,
-        NoRecordsFetchedException, SolrException
+    public void testGetUsersUnderRegionFromSolrWithEmptyRegionIdsList()
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         organizationManagementServiceImpl.getUsersUnderRegionFromSolr( new HashSet<Long>(), 1, 10 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testUpdateRegionWithNullUser() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testUpdateRegionWithNullUser()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateRegion( null, 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
@@ -1576,8 +1549,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testUpdateRegionWithNullRegionName() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testUpdateRegionWithNullRegionName()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateRegion( new User(), 1, null, "Pago Pago", TestConstants.TEST_EMPTY_STRING,
             "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
@@ -1585,8 +1558,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testUpdateRegionWithEmptyRegionName() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testUpdateRegionWithEmptyRegionName()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateRegion( new User(), 1, TestConstants.TEST_EMPTY_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
@@ -1595,8 +1568,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testUpdateRegionWithInvalidRegionId() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testUpdateRegionWithInvalidRegionId()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateRegion( new User(), 0, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
@@ -1605,8 +1578,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpdateRegionWhenRegionIsNull() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testUpdateRegionWhenRegionIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Mockito.when( regionDao.findById( Mockito.eq( Region.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.updateRegion( new User(), 1, TestConstants.TEST_STRING, "Pago Pago",
@@ -1616,8 +1589,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testUpdateRegionWhenAssigneeUserIsNull() throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+    public void testUpdateRegionWhenAssigneeUserIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Mockito.when( regionDao.findById( Mockito.eq( Region.class ), Mockito.anyLong() ) ).thenReturn( new Region() );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
@@ -1695,8 +1668,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testupdateBranchWithNullUser() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testupdateBranchWithNullUser()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateBranch( null, 1, 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
@@ -1705,8 +1678,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testupdateBranchWithNullBranchName() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testupdateBranchWithNullBranchName()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, null, "Pago Pago", TestConstants.TEST_EMPTY_STRING,
             "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
@@ -1714,8 +1687,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testupdateBranchWithEmptyBranchName() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testupdateBranchWithEmptyBranchName()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_EMPTY_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
@@ -1724,8 +1697,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testupdateBranchWithNullBranchAddress1() throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+    public void testupdateBranchWithNullBranchAddress1()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING, null,
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
@@ -1734,18 +1707,18 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = InvalidInputException.class)
-    public void testupdateBranchWithEmptyBranchAddress1() throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+    public void testupdateBranchWithEmptyBranchAddress1()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING,
-            TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago",
-            "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287",
+            1, TestConstants.TEST_EMPTY_ARRAY, false, true );
     }
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testupdateBranchWhenBranchIsNull() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testupdateBranchWhenBranchIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Mockito.when( branchDao.findById( Mockito.eq( Branch.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING, "Pago Pago",
@@ -1755,8 +1728,8 @@ public class OrganizationManagementServiceImplTest
 
 
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testupdateBranchWhenRegionIsNull() throws InvalidInputException, SolrException, NoRecordsFetchedException,
-        UserAssignmentException
+    public void testupdateBranchWhenRegionIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Branch branch = new Branch();
         branch.setRegion( new Region() );
@@ -1772,8 +1745,8 @@ public class OrganizationManagementServiceImplTest
 
     @SuppressWarnings ( "unchecked")
     @Test ( expected = NoRecordsFetchedException.class)
-    public void testupdateBranchWhenAssigneeUserIsNull() throws InvalidInputException, SolrException,
-        NoRecordsFetchedException, UserAssignmentException
+    public void testupdateBranchWhenAssigneeUserIsNull()
+        throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Branch branch = new Branch();
         branch.setRegion( new Region() );
@@ -1784,18 +1757,12 @@ public class OrganizationManagementServiceImplTest
         Mockito.doNothing().when( userProfileDao ).updateRegionIdForBranch( Mockito.anyLong(), Mockito.anyLong() );
         Mockito.when( solrSearchService.findUsersInBranch( Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt() ) )
             .thenReturn( null );
-        Mockito
-            .doReturn( null )
-            .when( organizationManagementServiceImpl )
-            .updateRegionIdForUsers( (SolrDocumentList) Matchers.any(), Matchers.anyLong(), Matchers.anyLong(),
-                Matchers.anyLong() );
+        Mockito.doReturn( null ).when( organizationManagementServiceImpl ).updateRegionIdForUsers(
+            (SolrDocumentList) Matchers.any(), Matchers.anyLong(), Matchers.anyLong(), Matchers.anyLong() );
         Mockito.doNothing().when( solrSearchService ).updateRegionsForMultipleUsers( Mockito.anyMap() );
         Mockito.doNothing().when( branchDao ).update( Mockito.any( Branch.class ) );
-        Mockito
-            .doNothing()
-            .when( organizationUnitSettingsDao )
-            .updateKeyOrganizationUnitSettingsByCriteria( Mockito.anyString(), Mockito.any(), Mockito.anyString(),
-                Mockito.any(), Mockito.anyString() );
+        Mockito.doNothing().when( organizationUnitSettingsDao ).updateKeyOrganizationUnitSettingsByCriteria(
+            Mockito.anyString(), Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.anyString() );
         Mockito.doNothing().when( solrSearchService ).addOrUpdateBranchToSolr( Mockito.any( Branch.class ) );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING, "Pago Pago",
@@ -1822,8 +1789,8 @@ public class OrganizationManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testGetLoopsCountByProfileWithEmptyProfileId() throws InvalidInputException
     {
-        organizationManagementServiceImpl
-            .getLoopsCountByProfile( TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING, 1 );
+        organizationManagementServiceImpl.getLoopsCountByProfile( TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING,
+            1 );
     }
 
 
@@ -1837,32 +1804,32 @@ public class OrganizationManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testGetLoopByProfileAndLoopIdWithNullProfileId() throws InvalidInputException
     {
-        organizationManagementServiceImpl.getLoopByProfileAndLoopId( null, TestConstants.TEST_STRING,
-            TestConstants.TEST_STRING, 1 );
+        organizationManagementServiceImpl.getLoopByProfileAndLoopId( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
+            1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testGetLoopByProfileAndLoopIdWithEmptyProfileId() throws InvalidInputException
     {
-        organizationManagementServiceImpl.getLoopByProfileAndLoopId( TestConstants.TEST_EMPTY_STRING,
-            TestConstants.TEST_STRING, TestConstants.TEST_STRING, 1 );
+        organizationManagementServiceImpl.getLoopByProfileAndLoopId( TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING,
+            TestConstants.TEST_STRING, 1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testGetLoopByProfileAndLoopIdWithNullLoopId() throws InvalidInputException
     {
-        organizationManagementServiceImpl.getLoopByProfileAndLoopId( TestConstants.TEST_STRING, null,
-            TestConstants.TEST_STRING, 1 );
+        organizationManagementServiceImpl.getLoopByProfileAndLoopId( TestConstants.TEST_STRING, null, TestConstants.TEST_STRING,
+            1 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testGetLoopByProfileAndLoopIdWithEmptyLoopId() throws InvalidInputException
     {
-        organizationManagementServiceImpl.getLoopByProfileAndLoopId( TestConstants.TEST_STRING,
-            TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_STRING, 1 );
+        organizationManagementServiceImpl.getLoopByProfileAndLoopId( TestConstants.TEST_STRING, TestConstants.TEST_EMPTY_STRING,
+            TestConstants.TEST_STRING, 1 );
     }
 
 
@@ -1895,12 +1862,10 @@ public class OrganizationManagementServiceImplTest
     public void testGetCollectionDotloopMappingByCollectionIdAndProfileIdWhenCollectionDotloopProfileMappingListIsNull()
         throws InvalidInputException
     {
-        Mockito.when(
-            collectionDotloopProfileMappingDao.findByKeyValue( Mockito.eq( CollectionDotloopProfileMapping.class ),
-                Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
-        assertNull( "CollectionDotloopProfileMappingList is not as expected",
-            organizationManagementServiceImpl.getCollectionDotloopMappingByCollectionIdAndProfileId( TestConstants.TEST_STRING,
-                1, TestConstants.TEST_STRING ) );
+        Mockito.when( collectionDotloopProfileMappingDao.findByKeyValue( Mockito.eq( CollectionDotloopProfileMapping.class ),
+            Mockito.anyMapOf( String.class, Object.class ) ) ).thenReturn( null );
+        assertNull( "CollectionDotloopProfileMappingList is not as expected", organizationManagementServiceImpl
+            .getCollectionDotloopMappingByCollectionIdAndProfileId( TestConstants.TEST_STRING, 1, TestConstants.TEST_STRING ) );
     }
 
 
@@ -1908,13 +1873,12 @@ public class OrganizationManagementServiceImplTest
     public void testGetCollectionDotloopMappingByCollectionIdAndProfileIdWhenCollectionDotloopProfileMappingListIsEmpty()
         throws InvalidInputException
     {
-        Mockito.when(
-            collectionDotloopProfileMappingDao.findByKeyValue( Mockito.eq( CollectionDotloopProfileMapping.class ),
+        Mockito
+            .when( collectionDotloopProfileMappingDao.findByKeyValue( Mockito.eq( CollectionDotloopProfileMapping.class ),
                 Mockito.anyMapOf( String.class, Object.class ) ) )
             .thenReturn( new ArrayList<CollectionDotloopProfileMapping>() );
-        assertNull( "CollectionDotloopProfileMappingList is not as expected",
-            organizationManagementServiceImpl.getCollectionDotloopMappingByCollectionIdAndProfileId( TestConstants.TEST_STRING,
-                1, TestConstants.TEST_STRING ) );
+        assertNull( "CollectionDotloopProfileMappingList is not as expected", organizationManagementServiceImpl
+            .getCollectionDotloopMappingByCollectionIdAndProfileId( TestConstants.TEST_STRING, 1, TestConstants.TEST_STRING ) );
     }
 
 
@@ -1950,9 +1914,8 @@ public class OrganizationManagementServiceImplTest
     public void testGetCollectionDotloopMappingByProfileIdWhenCollectionDotloopProfileMappingListIsEmpty()
         throws InvalidInputException
     {
-        Mockito.when(
-            collectionDotloopProfileMappingDao.findByColumn( Mockito.eq( CollectionDotloopProfileMapping.class ),
-                Mockito.anyString(), Mockito.anyString() ) ).thenReturn( new ArrayList<CollectionDotloopProfileMapping>() );
+        Mockito.when( collectionDotloopProfileMappingDao.findByColumn( Mockito.eq( CollectionDotloopProfileMapping.class ),
+            Mockito.anyString(), Mockito.anyString() ) ).thenReturn( new ArrayList<CollectionDotloopProfileMapping>() );
         assertNull( "CollectionDotloopProfileMappingList is not as expected",
             organizationManagementServiceImpl.getCollectionDotloopMappingByProfileId( TestConstants.TEST_STRING ) );
     }
@@ -2102,14 +2065,16 @@ public class OrganizationManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testGetAllBranchesUnderProfileTypeConnectedToZillowWithInvalidProfileLevel() throws InvalidInputException
     {
-        organizationManagementServiceImpl.getAllBranchesUnderProfileTypeConnectedToZillow( TestConstants.TEST_STRING, 1, 1, 10 );
+        organizationManagementServiceImpl.getAllBranchesUnderProfileTypeConnectedToZillow( TestConstants.TEST_STRING, 1, 1,
+            10 );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testGetAllBranchesUnderProfileTypeConnectedToZillowWithInvalidIden() throws InvalidInputException
     {
-        organizationManagementServiceImpl.getAllBranchesUnderProfileTypeConnectedToZillow( TestConstants.TEST_STRING, 0, 1, 10 );
+        organizationManagementServiceImpl.getAllBranchesUnderProfileTypeConnectedToZillow( TestConstants.TEST_STRING, 0, 1,
+            10 );
     }
 
 
@@ -2154,8 +2119,8 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.generateProfileNameForCompany( TestConstants.TEST_EMPTY_STRING, 1 );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testUpdateProfileUrlForDeletedEntityTypeNull() throws InvalidInputException
     {
@@ -2369,10 +2334,13 @@ public class OrganizationManagementServiceImplTest
         Map<String, List<User>> userMap = new HashMap<String, List<User>>();
         assertFalse( "User assignment validation result is not as expected",
             organizationManagementServiceImpl.validateUserAssignment( adminUser, assigneeUser, userMap ) );
-        assertTrue( "Invalid user assignment not found", userMap.size() != 0 && !userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ).isEmpty() );
+        assertTrue( "Invalid user assignment not found",
+            userMap.size() != 0 && !userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ).isEmpty() );
         assertEquals( "Invalid user assignment email id is not same as assignee user email id passed as argument",
             userMap.get( CommonConstants.INVALID_USERS_ASSIGN_LIST ).get( 0 ).getEmailId(), assigneeUser.getEmailId() );
     }
+
+
     @Test ( expected = InvalidInputException.class)
     public void testGetRegionIdsUnderCompanyWithInvalidCompanyId() throws InvalidInputException
     {

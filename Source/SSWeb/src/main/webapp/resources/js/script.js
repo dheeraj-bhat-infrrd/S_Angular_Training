@@ -6,6 +6,7 @@ var is_Opera = navigator.userAgent.indexOf("Presto") > -1;
 var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]\.[0-9]\.[0-9]\.[0-9]\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]+))$/;
 var zipcodeRegex = /^\d{5}([\-]?\d{4})?$/;
 var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
+var ausPhoneRegex = /^\+?[0-9]{0,2}[-\s\.]{0,1}[(]{0,1}[0-9]{4}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{3}$/;
 var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
 var nameRegex = /^[a-zA-Z ]*$/;
 var lastNameRegEx = /^[a-zA-Z0-9 ]*$/;
@@ -227,7 +228,7 @@ function validateForm(id) {
 
 		if ($(this).data('phone') == true) {
 			if ($(this).val() != "") {
-				if (phoneRegex.test($(this).val()) == true) {
+				if (phoneRegex.test($(this).val()) == true || ausPhoneRegex.test($(this).val()) == true ) {
 					$(this).parent().removeClass('input-error');
 				} else {
 					validate = false;
@@ -1410,9 +1411,84 @@ function initializeUnmatchedUserPage() {
 	$('#un-new-paginate-btn').attr("data-start", 0);
 	UnmatchedUserStartIndex = 0;
 	fetchUnmatchedUsers(UnmatchedUserStartIndex);
-	
-
 }
+
+var CorruptRecordsSize = 10;
+var CorruptRecordsStartIndex = 0;
+function initializeCorrupRecordsPage(){
+	$('#corrupt').html('');
+	$('#corrupt-paginate-btn').attr("data-start", 0);
+	CorruptRecordsStartIndex = 0;
+	fetchCorruptRecords(CorruptRecordsStartIndex);
+}
+
+function bindEventForCorruptRecordPage() {
+
+	// Click events proList pagination buttons
+	$('#corrupt-paginate-btn').on(
+			'click',
+			'#corrupt-next.paginate-button',
+			function(e) {
+				var start = parseInt($('#corrupt-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#corrupt-paginate-btn').attr(
+						"data-batch"));
+
+				start += batch;
+				$('#corrupt-paginate-btn').attr("data-start", start);
+				fetchCorruptRecords(start);
+			});
+
+	$('#corrupt-paginate-btn').on(
+			'click',
+			'#corrupt-prev.paginate-button',
+			function(e) {
+				var start = parseInt($('#corrupt-paginate-btn').attr(
+						"data-start"));
+				var batch = parseInt($('#corrupt-paginate-btn').attr(
+						"data-batch"));
+
+				start -= batch;
+				$('#corrupt-paginate-btn').attr("data-start", start);
+				fetchCorruptRecords(start);
+			});
+
+	$('#corrupt-paginate-btn').on(
+			'keypress',
+			'#sel-page-corrupt-list',
+			function(e) {
+				// if the letter is not digit then don't type anything
+				if (e.which != 8 && e.which != 0
+						&& (e.which < 48 || e.which > 57)) {
+					return false;
+				}
+				var totalPage = parseInt($('#corrupt-total-pages').text());
+				var prevPageNoVal = parseInt($('#sel-page-corrupt-list').val());
+				if (prevPageNoVal == NaN) {
+					prevPageNoVal = 0;
+				}
+				var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+				pageNo = parseInt(pageNo);
+				if (pageNo >= totalPage || pageNo <= 0) {
+					return false;
+				}
+			});
+
+	$('#corrupt-paginate-btn').on('keyup', '#sel-page-corrupt-list', function(e) {
+		if (e.which == 13) {
+			$(this).trigger('blur');
+		}
+	});
+
+	$('#corrupt-paginate-btn').on('blur', '#sel-page-corrupt-list', function(e) {
+		var batch = parseInt($('#corrupt-paginate-btn').attr("data-batch"));
+		var pageNoVal = parseInt($('#sel-page-corrupt-list').val());
+		UnmatchedUserStartIndex = (pageNoVal - 1) * batch;
+		$('#corrupt-paginate-btn').attr("data-start", UnmatchedUserStartIndex);
+		fetchUnmatchedUsers(UnmatchedUserStartIndex);
+	});
+}
+
 function  bindEventForMappedUserPage(){
 	// Click events proList pagination buttons
 	$('#mapped-paginate-btn').on(
@@ -1684,6 +1760,19 @@ function fetchUnmatchedUsers(newIndex) {
 			paginateUnmatchedUser, payload, true);
 
 }
+
+function fetchCorruptRecords(newIndex){
+	showOverlay();
+	var payload = {
+		"batchSize" : CorruptRecordsSize,
+		"startIndex" : newIndex
+
+	};
+
+	callAjaxGetWithPayloadData("./getcorruptpreinitiatedsurveys.do",
+			paginateCorruptRecords, payload, true);
+}
+
 function fetchProcessedUsers(newIndex) {
 	showOverlay();
 	var payload = {
@@ -1819,6 +1908,40 @@ function updatePaginationBtnsForUnmatchedUser() {
 		pageNo = 1;
 	}
 	$('#sel-page-un-new-list').val(pageNo);
+}
+function updatePaginationBtnsForCorruptRecords(){
+	var start = parseInt($('#corrupt-paginate-btn').attr("data-start"));
+	var total = parseInt($('#corrupt-paginate-btn').attr("data-total"));
+	var batch = parseInt($('#corrupt-paginate-btn').attr("data-batch"));
+
+	// update previous button
+	if (start == 0) {
+		$('#corrupt-prev').removeClass('paginate-button');
+	} else {
+		$('#corrupt-prev').addClass('paginate-button');
+	}
+
+	// update next button
+	if (start + batch >= total) {
+		$('#corrupt-next').removeClass('paginate-button');
+	} else {
+		$('#corrupt-next').addClass('paginate-button');
+	}
+
+	// update page no
+	var pageNo = 0;
+	if (start < total) {
+		pageNo = (start / batch) + 1;
+	} else {
+		pageNo = start / batch;
+	}
+	var emptyPageNo = isNaN(pageNo);
+	if (emptyPageNo) {
+		$('#corrupt-paginate-btn').attr("data-start", 0);
+		$('#corrupt-prev').removeClass('paginate-button');
+		pageNo = 1;
+	}
+	$('#sel-page-corrupt-list').val(pageNo);
 }
 function updatePaginationBtnsForProcessedUser() {
 	var startProcess = parseInt($('#un-processed-paginate-btn').attr(
@@ -1956,6 +2079,40 @@ function paginateUnmatchedUser(response) {
 		paintUnmatchedUser(reponseJson);
 	}
 	updatePaginationBtnsForUnmatchedUser();
+	hideOverlay();
+}
+function paginateCorruptRecords(response){
+	var reponseJson = $.parseJSON(response);
+	var start = parseInt($('#corrupt-paginate-btn').attr("data-start"));
+	var batch = parseInt($('#corrupt-paginate-btn').attr("data-batch"));
+
+	// error message
+	if (reponseJson.errMessage) {
+		showError(reponseJson.errMessage);
+		$('#corrupt').append("No Data found");
+		hideOverlay();
+	} else {
+		if (start == 0) {
+			var usersSize = reponseJson.totalRecord;
+			if (usersSize > 0) {
+				$('#corrupt-paginate-btn').show().attr("data-total", usersSize);
+				var totalPage = 0;
+				if (usersSize % batch == 0) {
+					totalPage = parseInt(usersSize / batch);
+				} else {
+					totalPage = parseInt(usersSize / batch + 1);
+				}
+
+				$('#corrupt-total-pages').text(totalPage);
+			}else if(usersSize ==0){
+				$('#corrupt-no-data').html("No data found");
+				$('#corrupt-no-data').show();
+			}
+
+		}
+		paintCorruptRecords(reponseJson);
+	}
+	updatePaginationBtnsForCorruptRecords();
 	hideOverlay();
 }
 function paginateProcessedUser(response) {
@@ -2339,8 +2496,8 @@ function paintUnmatchedUser(usersList) {
 					.forEach(function(arrayItem) {
 
 						untrack += '<div class="un-row">'
-								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.surveySourceId) + '">'
-								+ undefinedval(arrayItem.surveySourceId)
+								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.agentName) + '">'
+								+ undefinedval(arrayItem.agentName)
 								+ '</div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="'+ undefinedval(arrayItem.agentEmailId) + '">'
 								+ undefinedval(arrayItem.agentEmailId)
@@ -2366,6 +2523,41 @@ function paintUnmatchedUser(usersList) {
 		}
 	}
 }
+function paintCorruptRecords(usersList){
+	if (usersList != undefined) {
+		var usersSize = usersList.surveyPreInitiationList.length;
+
+		var untrack = "";
+		if (usersSize > 0) {
+			usersList.surveyPreInitiationList
+					.forEach(function(arrayItem) {
+
+						untrack += '<div class="un-row">'
+								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.agentName) + '">'
+								+ undefinedval(arrayItem.agentName)
+								+ '</div>'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="'+ undefinedval(arrayItem.agentEmailId) + '">'
+								+ undefinedval(arrayItem.agentEmailId)
+								+ '</div>'
+								+ '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="'+ undefinedval(arrayItem.customerFirstName) + '">'
+								+ undefinedval(arrayItem.customerFirstName)
+								+ '<span style="margin-left:2px;">'
+								+ undefinedval(arrayItem.customerLastName)
+								+ '</span> <br> <span style="margin-left:2px;" title="'+ undefinedval(arrayItem.customerEmailId) + '"> < '
+								+ undefinedval(arrayItem.customerEmailId)
+								+ ' > </span></div>'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.engagementClosedTime) + '">'
+								+ undefinedval(arrayItem.engagementClosedTime)
+								+ '</div>'
+								+ '						<div style="width:20%" class="float-left unmatchtab ss-date" title="'+ undefinedval(arrayItem.errorCodeDescription) + '">'
+								+ undefinedval(arrayItem.errorCodeDescription)
+								+ '</div></div>';
+					});
+
+			$('#corrupt').html(untrack);
+		}
+	}
+}
 function paintProcessedUser(usersList) {
 	if (usersList != undefined) {
 		var usersSize = usersList.surveyPreInitiationList.length;
@@ -2383,8 +2575,8 @@ function paintProcessedUser(usersList) {
 								action += "<br><span title="+ arrayItem.user.loginName + ">" + arrayItem.user.loginName +"</span> " 
 						}
 						unprocess += '<div class="un-row">'
-								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.surveySourceId) + '">'
-								+ undefinedval(arrayItem.surveySourceId)
+								+ '						<div style="width:10%" class="float-left unmatchtab ss-id" title="'+ undefinedval(arrayItem.agentName) + '">'
+								+ undefinedval(arrayItem.agentName)
 								+ '</div>'
 								+ '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="'+ undefinedval(arrayItem.agentEmailId) + '">'
 								+ undefinedval(arrayItem.agentEmailId)
