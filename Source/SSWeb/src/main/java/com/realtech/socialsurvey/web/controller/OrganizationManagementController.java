@@ -2263,7 +2263,11 @@ public class OrganizationManagementController
 
                 // Modify the company status to inactive.
                 user.getCompany().setStatus( CommonConstants.STATUS_INACTIVE );
+
                 organizationManagementService.updateCompany( user.getCompany() );
+
+                //Update company settings to deleted
+                organizationManagementService.deactivateCompanyInMongo( user.getCompany() );
 
                 LOG.info( "Company deactivated successfully, logging out now." );
                 request.getSession( false ).invalidate();

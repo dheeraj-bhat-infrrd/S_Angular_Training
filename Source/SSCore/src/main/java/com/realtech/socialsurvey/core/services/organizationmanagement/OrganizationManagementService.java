@@ -913,6 +913,13 @@ public interface OrganizationManagementService
 
 
     /**
+     * Method to set company status to deleted in mongo
+     * @param company
+     * @throws InvalidInputException
+     */
+    public void deactivateCompanyInMongo( Company company ) throws InvalidInputException;
+
+    /**
      * @param user
      * @return
      * @throws InvalidInputException
