@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 
 /**
@@ -94,48 +92,16 @@ public class SurveyPreInitiation implements Serializable
     @JoinColumn ( name = "AGENT_ID", referencedColumnName = "USER_ID", insertable = false, updatable = false)
     private User user;
 
-    @Column ( name = "ERROR_CODE")
-    private String errorCode;
-
-    @Transient
-    private String errorCodeDescription;
-
-
-    public String getErrorCodeDescription()
-    {
-        return errorCodeDescription;
-    }
-
-
-    public void setErrorCodeDescription( String errorCodeDescription )
-    {
-        this.errorCodeDescription = errorCodeDescription;
-    }
-
-
-    public String getErrorCode()
-    {
-        return errorCode;
-    }
-
-
-    public void setErrorCode( String errorCode )
-    {
-        this.errorCode = errorCode;
-    }
-
 
     public User getUser()
     {
         return this.user;
     }
 
-
-    public void setUser( User user )
+    public void setUser(User user)
     {
-        this.user = user;
+       this.user = user;
     }
-
 
     public long getSurveyPreIntitiationId()
     {
