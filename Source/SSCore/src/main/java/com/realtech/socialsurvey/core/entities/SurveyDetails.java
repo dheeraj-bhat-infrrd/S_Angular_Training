@@ -52,7 +52,7 @@ public class SurveyDetails
     private String summary;
     
     private long surveyPreIntitiationId;
-    private boolean newSurvey;
+    private boolean retakeSurvey;
     
     public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
     {
@@ -592,14 +592,14 @@ public class SurveyDetails
     }
 
 
-    public boolean isNewSurvey()
+    public boolean isRetakeSurvey()
     {
-        return newSurvey;
+        return retakeSurvey;
     }
 
 
-    public void setNewSurvey( boolean newSurvey )
+    public void setRetakeSurvey( boolean retakeSurvey )
     {
-        this.newSurvey = newSurvey;
+        this.retakeSurvey = retakeSurvey;
     }
 }
