@@ -1710,7 +1710,9 @@
 	margin-left:auto;
 	}
 	/* new registraion */
-	
+	#reg-left-view{
+	 display:none;
+	}
    
 
 }
@@ -2098,6 +2100,10 @@
    .admin-sel-item{
     width:200px;
    }
+   /*=========new_registration====================*/
+   #reg-left-view{
+	 display:none;
+	}
    
 }
 
