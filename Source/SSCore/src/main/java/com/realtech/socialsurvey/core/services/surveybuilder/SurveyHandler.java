@@ -71,7 +71,7 @@ public interface SurveyHandler
     public String getApplicationBaseUrl();
 
 
-    public void updateSurveyAsClicked( long agentId, String customerEmail );
+    public void updateSurveyAsClicked( String surveyMongoId );
 
 
     public String getSwearWords();
@@ -281,4 +281,7 @@ public interface SurveyHandler
 
     SurveyPreInitiation preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
         String custRelationWithAgent, String source );
+
+
+    void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 }

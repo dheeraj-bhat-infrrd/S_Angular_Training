@@ -321,12 +321,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public void updateSurveyAsClicked( long agentId, String customerEmail )
+    public void updateSurveyAsClicked( String surveyMongoId )
     {
         LOG.info( "Method updateSurveyAsClicked() to mark survey as clicked started." );
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( customerEmail ) );
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.SURVEY_CLICKED_COLUMN, true );
         update.set( CommonConstants.CREATED_ON, new Date() );
@@ -2269,6 +2268,25 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         } else {
             query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_EMAIL_COLUMN ).is( surveyDetails.getCustomerEmail() ) );
         }
+        Update update = new Update();
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, surveyDetails.getSocialMediaPostDetails() );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN,
+            surveyDetails.getSocialMediaPostResponseDetails() );
+        update.set( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, surveyDetails.getSurveyPreIntitiationId() );
+        update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method insertSurveyDetails() to insert details of survey finished." );
+    }
+    
+    
+    @Override
+    public void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails )
+    {
+        LOG.info( "Method insertSurveyDetails() to insert details of survey started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyDetails.get_id() ) );
+        
         Update update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, surveyDetails.getSocialMediaPostDetails() );
         update.set( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN,
