@@ -1571,9 +1571,11 @@ public class SurveyManagementController
         try {
             SurveyDetails survey = storeInitialSurveyDetails( agentId, customerEmail, firstName, lastName, reminderCount,
                 custRelationWithAgent, url, source , surveyPreIntitiationId , isOldRecord , retakeSurvey);
-            surveyHandler.updateSurveyAsClicked( agentId, customerEmail );
 
             if ( survey != null ) {
+                
+                surveyHandler.updateSurveyAsClicked( survey.get_id() );
+                
                 stage = survey.getStage();
                 editable = survey.getEditable();
                 surveyAndStage.put( "agentName", survey.getAgentName() );

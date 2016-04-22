@@ -257,12 +257,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
             // LOG.info( "Updating modified on column in agent hierarchy fro agent " );
             // updateModifiedOnColumnForAgentHierachy( agentId );
-            return null;
+            return surveyDetails;
         } else {
             //update survey PreIntitiation Id for survey
             survey.setSurveyPreIntitiationId( surveyPreIntitiationId );
             survey.setRetakeSurvey( retakeSurvey );
-            surveyDetailsDao.updateSurveyDetails( survey );
+            surveyDetailsDao.updateSurveyDetailsBySurveyId( survey );
             return survey;
         }
     }
@@ -385,10 +385,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * Method to update a survey as clicked when user triggers the survey and page of the first
      * question starts loading.
      */
-    public void updateSurveyAsClicked( long agentId, String customerEmail )
+    public void updateSurveyAsClicked( String surveyMongoId )
     {
         LOG.info( "Method updateSurveyAsClicked() to mark the survey as clicked, started" );
-        surveyDetailsDao.updateSurveyAsClicked( agentId, customerEmail );
+        surveyDetailsDao.updateSurveyAsClicked( surveyMongoId );
         LOG.info( "Method updateSurveyAsClicked() to mark the survey as clicked, finished" );
     }
 
@@ -1871,6 +1871,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
         surveyPreInitiation.setAgentId( user.getUserId() );
+        surveyPreInitiation.setAgentEmailId( user.getLoginName() );
         surveyPreInitiation.setCompanyId( user.getCompany().getCompanyId() );
         surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         surveyPreInitiation.setCustomerEmailId( custEmail );
@@ -2077,6 +2078,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         surveyDetailsDao.updateSurveyDetails( surveyDetails );
     }
+    
+    
+    @Override
+    @Transactional
+    public void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails )
+    {
+        surveyDetailsDao.updateSurveyDetailsBySurveyId( surveyDetails );
+    }
+
 
 
     public boolean validateDecryptedApiParams( Map<String, String> params )
