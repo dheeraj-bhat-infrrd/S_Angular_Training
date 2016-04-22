@@ -2269,6 +2269,9 @@ public class OrganizationManagementController
                 //Update company settings to deleted
                 organizationManagementService.deactivateCompanyInMongo( user.getCompany() );
 
+                //Deactivate company in solr
+                organizationManagementService.deleteCompanyFromSolr( user.getCompany() );
+
                 LOG.info( "Company deactivated successfully, logging out now." );
                 request.getSession( false ).invalidate();
                 SecurityContextHolder.clearContext();
