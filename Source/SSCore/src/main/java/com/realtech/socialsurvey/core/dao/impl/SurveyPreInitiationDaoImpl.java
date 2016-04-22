@@ -205,6 +205,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             AgentRankingReport agentRankingReport = null;
             if ( agentReportData.containsKey( survey.getAgentId() ) ) {
                 agentRankingReport = agentReportData.get( survey.getAgentId() );
+                agentRankingReport.setAgentName( survey.getAgentName() );
                 agentRankingReport.setIncompleteSurveys( agentRankingReport.getIncompleteSurveys() + 1 );
                 agentReportData.put( survey.getAgentId(), agentRankingReport );
             }
