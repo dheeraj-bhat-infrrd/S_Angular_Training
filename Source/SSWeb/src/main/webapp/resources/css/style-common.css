@@ -6852,9 +6852,10 @@ tr.u-tbl-header td {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 .verified-badge {
-	background: url(../images/ss-badge.png) no-repeat;
+	background: url(../images/ss-verified-customer.png) no-repeat;
 	cursor: pointer;
 	margin-top: 5px;
+	background-size: contain;
 }
 .star-rating{
 	background: url(../images/ss-stars.png) no-repeat;
@@ -7168,6 +7169,7 @@ tr.u-tbl-header td {
 	width: 26px;
     float: right;
     margin-top: 5px;
+    background-size: contain;
 }
 .smiley-bg-rat-1 {
 	background: url(../images/smiley-bg-rat-1.png) no-repeat center;

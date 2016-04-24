@@ -763,6 +763,9 @@ function paintReviews(result){
 		if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"){
 			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
 			}
+		if(reviewItem.source=="Zillow"){
+			reviewsHtml +=' <div class="zillow-badge  verify-image float-right" ></div>';
+			}
 		
 		
 		reviewsHtml += '	</div>';
@@ -825,13 +828,19 @@ function paintReviews(result){
 		}
 		
 		if (reviewItem.review.length > 250) {
-			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
+			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'';
+			if(reviewItem.source == "Zillow") {
+				reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a></span>';
+			}else{
+				reviewsHtml += '</span>';
+			}
+			reviewsHtml +='<span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
 		} else {
 			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
 		}
-		if(reviewItem.source == "Zillow") {
+		/*if(reviewItem.source == "Zillow") {
 			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
-		}
+		}*/
 		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
 			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";
 		else

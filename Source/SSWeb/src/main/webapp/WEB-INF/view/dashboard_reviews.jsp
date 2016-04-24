@@ -88,7 +88,7 @@
 							</c:otherwise>
 						</c:choose>
 						<c:if test="${profilemasterid !=4}">
-					<span class="float-left" style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${feedback.completeProfileUrl}"> ${feedback.agentName}</a></span>
+					<span class="float-left " style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${feedback.completeProfileUrl}" target="_blank"> ${feedback.agentName}</a></span>
 					</c:if>
 					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
 					<div class="ppl-head-2 float-left" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
@@ -113,6 +113,9 @@
 				</c:if>
 				<c:if test="${feedback.source =='DOTLOOP'}">
 				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+				</c:if>
+				<c:if test="${feedback.source =='Zillow'}">
+				<div class='zillow-badge  verify-image float-right'></div>
 				</c:if>
 			</div>
 			<c:if test="${ not empty feedback.summary }">

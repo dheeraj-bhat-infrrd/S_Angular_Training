@@ -50,7 +50,7 @@
 					<span class="float-left"> &#8212; Reviewed by </span>
 						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						<c:if test="${profilemasterid !=4}">
-					<span class="float-left" style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}"> ${reviewItem.agentName}</a></span>
+					<span class="float-left" style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>
 					</c:if>
 					</div>
 					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
@@ -74,6 +74,9 @@
 				</c:if>
 				<c:if test="${reviewItem.source =='DOTLOOP'}">
 				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+				</c:if>
+				<c:if test="${reviewItem.source =='Zillow'}">
+				<div class='zillow-badge   verify-image float-right' title='Click here to know more'></div>
 				</c:if>
 				
 			</div>
