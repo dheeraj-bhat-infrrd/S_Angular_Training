@@ -9,7 +9,6 @@ import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -84,8 +83,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     private static final Logger LOG = LoggerFactory.getLogger( DashboardServiceImpl.class );
 
-    //SS-1354: Using date format from CommonConstants
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
     private static Map<String, Integer> weightageColumns;
 
     @Autowired
@@ -704,8 +701,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new NoRecordsFetchedException( "No user adoption data found for the company id : " + companyId );
         }
 
+        DecimalFormat decimalFormat = new DecimalFormat( "#0" );
+        decimalFormat.setRoundingMode( RoundingMode.DOWN );
         Map<Integer, List<Object>> data = workbookData.getUserAdoptionReportDataToBeWrittenInSheet( rows );
-        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data, decimalFormat );
         return workbook;
     }
 
@@ -1550,9 +1549,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( company == null ) {
             throw new InvalidInputException( "Passed parameter company is null" );
         }
-        // Iterate over data and write to sheet
-        DecimalFormat decimalFormat = new DecimalFormat( "#0" );
-        decimalFormat.setRoundingMode( RoundingMode.DOWN );
 
         XSSFWorkbook workbook = workbookOperations.createWorkbook( usersData );
 

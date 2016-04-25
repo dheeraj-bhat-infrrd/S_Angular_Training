@@ -577,4 +577,39 @@ public class WorkbookData
         data.put( 1, userAdoptionReportToPopulate );
         return data;
     }
+
+
+    public Map<Integer, List<Object>> getCompanyReportDataToBeWrittenInSheet( List<Company> companies )
+    {
+        Integer counter = 1;
+        int max = 0;
+        int internalMax = 0;
+        Map<Integer, List<Object>> data = new TreeMap<>();
+        List<Object> companyDetailsToPopulate = new ArrayList<>();
+        for ( Company company : companies ) {
+            internalMax = 0;
+            companyDetailsToPopulate.add( company.getCompany() );
+            if ( company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() )
+                companyDetailsToPopulate.add( company.getLicenseDetails().get( 0 ).getAccountsMaster().getAccountName() );
+            else
+                companyDetailsToPopulate.add( "" );
+            companyDetailsToPopulate.add( company.getCreatedOn() );
+            companyDetailsToPopulate.add( company.getDisplayBillingMode() );
+            if ( company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() )
+                companyDetailsToPopulate.add( "Registered" );
+            else
+                companyDetailsToPopulate.add( "Not registered" );
+            data.put( ++counter, companyDetailsToPopulate );
+            companyDetailsToPopulate = new ArrayList<>();
+            if ( internalMax > max )
+                max = internalMax;
+        }
+        companyDetailsToPopulate.add( "Company Name" );
+        companyDetailsToPopulate.add( "Account Type" );
+        companyDetailsToPopulate.add( "Created on" );
+        companyDetailsToPopulate.add( "Billing mode" );
+        companyDetailsToPopulate.add( "Status" );
+        data.put( 1, companyDetailsToPopulate );
+        return data;
+    }
 }

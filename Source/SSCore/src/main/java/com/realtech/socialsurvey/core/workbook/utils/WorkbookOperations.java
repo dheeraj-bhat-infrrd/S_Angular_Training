@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.workbook.utils;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,84 @@ public class WorkbookOperations
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
         style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
+
+        // Iterate over data and write to sheet
+        Set<Integer> keyset = data.keySet();
+        int rownum = 0;
+        for ( Integer key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String ) {
+                    cell.setCellValue( (String) obj );
+                } else if ( obj instanceof Integer ) {
+                    cell.setCellValue( (Integer) obj );
+                } else if ( obj instanceof Date ) {
+                    cell.setCellStyle( style );
+                    cell.setCellValue( (Date) obj );
+                } else if ( obj instanceof Long ) {
+                    cell.setCellValue( String.valueOf( (Long) obj ) );
+                } else if ( obj instanceof Double ) {
+                    cell.setCellValue( (Double) obj );
+                }
+            }
+        }
+        return workbook;
+    }
+
+
+    public XSSFWorkbook createWorkbook( Map<Integer, List<Object>> data, DecimalFormat decimalFormat )
+    {
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
+
+        // Iterate over data and write to sheet
+        Set<Integer> keyset = data.keySet();
+        int rownum = 0;
+        for ( Integer key : keyset ) {
+            Row row = sheet.createRow( rownum++ );
+            List<Object> objArr = data.get( key );
+
+            int cellnum = 0;
+            for ( Object obj : objArr ) {
+                Cell cell = row.createCell( cellnum++ );
+                if ( obj instanceof String ) {
+                    cell.setCellValue( (String) obj );
+                } else if ( obj instanceof Integer ) {
+                    cell.setCellValue( (Integer) obj );
+                } else if ( obj instanceof Date ) {
+                    cell.setCellStyle( style );
+                    cell.setCellValue( (Date) obj );
+                } else if ( obj instanceof Long ) {
+                    cell.setCellValue( String.valueOf( (Long) obj ) );
+                } else if ( obj instanceof Double ) {
+                    cell.setCellValue( decimalFormat.format( obj ) );
+                }
+            }
+        }
+        return workbook;
+    }
+
+
+    public XSSFWorkbook createWorkbook( Map<Integer, List<Object>> data, String dateFormat )
+    {
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // Create a blank sheet
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat( df.getFormat( dateFormat ) );
 
         // Iterate over data and write to sheet
         Set<Integer> keyset = data.keySet();

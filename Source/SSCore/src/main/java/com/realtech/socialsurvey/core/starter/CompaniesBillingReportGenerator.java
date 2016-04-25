@@ -46,7 +46,7 @@ public class CompaniesBillingReportGenerator extends QuartzJobBean
             try {
                 if ( company.getLicenseDetails() != null && company.getLicenseDetails().size() > 0 ) {
                     LicenseDetail licenseDetail = company.getLicenseDetails().get( 0 );
-                    Map<String, List<Object>> data = billingReportsService.generateBillingReportDataForACompany( company
+                    Map<Integer, List<Object>> data = billingReportsService.generateBillingReportDataForACompany( company
                         .getCompanyId() );
                     User companyAdmin = userManagementService.getCompanyAdmin( company.getCompanyId() );
                     String adminName = null;

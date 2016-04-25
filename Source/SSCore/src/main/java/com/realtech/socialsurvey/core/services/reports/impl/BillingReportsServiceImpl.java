@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +41,8 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.impl.DashboardServiceImpl;
 import com.realtech.socialsurvey.core.services.reports.BillingReportsService;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
 
 @Component
@@ -65,6 +64,12 @@ public class BillingReportsServiceImpl implements BillingReportsService
 
     @Autowired
     private GenericDao<LicenseDetail, Long> licenceDetailDao;
+
+    @Autowired
+    private WorkbookOperations workbookOperations;
+
+    @Autowired
+    private WorkbookData workbookData;
 
     @Value ( "${BATCH_SIZE}")
     private int batchSize;
@@ -89,14 +94,14 @@ public class BillingReportsServiceImpl implements BillingReportsService
      */
     @Override
     @Transactional
-    public Map<String, List<Object>> generateBillingReportDataForCompanies()
+    public Map<Integer, List<Object>> generateBillingReportDataForCompanies()
     {
         LOG.debug( "Metohd generateBillingReportDataForCompanies started" );
         int startIndex = 0;
         Integer counter = 1;
 
         // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
+        Map<Integer, List<Object>> data = new TreeMap<>();
         List<Object> billingReportToPopulate = new ArrayList<>();
 
         // Store records for each batch here
@@ -156,7 +161,8 @@ public class BillingReportsServiceImpl implements BillingReportsService
 
                     // Populate public profile page url in the sheet
                     if ( isAgent ) {
-                        if ( agentSettings.getCompleteProfileUrl() == null || agentSettings.getCompleteProfileUrl().isEmpty() ) {
+                        if ( agentSettings.getCompleteProfileUrl() == null
+                            || agentSettings.getCompleteProfileUrl().isEmpty() ) {
                             LOG.error( "Agent profile url is empty for agentID : " + agentSettings.getIden() );
                             billingReportToPopulate.add( "NA" );
                         } else {
@@ -180,7 +186,7 @@ public class BillingReportsServiceImpl implements BillingReportsService
                         LOG.error( "An error occured while fetching the address for the user. Reason : ", e );
                     }
 
-                    data.put( ( ++counter ).toString(), billingReportToPopulate );
+                    data.put( ++counter, billingReportToPopulate );
                     billingReportToPopulate = new ArrayList<>();
                 }
             }
@@ -199,7 +205,7 @@ public class BillingReportsServiceImpl implements BillingReportsService
         billingReportToPopulate.add( CommonConstants.HEADER_ADDRESS );
         billingReportToPopulate.add( CommonConstants.HEADER_STATE );
 
-        data.put( "1", billingReportToPopulate );
+        data.put( 1, billingReportToPopulate );
         return data;
     }
 
@@ -209,14 +215,14 @@ public class BillingReportsServiceImpl implements BillingReportsService
      */
     @Override
     @Transactional
-    public Map<String, List<Object>> generateBillingReportDataForACompany( long companyId )
+    public Map<Integer, List<Object>> generateBillingReportDataForACompany( long companyId )
     {
         LOG.info( "Method generateBillingReportDataForACompany started for company : " + companyId );
         int startIndex = 0;
         Integer counter = 1;
 
         // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
+        Map<Integer, List<Object>> data = new TreeMap<>();
         List<Object> billingReportToPopulate = new ArrayList<>();
 
         // Store records for each batch here
@@ -277,7 +283,8 @@ public class BillingReportsServiceImpl implements BillingReportsService
 
                     // Populate public profile page url in the sheet
                     if ( isAgent ) {
-                        if ( agentSettings.getCompleteProfileUrl() == null || agentSettings.getCompleteProfileUrl().isEmpty() ) {
+                        if ( agentSettings.getCompleteProfileUrl() == null
+                            || agentSettings.getCompleteProfileUrl().isEmpty() ) {
                             LOG.error( "Agent profile url is empty for agentID : " + agentSettings.getIden() );
                             billingReportToPopulate.add( "NA" );
                         } else {
@@ -301,7 +308,7 @@ public class BillingReportsServiceImpl implements BillingReportsService
                         LOG.error( "An error occured while fetching the address for the user. Reason : ", e );
                     }
 
-                    data.put( ( ++counter ).toString(), billingReportToPopulate );
+                    data.put( ++counter, billingReportToPopulate );
                     billingReportToPopulate = new ArrayList<>();
                 }
             }
@@ -320,7 +327,7 @@ public class BillingReportsServiceImpl implements BillingReportsService
         billingReportToPopulate.add( CommonConstants.HEADER_ADDRESS );
         billingReportToPopulate.add( CommonConstants.HEADER_STATE );
 
-        data.put( "1", billingReportToPopulate );
+        data.put( 1, billingReportToPopulate );
 
         LOG.info( "Method generateBillingReportDataForACompany ended for company : " + companyId );
         return data;
@@ -334,37 +341,14 @@ public class BillingReportsServiceImpl implements BillingReportsService
      */
     @Override
     @Transactional
-    public void generateBillingReportAndMail( Map<String, List<Object>> data, String recipientMailId, String recipientName ) throws InvalidInputException, UndeliveredEmailException
+    public void generateBillingReportAndMail( Map<Integer, List<Object>> data, String recipientMailId, String recipientName )
+        throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "method generateBillingReportAndMail started" );
-        // Iterate over data and write to sheet
         DecimalFormat decimalFormat = new DecimalFormat( "#0" );
         decimalFormat.setRoundingMode( RoundingMode.DOWN );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data, decimalFormat );
 
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-
-        int rownum = 0;
-        for ( int i = 1; i <= data.size(); i++ ) {
-            String key = String.valueOf( i );
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = data.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
-                    cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Double )
-                    cell.setCellValue( decimalFormat.format( obj ) );
-                else if ( obj instanceof Long )
-                    cell.setCellValue( (Long) obj );
-                else if ( obj instanceof Boolean )
-                    cell.setCellValue( (Boolean) obj );
-            }
-        }
         // Create file and write report into it
         boolean excelCreated = false;
         String fileName = "Billing_Report-" + ( new Timestamp( new Date().getTime() ) );
@@ -470,10 +454,9 @@ public class BillingReportsServiceImpl implements BillingReportsService
                 if ( reportRow.getBranchId() != previousBranchId || previousBranchAddress == null ) {
                     previousBranchId = reportRow.getBranchId();
                     //Get branch settings and check if branch has address
-                    OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( reportRow
-                        .getBranchId() );
-                    if ( branchSettings.getContact_details() != null
-                        && branchSettings.getContact_details().getAddress() != null
+                    OrganizationUnitSettings branchSettings = organizationManagementService
+                        .getBranchSettingsDefault( reportRow.getBranchId() );
+                    if ( branchSettings.getContact_details() != null && branchSettings.getContact_details().getAddress() != null
                         && !branchSettings.getContact_details().getAddress().isEmpty() ) {
                         address = getAddressFromContactDetails( branchSettings.getContact_details() );
                         previousBranchAddress = address;
@@ -492,8 +475,8 @@ public class BillingReportsServiceImpl implements BillingReportsService
                     //Check if region ID has changed
                     if ( reportRow.getRegionId() != previousRegionId || previousRegionAddress == null ) {
                         previousRegionId = reportRow.getRegionId();
-                        OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( reportRow
-                            .getRegionId() );
+                        OrganizationUnitSettings regionSettings = organizationManagementService
+                            .getRegionSettings( reportRow.getRegionId() );
                         //Check if region has address
                         if ( regionSettings.getContact_details() != null
                             && regionSettings.getContact_details().getAddress() != null
@@ -515,8 +498,8 @@ public class BillingReportsServiceImpl implements BillingReportsService
                 // Check if company ID has changed
                 if ( reportRow.getCompanyId() != previousCompanyId || previousCompanyAddress == null ) {
                     previousCompanyId = reportRow.getCompanyId();
-                    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( reportRow
-                        .getCompanyId() );
+                    OrganizationUnitSettings companySettings = organizationManagementService
+                        .getCompanySettings( reportRow.getCompanyId() );
                     if ( companySettings.getContact_details() != null
                         && companySettings.getContact_details().getAddress() != null
                         && !companySettings.getContact_details().getAddress().isEmpty() ) {
