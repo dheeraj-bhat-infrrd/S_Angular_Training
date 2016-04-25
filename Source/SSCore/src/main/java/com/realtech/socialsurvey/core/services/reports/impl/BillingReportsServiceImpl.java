@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -31,12 +34,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.BillingReportData;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -62,6 +59,12 @@ public class BillingReportsServiceImpl implements BillingReportsService
 
     @Autowired
     private EmailServices emailServices;
+
+    @Autowired
+    private UserManagementService userManagementService;
+
+    @Autowired
+    private BatchTrackerService batchTrackerService;
 
     @Autowired
     private GenericDao<LicenseDetail, Long> licenceDetailDao;
@@ -603,5 +606,38 @@ public class BillingReportsServiceImpl implements BillingReportsService
         licenseDetail.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         licenceDetailDao.update( licenseDetail );
         LOG.info( "Method updateNextInvoiceBillingDateInLicenceDetail ended" );
+    }
+
+
+
+    @Override
+    public void companiesBillingReportGenerator()
+    {
+        List<Company> companies = getCompaniesWithExpiredInvoice();
+        for ( Company company : companies ) {
+            LOG.debug( "generating billing report for company : " + company.getCompany() );
+            try {
+                if ( company.getLicenseDetails() != null && company.getLicenseDetails().size() > 0 ) {
+                    LicenseDetail licenseDetail = company.getLicenseDetails().get( 0 );
+                    Map<String, List<Object>> data = generateBillingReportDataForACompany( company.getCompanyId() );
+                    User companyAdmin = userManagementService.getCompanyAdmin( company.getCompanyId() );
+                    String adminName = null;
+                    if ( licenseDetail.getRecipientMailId() != null && !licenseDetail.getRecipientMailId().isEmpty() ) {
+                        adminName = companyAdmin.getFirstName();
+                    }
+                    generateBillingReportAndMail( data, licenseDetail.getRecipientMailId(), adminName );
+                    updateNextInvoiceBillingDateInLicenceDetail( licenseDetail );
+                }
+            } catch ( Exception e ) {
+                LOG.error( "Error while generating and mailing billing report for company : " + company.getCompany() );
+                try {
+                    batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.COMPANIES_BILLING_REPORT_GENERATOR,
+                        System.currentTimeMillis(), e );
+                } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
+                    LOG.error( "error while sende report bug mail to admin ", e1 );
+                }
+                continue;
+            }
+        }
     }
 }

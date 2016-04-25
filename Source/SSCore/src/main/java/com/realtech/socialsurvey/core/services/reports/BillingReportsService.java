@@ -21,4 +21,9 @@ public interface BillingReportsService
 
     void updateNextInvoiceBillingDateInLicenceDetail( LicenseDetail licenseDetail );
 
+    /**
+     * Method to generate billing report for companies(Invoice)
+     */
+    public void companiesBillingReportGenerator();
+
 }
