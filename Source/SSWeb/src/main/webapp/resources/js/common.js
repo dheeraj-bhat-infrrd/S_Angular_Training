@@ -407,7 +407,7 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 
 	var roundedFloatingVal = parseFloat(rating).toFixed(2);
 	var ratingImgHtml = "";*/
-	
+	var roundedFloatingVal = parseFloat(rating).toFixed(1);
 	ratingIntVal= (Math.round(rating * 4) / 4).toFixed(2);
 	
 	/*if(source =="encompass" || source == "DOTLOOP"){
@@ -417,25 +417,25 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	}*/
 	
 	if(source != undefined && source == "Zillow"){
-		ratingImgHtml = "<div class='rating-image  star-rating-green-"+ ratingIntVal +"' title='"+ ratingIntVal+ "/5.00'></div>";
-		ratingImgHtml += "<div class='rating-image  zillow-badge' title='Zillow'></div>";
+		ratingImgHtml = "<div class='rating-image float-left star-rating-green-"+ ratingIntVal +"' title='"+ ratingIntVal+ "/5.00'></div>";
+		/*ratingImgHtml += "<div class='rating-image  zillow-badge' title='Zillow'></div>";*/
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml = "<div class='rating-image  star-rating-"+ ratingIntVal +"'  title='"+ ratingIntVal+ "/5.00'></div>";
-		ratingImgHtml+="<div class='verified-badge  verify-image' title='Click here to know more'></div>";
+		ratingImgHtml = "<div class='rating-image float-left star-rating-"+ ratingIntVal +"'  title='"+ ratingIntVal+ "/5.00'></div>";
+		/*ratingImgHtml+="<div class='verified-badge  verify-image' title='Click here to know more'></div>";*/
 		
 	}
 		else {
-		ratingImgHtml = "<div class='rating-image  star-rating-"+ratingIntVal+"'  title='"+ ratingIntVal+ "/5.00'></div>";		
+		ratingImgHtml = "<div class='rating-image float-left  star-rating-"+ratingIntVal+"'  title='"+ ratingIntVal+ "/5.00'></div>";		
 	}
 	
-	/*var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
+	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
 	if (isOverallRating) {
 		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
-	}*/
+	}
 
 	ratingParent.html('');
 	ratingParent.append(ratingImgHtml);
-	/*ratingParent.append(ratingImgHtml).append(ratingValHtml);*/
+	ratingParent.append(ratingValHtml);
 }
 $(document).on('click','.verified-badge',function(e){
 	window.open("https://socialsurvey.zendesk.com/hc/en-us/articles/216454118-Added-Verified-Customer-badge");

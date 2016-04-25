@@ -40,18 +40,24 @@
 			data-agentname="${reviewItem.agentName}" class="ppl-review-item dsh-review-cont hide">
 
 			<div class="ppl-header-wrapper clearfix">
+			<div class="float-left ppl-header-right">
+					<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-modified="false" 
+						data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
+					</div>
+				</div>
 				<div class="float-left ppl-header-left">
 					<div class="ppl-head-1">
-					<span>Reviewed by</span>
-						${reviewItem.customerFirstName} ${reviewItem.customerLastName}
+					<span class="float-left"> &#8212; Reviewed by </span>
+						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						<c:if test="${profilemasterid !=4}">
-					<span>for<a style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}"> ${reviewItem.agentName}</a></span>
+					<span class="float-left" style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>
 					</c:if>
 					</div>
+					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
 					<div class="ppl-head-2 float-left" data-modified="false" 
 						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 						value="${reviewItem.modifiedOn}" />"></div>
-						 <c:choose>
+						 <%-- <c:choose>
 					 <c:when test="${reviewItem.source=='agent' || reviewItem.source=='admin'}">
 					  <span class="float-left" style="font-family: opensanslight;"> - sourced by SocialSurvey</span>
 					 </c:when>
@@ -61,13 +67,18 @@
 					 <c:otherwise>
 					 <span class="float-left" style="font-family: opensanslight;"> - sourced by ${reviewItem.source} </span>
 					 </c:otherwise>
-					 </c:choose>
+					 </c:choose> --%>
 				</div>
-				<div class="float-right ppl-header-right">
-					<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-modified="false" 
-						data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
-					</div>
-				</div>
+				<c:if test="${reviewItem.source =='encompass'}">
+				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+				</c:if>
+				<c:if test="${reviewItem.source =='DOTLOOP'}">
+				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+				</c:if>
+				<c:if test="${reviewItem.source =='Zillow'}">
+				<div class='zillow-badge   verify-image float-right' title='Click here to know more'></div>
+				</c:if>
+				
 			</div>
 			<c:if test="${ not empty reviewItem.summary }">
 				<div class="ppl-content">${reviewItem.summary}</div>

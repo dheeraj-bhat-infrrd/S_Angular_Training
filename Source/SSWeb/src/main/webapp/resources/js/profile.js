@@ -736,32 +736,56 @@ function paintReviews(result){
 				+ ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="'
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
+		reviewsHtml += '    	<div class="float-left ppl-header-right">';
+		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
+		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';    
-		reviewsHtml += '			<div class="ppl-head-1"><span>Reviewed by </span>'+custDispName;
+		reviewsHtml += '			<div class="ppl-head-1 float-left"><span class="float-left"> &#8212; Reviewed by '+custDispName+'</span>';
 		if(profileLevel!= 'INDIVIDUAL'){
-			reviewsHtml +='<span> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
+			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
 		}
-		reviewsHtml +='</div>';
 		if (date != null) {
 			date = convertUserDateToLocale(date);
-			reviewsHtml += '		<div class="ppl-head-2 ">' + date.toString("MMMM d, yyyy") ; 
+			reviewsHtml += '	<span class="float-left" style="margin: 0 5px;">&#8212;</span>	<div class="ppl-head-2 float-left">' + date.toString("MMMM d, yyyy") ; 
 		}
-		if(reviewItem.source=="agent" || reviewItem.source=="admin"){
+		reviewsHtml +='</div>';
+		
+		/*if(reviewItem.source=="agent" || reviewItem.source=="admin"){
 			reviewsHtml += '<span  style="font-family: opensanslight;"> - sourced by SocialSurvey</span>';
 		}else if(reviewItem.source=="Zillow"){
 			reviewsHtml += '<span  style="font-family: opensanslight;"> - sourced by <span style="color:#009FE0;"> Zillow.com</span></span>';
 		}else {
 			reviewsHtml +='<span  style="font-family: opensanslight;"> - sourced by '+reviewItem.source+' </span>';
-		}
+		}*/
 		reviewsHtml += '		</div>';
+		
 		reviewsHtml += '		</div>';
-		reviewsHtml += '    	<div class="float-right ppl-header-right">';
-		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
-		reviewsHtml += '		</div>';
+		if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"){
+			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
+			}
+		if(reviewItem.source=="Zillow"){
+			reviewsHtml +=' <div class="zillow-badge  verify-image float-right" ></div>';
+			}
+		
+		
 		reviewsHtml += '	</div>';
 		
 		
+		
+		
+		
+		
 			
+			
+			
+			
+			/*<c:if test="${reviewItem.source =='encompass'}">
+		<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+		</c:if>
+		<c:if test="${reviewItem.source =='DOTLOOP'}">
+		<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+		</c:if>
+			*/
 		
 		/*reviewsHtml += '	</div>';
 		
@@ -804,13 +828,19 @@ function paintReviews(result){
 		}
 		
 		if (reviewItem.review.length > 250) {
-			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
+			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'';
+			if(reviewItem.source == "Zillow") {
+				reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a></span>';
+			}else{
+				reviewsHtml += '</span>';
+			}
+			reviewsHtml +='<span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
 		} else {
 			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
 		}
-		if(reviewItem.source == "Zillow") {
+		/*if(reviewItem.source == "Zillow") {
 			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
-		}
+		}*/
 		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
 			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";
 		else

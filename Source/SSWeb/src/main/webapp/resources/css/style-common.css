@@ -1997,12 +1997,13 @@ button.paypal.is-active {
 .ppl-head-1 {
 	font-size: 14px;
 	font-weight: bold !important;
+	margin-left: 10px;
+    line-height: 22px;
 }
 
 .ppl-head-2 {
 	font-size: 13px;
 	color: #666;
-	font-family: opensanslight;
 }
 
 .ppl-header-left {
@@ -6814,8 +6815,8 @@ tr.u-tbl-header td {
 }
 
 .rating-rounded {
-	margin-left: 5px;
-	line-height: 30px;
+	margin-left: 8px;
+	line-height: 21px;
 }
 
 .settings-rating-wrapper .rating-image {
@@ -6851,9 +6852,10 @@ tr.u-tbl-header td {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 .verified-badge {
-	background: url(../images/ss-badge.png) no-repeat;
+	background: url(../images/ss-verified-customer.png) no-repeat;
 	cursor: pointer;
 	margin-top: 5px;
+	background-size: contain;
 }
 .star-rating{
 	background: url(../images/ss-stars.png) no-repeat;
@@ -7167,6 +7169,7 @@ tr.u-tbl-header td {
 	width: 26px;
     float: right;
     margin-top: 5px;
+    background-size: contain;
 }
 .smiley-bg-rat-1 {
 	background: url(../images/smiley-bg-rat-1.png) no-repeat center;
