@@ -76,8 +76,8 @@
 						</div>
 					</c:if>  --%>
 				</div>
-				<div class="float-left ppl-header-left">
-					<div class="ppl-head-1">
+				<%-- <div class="float-left ppl-header-left dsh-resp-review hide">
+					<div class="ppl-head-1 ">
 					<span class="float-left"> &#8212; Reviewed by </span>
 						<c:choose>
 							<c:when test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
@@ -91,23 +91,12 @@
 					<span class="float-left " style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${feedback.completeProfileUrl}" target="_blank"> ${feedback.agentName}</a></span>
 					</c:if>
 					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
-					<div class="ppl-head-2 float-left" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
+					<div class="ppl-head-2 review-detail-profile float-left" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 						value="${feedback.modifiedOn}" />"> 
 					</div>
 					</div>
 					
-					<%--  <c:choose>
-					 <c:when test="${feedback.source=='agent' || feedback.source=='admin'}">
-					  <span class="float-left" style="font-family: opensanslight;"> - sourced by SocialSurvey</span>
-					 </c:when>
-					 <c:when test="${feedback.source=='Zillow'}">
-					  <span class="float-left" style="font-family: opensanslight;"> - sourced by <span style="color:#009FE0;">Zillow.com</span></span>
-					 </c:when>
-					 <c:otherwise>
-					 <span class="float-left" style="font-family: opensanslight;"> - sourced by ${feedback.source} </span>
-					 </c:otherwise>
-					 </c:choose> --%>
-				</div>
+				</div> --%>
 				<c:if test="${feedback.source =='encompass'}">
 				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
 				</c:if>
@@ -117,7 +106,40 @@
 				<c:if test="${feedback.source =='Zillow'}">
 				<div class='zillow-badge  verify-image float-right'></div>
 				</c:if>
+				
+				<div class=" ppl-header-left review-sm-screen ">
+				<div class="ppl-head-1 ">
+					<span class="float-left"> &#8212; Reviewed by </span>
+					<c:choose>
+						<c:when
+							test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
+							<span class="float-left"
+								style="margin-left: 5px; font-weight: 600 !important;">
+								${feedback.customerFirstName} </span>
+						</c:when>
+						<c:otherwise>
+							<span class="float-left"
+								style="margin-left: 5px; font-weight: 600 !important;">
+								${feedback.customerFirstName} ${feedback.customerLastName}</span>
+						</c:otherwise>
+					</c:choose>
+					<c:if test="${profilemasterid !=4}">
+						<span class="float-left " style="margin-left: 5px;">for<a
+							style="color: #236CAF; font-weight: 600 !important;"
+							href="${feedback.completeProfileUrl}" target="_blank">
+								${feedback.agentName}</a></span>
+					</c:if>
+					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
+					<div class="ppl-head-2 review-detail-profile float-left"
+						data-modified="false"
+						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
+						value="${feedback.modifiedOn}" />">
+					</div>
+				</div>
 			</div>
+			</div>
+
+
 			<c:if test="${ not empty feedback.summary }">
 				<div class="ppl-content">${feedback.summary}</div>
 			</c:if>
@@ -127,16 +149,16 @@
 				<!-- <div class="float-left icn-share icn-plus-open" style="display: block;"></div> -->
 				<div class="float-left clearfix ppl-share-social hide" style="display: block;">
 				
-					<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick ="getDashboardImageandCaption(${loop.index})" data-link="https://www.facebook.com/dialog/feed?${feedback.faceBookShareUrl}&link=${fn:replace(feedback.completeProfileUrl, 'localhost', '127.0.0.1')}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)} .&redirect_uri=https://www.facebook.com"></span>
+					<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb-rev" title="Facebook" onclick ="getDashboardImageandCaption(${loop.index})" data-link="https://www.facebook.com/dialog/feed?${feedback.faceBookShareUrl}&link=${fn:replace(feedback.completeProfileUrl, 'localhost', '127.0.0.1')}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)} .&redirect_uri=https://www.facebook.com"></span>
 					
 					<input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}"/>
-					<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterDashboardFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}&url=${feedback.completeProfileUrl}"></span>
+					<span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterDashboardFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}&url=${feedback.completeProfileUrl}"></span>
 					 <span
-						class="float-left ppl-share-icns icn-lin" title="LinkedIn"
+						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
 						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}+ &source="></span>
                        <span class="float-left" title="Google+">
                        <button 
-                           class="g-interactivepost float-left ppl-share-icns icn-gplus"
+                           class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
                            data-contenturl="${feedback.completeProfileUrl}"
                            data-clientid="${feedback.googleApi}"
                            data-cookiepolicy="single_host_origin"

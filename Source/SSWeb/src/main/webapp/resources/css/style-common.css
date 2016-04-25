@@ -1906,14 +1906,24 @@ button.paypal.is-active {
 .icn-fb {
 	background: url(../csssprites/icons_social.png) no-repeat 0 0;
 }
+.icn-fb-rev {
+	background: url(../images/ss-icon-small-facebook.png) no-repeat;
+}
 
 .icn-twit {
 	background: url(../csssprites/icons_social.png) no-repeat -350px 0;
+}
+.icn-twit-rev {
+	background: url(../images/ss-icon-small-twitter.png) no-repeat;
 }
 
 .icn-lin {
 	background: url(../csssprites/icons_social.png) no-repeat -150px 0;
 }
+.icn-lin-rev {
+	background: url(../images/ss-icon-small-linkedin.png) no-repeat;
+}
+
 
 .icn-ss {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
@@ -1956,6 +1966,10 @@ button.paypal.is-active {
 	background: url(../csssprites/icons_social.png) no-repeat -50px 0;
 	border: 0px;
 }
+.icn-gplus-rev {
+	background: url(../images/ss-icon-small-gplus.png) no-repeat;
+	border: 0px;
+}
 
 .icn-tweet {
 	background: url(../images/tweet.png) no-repeat center;
@@ -1995,7 +2009,7 @@ button.paypal.is-active {
 }
 
 .ppl-head-1 {
-	font-size: 14px;
+	font-size: 12px;
 	font-weight: bold !important;
 	margin-left: 10px;
     line-height: 22px;
@@ -2038,8 +2052,8 @@ button.paypal.is-active {
 	cursor: pointer;
 	margin-top: 3px;
 	margin-right: 5px;
-	height: 28px;
-	width: 28px;
+	height: 20px;
+	width: 20px;
 }
 
 .mobile-tabs {
@@ -4670,6 +4684,11 @@ img.prof-image {
 	color:#009FE0;
 }
 
+
+.not-verified {
+	color: #FF1A10 !important;
+}
+
 .dash-main-left {
 	overflow: hidden;
 	margin-left: -20px;
@@ -6854,7 +6873,6 @@ tr.u-tbl-header td {
 .verified-badge {
 	background: url(../images/ss-verified-customer.png) no-repeat;
 	cursor: pointer;
-	margin-top: 5px;
 	background-size: contain;
 }
 .star-rating{
@@ -7168,7 +7186,6 @@ tr.u-tbl-header td {
 	background: url(../images/zillow-badge.png) no-repeat;
 	width: 26px;
     float: right;
-    margin-top: 5px;
     background-size: contain;
 }
 .smiley-bg-rat-1 {
@@ -8831,3 +8848,4 @@ label.url-change-input-label {
 	font-size: 18px;
     padding: 5px;
 }
+

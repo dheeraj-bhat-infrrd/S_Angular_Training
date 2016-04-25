@@ -1538,4 +1538,70 @@ public class EmailServicesImplTest
     {
         emailServicesImpl.sendEmailVerificationRequestMailToAdmin( "test", "test", "", "test", "test" );
     }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailNullRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMail( null, "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailEmptyRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMail(  "", "test");
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailNullRcepientName() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMail(  "test", null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailEmptyRcepientName() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMail(  "test", "" );
+    }
+    
+    ///////
+    
+
+    @Test ( expected = InvalidInputException.class)
+    public void ssendEmailVerifiedNotificationMailToAdminNullRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin(  null, "test", "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailToAdminEmptyRcepientMail() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "", "test", "test", "test" );
+    }
+    
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailToAdminNullRcepientName() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "test", null, "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailToAdminEmptyRcepientName() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin(  "test", "", "test", "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailToAdminNullVerifiedEmail() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "test", "test", null, "test" );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void sendEmailVerifiedNotificationMailToAdminEmptyVerifiedEmaill() throws InvalidInputException, UndeliveredEmailException
+    {
+        emailServicesImpl.sendEmailVerifiedNotificationMailToAdmin( "test", "test", "", "test" );
+    }
+    
 }

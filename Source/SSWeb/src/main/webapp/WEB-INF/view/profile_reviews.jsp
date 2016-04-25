@@ -45,30 +45,20 @@
 						data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
 					</div>
 				</div>
-				<div class="float-left ppl-header-left">
-					<div class="ppl-head-1">
+				<%-- <div class="float-left ppl-header-left" style="width:290px;">
+					<div class="ppl-head-1 review-detail-profile">
 					<span class="float-left"> &#8212; Reviewed by </span>
 						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						<c:if test="${profilemasterid !=4}">
-					<span class="float-left" style="margin-left:5px;">for<a style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>
+					<span class="float-left" style="margin-left:5px;">for<a class="cursor-pointer" style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>
 					</c:if>
 					</div>
-					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
+					<span class="float-left" style="margin: 0 5px;line-height: 22px;">&#8212;</span>
 					<div class="ppl-head-2 float-left" data-modified="false" 
 						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 						value="${reviewItem.modifiedOn}" />"></div>
-						 <%-- <c:choose>
-					 <c:when test="${reviewItem.source=='agent' || reviewItem.source=='admin'}">
-					  <span class="float-left" style="font-family: opensanslight;"> - sourced by SocialSurvey</span>
-					 </c:when>
-					 <c:when test="${reviewItem.source=='Zillow'}">
-					  <span class="float-left" style="font-family: opensanslight;"> - sourced by <span style="color:#009FE0;">Zillow.com</span></span>
-					 </c:when>
-					 <c:otherwise>
-					 <span class="float-left" style="font-family: opensanslight;"> - sourced by ${reviewItem.source} </span>
-					 </c:otherwise>
-					 </c:choose> --%>
-				</div>
+						
+				</div> --%>
 				<c:if test="${reviewItem.source =='encompass'}">
 				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
 				</c:if>
@@ -78,6 +68,20 @@
 				<c:if test="${reviewItem.source =='Zillow'}">
 				<div class='zillow-badge   verify-image float-right' title='Click here to know more'></div>
 				</c:if>
+				<div class="ppl-header-left review-sm-screen " >
+					<div class="ppl-head-1 review-detail-profile">
+					<span class="float-left"> &#8212; Reviewed by </span>
+						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
+						<c:if test="${profilemasterid !=4}">
+					<span class="float-left" style="margin-left:5px;">for<a class="cursor-pointer" style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>
+					</c:if>
+					</div>
+					<span class="float-left" style="margin: 0 5px;line-height: 22px;">&#8212;</span>
+					<div class="ppl-head-2 float-left" data-modified="false" 
+						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
+						value="${reviewItem.modifiedOn}" />"></div>
+						
+				</div>
 				
 			</div>
 			<c:if test="${ not empty reviewItem.summary }">
@@ -90,19 +94,19 @@
 				</div> --%>
 				<!-- <div class="float-left icn-share icn-plus-open"></div> -->
 				<div class="float-left clearfix ppl-share-social ">
-					<span id = "fb_${loop.index}"class="float-left ppl-share-icns icn-fb" title="Facebook" onclick = "getImageandCaptionProfile(${loop.index});"
+					<span id = "fb_${loop.index}"class="float-left ppl-share-icns icn-fb-rev" title="Facebook" onclick = "getImageandCaptionProfile(${loop.index});"
 						data-link="https://www.facebook.com/dialog/feed?${reviewItem.faceBookShareUrl}&link=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey -${fn:escapeXml(reviewItem.review)} .&redirect_uri=https://www.facebook.com"></span>
 					
 					
 					    <input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}"/>
 						
-						<span class="float-left ppl-share-icns icn-twit" id ="twitt_${loop.index}" onclick="twitterProfileFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}&url=${reviewItem.completeProfileUrl}"></span>
+						<span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterProfileFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}&url=${reviewItem.completeProfileUrl}"></span>
 						 <span
-						class="float-left ppl-share-icns icn-lin" title="LinkedIn"
+						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
 						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl} &title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)} + &source="></span>
 					<span class="float-left" title="Google+">
 						<button
-							class="g-interactivepost float-left ppl-share-icns icn-gplus"
+							class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
 							data-contenturl="${reviewItem.completeProfileUrl}"
 							data-clientid="${reviewItem.googleApi}"
 							data-cookiepolicy="single_host_origin"
