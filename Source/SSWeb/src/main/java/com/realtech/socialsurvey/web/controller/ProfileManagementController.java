@@ -472,6 +472,19 @@ public class ProfileManagementController
         model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
         model.addAttribute( "profileSettings", profileSettings );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        
+        //email message to verify
+        if(profileSettings.getContact_details() != null && profileSettings.getContact_details().getMail_ids() != null ){
+            if(!profileSettings.getContact_details().getMail_ids().getIsWorkEmailVerified()){
+                String workMailVerificationTitle;
+                if(profileSettings.getContact_details().getMail_ids().getIsWorkMailVerifiedByAdmin()){
+                    workMailVerificationTitle = "A request has been sent to admin to verify the email " + profileSettings.getContact_details().getMail_ids().getWorkEmailToVerify();
+                }else{
+                    workMailVerificationTitle = "Please verify the email address " + profileSettings.getContact_details().getMail_ids().getWorkEmailToVerify();
+                }
+                model.addAttribute( "workMailVerificationTitle", workMailVerificationTitle );
+            }
+        }
 
         //Setting parentLock in session
         /*LockSettings parentLock = fetchParentLockSettings( model, user, accountType, userSettings, branchId, regionId,
@@ -2029,7 +2042,7 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings );
 
                 contactDetailsSettings = updateMailSettings( companySettings.getIden(), contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION , false );
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings );
                 companySettings.setContact_details( contactDetailsSettings );
@@ -2052,7 +2065,7 @@ public class ProfileManagementController
                 
 
                 contactDetailsSettings = updateMailSettings( regionSettings.getIden(), contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION , isWorkEmailLockedByCompany);
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
@@ -2074,7 +2087,7 @@ public class ProfileManagementController
                 }
 
                 contactDetailsSettings = updateMailSettings( branchSettings.getIden(), contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION , isWorkEmailLockedByCompany );
                 contactDetailsSettings = profileManagementService.updateContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
@@ -2096,7 +2109,7 @@ public class ProfileManagementController
                 }
 
                 contactDetailsSettings = updateMailSettings( agentSettings.getIden(), contactDetailsSettings, mailIds,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION , isWorkEmailLockedByCompany );
                 contactDetailsSettings = profileManagementService.updateAgentContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
                 agentSettings.setContact_details( contactDetailsSettings );
@@ -2174,7 +2187,7 @@ public class ProfileManagementController
 
     // Update mail ids
     private ContactDetailsSettings updateMailSettings( long entityId, ContactDetailsSettings contactDetailsSettings,
-        List<MiscValues> mailIds, String entityType ) throws InvalidInputException
+        List<MiscValues> mailIds, String entityType , boolean verifiedByAdmin ) throws InvalidInputException
     {
         LOG.debug( "Method updateMailSettings() called from ProfileManagementController" );
         if ( contactDetailsSettings == null ) {
@@ -2194,6 +2207,7 @@ public class ProfileManagementController
             if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
                 mailIdSettings.setWorkEmailToVerify( value );
                 mailIdSettings.setWorkEmailVerified( false );
+                mailIdSettings.setWorkMailVerifiedByAdmin( verifiedByAdmin );
             } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
                 mailIdSettings.setPersonal( value );
                 mailIdSettings.setPersonalEmailToVerify( value );

@@ -125,6 +125,9 @@ public class DashboardController
     @Autowired
     private AdminReports adminReport;
 
+    @Value ( "${APPLICATION_SUPPORT_EMAIL}")
+    private String applicationSupportEmail;
+    
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
@@ -2077,7 +2080,7 @@ public class DashboardController
 
             // Calling email services method to send mail to the Application
             // level admin.
-            emailServices.sendReportAbuseMail( applicationAdminEmail, applicationAdminName, agentName,
+            emailServices.sendReportAbuseMail( applicationSupportEmail, applicationAdminName, agentName,
                 customerName.replaceAll( "null", "" ), customerEmail, review, reason, null, null );
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );

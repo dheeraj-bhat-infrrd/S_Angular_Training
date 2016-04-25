@@ -27,6 +27,8 @@
 	</c:when>
 </c:choose>
 
+
+
 <input type="hidden" id="sel-prof-country-code" value="${contactdetail.countryCode}">
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-mail"></div>
@@ -37,41 +39,37 @@
 	
 	<c:choose>
 			<c:when	test="${not empty mailIds && not empty mailIds.work }">
+				<input id="email-id-work" class="float-left lp-con-row-item blue-text <c:if test="${not mailIds.isWorkEmailVerified}">not-verified</c:if> prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}" 
+							<c:if test="${not mailIds.isWorkEmailVerified}">title="${workMailVerificationTitle}"
+							</c:if> > 
 				<c:choose>
 					<c:when	test="${not parentLock.isWorkEmailLocked && profilemasterid != 1}">
-						<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}" <c:if test="${not mailIds.isWorkEmailVerified}"></c:if> title="Please verify the email address ${mailIds.workEmailToVerify}">
 						<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
 						<div id="email-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 					</c:when>
 					<c:when	test="${parentLock.isWorkEmailLocked && profilemasterid != 1}">
-						<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}" <c:if test="${not mailIds.isWorkEmailVerified}"></c:if> title="A request has been sent to admin to verify the email ${mailIds.workEmailToVerify}">
 						<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
 						<div id="email-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
 					</c:when>
 					<c:when	test="${parentLock.isWorkEmailLocked && profilemasterid == 1}">
-						<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}" <c:if test="${not mailIds.isWorkEmailVerified}"></c:if> title="Please verify the email address ${mailIds.workEmailToVerify}">
 						<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
 						<div id="email-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 					</c:when>
 					<c:when	test="${not parentLock.isWorkEmailLocked && lock.isWorkEmailLocked && profilemasterid == 1}">
-						<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}" <c:if test="${not mailIds.isWorkEmailVerified}"></c:if> title="Please verify the email address ${mailIds.workEmailToVerify}">
 						<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
 						<div id="email-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 					</c:when>
 					<c:when	test="${not parentLock.isWorkEmailLocked && not lock.isWorkEmailLocked && profilemasterid == 1 && isWorkEmailSetByEntity}">
-						<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}" <c:if test="${not mailIds.isWorkEmailVerified}"></c:if> title="Please verify the email address ${mailIds.workEmailToVerify}">
 						<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
 						<div id="email-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
 					</c:when>
 					<c:when	test="${not parentLock.isWorkEmailLocked && not lock.isWorkEmailLocked && profilemasterid == 1 && not isWorkEmailSetByEntity}">
-						<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}" <c:if test="${not mailIds.isWorkEmailVerified}"></c:if> title="Please verify the email address ${mailIds.workEmailToVerify}">
 						<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
 						<div id="email-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 					</c:when>
 			</c:choose>
 		</c:when>
 		<c:otherwise>
-			<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}" <c:if test="${not mailIds.isWorkEmailVerified}"></c:if> title="Please verify the email address ${mailIds.workEmailToVerify}">
 			<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
 			<div id="email-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 		</c:otherwise>
