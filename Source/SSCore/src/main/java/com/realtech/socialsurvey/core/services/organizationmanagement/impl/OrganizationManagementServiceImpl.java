@@ -26,8 +26,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.utils.MessageUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -111,6 +109,7 @@ import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -138,6 +137,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 
 
@@ -1563,9 +1563,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
             disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
         }
-        disabledAccount.setCreatedBy( String.valueOf( userId ) );
+        disabledAccount.setCreatedBy(
+            userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
         disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        disabledAccount.setModifiedBy( String.valueOf( userId ) );
+        disabledAccount.setModifiedBy(
+            userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
         disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
         LOG.info( "Adding the Disabled Account entity to the database" );
@@ -2876,9 +2878,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     && profile.getBranchId() == userProfileNew.getBranchId()
                     && profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
                     && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                    throw new InvalidInputException( messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS, DisplayMessageType.ERROR_MESSAGE )
-                        .getMessage() );
+                    throw new InvalidInputException(
+                        messageUtils.getDisplayMessage( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                 }
 
                 // Updating existing assignment
@@ -3042,9 +3044,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 if ( profile.getBranchId() == userProfileNew.getBranchId()
                     && profile.getProfilesMaster() == userProfileNew.getProfilesMaster()
                     && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                    throw new InvalidInputException( messageUtils.getDisplayMessage(
-                        DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS, DisplayMessageType.ERROR_MESSAGE )
-                        .getMessage() );
+                    throw new InvalidInputException(
+                        messageUtils.getDisplayMessage( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
+                            DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                 }
 
                 // Updating existing assignment
@@ -5010,6 +5012,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method to remove all regions in company : " + company.getCompany() + " finished" );
     }
 
+
     /*
      * Method to purge all the details of the given company(Not recoverable).
      */
@@ -5138,7 +5141,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             //Remove social media connections
             socialManagementService.disconnectAllSocialConnections( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
-            
+
             // Remove from disabled account
             List<String> conditions = new ArrayList<>();
             conditions.add( "company.companyId = " + company.getCompanyId() );
@@ -5253,9 +5256,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings companySettings = getCompanySettings( company.getCompanyId() );
 
         //Set status of company setting to DELETED
-        organizationUnitSettingsDao
-            .updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_DELETED_MONGO,
-                companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_DELETED_MONGO, companySettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         LOG.info( "Method to deactivate company in mongo finished" );
     }
@@ -6999,7 +7002,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( accounts != null && !accounts.isEmpty() ) {
             DisabledAccount account = accounts.get( 0 );
             account.setForceDelete( true );
-            account.setModifiedBy( String.valueOf( userId ) );
+            account.setModifiedBy(
+                userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
             disabledAccountDao.update( account );
         }
     }
