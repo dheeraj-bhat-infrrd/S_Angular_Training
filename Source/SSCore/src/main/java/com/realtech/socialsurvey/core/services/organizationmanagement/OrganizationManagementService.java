@@ -867,6 +867,14 @@ public interface OrganizationManagementService
 
 
     /**
+     * Method to delete a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    void deleteCompanyFromSolr( Company company ) throws InvalidInputException, SolrException;
+
+    /**
      * @param company
      * @throws InvalidInputException
      * @throws SolrException

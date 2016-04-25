@@ -690,6 +690,31 @@ public class SolrSearchServiceImpl implements SolrSearchService
     }
 
 
+    private SolrQuery fixQuery( SolrQuery query, String searchColumn, String searchKey )
+    {
+        if ( !searchKey.contains( " " ) ) {
+            query.addFilterQuery( searchColumn + ":" + searchKey );
+            return query;
+        }
+        /*
+        Example:
+        Office first second third
+        q=branchName:Office\ first\ second
+        fq=branchName:third*
+        So the last word should be part of fq
+        the remaining should be part of q, with whitespaces escaped
+         */
+        //Take the last word and put that as part of fq
+        String lastWord = searchKey.substring( searchKey.lastIndexOf( ' ' ), searchKey.length() );
+        //Put this as part of the query
+        String queryStr = searchKey.substring( 0, searchKey.lastIndexOf( ' ' ) ).replace( " ", "\\ " );
+
+        query.addFilterQuery( searchColumn + ":" + queryStr );
+        query.addFilterQuery( searchColumn + ":" + lastWord );
+        return query;
+    }
+
+
     /**
      * Method to perform search of Users from solr based on the input pattern for user and company.
      * 
@@ -1313,7 +1338,8 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 query.addFilterQuery(
                     CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.IS_DEFAULT_BY_SYSTEM_NO );
 
-            query.addFilterQuery( searchColumn + ":" + searchKey );
+            //query.addFilterQuery( searchColumn + ":" + searchKey );
+            fixQuery( query, searchColumn, searchKey );
             query.addFilterQuery( "-" + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_INACTIVE );
 
             LOG.debug( "Querying solr for searching " + searchColumn );

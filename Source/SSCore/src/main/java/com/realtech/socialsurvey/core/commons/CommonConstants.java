@@ -759,13 +759,13 @@ public interface CommonConstants
 
     // Constants for Agent Ranking Report
     public static final String HEADER_AGENT_RANK = "User Rank";
-    public static final String HEADER_FIRST_NAME = "First Name";
-    public static final String HEADER_LAST_NAME = "Last Name";
+    public static final String HEADER_FIRST_NAME = "User First Name";
+    public static final String HEADER_LAST_NAME = "User Last Name";
     public static final String HEADER_AVG_SCORE = "Avg Score";
-    public static final String HEADER_SUM_SURVEYS = "Sum Surveys";
-    public static final String HEADER_REGISTRATION_DATE = "Registration Date";
-    public static final String HEADER_COMPLETED_SURVEY_COUNT = "Completed surveys count";
-    public static final String HEADER_INCOMPLTE_SURVEY_COUNT = "Incomplete surveys count";
+    public static final String HEADER_SUM_SURVEYS = "Total Surveys";
+    public static final String HEADER_REGISTRATION_DATE = "User Registration Date";
+    public static final String HEADER_COMPLETED_SURVEY_COUNT = "Completed Surveys Count";
+    public static final String HEADER_INCOMPLETE_SURVEY_COUNT = "Incomplete Surveys Count";
 
     // Constants for Survey Results Report
     public static final String HEADER_AGENT_FIRST_NAME = "User First Name";
