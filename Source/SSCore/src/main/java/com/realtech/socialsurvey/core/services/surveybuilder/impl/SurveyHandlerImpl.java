@@ -890,7 +890,24 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String surveySource = CommonConstants.SURVEY_REQUEST_AGENT;
         if ( survey != null && survey.getSource() != null )
             surveySource = survey.getSource();
-        preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource );
+        //preinitiate survey
+        if(survey != null ){
+            SurveyPreInitiation surveyPreInitiation = getPreInitiatedSurvey( user.getUserId(), custEmail,
+                custFirstName, custLastName );
+             if(surveyPreInitiation != null){
+                 markSurveyAsStarted( surveyPreInitiation );
+             }
+             else
+                 preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource );             
+         }else{
+             SurveyPreInitiation surveyPreInitiation = getPreInitiatedSurvey( survey.getSurveyPreIntitiationId() );
+             if(surveyPreInitiation != null){
+                 markSurveyAsStarted( surveyPreInitiation );
+             }
+             else
+                 preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource ); 
+         }
+        
 
         //get mail subject and body
         String mailBody = "";
@@ -1362,7 +1379,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     @Transactional
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
-        String custLastName ) throws NoRecordsFetchedException
+        String custLastName ) 
     {
         LOG.info( "Method getPreInitiatedSurvey() started. " );
         /*Map<String, Object> queries = new HashMap<>();
@@ -1370,9 +1387,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         queries.put( "customerEmailId", customerEmail );*/
         Criterion agentIdCriteria = Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId );
         Criterion emailCriteria = Restrictions.eq( "customerEmailId", customerEmail );
-        Criterion statusCriteria = Restrictions.and(
-            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE ),
-            Restrictions.ne( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_DELETED ) );
+        
+        Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN, Arrays.asList( CommonConstants.SURVEY_STATUS_PRE_INITIATED , CommonConstants.SURVEY_STATUS_INITIATED , CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE , CommonConstants.STATUS_SURVEYPREINITIATION_DELETED )  );
         Criterion firstNameCriteria = null;
         Criterion lastNameCriteria = null;
 
@@ -1416,7 +1432,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
-    public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId ) throws NoRecordsFetchedException
+    public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId ) 
     {
         LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started. " );
         SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById( SurveyPreInitiation.class,

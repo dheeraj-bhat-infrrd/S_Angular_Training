@@ -612,7 +612,8 @@ public class SurveyManagementController
                     surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName , surveyPreInitiation.getSurveyPreIntitiationId() , retakeSurvey ),
                     surveyPreInitiation.getSurveySource() , surveyPreInitiation.getSurveyPreIntitiationId() , isOldRecord , retakeSurvey);
 
-                surveyHandler.markSurveyAsStarted( surveyPreInitiation );
+                if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED)
+                    surveyHandler.markSurveyAsStarted( surveyPreInitiation );
                
 
                 // fetching company logo
@@ -1521,16 +1522,22 @@ public class SurveyManagementController
         String customerEmail = request.getParameter( "customerEmail" );
         String firstName = request.getParameter( "firstName" );
         String lastName = request.getParameter( "lastName" );
+        String surveyId = request.getParameter( "surveyId" );
+        
         try {
             if ( agentIdStr == null || agentIdStr.isEmpty() ) {
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
             }
             long agentId = Long.parseLong( agentIdStr );
-            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, firstName, lastName );
+            surveyHandler.changeStatusOfSurvey( surveyId , true );
+            SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
             User user = userManagementService.getUserByUserId( agentId );
-            surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustomerInteractionDetails(),
-                user, surveyHandler.composeLink( agentId, customerEmail, firstName, lastName , survey.getSurveyPreIntitiationId() , true ) );
-        } catch ( NonFatalException e ) {
+            Map<String , String> urlParams  = urlGenerator.decryptUrl( survey.getUrl() );
+            urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
+            String updatedUrl = urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
+            surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
+                updatedUrl);
+            } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
         }
     }
