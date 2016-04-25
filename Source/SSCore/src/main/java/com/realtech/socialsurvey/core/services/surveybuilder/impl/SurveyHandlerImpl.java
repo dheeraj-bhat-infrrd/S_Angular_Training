@@ -890,7 +890,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String surveySource = CommonConstants.SURVEY_REQUEST_AGENT;
         if ( survey != null && survey.getSource() != null )
             surveySource = survey.getSource();
-        preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource );
+        //preinitiate survey
+        if(survey != null ){
+            SurveyPreInitiation surveyPreInitiation = getPreInitiatedSurvey( survey.getSurveyPreIntitiationId() );
+             if(surveyPreInitiation != null){
+                 markSurveyAsStarted( surveyPreInitiation );
+             }
+             else{
+                 preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource );             }
+         }
+        
 
         //get mail subject and body
         String mailBody = "";
@@ -1416,7 +1425,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
-    public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId ) throws NoRecordsFetchedException
+    public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId ) 
     {
         LOG.info( "Method getSurveyByAgentIdAndCutomerEmail() started. " );
         SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById( SurveyPreInitiation.class,

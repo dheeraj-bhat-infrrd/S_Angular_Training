@@ -127,7 +127,7 @@ public interface SurveyHandler
         String custLastName ) throws NoRecordsFetchedException;
 
 
-    public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId ) throws NoRecordsFetchedException;
+    public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId );
 
 
     public void deleteSurveyPreInitiationDetailsPermanently( SurveyPreInitiation surveyPreInitiation );
