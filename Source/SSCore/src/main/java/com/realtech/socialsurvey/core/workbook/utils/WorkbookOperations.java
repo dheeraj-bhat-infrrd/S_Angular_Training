@@ -13,6 +13,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+
 
 /**
  * @author RareMile
@@ -21,8 +23,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkbookOperations
 {
-    private static final String DATE_FORMAT = "MM/dd/yyyy";
-
 
     /**
      * Method to create workbook
@@ -30,7 +30,7 @@ public class WorkbookOperations
      * @param data
      * @return XSSFWorkbook
      */
-    public XSSFWorkbook createWorkbook( Map<String, List<Object>> data )
+    public XSSFWorkbook createWorkbook( Map<Integer, List<Object>> data )
     {
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -39,25 +39,29 @@ public class WorkbookOperations
         XSSFSheet sheet = workbook.createSheet();
         XSSFDataFormat df = workbook.createDataFormat();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( DATE_FORMAT ) );
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
 
         // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
+        Set<Integer> keyset = data.keySet();
         int rownum = 0;
-        for ( String key : keyset ) {
+        for ( Integer key : keyset ) {
             Row row = sheet.createRow( rownum++ );
             List<Object> objArr = data.get( key );
 
             int cellnum = 0;
             for ( Object obj : objArr ) {
                 Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
+                if ( obj instanceof String ) {
                     cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
+                } else if ( obj instanceof Integer ) {
                     cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Date ) {
+                } else if ( obj instanceof Date ) {
                     cell.setCellStyle( style );
                     cell.setCellValue( (Date) obj );
+                } else if ( obj instanceof Long ) {
+                    cell.setCellValue( String.valueOf( (Long) obj ) );
+                } else if ( obj instanceof Double ) {
+                    cell.setCellValue( (Double) obj );
                 }
             }
         }
