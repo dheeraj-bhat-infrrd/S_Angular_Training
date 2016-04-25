@@ -1203,16 +1203,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_ACCOUNT_DISABLED, isAccountDisabled, companySettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        //Set status to Deleted if isAccountDisabled is true, Active otherwise
-        if ( isAccountDisabled ) {
-            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN,
-                CommonConstants.STATUS_DELETED_MONGO, companySettings,
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        } else {
-            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN,
-                CommonConstants.STATUS_ACTIVE_MONGO, companySettings,
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        }
 
         LOG.info( "Updated the isAccountDisabled successfully" );
     }
@@ -1535,7 +1525,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public void addDisabledAccount( long companyId, boolean forceDisable )
+    public void addDisabledAccount( long companyId, boolean forceDisable, long userId )
         throws InvalidInputException, NoRecordsFetchedException, PaymentException
     {
         LOG.info( "Adding the disabled account to the database for company id : " + companyId );
@@ -1573,9 +1563,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
             disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
         }
-        disabledAccount.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
+        disabledAccount.setCreatedBy( String.valueOf( userId ) );
         disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        disabledAccount.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
+        disabledAccount.setModifiedBy( String.valueOf( userId ) );
         disabledAccount.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
         LOG.info( "Adding the Disabled Account entity to the database" );
@@ -4938,6 +4928,88 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    /**
+     * Method to remove a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    @Override
+    public void deleteCompanyFromSolr( Company company ) throws InvalidInputException, SolrException
+    {
+        if ( company == null ) {
+            throw new InvalidInputException( "The company object is null" );
+        }
+        LOG.info( "Method to delete the company : " + company.getCompany() + " from Solr started." );
+        removeUsersInCompanyFromSolr( company );
+        removeBranchesInCompanyFromSolr( company );
+        removeRegionsInCompanyFromSolr( company );
+        LOG.info( "Method to delete the company : " + company.getCompany() + " from Solr finished." );
+    }
+
+
+    /**
+     * Method to remove all the users in a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    void removeUsersInCompanyFromSolr( Company company ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method to remove all users in company : " + company.getCompany() + " started" );
+        List<Long> agentIds = null;
+        do {
+            agentIds = solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
+            if ( agentIds == null || agentIds.isEmpty() ) {
+                break;
+            }
+            solrSearchService.removeUsersFromSolr( agentIds );
+        } while ( true );
+        LOG.info( "Method to remove all users in company : " + company.getCompany() + " finished" );
+    }
+
+
+    /**
+     * Method to remove all the branches in a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    void removeBranchesInCompanyFromSolr( Company company ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method to remove all branches in company : " + company.getCompany() + " started" );
+        List<Long> branchIds = null;
+        do {
+            branchIds = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
+            if ( branchIds == null || branchIds.isEmpty() ) {
+                break;
+            }
+            solrSearchService.removeBranchesFromSolr( branchIds );
+        } while ( true );
+        LOG.info( "Method to remove all branches in company : " + company.getCompany() + " finished" );
+    }
+
+
+    /**
+     * Method to remove all the regions in a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    void removeRegionsInCompanyFromSolr( Company company ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method to remove all regions in company : " + company.getCompany() + " started" );
+        List<Long> regionIds = null;
+        do {
+            regionIds = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
+            if ( regionIds == null || regionIds.isEmpty() ) {
+                break;
+            }
+            solrSearchService.removeRegionsFromSolr( regionIds );
+        } while ( true );
+        LOG.info( "Method to remove all regions in company : " + company.getCompany() + " finished" );
+    }
+
     /*
      * Method to purge all the details of the given company(Not recoverable).
      */
@@ -5066,6 +5138,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             //Remove social media connections
             socialManagementService.disconnectAllSocialConnections( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
+            
+            // Remove from disabled account
+            List<String> conditions = new ArrayList<>();
+            conditions.add( "company.companyId = " + company.getCompanyId() );
+            disabledAccountDao.deleteByCondition( "DisabledAccount", conditions );
 
             // Deleting company from MySQL
             company.setStatus( CommonConstants.STATUS_COMPANY_DELETED );
@@ -5163,6 +5240,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method to change company details updateCompany() started." );
         companyDao.merge( company );
         LOG.info( "Method to change company details updateCompany() finished." );
+    }
+
+
+    @Override
+    public void deactivateCompanyInMongo( Company company ) throws InvalidInputException
+    {
+        LOG.info( "Method to deactivate company in mongo started" );
+        if ( company == null ) {
+            throw new InvalidInputException( "Company object is null" );
+        }
+        OrganizationUnitSettings companySettings = getCompanySettings( company.getCompanyId() );
+
+        //Set status of company setting to DELETED
+        organizationUnitSettingsDao
+            .updateParticularKeyOrganizationUnitSettings( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_DELETED_MONGO,
+                companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOG.info( "Method to deactivate company in mongo finished" );
     }
 
 
@@ -6891,6 +6986,22 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         event.setRegionId( regionId );
         eventDao.save( event );
         LOG.info( "Logging connection event in event table completes successfully" );
+    }
+
+
+    @Override
+    @Transactional
+    public void forceDeleteDisabledAccount( long companyId, long userId )
+    {
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( "company.companyId", companyId );
+        List<DisabledAccount> accounts = disabledAccountDao.findByKeyValue( DisabledAccount.class, queries );
+        if ( accounts != null && !accounts.isEmpty() ) {
+            DisabledAccount account = accounts.get( 0 );
+            account.setForceDelete( true );
+            account.setModifiedBy( String.valueOf( userId ) );
+            disabledAccountDao.update( account );
+        }
     }
 }
 // JIRA: SS-27: By RM05: EOC

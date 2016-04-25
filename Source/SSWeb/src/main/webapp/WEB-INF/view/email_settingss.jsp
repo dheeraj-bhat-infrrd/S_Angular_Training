@@ -132,7 +132,16 @@
 					<div class="float-left"><spring:message code="label.reminder.interval.key" /></div>
 					<div class="clearfix float-left">
 						<div class="float-left st-input-reminder">
-							<input class="st-rating-input" name="reminder-interval" id="reminder-interval" value="${reminderinterval}">
+						<c:choose>
+						 <c:when test="${isreminderdisabled == false}">
+						 <input class="st-rating-input" name="reminder-interval"
+								id="reminder-interval" value="${reminderinterval}">
+						 </c:when>
+						 <c:otherwise>
+						  <input class="st-rating-input" name="reminder-interval"
+								id="reminder-interval" value="${reminderinterval}" disabled>
+						 </c:otherwise>
+						 </c:choose>
 							<div id="reminder-interval-error" class="hm-item-err-2"></div>
 						</div>
 						<div class="float-left"><spring:message code="label.days.key" /></div>
@@ -286,7 +295,16 @@
 					<div class="float-left"><spring:message code="label.post.reminder.interval.key" /></div>
 					<div class="clearfix float-left">
 						<div class="float-left st-input-reminder">
-							<input class="st-rating-input" name="post-reminder-interval" id="post-reminder-interval" value="${postreminderinterval}">
+						<c:choose>
+						 <c:when test="${ispostreminderdisabled == false}">
+						 <input class="st-rating-input" name="post-reminder-interval"
+								id="post-reminder-interval" value="${postreminderinterval}">
+						 </c:when>
+						 <c:otherwise>
+						 <input class="st-rating-input" name="post-reminder-interval"
+								id="post-reminder-interval" value="${postreminderinterval}" disabled>
+						 </c:otherwise>
+						 </c:choose>
 							<div id="post-reminder-interval-error" class="hm-item-err-2"></div>
 						</div>
 						<div class="float-left"><spring:message code="label.days.key" /></div>

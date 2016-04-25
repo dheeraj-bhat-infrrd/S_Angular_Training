@@ -70,6 +70,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -1291,7 +1292,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      */
     @Override
     public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl,
+        long agentId, double rating, String surveyId, String feedback, boolean isAbusive, String serverBaseUrl,
         boolean onlyPostToSocialSurvey ) throws NonFatalException
     {
 
@@ -1328,7 +1329,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             List<OrganizationUnitSettings> branchSettings = settingsMap
                 .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
-            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyId );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
 
@@ -1482,7 +1483,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( agentSocialList );
             socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( companySocialList );
             surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
-            surveyHandler.updateSurveyDetails( surveyDetails );
+            surveyHandler.updateSurveyDetailsBySurveyId( surveyDetails );
 
 
         } catch ( NonFatalException e ) {
@@ -2040,6 +2041,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getCorruptPreInitiatedSurveys( companyId,
             startIndex, batchSize );
+        for ( SurveyPreInitiation survey : surveyPreInitiations ) {
+            survey.setErrorCodeDescription( SurveyErrorCode.valueOf( survey.getErrorCode() ).getValue() );
+        }
         surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
         surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getCorruptPreInitiatedSurveyCount( companyId ) );
         return surveyPreInitiationListVO;

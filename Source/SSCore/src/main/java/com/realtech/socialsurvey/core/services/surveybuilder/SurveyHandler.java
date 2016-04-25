@@ -48,7 +48,7 @@ public interface SurveyHandler
      * @param stage
      * @throws Exception
      */
-    public void updateCustomerAnswersInSurvey( long agentId, String customerEmail, String question, String questionType,
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType,
         String answer, int stage );
 
 
@@ -56,12 +56,12 @@ public interface SurveyHandler
      * Method to update customer review and final score on the basis of rating questions in
      * SURVEY_DETAILS.
      */
-    public void updateGatewayQuestionResponseAndScore( long agentId, String customerEmail, String mood, String review,
+    public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review,
         boolean isAbusive, String agreedToShare );
 
 
     public SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source ) throws SolrException,
+        int reminderCount, String custRelationWithAgent, String url, String source , long surveyPreIntitiationId , boolean isOldRecord , boolean retakeSurvey) throws SolrException,
         NoRecordsFetchedException, InvalidInputException;
 
 
@@ -71,7 +71,7 @@ public interface SurveyHandler
     public String getApplicationBaseUrl();
 
 
-    public void updateSurveyAsClicked( long agentId, String customerEmail );
+    public void updateSurveyAsClicked( String surveyMongoId );
 
 
     public String getSwearWords();
@@ -110,7 +110,7 @@ public interface SurveyHandler
     public String getSurveyUrl( long agentId, String customerEmail, String baseUrl ) throws InvalidInputException;
 
 
-    public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable );
+    public void changeStatusOfSurvey( String surveyId, boolean editable );
 
 
     public void sendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
@@ -133,9 +133,9 @@ public interface SurveyHandler
     public void deleteSurveyPreInitiationDetailsPermanently( SurveyPreInitiation surveyPreInitiation );
 
 
-    public String composeLink( long userId, String custEmail, String custFirstName, String custaLastName )
+    public String composeLink( long userId, String custEmail, String custFirstName, String custaLastName , long surveyPreInitiationId , boolean retakeSurvey   )
         throws InvalidInputException;
-
+    
 
     public void markSurveyAsStarted( SurveyPreInitiation surveyPreInitiation );
 
@@ -277,4 +277,11 @@ public interface SurveyHandler
 
 
     public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
+
+
+    SurveyPreInitiation preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
+        String custRelationWithAgent, String source );
+
+
+    void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 }

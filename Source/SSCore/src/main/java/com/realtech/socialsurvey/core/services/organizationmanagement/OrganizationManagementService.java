@@ -225,7 +225,7 @@ public interface OrganizationManagementService
      * @throws NoRecordsFetchedException
      * @throws PaymentException
      */
-    public void addDisabledAccount( long companyId, boolean forceDisable )
+    public void addDisabledAccount( long companyId, boolean forceDisable, long modifiedBy )
         throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 
 
@@ -867,6 +867,14 @@ public interface OrganizationManagementService
 
 
     /**
+     * Method to delete a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    void deleteCompanyFromSolr( Company company ) throws InvalidInputException, SolrException;
+
+    /**
      * @param company
      * @throws InvalidInputException
      * @throws SolrException
@@ -911,6 +919,13 @@ public interface OrganizationManagementService
      */
     public void updateCompany( Company company ) throws DatabaseException;
 
+
+    /**
+     * Method to set company status to deleted in mongo
+     * @param company
+     * @throws InvalidInputException
+     */
+    public void deactivateCompanyInMongo( Company company ) throws InvalidInputException;
 
     /**
      * @param user
@@ -1347,4 +1362,7 @@ public interface OrganizationManagementService
 
     public void logEvent( String eventType, String action, String modifiedBy, long companyId, int agentId, int regionId,
         int branchId );
+
+
+    public void forceDeleteDisabledAccount( long companyId, long userId );
 }

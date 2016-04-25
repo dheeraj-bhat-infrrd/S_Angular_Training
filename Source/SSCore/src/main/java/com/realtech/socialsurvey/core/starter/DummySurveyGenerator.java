@@ -6,14 +6,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationService;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -70,8 +73,8 @@ public class DummySurveyGenerator {
 						mood = "sad";
 					}
 					// Trigger survey (Store initial details)
-					surveyHandler.storeInitialSurveyDetails(user.getUserId(), custEmail + count + custEmailDomain, custEmail + count, custEmail
-							+ "last", 0, "transacted", "http://localhost:8080/" + CommonConstants.SHOW_SURVEY_PAGE, MongoSocialPostDaoImpl.KEY_SOURCE_SS);
+					SurveyDetails surveyDetails = surveyHandler.storeInitialSurveyDetails(user.getUserId(), custEmail + count + custEmailDomain, custEmail + count, custEmail
+							+ "last", 0, "transacted", "http://localhost:8080/" + CommonConstants.SHOW_SURVEY_PAGE, MongoSocialPostDaoImpl.KEY_SOURCE_SS , user.getUserId() , false , false);
 					// Fetch survey for each agent
 					List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(user.getUserId());
 					// Store answer to each question
@@ -83,11 +86,11 @@ public class DummySurveyGenerator {
 						else {
 							surveyQuestion.setCustomerResponse("Random Answer");
 						}
-						surveyHandler.updateCustomerAnswersInSurvey(user.getUserId(), custEmail + count + custEmailDomain,
+						surveyHandler.updateCustomerAnswersInSurvey(surveyDetails.get_id(),
 								surveyQuestion.getQuestion(), surveyQuestion.getQuestionType(), surveyQuestion.getCustomerResponse(), qno++);
 					}
 					// Store final answer and gateway answer.
-					surveyHandler.updateGatewayQuestionResponseAndScore(user.getUserId(), custEmail + count + custEmailDomain, mood,
+					surveyHandler.updateGatewayQuestionResponseAndScore(surveyDetails.get_id(), mood,
 							"I am kind of happy but dont go by the rating. It may say anything. ", false, "false");
 				}
 				catch (SolrException | NoRecordsFetchedException | InvalidInputException e) {

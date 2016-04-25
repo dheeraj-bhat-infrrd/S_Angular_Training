@@ -200,6 +200,7 @@
 				<entry key="solrSearchService" value-ref="solrSearchService" />
 				<entry key="accountPermDeleteSpan" value="${ACCOUNT_PERM_DELETE_SPAN}" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
+				<entry key="userManagementService" value-ref="userManagementService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -333,6 +334,7 @@
 				<entry key="applicationAdminName" value="${APPLICATION_ADMIN_NAME}" />
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 				<entry key="crmBatchTrackerService" value-ref="crmBatchTrackerService" />
+				<entry key="crmBatchTrackerHistoryService" value-ref="crmBatchTrackerHistoryService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -633,10 +635,13 @@
 		class="com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl" />
 	<bean id="batchTrackerService"
 		class="com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl" />
-		
+
 	<bean id="crmBatchTrackerService"
 		class="com.realtech.socialsurvey.core.services.crmbatchtracker.impl.CRMBatchTrackerServiceImpl" />
 		
+	<bean id="crmBatchTrackerHistoryService"
+		class="com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.impl.CRMBatchTrackerHistoryServiceImpl" />
+
 	<bean id="urlService"
 		class="com.realtech.socialsurvey.core.services.generator.impl.UrlServiceImpl" />
 

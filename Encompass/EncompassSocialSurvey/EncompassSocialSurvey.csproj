@@ -112,6 +112,8 @@
     <Compile Include="EncompassSocialSurveyConstant.cs" />
     <Compile Include="EncompassSocialSurveyConfiguration.cs" />
     <Compile Include="EncryptionHelper.cs" />
+    <Compile Include="Entity\BaseEntity.cs" />
+    <Compile Include="Entity\CrmBatchTrackerHistory.cs" />
     <Compile Include="Entity\EncompassCredential.cs" />
     <Compile Include="Entity\Company.cs" />
     <Compile Include="Entity\CompanyCredentials.cs" />

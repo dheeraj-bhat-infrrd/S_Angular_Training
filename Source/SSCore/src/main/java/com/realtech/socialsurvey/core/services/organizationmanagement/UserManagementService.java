@@ -600,5 +600,7 @@ public interface UserManagementService
      * Method to map CRM Data with AgentIds
      */
     public void crmDataAgentIdMApper();
+
+    public User getAdminUserByCompanyId(long companyId);
 }
 // JIRA SS-34 BY RM02 BOC

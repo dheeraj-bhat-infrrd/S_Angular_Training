@@ -83,6 +83,7 @@
 				<value>com.realtech.socialsurvey.core.entities.UploadStatus</value>
 				<value>com.realtech.socialsurvey.core.entities.ReferralInvitiation</value>
 				<value>com.realtech.socialsurvey.core.entities.UserReferralMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.CrmBatchTrackerHistory</value>
 				<value>com.realtech.socialsurvey.core.entities.Event</value>
 			</list>
 		</property>

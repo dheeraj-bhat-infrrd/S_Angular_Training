@@ -1040,7 +1040,7 @@ public class DashboardController
             if ( survey != null ) {
                 //                surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
                 //                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
-                surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
+                surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName , survey.getSurveyPreIntitiationId() , false);
             }
 
             try {
@@ -1208,7 +1208,7 @@ public class DashboardController
                     if ( survey != null ) {
                         //                        surveyLink = surveyHandler.getSurveyUrl( agentId, customerEmail,
                         //                            surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ) );
-                        surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName );
+                        surveyLink = surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName , survey.getSurveyPreIntitiationId() , false );
                     }
 
                     AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
@@ -2003,17 +2003,25 @@ public class DashboardController
         String customerEmail = request.getParameter( "customerEmail" );
         String firstName = request.getParameter( "firstName" );
         String lastName = request.getParameter( "lastName" );
+        String surveyId = request.getParameter( "surveyId" );
         try {
+            
+            if(surveyId == null || surveyId.isEmpty()){
+                throw new InvalidInputException("Passed parameter survey id is null or empty");
+            }
+            
             if ( agentIdStr == null || agentIdStr.isEmpty() ) {
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
             }
             long agentId = Long.parseLong( agentIdStr );
-            surveyHandler.changeStatusOfSurvey( agentId, customerEmail, firstName, lastName, true );
-            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
+            surveyHandler.changeStatusOfSurvey( surveyId , true );
+            SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
             User user = userManagementService.getUserByUserId( agentId );
-            surveyHandler.decreaseSurveyCountForAgent( agentId );
+            Map<String , String> urlParams  = urlGenerator.decryptUrl( survey.getUrl() );
+            urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
+            String updatedUrl = urlGenerator.generateUrl( urlParams, surveyHandler.getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
             surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
-                survey.getUrl() );
+                updatedUrl);
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
         }

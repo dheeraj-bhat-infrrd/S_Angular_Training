@@ -16,10 +16,10 @@ public class AgentRankingReportComparator implements Comparator<AgentRankingRepo
 	public int compare(AgentRankingReport agentReport1, AgentRankingReport agentReport2) {
 		LOG.debug("Comparing AgentRankingReports");
 
-		if (agentReport1.getAverageScore() > agentReport2.getAverageScore()) {
+		if (agentReport1.getCompletedSurveys() > agentReport2.getCompletedSurveys()) {
 			return -1;
 		}
-		else if (agentReport1.getAverageScore() < agentReport2.getAverageScore()) {
+		else if (agentReport1.getCompletedSurveys() < agentReport2.getCompletedSurveys()) {
 			return 1;
 		}
 		else {
