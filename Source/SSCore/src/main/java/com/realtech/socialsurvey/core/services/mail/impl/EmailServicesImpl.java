@@ -431,6 +431,68 @@ public class EmailServicesImpl implements EmailServices
         LOG.info( "Successfully sent verification mail" );
     }
 
+    @Override
+    public void sendEmailVerifiedNotificationMail( String recipientMailId, String recipientName  )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendEmailVerifiedNotificationMail called for emailId : " + recipientMailId );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            throw new InvalidInputException( "Recipients Email Id can not be null or empty" );
+        }
+        if ( recipientName == null || recipientName.isEmpty() ) {
+            throw new InvalidInputException( "Recipients Name can not be null or empty" );
+        }
+
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.EMAIL_VERIFIED_NOTIFICATION_MAIL_SUBJECT;
+
+        FileContentReplacements fileContentReplacements = new FileContentReplacements();
+        fileContentReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.EMAIL_VERIFIED_NOTIFICATION_MAIL_BODY );
+        fileContentReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, appBaseUrl,
+            appBaseUrl ) );
+
+        LOG.debug( "Calling email sender to sendEmailVerifiedNotificationMaill" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, fileContentReplacements, false, false );
+        LOG.info( "Successfully sendEmailVerifiedNotificationMail" );
+    }
+    
+    @Override
+    public void sendEmailVerifiedNotificationMailToAdmin( String recipientMailId, String recipientName ,  String verifiedEmail,  String entityName  )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Method sendEmailVerifiedNotificationMailToAdmin called for emailId : " + recipientMailId );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            throw new InvalidInputException( "Recipients Email Id can not be null or empty" );
+        }
+        if ( recipientName == null || recipientName.isEmpty() ) {
+            throw new InvalidInputException( "Recipients Name can not be null or empty" );
+        }
+        if ( verifiedEmail == null || verifiedEmail.isEmpty() ) {
+            throw new InvalidInputException( "verified Email can not be null or empty" );
+        }
+
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        
+        FileContentReplacements subjectFileContentReplacements = new FileContentReplacements();
+        subjectFileContentReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.EMAIL_VERIFIED_NOTIFICATION_MAIL_TO_ADMIN_SUBJECT );
+        subjectFileContentReplacements.setReplacementArgs( Arrays.asList( entityName) );
+
+        FileContentReplacements fileContentReplacements = new FileContentReplacements();
+        fileContentReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.EMAIL_VERIFIED_NOTIFICATION_MAIL_TO_ADMIN_BODY );
+        fileContentReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, verifiedEmail, entityName , appBaseUrl,
+            appBaseUrl ) );
+
+        LOG.debug( "Calling email sender to sendEmailVerifiedNotificationMailToAdmin" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectFileContentReplacements, fileContentReplacements, false, false );
+        LOG.info( "Successfully sent EmailVerifiedNotificationMailToAdmin" );
+    }
+    
     /**
      * Method to send mail with verification link to verify the account
      * 

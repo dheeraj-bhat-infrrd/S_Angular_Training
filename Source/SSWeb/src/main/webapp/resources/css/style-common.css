@@ -4670,6 +4670,11 @@ img.prof-image {
 	color:#009FE0;
 }
 
+
+.not-verified {
+	color: #FF1A10 !important;
+}
+
 .dash-main-left {
 	overflow: hidden;
 	margin-left: -20px;

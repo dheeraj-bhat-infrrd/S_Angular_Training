@@ -2020,16 +2020,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method generateAndSendEmailVerificationRequestLinkToAdmin started " );
         Map<String, String> urlParams = null;
 
-        if(entitySettings == null){
+        if ( entitySettings == null ) {
             throw new InvalidInputException( "Invalid argument passed , passed entity setting is null: " );
         }
 
-        
+
         User companyAdmin = userManagementService.getCompanyAdmin( companyId );
         if ( companyAdmin == null ) {
             throw new InvalidInputException( "No admin found for passed company id : " + companyId );
         }
-        
+
         String adminName = companyAdmin.getFirstName();
         if ( companyAdmin.getLastName() != null && !companyAdmin.getLastName().isEmpty() ) {
             adminName = companyAdmin.getFirstName() + " " + companyAdmin.getLastName();
@@ -2077,6 +2077,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             .fetchOrganizationUnitSettingsById( iden, collection );
         ContactDetailsSettings contactDetails = unitSettings.getContact_details();
         MailIdSettings mailIds = contactDetails.getMail_ids();
+        User companyAdmin = null;
 
         if ( verificationType == null || verificationType.isEmpty() ) {
             throw new InvalidInputException(
@@ -2109,7 +2110,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( region != null ) {
                     settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.EMAIL_ID_WORK, true );
                     userManagementService.updateRegion( region );
-
+                    companyAdmin = userManagementService.getCompanyAdmin( region.getCompany().getCompanyId() );
                 }
 
             } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
@@ -2117,6 +2118,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( branch != null ) {
                     settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.EMAIL_ID_WORK, true );
                     userManagementService.updateBranch( branch );
+                    companyAdmin = userManagementService.getCompanyAdmin( branch.getCompany().getCompanyId() );
                 }
             } else if ( collection.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
 
@@ -2133,6 +2135,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 updateEmailIdInSolr( emailVerified, iden );
                 // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
                 // END
+                //get company admin
+                companyAdmin = userManagementService.getCompanyAdmin( user.getCompany().getCompanyId() );
+            }
+
+            //send email verified mail to admin
+            if ( verificationType.equalsIgnoreCase( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_ADMIN ) ) {
+                //send mail to entity
+                emailServices.sendEmailVerifiedNotificationMail( emailVerified, unitSettings.getContact_details().getName() );
+                //send mail to admin
+                if ( companyAdmin != null ) {
+                    String adminName = companyAdmin.getFirstName();
+                    if ( companyAdmin.getLastName() != null && !companyAdmin.getLastName().isEmpty() ) {
+                        adminName = companyAdmin.getFirstName() + " " + companyAdmin.getLastName();
+                    }
+                    emailServices.sendEmailVerifiedNotificationMailToAdmin( companyAdmin.getLoginName(),
+                        adminName, emailVerified, unitSettings.getContact_details().getName() );
+                }
             }
         } else if ( emailType.equals( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
             String emailVerified = mailIds.getPersonalEmailToVerify();
@@ -2813,8 +2832,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "Method to get Agent's Report for a specific time and all time finished." );
         return new ArrayList<>( agentReportData.values() );
     }
-    
-    
+
+
     /**
      * Method to initialize agent report data(to include all active agent in the company)
      * @param agentReportData
