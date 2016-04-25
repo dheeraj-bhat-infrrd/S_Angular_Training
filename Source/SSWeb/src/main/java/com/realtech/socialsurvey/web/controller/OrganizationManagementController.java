@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +50,6 @@ import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
@@ -66,7 +67,6 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -86,13 +86,13 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
-import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 
@@ -153,12 +153,6 @@ public class OrganizationManagementController
     @Autowired
     private HierarchyStructureUploadService hierarchyStructureUploadService;
 
-    @Autowired
-    private UploadValidationService uploadValidationService;
-
-    @Autowired
-    private EmailServices emailServices;
-
     @Value ( "${CDN_PATH}")
     private String endpoint;
 
@@ -190,6 +184,9 @@ public class OrganizationManagementController
 
     @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
     private String salesLeadEmail;
+
+    @Autowired
+    private WorkbookData workbookData;
 
 
     /**
@@ -1629,13 +1626,13 @@ public class OrganizationManagementController
                 companySettings.setSurvey_settings( originalSurveySettings );
                 LOG.info( "Updated Survey Settings" );
             }
-         // Updating settings in session
+            // Updating settings in session
             HttpSession session = request.getSession();
             UserSettings userSettings = (UserSettings) session
                 .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
             if ( userSettings != null )
                 userSettings.setCompanySettings( companySettings );
-            
+
         } catch ( NumberFormatException e ) {
             LOG.error( "NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e );
             message = messageUtils
@@ -2253,7 +2250,8 @@ public class OrganizationManagementController
                 // Add an entry into Disabled_Accounts table with disable_date as current date
                 // and status as inactive.
                 try {
-                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true, user.getUserId() );
+                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true,
+                        user.getUserId() );
                 } catch ( NoRecordsFetchedException | PaymentException e ) {
                     LOG.error(
                         "Exception caught in deactivateCompany() of OrganizationManagementController. Nested exception is ",
@@ -3065,7 +3063,7 @@ public class OrganizationManagementController
             LOG.error( "Null value found for startIndex or batch size." );
             return "Null value found for startIndex or batch size.";
         }
-        
+
         SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
         int startIndex;
         int batchSize;
@@ -3358,5 +3356,78 @@ public class OrganizationManagementController
     }
 
 
+    @RequestMapping ( value = "/downloadusersurveyreport")
+    public void getUserSurveyReport( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method getUserSurveyReport() started." );
+        try {
+            String companyIdStr = request.getParameter( "companyId" );
+            String tabIdStr = request.getParameter( "tabId" );
+            long companyId;
+            int tabId;
+            if ( companyIdStr == null || companyIdStr.isEmpty() ) {
+                throw new InvalidInputException( "Passed parameter companyId is invalid" );
+            }
+            if ( tabIdStr == null || tabIdStr.isEmpty() ) {
+                throw new InvalidInputException( "Passed parameter tabIdStr is invalid" );
+            }
+
+            try {
+                companyId = Long.parseLong( companyIdStr );
+                tabId = Integer.parseInt( tabIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while parsing companyId/tabId in getUserSurveyReport(). Nested exception is ",
+                    e );
+                throw e;
+            }
+
+            try {
+                User user = sessionHelper.getCurrentUser();
+                String fileName = getSurveyReportFileNameByTabId().get( tabId ) + "_" + user.getCompany().getCompany() + "_"
+                    + new DateTime( System.currentTimeMillis() ).toString() + workbookData.EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = socialManagementService.getUserSurveyReportByTabId( tabId, companyId );
+                response.setContentType( workbookData.EXCEL_FORMAT );
+                String headerKey = workbookData.CONTENT_DISPOSITION_HEADER;
+                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
+                response.setHeader( headerKey, headerValue );
+                OutputStream responseStream = null;
+
+                try {
+                    responseStream = response.getOutputStream();
+                    workbook.write( responseStream );
+                } catch ( IOException e ) {
+                    LOG.error( "IOException caught in getUserSurveyReport(). Nested exception is ", e );
+                } finally {
+                    try {
+                        responseStream.close();
+                    } catch ( IOException e ) {
+                        LOG.error( "IOException caught in getUserSurveyReport(). Nested exception is ", e );
+                    }
+                }
+
+                response.flushBuffer();
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException caught in getUserSurveyReport(). Nested exception is ", e );
+                throw e;
+            } catch ( IOException e ) {
+                LOG.error( "IOException caught in getUserSurveyReport(). Nested exception is ", e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Error while getting survey Report", e );
+        }
+        LOG.info( "Method getUserSurveyReport() ended." );
+    }
+
+
+    private Map<Integer, String> getSurveyReportFileNameByTabId()
+    {
+        Map<Integer, String> fineNameMap = new HashMap<Integer, String>();
+        fineNameMap.put( CommonConstants.UNMATCHED_USER_TABID, "Unmatched-Survey-Report" );
+        fineNameMap.put( CommonConstants.PROCESSED_USER_TABID, "Processed-Survey-Report" );
+        fineNameMap.put( CommonConstants.MAPPED_USER_TABID, "Mapped-Survey-Report" );
+        fineNameMap.put( CommonConstants.CORRUPT_USER_TABID, "Corrupt-Survey-Report" );
+        return fineNameMap;
+    }
 }
 // JIRA: SS-24 BY RM02 EOC
