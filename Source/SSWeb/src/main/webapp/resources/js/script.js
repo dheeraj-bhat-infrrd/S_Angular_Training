@@ -2214,20 +2214,26 @@ function paintProList(usersList) {
 
 								usersHtml = usersHtml + '</div>';
 								usersHtml = usersHtml
-										+ '<div class="float-left ctnt-list-item-btn-wrap clearfix">'
-										+ '<div class="float-left ctnt-review-score" data-score="'
-										+ reviewScore
-										+ '"></div>'
+										+ '<div class="float-right ctnt-list-item-btn-wrap clearfix">'
 										+ '<div class="float-left ctnt-review-count" user="'
-										+ user.userId + '">' + reviewCount
-										+ ' Review(s)</div>' + '</div>';
+										+ user.userId + '">' ;
+								if(reviewCount==0){
+									usersHtml+= 'Write a review </div>';
+								}else{
+							   usersHtml+= reviewCount
+										+ ' Review(s) </div>'
+								}
+								usersHtml+= '<div class="float-left ctnt-review-score" data-score="'
+										+ reviewScore
+										+ '"></div>'+ '</div>';
 								usersHtml = usersHtml + '</div>';
 							});
 			$('#ctnt-list-wrapper').html(usersHtml);
 
 			$('.ctnt-review-score').each(function() {
-				changeRatingPattern($(this).attr("data-score"), $(this));
 				$(this).append(" - ");
+				proRatingPattern($(this).attr("data-score"), $(this));
+				
 			});
 
 			$(".ctnt-list-item").click(function(e) {
@@ -2753,7 +2759,7 @@ function adjustTextContainerWidthOnResize() {
 	var parentWidth = $('.ctnt-list-item').width();
 	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
 	var textContainerWidth = parentWidth - imgWidth - 35;
-	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
+	/*$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);*/
 }
 
 // Function to validate the first name pattern

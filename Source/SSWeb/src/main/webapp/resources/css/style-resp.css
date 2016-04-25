@@ -1714,6 +1714,10 @@
 	.review-sm-screen{
 	 clear:both;
 	}
+	.ctnt-list-item-btn-wrap {
+	 float:none;
+	 margin-left:55px;
+	}
 
 }
 
