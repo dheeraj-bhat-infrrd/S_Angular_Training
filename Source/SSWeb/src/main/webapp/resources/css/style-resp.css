@@ -589,8 +589,11 @@
         padding-top: 15px;
         margin-bottom: 0;
     }
-    .posts-panel-item, .ppl-review-item,.ppl-review-item-last{
+    .posts-panel-item,,.ppl-review-item-last{
         padding: 15px;
+    }
+    .ppl-review-item{
+      padding:15px 4px;
     }
     .tweet-icn{
         min-width: 32px;
@@ -620,11 +623,7 @@
     .ppl-share-wrapper{
         line-height: 30px;
     }
-    .ppl-share-icns{
-        /* background-size: 26px; */
-        height: 30px;
-        width: 30px;
-    }
+    
     .float-left.icn-share.icn-plus-open{
         background-size: 24px;
     }
@@ -1060,7 +1059,7 @@
         margin: 10px auto;
     }
     .ppl-head-1{
-        font-size: 14px;
+        font-size: 10px;
     }
     .ppl-head-2 {
         font-size: 11px;
@@ -1709,6 +1708,12 @@
 	.sq-btn-post-social-btn{
 	margin-left:auto;
 	}
+	.dsh-resp-review{
+	 display:none;
+	}
+	.review-sm-screen{
+	 clear:both;
+	}
 
 }
 
@@ -1818,7 +1823,6 @@
         height: 35px;
     }
     .ppl-header-left{
-        width: 300px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -2095,6 +2099,9 @@
    .admin-sel-item{
     width:200px;
    }
+   .review-sm-screen{
+	 clear:both;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
