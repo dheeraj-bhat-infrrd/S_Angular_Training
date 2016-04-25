@@ -21,6 +21,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +86,9 @@ import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
+import com.realtech.socialsurvey.core.vo.UserList;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -197,6 +201,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Autowired
     private ExternalSurveyTrackerDao externalSurveyTrackerDao;
+
+    @Autowired
+    private WorkbookOperations workbookOperations;
+
+    @Autowired
+    private WorkbookData workbookData;
 
 
     /**
@@ -2047,5 +2057,32 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
         surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getCorruptPreInitiatedSurveyCount( companyId ) );
         return surveyPreInitiationListVO;
+    }
+
+
+    @Override
+    @Transactional
+    public XSSFWorkbook getUserSurveyReportByTabId( int tabId, long companyId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        SurveyPreInitiationList surveyPreInitiationListVO = null;
+        Map<String, List<Object>> data = null;
+        XSSFWorkbook workbook = null;
+        if ( tabId == CommonConstants.UNMATCHED_USER_TABID ) {
+            surveyPreInitiationListVO = this.getUnmatchedPreInitiatedSurveys( companyId, -1, -1 );
+            data = workbookData.getUnmatchedOrProcessedSurveyDataToBeWrittenInSheet( surveyPreInitiationListVO );
+        } else if ( tabId == CommonConstants.PROCESSED_USER_TABID ) {
+            surveyPreInitiationListVO = this.getProcessedPreInitiatedSurveys( companyId, -1, -1 );
+            data = workbookData.getUnmatchedOrProcessedSurveyDataToBeWrittenInSheet( surveyPreInitiationListVO );
+        } else if ( tabId == CommonConstants.MAPPED_USER_TABID ) {
+            UserList userList = new UserList();
+            userList = userManagementService.getUsersAndEmailMappingForCompany( companyId, -1, -1 );
+            data = workbookData.getMappedSurveyDataToBeWrittenInSheet( userList );
+        } else if ( tabId == CommonConstants.CORRUPT_USER_TABID ) {
+            surveyPreInitiationListVO = this.getCorruptPreInitiatedSurveys( companyId, -1, -1 );
+            data = workbookData.getCorruptSurveyDataToBeWrittenInSheet( surveyPreInitiationListVO );
+        }
+        workbook = workbookOperations.createWorkbook( data );
+        return workbook;
     }
 }

@@ -4684,6 +4684,11 @@ img.prof-image {
 	color:#009FE0;
 }
 
+
+.not-verified {
+	color: #FF1A10 !important;
+}
+
 .dash-main-left {
 	overflow: hidden;
 	margin-left: -20px;
@@ -8723,12 +8728,6 @@ label.url-change-input-label {
 .un-row{
 	border-bottom:1px solid #dcdcdc;
 	    height: 58px;
-}
-.un-heading{
-	border-top: #d2dedf 1px solid;
-    font-weight: 600 !important;
-    margin-top: 30px;
-    padding: 10px;
 }
 
 .hierarchy-btn {
