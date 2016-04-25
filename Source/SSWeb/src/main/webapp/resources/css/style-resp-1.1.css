@@ -224,13 +224,13 @@
     .ctnt-item-comment{
         display: none;
     }
-    .ctnt-list-item-btn-wrap{
+    /* .ctnt-list-item-btn-wrap{
         clear: both;
         margin-top: 15px;
         float: right;
         width: 100%;
         padding-left: 10px;
-    }
+    } */
     .registration-form-cls{
         margin-bottom: 0;
     }
@@ -419,9 +419,9 @@
         width: 219px;
         height: 30px;
     }
-    .ctnt-list-item-txt-wrap{
+    /* .ctnt-list-item-txt-wrap{
     	width: 245px !important;
-    }
+    } */
     .ctnt-review-btn{
     	width:125px;
     }
@@ -527,9 +527,9 @@
     .pro-inp{
         width: 207px;
     }
-    .ctnt-list-item-txt-wrap{
+    /* .ctnt-list-item-txt-wrap{
     	width: 385px !important;
-    }
+    } */
     .reg-err-pu{
         height: 50px;
         line-height: 50px;
@@ -543,9 +543,9 @@
 
 /* ============== LARGE SIZED SCREENS ==============*/
 @media (min-width: 1200px) {
-    .ctnt-list-item-txt-wrap{
+   /*  .ctnt-list-item-txt-wrap{
 		width:537px !important;
-	}
+	} */
 	.reg-cap-txt{
         width: 256px !important;
     }
