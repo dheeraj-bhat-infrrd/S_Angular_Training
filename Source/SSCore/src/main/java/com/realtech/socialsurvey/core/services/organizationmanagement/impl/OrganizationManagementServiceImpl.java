@@ -4928,6 +4928,88 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    /**
+     * Method to remove a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    @Override
+    public void deleteCompanyFromSolr( Company company ) throws InvalidInputException, SolrException
+    {
+        if ( company == null ) {
+            throw new InvalidInputException( "The company object is null" );
+        }
+        LOG.info( "Method to delete the company : " + company.getCompany() + " from Solr started." );
+        removeUsersInCompanyFromSolr( company );
+        removeBranchesInCompanyFromSolr( company );
+        removeRegionsInCompanyFromSolr( company );
+        LOG.info( "Method to delete the company : " + company.getCompany() + " from Solr finished." );
+    }
+
+
+    /**
+     * Method to remove all the users in a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    void removeUsersInCompanyFromSolr( Company company ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method to remove all users in company : " + company.getCompany() + " started" );
+        List<Long> agentIds = null;
+        do {
+            agentIds = solrSearchService.searchUserIdsByCompany( company.getCompanyId() );
+            if ( agentIds == null || agentIds.isEmpty() ) {
+                break;
+            }
+            solrSearchService.removeUsersFromSolr( agentIds );
+        } while ( true );
+        LOG.info( "Method to remove all users in company : " + company.getCompany() + " finished" );
+    }
+
+
+    /**
+     * Method to remove all the branches in a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    void removeBranchesInCompanyFromSolr( Company company ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method to remove all branches in company : " + company.getCompany() + " started" );
+        List<Long> branchIds = null;
+        do {
+            branchIds = solrSearchService.searchBranchIdsByCompany( company.getCompanyId() );
+            if ( branchIds == null || branchIds.isEmpty() ) {
+                break;
+            }
+            solrSearchService.removeBranchesFromSolr( branchIds );
+        } while ( true );
+        LOG.info( "Method to remove all branches in company : " + company.getCompany() + " finished" );
+    }
+
+
+    /**
+     * Method to remove all the regions in a company from Solr
+     * @param company
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    void removeRegionsInCompanyFromSolr( Company company ) throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method to remove all regions in company : " + company.getCompany() + " started" );
+        List<Long> regionIds = null;
+        do {
+            regionIds = solrSearchService.searchRegionIdsByCompany( company.getCompanyId() );
+            if ( regionIds == null || regionIds.isEmpty() ) {
+                break;
+            }
+            solrSearchService.removeRegionsFromSolr( regionIds );
+        } while ( true );
+        LOG.info( "Method to remove all regions in company : " + company.getCompany() + " finished" );
+    }
+
     /*
      * Method to purge all the details of the given company(Not recoverable).
      */
