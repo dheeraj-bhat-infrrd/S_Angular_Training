@@ -124,7 +124,7 @@ public interface SurveyHandler
 
 
     public SurveyPreInitiation getPreInitiatedSurvey( long agentId, String customerEmail, String custFirstName,
-        String custLastName ) throws NoRecordsFetchedException;
+        String custLastName );
 
 
     public SurveyPreInitiation getPreInitiatedSurvey( long surveyPreInitiationId );
