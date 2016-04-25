@@ -1195,41 +1195,38 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         Collections.sort( agentDetails, new AgentRankingReportComparator() );
 
         // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
+        Map<Integer, List<Object>> data = new TreeMap<>();
         List<Object> surveyDetailsToPopulate = new ArrayList<>();
-        int agentRank = 1;
         for ( AgentRankingReport agentDetail : agentDetails ) {
-            surveyDetailsToPopulate.add( agentRank++ );
             surveyDetailsToPopulate.add( agentDetail.getAgentFirstName() );
             surveyDetailsToPopulate.add( agentDetail.getAgentLastName() );
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis( agentDetail.getRegistrationDate() );
+            surveyDetailsToPopulate.add( DATE_FORMATTER.format( calendar.getTime() ) );
             surveyDetailsToPopulate.add( agentDetail.getAverageScore() );
             surveyDetailsToPopulate.add( agentDetail.getCompletedSurveys() );
             surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() );
             surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() + agentDetail.getCompletedSurveys() );
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis( agentDetail.getRegistrationDate() );
-            surveyDetailsToPopulate.add( DATE_FORMATTER.format( calendar.getTime() ) );
 
-            data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
+            data.put( ( ++counter ), surveyDetailsToPopulate );
             surveyDetailsToPopulate = new ArrayList<>();
         }
 
         // Setting up headers
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_AGENT_RANK );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_FIRST_NAME );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_LAST_NAME );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_REGISTRATION_DATE );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_AVG_SCORE );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_COMPLETED_SURVEY_COUNT );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_INCOMPLTE_SURVEY_COUNT );
+        surveyDetailsToPopulate.add( CommonConstants.HEADER_INCOMPLETE_SURVEY_COUNT );
         surveyDetailsToPopulate.add( CommonConstants.HEADER_SUM_SURVEYS );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_REGISTRATION_DATE );
 
-        data.put( "1", surveyDetailsToPopulate );
+        data.put( 1, surveyDetailsToPopulate );
 
         // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
+        Set<Integer> keyset = data.keySet();
         int rownum = 0;
-        for ( String key : keyset ) {
+        for ( int key : keyset ) {
             Row row = sheet.createRow( rownum++ );
             List<Object> objArr = data.get( key );
             int cellnum = 0;
