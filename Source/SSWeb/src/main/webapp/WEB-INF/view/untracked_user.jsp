@@ -1,21 +1,26 @@
+<%@page import="com.realtech.socialsurvey.core.commons.CommonConstants"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
-<div style="border-top: 1px solid #dcdcdc;margin-top: 10px;padding-top: 10px;">
-	
-	<div class="container" style="margin-top: 20px;">
-<div class="un-heading">Unmatched/Processed Transactions</div>
+<div style="height:100%; width:100%;">
+	<div class="container" style="margin-top: 20px;height:100%; width:100%;">
+		<div style="height:40px">
+			<div style="display:inline; font-weight: 600 !important;">Unmatched/Processed Transactions</div>
+			<div class="float-right" id="download-report" style="color:#009FE0;cursor:pointer" onclick="downloadSurveyReport(selectedTabIdOnSurveyRecordsSection,${entityId})">
+				Download mismatch records report
+			</div>
+		</div>
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
-			<li class="active" ><a href="#new-tab" role="tab" data-toggle="tab" onclick="initializeUnmatchedUserPage();" >
+			<li class="active"><a id="new-tab-id" href="#new-tab" role="tab" data-toggle="tab" onclick="initializeUnmatchedUserPageOnSelect();" data-iden="<%=CommonConstants.UNMATCHED_USER_TABID %>">
 					New <i class="fa fa-folder-open-o"></i></a></li>
-			<li><a href="#processed-tab" role="tab" data-toggle="tab" onclick="initializeProcesedUserPage();">
+			<li><a id="processed-tab-id" href="#processed-tab" role="tab" data-toggle="tab" onclick="initializeProcesedUserPageOnSelect();" data-iden="<%=CommonConstants.PROCESSED_USER_TABID %>">
 					Processed <i class="fa fa-folder-o"></i></a></li>
-            <li><a href="#mapped-tab" role="tab" data-toggle="tab" onclick="initializeMapped();">
+            <li><a id="mapped-tab-id" href="#mapped-tab" role="tab" data-toggle="tab" onclick="initializeMappedOnSelect();" data-iden="<%=CommonConstants.MAPPED_USER_TABID %>">
                  	Mapped Users <i class="fa fa-map-o"></i></a></li>
-            <li><a href="#corrupt-tab" role="tab" data-toggle="tab" onclick="initializeCorrupRecordsPage();">
+            <li><a id="corrupt-tab-id" href="#corrupt-tab" role="tab" data-toggle="tab" onclick="initializeCorruptRecordsPageOnSelect();" data-iden="<%=CommonConstants.CORRUPT_USER_TABID %>">
                  	Corrupt Records <i class="fa fa-folder-open-o"></i></a></li>
 		</ul>
 
@@ -115,16 +120,42 @@
 			</div>
 		</div>
 	</div>
-	</div>
-	<script>
-$(document).ready(function(){
-	bindEventForUnmatchedUserPage();
-	bindEventsForProcessUserPage();
-	bindEventForMappedUserPage();
-	bindEventForCorruptRecordPage();
-	initializeUnmatchedUserPage();
-	initializeProcesedUserPage();
-	initializeMapped();
-	initializeCorrupRecordsPage();
-}); 
+</div>
+<script>
+	$(document).ready(function(){
+		bindEventForUnmatchedUserPage();
+		bindEventsForProcessUserPage();
+		bindEventForMappedUserPage();
+		bindEventForCorruptRecordPage();
+		initializeUnmatchedUserPage();
+		initializeProcesedUserPage();
+		initializeMapped();
+		initializeCorruptRecordsPage();
+	}); 
+	
+	var selectedTabIdOnSurveyRecordsSection=1;
+	
+	function initializeUnmatchedUserPageOnSelect(){
+		selectedTabIdOnSurveyRecordsSection = $('#new-tab-id').data('iden');
+		$('#download-report').html('Download mismatch records report');
+		initializeUnmatchedUserPage();
+	}
+	
+	function initializeProcesedUserPageOnSelect(){
+		selectedTabIdOnSurveyRecordsSection = $('#processed-tab-id').data('iden');
+		$('#download-report').html('Download processed records report');
+		initializeProcesedUserPage();
+	}
+		
+	function initializeMappedOnSelect(){
+		selectedTabIdOnSurveyRecordsSection = $('#mapped-tab-id').data('iden');
+		$('#download-report').html('Download mapped records report');
+		initializeMapped();
+	}
+	
+	function initializeCorruptRecordsPageOnSelect(){
+		selectedTabIdOnSurveyRecordsSection = $('#corrupt-tab-id').data('iden');
+		$('#download-report').html('Download corrupt records report');
+		initializeCorruptRecordsPage();
+	}
 </script>

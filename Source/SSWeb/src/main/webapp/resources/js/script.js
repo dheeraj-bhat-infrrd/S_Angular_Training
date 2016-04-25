@@ -1415,11 +1415,15 @@ function initializeUnmatchedUserPage() {
 
 var CorruptRecordsSize = 10;
 var CorruptRecordsStartIndex = 0;
-function initializeCorrupRecordsPage(){
+function initializeCorruptRecordsPage(){
 	$('#corrupt').html('');
 	$('#corrupt-paginate-btn').attr("data-start", 0);
 	CorruptRecordsStartIndex = 0;
 	fetchCorruptRecords(CorruptRecordsStartIndex);
+}
+
+function downloadSurveyReport(tabId, companyId){
+	window.location.href = "/downloadusersurveyreport.do?tabId="+ tabId+"&companyId="+companyId;
 }
 
 function bindEventForCorruptRecordPage() {

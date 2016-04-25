@@ -1166,4 +1166,9 @@ public interface CommonConstants
     public static final String ACTION_ENABLED = "ENABLED";
     public static final String ACTION_DISABLED = "DISABLED";
     
+    public static final int UNMATCHED_USER_TABID = 1;
+    public static final int PROCESSED_USER_TABID = 2;
+    public static final int MAPPED_USER_TABID = 3;
+    public static final int CORRUPT_USER_TABID = 4;
+    
 }
