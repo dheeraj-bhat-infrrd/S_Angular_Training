@@ -373,5 +373,7 @@ public interface SolrSearchService
 
 
     public void removeBranchFromSolr( long branchIdToRemove ) throws SolrException, InvalidInputException;
+
+    public void solrReviewCountUpdater();
 }
 // JIRA:SS-62 BY RM 02 EOC

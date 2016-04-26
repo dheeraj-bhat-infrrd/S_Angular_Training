@@ -28,7 +28,6 @@
 			value="com.realtech.socialsurvey.core.starter.SolrReviewCountUpdater" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 				<entry key="solrSearchService" value-ref="solrSearchService" />
 			</map>
 		</property>
