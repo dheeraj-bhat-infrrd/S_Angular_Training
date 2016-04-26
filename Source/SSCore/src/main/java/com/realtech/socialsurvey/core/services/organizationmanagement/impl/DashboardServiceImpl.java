@@ -9,13 +9,11 @@ import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,17 +21,9 @@ import java.util.TreeMap;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFDataFormat;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -51,31 +41,23 @@ import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
-import com.realtech.socialsurvey.core.entities.Survey;
-import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
-import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -85,10 +67,10 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
 
 // JIRA SS-137 BY RM05:BOC
@@ -101,19 +83,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     private static final Logger LOG = LoggerFactory.getLogger( DashboardServiceImpl.class );
 
-    //SS-1354: Using date format from CommonConstants
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
     private static Map<String, Integer> weightageColumns;
 
     @Autowired
-    private SurveyHandler surveyHandler;
+    private SurveyDetailsDao surveyDetailsDao;
 
     @Autowired
-    private SurveyDetailsDao surveyDetailsDao;
-    
-    @Autowired
     private GenericDao<FeedStatus, Long> feedStatusDao;
-    
+
     @Autowired
     private EmailServices emailServices;
 
@@ -127,9 +104,6 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     private OrganizationManagementService organizationManagementService;
 
     @Autowired
-    private UserManagementService userManagementService;
-    
-    @Autowired
     private SocialManagementService socialManagementService;
 
     @Autowired
@@ -141,29 +115,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Autowired
     private UserDao userDao;
 
-    
-    
     @Autowired
     private GenericDao<FileUpload, Long> fileUploadDao;
-    
-    
-
-    @Autowired
-    private RegionDao regionDao;
 
     @Resource
     @Qualifier ( "branch")
     private BranchDao branchDao;
-    
+
     @Autowired
     private HierarchyDownloadService hierarchyDownloadService;
-    
-    @Autowired
-    private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
-    
-    @Autowired
-    private GenericDao<SurveyQuestionsMapping, Long> surveyQuestionsMappingDao;
-    
+
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
 
@@ -173,14 +134,19 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String adminName;
 
+    @Autowired
+    private WorkbookOperations workbookOperations;
+
+    @Autowired
+    private WorkbookData workbookData;
 
 
     @Transactional
     @Override
     public long getAllSurveyCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
     {
-        LOG.info( "Get all survey count for " + columnName + " and value " + columnValue + " with number of days: "
-            + numberOfDays );
+        LOG.info(
+            "Get all survey count for " + columnName + " and value " + columnValue + " with number of days: " + numberOfDays );
 
         if ( columnName == null || columnName.isEmpty() ) {
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
@@ -239,8 +205,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public long getAllSurveyCountForStatistics( String columnName, long columnValue, int numberOfDays )
         throws InvalidInputException
     {
-        LOG.info( "Get all survey count for " + columnName + " and value " + columnValue + " with number of days: "
-            + numberOfDays );
+        LOG.info(
+            "Get all survey count for " + columnName + " and value " + columnValue + " with number of days: " + numberOfDays );
 
         if ( columnName == null || columnName.isEmpty() ) {
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
@@ -396,8 +362,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( columnValue <= 0l ) {
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
-        return surveyDetailsDao
-            .getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false, 0, 0 );
+        return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false, 0,
+            0 );
     }
 
 
@@ -417,7 +383,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException( "Wrong input parameter : passed input parameter user is null" );
         }
         if ( organizationUnitSettings == null ) {
-            throw new InvalidInputException( "Wrong input parameter : passed input parameter organizationUnitSettings is null" );
+            throw new InvalidInputException(
+                "Wrong input parameter : passed input parameter organizationUnitSettings is null" );
         }
 
         int totalWeight = 0;
@@ -494,8 +461,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( socialPosts > CommonConstants.MAX_SOCIAL_POSTS )
             socialPosts = CommonConstants.MAX_SOCIAL_POSTS;
         double normalizedSocialPosts = socialPosts * 25 / CommonConstants.MAX_SOCIAL_POSTS;
-        int overallPercentage = (int) Math.round( normalizedSurveyScore + normalizedProfileCompleteness + normalizedSurveyCount
-            + normalizedSocialPosts );
+        int overallPercentage = (int) Math
+            .round( normalizedSurveyScore + normalizedProfileCompleteness + normalizedSurveyCount + normalizedSocialPosts );
         if ( overallPercentage < 34 )
             badges = 1;
         else if ( overallPercentage < 67 )
@@ -574,8 +541,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         } else if ( columnName.equals( "branchId" ) ) {
             agentIds = userProfileDao.findUserIdsByBranch( columnValue );
         }
-        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount( companyId,
-            agentId, CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds, criteria );
+        Map<Integer, Integer> incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount( companyId, agentId,
+            CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds, criteria );
         LOG.debug( "Aggregating completed and incomplete surveys" );
         Map<Integer, Integer> allSurveysSent = aggregateAllSurveysSent( incompleteSurveys, completedSurveyToBeProcessed );
 
@@ -584,8 +551,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             startDate, endDate, criteria );
 
         LOG.debug( "Getting social posts count." );
-        Map<Integer, Integer> socialPosts = surveyDetailsDao.getSocialPostsAggregationCount( columnName, columnValue,
-            startDate, endDate, criteria );
+        Map<Integer, Integer> socialPosts = surveyDetailsDao.getSocialPostsAggregationCount( columnName, columnValue, startDate,
+            endDate, criteria );
 
         Map<String, Map<Integer, Integer>> map = new HashMap<String, Map<Integer, Integer>>();
         map.put( "clicked", clickedSurveys );
@@ -639,68 +606,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( surveyDetails == null ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter surveyDetails is null" );
         }
-        // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        XSSFDataFormat df = workbook.createDataFormat();
-        CellStyle style = workbook.createCellStyle();
-
-        //SS-1354: Using date format from CommonConstants
-        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
-        Integer counter = 1;
-
-        // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> surveyDetailsToPopulate = new ArrayList<>();
-        for ( SurveyPreInitiation survey : surveyDetails ) {
-            surveyDetailsToPopulate.add( survey.getCustomerFirstName() );
-            surveyDetailsToPopulate.add( survey.getCustomerLastName() );
-            surveyDetailsToPopulate.add( survey.getCustomerEmailId() );
-            surveyDetailsToPopulate.add( survey.getCreatedOn() );
-            surveyDetailsToPopulate.add( survey.getModifiedOn() );
-
-            /*try {
-                surveyDetailsToPopulate.add( surveyHandler.composeLink( survey.getAgentId(), survey.getCustomerEmailId(),
-                    survey.getCustomerFirstName(), survey.getCustomerLastName() ) );
-            } catch ( InvalidInputException e ) {
-                LOG.error( "Invalid input exception caught in downloadIncompleteSurveyData(). Nested exception is ", e );
-            }*/
-            data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
-            surveyDetailsToPopulate = new ArrayList<>();
-        }
-
-        surveyDetailsToPopulate.add( "First Name" );
-        surveyDetailsToPopulate.add( "Last Name" );
-        surveyDetailsToPopulate.add( "Email Id" );
-        surveyDetailsToPopulate.add( "Started On" );
-        surveyDetailsToPopulate.add( "Last Updated On" );
-        //surveyDetailsToPopulate.add( "Link To Survey" );
-
-        data.put( "1", surveyDetailsToPopulate );
-
-        // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
-        int rownum = 0;
-        for ( String key : keyset ) {
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = data.get( key );
-
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
-                    cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Date ) {
-                    cell.setCellStyle( style );
-                    cell.setCellValue( (Date) obj );
-                }
-            }
-        }
-
+        Map<Integer, List<Object>> data = workbookData.getIncompleteSurveyDataToBeWrittenInSheet( surveyDetails );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
     }
 
@@ -717,101 +624,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         if ( socialPosts == null ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter surveyDetails is null" );
         }
-
-        // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        XSSFDataFormat df = workbook.createDataFormat();
-        CellStyle style = workbook.createCellStyle();
-
-        //SS-1354: Using date format from CommonConstants
-        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
-        Integer counter = 1;
-
-        // Sorting SurveyResults
         Collections.sort( socialPosts, new SocialPostsComparator() );
-
-        // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> socialPostsToPopulate = new ArrayList<>();
-        for ( SocialPost post : socialPosts ) {
-            if ( post.getSource() != null && !post.getSource().isEmpty() ) {
-                socialPostsToPopulate.add( post.getPostText() );
-                socialPostsToPopulate.add( DATE_FORMATTER.format( new Date( post.getTimeInMillis() ) ) );
-                socialPostsToPopulate.add( post.getSource() );
-                try {
-                    if ( post.getAgentId() > 0 ) {
-                        socialPostsToPopulate.add( "user" );
-
-                        socialPostsToPopulate.add( organizationManagementService.getAgentSettings( post.getAgentId() )
-                            .getProfileName() );
-
-                    } else if ( post.getBranchId() > 0 ) {
-                        socialPostsToPopulate.add( "branch" );
-                        socialPostsToPopulate.add( organizationManagementService.getBranchSettingsDefault( post.getBranchId() )
-                            .getProfileName() );
-                    } else if ( post.getRegionId() > 0 ) {
-                        socialPostsToPopulate.add( "region" );
-                        socialPostsToPopulate.add( organizationManagementService.getRegionSettings( post.getRegionId() )
-                            .getProfileName() );
-                    } else if ( post.getCompanyId() > 0 ) {
-                        socialPostsToPopulate.add( "company" );
-                        socialPostsToPopulate.add( organizationManagementService.getCompanySettings( post.getCompanyId() )
-                            .getProfileName() );
-                    } else {
-                        socialPostsToPopulate.add( "unavailable" );
-                        socialPostsToPopulate.add( "unavailable" );
-                    }
-                    socialPostsToPopulate.add( post.getPostedBy() );
-                    socialPostsToPopulate.add( post.getPostUrl() );
-                } catch ( InvalidInputException e ) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch ( NoRecordsFetchedException e ) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                data.put( ( ++counter ).toString(), socialPostsToPopulate );
-                socialPostsToPopulate = new ArrayList<>();
-            }
-        }
-
-        // Setting up headers
-        socialPostsToPopulate.add( CommonConstants.HEADER_POST_COMMENT );
-        socialPostsToPopulate.add( CommonConstants.HEADER_POST_DATE );
-        socialPostsToPopulate.add( CommonConstants.HEADER_POST_SOURCE );
-        socialPostsToPopulate.add( CommonConstants.HEADER_POST_LEVEL );
-        socialPostsToPopulate.add( CommonConstants.HEADER_POST_LEVEL_NAME );
-        socialPostsToPopulate.add( CommonConstants.HEADER_POSTED_BY );
-        socialPostsToPopulate.add( CommonConstants.HEADER_POST_URL );
-
-
-        data.put( "1", socialPostsToPopulate );
-
-        // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
-        int rownum = 0;
-        for ( String key : keyset ) {
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = data.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
-                    cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Double )
-                    cell.setCellValue( (Double) obj );
-                else if ( obj instanceof Date ) {
-                    cell.setCellStyle( style );
-                    cell.setCellValue( (Date) obj );
-                }
-            }
-        }
+        Map<Integer, List<Object>> data = workbookData.getSocialMonitorDataToBeWrittenInSheet( socialPosts );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
     }
 
@@ -838,328 +653,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new InvalidInputException( "Invalid input parameter : passed input parameter company id is invalid" );
         }
 
-        // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        XSSFDataFormat df = workbook.createDataFormat();
-        CellStyle style = workbook.createCellStyle();
-
-        //SS-1354: Using date format from CommonConstants
-        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
-        Integer counter = 1;
-
-        // Sorting SurveyResults
         Collections.sort( surveyDetails, new SurveyResultsComparator() );
-
-        // Finding max questions
-        int max = 0;
-        int internalMax = 0;
-        for ( SurveyDetails survey : surveyDetails ) {
-            if ( survey.getSurveyResponse() != null ) {
-                internalMax = survey.getSurveyResponse().size();
-                if ( internalMax > max ) {
-                    max = internalMax;
-                }
-            }
-        }
-
-        if ( max == 0 ) {
-            try {
-                // Find Survey Questions configured for company
-                Company company = companyDao.findById( Company.class, companyId );
-                Map<String, Object> queries = new HashMap<String, Object>();
-                queries.put( CommonConstants.COMPANY_COLUMN, company );
-                queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-
-                List<SurveyCompanyMapping> surveyCompanyMappingList = surveyCompanyMappingDao.findByKeyValue(
-                    SurveyCompanyMapping.class, queries );
-                if ( surveyCompanyMappingList != null && surveyCompanyMappingList.size() > 0 ) {
-
-                    Survey survey = surveyCompanyMappingList.get( 0 ).getSurvey();
-
-                    queries = new HashMap<String, Object>();
-                    queries.put( CommonConstants.SURVEY_COLUMN, survey );
-                    queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-
-                    List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByKeyValueAscending(
-                        SurveyQuestionsMapping.class, queries, CommonConstants.SURVEY_QUESTION_ORDER_COLUMN );
-
-                    if ( surveyQuestionsMappings != null && surveyCompanyMappingList.size() > 0 ) {
-                        max = surveyCompanyMappingList.size();
-                    }
-                }
-            } catch ( Exception e ) {
-                LOG.warn( "Error occurred while fetching survey question details for company id : " + companyId );
-            }
-        }
-
-
-        // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> surveyDetailsToPopulate = new ArrayList<>();
-        for ( SurveyDetails survey : surveyDetails ) {
-            if ( survey.getSurveyResponse() != null ) {
-                String agentName = survey.getAgentName();
-                surveyDetailsToPopulate.add( agentName.substring( 0, agentName.lastIndexOf( ' ' ) ) );
-                surveyDetailsToPopulate.add( agentName.substring( agentName.lastIndexOf( ' ' ) + 1 ) );
-                surveyDetailsToPopulate.add( survey.getCustomerFirstName() );
-                surveyDetailsToPopulate.add( survey.getCustomerLastName() );
-                surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getCreatedOn() ) );
-                surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getModifiedOn() ) );
-                surveyDetailsToPopulate.add( Days.daysBetween( new DateTime( survey.getCreatedOn() ),
-                    new DateTime( survey.getModifiedOn() ) ).getDays() );
-
-                if ( survey.getSource() != null && !survey.getSource().isEmpty() ) {
-                    if ( survey.getSource().equals( CommonConstants.SURVEY_REQUEST_AGENT ) )
-                        surveyDetailsToPopulate.add( "user" );
-                    else
-                        surveyDetailsToPopulate.add( survey.getSource() );
-                } else {
-                    surveyDetailsToPopulate.add( MongoSocialPostDaoImpl.KEY_SOURCE_SS );
-                }
-
-                //add score
-                surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ));
-                for ( SurveyResponse response : survey.getSurveyResponse() ) {
-                    surveyDetailsToPopulate.add( response.getAnswer() );
-                }
-
-                surveyDetailsToPopulate.add( survey.getMood() );
-                surveyDetailsToPopulate.add( survey.getReview() );
-                if ( survey.getMood() != null && survey.getMood().equals( CommonConstants.SURVEY_MOOD_GREAT )
-                    && survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty() ) {
-                    String status = survey.getAgreedToShare();
-                    if ( status.equals( "true" ) ) {
-                        surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
-                    } else {
-                        surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
-                    }
-                } else {
-                    surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
-                }
-                /*if ( survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty() ) {
-                    String status = survey.getAgreedToShare();
-                    if ( status.equals( "true" ) ) {
-                        surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
-                    } else {
-                        surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
-                    }
-                } else if ( survey.getSharedOn() != null && !survey.getSharedOn().isEmpty() ) {
-                    surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
-                } else {
-                    surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
-                }*/
-                
-                
-                Map<Long,Branch> cashedBranches = new HashMap<Long, Branch>();
-                Map<Long,Region> cashedRegions = new HashMap<Long, Region>();
-                
-                if ( survey.getSocialMediaPostDetails() != null ) {
-                    
-                    //for company
-                    Set<String> companySocialMedia = new HashSet<>();
-                    if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null
-                        && survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() != null
-                        && !survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn().isEmpty() ) {
-                        companySocialMedia.addAll( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() );
-                    }
-                    surveyDetailsToPopulate.add( StringUtils.join( companySocialMedia, "," ) );
-                    
-                    //for agent
-                    Set<String> agentSocialMedia = new HashSet<>();
-                    if ( survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
-                        && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null
-                        && !survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn().isEmpty() ) {
-                        agentSocialMedia.addAll( survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() );
-                    }
-                    surveyDetailsToPopulate.add( StringUtils.join( agentSocialMedia, "," ) );
-                    
-                    
-                    //for region
-                    String regionShared = "";
-                    if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null
-                        && !survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList().isEmpty() ) {
-                        for ( RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails()
-                            .getRegionMediaPostDetailsList() ) {
-                            //get region
-                            Region region = cashedRegions.get(regionMediaDetail.getRegionId()); 
-                            if(region == null){
-                                region = regionDao.findById( Region.class, regionMediaDetail.getRegionId() );
-                                cashedRegions.put( regionMediaDetail.getRegionId(), region );
-                            }
-                            //get shared on for region
-                            if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() ) {
-                                regionShared += region.getRegion() + ": { " + StringUtils.join( regionMediaDetail.getSharedOn(), "," )  +" }, ";
-                            }
-                        }
-                    }
-                    if ( regionShared.contains( "}," ) )
-                        regionShared = regionShared.substring( 0, regionShared.lastIndexOf( "," ) );
-                    surveyDetailsToPopulate.add( regionShared );
-                    
-                    //for branch
-                    String branchShared = "";
-                    if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null
-                        && !survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList().isEmpty() ) {
-                        for ( BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails()
-                            .getBranchMediaPostDetailsList() ) {
-                            //get branch
-                            Branch branch= cashedBranches.get( branchMediaDetail.getBranchId() );
-                            if(branch == null){
-                                branch = branchDao.findById( Branch.class, branchMediaDetail.getBranchId() );
-                                cashedBranches.put( branchMediaDetail.getBranchId(), branch );
-                            }
-                            //get shared on for region
-                            if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() ) {
-                                branchShared += branch.getBranch() + ": { " + StringUtils.join( branchMediaDetail.getSharedOn(), "," )  +"}, ";
-                            }
-                        }
-                    }
-                    if ( branchShared.contains( "}," ) )
-                        branchShared = branchShared.substring( 0, branchShared.lastIndexOf( "," ) );
-                    surveyDetailsToPopulate.add( branchShared );
-                }
-
-                data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
-                surveyDetailsToPopulate = new ArrayList<>();
-            } else if ( survey.getSource().equalsIgnoreCase( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
-                if ( survey.getAgentId() > 0 ) {
-                    String agentName = survey.getAgentName();
-                    if ( agentName == null || agentName.isEmpty() ) {
-                        try {
-                            AgentSettings agentSettings = organizationManagementService.getAgentSettings( survey.getAgentId() );
-                            if ( agentSettings.getContact_details() != null
-                                && agentSettings.getContact_details().getName() != null
-                                && !agentSettings.getContact_details().getName().isEmpty() ) {
-                                agentName = agentSettings.getContact_details().getName();
-                            } else {
-                                agentName = "";
-                            }
-                        } catch ( NoRecordsFetchedException e ) {
-                            LOG.warn( "Error occurred while fetching agent settings for id : " + survey.getAgentId() );
-                        }
-                    }
-                    if ( agentName.contains( " " ) ) {
-                        surveyDetailsToPopulate.add( agentName.substring( 0, agentName.lastIndexOf( ' ' ) ) );
-                        surveyDetailsToPopulate.add( agentName.substring( agentName.lastIndexOf( ' ' ) + 1 ) );
-                    } else {
-                        surveyDetailsToPopulate.add( agentName );
-                        surveyDetailsToPopulate.add( "" );
-                    }
-
-                    surveyDetailsToPopulate.add( survey.getCustomerFirstName() );
-                    surveyDetailsToPopulate.add( "" );
-                    surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getCreatedOn() ) );
-                    surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getModifiedOn() ) );
-                    surveyDetailsToPopulate.add( Days.daysBetween( new DateTime( survey.getCreatedOn() ),
-                        new DateTime( survey.getModifiedOn() ) ).getDays() );
-
-                    surveyDetailsToPopulate.add( survey.getSource() );
-
-                    //add score
-                    surveyDetailsToPopulate.add( surveyHandler.getFormattedSurveyScore( survey.getScore() ));
-
-                    // Since Zillow reviews have no Survey Response Data, push empty data
-                    for ( int i = 1; i <= max; i++ ) {
-                        surveyDetailsToPopulate.add( "" );
-                    }
-                    surveyDetailsToPopulate.add( "" );
-                    surveyDetailsToPopulate.add( survey.getReview() );
-                    if ( survey.getAgreedToShare() != null && !survey.getAgreedToShare().isEmpty() ) {
-                        String status = survey.getAgreedToShare();
-                        if ( status.equals( "true" ) ) {
-                            surveyDetailsToPopulate.add( CommonConstants.STATUS_YES );
-                        } else {
-                            surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
-                        }
-                    } else {
-                        surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
-                    }
-                    if ( survey.getSocialMediaPostDetails() != null ) {
-                        Set<String> socialMedia = new HashSet<>();
-                        if ( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails() != null
-                            && survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() != null
-                            && !survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn().isEmpty() ) {
-                            socialMedia.addAll( survey.getSocialMediaPostDetails().getCompanyMediaPostDetails().getSharedOn() );
-                        }
-                        if ( survey.getSocialMediaPostDetails().getAgentMediaPostDetails() != null
-                            && survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() != null
-                            && !survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn().isEmpty() ) {
-                            socialMedia.addAll( survey.getSocialMediaPostDetails().getAgentMediaPostDetails().getSharedOn() );
-                        }
-                        if ( survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList() != null
-                            && !survey.getSocialMediaPostDetails().getRegionMediaPostDetailsList().isEmpty() ) {
-                            for ( RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails()
-                                .getRegionMediaPostDetailsList() ) {
-                                if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() ) {
-                                    socialMedia.addAll( regionMediaDetail.getSharedOn() );
-                                }
-                            }
-                        }
-                        if ( survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList() != null
-                            && !survey.getSocialMediaPostDetails().getBranchMediaPostDetailsList().isEmpty() ) {
-                            for ( BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails()
-                                .getBranchMediaPostDetailsList() ) {
-                                if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() ) {
-                                    socialMedia.addAll( branchMediaDetail.getSharedOn() );
-                                }
-                            }
-                        }
-                        surveyDetailsToPopulate.add( StringUtils.join( socialMedia, "," ) );
-                    }
-
-                    data.put( ( ++counter ).toString(), surveyDetailsToPopulate );
-                    surveyDetailsToPopulate = new ArrayList<>();
-                }
-            }
-        }
-
-        // Setting up headers
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_AGENT_FIRST_NAME );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_AGENT_LAST_NAME );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_CUSTOMER_FIRST_NAME );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_CUSTOMER_LAST_NAME );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_SENT_DATE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_COMPLETED_DATE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_TIME_INTERVAL );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_SOURCE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_SCORE );
-        for ( counter = 1; counter <= max; counter++ ) {
-            surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_QUESTION + counter );
-        }
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_SURVEY_GATEWAY );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_CUSTOMER_COMMENTS );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_AGREED_SHARE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_COMPANY );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_AGENT );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_REGIONS );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_CLICK_THROUGH_FOR_BRANCHES );
-
-        data.put( "1", surveyDetailsToPopulate );
-
-        // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
-        int rownum = 0;
-        for ( String key : keyset ) {
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = data.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
-                    cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Double )
-                    cell.setCellValue( (Double) obj );
-                else if ( obj instanceof Date ) {
-                    cell.setCellStyle( style );
-                    cell.setCellValue( (Date) obj );
-                }
-            }
-        }
+        Map<Integer, List<Object>> data = workbookData.getCustomerSurveyResultDataToBeWrittenInSheet( surveyDetails,
+            companyId );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
     }
 
@@ -1171,81 +668,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public XSSFWorkbook downloadAgentRankingData( List<AgentRankingReport> agentDetails, String fileLocation )
         throws IOException, InvalidInputException
     {
-
         if ( fileLocation == null || fileLocation.isEmpty() ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter fileLocation is null or empty" );
         }
         if ( agentDetails == null ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter agentDetails is null" );
         }
-
-        // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        XSSFDataFormat df = workbook.createDataFormat();
-        CellStyle style = workbook.createCellStyle();
-
-        //SS-1354: Using date format from CommonConstants
-        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );
-        Integer counter = 1;
-
-        // Sorting AgentRankingReports
         Collections.sort( agentDetails, new AgentRankingReportComparator() );
-
-        // This data needs to be written (List<Object>)
-        Map<Integer, List<Object>> data = new TreeMap<>();
-        List<Object> surveyDetailsToPopulate = new ArrayList<>();
-        for ( AgentRankingReport agentDetail : agentDetails ) {
-            surveyDetailsToPopulate.add( agentDetail.getAgentFirstName() );
-            surveyDetailsToPopulate.add( agentDetail.getAgentLastName() );
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis( agentDetail.getRegistrationDate() );
-            surveyDetailsToPopulate.add( DATE_FORMATTER.format( calendar.getTime() ) );
-            surveyDetailsToPopulate.add( agentDetail.getAverageScore() );
-            surveyDetailsToPopulate.add( agentDetail.getCompletedSurveys() );
-            surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() );
-            surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() + agentDetail.getCompletedSurveys() );
-
-            data.put( ( ++counter ), surveyDetailsToPopulate );
-            surveyDetailsToPopulate = new ArrayList<>();
-        }
-
-        // Setting up headers
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_FIRST_NAME );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_LAST_NAME );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_REGISTRATION_DATE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_AVG_SCORE );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_COMPLETED_SURVEY_COUNT );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_INCOMPLETE_SURVEY_COUNT );
-        surveyDetailsToPopulate.add( CommonConstants.HEADER_SUM_SURVEYS );
-
-        data.put( 1, surveyDetailsToPopulate );
-
-        // Iterate over data and write to sheet
-        Set<Integer> keyset = data.keySet();
-        int rownum = 0;
-        for ( int key : keyset ) {
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = data.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
-                    cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Double )
-                    cell.setCellValue( (Double) obj );
-                else if ( obj instanceof Long )
-                    cell.setCellValue( (Long) obj );
-                else if ( obj instanceof Date ) {
-                    cell.setCellStyle( style );
-                    cell.setCellValue( (Date) obj );
-                }
-            }
-        }
+        Map<Integer, List<Object>> data = workbookData.getAgentRankingDataToBeWrittenInSheet( agentDetails );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         return workbook;
     }
 
@@ -1255,8 +686,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      */
     @Override
     @Transactional
-    public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public XSSFWorkbook downloadUserAdoptionReportData( long companyId ) throws InvalidInputException, NoRecordsFetchedException
     {
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
@@ -1271,74 +701,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             throw new NoRecordsFetchedException( "No user adoption data found for the company id : " + companyId );
         }
 
-        // Blank workbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        Integer counter = 1;
-
-        // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> userAdoptionReportToPopulate = new ArrayList<>();
-
-        for ( Object[] row : rows ) {
-            // row 0 - company
-            // row 1 - region
-            // row 2 - branch
-            // row 3 - invited users
-            // row 4 - active users
-            // row 5 - adoption rate
-            userAdoptionReportToPopulate.add( String.valueOf( row[0] ) );
-            if ( row[1] != null && !CommonConstants.DEFAULT_REGION_NAME.equalsIgnoreCase( String.valueOf( row[1] ) ) )
-                userAdoptionReportToPopulate.add( String.valueOf( row[1] ) );
-            else
-                userAdoptionReportToPopulate.add( "" );
-            if ( row[2] != null && !CommonConstants.DEFAULT_BRANCH_NAME.equalsIgnoreCase( String.valueOf( row[2] ) ) )
-                userAdoptionReportToPopulate.add( String.valueOf( row[2] ) );
-            else
-                userAdoptionReportToPopulate.add( "" );
-            Integer userCount = new Integer( String.valueOf( row[3] ) );
-            Integer activeUserCount = new Integer( String.valueOf( row[4] ) );
-            String adoptionRate = String.valueOf( row[5] ).replace( "\\.00", "" );
-            userAdoptionReportToPopulate.add( userCount );
-            userAdoptionReportToPopulate.add( activeUserCount );
-            userAdoptionReportToPopulate.add( adoptionRate != "null" ? adoptionRate : "0%" );
-
-            data.put( ( ++counter ).toString(), userAdoptionReportToPopulate );
-            userAdoptionReportToPopulate = new ArrayList<>();
-        }
-
-        // Setting up headers
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_COMPANY );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_REGION );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_BRANCH );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_INVITED_USERS );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ACTIVE_USERS );
-        userAdoptionReportToPopulate.add( CommonConstants.HEADER_ADOPTION_RATES );
-
-        data.put( "1", userAdoptionReportToPopulate );
-
-        // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
         DecimalFormat decimalFormat = new DecimalFormat( "#0" );
         decimalFormat.setRoundingMode( RoundingMode.DOWN );
-
-        int rownum = 0;
-        for ( String key : keyset ) {
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = data.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
-                    cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Double )
-                    cell.setCellValue( decimalFormat.format( obj ) );
-            }
-        }
+        Map<Integer, List<Object>> data = workbookData.getUserAdoptionReportDataToBeWrittenInSheet( rows );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data, decimalFormat );
         return workbook;
     }
 
@@ -1368,7 +734,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         return filesToBeUploaded;
     }
-    
+
+
     /**
      * 
      * @return
@@ -1380,7 +747,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     {
         LOG.info( "Method getActiveBillingReports called" );
 
-        Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, CommonConstants.FILE_UPLOAD_BILLING_REPORT );
+        Criterion fileUploadTypeCriteria = Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN,
+            CommonConstants.FILE_UPLOAD_BILLING_REPORT );
         List<Integer> statusList = new ArrayList<Integer>();
         //get only active records
         statusList.add( CommonConstants.STATUS_ACTIVE );
@@ -1413,8 +781,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      */
     @Override
     @Transactional
-    public XSSFWorkbook downloadCompanyHierarchyReportData( long companyId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public XSSFWorkbook downloadCompanyHierarchyReportData( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
@@ -1473,8 +841,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
      */
     @Override
     @Transactional
-    public Map<Integer, List<Object>> downloadCompanyUsersReportData( long companyId ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException
+    public Map<Integer, List<Object>> downloadCompanyUsersReportData( long companyId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
     {
         if ( companyId <= 0l ) {
             throw new InvalidInputException( "Invalid input parameter : passed input parameter companyId is invalid" );
@@ -1482,8 +850,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
         Company company = companyDao.findById( Company.class, companyId );
         Region defaultRegion = organizationManagementService.getDefaultRegionForCompany( company );
-        Branch defaultBranchOfDefaultRegion = organizationManagementService.getDefaultBranchForRegion( defaultRegion
-            .getRegionId() );
+        Branch defaultBranchOfDefaultRegion = organizationManagementService
+            .getDefaultBranchForRegion( defaultRegion.getRegionId() );
 
         List<Branch> defaultBranchList = new ArrayList<Branch>();
         List<User> userList = new ArrayList<User>();
@@ -1575,7 +943,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 String regionIdAsAdmin = "";
                 String regionsAsAdminName = "";
                 String branchId = "";
-                String branchsName= "";
+                String branchsName = "";
                 String branchIdAsAdmin = "";
                 String branchNameAsAdmin = "";
                 boolean isCompanyAdminHasAnotherRole = false;
@@ -1598,13 +966,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                                 branchId += userProfile.getBranchId() + ",";
                                 branchsName += userProfile.getBranchName() + ",";
                             }
-                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                            if ( userProfile.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                                 && !agentIds.contains( user.getUserId() ) ) {
                                 agentIds.add( user.getUserId() );
                                 if ( isCompanyAdmin )
                                     isCompanyAdminHasAnotherRole = true;
                             }
-                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                            if ( userProfile.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                                 if ( defaultRegion.getRegionId() != userProfile.getRegionId()
                                     && CommonConstants.DEFAULT_REGION_ID != userProfile.getRegionId()
                                     && !regionIdAsAdmin.contains( String.valueOf( userProfile.getRegionId() ) ) ) {
@@ -1614,7 +984,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                                         isCompanyAdminHasAnotherRole = true;
                                 }
                             }
-                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                            if ( userProfile.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                                 if ( !defaultBranchIdList.contains( userProfile.getBranchId() )
                                     && CommonConstants.DEFAULT_BRANCH_ID != userProfile.getBranchId()
                                     && defaultBranchOfDefaultRegion.getBranchId() != userProfile.getBranchId()
@@ -1645,8 +1016,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 //company admin
                 if ( !isCompanyAdmin || isCompanyAdminHasAnotherRole )
                     userIdList.add( user.getUserId() );
-                
-                if(isCompanyAdmin)
+
+                if ( isCompanyAdmin )
                     companyAdmin = user;
 
             }
@@ -1663,13 +1034,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     userIdSettingsMap.put( agentSettings.getIden(), agentSettings );
                 }
             }
-            
-          //get user social media action detail
+
+            //get user social media action detail
             socialMediaActionMap = socialManagementService
                 .getSocialConnectionsHistoryForEntities( CommonConstants.AGENT_ID_COLUMN, userIdList );
         }
 
-        
+
         latestSurveyCompletedForAgent = surveyDetailsDao.getLatestCompletedSurveyDateForAgents( companyId );
         latestSurveySentForAgent = surveyPreInitiationDao.getLatestSurveySentForAgent( companyId );
 
@@ -1867,10 +1238,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                     profileComplete += " , ";
 
                     //Licenses
-                    if(userSettings.getLicenses() != null )
-                    	profileComplete += "Licenses = Yes";
+                    if ( userSettings.getLicenses() != null )
+                        profileComplete += "Licenses = Yes";
                     else
-                    	profileComplete += "Licenses = No";
+                        profileComplete += "Licenses = No";
                     profileComplete += " , ";
 
 
@@ -2048,8 +1419,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 //lending tree
                 if ( userSettings != null && userSettings.getSocialMediaTokens() != null
                     && userSettings.getSocialMediaTokens().getLendingTreeToken() != null ) {
-                    userReportToPopulate.add( userSettings.getSocialMediaTokens().getLendingTreeToken()
-                        .getLendingTreeProfileLink() );
+                    userReportToPopulate
+                        .add( userSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink() );
                 } else {
                     userReportToPopulate.add( "" );
                 }
@@ -2170,43 +1541,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Override
     @Transactional
-    public void generateCompanyReportAndMail( Map<Integer, List<Object>> usersData, String recipientMailId, String recipientName , Company company )
-        throws InvalidInputException, UndeliveredEmailException
+    public void generateCompanyReportAndMail( Map<Integer, List<Object>> usersData, String recipientMailId,
+        String recipientName, Company company ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "method generateCompanyReportAndMail started" );
-        
-        if(company == null){
-            throw new InvalidInputException("Passed parameter company is null");
-        }
-        // Iterate over data and write to sheet
-        DecimalFormat decimalFormat = new DecimalFormat( "#0" );
-        decimalFormat.setRoundingMode( RoundingMode.DOWN );
 
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-
-        // Iterate over data and write to sheet
-        Set<Integer> keyset = usersData.keySet();
-
-        int rownum = 0;
-        for ( Integer key : keyset ) {
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = usersData.get( key );
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                if ( obj instanceof Long )
-                    cell.setCellValue( String.valueOf( (Long) obj ) );
-                //resize column 
-                //sheet.autoSizeColumn( cellnum - 1 );
-
-            }
-
+        if ( company == null ) {
+            throw new InvalidInputException( "Passed parameter company is null" );
         }
 
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( usersData );
 
         // Create file and write report into it
         boolean excelCreated = false;
@@ -2230,7 +1574,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             excelCreated = false;
         } finally {
             try {
-                if(fileOutput != null)
+                if ( fileOutput != null )
                     fileOutput.close();
                 if ( inputStream != null ) {
                     inputStream.close();
@@ -2262,13 +1606,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             LOG.debug( "sending mail to : " + name + " at : " + mailId );
             String subject = CommonConstants.COMPANY_USERS_REPORT_MAIL_SUBJ + company.getCompany();
             String body = CommonConstants.COMPANY_USERS_REPORT_MAIL_BODY;
-            emailServices.sendCustomMail(name, recipientMailId, subject, body, attachmentsDetails);
+            emailServices.sendCustomMail( name, recipientMailId, subject, body, attachmentsDetails );
         }
 
         LOG.info( "method generateCompanyReportAndMail ended" );
     }
-    
-    
+
+
     @Override
     @Transactional
     public void generateCompanyHierarchyReportAndMail( long companyId, String recipientMailId, String recipientName )

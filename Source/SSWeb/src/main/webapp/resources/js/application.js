@@ -5408,6 +5408,8 @@ function initSurveyWithUrl(q) {
 				lastName = data.responseJSON.customerLastName;
 				surveyId = data.responseJSON.surveyId;
 				paintSurveyPage(data);
+                var message = $("#pst-srvy-div .bd-check-txt").html();
+                $("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 			}
 		},
 		error : function(e) {

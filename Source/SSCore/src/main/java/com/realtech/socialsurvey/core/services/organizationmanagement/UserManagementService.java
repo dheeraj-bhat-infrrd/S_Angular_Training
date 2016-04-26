@@ -595,7 +595,12 @@ public interface UserManagementService
 
     public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
         throws InvalidInputException, SolrException;
-    
+
+    /**
+     * Method to map CRM Data with AgentIds
+     */
+    public void crmDataAgentIdMApper();
+
     public User getAdminUserByCompanyId(long companyId);
 }
 // JIRA SS-34 BY RM02 BOC
