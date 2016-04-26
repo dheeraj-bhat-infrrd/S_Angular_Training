@@ -1407,3 +1407,9 @@ function getDateFromWeekAndYear(year, weekNumber) {
 	date = date.toString("MMM d, yyyy");
 	return date;
 }
+//Function for Html encoding
+function escapeHtml(stringInput) {
+var div = document.createElement('div');
+div.appendChild(document.createTextNode(stringInput));
+return div.innerHTML;
+}

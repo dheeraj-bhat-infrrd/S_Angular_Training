@@ -119,7 +119,7 @@
 				</div>
 				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide"></div> -->
 			</div>
-			<div class="ppl-content">${reviewItem.review}</div>
+			<div class="ppl-content">${fn:escapeXml(reviewItem.review)}</div>
 		</div>
 	</c:forEach>
 </c:if>

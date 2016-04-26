@@ -184,7 +184,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="ppl-content">${feedback.review}</div>
+			<div class="ppl-content">${fn:escapeXml(feedback.review)}</div>
 		</div>
 	</c:forEach>
 </c:if>
