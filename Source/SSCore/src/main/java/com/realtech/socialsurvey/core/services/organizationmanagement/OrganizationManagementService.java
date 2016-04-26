@@ -1369,4 +1369,6 @@ public interface OrganizationManagementService
     public void deactivatedAccountPurger();
 
     public void hierarchySettingsCorrector();
+
+    public void imageProcessorStarter();
 }
