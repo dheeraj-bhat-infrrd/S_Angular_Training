@@ -236,5 +236,7 @@ public interface SocialManagementService
         throws InvalidInputException, NoRecordsFetchedException;
 
     public void imcompleteSocialPostReminderSender();
+
+    public void zillowReviewProcessorStarter();
 }
 // JIRA SS-34 BY RM02 BOC
