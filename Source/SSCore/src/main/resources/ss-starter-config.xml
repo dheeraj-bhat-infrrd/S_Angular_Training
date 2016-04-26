@@ -81,7 +81,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="reviseSubscription" value-ref="reviseSubscription" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
