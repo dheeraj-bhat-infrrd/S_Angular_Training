@@ -304,7 +304,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
