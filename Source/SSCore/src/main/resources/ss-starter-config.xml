@@ -68,19 +68,7 @@
 			value="com.realtech.socialsurvey.core.starter.IncompleteSurveyReminderSender" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="surveyHandler" value-ref="surveyHandler" />
-				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="userManagementService" value-ref="userManagementService" />
-				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="profileManagementService" value-ref="profileManagementService" />
-				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
-				<entry key="applicationBaseUrl" value="${APPLICATION_BASE_URL}" />
-				<entry key="applicationLogoUrl" value="${APPLICATION_LOGO_URL}" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="urlService" value-ref="urlService" />
-				<entry key="fileOperations" value-ref="fileOperations" />
-				<entry key="paramOrderTakeSurveyReminder" value="${PARAM_ORDER_TAKE_SURVEY_REMINDER}" />
-				<entry key="paramOrderTakeSurvey" value="${PARAM_ORDER_TAKE_SURVEY}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
