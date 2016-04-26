@@ -1,6 +1,44 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,36 +71,9 @@ import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFDataFormat;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
 
 @DependsOn ( "generic")
@@ -239,6 +250,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private GenericDao<Event, Long> eventDao;
+
+    @Autowired
+    private WorkbookOperations workbookOperations;
+
+    @Autowired
+    private WorkbookData workbookData;
 
 
     /**
@@ -5460,68 +5477,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     public XSSFWorkbook downloadCompanyReport( List<Company> companies, String fileName )
     {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        // Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet();
-        XSSFDataFormat df = workbook.createDataFormat();
-        CellStyle style = workbook.createCellStyle();
-        style.setDataFormat( df.getFormat( "d-mm-yyyy" ) );
-        Integer counter = 1;
-        int max = 0;
-        int internalMax = 0;
-
-        // This data needs to be written (List<Object>)
-        Map<String, List<Object>> data = new TreeMap<>();
-        List<Object> companyDetailsToPopulate = new ArrayList<>();
-        for ( Company company : companies ) {
-            internalMax = 0;
-            companyDetailsToPopulate.add( company.getCompany() );
-            if ( company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() )
-                companyDetailsToPopulate.add( company.getLicenseDetails().get( 0 ).getAccountsMaster().getAccountName() );
-            else
-                companyDetailsToPopulate.add( "" );
-            companyDetailsToPopulate.add( company.getCreatedOn() );
-            companyDetailsToPopulate.add( company.getDisplayBillingMode() );
-            if ( company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty() )
-                companyDetailsToPopulate.add( "Registered" );
-            else
-                companyDetailsToPopulate.add( "Not registered" );
-            data.put( ( ++counter ).toString(), companyDetailsToPopulate );
-            companyDetailsToPopulate = new ArrayList<>();
-            if ( internalMax > max )
-                max = internalMax;
-        }
-
-        companyDetailsToPopulate.add( "Company Name" );
-        companyDetailsToPopulate.add( "Account Type" );
-        companyDetailsToPopulate.add( "Created on" );
-        companyDetailsToPopulate.add( "Billing mode" );
-        companyDetailsToPopulate.add( "Status" );
-
-        data.put( "1", companyDetailsToPopulate );
-
-        // Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
-        int rownum = 0;
-        for ( String key : keyset ) {
-            Row row = sheet.createRow( rownum++ );
-            List<Object> objArr = data.get( key );
-
-            int cellnum = 0;
-            for ( Object obj : objArr ) {
-                Cell cell = row.createCell( cellnum++ );
-                if ( obj instanceof String )
-                    cell.setCellValue( (String) obj );
-                else if ( obj instanceof Integer )
-                    cell.setCellValue( (Integer) obj );
-                else if ( obj instanceof Date ) {
-                    cell.setCellStyle( style );
-                    cell.setCellValue( (Date) obj );
-                }
-            }
-        }
-
+        Map<Integer, List<Object>> data = workbookData.getCompanyReportDataToBeWrittenInSheet( companies );
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data, "d-mm-yyyy" );
         return workbook;
     }
 

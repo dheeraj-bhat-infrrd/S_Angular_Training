@@ -2066,7 +2066,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         throws InvalidInputException, NoRecordsFetchedException
     {
         SurveyPreInitiationList surveyPreInitiationListVO = null;
-        Map<String, List<Object>> data = null;
+        Map<Integer, List<Object>> data = null;
         XSSFWorkbook workbook = null;
         if ( tabId == CommonConstants.UNMATCHED_USER_TABID ) {
             surveyPreInitiationListVO = this.getUnmatchedPreInitiatedSurveys( companyId, -1, -1 );
