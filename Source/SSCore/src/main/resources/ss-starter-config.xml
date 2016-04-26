@@ -55,15 +55,7 @@
 			value="com.realtech.socialsurvey.core.starter.IncompleteSocialPostReminderSender" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="urlGenerator" value-ref="urlGenerator" />
-				<entry key="surveyHandler" value-ref="surveyHandler" />
-				<entry key="emailServices" value-ref="emailServices" />
-				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="socialManagementService" value-ref="socialManagementService" />
-				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="utils" value-ref="utils" />
-				<entry key="fbAppId" value="${FB_CLIENT_ID}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />

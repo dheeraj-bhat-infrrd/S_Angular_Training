@@ -234,5 +234,7 @@ public interface SocialManagementService
 
     public XSSFWorkbook getUserSurveyReportByTabId( int tabId, long companyId )
         throws InvalidInputException, NoRecordsFetchedException;
+
+    public void imcompleteSocialPostReminderSender();
 }
 // JIRA SS-34 BY RM02 BOC
