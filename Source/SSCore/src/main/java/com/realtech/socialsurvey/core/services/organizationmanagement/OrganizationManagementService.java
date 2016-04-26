@@ -1365,4 +1365,6 @@ public interface OrganizationManagementService
 
 
     public void forceDeleteDisabledAccount( long companyId, long userId );
+
+    public void deactivatedAccountPurger();
 }

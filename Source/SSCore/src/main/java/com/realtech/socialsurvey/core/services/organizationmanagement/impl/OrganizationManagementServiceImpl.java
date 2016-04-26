@@ -1,31 +1,37 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.annotation.Resource;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.*;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.*;
+import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -46,99 +52,16 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
-import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
-import com.realtech.socialsurvey.core.commons.Utils;
-import com.realtech.socialsurvey.core.dao.BranchDao;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
-import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
-import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.RegionDao;
-import com.realtech.socialsurvey.core.dao.RemovedUserDao;
-import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.dao.UserInviteDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
-import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.CRMInfo;
-import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
-import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
-import com.realtech.socialsurvey.core.entities.DisabledAccount;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.Event;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.FileUpload;
-import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.LockSettings;
-import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
-import com.realtech.socialsurvey.core.entities.MailContent;
-import com.realtech.socialsurvey.core.entities.MailContentSettings;
-import com.realtech.socialsurvey.core.entities.MailIdSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
-import com.realtech.socialsurvey.core.entities.RetriedTransaction;
-import com.realtech.socialsurvey.core.entities.StateLookup;
-import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.UploadStatus;
-import com.realtech.socialsurvey.core.entities.UploadValidation;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserApiKey;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
-import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.OrganizationUnit;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.DatabaseException;
-import com.realtech.socialsurvey.core.exception.FatalException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
-import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
+import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @DependsOn ( "generic")
@@ -268,6 +191,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     String paramOrderIncompleteSurveyReminder;
     @Value ( "${PARAM_ORDER_SURVEY_COMPLETION_UNPLEASANT_MAIL}")
     String paramOrderSurveyCompletionUnpleasantMail;
+    @Value( "${ACCOUNT_PERM_DELETE_SPAN}" )
+    String accountPermDeleteSpan;
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
@@ -7005,6 +6930,89 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             account.setModifiedBy(
                 userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
             disabledAccountDao.update( account );
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public void deactivatedAccountPurger() {
+        try {
+            // update last start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER, CommonConstants.BATCH_NAME_DEACTIVATED_ACCOUNT_PURGER );
+
+            int maxDaysToPurgeAccount = Integer.parseInt( accountPermDeleteSpan );
+            List<DisabledAccount> disabledAccounts = getAccountsForPurge( maxDaysToPurgeAccount );
+            for ( DisabledAccount account : disabledAccounts ) {
+                try {
+                    sendAccountDeletedNotificationMail( account );
+                    purgeCompanyDetails( account.getCompany() );
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Invalid Input Exception caught while sending email to the company admin. Nested exception is ",
+                        e );
+                }
+            }
+
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER );
+            LOG.info( "Completed DeactivatedAccountPurger" );
+        } catch ( Exception e ) {
+            LOG.error( "Error in DeactivatedAccountPurger", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER, e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_DEACTIVATED_ACCOUNT_PURGER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in DeactivatedAccountPurger " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+    /*
+     * Method to purge all the details of the company
+    */
+    @Transactional
+    private void purgeCompanyDetails( Company company )
+    {
+        LOG.debug( "Method to delete all the company details purgeCompany() started." );
+
+        try {
+            User user = userManagementService.getAdminUserByCompanyId( company.getCompanyId() );
+            deleteCompany( company, user );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
+        } catch ( SolrException e ) {
+            LOG.error( "SolrException caught in purgeCompany(). Nested exception is ", e );
+        }
+
+        LOG.debug( "Method to delete all the company details purgeCompany() finished." );
+    }
+
+
+    private void sendAccountDeletedNotificationMail( DisabledAccount disabledAccount ) throws InvalidInputException
+    {
+        // Send email to notify each company admin that the company account will be deactivated after 30 days so that they can take required steps.
+        Company company = disabledAccount.getCompany();
+        Map<String, String> companyAdmin = new HashMap<String, String>();
+        try {
+            companyAdmin = solrSearchService.getCompanyAdmin( company.getCompanyId() );
+        } catch ( SolrException e1 ) {
+            LOG.error(
+                "SolrException caught in sendAccountDeletedNotificationMail() while trying to send mail to the company admin ." );
+        }
+        try {
+            if ( companyAdmin != null && companyAdmin.get( "emailId" ) != null )
+                emailServices.sendAccountDeletionMail( companyAdmin.get( "emailId" ), companyAdmin.get( "displayName" ),
+                    companyAdmin.get( "loginName" ) );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ",
+                e );
         }
     }
 }

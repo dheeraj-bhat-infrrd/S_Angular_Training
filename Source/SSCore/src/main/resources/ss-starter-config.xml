@@ -196,11 +196,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="emailServices" value-ref="emailServices" />
-				<entry key="solrSearchService" value-ref="solrSearchService" />
-				<entry key="accountPermDeleteSpan" value="${ACCOUNT_PERM_DELETE_SPAN}" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="userManagementService" value-ref="userManagementService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
