@@ -1,9 +1,4 @@
-$('#reg-start-individual').click( function() {
-    $(this).toggleClass("reg-individual-click");
-  } );
-$('#reg-start-business').click( function() {
-    $(this).toggleClass("reg-business-click");
-  } );
+
 function showSigupContent(url) {
 	
 	closeMoblieScreenMenu();
@@ -14,7 +9,11 @@ var app = angular.module('SocialSurvey',['ngRoute']);
 app.config(['$routeProvider', function ($routeProvider) {
 
     $routeProvider
-    .when("/s", {
+    .when("/accountsignup", {
+        templateUrl: "../../resources/html/accountsignup.html",
+        controller: "accountSignupController"
+    })
+    .when("/linkedin", {
         templateUrl: "../../resources/html/linkedIn.html",
         controller: "linkedInController"
     })

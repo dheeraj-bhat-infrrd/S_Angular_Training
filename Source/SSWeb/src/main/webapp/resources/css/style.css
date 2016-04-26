@@ -357,7 +357,7 @@
 .reg-ss-logo{
 	width:160px;
 	height:30px;
-	margin:20px 0 0 20px;
+	margin:20px 0 20 20px;
 }
 .reg-right-container{
 	background-color:#326AAD;
@@ -395,7 +395,7 @@
 .reg-pln-btn{
 	background-color: #C4C4C4;
     height: 50px;
-    line-height: 22px;
+    line-height: 42px;
     width: 120px;
     text-align: center;
     color: #fff;
@@ -409,21 +409,6 @@
 	font-size: 14px;
     font-weight: 600 !important;
     margin: 10px 0;
-}
-#reg-start-individual:hover{
-	background-color:#37A872;
-}
-#reg-start-business:hover{
-	background-color:#4F85CA;
-}
-.reg-individual-click{
-	background-color:#37A872;
-}
-.reg-business-click{
-	background-color:#4F85CA;
-}
-#reg-nav>.active>a{
-	background-color:#FFFFFf !important;
 }
 .reg-linkedin-border{
 	border: 1px solid #D7D7D7;
@@ -491,6 +476,67 @@
     margin-right: 10px;
 }
 
+.btn-breadcrumb .btn:not(:last-child):after {
+  content: " ";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 17px solid transparent;
+  border-bottom: 17px solid transparent;
+  border-left: 10px solid white;
+  position: absolute;
+  top: 50%;
+  margin-top: -17px;
+  left: 100%;
+  z-index: 3;
+}
+.btn-breadcrumb .btn:not(:last-child):before {
+  content: " ";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 17px solid transparent;
+  border-bottom: 17px solid transparent;
+  border-left: 10px solid rgb(173, 173, 173);
+  position: absolute;
+  top: 50%;
+  margin-top: -17px;
+  margin-left: 1px;
+  left: 100%;
+  z-index: 3;
+}
+.btn-breadcrumb .btn.btn-primary:not(:last-child):after {
+  border-left: 10px solid #428bca;
+}
+.btn-breadcrumb .btn.btn-primary:not(:last-child):before {
+  border-left: 10px solid #357ebd;
+}
+.btn-breadcrumb .btn.btn-primary:hover:not(:last-child):after {
+  border-left: 10px solid #3276b1;
+}
+.btn-breadcrumb .btn.btn-primary:hover:not(:last-child):before {
+  border-left: 10px solid #285e8e;
+}
+.btn-group{
+	width:100%;
+}
+.btn-group>.btn{
+	width:33.33%
+}
+.btn{
+	border-radius:0px !important;
+}
+
+/** The Spacing **/
+.btn-breadcrumb .btn {
+  padding:6px 12px 6px 24px;
+}
+.btn-breadcrumb .btn:first-child {
+  padding:6px 6px 6px 10px;
+}
+.btn-breadcrumb .btn:last-child {
+  padding:6px 18px 6px 24px;
+}
 //drop down
 .dropzone,
 .dropzone * {

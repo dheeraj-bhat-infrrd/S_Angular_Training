@@ -54,11 +54,11 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
-	
+	<script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
 </head>
 <body ng-app="SocialSurvey">
 
-
+ 
 <div ng-view></div>
 
 </div>
@@ -66,7 +66,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-route.min.js"></script>
-<script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
+
  <script src="${initParam.resourcesPath}/resources/js/signup.js"></script> 
  <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
