@@ -328,7 +328,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.SURVEY_CLICKED_COLUMN, true );
-        update.set( CommonConstants.CREATED_ON, new Date() );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateSurveyAsClicked() to mark survey as clicked finished." );
