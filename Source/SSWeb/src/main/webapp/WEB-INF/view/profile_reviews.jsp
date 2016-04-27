@@ -118,8 +118,25 @@
 					</span>
 				</div>
 				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide"></div> -->
+				
 			</div>
-			<div class="ppl-content">${reviewItem.review}</div>
+			<c:choose>
+				<c:when test="${fn:length(reviewItem.review)>250}">
+					<div class="ppl-content">
+						<span class="review-complete-txt">${reviewItem.review}</span>
+						<c:if test="${reviewItem.source=='Zillow' }">
+                          <br><span><a class="view-zillow-link hide" href="{feedback.sourceId}"  target="_blank">View on zillow</a></span>
+						</c:if>
+						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
+							<span class="review-more-button">read full review</span>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<div class="ppl-content">${reviewItem.review}</div>
+				</c:otherwise>
+			</c:choose>
+			
+			<%-- <div class="ppl-content">${reviewItem.review}</div> --%>
 		</div>
 	</c:forEach>
 </c:if>

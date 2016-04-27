@@ -11004,3 +11004,14 @@ function paintReviews(result, isRequestFromDashBoard){
 		$(window).trigger('scroll');
 	}, 100);
 }
+$(document).on('click','.review-more-button',function(){
+	$(this).parent().find('.review-less-text').hide();
+	$(this).parent().find('.review-complete-txt').show();
+	$(this).parent().find('.view-zillow-link').show();
+	$(this).hide();
+});
+/*$('.review-more-button').click(function(){
+	$(this).parent().find('.review-less-text').hide();
+	$(this).parent().find('.review-complete-txt').show();
+	$(this).hide();
+});*/
