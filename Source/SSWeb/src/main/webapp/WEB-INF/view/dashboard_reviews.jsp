@@ -184,7 +184,22 @@
 					</div>
 				</div>
 			</div>
-			<div class="ppl-content">${feedback.review}</div>
+			<c:choose>
+				<c:when test="${fn:length(feedback.review)>250}">
+					<div class="ppl-content">
+						<span class="review-complete-txt">${feedback.review}</span>
+						<c:if test="${feedback.source=='Zillow' }">
+                          <br><span><a class="view-zillow-link hide" href="{feedback.sourceId}"  target="_blank">View on zillow</a></span>
+						</c:if>
+						<span class="review-less-text">${fn:substring(feedback.review, 0, 250)}</span>
+							<span class="review-more-button">read full review</span>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<div class="ppl-content">${feedback.review}</div>
+				</c:otherwise>
+			</c:choose>
+
 		</div>
 	</c:forEach>
 </c:if>

@@ -835,7 +835,7 @@ function paintReviews(result){
 			}else{
 				reviewsHtml += '</span>';
 			}
-			reviewsHtml +='<span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
+			reviewsHtml +='<span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">read full review</span>';
 		} else {
 			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
 		}
