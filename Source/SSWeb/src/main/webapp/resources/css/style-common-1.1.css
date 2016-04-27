@@ -595,6 +595,7 @@ input#find-pro-submit{
 
 .ctnt-list-item-txt-wrap{
 	overflow: hidden;
+	width:60%;
 }
 
 .ctnt-list-header{

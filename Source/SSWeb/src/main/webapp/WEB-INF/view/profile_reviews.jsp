@@ -135,7 +135,7 @@
 					<div class="ppl-content">
 						<span class="review-complete-txt">${reviewItem.review}</span>
 						<c:if test="${reviewItem.source=='Zillow' }">
-                          <br><span><a class="view-zillow-link hide" href="{reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
+                          <br><span><a class="view-zillow-link hide" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
 						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
