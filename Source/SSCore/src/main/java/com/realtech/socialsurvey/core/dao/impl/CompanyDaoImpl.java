@@ -95,10 +95,13 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
     @SuppressWarnings ( "unchecked")
     @Override
     public List<Company> searchCompaniesByNameAndKeyValue( String namePattern, int accountType, int status,
-        boolean inCompleteCompany )
+        boolean inCompleteCompany , Timestamp startDate )
     {
         Criteria criteria = getSession().createCriteria( Company.class );
         criteria.add( Restrictions.ilike( "company", namePattern, MatchMode.START ) );
+        
+        if(startDate != null)
+            criteria.add( Restrictions.ge( "createdOn", startDate ) );
 
         if ( inCompleteCompany ) {
             criteria.add( Restrictions.sqlRestriction( "COMPANY_ID NOT in (select ld.COMPANY_ID from LICENSE_DETAILS ld)" ) );

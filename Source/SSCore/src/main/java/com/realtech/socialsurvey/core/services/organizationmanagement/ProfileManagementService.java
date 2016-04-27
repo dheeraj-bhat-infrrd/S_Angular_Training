@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
 import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -407,7 +408,7 @@ public interface ProfileManagementService
         String recipientName ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException, NonFatalException;
+    public String updateEmailVerificationStatus( String urlParamsStr ) throws InvalidInputException, NonFatalException;
 
 
     /**
@@ -636,4 +637,18 @@ public interface ProfileManagementService
 
 
     void removeTokensFromProfile( OrganizationUnitSettings profile );
+    
+    /**
+     * 
+     * @param mailIds
+     * @param companyId
+     * @param entityType
+     * @param entitySettings
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    void generateAndSendEmailVerificationRequestLinkToAdmin( List<MiscValues> mailIds, long companyId, String entityType,
+        OrganizationUnitSettings entitySettings ) throws InvalidInputException, UndeliveredEmailException;
+
+    public void imageLoader();
 }

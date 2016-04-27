@@ -14,3 +14,4 @@ Source/.idea/
 Source/**/*.eml
 Source/**/*.iml
 Source/standalone/
+/**/target/

@@ -14,6 +14,14 @@ namespace EncompassSocialSurvey.Service
 
         private static string tempFolderPath = EncompassSocialSurveyConfiguration.TempFolderPath;
 
+        #region public methods
+
+        /// <summary>
+        /// Gets crm batch tracker
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public CRMBatchTrackerEntity getCrmBatchTracker(long companyId, string source)
         {
             Logger.Debug("Inside method getCrmBatchTracker");
@@ -21,7 +29,7 @@ namespace EncompassSocialSurvey.Service
             CRMBatchTrackerEntity entity = null;
             try
             {
-                entity = loanRepo.getCrmBatchTrackerByCompanyAndSource(companyId, source);
+                entity = loanRepo.GetCrmBatchTrackerByCompanyAndSource(companyId, source);
             }
             catch (Exception ex)
             {
@@ -31,6 +39,11 @@ namespace EncompassSocialSurvey.Service
             return entity;
         }
 
+        /// <summary>
+        /// checks if company exist or not
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
         public Boolean isCompanyActive(long companyId)
         {
             Logger.Debug("Inside method getCompany");
@@ -38,7 +51,7 @@ namespace EncompassSocialSurvey.Service
             Company company = null;
             try
             {
-                company = loanRepo.getCompanyById(companyId);
+                company = loanRepo.GetCompanyById(companyId);
                 if(company.status.Equals(EncompassSocialSurveyConstant.COMPANY_INACTIVE)){
                     return false;
                 }else{
@@ -51,6 +64,11 @@ namespace EncompassSocialSurvey.Service
                 throw;
             }
         }
+
+        /// <summary>
+        /// updates crm batch tracker
+        /// </summary>
+        /// <param name="entity"></param>
         public void UpdateCrmbatchTracker(CRMBatchTrackerEntity entity)
         {
             Logger.Debug("Inside method updateCrmBatchTracker");
@@ -65,6 +83,11 @@ namespace EncompassSocialSurvey.Service
             }
 
         }
+
+        /// <summary>
+        /// Insert crm batch tracker
+        /// </summary>
+        /// <param name="entity"></param>
         public void InsertCrmBatchTracker(CRMBatchTrackerEntity entity)
         {
             Logger.Info("Inside methid InsertCrmBatchTracker for Company " + entity.CompanyId);
@@ -82,6 +105,12 @@ namespace EncompassSocialSurvey.Service
             
 
         }
+
+        /// <summary>
+        /// Insert Loan
+        /// </summary>
+        /// <param name="loansVM"></param>
+        /// <returns></returns>
         public bool InsertLoans(List<LoanViewModel> loansVM)
         {
             Logger.Info("Entering the method LoanService.InsertLoans(List<>):");
@@ -109,8 +138,13 @@ namespace EncompassSocialSurvey.Service
             return returnValue;
         }
 
-
-        public void sendLoanReportToEmailAddresses(String filePath, String emailAddresses, int noOfDays)
+        /// <summary>
+        /// send loan reports
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="emailAddresses"></param>
+        /// <param name="noOfDays"></param>
+        public void SendLoanReportToEmailAddresses(String filePath, String emailAddresses, int noOfDays)
         {
             Logger.Info("Entering the method LoanService.sendLoanReportToEmailAddresses");
             try
@@ -134,8 +168,13 @@ namespace EncompassSocialSurvey.Service
             }
         }
 
-
-        public String createLoanListCSV(List<LoanViewModel> loansVM, String companyName)
+        /// <summary>
+        /// creates csv report
+        /// </summary>
+        /// <param name="loansVM"></param>
+        /// <param name="companyName"></param>
+        /// <returns></returns>
+        public String CreateLoanListCSV(List<LoanViewModel> loansVM, String companyName)
         {
             Logger.Info("Entering the method LoanService.createLoanListCSV for company : " + companyName);
             try
@@ -163,7 +202,14 @@ namespace EncompassSocialSurvey.Service
                 throw e;
             }
         }
-        public String createExcelSpreadSheetForLoanlist(List<LoanViewModel> loansVM , String companyName)
+
+        /// <summary>
+        /// cretate excel sheet for loans
+        /// </summary>
+        /// <param name="loansVM"></param>
+        /// <param name="companyName"></param>
+        /// <returns></returns>
+        public String CreateExcelSpreadSheetForLoanlist(List<LoanViewModel> loansVM , String companyName)
         {
             Logger.Info("Entering the method LoanService.createExcelSpreadSheetForLoanlist for company : " + companyName);
             Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
@@ -219,5 +265,27 @@ namespace EncompassSocialSurvey.Service
             }                   
         }
 
+        /// <summary>
+        /// insert crm batch tracker history with count of records fetched
+        /// </summary>
+        /// <param name="entity"></param>
+        public void InsertCrmBatchTrackerHistory(CrmBatchTrackerHistory entity)
+        {
+            Logger.Info("Inside method LoanService.InsertCrmBatchTrackerHistory for CRM ID: " + entity.CrmBatchTrackerID);
+            Logger.Debug("Insert the record into db");
+            LoanRepository loanRepo = new LoanRepository();
+            try
+            {
+                loanRepo.InsertCRMBatchTrackerHistory(entity);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Caught an exception: LoanService.InsertCrmBatchTrackerHistory(): ", ex);
+                throw;
+            }
+            Logger.Info("Exit method LoanService.InsertCrmBatchTrackerHistory for CRM ID: " + entity.CrmBatchTrackerID);
+        }
+
+        #endregion
     }
 }

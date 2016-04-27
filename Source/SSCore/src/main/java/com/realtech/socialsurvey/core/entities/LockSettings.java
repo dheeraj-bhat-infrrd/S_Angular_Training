@@ -12,6 +12,7 @@ public class LockSettings
     private boolean isAboutMeLocked;
     private boolean isAddressLocked;
     private boolean isMinScoreLocked;
+    private boolean isWorkEmailLocked;
 
 
     public boolean getIsLogoLocked()
@@ -119,6 +120,18 @@ public class LockSettings
     public void setMinScoreLocked( boolean isMinScoreLocked )
     {
         this.isMinScoreLocked = isMinScoreLocked;
+    }
+
+
+    public boolean getIsWorkEmailLocked()
+    {
+        return isWorkEmailLocked;
+    }
+
+
+    public void setWorkEmailLocked( boolean isWorkEmailLocked )
+    {
+        this.isWorkEmailLocked = isWorkEmailLocked;
     }
 
 

@@ -264,9 +264,9 @@
     .pro-inp{
         width: 219px;
     }
-    .ctnt-list-item-txt-wrap{
+   /*  .ctnt-list-item-txt-wrap{
     	width: 257px !important;
-    }
+    } */
     .ctnt-review-btn{
     	width:125px;
     }
@@ -321,18 +321,18 @@
     .pro-inp{
         width: 223px;
     }
-    .ctnt-list-item-txt-wrap{
+    /* .ctnt-list-item-txt-wrap{
     	width: 385px !important;
-    }
+    } */
 }
 
 
 
 /* ============== LARGE SIZED SCREENS ==============*/
 @media (min-width: 1200px) {
-    .ctnt-list-item-txt-wrap{
+   /*  .ctnt-list-item-txt-wrap{
 		width:537px !important;
-	}
+	} */
 }
 
 

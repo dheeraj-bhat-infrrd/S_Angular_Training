@@ -366,7 +366,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
-	$.ajax({
+	return $.ajax({
 		url : url,
 		headers: {          
             Accept : "text/plain; charset=utf-8"   
@@ -388,6 +388,9 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			if(e.status == 0) {
+				return;
+			}
 			redirectErrorpage();
 		}
 	});
@@ -395,35 +398,30 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 
 function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	var ratingIntVal = 0;
-
+/*
 	if (ratingIntVal % 1 == 0) {
 		ratingIntVal = parseInt(rating);
 	} else {
 		ratingIntVal = parseInt(rating) + 1;
 	}
 
-	/*if (ratingIntVal == 0) {
-		ratingIntVal = 1;
-	}
-*/
+	var roundedFloatingVal = parseFloat(rating).toFixed(2);
+	var ratingImgHtml = "";*/
 	var roundedFloatingVal = parseFloat(rating).toFixed(1);
-	var ratingImgHtml = "";
+	var ratingFloat= parseFloat(roundedFloatingVal).toFixed(2);
+	/*ratingIntVal= (Math.round(rating * 4) / 4).toFixed(2);*/
+	var ratingInt= parseInt(ratingFloat*4);
+	ratingIntVal=(ratingInt/4).toFixed(2);
 	
-	/*if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
-	}else {
-		ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";		
-	}*/
 	
 	if(source != undefined && source == "Zillow"){
-		ratingImgHtml = "<div class='rating-image float-left icn-zillow' title='Zillow'></div>";
+		ratingImgHtml = "<div class='rating-image cursor-pointer  float-left star-rating-green-"+ ratingIntVal +"' title='"+roundedFloatingVal+"' ></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml+="<div class='verified-badge float-left verify-image' title='Click here to know more'></div>";
-		ratingImgHtml += "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";	
+		ratingImgHtml = "<div class='rating-image  cursor-pointer float-left star-rating-"+ ratingIntVal +"' title='"+roundedFloatingVal+"'></div>";
 		
 	}
 		else {
-		ratingImgHtml = "<div class='rating-image float-left smiley-rat-" + ratingIntVal + "' title='Social Survey'></div>";		
+		ratingImgHtml = "<div class='rating-image cursor-pointer float-left  star-rating-"+ratingIntVal+"' title='"+roundedFloatingVal+"'></div>";		
 	}
 	
 	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
@@ -432,8 +430,37 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	}
 
 	ratingParent.html('');
-	ratingParent.append(ratingImgHtml).append(ratingValHtml);
-}
+	ratingParent.append(ratingImgHtml);
+	ratingParent.append(ratingValHtml);
+};
+function proRatingPattern(rating, ratingParent, isOverallRating, source) {
+	var ratingIntVal = 0;
+	var roundedFloatingVal = parseFloat(rating).toFixed(1);
+	var ratingFloat =parseFloat(roundedFloatingVal).toFixed(2);
+	var ratingInt= parseInt(ratingFloat*4);
+	ratingIntVal=(ratingInt/4).toFixed(2);
+	if(roundedFloatingVal!= 0.0){
+		var ratingValHtml = "<div class='rating-rounded float-left' style='font-weight:600 !important'>&#8212; " + roundedFloatingVal + "</div>";
+		if (isOverallRating) {
+			ratingValHtml = "<div class='rating-rounded float-left' style='font-weight:600 !important'>&#8212; " + roundedFloatingVal + " - </div>";
+		}
+	}
+	
+	if(source != undefined && source == "Zillow"){
+		ratingImgHtml = "<div class='rating-image  cursor-pointer float-left star-rating-green-"+ ratingIntVal +"' title='"+roundedFloatingVal+"' style='margin-left: 10px;'></div>";
+	}else if(source =="encompass" || source == "DOTLOOP"){
+		ratingImgHtml = "<div class='rating-image  cursor-pointer float-left star-rating-"+ ratingIntVal +"' title='"+roundedFloatingVal+"' style='margin-left: 10px;' ></div>";
+		
+	}
+		else {
+		ratingImgHtml = "<div class='rating-image cursor-pointer float-left  star-rating-"+ratingIntVal+"' title='"+roundedFloatingVal+"' style='margin-left: 10px;'></div>";		
+	}
+
+	ratingParent.html('');
+	ratingParent.append(ratingValHtml);
+	ratingParent.append(ratingImgHtml);
+	
+};
 $(document).on('click','.verified-badge',function(e){
 	window.open("https://socialsurvey.zendesk.com/hc/en-us/articles/216454118-Added-Verified-Customer-badge");
 });

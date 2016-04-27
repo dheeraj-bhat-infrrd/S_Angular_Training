@@ -29,17 +29,17 @@ public interface SurveyDetailsDao
     public void updateEmailForExistingFeedback( long agentId, String customerEmail );
 
 
-    public void updateCustomerResponse( long agentId, String customerEmail, SurveyResponse surveyResponse, int stage );
+    public void updateCustomerResponse( String surveyId, SurveyResponse surveyResponse, int stage );
 
 
-    public void updateGatewayAnswer( long agentId, String customerEmail, String mood, String review, boolean isAbusive,
+    public void updateGatewayAnswer(String surveyId, String mood, String review, boolean isAbusive,
         String agreedToShare );
 
 
-    public void updateFinalScore( long agentId, String customerEmail );
+    public void updateFinalScore( String surveyId );
 
 
-    public void updateSurveyAsClicked( long agentId, String customerEmail );
+    public void updateSurveyAsClicked( String surveyMongoId);
 
 
     public Map<String, Long> getCountOfCustomersByMood( String columnName, long columnValue );
@@ -144,7 +144,7 @@ public interface SurveyDetailsDao
         int maxReminders );
 
 
-    public void changeStatusOfSurvey( long agentId, String customerEmail, String firstName, String lastName, boolean editable );
+    public void changeStatusOfSurvey( String surveyId, boolean editable );
 
 
     public void updateReminderCountForSocialPost( Long agentId, String customerEmail );
@@ -253,4 +253,14 @@ public interface SurveyDetailsDao
 
 
     Map<Long, Date> getLatestCompletedSurveyDateForAgents( long companyId );
+
+
+    SurveyDetails getSurveyByAgentIdAndCustomerEmailAndNoOfDays( long agentId, String customerEmail, String firstName,
+        String lastName, int noOfDays );
+
+
+    SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
+
+
+    void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 }

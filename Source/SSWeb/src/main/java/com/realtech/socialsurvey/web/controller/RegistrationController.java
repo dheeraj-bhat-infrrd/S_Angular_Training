@@ -32,6 +32,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -616,43 +617,50 @@ public class RegistrationController
 	}
 
 	// JIRA - SS-536: Added for manual registration via invite
-	@ResponseBody
-	@RequestMapping(value = "/generateregistrationurl")
-	public String geerateRegistrationUrlForManualCompanyCreation(@RequestParam("firstName") String firstName,
-			@RequestParam("lastName") String lastName, @RequestParam("emailId") String emailId,
-			@RequestParam("creatorEmailId") String creatorEmailId, @RequestParam("api_key") String apiKey) {
-		LOG.info("Creating invitation url for " + firstName + " " + lastName + " and email " + emailId);
-		String result = null;
+    //TODO: Hardcode api_key and admin email
+    @ResponseBody
+    @RequestMapping ( value = "/generateregistrationurl")
+    public String geerateRegistrationUrlForManualCompanyCreation( @RequestParam ( "firstName") String firstName,
+        @RequestParam ( "lastName") String lastName, @RequestParam ( "emailId") String emailId )
+    {
+        LOG.info( "Creating invitation url for " + firstName + " " + lastName + " and email " + emailId );
+        String result = null;
 
-		try {
-			// generating the url
-			Map<String, String> params = new HashMap<String, String>();
-			params.put(CommonConstants.FIRST_NAME, URLEncoder.encode(firstName, "UTF-8"));
-			if (lastName != null) {
-				params.put(CommonConstants.LAST_NAME, URLEncoder.encode(lastName, "UTF-8"));
-			} else {
-				params.put(CommonConstants.LAST_NAME, URLEncoder.encode("", "UTF-8"));
-			}
-			params.put(CommonConstants.EMAIL_ID, URLEncoder.encode(emailId, "UTF-8"));
-			params.put(CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode(creatorEmailId, "UTF-8"));
-			params.put(CommonConstants.API_KEY_FROM_URL, apiKey);
+        try {
+            UserApiKey key = userManagementService.getApiKey();
+            if ( key == null ) {
+                throw new InvalidInputException( "No active API key exists in the database!" );
+            }
+            String apiKey = key.getApiKey();
+            String creatorEmailId = key.getApiSecret();
 
-			LOG.debug("Validating api key");
-			if (!userManagementService.isValidApiKey(creatorEmailId, apiKey)) {
-				LOG.warn("Invalid api key");
-				throw new InvalidInputException("Could not authenticate the API key.");
-			}
+            // generating the url
+            Map<String, String> params = new HashMap<String, String>();
+            params.put( CommonConstants.FIRST_NAME, URLEncoder.encode( firstName, "UTF-8" ) );
+            if ( lastName != null ) {
+                params.put( CommonConstants.LAST_NAME, URLEncoder.encode( lastName, "UTF-8" ) );
+            } else {
+                params.put( CommonConstants.LAST_NAME, URLEncoder.encode( "", "UTF-8" ) );
+            }
+            params.put( CommonConstants.EMAIL_ID, URLEncoder.encode( emailId, "UTF-8" ) );
+            params.put( CommonConstants.ACCOUNT_CRETOR_EMAIL_ID, URLEncoder.encode( creatorEmailId, "UTF-8" ) );
+            params.put( CommonConstants.API_KEY_FROM_URL, apiKey );
 
-			String url = urlGenerator.generateUrl(params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION);
-			emailServices.sendManualRegistrationLink(emailId, firstName, lastName, url);
-			result = "Invitation sent successfully";
-		}
-		catch (InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException | NoRecordsFetchedException e) {
-			LOG.error("Exception caught while sending mail to generating registration url", e);
-			result = "Something went wrong. " + e.getMessage();
-		}
-		return result;
-	}
+            LOG.debug( "Validating api key" );
+            if ( !userManagementService.isValidApiKey( creatorEmailId, apiKey ) ) {
+                LOG.warn( "Invalid api key" );
+                throw new InvalidInputException( "Could not authenticate the API key." );
+            }
+
+            String url = urlGenerator.generateUrl( params, applicationBaseUrl + CommonConstants.MANUAL_REGISTRATION );
+            emailServices.sendManualRegistrationLink( emailId, firstName, lastName, url );
+            result = "Invitation sent successfully";
+        } catch ( InvalidInputException | UndeliveredEmailException | UnsupportedEncodingException | NoRecordsFetchedException e ) {
+            LOG.error( "Exception caught while sending mail to generating registration url", e );
+            result = "Something went wrong. " + e.getMessage();
+        }
+        return result;
+    }
 
 	/**
 	 * Check if captcha is valid
