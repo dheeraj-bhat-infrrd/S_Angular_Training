@@ -2,18 +2,19 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.io.*;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.FileOperations;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -191,6 +192,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
+
+    @Autowired
+    private UrlService urlService;
+
+    @Autowired
+    private FileOperations fileOperations;
+
+    @Value( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}" )
+    private String paramOrderTakeSurveyReminder;
+
+    @Value( "${PARAM_ORDER_TAKE_SURVEY}" )
+    private String paramOrderTakeSurvey;
+
+    @Autowired
+    private EmailFormatHelper emailFormatHelper;
+
+    @Value( "${APPLICATION_LOGO_URL}" )
+    private String applicationLogoUrl;
 
 
     /**
@@ -4228,5 +4247,452 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             return user.get( CommonConstants.INITIAL_INDEX );
         }
         return null;
+    }
+
+
+    @Override public void incompleteSurveyReminderSender()
+    {
+        try {
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
+                CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER );
+
+            for ( Company company : organizationManagementService.getAllCompanies() ) {
+                Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
+                int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
+                int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
+                LOG.debug( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
+                Date epochReminderDate = null;
+                List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler
+                    .getIncompleteSurveyCustomersEmail( company );
+                LOG.debug( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
+                    + " surveys sent for company id " + company.getCompanyId() );
+                for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
+                    LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
+
+                    LOG.debug( "Survey pre initiation id: " + survey.getSurveyPreIntitiationId() + " within reminder counts" );
+                    boolean reminder = false;
+                    try {
+                        epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
+                    } catch ( Exception e ) {
+                        LOG.error( "Exception caught " + e.getMessage() );
+                        continue;
+                    }
+                    LOG.debug( "Last reminder time: " + String.valueOf( survey.getLastReminderTime() ) );
+                    if ( survey.getLastReminderTime().after( epochReminderDate ) ) {
+                        LOG.debug( "Reminder mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
+                        reminder = true;
+                    } else {
+                        LOG.debug(
+                            "Initial survey request mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
+                        reminder = false;
+                    }
+                    long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
+                    long currentTime = System.currentTimeMillis();
+                    if ( surveyHandler
+                        .checkIfTimeIntervalHasExpired( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
+                        LOG.debug( "Survey eligible for sending mail with id: " + survey.getSurveyPreIntitiationId() );
+                        try {
+                            /*
+                             * if ( survey.getSurveySource().equalsIgnoreCase(
+                             * CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
+                             * sendMailToAgent( survey ); }
+                             */
+                            if ( reminder ) {
+                                if ( survey.getReminderCounts() < reminderCount ) {
+                                    sendSurveyReminderEmail( emailServices, organizationManagementService, survey,
+                                        company.getCompanyId() );
+                                    surveyHandler.markSurveyAsSent( survey );
+                                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
+                                } else {
+                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
+                                        + " has exceeded the reminder count " );
+                                }
+                            } else {
+                                sendSurveyInitiationEmail( emailServices, organizationManagementService, survey,
+                                    company.getCompanyId() );
+                                surveyHandler.markSurveyAsSent( survey );
+                                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
+                            }
+
+                        } catch ( InvalidInputException e ) {
+                            LOG.error(
+                                "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
+                                e );
+                        } catch ( ProfileNotFoundException e ) {
+                            LOG.error( "Error while sending incomplete survey mail ", e );
+                        }
+                    }
+
+                }
+            }
+            LOG.info( "Completed IncompleteSurveyReminderSender" );
+            //Update last build time in batch tracker table
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER );
+        } catch ( Exception e ) {
+            LOG.error( "Error in IncompleteSurveyReminderSender", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService
+                    .updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
+                        e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService
+                    .sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER,
+                        System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in IncompleteSurveyReminderSender " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+
+    private void sendSurveyReminderEmail( EmailServices emailServices,
+        OrganizationManagementService organizationManagementService, SurveyPreInitiation survey, long companyId )
+        throws InvalidInputException, ProfileNotFoundException
+    {
+        // Send email to complete survey to each customer.
+        OrganizationUnitSettings companySettings = null;
+        String agentName = "";
+        User user = null;
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
+        user = getUserByUserId( survey.getAgentId() );
+
+        if ( user != null ) {
+            agentName = user.getFirstName();
+        }
+
+        String surveyLink = surveyHandler
+            .composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+        try {
+            companySettings = organizationManagementService.getCompanySettings( companyId );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException occured while trying to fetch company settings." );
+        }
+
+        // Fetching agent settings.
+        AgentSettings agentSettings = getUserSettings( survey.getAgentId() );
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
+            }
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        String agentTitle = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+            agentTitle = agentSettings.getContact_details().getTitle();
+        }
+
+        String agentEmailId = "";
+        if ( agentSettings.getContact_details().getMail_ids().getWork() != null ) {
+            agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+        }
+
+        String agentPhone = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+            && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+            agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+        }
+
+
+        String companyName = user.getCompany().getCompany();
+        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
+        String fullAddress = "";
+
+        // Null check
+
+
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogoThumbnail();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+
+        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+            logoUrl = applicationLogoUrl;
+        }
+
+        //JIRA SS-1363 end
+
+        String mailBody = "";
+        String mailSubject = "";
+        if ( companySettings != null && companySettings.getMail_content() != null
+            && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
+
+            MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
+
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(), mailContent.getParam_order() );
+            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
+            if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
+                mailSubject = mailContent.getMail_subject();
+            }
+
+
+        } else {
+            mailSubject = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT );
+
+            mailBody = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY );
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
+        }
+        //replace legends
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+
+        //send mail
+        try {
+            emailServices
+                .sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
+        }
+    }
+
+
+    private void sendSurveyInitiationEmail( EmailServices emailServices,
+        OrganizationManagementService organizationManagementService, SurveyPreInitiation survey, long companyId )
+        throws InvalidInputException, ProfileNotFoundException
+    {
+        // Send email to complete survey to each customer.
+        OrganizationUnitSettings companySettings = null;
+        String agentName = "";
+        User user = null;
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
+        user = getUserByUserId( survey.getAgentId() );
+
+        if ( user != null ) {
+            agentName = user.getFirstName();
+        }
+
+        String surveyLink = surveyHandler
+            .composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+        try {
+            companySettings = organizationManagementService.getCompanySettings( companyId );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException occured while trying to fetch company settings." );
+        }
+
+        // Fetching agent settings.
+        AgentSettings agentSettings = getUserSettings( survey.getAgentId() );
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
+            }
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        String agentTitle = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+            agentTitle = agentSettings.getContact_details().getTitle();
+        }
+
+        String agentEmailId = "";
+        if ( agentSettings.getContact_details().getMail_ids().getWork() != null ) {
+            agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+        }
+
+        String agentPhone = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+            && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+            agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+        }
+
+
+        String companyName = user.getCompany().getCompany();
+        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
+        String fullAddress = "";
+
+        // Null check
+
+
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogoThumbnail();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+        //JIRA SS-1363 end
+
+        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+            logoUrl = applicationLogoUrl;
+        }
+        LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+        try {
+            surveyLink = urlService.shortenUrl( surveyLink );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
+        }
+
+        //get mail subject and body
+        String mailBody = "";
+        String mailSubject = "";
+        if ( companySettings != null && companySettings.getMail_content() != null
+            && companySettings.getMail_content().getTake_survey_mail() != null ) {
+
+            MailContent mailContent = companySettings.getMail_content().getTake_survey_mail();
+
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(), mailContent.getParam_order() );
+
+
+            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
+
+            mailBody = emailFormatHelper
+                .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                    survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+            if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
+                mailSubject = mailContent.getMail_subject();
+            }
+            mailSubject = emailFormatHelper
+                .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                    survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+
+        } else {
+
+            mailSubject = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
+
+            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( agentName ) );
+
+            mailBody = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
+
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
+        }
+
+        //replace the legends
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+
+        //send the mail
+        try {
+            emailServices
+                .sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
+        }
+    }
+
+    private void sendMailToAgent( SurveyPreInitiation survey )
+    {
+        try {
+            emailServices.sendAgentSurveyReminderMail( survey.getCustomerEmailId(), survey );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught " + e.getMessage() );
+        }
     }
 }

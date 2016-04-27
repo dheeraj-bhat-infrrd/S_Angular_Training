@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.search.impl;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -15,6 +16,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -92,6 +95,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Autowired
     private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private BatchTrackerService batchTrackerService;
 
 
     /**
@@ -2884,5 +2890,45 @@ public class SolrSearchServiceImpl implements SolrSearchService
             throw new SolrException( "Exception while removing branch from solr. Reason : " + e.getMessage(), e );
         }
         LOG.info( "Method removeBranchFromSolr() to remove branch id {} from solr finished successfully.", branchIdToRemove );
+    }
+
+
+    @Override
+    public void solrReviewCountUpdater() {
+        try {
+            //getting last run end time of batch and update last start time
+            long lastRunEndTime = batchTrackerService
+                .getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER  , CommonConstants.BATCH_NAME_REVIEW_COUNT_UPDATER );
+            //get user id list for them review count will be updated
+            List<Long> userIdList = batchTrackerService.getUserIdListToBeUpdated( lastRunEndTime );
+            //getting no of reviews for the agents
+            Map<Long, Integer> agentsReviewCount;
+            try {
+                agentsReviewCount = batchTrackerService.getReviewCountForAgents( userIdList );
+            } catch ( ParseException e ) {
+                LOG.error( "Error while parsing the data fetched from mongo for survey count", e );
+                throw e;
+            }
+            if ( agentsReviewCount != null && !agentsReviewCount.isEmpty() )
+                updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
+
+
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER );
+        } catch ( Exception e ) {
+            LOG.error( "Error in solr review count updater", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_REVIEW_COUNT_UPDATER,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_REVIEW_COUNT_UPDATER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in batch tracker " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
     }
 }

@@ -47,81 +47,18 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
-import com.realtech.socialsurvey.core.dao.BranchDao;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
-import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
-import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.RegionDao;
-import com.realtech.socialsurvey.core.dao.RemovedUserDao;
-import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.dao.UserInviteDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
-import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
+import com.realtech.socialsurvey.core.dao.*;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.CRMInfo;
-import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
-import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
-import com.realtech.socialsurvey.core.entities.DisabledAccount;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.Event;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.FileUpload;
-import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.LockSettings;
-import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
-import com.realtech.socialsurvey.core.entities.MailContent;
-import com.realtech.socialsurvey.core.entities.MailContentSettings;
-import com.realtech.socialsurvey.core.entities.MailIdSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
-import com.realtech.socialsurvey.core.entities.RetriedTransaction;
-import com.realtech.socialsurvey.core.entities.StateLookup;
-import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.UploadStatus;
-import com.realtech.socialsurvey.core.entities.UploadValidation;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserApiKey;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.DatabaseException;
-import com.realtech.socialsurvey.core.exception.FatalException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.exception.*;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.*;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -133,6 +70,8 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
+import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
+
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -228,6 +167,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private ProfileManagementService profileManagementService;
 
     @Autowired
+    private ImageProcessor imageProcessor;
+
+    @Autowired
     private GenericDao<LicenseDetail, Long> licenseDetailDao;
 
     @Autowired
@@ -264,6 +206,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     String paramOrderIncompleteSurveyReminder;
     @Value ( "${PARAM_ORDER_SURVEY_COMPLETION_UNPLEASANT_MAIL}")
     String paramOrderSurveyCompletionUnpleasantMail;
+    @Value( "${ACCOUNT_PERM_DELETE_SPAN}" )
+    String accountPermDeleteSpan;
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
@@ -6949,5 +6893,737 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             disabledAccountDao.update( account );
         }
     }
+
+
+    @Override
+    @Transactional
+    public void deactivatedAccountPurger() {
+        try {
+            // update last start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER, CommonConstants.BATCH_NAME_DEACTIVATED_ACCOUNT_PURGER );
+
+            int maxDaysToPurgeAccount = Integer.parseInt( accountPermDeleteSpan );
+            List<DisabledAccount> disabledAccounts = getAccountsForPurge( maxDaysToPurgeAccount );
+            for ( DisabledAccount account : disabledAccounts ) {
+                try {
+                    sendAccountDeletedNotificationMail( account );
+                    purgeCompanyDetails( account.getCompany() );
+                } catch ( InvalidInputException e ) {
+                    LOG.error( "Invalid Input Exception caught while sending email to the company admin. Nested exception is ",
+                        e );
+                }
+            }
+
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER );
+            LOG.info( "Completed DeactivatedAccountPurger" );
+        } catch ( Exception e ) {
+            LOG.error( "Error in DeactivatedAccountPurger", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_DEACTIVATED_ACCOUNT_PURGER, e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_DEACTIVATED_ACCOUNT_PURGER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in DeactivatedAccountPurger " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+    /*
+     * Method to purge all the details of the company
+    */
+    @Transactional
+    private void purgeCompanyDetails( Company company )
+    {
+        LOG.debug( "Method to delete all the company details purgeCompany() started." );
+
+        try {
+            User user = userManagementService.getAdminUserByCompanyId( company.getCompanyId() );
+            deleteCompany( company, user );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
+        } catch ( SolrException e ) {
+            LOG.error( "SolrException caught in purgeCompany(). Nested exception is ", e );
+        }
+
+        LOG.debug( "Method to delete all the company details purgeCompany() finished." );
+    }
+
+
+    private void sendAccountDeletedNotificationMail( DisabledAccount disabledAccount ) throws InvalidInputException
+    {
+        // Send email to notify each company admin that the company account will be deactivated after 30 days so that they can take required steps.
+        Company company = disabledAccount.getCompany();
+        Map<String, String> companyAdmin = new HashMap<String, String>();
+        try {
+            companyAdmin = solrSearchService.getCompanyAdmin( company.getCompanyId() );
+        } catch ( SolrException e1 ) {
+            LOG.error(
+                "SolrException caught in sendAccountDeletedNotificationMail() while trying to send mail to the company admin ." );
+        }
+        try {
+            if ( companyAdmin != null && companyAdmin.get( "emailId" ) != null )
+                emailServices.sendAccountDeletionMail( companyAdmin.get( "emailId" ), companyAdmin.get( "displayName" ),
+                    companyAdmin.get( "loginName" ) );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ",
+                e );
+        }
+    }
+
+
+    @Override
+    public void hierarchySettingsCorrector() {
+        try {
+            // update last start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR, CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR );
+            // get a list of all the companies and find all the values set
+            Set<Company> companyList = getAllCompanies();
+            LOG.debug( "Got " + companyList.size() + " companies" );
+            for ( Company company : companyList ) {
+                OrganizationUnitSettings companySetting = null;
+                try {
+                    companySetting = getCompanySettings( company.getCompanyId() );
+                } catch ( InvalidInputException e1 ) {
+                    LOG.error( "Exception caught ", e1 );
+                }
+                if ( companySetting != null ) {
+                    processCompany( companySetting );
+                    try {
+                        List<Region> regions = company.getRegions();
+                        for ( Region region : regions ) {
+                            // get region settings
+                            OrganizationUnitSettings regionSetting = getRegionSettings( region
+                                .getRegionId() );
+                            processRegion( regionSetting, region );
+                        }
+
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "Could not get regions for company profile " + companySetting.getProfileName(), e );
+                    }
+                }
+            }
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR );
+        } catch ( Exception e ) {
+            LOG.error( "Error in HierarchySettingsCorrector", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in HierarchySettingsCorrector " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+
+    private void processRegion( OrganizationUnitSettings regionSetting, Region region )
+    {
+        LOG.debug( "Processing region " + region.getRegion() );
+        long setterValue = 0l;
+        LOG.debug( "Getting details of region: " + region.getRegion() );
+        if ( regionSetting.getLogo() != null ) {
+            LOG.debug( "Logo is set" );
+            setterValue += SettingsForApplication.LOGO.getOrder() * 2;
+        } else {
+            LOG.debug( "Logo is not set" );
+        }
+        if ( regionSetting.getContact_details() != null ) {
+            if ( regionSetting.getContact_details().getAddress() != null ) {
+                LOG.debug( "Address is set" );
+                setterValue += SettingsForApplication.ADDRESS.getOrder() * 2;
+            } else {
+                LOG.debug( "Address is not set" );
+            }
+            if ( regionSetting.getContact_details().getContact_numbers() != null ) {
+                LOG.debug( "Contact number is set" );
+                setterValue += SettingsForApplication.PHONE.getOrder() * 2;
+            } else {
+                LOG.debug( "Contact number is not set" );
+            }
+            // skipping location
+            if ( regionSetting.getContact_details().getWeb_addresses() != null ) {
+                LOG.debug( "Web address is set" );
+                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 2;
+            } else {
+                LOG.debug( "Web address is not set" );
+            }
+            if ( regionSetting.getContact_details().getAbout_me() != null ) {
+                LOG.debug( "About me is set" );
+                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 2;
+            } else {
+                LOG.debug( "About me is not set" );
+            }
+            if ( regionSetting.getContact_details().getMail_ids() != null
+                && regionSetting.getContact_details().getMail_ids().getWork() != null ) {
+                LOG.debug( "Work email id is set" );
+                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 2;
+            } else {
+                LOG.debug( "Work email id is not set" );
+            }
+        }
+        if ( regionSetting.getSocialMediaTokens() != null ) {
+            if ( regionSetting.getSocialMediaTokens().getFacebookToken() != null ) {
+                LOG.debug( "Facebook is set" );
+                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 2;
+            } else {
+                LOG.debug( "Facebook is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getTwitterToken() != null ) {
+                LOG.debug( "Twitter is set" );
+                setterValue += SettingsForApplication.TWITTER.getOrder() * 2;
+            } else {
+                LOG.debug( "Twitter is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+                LOG.debug( "Linkedin is set" );
+                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 2;
+            } else {
+                LOG.debug( "Linkedin is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
+                LOG.debug( "Google+ is set" );
+                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 2;
+            } else {
+                LOG.debug( "Google+ is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
+                LOG.debug( "Yelp is set" );
+                setterValue += SettingsForApplication.YELP.getOrder() * 2;
+            } else {
+                LOG.debug( "Yelp is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getZillowToken() != null ) {
+                LOG.debug( "Zillow is set" );
+                setterValue += SettingsForApplication.ZILLOW.getOrder() * 2;
+            } else {
+                LOG.debug( "Zillow is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getRealtorToken() != null ) {
+                LOG.debug( "Realtor is set" );
+                setterValue += SettingsForApplication.REALTOR.getOrder() * 2;
+            } else {
+                LOG.debug( "Realtor is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
+                LOG.debug( "Lending tree is set" );
+                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 2;
+            } else {
+                LOG.debug( "Lending tree is not set" );
+            }
+        }
+        LOG.debug( "Final Settings setter value : " + setterValue );
+        region.setSettingsSetStatus( String.valueOf( setterValue ) );
+        // update the values to company
+        updateRegion( region );
+        // get list of branches for region
+        try {
+            List<Branch> branches = region.getBranches();
+            for ( Branch branch : branches ) {
+                try {
+                    OrganizationUnitSettings branchSetting = getBranchSettingsDefault( branch
+                        .getBranchId() );
+                    processBranch( branchSetting, branch );
+                } catch ( NoRecordsFetchedException e ) {
+                    LOG.error( "Could not get branches setting for " + branch.getBranch(), e );
+                }
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Could not get branches for region " + region.getRegionId(), e );
+        }
+    }
+
+
+    private void processBranch( OrganizationUnitSettings branchSetting, Branch branch )
+    {
+        LOG.debug( "Updating details for branch " + branch.getBranch() );
+        long setterValue = 0l;
+        LOG.debug( "Getting details of branch: " + branch.getRegion() );
+        if ( branchSetting.getLogo() != null ) {
+            LOG.debug( "Logo is set" );
+            setterValue += SettingsForApplication.LOGO.getOrder() * 4;
+        } else {
+            LOG.debug( "Logo is not set" );
+        }
+        if ( branchSetting.getContact_details() != null ) {
+            if ( branchSetting.getContact_details().getAddress() != null ) {
+                LOG.debug( "Address is set" );
+                setterValue += SettingsForApplication.ADDRESS.getOrder() * 4;
+            } else {
+                LOG.debug( "Address is not set" );
+            }
+            if ( branchSetting.getContact_details().getContact_numbers() != null ) {
+                LOG.debug( "Contact number is set" );
+                setterValue += SettingsForApplication.PHONE.getOrder() * 4;
+            } else {
+                LOG.debug( "Contact number is not set" );
+            }
+            // skipping location
+            if ( branchSetting.getContact_details().getWeb_addresses() != null ) {
+                LOG.debug( "Web address is set" );
+                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 4;
+            } else {
+                LOG.debug( "Web address is not set" );
+            }
+            if ( branchSetting.getContact_details().getAbout_me() != null ) {
+                LOG.debug( "About me is set" );
+                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 4;
+            } else {
+                LOG.debug( "About me is not set" );
+            }
+            if ( branchSetting.getContact_details().getMail_ids() != null
+                && branchSetting.getContact_details().getMail_ids().getWork() != null ) {
+                LOG.debug( "Work email id is set" );
+                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 4;
+            } else {
+                LOG.debug( "Work email id is not set" );
+            }
+        }
+        if ( branchSetting.getSocialMediaTokens() != null ) {
+            if ( branchSetting.getSocialMediaTokens().getFacebookToken() != null ) {
+                LOG.debug( "Facebook is set" );
+                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 4;
+            } else {
+                LOG.debug( "Facebook is not set" );
+            }
+            if ( branchSetting.getSocialMediaTokens().getTwitterToken() != null ) {
+                LOG.debug( "Twitter is set" );
+                setterValue += SettingsForApplication.TWITTER.getOrder() * 4;
+            } else {
+                LOG.debug( "Twitter is not set" );
+            }
+            if ( branchSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+                LOG.debug( "Linkedin is set" );
+                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 4;
+            } else {
+                LOG.debug( "Linkedin is not set" );
+            }
+            if ( branchSetting.getSocialMediaTokens().getGoogleToken() != null ) {
+                LOG.debug( "Google+ is set" );
+                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 4;
+            } else {
+                LOG.debug( "Google+ is not set" );
+            }
+            if ( branchSetting.getSocialMediaTokens().getYelpToken() != null ) {
+                LOG.debug( "Yelp is set" );
+                setterValue += SettingsForApplication.YELP.getOrder() * 4;
+            } else {
+                LOG.debug( "Yelp is not set" );
+            }
+            if ( branchSetting.getSocialMediaTokens().getZillowToken() != null ) {
+                LOG.debug( "Zillow is set" );
+                setterValue += SettingsForApplication.ZILLOW.getOrder() * 4;
+            } else {
+                LOG.debug( "Zillow is not set" );
+            }
+            if ( branchSetting.getSocialMediaTokens().getRealtorToken() != null ) {
+                LOG.debug( "Realtor is set" );
+                setterValue += SettingsForApplication.REALTOR.getOrder() * 4;
+            } else {
+                LOG.debug( "Realtor is not set" );
+            }
+            if ( branchSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
+                LOG.debug( "Lending tree is set" );
+                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 4;
+            } else {
+                LOG.debug( "Lending tree is not set" );
+            }
+        }
+        LOG.debug( "Final Settings setter value : " + setterValue );
+        branch.setSettingsSetStatus( String.valueOf( setterValue ) );
+        // update the values to company
+        updateBranch( branch );
+    }
+
+
+    private void processCompany( OrganizationUnitSettings companySetting )
+    {
+        long setterValue = 0l;
+        /* String lockValue = "0";*/
+        // get a the company id and get the company from SQL
+        LOG.debug( "Getting details of company: " + companySetting.getIden() );
+        Company company = getCompanyById( companySetting.getIden() );
+        LOG.debug( "Checking for all the values that can be set for " + company.getCompany() );
+        if ( companySetting.getLogo() != null ) {
+            LOG.debug( "Logo is set" );
+            setterValue += SettingsForApplication.LOGO.getOrder() * 1;
+            // lock the logo
+            /* lockValue = "1";*/
+        } else {
+            LOG.debug( "Logo is not set" );
+        }
+        if ( companySetting.getContact_details() != null ) {
+            if ( companySetting.getContact_details().getAddress() != null ) {
+                LOG.debug( "Address is set" );
+                setterValue += SettingsForApplication.ADDRESS.getOrder() * 1;
+            } else {
+                LOG.debug( "Address is not set" );
+            }
+            if ( companySetting.getContact_details().getContact_numbers() != null ) {
+                LOG.debug( "Contact number is set" );
+                setterValue += SettingsForApplication.PHONE.getOrder() * 1;
+            } else {
+                LOG.debug( "Contact number is not set" );
+            }
+            // skipping location
+            if ( companySetting.getContact_details().getWeb_addresses() != null ) {
+                LOG.debug( "Web address is set" );
+                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 1;
+            } else {
+                LOG.debug( "Web address is not set" );
+            }
+            if ( companySetting.getContact_details().getAbout_me() != null ) {
+                LOG.debug( "About me is set" );
+                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 1;
+            } else {
+                LOG.debug( "About me is not set" );
+            }
+            if ( companySetting.getContact_details().getMail_ids() != null
+                && companySetting.getContact_details().getMail_ids().getWork() != null ) {
+                LOG.debug( "Work email id is set" );
+                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 1;
+            } else {
+                LOG.debug( "Work email id is not set" );
+            }
+        }
+        if ( companySetting.getSocialMediaTokens() != null ) {
+            if ( companySetting.getSocialMediaTokens().getFacebookToken() != null ) {
+                LOG.debug( "Facebook is set" );
+                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 1;
+            } else {
+                LOG.debug( "Facebook is not set" );
+            }
+            if ( companySetting.getSocialMediaTokens().getTwitterToken() != null ) {
+                LOG.debug( "Twitter is set" );
+                setterValue += SettingsForApplication.TWITTER.getOrder() * 1;
+            } else {
+                LOG.debug( "Twitter is not set" );
+            }
+            if ( companySetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+                LOG.debug( "Linkedin is set" );
+                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 1;
+            } else {
+                LOG.debug( "Linkedin is not set" );
+            }
+            if ( companySetting.getSocialMediaTokens().getGoogleToken() != null ) {
+                LOG.debug( "Google+ is set" );
+                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 1;
+            } else {
+                LOG.debug( "Google+ is not set" );
+            }
+            if ( companySetting.getSocialMediaTokens().getYelpToken() != null ) {
+                LOG.debug( "Yelp is set" );
+                setterValue += SettingsForApplication.YELP.getOrder() * 1;
+            } else {
+                LOG.debug( "Yelp is not set" );
+            }
+            if ( companySetting.getSocialMediaTokens().getZillowToken() != null ) {
+                LOG.debug( "Zillow is set" );
+                setterValue += SettingsForApplication.ZILLOW.getOrder() * 1;
+            } else {
+                LOG.debug( "Zillow is not set" );
+            }
+            if ( companySetting.getSocialMediaTokens().getRealtorToken() != null ) {
+                LOG.debug( "Realtor is set" );
+                setterValue += SettingsForApplication.REALTOR.getOrder() * 1;
+            } else {
+                LOG.debug( "Realtor is not set" );
+            }
+            if ( companySetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
+                LOG.debug( "Lending tree is set" );
+                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 1;
+            } else {
+                LOG.debug( "Lending tree is not set" );
+            }
+        }
+
+        LOG.debug( "Final Settings setter value : " + setterValue );
+        /*    LOG.debug( "Final Settings locker value : " + lockValue );*/
+        company.setSettingsSetStatus( String.valueOf( setterValue ) );
+        /* company.setSettingsLockStatus( lockValue );*/
+        // update the values to company
+        updateCompany( company );
+    }
+
+
+    @Override
+    public void imageProcessorStarter() {
+        try {
+            // update last start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_IMAGE_PROCESSING_STARTER, CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER );
+
+            Map<Long, String> images = null;
+            // get unprocessed company profile images
+            images = getUnprocessedProfileImages( CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            String fileName = null;
+            if ( images != null ) {
+                for ( long id : images.keySet() ) {
+                    try {
+                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_PROFILE );
+                    } catch ( Exception e ) {
+                        LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
+                    }
+                }
+            }
+            // get unprocessed region profile images
+            images = getUnprocessedProfileImages( CommonConstants.REGION_SETTINGS_COLLECTION );
+            if ( images != null ) {
+                for ( long id : images.keySet() ) {
+                    try {
+                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_PROFILE );
+                    } catch ( Exception e ) {
+                        LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
+                    }
+                }
+            }
+            // get unprocessed branch profile images
+            images = getUnprocessedProfileImages( CommonConstants.BRANCH_SETTINGS_COLLECTION );
+            if ( images != null ) {
+                for ( long id : images.keySet() ) {
+                    try {
+                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_PROFILE );
+                    } catch ( Exception e ) {
+                        LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
+                    }
+                }
+            }
+            // get unprocessed agent profile images
+            images = getUnprocessedProfileImages( CommonConstants.AGENT_SETTINGS_COLLECTION );
+            if ( images != null ) {
+                for ( long id : images.keySet() ) {
+                    try {
+                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_PROFILE );
+                    } catch ( Exception e ) {
+                        LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
+                    }
+                }
+            }
+
+            // get unprocessed company logo images
+            images = getUnprocessedLogoImages( CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            if ( images != null ) {
+                for ( long id : images.keySet() ) {
+                    try {
+                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                    } catch ( Exception e ) {
+                        LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
+                    }
+                }
+            }
+            // get unprocessed region logo images
+            images = getUnprocessedLogoImages( CommonConstants.REGION_SETTINGS_COLLECTION );
+            if ( images != null ) {
+                for ( long id : images.keySet() ) {
+                    try {
+                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                    } catch ( Exception e ) {
+                        LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
+                    }
+                }
+            }
+            // get unprocessed branch logo images
+            images = getUnprocessedLogoImages( CommonConstants.BRANCH_SETTINGS_COLLECTION );
+            if ( images != null ) {
+                for ( long id : images.keySet() ) {
+                    try {
+                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                    } catch ( Exception e ) {
+                        LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
+                    }
+                }
+            }
+
+            // get unprocessed branch logo images
+            images = getUnprocessedLogoImages( CommonConstants.AGENT_SETTINGS_COLLECTION );
+            if ( images != null ) {
+                for ( long id : images.keySet() ) {
+                    try {
+                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                    } catch ( Exception e ) {
+                        LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
+                        try {
+                            //send report bug mail to admin
+                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                                System.currentTimeMillis(), e );
+                        } catch ( InvalidInputException e1 ) {
+                            LOG.error( "Error while updating error message in processing of images " );
+                        } catch ( UndeliveredEmailException e1 ) {
+                            LOG.error( "Error while sending report excption mail to admin " );
+                        }
+                    }
+                }
+            }
+
+            /*try {
+            	imageProcessor
+            			.processImage(
+            					"https://don7n2as2v6aa.cloudfront.net/userprofilepics/P-ae12f4d2e10a5437b18dbc58c55170737b409c7dd5aa3a5121f77757f94d5acd71b277130acdb9a08b3ea8169734c834aaee0c036840e20915ca0873e8d0ae19.png",
+            					CommonConstants.IMAGE_TYPE_PROFILE);
+            }
+            catch (ImageProcessingException | InvalidInputException e) {
+            	LOG.error("Could not process image", e);
+            }*/
+
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_IMAGE_PROCESSING_STARTER );
+            LOG.info( "Finished processing of images" );
+        } catch ( Exception e ) {
+            LOG.error( "Error in processing of images", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_IMAGE_PROCESSING_STARTER,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in processing of images " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+
+
+    private Map<Long, String> getUnprocessedProfileImages( String collection )
+    {
+        LOG.debug( "Getting unprocessed profile images for collection " + collection );
+        Map<Long, String> unprocessedProfileImages = null;
+        try {
+            unprocessedProfileImages = getListOfUnprocessedImages( collection,
+                CommonConstants.IMAGE_TYPE_PROFILE );
+            if ( unprocessedProfileImages == null ) {
+                LOG.debug( "No unprocessed profile images exist" );
+            }
+        } catch ( InvalidInputException e ) {
+            LOG.error( "The collection name or the image type is invalid. Reason : ", e );
+        }
+        LOG.debug( "returning unprocessed profile images" );
+        return unprocessedProfileImages;
+    }
+
+
+    private Map<Long, String> getUnprocessedLogoImages( String collection )
+    {
+        LOG.debug( "Getting unprocessed logo images for collection  " + collection );
+
+        Map<Long, String> unprocessedLogoImages = null;
+        if ( collection == null || collection.isEmpty() ) {
+            LOG.error( "Collection can't be empty" );
+        } else {
+            try {
+                unprocessedLogoImages = getListOfUnprocessedImages( collection,
+                    CommonConstants.IMAGE_TYPE_LOGO );
+                if ( unprocessedLogoImages == null ) {
+                    LOG.debug( "No unprocessed logo images exist" );
+                }
+            } catch ( InvalidInputException e ) {
+                LOG.error( "The collection name or the image type is invalid. Reason : ", e );
+            }
+            LOG.debug( "returning unprocessed logo images" );
+        }
+        return unprocessedLogoImages;
+    }
+
+
+    private void updateImage( long iden, String fileName, String collectionName, String imageType )
+        throws InvalidInputException
+    {
+        LOG.info( "Method updateImage started" );
+        updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true,
+            true );
+        LOG.info( "Method updateImage finished" );
+    }
+
 }
 // JIRA: SS-27: By RM05: EOC

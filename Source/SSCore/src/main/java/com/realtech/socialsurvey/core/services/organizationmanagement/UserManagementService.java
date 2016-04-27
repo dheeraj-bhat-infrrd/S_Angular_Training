@@ -602,5 +602,7 @@ public interface UserManagementService
     public void crmDataAgentIdMApper();
 
     public User getAdminUserByCompanyId(long companyId);
+
+    public void incompleteSurveyReminderSender();
 }
 // JIRA SS-34 BY RM02 BOC

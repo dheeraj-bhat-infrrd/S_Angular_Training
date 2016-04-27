@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -23,6 +20,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,33 +40,6 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AccountsMaster;
-import com.realtech.socialsurvey.core.entities.AgentMediaPostResponseDetails;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyMediaPostResponseDetails;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.EntityMediaPostResponseDetails;
-import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
-import com.realtech.socialsurvey.core.entities.MediaPostDetails;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileStage;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.RegionMediaPostResponseDetails;
-import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.SocialMediaPostResponse;
-import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
@@ -124,7 +95,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private EmailServices emailServices;
 
     @Autowired
+    private Utils utils;
+
+    @Autowired
     private UserManagementService userManagementService;
+
+    @Autowired
+    private BatchTrackerService batchTrackerService;
 
     @Autowired
     private UserProfileDao userProfileDao;
@@ -193,6 +170,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Value ( "${CUSTOM_SOCIALNETWORK_POST_COMPANY_ID}")
     private String customisedSocialNetworkCompanyId;
 
+    @Value( "${ZILLOW_AUTO_POST_THRESHOLD}" )
+    private int zillowAutoPostThreshold;
+
     @Autowired
     private SocialPostDao socialPostDao;
 
@@ -208,6 +188,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Autowired
     private WorkbookData workbookData;
 
+    private final int batchSize = 50;
+
+    private static final String STYLE_ATTR = "align=\"center\"style=\"display:block; width: 150px; height: 40px; line-height: 40px;float: left; margin: 5px ;text-decoration:none;background: #009FE3; border-bottom: 2px solid #077faf; color: #fff; text-align: center; border-radius: 3px; font-size: 15px;border: 0;\"";
+
+    @Value( "${FB_CLIENT_ID}" )
+    private String fbAppId;
 
     /**
      * Returns the Twitter request token for a particular URL
@@ -2084,5 +2070,860 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
         workbook = workbookOperations.createWorkbook( data );
         return workbook;
+    }
+
+
+    @Override
+    public void imcompleteSocialPostReminderSender() {
+        try {
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER,
+                CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
+
+            StringBuilder links = new StringBuilder();
+            User user = null;
+            for ( Company company : organizationManagementService.getAllCompanies() ) {
+                List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys( company
+                    .getCompanyId() );
+                for ( SurveyDetails survey : incompleteSocialPostCustomers ) {
+                    // To fetch settings of agents/closest in the hierarchy
+                    Map<String, String> socialSitesWithSettings = new HashMap<>();
+                    try {
+                        socialSitesWithSettings = getSocialSitesWithSettingsConfigured( survey );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "InvalidInputException caught in executeInternal() for SocialpostReminderMail" );
+                        continue;
+                    }
+
+                    links = new StringBuilder();
+                    try {
+                        user = userManagementService.getUserByUserId( survey.getAgentId() );
+                    } catch ( InvalidInputException e ) {
+                        LOG.error( "InvalidInputException occured while fetch agent settings/ user details for user id "
+                            + survey.getAgentId() + ". Nested exception is ", e );
+                        continue;
+                    }
+                    links.append("<div style=\"width: 320px;margin: auto;clear:both;\">");
+                    if ( socialSitesWithSettings.get( CommonConstants.REALTOR_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.REALTOR_LABEL ) + ">"
+                            + CommonConstants.REALTOR_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.LENDING_TREE_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.LENDING_TREE_LABEL ) + ">"
+                            + CommonConstants.LENDING_TREE_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.ZILLOW_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.ZILLOW_LABEL ) + ">" + CommonConstants.ZILLOW_LABEL
+                            + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.YELP_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.YELP_LABEL )
+                            + ">" + CommonConstants.YELP_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL ) + ">"
+                            + CommonConstants.GOOGLE_PLUS_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.LINKEDIN_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.LINKEDIN_LABEL ) + ">"
+                            + CommonConstants.LINKEDIN_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.TWITTER_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.TWITTER_LABEL ) + ">"
+                            + CommonConstants.TWITTER_LABEL + "</a>" );
+                    }
+                    if ( socialSitesWithSettings.get( CommonConstants.FACEBOOK_LABEL ) != null ) {
+                        links.append( "<a " + STYLE_ATTR + " href="
+                            + socialSitesWithSettings.get( CommonConstants.FACEBOOK_LABEL ) + ">"
+                            + CommonConstants.FACEBOOK_LABEL + "</a>" );
+                    }
+                    links.append("</div>");
+                    // Send email to complete social post for survey to each customer.
+                    if ( !links.toString().isEmpty() ) {
+                        try {
+                            surveyHandler.sendSocialPostReminderMail( survey.getCustomerEmail(), survey.getCustomerFirstName(),
+                                survey.getCustomerLastName(), user, links.toString() );
+                            surveyHandler.updateReminderCountForSocialPosts( survey.getAgentId(), survey.getCustomerEmail() );
+                        } catch ( InvalidInputException | UndeliveredEmailException | ProfileNotFoundException e ) {
+                            LOG.error(
+                                "Exception caught in IncompleteSurveyReminderSender.main while trying to send reminder mail to "
+                                    + survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e );
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            //Update last build time in batch tracker table
+            batchTrackerService
+                .updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER );
+
+        } catch ( Exception e ) {
+            LOG.error( "Error in IncompleteSocialPostReminderSender", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER, e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError(
+                    CommonConstants.BATCH_NAME_INCOMPLETE_SOCIAL_POST_REMINDER_SENDER, System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in IncompleteSocialPostReminderSender " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+    private Map<String, String> getSocialSitesWithSettingsConfigured( SurveyDetails survey ) throws InvalidInputException
+    {
+        LOG.debug( "Method to get settings of agent and admins in the hierarchy getSocialSitesWithSettingsConfigured() started." );
+        long agentId = survey.getAgentId();
+        OrganizationUnitSettings agentSettings = userManagementService.getUserSettings( agentId );
+        Map<String, List<OrganizationUnitSettings>> settingsMap = getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( agentId );
+        List<OrganizationUnitSettings> companySettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> regionSettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> branchSettings = settingsMap
+            .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        Map<String, String> socialSiteUrlMap = new HashMap<String, String>();
+
+        // Enabling Zillow, Realtor, Lending tree and Yelp from agent settings
+        if ( agentSettings != null ) {
+            if ( agentSettings.getSocialMediaTokens() != null ) {
+                if ( agentSettings.getSocialMediaTokens().getRealtorToken() != null ) {
+                    socialSiteUrlMap.put( CommonConstants.REALTOR_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.REALTOR_LABEL, agentSettings ) );
+                }
+                if ( agentSettings.getSocialMediaTokens().getLendingTreeToken() != null ) {
+                    socialSiteUrlMap.put( CommonConstants.LENDING_TREE_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.LENDING_TREE_LABEL, agentSettings ) );
+                }
+                if ( agentSettings.getSocialMediaTokens().getZillowToken() != null ) {
+                    socialSiteUrlMap.put( CommonConstants.ZILLOW_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.ZILLOW_LABEL, agentSettings ) );
+                }
+                if ( agentSettings.getSocialMediaTokens().getYelpToken() != null ) {
+                    socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, agentSettings ) );
+                }
+            }
+        }
+
+        // Enabling Zillow, Realtor, Lending tree and Yelp if anyone closest in hierarchy to agent has
+        // configured in settings.
+        for ( OrganizationUnitSettings setting : branchSettings ) {
+            if ( setting.getSocialMediaTokens() != null ) {
+                if ( setting.getSocialMediaTokens().getRealtorToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.REALTOR_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.REALTOR_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.REALTOR_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getLendingTreeToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.LENDING_TREE_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.LENDING_TREE_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.LENDING_TREE_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getZillowToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.ZILLOW_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.ZILLOW_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.ZILLOW_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getYelpToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.YELP_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
+                }
+            }
+        }
+        for ( OrganizationUnitSettings setting : regionSettings ) {
+            if ( setting.getSocialMediaTokens() != null ) {
+                if ( setting.getSocialMediaTokens().getRealtorToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.REALTOR_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.REALTOR_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.REALTOR_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getLendingTreeToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.LENDING_TREE_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.LENDING_TREE_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.LENDING_TREE_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getZillowToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.ZILLOW_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.ZILLOW_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.ZILLOW_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getYelpToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.YELP_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
+                }
+            }
+        }
+        for ( OrganizationUnitSettings setting : companySettings ) {
+            if ( setting.getSocialMediaTokens() != null ) {
+                if ( setting.getSocialMediaTokens().getRealtorToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.REALTOR_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.REALTOR_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.REALTOR_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getLendingTreeToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.LENDING_TREE_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.LENDING_TREE_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.LENDING_TREE_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getZillowToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.ZILLOW_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.ZILLOW_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.ZILLOW_LABEL, setting ) );
+                }
+                if ( setting.getSocialMediaTokens().getYelpToken() != null
+                    && socialSiteUrlMap.get( CommonConstants.YELP_LABEL ) == null ) {
+                    socialSiteUrlMap.put( CommonConstants.YELP_LABEL,
+                        generateSocialSiteUrl( survey, CommonConstants.YELP_LABEL, setting ) );
+                }
+            }
+        }
+
+        // build social site url's like Google Plus, LinkedIn, Twitter and Facebook
+        socialSiteUrlMap.put( CommonConstants.GOOGLE_PLUS_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_PLUS_LABEL, agentSettings ) );
+        socialSiteUrlMap.put( CommonConstants.LINKEDIN_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.LINKEDIN_LABEL, agentSettings ) );
+        socialSiteUrlMap.put( CommonConstants.TWITTER_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.TWITTER_LABEL, agentSettings ) );
+        socialSiteUrlMap.put( CommonConstants.FACEBOOK_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.FACEBOOK_LABEL, agentSettings ) );
+        LOG.debug( "Method getSocialSitesWithSettingsConfigured() finished" );
+        return socialSiteUrlMap;
+    }
+
+
+    private String generateSocialSiteUrl( SurveyDetails survey, String socialSite,
+        OrganizationUnitSettings organizationUnitSettings ) throws InvalidInputException
+    {
+        LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() started." );
+        double fmt_Rating = surveyHandler.getFormattedSurveyScore( survey.getScore() );
+        String url = "";
+        String customerDisplayName = new EmailFormatHelper().getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
+            survey.getCustomerLastName() );
+        String reviewText = fmt_Rating + "-star response from " + customerDisplayName + " for " + survey.getAgentName()
+            + " at SocialSurvey - " + survey.getReview();
+        reviewText = utils.urlEncodeText( reviewText );
+        switch ( socialSite ) {
+            case CommonConstants.REALTOR_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getRealtorToken().getRealtorProfileLink()
+                    + "#reviews-section";
+                break;
+            case CommonConstants.LENDING_TREE_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getLendingTreeToken().getLendingTreeProfileLink();
+                break;
+            case CommonConstants.ZILLOW_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink();
+                break;
+            case CommonConstants.YELP_LABEL:
+                url = organizationUnitSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
+                break;
+            case CommonConstants.GOOGLE_PLUS_LABEL:
+                url = "https://plus.google.com/share?url=" + organizationUnitSettings.getCompleteProfileUrl();
+                break;
+            case CommonConstants.LINKEDIN_LABEL:
+                url += "https://www.linkedin.com/shareArticle?mini=true&url="
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&title=&summary=" + reviewText + "&source=";
+                break;
+            case CommonConstants.TWITTER_LABEL:
+                url += "https://twitter.com/intent/tweet?text=" + reviewText + ".&url="
+                    + organizationUnitSettings.getCompleteProfileUrl();
+                break;
+            case CommonConstants.FACEBOOK_LABEL:
+                url += "https://www.facebook.com/dialog/feed?app_id=" + fbAppId + "&link="
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&description=" + reviewText
+                    + ".&redirect_uri=https://www.facebook.com";
+                break;
+        }
+
+        LOG.debug( "Method to generate URL for social sites, generateSocialSiteUrl() ended." );
+        return url;
+    }
+
+
+    @Override
+    public void zillowReviewProcessorStarter() {
+        try {
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER,
+                CommonConstants.BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER );
+
+            // Fetch All companies
+            for ( Company company : organizationManagementService.getAllCompanies() ) {
+                try {
+                    long companyId = company.getCompanyId();
+                    List<OrganizationUnitSettings> regionSettings = new ArrayList<OrganizationUnitSettings>();
+                    List<OrganizationUnitSettings> branchSettings = new ArrayList<OrganizationUnitSettings>();
+                    List<OrganizationUnitSettings> agentSettings = new ArrayList<OrganizationUnitSettings>();
+                    Map<Long, OrganizationUnitSettings> agentIdSettingsMap = new HashMap<Long, OrganizationUnitSettings>();
+
+                    // find all users connected to zillow
+                    LOG.debug( "Fetching settings of agents connected to zillow under company id : " + companyId );
+                    int start = 0;
+                    List<Long> batchUserIdList = new ArrayList<Long>();
+                    do {
+                        batchUserIdList = organizationManagementService.getAgentIdsUnderCompany( companyId, start, batchSize );
+                        if ( batchUserIdList != null && batchUserIdList.size() > 0 ) {
+                            // fetch zillow settings for these ids and add to list
+                            List<OrganizationUnitSettings> currBatchUserSettings = organizationManagementService
+                                .fetchUnitSettingsConnectedToZillow(
+                                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, batchUserIdList );
+                            if ( currBatchUserSettings != null && !currBatchUserSettings.isEmpty() ) {
+                                agentSettings.addAll( currBatchUserSettings );
+                            }
+                        }
+                        start += batchSize;
+                    } while ( batchUserIdList != null && batchUserIdList.size() == batchSize );
+
+                    // find all branches connected to zillow
+                    LOG.debug( "Fetching settings of branches connected to zillow under company id : " + companyId );
+                    start = 0;
+                    List<Long> batchBranchIdList = new ArrayList<Long>();
+                    do {
+                        batchBranchIdList = organizationManagementService
+                            .getBranchIdsUnderCompany( companyId, start, batchSize );
+                        if ( batchBranchIdList != null && batchBranchIdList.size() > 0 ) {
+                            // fetch zillow settings for these ids and add to list
+                            List<OrganizationUnitSettings> currBatchBatchSettings = organizationManagementService
+                                .fetchUnitSettingsConnectedToZillow(
+                                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, batchBranchIdList );
+                            if ( currBatchBatchSettings != null && !currBatchBatchSettings.isEmpty() ) {
+                                branchSettings.addAll( currBatchBatchSettings );
+                            }
+                        }
+                        start += batchSize;
+                    } while ( batchBranchIdList != null && batchBranchIdList.size() == batchSize );
+
+                    // find all regions connected to zillow.
+                    LOG.debug( "Fetching settings of regions connected to zillow under company id : " + companyId );
+                    start = 0;
+                    List<Long> batchRegionIdList = new ArrayList<Long>();
+                    do {
+                        batchRegionIdList = organizationManagementService
+                            .getRegionIdsUnderCompany( companyId, start, batchSize );
+                        if ( batchRegionIdList != null && batchRegionIdList.size() > 0 ) {
+                            // fetch zillow settings for these ids and add to list
+                            List<OrganizationUnitSettings> currBatchRegionSettings = organizationManagementService
+                                .fetchUnitSettingsConnectedToZillow(
+                                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, batchRegionIdList );
+                            if ( currBatchRegionSettings != null && !currBatchRegionSettings.isEmpty() ) {
+                                regionSettings.addAll( currBatchRegionSettings );
+                            }
+                        }
+                        start += batchSize;
+                    } while ( batchRegionIdList != null && batchRegionIdList.size() == batchSize );
+
+
+                    // Fetch Company Settings
+                    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+
+                    // Fetch & save zillow reviews for agents
+                    if ( agentSettings != null && !agentSettings.isEmpty() ) {
+                        for ( OrganizationUnitSettings agentSetting : agentSettings ) {
+                            agentIdSettingsMap.put( agentSetting.getIden(), agentSetting );
+                            LOG.debug( "Fetching and saving zillow reviews for agent id : " + agentSetting.getIden() );
+                            profileManagementService.fetchAndSaveZillowData( agentSetting,
+                                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyId, true, false );
+                            LOG.debug( "Fetched and saved zillow reviews for agent id : " + agentSetting.getIden() );
+                        }
+                    }
+
+                    // Fetch & save zillow reviews for branches
+                    if ( branchSettings != null && !branchSettings.isEmpty() ) {
+                        for ( OrganizationUnitSettings branchSetting : branchSettings ) {
+                            LOG.debug( "Fetching and saving zillow reviews for branch id : " + branchSetting.getIden() );
+                            profileManagementService.fetchAndSaveZillowData( branchSetting,
+                                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, companyId, true, false );
+                            LOG.debug( "Fetched and saved zillow reviews for branch id : " + branchSetting.getIden() );
+                        }
+                    }
+
+                    // Fetch & save zillow reviews for regions
+                    if ( regionSettings != null && !regionSettings.isEmpty() ) {
+                        for ( OrganizationUnitSettings regionSetting : regionSettings ) {
+                            LOG.debug( "Fetching and saving zillow reviews for region id : " + regionSetting.getIden() );
+                            profileManagementService.fetchAndSaveZillowData( regionSetting,
+                                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, companyId, true, false );
+                            LOG.debug( "Fetched and saved zillow reviews for region id : " + regionSetting.getIden() );
+                        }
+                    }
+
+                    // Fetch & save zillow reviews for company
+                    if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+                        && companySettings.getSocialMediaTokens().getZillowToken() != null ) {
+                        LOG.debug( "Fetching and saving zillow reviews for company id : " + companyId );
+                        profileManagementService.fetchAndSaveZillowData( companySettings,
+                            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companyId, true, false );
+                        LOG.debug( "Fetched and saved zillow reviews for company id : " + companyId );
+                    }
+
+                    // Fetch all zillow data from temp table and trigger auto post
+                    List<ZillowTempPost> zillowTempPostList = getAllZillowTempPosts();
+                    List<Long> processedZillowTempPostIds = new ArrayList<Long>();
+                    if ( zillowTempPostList != null && !zillowTempPostList.isEmpty() ) {
+                        for ( ZillowTempPost zillowTempPost : zillowTempPostList ) {
+                            try {
+                                if ( zillowTempPost != null ) {
+                                    // change this to support another units in hierarchy
+                                    OrganizationUnitSettings agentSetting = agentIdSettingsMap.get( zillowTempPost
+                                        .getEntityId() );
+                                    SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( zillowTempPost
+                                        .getZillowSurveyId() );
+                                    if ( checkReviewCanBePostedToSocialMedia( zillowTempPost, agentSetting, companySettings,
+                                        surveyDetails ) ) {
+                                        // post the zillow review to social media
+                                        List<String> postedOnList = null;
+                                        boolean autoPostSuccess = false;
+                                        String postedOn = "";
+                                        try {
+                                            postedOnList = postToSocialMedia( zillowTempPost, agentSetting, surveyDetails,
+                                                agentSetting );
+                                        } catch ( Exception e ) {
+                                            LOG.error( "Error occurred while posting to social media. Reason", e );
+                                        }
+                                        int postToSocialMedia = 0;
+                                        if ( postedOnList != null && postedOnList.size() > 0 ) {
+                                            postToSocialMedia = CommonConstants.YES;
+                                            autoPostSuccess = true;
+                                            postedOn = postedOnList.toString().replace( "[", "" ).replace( "]", "" )
+                                                .replace( ", ", "," );
+                                        }
+
+                                        // check review for complaint resolution
+                                        boolean complaintResStatus = triggerComplaintResolutionWorkflowForZillowReview(
+                                            companySettings, zillowTempPost, surveyDetails, agentSetting, postToSocialMedia,
+                                            postedOn );
+
+                                        if ( !complaintResStatus && autoPostSuccess ) {
+                                            // add to external survey tracker
+                                            saveExternalSurveyTracker(
+                                                zillowTempPost.getEntityColumnName(), zillowTempPost.getEntityId(),
+                                                CommonConstants.SURVEY_SOURCE_ZILLOW, agentSetting.getSocialMediaTokens()
+                                                    .getZillowToken().getZillowProfileLink(),
+                                                zillowTempPost.getZillowReviewUrl(), zillowTempPost.getZillowReviewRating(),
+                                                postToSocialMedia, CommonConstants.NO, zillowTempPost.getZillowReviewDate(),
+                                                postedOn );
+                                        }
+                                    }
+                                    // add to zillow temp post id to processed list
+                                    processedZillowTempPostIds.add( zillowTempPost.getId() );
+                                }
+                            } catch ( Exception e ) {
+                                LOG.error( "Error occurred while auto posting zillow review to social media", e );
+                            }
+                        }
+                        // remove processed zillow temp posts
+                        if ( !processedZillowTempPostIds.isEmpty() ) {
+                            removeProcessedZillowTempPosts( processedZillowTempPostIds );
+                        }
+                    }
+
+                } catch ( Exception e ) {
+                    LOG.error( "Exception occurred while processing zillow for company id : " + company.getCompanyId() );
+                    //update batch tracker with error message
+                    batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                        CommonConstants.BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER, e.getMessage() );
+                    //send report bug mail to admin
+                    batchTrackerService.sendMailToAdminRegardingBatchError(
+                        CommonConstants.BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER, System.currentTimeMillis(), e );
+                }
+            }
+
+            //Update last build time in batch tracker table
+            batchTrackerService
+                .updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER );
+        } catch ( Exception e ) {
+            LOG.error( "Error in ZillowReviewFetchAndAutoPoster", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER, e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError(
+                    CommonConstants.BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER, System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in ZillowReviewFetchAndAutoPoster " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report exception mail to admin " );
+            }
+        }
+    }
+
+    /**
+     * Method to check whether Zillow Review can be posted to social Media
+     * */
+    boolean checkReviewCanBePostedToSocialMedia( ZillowTempPost zillowTempPost, OrganizationUnitSettings unitSettings,
+        OrganizationUnitSettings companySettings, SurveyDetails survey )
+    {
+        if ( zillowTempPost == null ) {
+            LOG.error( "zillowTempPost passed cannot be null" );
+            return false;
+        }
+        if ( unitSettings == null ) {
+            LOG.error( "unitSettings passed cannot be null" );
+            return false;
+        }
+        if ( survey == null ) {
+            LOG.error( "survey passed cannot be null" );
+            return false;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.add( Calendar.DATE, -zillowAutoPostThreshold );
+        cal.set( Calendar.HOUR, 0 );
+        cal.set( Calendar.MINUTE, 0 );
+        cal.set( Calendar.SECOND, 0 );
+        cal.set( Calendar.MILLISECOND, 0 );
+
+        if ( checkExternalSurveyTrackerExist( zillowTempPost.getEntityColumnName(),
+            zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW, zillowTempPost.getZillowReviewUrl(),
+            zillowTempPost.getZillowReviewDate() ) == null
+            && unitSettings.getSurvey_settings() != null
+            && !utils.checkReviewForSwearWords( zillowTempPost.getZillowReviewDescription(), surveyHandler.getSwearList() )
+            && zillowTempPost.getZillowReviewDate().after( cal.getTime() ) ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public List<String> postToSocialMedia( ZillowTempPost zillowTempPost, OrganizationUnitSettings organizationUnitSettings,
+        SurveyDetails surveyDetails, OrganizationUnitSettings agentSettings ) throws NonFatalException
+    {
+
+        LOG.info( "Method to post feedback of customer to various pages of social networking sites started." );
+        List<String> postedOnList = new ArrayList<String>();
+        try {
+            // add else to support other units in hierarchy
+            if ( zillowTempPost.getEntityColumnName().equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+                long agentId = organizationUnitSettings.getIden();
+                User agent = userManagementService.getUserByUserId( agentId );
+                ContactDetailsSettings contactDetailSettings = organizationUnitSettings.getContact_details();
+                String agentName = contactDetailSettings.getName();
+                String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( surveyDetails.getCustomerFirstName(), "" );
+                int accountMasterId = 0;
+                try {
+                    AccountsMaster masterAccount = agent.getCompany().getLicenseDetails().get( CommonConstants.INITIAL_INDEX )
+                        .getAccountsMaster();
+                    accountMasterId = masterAccount.getAccountsMasterId();
+                } catch ( NullPointerException e ) {
+                    LOG.error( "NullPointerException caught in postToSocialMedia() while fetching account master id for agent "
+                        + agent.getFirstName() );
+                }
+
+                Map<String, List<OrganizationUnitSettings>> settingsMap = getSettingsForBranchesAndRegionsInHierarchy( agentId );
+                List<OrganizationUnitSettings> companySettings = settingsMap
+                    .get( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                List<OrganizationUnitSettings> regionSettings = settingsMap
+                    .get( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                List<OrganizationUnitSettings> branchSettings = settingsMap
+                    .get( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+                boolean doAutoPost = false;
+                for ( OrganizationUnitSettings companySetting : companySettings ) {
+                    if ( companySetting.isAllowZillowAutoPost() && !doAutoPost ) {
+                        doAutoPost = companySetting.isAllowZillowAutoPost();
+                    }
+                }
+                for ( OrganizationUnitSettings regionSetting : regionSettings ) {
+                    if ( regionSetting.isAllowZillowAutoPost() && !doAutoPost ) {
+                        doAutoPost = regionSetting.isAllowZillowAutoPost();
+                    }
+                }
+                for ( OrganizationUnitSettings branchSetting : branchSettings ) {
+                    if ( branchSetting.isAllowZillowAutoPost() && !doAutoPost ) {
+                        doAutoPost = branchSetting.isAllowZillowAutoPost();
+                    }
+                }
+
+                if ( agentSettings.isAllowZillowAutoPost() && !doAutoPost ) {
+                    doAutoPost = agentSettings.isAllowZillowAutoPost();
+                }
+
+
+                // Since auto post flag is not set true in hierarchy
+                if ( false || doAutoPost ) {
+                    return postedOnList;
+                }
+
+                SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
+                    companySettings.get( 0 ), regionSettings, branchSettings );
+
+                //create socialMediaPostResponseDetails object
+                SocialMediaPostResponseDetails socialMediaPostResponseDetails = surveyDetails
+                    .getSocialMediaPostResponseDetails();
+                if ( socialMediaPostResponseDetails == null ) {
+                    socialMediaPostResponseDetails = new SocialMediaPostResponseDetails();
+                }
+                AgentMediaPostResponseDetails agentMediaPostResponseDetails = socialMediaPostResponseDetails
+                    .getAgentMediaPostResponseDetails();
+                if ( agentMediaPostResponseDetails == null ) {
+                    agentMediaPostResponseDetails = new AgentMediaPostResponseDetails();
+                    agentMediaPostResponseDetails.setAgentId( socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
+                }
+                CompanyMediaPostResponseDetails companyMediaPostResponseDetails = socialMediaPostResponseDetails
+                    .getCompanyMediaPostResponseDetails();
+                if ( companyMediaPostResponseDetails == null ) {
+                    companyMediaPostResponseDetails = new CompanyMediaPostResponseDetails();
+                    companyMediaPostResponseDetails.setCompanyId( socialMediaPostDetails.getCompanyMediaPostDetails()
+                        .getCompanyId() );
+                }
+                List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList = socialMediaPostResponseDetails
+                    .getRegionMediaPostResponseDetailsList();
+                if ( regionMediaPostResponseDetailsList == null ) {
+                    regionMediaPostResponseDetailsList = new ArrayList<RegionMediaPostResponseDetails>();
+                }
+                List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList = socialMediaPostResponseDetails
+                    .getBranchMediaPostResponseDetailsList();
+                if ( branchMediaPostResponseDetailsList == null ) {
+                    branchMediaPostResponseDetailsList = new ArrayList<BranchMediaPostResponseDetails>();
+                }
+
+
+                if ( socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn() == null ) {
+                    socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( new ArrayList<String>() );
+                }
+                if ( socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn() == null ) {
+                    socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( new ArrayList<String>() );
+                }
+
+                List<String> agentSocialList = socialMediaPostDetails.getAgentMediaPostDetails().getSharedOn();
+                List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
+
+
+                for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
+                    if ( branchMediaPostDetails.getSharedOn() == null ) {
+                        branchMediaPostDetails.setSharedOn( new ArrayList<String>() );
+                    }
+                    //create BranchMediaPostResponseDetails
+                    BranchMediaPostResponseDetails branchMediaPostResponseDetails = new BranchMediaPostResponseDetails();
+                    branchMediaPostResponseDetails.setBranchId( branchMediaPostDetails.getBranchId() );
+                    branchMediaPostResponseDetails.setRegionId( branchMediaPostDetails.getRegionId() );
+                    if ( getBMPRDFromBMPRDList( branchMediaPostResponseDetailsList,
+                        branchMediaPostDetails.getBranchId() ) == null ) {
+                        branchMediaPostResponseDetailsList.add( branchMediaPostResponseDetails );
+                    }
+                }
+                for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
+                    if ( regionMediaPostDetails.getSharedOn() == null ) {
+                        regionMediaPostDetails.setSharedOn( new ArrayList<String>() );
+                    }
+                    //create RegionMediaPostResponseDetails
+                    RegionMediaPostResponseDetails regionMediaPostResponseDetails = new RegionMediaPostResponseDetails();
+                    regionMediaPostResponseDetails.setRegionId( regionMediaPostDetails.getRegionId() );
+                    if ( getRMPRDFromRMPRDList( regionMediaPostResponseDetailsList,
+                        regionMediaPostDetails.getRegionId() ) == null ) {
+                        regionMediaPostResponseDetailsList.add( regionMediaPostResponseDetails );
+                    }
+                }
+
+                socialMediaPostResponseDetails.setAgentMediaPostResponseDetails( agentMediaPostResponseDetails );
+                socialMediaPostResponseDetails.setCompanyMediaPostResponseDetails( companyMediaPostResponseDetails );
+                socialMediaPostResponseDetails.setBranchMediaPostResponseDetailsList( branchMediaPostResponseDetailsList );
+                socialMediaPostResponseDetails.setRegionMediaPostResponseDetailsList( regionMediaPostResponseDetailsList );
+
+                if ( !agentSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                    agentSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+
+                if ( !companySocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                    companySocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+
+                for ( RegionMediaPostDetails regionMediaPostDetails : socialMediaPostDetails.getRegionMediaPostDetailsList() ) {
+                    List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
+                    if ( !regionSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                        regionSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+                    regionMediaPostDetails.setSharedOn( regionSocialList );
+
+
+                }
+                for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails.getBranchMediaPostDetailsList() ) {
+                    List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
+                    if ( !branchSocialList.contains( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE ) )
+                        branchSocialList.add( CommonConstants.SOCIAL_SURVEY_SOCIAL_SITE );
+                    branchMediaPostDetails.setSharedOn( branchSocialList );
+                }
+
+                String feedback = Jsoup.parse( zillowTempPost.getZillowReviewDescription() ).text();
+                //                String linkedInfeedback = StringEscapeUtils.escapeXml( feedback );
+
+
+                // Facebook
+                //String facebookMessage = ratingFormat.format( zillowTempPost.getZillowReviewRating() ) + "-Star response from "
+                //    + surveyDetails.getCustomerFirstName() + " for " + agentName + " on Zillow - view at "
+                //    + zillowTempPost.getZillowReviewUrl();
+                //facebookMessage += "\n Feedback : " + feedback;
+
+                String profileLink = "";
+                if ( agentSettings != null && agentSettings.getSocialMediaTokens() != null
+                    && agentSettings.getSocialMediaTokens().getZillowToken() != null
+                    && agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null
+                    && !agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink().isEmpty() ) {
+                    profileLink = agentSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink();
+                } else {
+                    profileLink = zillowTempPost.getZillowReviewSourceLink();
+                }
+
+                // String facebookMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review on Zillow via SocialSurvey saying : \"" + feedback + "\"\nView this and more at "
+                //    + zillowTempPost.getZillowReviewUrl();
+
+                double rating = surveyHandler.getFormattedSurveyScore( zillowTempPost.getZillowReviewRating() );
+
+                String facebookMessage = buildFacebookAutoPostMessage( customerDisplayName, agentName,
+                    rating , feedback, zillowTempPost.getZillowReviewUrl(), true );
+
+                postToFacebookForHierarchy( facebookMessage, zillowTempPost.getZillowReviewRating(),
+                    zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,
+                    socialMediaPostResponseDetails, true );
+
+                String linkedInComment = feedback != null && feedback.length() > 500 ? feedback.substring( 0, 500 ) : feedback;
+                linkedInComment = feedback != null && feedback.length() > 500 ? ( linkedInComment.substring( 0,
+                    linkedInComment.lastIndexOf( " " ) ) + " ..." ) : linkedInComment;
+
+                // LinkedIn
+                // String linkedinMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review on Zillow via SocialSurvey saying : \"" + linkedInComment + "\". View this and more at "
+                //    + zillowTempPost.getZillowReviewUrl();
+
+                String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName,
+                    rating, feedback, zillowTempPost.getZillowReviewUrl(), true );
+
+                String linkedinProfileUrl = zillowTempPost.getZillowReviewUrl();
+                String linkedinMessageFeedback = "From : " + surveyDetails.getCustomerFirstName() + " - " + feedback;
+
+                postToLinkedInForHierarchy( linkedinMessage, zillowTempPost.getZillowReviewRating(),
+                    linkedinProfileUrl, linkedinMessageFeedback, accountMasterId, socialMediaPostDetails,
+                    socialMediaPostResponseDetails, companySettings.get( 0 ), true );
+
+                // Twitter
+                //String twitterMessage = String.format( CommonConstants.ZILLOW_TWITTER_MESSAGE,
+                //    ratingFormat.format( zillowTempPost.getZillowReviewRating() ), surveyDetails.getCustomerFirstName(),
+                //    agentName, "@SocialSurveyMe" ) + zillowTempPost.getZillowReviewUrl();
+
+                // String twitterMessage = surveyDetails.getCustomerFirstName() + " gave " + agentName + " a "
+                //    + ratingFormat.format( zillowTempPost.getZillowReviewRating() )
+                //    + "-star review @Zillow via @SocialSurveyMe. " + profileLink;
+
+                String twitterMessage = buildTwitterAutoPostMessage( customerDisplayName, agentName,
+                    rating, feedback, zillowTempPost.getZillowReviewUrl(), true );
+
+                postToTwitterForHierarchy( twitterMessage, zillowTempPost.getZillowReviewRating(),
+                    zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,
+                    socialMediaPostResponseDetails );
+
+
+                surveyDetails.setSocialMediaPostResponseDetails( socialMediaPostResponseDetails );
+
+                socialMediaPostDetails.getAgentMediaPostDetails().setSharedOn( agentSocialList );
+                socialMediaPostDetails.getCompanyMediaPostDetails().setSharedOn( companySocialList );
+                surveyDetails.setSocialMediaPostDetails( socialMediaPostDetails );
+                surveyHandler.updateSurveyDetails( surveyDetails );
+
+                // check if auto post triggered anywhere in hierarchy
+                if ( agentSocialList != null && agentSocialList.size() > 0 ) {
+                    for ( String agentSocialPostMedia : agentSocialList ) {
+                        if ( !postedOnList.contains( agentSocialPostMedia ) ) {
+                            postedOnList.add( agentSocialPostMedia );
+                        }
+                    }
+                } else if ( companySocialList != null && companySocialList.size() > 0 ) {
+                    for ( String companySocialPostMedia : companySocialList ) {
+                        if ( !postedOnList.contains( companySocialPostMedia ) ) {
+                            postedOnList.add( companySocialPostMedia );
+                        }
+                    }
+                } else if ( socialMediaPostDetails != null && socialMediaPostDetails.getRegionMediaPostDetailsList() != null ) {
+                    for ( RegionMediaPostDetails regionMediaPostDetailsList : socialMediaPostDetails
+                        .getRegionMediaPostDetailsList() ) {
+                        if ( regionMediaPostDetailsList != null && regionMediaPostDetailsList.getSharedOn() != null
+                            && regionMediaPostDetailsList.getSharedOn().size() > 0 ) {
+                            for ( String regionSocialPostMedia : regionMediaPostDetailsList.getSharedOn() ) {
+                                if ( !postedOnList.contains( regionSocialPostMedia ) ) {
+                                    postedOnList.add( regionSocialPostMedia );
+                                }
+                            }
+                        }
+                    }
+                } else if ( socialMediaPostDetails != null && socialMediaPostDetails.getBranchMediaPostDetailsList() != null ) {
+                    for ( BranchMediaPostDetails branchMediaPostDetails : socialMediaPostDetails
+                        .getBranchMediaPostDetailsList() ) {
+                        if ( branchMediaPostDetails != null && branchMediaPostDetails.getSharedOn() != null
+                            && branchMediaPostDetails.getSharedOn().size() > 0 ) {
+                            for ( String branchSocialPostMedia : branchMediaPostDetails.getSharedOn() ) {
+                                if ( !postedOnList.contains( branchSocialPostMedia ) ) {
+                                    postedOnList.add( branchSocialPostMedia );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error(
+                "Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ",
+                e );
+            throw new NonFatalException( e.getMessage() );
+        }
+        LOG.info( "Method to post feedback of customer to various pages of social networking sites finished." );
+        return postedOnList;
+    }
+
+
+    private boolean triggerComplaintResolutionWorkflowForZillowReview( OrganizationUnitSettings companySettings,
+        ZillowTempPost zillowTempPost, SurveyDetails survey, OrganizationUnitSettings unitSettings, int autoPostSuccess,
+        String postedOn )
+    {
+        LOG.info( "Method to trigger complaint resolution workflow for a review, triggerComplaintResolutionWorkflowForZillowReview started." );
+        // trigger complaint resolution workflow if configured
+        if ( companySettings.getSurvey_settings() != null
+            && companySettings.getSurvey_settings().getComplaint_res_settings() != null ) {
+            ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings()
+                .getComplaint_res_settings();
+            ExternalSurveyTracker externalSurveyTracker = checkExternalSurveyTrackerExist(
+                zillowTempPost.getEntityColumnName(), zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW,
+                zillowTempPost.getZillowReviewUrl(), zillowTempPost.getZillowReviewDate() );
+            if ( complaintRegistrationSettings.isEnabled()
+                && ( ( zillowTempPost.getZillowReviewRating() > 0d && complaintRegistrationSettings.getRating() > 0d && zillowTempPost
+                .getZillowReviewRating() <= complaintRegistrationSettings.getRating() ) )
+                && ( externalSurveyTracker == null || externalSurveyTracker.getComplaintResolutionStatus() == CommonConstants.NO ) ) {
+                try {
+                    survey.setUnderResolution( true );
+                    surveyHandler.updateSurveyAsUnderResolution( survey.get_id() );
+                    emailServices.sendZillowReviewComplaintHandleMail( complaintRegistrationSettings.getMailId(),
+                        zillowTempPost.getZillowReviewerName(), String.valueOf( zillowTempPost.getZillowReviewRating() ),
+                        zillowTempPost.getZillowReviewUrl() );
+
+                    // add complaint resolution status in External Survey Tracker
+                    saveExternalSurveyTracker( zillowTempPost.getEntityColumnName(),
+                        zillowTempPost.getEntityId(), CommonConstants.SURVEY_SOURCE_ZILLOW, unitSettings.getSocialMediaTokens()
+                            .getZillowToken().getZillowProfileLink(), zillowTempPost.getZillowReviewUrl(),
+                        zillowTempPost.getZillowReviewRating(), autoPostSuccess, CommonConstants.YES,
+                        zillowTempPost.getZillowReviewDate(), postedOn );
+                    return true;
+                } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                    LOG.error( "Error while sending complaint resolution mail to admins. Reason :", e );
+                    return true;
+                }
+            }
+        }
+        LOG.info( "Method to trigger complaint resolution workflow for a review, triggerComplaintResolutionWorkflowForZillowReview finished." );
+        return false;
     }
 }

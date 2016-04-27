@@ -28,7 +28,6 @@
 			value="com.realtech.socialsurvey.core.starter.SolrReviewCountUpdater" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 				<entry key="solrSearchService" value-ref="solrSearchService" />
 			</map>
 		</property>
@@ -55,15 +54,7 @@
 			value="com.realtech.socialsurvey.core.starter.IncompleteSocialPostReminderSender" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="urlGenerator" value-ref="urlGenerator" />
-				<entry key="surveyHandler" value-ref="surveyHandler" />
-				<entry key="emailServices" value-ref="emailServices" />
-				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="socialManagementService" value-ref="socialManagementService" />
-				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="utils" value-ref="utils" />
-				<entry key="fbAppId" value="${FB_CLIENT_ID}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -76,19 +67,7 @@
 			value="com.realtech.socialsurvey.core.starter.IncompleteSurveyReminderSender" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="surveyHandler" value-ref="surveyHandler" />
-				<entry key="emailServices" value-ref="emailServices" />
 				<entry key="userManagementService" value-ref="userManagementService" />
-				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="profileManagementService" value-ref="profileManagementService" />
-				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
-				<entry key="applicationBaseUrl" value="${APPLICATION_BASE_URL}" />
-				<entry key="applicationLogoUrl" value="${APPLICATION_LOGO_URL}" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="urlService" value-ref="urlService" />
-				<entry key="fileOperations" value-ref="fileOperations" />
-				<entry key="paramOrderTakeSurveyReminder" value="${PARAM_ORDER_TAKE_SURVEY_REMINDER}" />
-				<entry key="paramOrderTakeSurvey" value="${PARAM_ORDER_TAKE_SURVEY}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -102,7 +81,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="reviseSubscription" value-ref="reviseSubscription" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -196,11 +174,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="emailServices" value-ref="emailServices" />
-				<entry key="solrSearchService" value-ref="solrSearchService" />
-				<entry key="accountPermDeleteSpan" value="${ACCOUNT_PERM_DELETE_SPAN}" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="userManagementService" value-ref="userManagementService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -228,10 +201,6 @@
 			<map>
 				<entry key="fileUploadService" value-ref="fileUploadService" />
 				<entry key="profileManagementService" value-ref="profileManagementService" />
-				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="amazonImageBucket" value="${AMAZON_IMAGE_BUCKET}" />
-				<entry key="cdnUrl" value="${CDN_PATH}" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -309,7 +278,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -346,9 +314,7 @@
 			value="com.realtech.socialsurvey.core.starter.ImageProcessingStarter" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="imageProcessor" value-ref="imageProcessor" />
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -361,17 +327,7 @@
 			value="com.realtech.socialsurvey.core.starter.ZillowReviewProcessorAndAutoPostStarter" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="surveyHandler" value-ref="surveyHandler" />
-				<entry key="emailServices" value-ref="emailServices" />
-				<entry key="userManagementService" value-ref="userManagementService" />
 				<entry key="socialManagementService" value-ref="socialManagementService" />
-				<entry key="organizationManagementService" value-ref="organizationManagementService" />
-				<entry key="profileManagementService" value-ref="profileManagementService" />
-				<entry key="batchTrackerService" value-ref="batchTrackerService" />
-				<entry key="utils" value-ref="utils" />
-				<entry key="zillowAutoPostThreshold" value="${ZILLOW_AUTO_POST_THRESHOLD}" />
-				<entry key="emailFormatHelper" value-ref="emailFormatHelper" />
-				<entry key="emailServices" value-ref="emailServices" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
