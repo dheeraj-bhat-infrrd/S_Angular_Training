@@ -1608,9 +1608,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao
             .fetchOrganizationUnitSettingsByProfileName( agentProfileName,
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-        if ( organizationUnitSettings == null
-            || ( organizationUnitSettings.getStatus() != null && organizationUnitSettings.getStatus().equalsIgnoreCase(
-                CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+        if ( organizationUnitSettings == null || ( organizationUnitSettings.getStatus() != null && (
+            organizationUnitSettings.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO )
+                || organizationUnitSettings.getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
             LOG.warn( "No profile found with profile name: " + agentProfileName );
             throw new ProfileNotFoundException( "No profile found with profile name: " + agentProfileName );
         } else {
@@ -3296,6 +3296,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 && userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                 // get the branch profile if it is not present in the branch settings
                 if ( userProfile.getBranchId() > 0l ) {
+                    Branch branch = userManagementService.getBranchById( userProfile.getBranchId() );
+                    if ( branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES )
+                        break;
                     entitySettings = organizationManagementService.getBranchSettingsDefault( userProfile.getBranchId() );
                     contactDetails = entitySettings.getContact_details();
                     if ( contactDetails != null && contactDetails.getAddress1() != null ) {
@@ -3313,10 +3316,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( !parentLockSettings.getIsLogoLocked() && entitySettings != null && contactDetails != null ) {
             if ( logoUrl == null || logoUrl.isEmpty() ) {
                 Branch branch = branchDao.findById( Branch.class, entitySettings.getIden() );
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( branch.getRegion()
-                    .getRegionId() );
-                if ( regionSettings.getLogoThumbnail() != null && !regionSettings.getLogoThumbnail().isEmpty() ) {
-                    logoUrl = regionSettings.getLogoThumbnail();
+                if ( branch.getRegion().getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
+                    OrganizationUnitSettings regionSettings = organizationManagementService
+                        .getRegionSettings( branch.getRegion().getRegionId() );
+                    if ( regionSettings.getLogoThumbnail() != null && !regionSettings.getLogoThumbnail().isEmpty() ) {
+                        logoUrl = regionSettings.getLogoThumbnail();
+                    }
                 }
             }
         }
