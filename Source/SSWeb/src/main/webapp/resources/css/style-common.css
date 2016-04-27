@@ -3400,11 +3400,11 @@ button.paypal.is-active {
 }
 
 .review-count-left {
-	line-height: 30px;
+	line-height: 22px;
 	height: 30px;
 	font-size: 14px;
 	color: #009FE0;
-	margin-left: 15px;
+	margin-left: 5px;
 }
 
 .prof-user-logo {
