@@ -33,6 +33,9 @@ app.controller('linkedInController',['$http','$location',function($http,$locatio
 	var vm = this;
     vm.title = 'AngularJS for SocialSurvey';
 }]);
+app.controller('accountSignupController',['$http','$location',function($http,$location){
+	$('#reg-phone').intlTelInput();
+}]);
 
 /*app.controller('dropZoneCtrl',['$http','$location',function($http,$location){
 	app.directive('dropZone', function() {

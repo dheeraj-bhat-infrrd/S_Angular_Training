@@ -54,6 +54,8 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
 	<script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
 </head>
 <body ng-app="SocialSurvey">
@@ -63,12 +65,15 @@
 
 </div>
 </body>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-route.min.js"></script>
-
+<script src="${initParam.resourcesPath}/resources/js/intlTelInput.js"></script>
  <script src="${initParam.resourcesPath}/resources/js/signup.js"></script> 
  <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
+
 </body>
 </html>
