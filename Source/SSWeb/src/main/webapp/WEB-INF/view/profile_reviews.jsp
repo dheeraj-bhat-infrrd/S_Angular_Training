@@ -35,8 +35,8 @@
 	</c:when>
 </c:choose>
 		<div data-firstname="${reviewItem.customerFirstName}"
-			data-lastname="${reviewItem.customerLastName}"
-			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}"
+			data-lastname="${reviewItem.customerLastName}" data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
+			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}" data-customeremail="${reviewItem.customerEmail}"
 			data-agentname="${reviewItem.agentName}" class="ppl-review-item dsh-review-cont hide">
 
 			<div class="ppl-header-wrapper clearfix">
@@ -118,14 +118,24 @@
 					</span>
 				</div>
 				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide"></div> -->
-				
+				<div class="float-right">
+					<div class="clearfix">
+						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
+							title="Report"></div>
+						<%-- <c:if test="${reviewItem.source != 'Zillow'}">
+							 <span class="report-resend-icn-container clearfix float-right"> 
+								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
+							
+						</c:if> --%>
+					</div>
+				</div>
 			</div>
 			<c:choose>
 				<c:when test="${fn:length(reviewItem.review)>250}">
 					<div class="ppl-content">
 						<span class="review-complete-txt">${reviewItem.review}</span>
 						<c:if test="${reviewItem.source=='Zillow' }">
-                          <br><span><a class="view-zillow-link hide" href="{feedback.sourceId}"  target="_blank">View on zillow</a></span>
+                          <br><span><a class="view-zillow-link hide" href="{reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
 						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
