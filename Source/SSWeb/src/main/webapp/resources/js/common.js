@@ -415,13 +415,13 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	
 	
 	if(source != undefined && source == "Zillow"){
-		ratingImgHtml = "<div class='rating-image float-left star-rating-green-"+ ratingIntVal +"' ></div>";
+		ratingImgHtml = "<div class='rating-image cursor-pointer  float-left star-rating-green-"+ ratingIntVal +"' title='"+roundedFloatingVal+"' ></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml = "<div class='rating-image float-left star-rating-"+ ratingIntVal +"' ></div>";
+		ratingImgHtml = "<div class='rating-image  cursor-pointer float-left star-rating-"+ ratingIntVal +"' title='"+roundedFloatingVal+"'></div>";
 		
 	}
 		else {
-		ratingImgHtml = "<div class='rating-image float-left  star-rating-"+ratingIntVal+"' ></div>";		
+		ratingImgHtml = "<div class='rating-image cursor-pointer float-left  star-rating-"+ratingIntVal+"' title='"+roundedFloatingVal+"'></div>";		
 	}
 	
 	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
@@ -447,13 +447,13 @@ function proRatingPattern(rating, ratingParent, isOverallRating, source) {
 	}
 	
 	if(source != undefined && source == "Zillow"){
-		ratingImgHtml = "<div class='rating-image float-left star-rating-green-"+ ratingIntVal +"' style='margin-left: 10px;'></div>";
+		ratingImgHtml = "<div class='rating-image  cursor-pointer float-left star-rating-green-"+ ratingIntVal +"' title='"+roundedFloatingVal+"' style='margin-left: 10px;'></div>";
 	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml = "<div class='rating-image float-left star-rating-"+ ratingIntVal +"'style='margin-left: 10px;' ></div>";
+		ratingImgHtml = "<div class='rating-image  cursor-pointer float-left star-rating-"+ ratingIntVal +"' title='"+roundedFloatingVal+"' style='margin-left: 10px;' ></div>";
 		
 	}
 		else {
-		ratingImgHtml = "<div class='rating-image float-left  star-rating-"+ratingIntVal+"'style='margin-left: 10px;'></div>";		
+		ratingImgHtml = "<div class='rating-image cursor-pointer float-left  star-rating-"+ratingIntVal+"' title='"+roundedFloatingVal+"' style='margin-left: 10px;'></div>";		
 	}
 
 	ratingParent.html('');
