@@ -408,7 +408,10 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	var roundedFloatingVal = parseFloat(rating).toFixed(2);
 	var ratingImgHtml = "";*/
 	var roundedFloatingVal = parseFloat(rating).toFixed(1);
-	ratingIntVal= (Math.round(rating * 4) / 4).toFixed(2);
+	var ratingFloat= parseFloat(roundedFloatingVal).toFixed(2);
+	/*ratingIntVal= (Math.round(rating * 4) / 4).toFixed(2);*/
+	var ratingInt= parseInt(ratingFloat*4);
+	ratingIntVal=(ratingInt/4).toFixed(2);
 	
 	
 	if(source != undefined && source == "Zillow"){
@@ -433,7 +436,9 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 function proRatingPattern(rating, ratingParent, isOverallRating, source) {
 	var ratingIntVal = 0;
 	var roundedFloatingVal = parseFloat(rating).toFixed(1);
-	ratingIntVal= (Math.round(rating * 4) / 4).toFixed(2);
+	var ratingFloat =parseFloat(roundedFloatingVal).toFixed(2);
+	var ratingInt= parseInt(ratingFloat*4);
+	ratingIntVal=(ratingInt/4).toFixed(2);
 	if(roundedFloatingVal!= 0.0){
 		var ratingValHtml = "<div class='rating-rounded float-left' style='font-weight:600 !important'>&#8212; " + roundedFloatingVal + "</div>";
 		if (isOverallRating) {
