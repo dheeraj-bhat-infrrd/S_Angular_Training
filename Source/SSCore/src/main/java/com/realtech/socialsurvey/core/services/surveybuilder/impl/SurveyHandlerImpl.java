@@ -915,7 +915,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                  preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource ); 
          }
         
-
+        
+        LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
+        surveyUrl = urlService.shortenUrl( surveyUrl );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
+        
         //get mail subject and body
         String mailBody = "";
         String mailSubject = "";
@@ -925,9 +929,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             MailContent restartSurvey = companySettings.getMail_content().getRestart_survey_mail();
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( restartSurvey.getMail_body(),
                 restartSurvey.getParam_order() );
-            LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
-            surveyUrl = urlService.shortenUrl( surveyUrl );
-            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
             mailSubject = restartSurvey.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1779,6 +1780,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         OrganizationUnitSettings companySettings = organizationManagementService
             .getCompanySettings( user.getCompany().getCompanyId() );
+        
+        LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
+        surveyUrl = urlService.shortenUrl( surveyUrl );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
         //get mail subject and body
         String mailBody = "";
@@ -1788,10 +1793,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             MailContent takeSurvey = companySettings.getMail_content().getTake_survey_mail();
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( takeSurvey.getMail_body(), takeSurvey.getParam_order() );
-
-            LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
-            surveyUrl = urlService.shortenUrl( surveyUrl );
-            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
             // Adding mail subject
             mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;
