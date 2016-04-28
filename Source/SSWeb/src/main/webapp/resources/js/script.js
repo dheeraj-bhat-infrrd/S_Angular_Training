@@ -2218,7 +2218,7 @@ function paintProList(usersList) {
 
 								usersHtml = usersHtml + '</div>';
 								usersHtml = usersHtml
-										+ '<div class="float-right ctnt-list-item-btn-wrap clearfix">'
+										+ '<div class="float-right ctnt-list-item-btn-wrap clearfix pro-star-mar">'
 										+ '<div class="float-left ctnt-review-count" user="'
 										+ user.userId + '">' ;
 								if(reviewCount==0){
