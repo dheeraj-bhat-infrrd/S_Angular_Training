@@ -161,6 +161,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
     private int maxSocialPostReminderInterval;
 
+    @Value( "${MAX_SURVEY_REMINDER_INTERVAL}" )
+    private int maxSurveyReminderInterval;
+
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
     String paramOrderTakeSurveySubject;
@@ -585,8 +588,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
             Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
+
+        //Get only those surveys that have lastReminderTime within the last N days
+        Criterion maxDaysBackCriteria = Restrictions.ge( CommonConstants.SURVEY_LAST_REMINDER_TIME,
+            new Timestamp( System.currentTimeMillis() - ( maxSurveyReminderInterval * 24 * 3600 * 1000l ) ) );
         incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
-            statusCriteria );
+            statusCriteria, maxDaysBackCriteria );
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
     }
