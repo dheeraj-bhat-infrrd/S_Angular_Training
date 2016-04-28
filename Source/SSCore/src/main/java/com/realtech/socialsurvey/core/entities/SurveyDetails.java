@@ -54,6 +54,7 @@ public class SurveyDetails
     private long surveyPreIntitiationId;
     private boolean retakeSurvey;
     
+    private Date surveySentDate;
     private Date surveyCompletedDate;
     private Date surveyTransactionDate;
     private String surveyGeoLocation;
@@ -606,6 +607,18 @@ public class SurveyDetails
     public void setRetakeSurvey( boolean retakeSurvey )
     {
         this.retakeSurvey = retakeSurvey;
+    }
+
+
+    public Date getSurveySentDate()
+    {
+        return surveySentDate;
+    }
+
+
+    public void setSurveySentDate( Date surveySentDate )
+    {
+        this.surveySentDate = surveySentDate;
     }
 
 
