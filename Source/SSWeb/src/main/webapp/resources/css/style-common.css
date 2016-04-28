@@ -2009,15 +2009,16 @@ button.paypal.is-active {
 }
 
 .ppl-head-1 {
-	font-size: 12px;
+	font-size: 15px;
 	font-weight: bold !important;
-	margin-left: 10px;
     line-height: 22px;
 }
 
 .ppl-head-2 {
-	font-size: 13px;
+	font-size: 15px;
 	color: #666;
+	margin-left: 10px;
+    line-height: 22px;
 }
 
 .ppl-header-left {
@@ -2031,7 +2032,9 @@ button.paypal.is-active {
 }
 
 .ppl-content {
-	line-height: 24px;
+	line-height: 22px;
+	font-size:15px;
+	padding-top: 20px;
 }
 
 .rev-ppl-share-wrapper {
@@ -2040,8 +2043,9 @@ button.paypal.is-active {
 }
 
 .ppl-share-wrapper {
-	margin: 10px 0 10px 0;
+	margin: 5px 0 5px 0;
 	line-height: 36px;
+	/* opacity:0.1; */
 }
 
 .icn-rem-size {
@@ -3538,6 +3542,14 @@ button.paypal.is-active {
 	padding-bottom: 10px;
 	margin-top: 10px;
 	word-break: break-word;
+	position: relative;
+	padding-top: 25px;
+}
+.dash-flag-retake{
+	position:absolute;
+	top:90%;
+	right:10px;
+	
 }
 
 .ppl-review-item:last-child {
@@ -3545,8 +3557,14 @@ button.paypal.is-active {
 }
 
 .ppl-review-item-last {
-	padding-bottom: 10px;
-	margin-top: 10px;
+	/* padding-bottom: 10px;
+	margin-top: 10px; */
+	border-bottom: 1px solid #dcdcdc;
+    padding-bottom: 10px;
+    margin-top: 10px;
+    word-break: break-word;
+    position: relative;
+    padding-top: 20px;
 }
 
 .survery-header-2 {
@@ -8687,7 +8705,7 @@ label.url-change-input-label {
 }
 
 .share-plus-height {
-	height: 33px;
+	height: 10px;
 }
 
 .en-icn {
@@ -8850,4 +8868,10 @@ label.url-change-input-label {
 }
 .pro-star-mar{
 	margin-right:-7px;
+}
+.public-report{
+	    position: absolute;
+    top: 93%; 
+    right: 10px;
+
 }

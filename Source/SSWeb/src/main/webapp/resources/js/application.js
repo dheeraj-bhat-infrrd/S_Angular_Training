@@ -10087,12 +10087,12 @@ $(document).on('mouseover', '#prof-posts .tweet-panel-item' , function(e){
 $(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
 	$(this).find('.dlt-survey-wrapper').addClass('hide');
 });
-$(document).on('mouseover','.dsh-review-cont ',function(e){
-	$(this).find('.ppl-share-wrapper').css('visibility','visible');
+/*$(document).on('mouseover','.dsh-review-cont ',function(e){
+	$(this).find('.ppl-share-wrapper').css('opacity','1');
 });
 $(document).on('mouseleave','.dsh-review-cont ',function(e){
-	$(this).find('.ppl-share-wrapper').css('visibility','hidden');;
-});
+	$(this).find('.ppl-share-wrapper').css('opacity','0.1');;
+});*/
 
 $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
 	e.stopPropagation();

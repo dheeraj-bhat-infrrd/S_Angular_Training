@@ -588,6 +588,12 @@ input#find-pro-submit{
 	border-radius: 3px;
     margin-left: 0;
 }
+.ppl-share-social{
+	position:absolute;
+	left: 10px;
+    top: 94%;
+	
+}
 .pro-list-default-img {
 	background: url(../images/place-holder-individual.png) no-repeat center;
 	background-size: contain;
