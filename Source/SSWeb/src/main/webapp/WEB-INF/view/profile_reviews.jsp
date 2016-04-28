@@ -116,18 +116,18 @@
 			</div>
 			
 			<c:choose>
-				<c:when test="${fn:length(reviewItem.review)>250}">
-					<div class="ppl-content">
+				<c:when test="${fn:length(reviewItem.review)>200}">
+					<div class="ppl-content review-height">
 						<span class="review-complete-txt">${reviewItem.review}</span>
 						<c:if test="${reviewItem.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
-						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
+						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 200)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content">${reviewItem.review}</div>
+					<div class="ppl-content review-height">${reviewItem.review}</div>
 				</c:otherwise>
 			</c:choose>
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
