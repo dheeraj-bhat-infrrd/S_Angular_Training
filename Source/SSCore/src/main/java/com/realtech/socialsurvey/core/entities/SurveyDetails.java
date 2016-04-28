@@ -54,6 +54,12 @@ public class SurveyDetails
     private long surveyPreIntitiationId;
     private boolean retakeSurvey;
     
+    private Date surveySentDate;
+    private Date surveyCompletedDate;
+    private Date surveyTransactionDate;
+    private String surveyGeoLocation;
+    private String surveyType;
+    
     public SocialMediaPostResponseDetails getSocialMediaPostResponseDetails()
     {
         return socialMediaPostResponseDetails;
@@ -601,5 +607,65 @@ public class SurveyDetails
     public void setRetakeSurvey( boolean retakeSurvey )
     {
         this.retakeSurvey = retakeSurvey;
+    }
+
+
+    public Date getSurveySentDate()
+    {
+        return surveySentDate;
+    }
+
+
+    public void setSurveySentDate( Date surveySentDate )
+    {
+        this.surveySentDate = surveySentDate;
+    }
+
+
+    public Date getSurveyCompletedDate()
+    {
+        return surveyCompletedDate;
+    }
+
+
+    public void setSurveyCompletedDate( Date surveyCompletedDate )
+    {
+        this.surveyCompletedDate = surveyCompletedDate;
+    }
+
+
+    public Date getSurveyTransactionDate()
+    {
+        return surveyTransactionDate;
+    }
+
+
+    public void setSurveyTransactionDate( Date surveyTransactionDate )
+    {
+        this.surveyTransactionDate = surveyTransactionDate;
+    }
+
+
+    public String getSurveyGeoLocation()
+    {
+        return surveyGeoLocation;
+    }
+
+
+    public void setSurveyGeoLocation( String surveyGeoLocation )
+    {
+        this.surveyGeoLocation = surveyGeoLocation;
+    }
+
+
+    public String getSurveyType()
+    {
+        return surveyType;
+    }
+
+
+    public void setSurveyType( String surveyType )
+    {
+        this.surveyType = surveyType;
     }
 }
