@@ -287,11 +287,6 @@ namespace EncompassSocialSurvey
                         UpdateRecentRecordFetchTimeInCrmBatchTracker(crmBatchTracker,loanService);
                     }
 
-                    //update recent records fetched count in crm batch tracker
-                    UpdateLastRunRecordFetechedCountInCrmBatchTracker(loanService, crmBatchTracker, returnLoansViewModel.Count);
-
-                    //insert count of records fetched in crm batch tracker history  
-                    InsertCrmBatchTrackerHistory(loanService, crmBatchTracker.Id, returnLoansViewModel.Count);
                     //update last run end date
                     UpdateLastRunEndTimeInCrmBatchTracker(crmBatchTracker,loanService);
                 }
@@ -324,7 +319,7 @@ namespace EncompassSocialSurvey
         /// <param name="loanService"></param>
         /// <param name="id"></param>
         /// <param name="count"></param>
-        private void InsertCrmBatchTrackerHistory(LoanService loanService, long crmBatchTrackerId, int count)
+        public void InsertCrmBatchTrackerHistory(LoanService loanService, long crmBatchTrackerId, int count)
         {
             CrmBatchTrackerHistory entity = new CrmBatchTrackerHistory();
             Logger.Debug("Inside method Loan.Utility.InsertCrmBatchTrackerHistory() ");
@@ -351,7 +346,7 @@ namespace EncompassSocialSurvey
         /// <param name="loanService"></param>
         /// <param name="crmBatchTracker"></param>
         /// <param name="count"></param>
-        private void UpdateLastRunRecordFetechedCountInCrmBatchTracker(LoanService loanService, CRMBatchTrackerEntity crmBatchTracker, int count)
+        public void UpdateLastRunRecordFetechedCountInCrmBatchTracker(LoanService loanService, CRMBatchTrackerEntity crmBatchTracker, int count)
         {
             Logger.Debug("Inside method ULoanUtility.pdateRecentFetechedRecordsCountInCrmBatchTracker() ");
             if (loanService != null && crmBatchTracker != null)

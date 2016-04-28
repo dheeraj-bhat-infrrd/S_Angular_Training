@@ -69,26 +69,68 @@
 				<div class='zillow-badge   verify-image float-right' title='Click here to know more'></div>
 				</c:if>
 				<div class="ppl-header-left review-sm-screen " >
-					<div class="ppl-head-1 review-detail-profile">
-					<span class="float-left"> &#8212; Reviewed by </span>
+				<div class="ppl-head-2 float-left" data-modified="false" 
+						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
+						value="${reviewItem.modifiedOn}" />"></div>
+					<div class="ppl-head-1 review-detail-profile" style="clear:both">
+					<span class="float-left">  Reviewed by </span>
 						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						<c:if test="${profilemasterid !=4}">
 					<span class="float-left" style="margin-left:5px;">for<a class="cursor-pointer" style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>
 					</c:if>
+					<c:choose>
+							<c:when test="${ not empty reviewItem.summary }">
+								<div class="ppl-content" style="clear:both">${reviewItem.summary}</div>
+							</c:when>
+							<c:otherwise>
+							<c:choose>
+							<c:when
+								test="${not (empty reviewItem.surveyGeoLocation and empty reviewItem.surveyType)}">
+								<div class="ppl-content" style="clear:both">${reviewItem.surveyGeoLocation}
+									<span>${reviewItem.surveyType}</span>
+								</div>
+							</c:when>
+							<c:otherwise>
+								<div style="clear:both">
+									Completed transation on
+                                       <c:choose>
+									<c:when test="${ not empty reviewItem.surveyTransactionDate} ">
+										<span>${ reviewItem.surveyTransactionDate}</span>
+									</c:when>
+									<c:otherwise>
+										<span>${reviewItem.modifiedOn}</span>
+									</c:otherwise>
+									</c:choose>
+								</div>
+							</c:otherwise>
+						</c:choose>
+							</c:otherwise>
+						</c:choose>
+					
 					</div>
-					<span class="float-left" style="margin: 0 5px;line-height: 22px;">&#8212;</span>
-					<div class="ppl-head-2 float-left" data-modified="false" 
-						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
-						value="${reviewItem.modifiedOn}" />"></div>
+					
+					
 						
 				</div>
 				
 			</div>
-			<c:if test="${ not empty reviewItem.summary }">
-				<div class="ppl-content">${reviewItem.summary}</div>
-			</c:if>
 			
-			<div class="ppl-share-wrapper clearfix share-plus-height" style="visibility:hidden;">
+			<c:choose>
+				<c:when test="${fn:length(reviewItem.review)>250}">
+					<div class="ppl-content">
+						<span class="review-complete-txt">${reviewItem.review}</span>
+						<c:if test="${reviewItem.source=='Zillow' }">
+                          <br><span><a class="view-zillow-link hide" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
+						</c:if>
+						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
+							<span class="review-more-button">read full review</span>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<div class="ppl-content">${reviewItem.review}</div>
+				</c:otherwise>
+			</c:choose>
+			<div class="ppl-share-wrapper clearfix share-plus-height" >
 				<%-- <div class="float-left blue-text ppl-share-shr-txt">
 					<spring:message code="label.share.key" />
 				</div> --%>
@@ -118,7 +160,7 @@
 					</span>
 				</div>
 				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide"></div> -->
-				<div class="float-right">
+				<div class="float-right dash-flag-retake ">
 					<div class="clearfix">
 						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
 							title="Report"></div>
@@ -130,21 +172,7 @@
 					</div>
 				</div>
 			</div>
-			<c:choose>
-				<c:when test="${fn:length(reviewItem.review)>250}">
-					<div class="ppl-content">
-						<span class="review-complete-txt">${reviewItem.review}</span>
-						<c:if test="${reviewItem.source=='Zillow' }">
-                          <br><span><a class="view-zillow-link hide" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
-						</c:if>
-						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
-							<span class="review-more-button">read full review</span>
-					</div>
-				</c:when>
-				<c:otherwise>
-					<div class="ppl-content">${reviewItem.review}</div>
-				</c:otherwise>
-			</c:choose>
+			
 			
 			<%-- <div class="ppl-content">${reviewItem.review}</div> --%>
 		</div>

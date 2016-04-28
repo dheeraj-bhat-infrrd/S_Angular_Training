@@ -123,6 +123,8 @@ namespace EncompassSocialSurvey.DAL
 
         #endregion
 
+        public int noOfRecordsInserted = 0;
+
         #region public methods
 
         /// <summary>
@@ -253,6 +255,7 @@ namespace EncompassSocialSurvey.DAL
 
                         //
                         commandToInsert.ExecuteNonQuery();
+                        noOfRecordsInserted++;
                     }
                 }
             }
@@ -315,11 +318,10 @@ namespace EncompassSocialSurvey.DAL
         /// </summary>
         /// <param name="loans"></param>
         /// <returns></returns>
-        public bool InserLoan(List<LoanEntity> loans)
+        public int InserLoan(List<LoanEntity> loans)
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(List<>)");
-            bool returnValue = false;
-
+           
             MySqlConnection mySqlDbConnnection = null;
             try
             {
@@ -348,7 +350,7 @@ namespace EncompassSocialSurvey.DAL
 
             //
             Logger.Info("Exiting the method LoanRepository.InsertLoan(List<>)");
-            return returnValue;
+            return noOfRecordsInserted;
         }
 
         /// <summary>
