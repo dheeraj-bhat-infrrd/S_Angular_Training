@@ -283,7 +283,13 @@ public class WorkbookData
         }
         Integer counter = 1;
         Map<Integer, List<Object>> data = new TreeMap<>();
+        
+        Map<Long, Branch> cachedBranches = new HashMap<Long, Branch>();
+        Map<Long, Region> cachedRegions = new HashMap<Long, Region>();
+        
+        //create list of objects to populate
         List<Object> surveyDetailsToPopulate = new ArrayList<>();
+        
         for ( SurveyDetails survey : surveyDetails ) {
             if ( survey.getSurveyResponse() != null ) {
                 String agentName = survey.getAgentName();
@@ -322,8 +328,7 @@ public class WorkbookData
                 } else {
                     surveyDetailsToPopulate.add( CommonConstants.STATUS_NO );
                 }
-                Map<Long, Branch> cashedBranches = new HashMap<Long, Branch>();
-                Map<Long, Region> cashedRegions = new HashMap<Long, Region>();
+                
                 if ( survey.getSocialMediaPostDetails() != null ) {
                     //for company
                     Set<String> companySocialMedia = new HashSet<>();
@@ -351,13 +356,15 @@ public class WorkbookData
                         for ( RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails()
                             .getRegionMediaPostDetailsList() ) {
                             //get region
-                            Region region = cashedRegions.get( regionMediaDetail.getRegionId() );
+                            Region region = cachedRegions.get( regionMediaDetail.getRegionId() );
                             if ( region == null ) {
                                 region = regionDao.findById( Region.class, regionMediaDetail.getRegionId() );
-                                cashedRegions.put( regionMediaDetail.getRegionId(), region );
+                                //check if region is not null and not a default region
+                                if(region != null && region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO)
+                                    cachedRegions.put( regionMediaDetail.getRegionId(), region );
                             }
                             //get shared on for region
-                            if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() ) {
+                            if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() && region != null && region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
                                 regionShared += region.getRegion() + ": { "
                                     + StringUtils.join( regionMediaDetail.getSharedOn(), "," ) + " }, ";
                             }
@@ -374,13 +381,15 @@ public class WorkbookData
                         for ( BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails()
                             .getBranchMediaPostDetailsList() ) {
                             //get branch
-                            Branch branch = cashedBranches.get( branchMediaDetail.getBranchId() );
+                            Branch branch = cachedBranches.get( branchMediaDetail.getBranchId() );
                             if ( branch == null ) {
                                 branch = branchDao.findById( Branch.class, branchMediaDetail.getBranchId() );
-                                cashedBranches.put( branchMediaDetail.getBranchId(), branch );
+                                //check if branch is not null and not a default branch
+                                if(branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO)
+                                    cachedBranches.put( branchMediaDetail.getBranchId(), branch );
                             }
                             //get shared on for region
-                            if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() ) {
+                            if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() && branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO) {
                                 branchShared += branch.getBranch() + ": { "
                                     + StringUtils.join( branchMediaDetail.getSharedOn(), "," ) + "}, ";
                             }
