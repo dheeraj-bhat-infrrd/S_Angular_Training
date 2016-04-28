@@ -73,7 +73,7 @@
 						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
 						value="${reviewItem.modifiedOn}" />"></div>
 					<div class="ppl-head-1 review-detail-profile" style="clear:both">
-					<span class="float-left"> &#8212; Reviewed by </span>
+					<span class="float-left">  Reviewed by </span>
 						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						<c:if test="${profilemasterid !=4}">
 					<span class="float-left" style="margin-left:5px;">for<a class="cursor-pointer" style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>

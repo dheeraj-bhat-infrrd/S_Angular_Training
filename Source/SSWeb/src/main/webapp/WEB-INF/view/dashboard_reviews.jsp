@@ -114,7 +114,7 @@
 						value="${feedback.modifiedOn}" />">
 					</div>
 				<div class="ppl-head-1 " style="clear:both">
-					<span class="float-left"> &#8212; Reviewed by </span>
+					<span class="float-left"> Reviewed by </span>
 					<c:choose>
 						<c:when
 							test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">

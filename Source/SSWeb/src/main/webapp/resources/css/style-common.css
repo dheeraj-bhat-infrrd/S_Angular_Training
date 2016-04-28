@@ -2009,13 +2009,13 @@ button.paypal.is-active {
 }
 
 .ppl-head-1 {
-	font-size: 12px;
+	font-size: 15px;
 	font-weight: bold !important;
     line-height: 22px;
 }
 
 .ppl-head-2 {
-	font-size: 13px;
+	font-size: 15px;
 	color: #666;
 	margin-left: 10px;
     line-height: 22px;
@@ -2032,7 +2032,9 @@ button.paypal.is-active {
 }
 
 .ppl-content {
-	line-height: 24px;
+	line-height: 22px;
+	font-size:15px;
+	padding-top: 20px;
 }
 
 .rev-ppl-share-wrapper {
@@ -2041,7 +2043,7 @@ button.paypal.is-active {
 }
 
 .ppl-share-wrapper {
-	margin: 10px 0 10px 0;
+	margin: 5px 0 5px 0;
 	line-height: 36px;
 	/* opacity:0.1; */
 }
@@ -8703,7 +8705,7 @@ label.url-change-input-label {
 }
 
 .share-plus-height {
-	height: 20px;
+	height: 10px;
 }
 
 .en-icn {

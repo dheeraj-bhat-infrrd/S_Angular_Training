@@ -424,7 +424,7 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 		ratingImgHtml = "<div class='rating-image cursor-pointer float-left  star-rating-"+ratingIntVal+"' title='"+roundedFloatingVal+"/5.0'></div>";		
 	}
 	
-	var ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + "</div>";
+	var ratingValHtml = "<div class='rating-rounded float-left' style='font-size:15px;line-height:22px;' >"+ roundedFloatingVal + "</div>";
 	if (isOverallRating) {
 		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
 	}
