@@ -178,6 +178,7 @@ public interface CommonConstants
     public static final String SURVEY_PREINITIATION_ID_COLUMN = "surveyPreIntitiationId";
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";
+    public static final String SURVEY_LAST_REMINDER_TIME = "lastReminderTime";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
