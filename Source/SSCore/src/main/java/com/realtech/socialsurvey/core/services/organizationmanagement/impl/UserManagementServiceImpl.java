@@ -4474,6 +4474,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //JIRA SS-1363 end
 
+        LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+        surveyLink = urlService.shortenUrl( surveyLink );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
+        
         String mailBody = "";
         String mailSubject = "";
         if ( companySettings != null && companySettings.getMail_content() != null
