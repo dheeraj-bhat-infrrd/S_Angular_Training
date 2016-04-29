@@ -564,8 +564,7 @@ public class ProfileViewController
 
 
                 if ( individualProfile == null || ( individualProfile.getStatus() != null && (
-                    individualProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) || individualProfile
-                        .getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
+                    individualProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find agent profile for profile name " + agentProfileName );
                 }
                 Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( individualProfile );
