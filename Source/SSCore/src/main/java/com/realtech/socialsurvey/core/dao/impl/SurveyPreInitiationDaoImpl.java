@@ -620,8 +620,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update updateAgentIdOfPreInitiatedSurveys started." );
         String queryStr = "UPDATE SURVEY_PRE_INITIATION SET STATUS = "
-            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + "  WHERE AGENT_EMAILID = ? AND (STATUS = "
-            + CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD + " OR STATUS = "
+            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + "  WHERE AGENT_EMAILID = ? AND STATUS IN ("
+            + CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD + ", "
             + CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD + ") ";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, agentEmailAddress );
