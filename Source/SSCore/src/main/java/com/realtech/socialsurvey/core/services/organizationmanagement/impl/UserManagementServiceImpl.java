@@ -3778,9 +3778,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
 
         userEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setCreatedBy( user.getCompany().getCompany() );
+        //TODO : Modify createdBy and modifiedBy to store the actual admin's ID
+        userEmailMapping.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setModifiedBy( user.getCompany().getCompany() );
+        userEmailMapping.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
         userEmailMappingDao.save( userEmailMapping );
         return user;
     }
