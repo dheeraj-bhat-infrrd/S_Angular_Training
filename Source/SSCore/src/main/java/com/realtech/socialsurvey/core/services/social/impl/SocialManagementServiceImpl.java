@@ -2038,7 +2038,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getCorruptPreInitiatedSurveys( companyId,
             startIndex, batchSize );
         for ( SurveyPreInitiation survey : surveyPreInitiations ) {
+            if ( survey.getErrorCode() != null )
             survey.setErrorCodeDescription( SurveyErrorCode.valueOf( survey.getErrorCode() ).getValue() );
+            else
+                survey.setErrorCodeDescription( SurveyErrorCode.NOT_KNOWN.getValue() );
         }
         surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
         surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getCorruptPreInitiatedSurveyCount( companyId ) );
