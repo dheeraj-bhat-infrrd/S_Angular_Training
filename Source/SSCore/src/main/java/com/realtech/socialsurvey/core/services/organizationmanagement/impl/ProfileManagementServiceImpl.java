@@ -1609,8 +1609,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             .fetchOrganizationUnitSettingsByProfileName( agentProfileName,
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
         if ( organizationUnitSettings == null || ( organizationUnitSettings.getStatus() != null && (
-            organizationUnitSettings.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO )
-                || organizationUnitSettings.getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
+            organizationUnitSettings.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) ) {
             LOG.warn( "No profile found with profile name: " + agentProfileName );
             throw new ProfileNotFoundException( "No profile found with profile name: " + agentProfileName );
         } else {
