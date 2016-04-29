@@ -137,13 +137,13 @@
 
 						<c:choose>
 							<c:when test="${ not empty feedback.summary }">
-								<div class="ppl-content" style="clear:both">${feedback.summary}</div>
+								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${feedback.summary}</div>
 							</c:when>
 							<c:otherwise>
 							<c:choose>
 							<c:when
 								test="${not (empty feedback.surveyGeoLocation and empty feedback.surveyType)}">
-								<div class="ppl-content" style="clear:both">${feedback.surveyGeoLocation}
+								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${feedback.surveyGeoLocation}
 									<span>${feedback.surveyType}</span>
 								</div>
 							</c:when>
@@ -193,13 +193,13 @@
 			
 			<%-- <div class="ppl-content">${feedback.review}</div> --%>
 			<c:choose>
-				<c:when test="${fn:length(feedback.review)>200}">
+				<c:when test="${fn:length(feedback.review)>250}">
 					<div class="ppl-content review-height">
 						<span class="review-complete-txt">${feedback.review}</span>
 						<c:if test="${feedback.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
-						<span class="review-less-text">${fn:substring(feedback.review, 0, 200)}</span>
+						<span class="review-less-text">${fn:substring(feedback.review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
 				</c:when>
@@ -263,11 +263,11 @@
 				</div>
 				</c:if>
 				<c:if test="${feedback.source == 'Zillow'}">
-				<div class="float-right dash-flag-retake" style="height:35px; width:48px;">
+				<div class="float-right dash-flag-retake" >
 					<div class="clearfix">
 						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
 							title="Report"></div>
-								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
+								<!-- <div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div> -->
 					</div>
 				</div>
 				</c:if>
