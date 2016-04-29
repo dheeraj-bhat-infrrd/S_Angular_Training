@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -3777,10 +3778,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
 
         userEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setCreatedBy( user.getCompany().getCompany() );
+        //TODO : Modify createdBy and modifiedBy to store the actual admin's ID
+        userEmailMapping.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setModifiedBy( user.getCompany().getCompany() );
-
+        userEmailMapping.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
         userEmailMappingDao.save( userEmailMapping );
         return user;
     }
@@ -4722,6 +4723,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //If user is deleted, mark the survey status as corrupt
         if ( user.getStatus() == CommonConstants.STATUS_INACTIVE ) {
             survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD );
+            survey.setErrorCode( SurveyErrorCode.USER_DELETED.name() );
             surveyPreInitiationDao.update( survey );
             return true;
         }
