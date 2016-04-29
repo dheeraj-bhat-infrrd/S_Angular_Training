@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -243,6 +244,7 @@ public class WorkbookData
     }
 
 
+    @Transactional
     public Map<Integer, List<Object>> getCustomerSurveyResultDataToBeWrittenInSheet( List<SurveyDetails> surveyDetails,
         long companyId ) throws InvalidInputException
     {
@@ -284,8 +286,21 @@ public class WorkbookData
         Integer counter = 1;
         Map<Integer, List<Object>> data = new TreeMap<>();
         
-        Map<Long, Branch> cachedBranches = new HashMap<Long, Branch>();
-        Map<Long, Region> cachedRegions = new HashMap<Long, Region>();
+        
+        //get the branches and regions for company
+        Map<Long, Branch> branchesForCompany = new HashMap<Long, Branch>();
+        Map<Long, Region> regionsForCompany = new HashMap<Long, Region>();
+        
+        List<Region> regionList = regionDao.getRegionsForCompany( companyId, -1, -1 );
+        List<Branch> branchList = branchDao.getBranchesForCompany( companyId, CommonConstants.IS_DEFAULT_BY_SYSTEM_NO, -1, -1 );
+        for(Region region : regionList){
+            if(region != null)
+                regionsForCompany.put( region.getRegionId(), region );
+        }
+        for(Branch branch : branchList){
+            if(branch != null)
+                branchesForCompany.put( branch.getBranchId(), branch );
+        }
         
         //create list of objects to populate
         List<Object> surveyDetailsToPopulate = new ArrayList<>();
@@ -356,13 +371,7 @@ public class WorkbookData
                         for ( RegionMediaPostDetails regionMediaDetail : survey.getSocialMediaPostDetails()
                             .getRegionMediaPostDetailsList() ) {
                             //get region
-                            Region region = cachedRegions.get( regionMediaDetail.getRegionId() );
-                            if ( region == null ) {
-                                region = regionDao.findById( Region.class, regionMediaDetail.getRegionId() );
-                                //check if region is not null and not a default region
-                                if(region != null && region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO)
-                                    cachedRegions.put( regionMediaDetail.getRegionId(), region );
-                            }
+                            Region region = regionsForCompany.get( regionMediaDetail.getRegionId() );
                             //get shared on for region
                             if ( regionMediaDetail.getSharedOn() != null && !regionMediaDetail.getSharedOn().isEmpty() && region != null && region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
                                 regionShared += region.getRegion() + ": { "
@@ -381,13 +390,7 @@ public class WorkbookData
                         for ( BranchMediaPostDetails branchMediaDetail : survey.getSocialMediaPostDetails()
                             .getBranchMediaPostDetailsList() ) {
                             //get branch
-                            Branch branch = cachedBranches.get( branchMediaDetail.getBranchId() );
-                            if ( branch == null ) {
-                                branch = branchDao.findById( Branch.class, branchMediaDetail.getBranchId() );
-                                //check if branch is not null and not a default branch
-                                if(branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO)
-                                    cachedBranches.put( branchMediaDetail.getBranchId(), branch );
-                            }
+                            Branch branch = branchesForCompany.get( branchMediaDetail.getBranchId() );
                             //get shared on for region
                             if ( branchMediaDetail.getSharedOn() != null && !branchMediaDetail.getSharedOn().isEmpty() && branch != null && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO) {
                                 branchShared += branch.getBranch() + ": { "
