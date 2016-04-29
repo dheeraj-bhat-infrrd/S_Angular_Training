@@ -193,18 +193,18 @@
 			
 			<%-- <div class="ppl-content">${feedback.review}</div> --%>
 			<c:choose>
-				<c:when test="${fn:length(feedback.review)>250}">
-					<div class="ppl-content">
+				<c:when test="${fn:length(feedback.review)>200}">
+					<div class="ppl-content review-height">
 						<span class="review-complete-txt">${feedback.review}</span>
 						<c:if test="${feedback.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
-						<span class="review-less-text">${fn:substring(feedback.review, 0, 250)}</span>
+						<span class="review-less-text">${fn:substring(feedback.review, 0, 200)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content">${feedback.review}</div>
+					<div class="ppl-content review-height">${feedback.review}</div>
 				</c:otherwise>
 			</c:choose>
 			
@@ -236,7 +236,7 @@
                        
 				</div>
 				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div> -->
-				<div class="float-right dash-flag-retake">
+				<%-- <div class="float-right dash-flag-retake">
 					<div class="clearfix">
 						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
 							title="Report"></div>
@@ -251,7 +251,28 @@
 							
 						</c:if>
 					</div>
+				</div> --%>
+				
+				<c:if test="${feedback.source != 'Zillow'}">
+				<div class="float-right dash-flag-retake">
+					<div class="clearfix">
+						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
+							title="Report"></div>
+								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
+					</div>
 				</div>
+				</c:if>
+				<c:if test="${feedback.source == 'Zillow'}">
+				<div class="float-right dash-flag-retake" style="height:35px; width:48px;">
+					<div class="clearfix">
+						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
+							title="Report"></div>
+								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
+					</div>
+				</div>
+				</c:if>
+				
+				
 			</div>
 			
 		</div>
