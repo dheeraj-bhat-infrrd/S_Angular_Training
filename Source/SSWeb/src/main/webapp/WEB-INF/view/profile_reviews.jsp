@@ -80,13 +80,13 @@
 					</c:if>
 					<c:choose>
 							<c:when test="${ not empty reviewItem.summary }">
-								<div class="ppl-content" style="clear:both">${reviewItem.summary}</div>
+								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
 							</c:when>
 							<c:otherwise>
 							<c:choose>
 							<c:when
 								test="${not (empty reviewItem.surveyGeoLocation and empty reviewItem.surveyType)}">
-								<div class="ppl-content" style="clear:both">${reviewItem.surveyGeoLocation}
+								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.surveyGeoLocation}
 									<span>${reviewItem.surveyType}</span>
 								</div>
 							</c:when>
@@ -116,13 +116,13 @@
 			</div>
 			
 			<c:choose>
-				<c:when test="${fn:length(reviewItem.review)>200}">
+				<c:when test="${fn:length(reviewItem.review)>250}">
 					<div class="ppl-content review-height">
 						<span class="review-complete-txt">${reviewItem.review}</span>
 						<c:if test="${reviewItem.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
-						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 200)}</span>
+						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
 				</c:when>

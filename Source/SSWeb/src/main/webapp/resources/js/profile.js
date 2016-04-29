@@ -746,7 +746,7 @@ function paintReviews(result){
 			reviewsHtml +=' <div class="zillow-badge  verify-image float-right" ></div>';
 			}
 		reviewsHtml += '		<div class=" ppl-header-left review-detail-profile review-sm-screen" >';   
-		reviewsHtml += '<div class="ppl-head-2 float-left">' + date.toString("MMMM  yyyy")+'</div>'
+		reviewsHtml += '<div class="ppl-head-2 float-left">' + date.toString("MMMM d yyyy")+'</div>'
 		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'</span></span>';
 		if(profileLevel!= 'INDIVIDUAL'){
 			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
@@ -758,17 +758,17 @@ function paintReviews(result){
 		
 		
 		if(reviewItem.summary!=null){
-			reviewsHtml +='<div class="ppl-content" style="clear:both">'+reviewItem.summary+'</div>';
+			reviewsHtml +='<div class="ppl-content" style="clear:both;padding-top:0px !important;">'+reviewItem.summary+'</div>';
 		}else{
 			if(reviewItem.surveyGeoLocation!=null && reviewItem.surveyType){
-				reviewsHtml +='<div class="ppl-content" style="clear:both">'+reviewItem.surveyGeoLocation+'<span>'+reviewItem.surveyType+'</span></div>';
+				reviewsHtml +='<div class="ppl-content" style="clear:both;padding-top:0px !important;">'+reviewItem.surveyGeoLocation+'<span>'+reviewItem.surveyType+'</span></div>';
 			
 			}else{
 				reviewsHtml +='<div style="clear:both">Completed transation on';
 				if(reviewsHtml.surveyTransactionDate !=null){
-					reviewsHtml +=' <span>'+ reviewItem.surveyTransactionDate.toString("MMMM  yyyy")+'</span></div>';
+					reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span></div>';
 				}else{
-					reviewsHtml +=' <span>'+reviewItem.modifiedOn.toString("MMMM  yyyy")+'</span></div>';
+					reviewsHtml +=' <span>'+new Date(reviewItem.modifiedOn).toString("MMMM  yyyy")+'</span></div>';
 				}
 			}
 			
@@ -839,14 +839,14 @@ function paintReviews(result){
 		reviewsHtml += '</div>';*/
 
 
-		if (reviewItem.review.length > 200) {
+		if (reviewItem.review.length > 250) {
 			reviewsHtml += '<div class="ppl-content review-height"><span class="review-complete-txt">'+reviewItem.review+'';
 			if(reviewItem.source == "Zillow") {
 				reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a></span>';
 			}else{
 				reviewsHtml += '</span>';
 			}
-			reviewsHtml +='<span class="review-less-text">' + reviewItem.review.substr(0,200) + '</span><span class="review-more-button">read full review</span>';
+			reviewsHtml +='<span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">read full review</span>';
 		} else {
 			reviewsHtml += '<div class="ppl-content review-height">'+reviewItem.review;
 		}
@@ -917,6 +917,39 @@ $(document).on('mouseleave','.ppl-review-item ',function(e){
 $(document).on('mouseleave','.ppl-review-item-last',function(e){
 	$(this).find('.ppl-share-wrapper').css('visibility','hidden');
 });*/
+
+$(document).on('mouseover','.ppl-review-item ',function(e){
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
+	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
+});
+$(document).on('mouseleave','.ppl-review-item ',function(e){
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
+	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
+});
+$(document).on('mouseover','.ppl-review-item-last ',function(e){
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
+	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
+});
+$(document).on('mouseleave','.ppl-review-item-last',function(e){
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
+	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
+});
 $(document).on('click','.review-more-button',function(){
 	$(this).parent().find('.review-less-text').hide();
 	$(this).parent().find('.review-complete-txt').show();
