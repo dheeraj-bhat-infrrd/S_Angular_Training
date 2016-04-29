@@ -599,6 +599,7 @@ public class BillingReportsServiceImpl implements BillingReportsService
 
 
     @Override
+    @Transactional
     public void companiesBillingReportGenerator()
     {
         List<Company> companies = getCompaniesWithExpiredInvoice();
