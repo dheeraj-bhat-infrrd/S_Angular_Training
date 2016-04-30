@@ -108,12 +108,27 @@
 				</c:if>
 				
 				<div class=" ppl-header-left review-sm-screen ">
-				<div class="ppl-head-2 review-detail-profile float-left"
-						data-modified="false"
-						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
+
+
+
+
+					<c:choose>
+						<c:when test="${ not empty feedback.surveyCompletedDate}">
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${feedback.surveyCompletedDate}" />">
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
 						value="${feedback.modifiedOn}" />">
-					</div>
-				<div class="ppl-head-1 " style="clear:both">
+							</div>
+						</c:otherwise>
+					</c:choose>
+					<div class="ppl-head-1 " style="clear:both">
 					<span class="float-left"> Reviewed by </span>
 					<c:choose>
 						<c:when
@@ -143,19 +158,21 @@
 							<c:choose>
 							<c:when
 								test="${not (empty feedback.surveyGeoLocation and empty feedback.surveyType)}">
-								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${feedback.surveyGeoLocation}
+								<div class="ppl-content " style="clear:both;padding-top:0px !important;">${feedback.surveyGeoLocation}
 									<span>${feedback.surveyType}</span>
 								</div>
 							</c:when>
 							<c:otherwise>
 								<div style="clear:both">
-									Completed transation on
+									Completed transation in
                                        <c:choose>
 									<c:when test="${ not empty feedback.surveyTransactionDate} ">
-										<span>${ feedback.surveyTransactionDate}</span>
+										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+						value="${ feedback.surveyTransactionDate}" />"></span>
 									</c:when>
 									<c:otherwise>
-										<span>${feedback.modifiedOn}</span>
+										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+						value="${feedback.modifiedOn}" />"></span>
 									</c:otherwise>
 									</c:choose>
 								</div>
@@ -163,25 +180,6 @@
 						</c:choose>
 							</c:otherwise>
 						</c:choose>
-
-
-
-
-						
-						<%-- <c:choose>
-							<c:when test="${not empty feedback.surveyCompletedDate}">
-								<div class="ppl-head-2 review-detail-profile float-left"
-						><fmt:formatDate type="date" pattern="M d,YYYY"
-						value="${feedback.surveyCompletedDate}" />
-					</div>
-							</c:when>
-							<c:otherwise>
-								<div class="ppl-head-2 review-detail-profile float-left"><fmt:formatDate type="date"  pattern="M d,YYYY"
-						value="${feedback.modifiedOn}" />
-					</div>
-							</c:otherwise>
-						</c:choose>
- --%>
 						
 				</div>
 				

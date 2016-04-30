@@ -746,7 +746,13 @@ function paintReviews(result){
 			reviewsHtml +=' <div class="zillow-badge  verify-image float-right" ></div>';
 			}
 		reviewsHtml += '		<div class=" ppl-header-left review-detail-profile review-sm-screen" >';   
-		reviewsHtml += '<div class="ppl-head-2 float-left">' + date.toString("MMMM d yyyy")+'</div>'
+		if(reviewItem.surveyCompletedDate!=null){
+			reviewsHtml += '<div class="ppl-head-2 float-left">' + new Date(reviewItem.surveyCompletedDate).toString("MMMM d yyyy")+'</div>'
+		}else{
+			reviewsHtml += '<div class="ppl-head-2 float-left">' + new Date(reviewItem.modifiedOn).toString("MMMM d, yyyy")+'</div>'
+		}
+		
+		
 		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'</span></span>';
 		if(profileLevel!= 'INDIVIDUAL'){
 			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
@@ -764,7 +770,7 @@ function paintReviews(result){
 				reviewsHtml +='<div class="ppl-content" style="clear:both;padding-top:0px !important;">'+reviewItem.surveyGeoLocation+'<span>'+reviewItem.surveyType+'</span></div>';
 			
 			}else{
-				reviewsHtml +='<div style="clear:both">Completed transation on';
+				reviewsHtml +='<div style="clear:both">Completed transation in';
 				if(reviewsHtml.surveyTransactionDate !=null){
 					reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span></div>';
 				}else{
