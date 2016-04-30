@@ -702,6 +702,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
             query.addFilterQuery( searchColumn + ":" + searchKey );
             return query;
         }
+        if ( searchColumn.equalsIgnoreCase( CommonConstants.USER_DISPLAY_NAME_SOLR ) ) {
+            searchKey = searchKey.replace( " ", "\\ " );
+            query.addFilterQuery( searchColumn + ":" + searchKey );
+            return query;
+        }
         /*
         Example:
         Office first second third
@@ -1308,7 +1313,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
         List<SolrDocument> results = new ArrayList<SolrDocument>();
         QueryResponse response = null;
-        searchKey = searchKey + "*";
+        searchKey = searchKey.trim() + "*";
 
         SolrQuery query = new SolrQuery();
         try {
