@@ -109,7 +109,7 @@
 				
 				<div class=" ppl-header-left review-sm-screen ">
 
-
+				<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
 
 
 					<c:choose>
@@ -191,18 +191,18 @@
 			
 			<%-- <div class="ppl-content">${feedback.review}</div> --%>
 			<c:choose>
-				<c:when test="${fn:length(feedback.review)>250}">
+				<c:when test="${fn:length(review)>250}">
 					<div class="ppl-content review-height">
-						<span class="review-complete-txt">${feedback.review}</span>
+						<span class="review-complete-txt">${review}</span>
 						<c:if test="${feedback.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
-						<span class="review-less-text">${fn:substring(feedback.review, 0, 250)}</span>
+						<span class="review-less-text">${fn:substring(review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content review-height">${feedback.review}</div>
+					<div class="ppl-content review-height">${review}</div>
 				</c:otherwise>
 			</c:choose>
 			

@@ -760,7 +760,19 @@ public class UserManagementServiceImplTest
         userManagementServiceImpl.getUserSettings( 0l );
     }
 
-
+    @Test ( expected = InvalidInputException.class)
+    public void testFetchAgentContactDetailByEncryptedIdForNull() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.fetchAgentContactDetailByEncryptedId( null );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testFetchAgentContactDetailByEncryptedIdForEmpty() throws InvalidInputException, NoRecordsFetchedException
+    {
+        userManagementServiceImpl.fetchAgentContactDetailByEncryptedId( "" );
+    }
+    
+    
     @Test ( expected = InvalidInputException.class)
     public void testAssignUserToCompanyForNullAdmin() throws InvalidInputException, NoRecordsFetchedException, SolrException
     {

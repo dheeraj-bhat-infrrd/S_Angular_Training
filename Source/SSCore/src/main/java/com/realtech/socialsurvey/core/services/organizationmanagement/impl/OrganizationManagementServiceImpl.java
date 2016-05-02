@@ -5392,7 +5392,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return unitSettings;
     }
+    
+    
+    @Override
+    public List<AgentSettings> getAllAgentsFromMongo()
+    {
+        LOG.debug( "Method AgentSettings() called" );
 
+        List<AgentSettings> unitSettings = organizationUnitSettingsDao.getAllAgentSettings();
+
+        return unitSettings;
+    }
+
+    
 
     @Transactional
     @Override
@@ -6892,6 +6904,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
             disabledAccountDao.update( account );
         }
+    }
+    
+    @Override
+    public void updateUserEncryptedIdOfSetting(AgentSettings agentSettings , String userEncryptedId){
+        LOG.info( "Inside method updateUserEncryptedIdOfSetting for userEncryptedId : " + userEncryptedId );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_USER_ENCRYPTED_ID,
+            userEncryptedId, agentSettings );
     }
 
 

@@ -2245,6 +2245,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return agentSettings;
     }
+    
+    @Override
+    public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId ) throws InvalidInputException
+    {
+        LOG.info( "Getting agent settings for userEncryptedId id: " + userEncryptedId );
+        if ( userEncryptedId == null || userEncryptedId.isEmpty()) {
+            throw new InvalidInputException( "Invalid userEncrypted id for fetching user settings" );
+        }
+        ContactDetailsSettings contactDetailsSettings = organizationUnitSettingsDao.fetchAgentContactDetailByEncryptedId( userEncryptedId );
+        
+        return contactDetailsSettings;
+    }
 
 
     @Override
@@ -2565,6 +2577,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         agentSettings.setModifiedBy( user.getModifiedBy() );
         agentSettings.setModifiedOn( System.currentTimeMillis() );
         agentSettings.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
+        
+        //set encrypted id
+        agentSettings.setUserEncryptedId( generateUserEncryptedId( user.getUserId() ) );
+        
 
         //Set status to incomplete
         agentSettings.setStatus( CommonConstants.STATUS_INCOMPLETE_MONGO );
@@ -2616,6 +2632,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Inserted into agent settings" );
     }
 
+    
+    @Override
+    public String generateUserEncryptedId(long userId) throws InvalidInputException{
+        LOG.debug( "method generateUserEncryptedId started for user id  " + userId );
+        
+        long hashedUserId = String.valueOf( userId ).hashCode();
+        String hashedUserIdStr = String.valueOf( hashedUserId );
+        String paddedBitString = "";
+        if(hashedUserIdStr.length() < 12){
+            for(int i=0 ; i< 12-hashedUserIdStr.length() ; i++){
+                paddedBitString += (int)(10.0 * Math.random());
+            }
+            hashedUserIdStr += paddedBitString;
+        }
+        
+        String userEncryptedId = encryptionHelper.encodeBase64( hashedUserIdStr );
+        return userEncryptedId;
+        
+    }
 
     /**
      * Method to generate a unique profile name from emailid and userId of individual

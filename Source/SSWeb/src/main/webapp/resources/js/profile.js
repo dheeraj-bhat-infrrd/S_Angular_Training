@@ -733,7 +733,7 @@ function paintReviews(result){
 		reviewsHtml = reviewsHtml +
 			'<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName)
 				+ ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName)
-				+ ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="'
+				+ ' data-rating=' + reviewItem.score + ' data-review="' + escapeHtml(reviewItem.review) + '" data-customeremail="'
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '    	<div class="float-left ppl-header-right">';
@@ -845,16 +845,18 @@ function paintReviews(result){
 		reviewsHtml += '</div>';*/
 
 
-		if (reviewItem.review.length > 250) {
+		var review =  escapeHtml(reviewItem.review);
+		
+		if (review.length > 250) {
 			reviewsHtml += '<div class="ppl-content review-height"><span class="review-complete-txt">'+reviewItem.review+'';
 			if(reviewItem.source == "Zillow") {
 				reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a></span>';
 			}else{
 				reviewsHtml += '</span>';
 			}
-			reviewsHtml +='<span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">read full review</span>';
+			reviewsHtml +='<span class="review-less-text">' + review.substr(0,250) + '</span><span class="review-more-button">read full review</span>';
 		} else {
-			reviewsHtml += '<div class="ppl-content review-height">'+reviewItem.review;
+			reviewsHtml += '<div class="ppl-content review-height">'+review;
 		}
 		reviewsHtml += '	</div>';
 		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height" >';
@@ -875,6 +877,7 @@ function paintReviews(result){
 		}*/
 		
 		
+
 		/*if(reviewItem.source == "Zillow") {
 			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
 		}*/
@@ -1683,7 +1686,7 @@ function paintPublicPosts(posts) {
 			+ '<div class="tweet-icn '+ iconClass +' float-left"></div>'
 			+ "</a>"
 			+ '<div class="tweet-txt float-left">'
-				+ '<div class="tweet-text-main">' + linkify(post.postText) + '</div>'
+				+ '<div class="tweet-text-main">' + linkify(escapeHtml(post.postText)) + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy + '</em></div>'
 				+ '<div class="tweet-text-time"><em>' + convertUserDateToWeekFormt(new Date(post.timeInMillis)) + '</em></div>'
 			+ '	</div>'
