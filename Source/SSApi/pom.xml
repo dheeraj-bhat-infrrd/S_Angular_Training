@@ -14,6 +14,7 @@
 	<properties>
 		<jackson.version>2.6.1</jackson.version>
 		<swagger.version>1.0.2</swagger.version>
+		<guava.version>16.0.1</guava.version>
 	</properties>
 
 	<dependencies>
@@ -126,6 +127,13 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-hibernate4</artifactId>
 			<version>${jackson.version}</version>
+		</dependency>
+
+		<!-- Guava dependency -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
 		</dependency>
 
 		<!-- Test Artifacts -->
