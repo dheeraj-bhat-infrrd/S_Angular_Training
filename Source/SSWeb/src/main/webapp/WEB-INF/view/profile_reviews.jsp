@@ -33,6 +33,10 @@
 	<c:when test="${entityType == 'agentId'}">
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
+	
+	
+	<c:set value="${fn:escapeXml(reviewItem.review)}" var="review"></c:set>
+	
 </c:choose>
 		<div data-firstname="${reviewItem.customerFirstName}"
 			data-lastname="${reviewItem.customerLastName}" data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
@@ -136,18 +140,18 @@
 			</div>
 			
 			<c:choose>
-				<c:when test="${fn:length(reviewItem.review)>250}">
+				<c:when test="${fn:length(review)>250}">
 					<div class="ppl-content review-height">
-						<span class="review-complete-txt">${reviewItem.review}</span>
+						<span class="review-complete-txt">${review}</span>
 						<c:if test="${reviewItem.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
-						<span class="review-less-text">${fn:substring(reviewItem.review, 0, 250)}</span>
+						<span class="review-less-text">${fn:substring(review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content review-height">${reviewItem.review}</div>
+					<div class="ppl-content review-height">${review}</div>
 				</c:otherwise>
 			</c:choose>
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
