@@ -1818,12 +1818,14 @@ function twitterFn(loop) {
         .lastIndexOf("&"));
     var twitId = 'twttxt_' + loop;
     var twitText = $("#" + twitId).val();
+    twitText = decodeURIComponent(twitText);
     var length = twitText.length;
     if (length > 109) {
 
         var twittStrnDot = "...";
         var substringed = twitText.substring(0, 105);
         var finalString = substringed.concat(twittStrnDot);
+        finalString = encodeURIComponent(finalString);
         $("#" + twitId).val(finalString);
         twitLink = twitLink.replace(String, finalString);
         if (document.getElementById('twitt_' + loop) != null) {
