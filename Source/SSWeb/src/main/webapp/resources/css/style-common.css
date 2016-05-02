@@ -1898,7 +1898,30 @@ button.paypal.is-active {
 .icn-phone {
 	background: url(../images/tele.png) no-repeat center;
 }
-
+.ppl-review-item:hover .icn-fb-rev{ 
+	background:url(../images/colfb.png) no-repeat;
+	}
+.ppl-review-item:hover .icn-twit-rev{ 
+	background:url(../images/ss-icon-small-twitter.png) no-repeat;
+	}
+.ppl-review-item:hover .icn-lin-rev{ 
+	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
+	}
+ .ppl-review-item:hover .icn-gplus-rev { 
+	background:url(../images/ss-icon-small-gplus.png) no-repeat;
+	}
+/* .dsh-review-cont:hover .icn-fb-rev{
+	background:url(../images/colfb.png) no-repeat;
+}
+.dsh-review-cont:hover .icn-twit-rev{
+	background:url(../images/ss-icon-small-twitter.png) no-repeat;
+}
+.dsh-review-cont:hover .icn-lin-rev{
+	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
+}
+.dsh-review-cont:hover .icn-gplus-rev {
+	background:url(../images/ss-icon-small-gplus.png) no-repeat;
+} */
 .icn-fax {
 	background: url(../images/fax.png) no-repeat center;
 }

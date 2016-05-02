@@ -143,11 +143,16 @@
 								${feedback.customerFirstName} ${feedback.customerLastName}</span>
 						</c:otherwise>
 					</c:choose>
+					
+					
+					
 					<c:if test="${profilemasterid !=4}">
+					<c:if test="${not empty feedback.agentName }">
 						<span class="float-left " style="margin-left: 5px;">for<a
 							style="color: #236CAF; font-weight: 600 !important;"
 							href="${feedback.completeProfileUrl}" target="_blank">
 								${feedback.agentName}</a></span>
+					</c:if>
 					</c:if>
 
 						<c:choose>

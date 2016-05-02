@@ -754,7 +754,7 @@ function paintReviews(result){
 		
 		
 		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'</span></span>';
-		if(profileLevel!= 'INDIVIDUAL'){
+		if(profileLevel!= 'INDIVIDUAL' && reviewItem.agentName!=null){
 			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
 		}
 		if (date != null) {
@@ -924,38 +924,7 @@ $(document).on('mouseleave','.ppl-review-item-last',function(e){
 	$(this).find('.ppl-share-wrapper').css('visibility','hidden');
 });*/
 
-$(document).on('mouseover','.ppl-review-item ',function(e){
-	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
-	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
-	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
-	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
-	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
-	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
-});
-$(document).on('mouseleave','.ppl-review-item ',function(e){
-	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
-	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
-	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
-	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
-	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
-	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
-});
-$(document).on('mouseover','.ppl-review-item-last ',function(e){
-	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
-	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
-	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
-	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
-	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
-	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
-});
-$(document).on('mouseleave','.ppl-review-item-last',function(e){
-	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
-	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
-	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
-	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
-	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
-	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
-});
+
 $(document).on('click','.review-more-button',function(){
 	$(this).parent().find('.review-less-text').hide();
 	$(this).parent().find('.review-complete-txt').show();
@@ -1818,14 +1787,12 @@ function twitterFn(loop) {
         .lastIndexOf("&"));
     var twitId = 'twttxt_' + loop;
     var twitText = $("#" + twitId).val();
-    twitText = decodeURIComponent(twitText);
     var length = twitText.length;
     if (length > 109) {
 
         var twittStrnDot = "...";
         var substringed = twitText.substring(0, 105);
         var finalString = substringed.concat(twittStrnDot);
-        finalString = encodeURIComponent(finalString);
         $("#" + twitId).val(finalString);
         twitLink = twitLink.replace(String, finalString);
         if (document.getElementById('twitt_' + loop) != null) {
