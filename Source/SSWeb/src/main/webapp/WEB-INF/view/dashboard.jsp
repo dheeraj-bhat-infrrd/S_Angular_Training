@@ -175,7 +175,7 @@
 				
 				<div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
 					<div class="people-say-wrapper rt-content-main rt-content-main-adj">
-						<div class="main-con-header clearfix pad-bot-10-resp">
+						<div class="main-con-header clearfix pad-bot-10-resp" style="display: block;border-bottom: 1px solid #dcdcdc;padding: 15px 0;">
 							<div id="review-desc" class="float-left dash-ppl-say-lbl" data-profile-name="${profileName}">
 							</div>
 						</div>

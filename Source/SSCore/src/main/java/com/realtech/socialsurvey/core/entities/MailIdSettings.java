@@ -10,6 +10,7 @@ public class MailIdSettings {
 	private String work;
 	private String workEmailToVerify;
 	private boolean isWorkEmailVerified = true;
+	private boolean isWorkMailVerifiedByAdmin;
 	private String personal;
 	private String personalEmailToVerify;
 	private boolean isPersonalEmailVerified = true;
@@ -64,7 +65,17 @@ public class MailIdSettings {
 		this.isPersonalEmailVerified = isPersonalEmailVerified;
 	}
 
-	public List<MiscValues> getOthers() {
+	public boolean getIsWorkMailVerifiedByAdmin()
+    {
+        return isWorkMailVerifiedByAdmin;
+    }
+
+    public void setWorkMailVerifiedByAdmin( boolean isWorkMailVerifiedByAdmin )
+    {
+        this.isWorkMailVerifiedByAdmin = isWorkMailVerifiedByAdmin;
+    }
+
+    public List<MiscValues> getOthers() {
 		return others;
 	}
 
@@ -72,7 +83,9 @@ public class MailIdSettings {
 		this.others = others;
 	}
 
-	@Override
+    
+
+    @Override
 	public String toString() {
 		return "work: " + work + "\t isWorkEmailVerified: " + isWorkEmailVerified + "\t personal: " + personal + "\t isPersonalEmailVerified: "
 				+ isPersonalEmailVerified + "\t others: " + (others != null ? others.toString() : "null");

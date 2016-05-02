@@ -35,6 +35,15 @@ public final class EmailTemplateConstants {
 
 	public static final String EMAIL_VERIFICATION_MAIL_BODY = "EmailVerificationMailBody.html";
 	public static final String EMAIL_VERIFICATION_MAIL_SUBJECT = "EmailVerificationMailSubject.txt";
+	
+	public static final String EMAIL_VERIFICATION_TO_ADMIN_MAIL_BODY = "EmailVerificationToAdminMailBody.html";
+    public static final String EMAIL_VERIFICATION_TO_ADMIN_MAIL_SUBJECT = "EmailVerificationToAdminMailSubject.txt";
+    
+    public static final String EMAIL_VERIFIED_NOTIFICATION_MAIL_BODY = "EmailVerifiedNotificationMailBody.html";
+    public static final String EMAIL_VERIFIED_NOTIFICATION_MAIL_SUBJECT = "EmailVerifiedNotificationMailSubject.txt";
+    
+    public static final String EMAIL_VERIFIED_NOTIFICATION_MAIL_TO_ADMIN_BODY = "EmailVerifiedNotificationMailToAdminBody.html";
+    public static final String EMAIL_VERIFIED_NOTIFICATION_MAIL_TO_ADMIN_SUBJECT = "EmailVerifiedNotificationMailToAdminSubject.txt";
 
 	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
 	public static final String FATAL_EXCEPTION_MAIL_SUBJECT = "FatalExceptionMailSubject.txt";

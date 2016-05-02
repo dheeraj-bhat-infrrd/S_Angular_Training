@@ -337,7 +337,7 @@
     .um-bottom-content{
         padding: 0 !important;
     }
-    .st-score-txt, .st-score-rt{
+    .st-score-txt, .st-score-rt,.wd-score-txt{
         padding: 10px;
     }
     .st-score-txt {
@@ -346,6 +346,12 @@
 		float: none;
 		width: 100%;
 		border-right: none;
+	}
+	.wd-score-txt {
+		height: auto;
+		margin-bottom: 20px;
+		float: none;
+		width: 100%;
 	}
 	.score-rt-post {
         width: 260px;
@@ -583,8 +589,11 @@
         padding-top: 15px;
         margin-bottom: 0;
     }
-    .posts-panel-item, .ppl-review-item,.ppl-review-item-last{
+    .posts-panel-item,,.ppl-review-item-last{
         padding: 15px;
+    }
+    .ppl-review-item{
+      padding:15px 4px;
     }
     .tweet-icn{
         min-width: 32px;
@@ -614,11 +623,7 @@
     .ppl-share-wrapper{
         line-height: 30px;
     }
-    .ppl-share-icns{
-        /* background-size: 26px; */
-        height: 30px;
-        width: 30px;
-    }
+    
     .float-left.icn-share.icn-plus-open{
         background-size: 24px;
     }
@@ -1054,7 +1059,7 @@
         margin: 10px auto;
     }
     .ppl-head-1{
-        font-size: 14px;
+        font-size: 10px;
     }
     .ppl-head-2 {
         font-size: 11px;
@@ -1703,6 +1708,16 @@
 	.sq-btn-post-social-btn{
 	margin-left:auto;
 	}
+	.dsh-resp-review{
+	 display:none;
+	}
+	.review-sm-screen{
+	 clear:both;
+	}
+	.ctnt-list-item-btn-wrap {
+	 float:none;
+	 margin-left:55px;
+	}
 
 }
 
@@ -1780,6 +1795,9 @@
         width: 100%;
         border-right: 0;
     }
+    .wd-score-txt {
+		width: 100%;
+	}
     .score-rt-post-OR {
         padding-left: 55px;
     }
@@ -1809,7 +1827,6 @@
         height: 35px;
     }
     .ppl-header-left{
-        width: 300px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -2086,6 +2103,9 @@
    .admin-sel-item{
     width:200px;
    }
+   .review-sm-screen{
+	 clear:both;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -2105,7 +2125,7 @@
     .um-item-row-txt-OR{
         width: 200px;
     }
-    .st-score-txt{
+    .st-score-txt,.wd-score-txt{
         width: 50%;
     }
     .st-score-rt {

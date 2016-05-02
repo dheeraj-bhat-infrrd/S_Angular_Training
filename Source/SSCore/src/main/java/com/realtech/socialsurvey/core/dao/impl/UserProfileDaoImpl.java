@@ -54,13 +54,13 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
      */
 
     @Override
-    public void deactivateAllUserProfilesForUser( User admin, User userToBeDeactivated )
+    public void deactivateAllUserProfilesForUser( User admin, User userToBeDeactivated, int status )
     {
 
         LOG.info( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
         Query query = getSession().getNamedQuery( "UserProfile.updateProfileByUser" );
         // Setting status for user profile as inactive.
-        query.setParameter( 0, CommonConstants.STATUS_INACTIVE );
+        query.setParameter( 0, status );
         query.setParameter( 1, String.valueOf( admin.getUserId() ) );
         query.setParameter( 2, new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( 3, userToBeDeactivated );

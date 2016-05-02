@@ -77,7 +77,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
     {
         T entity;
         try {
-            entity = (T) getSession().load( entityClass, id );
+            entity = (T) getSession().get( entityClass, id );
         } catch ( HibernateException hibernateException ) {
             LOG.error( "HibernateException caught in findById(). ", hibernateException );
             throw new DatabaseException( "HibernateException caught in findById(). ", hibernateException );

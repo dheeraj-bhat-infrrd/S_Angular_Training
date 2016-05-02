@@ -36,10 +36,10 @@
 	class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container">
 		<div class="um-header margin-top-25">
-			<spring:message code="label.widgetheader.key" />
+			<spring:message code="label.widgetheader.key" /> - <div id= widget-name" style="display: inline;">${entityName}</div>
 		</div>
 		<div class="clearfix st-score-wrapper" style="height: 600px">
-			<div id="basic-widget-view" class="float-left st-score-txt widget-display" ></div>
+			<div id="basic-widget-view" class="float-left wd-score-txt widget-display" ></div>
 			<div class="clearfix float-right st-score-rt pos-relative widget-code" style="width: 40%;">
 				<div style="padding:5px">
 					<div class="st-widget-txt" style="font-weight: 600 !important;">

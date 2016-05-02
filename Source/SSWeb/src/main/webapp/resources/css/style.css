@@ -282,6 +282,11 @@
     width: 50%;
     border-right: 1px solid #dcdcdc;
 }
+.wd-score-txt{
+	 height: 110px;
+    line-height: 26px;
+    width: 50%;
+}
 
 .icn-spanner {
     background: url(../images/spanner.png) no-repeat center;

@@ -2,9 +2,6 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EncompassSocialSurvey.DAL
 {
@@ -126,6 +123,8 @@ namespace EncompassSocialSurvey.DAL
 
         #endregion
 
+        public int noOfRecordsInserted = 0;
+
         #region public methods
 
         /// <summary>
@@ -138,33 +137,33 @@ namespace EncompassSocialSurvey.DAL
             Logger.Info("Inside method UpdateCrmBatchTracker");
             bool returnValue = false;
             String updateQuery = CRM_BATCH_TRACKER_UPDATE_QUERY;
-            MySqlConnection mySqlDbConnection = null;
-            MySqlCommand commandToUpdate = null;
+           
             try
             {
-                mySqlDbConnection = _socialSurveryContext.DBConnnection;
-                commandToUpdate = new MySqlCommand(updateQuery, mySqlDbConnection);
-
-                // set the parameters
-                commandToUpdate.Parameters.Add("?ID", MySqlDbType.Int32).Value = entity.Id;
-                commandToUpdate.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = entity.ModifiedOn;
-                commandToUpdate.Parameters.Add("?LAST_RUN_START_DATE", MySqlDbType.DateTime).Value = entity.LastRunStartDate;
-                commandToUpdate.Parameters.Add("?LAST_RUN_END_DATE", MySqlDbType.DateTime).Value = entity.LastRunEndDate;
-                commandToUpdate.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
-                commandToUpdate.Parameters.Add("?LAST_RUN_RECORD_FETCHED_COUNT", MySqlDbType.Int32).Value = entity.LastRunRecordFetchedCount;
-                commandToUpdate.Parameters.Add("?ERROR", MySqlDbType.String).Value = entity.error;
-                commandToUpdate.ExecuteNonQuery();
+                using (MySqlConnection mySqlDbConnection = _socialSurveryContext.DBConnnection)
+                {
+                    using (MySqlCommand commandToUpdate = new MySqlCommand(updateQuery, mySqlDbConnection))
+                    {
+                        
+                        // set the parameters
+                        commandToUpdate.Parameters.Add("?ID", MySqlDbType.Int32).Value = entity.Id;
+                        commandToUpdate.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = entity.ModifiedOn;
+                        commandToUpdate.Parameters.Add("?LAST_RUN_START_DATE", MySqlDbType.DateTime).Value = entity.LastRunStartDate;
+                        commandToUpdate.Parameters.Add("?LAST_RUN_END_DATE", MySqlDbType.DateTime).Value = entity.LastRunEndDate;
+                        commandToUpdate.Parameters.Add("?RECENT_RECORD_FETCHED_DATE", MySqlDbType.DateTime).Value = entity.RecentRecordFetchedDate;
+                        commandToUpdate.Parameters.Add("?LAST_RUN_RECORD_FETCHED_COUNT", MySqlDbType.Int32).Value = entity.LastRunRecordFetchedCount;
+                        commandToUpdate.Parameters.Add("?ERROR", MySqlDbType.String).Value = entity.error;
+                        commandToUpdate.ExecuteNonQuery();
+                    }
+                }
             }
+
             catch (Exception ex)
             {
                 Logger.Error("Caught an exception: LoanRepository.UpdateCrmBatchTracker()", ex);
                 throw ex;
             }
-            finally
-            {
-                if (null != commandToUpdate) { commandToUpdate.Dispose(); }
-                if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
-            }
+            
 
             return returnValue;
 
@@ -226,39 +225,38 @@ namespace EncompassSocialSurvey.DAL
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(): LoanId:" + loan.SurveySourceId + " : CustomerEmailId : " + loan.CustomerEmailId);
             bool returnValue = false;
-
             string insertQuery = INSERT_QUERY;
-            MySqlCommand commandToInsert = null;
-
+            
             try
             {
 
                 if (false == IsSurveySourceIdExists(loan, mySqlDbConnection))
                 {
-                    commandToInsert = new MySqlCommand(insertQuery, mySqlDbConnection);
+                    using (MySqlCommand commandToInsert = new MySqlCommand(insertQuery, mySqlDbConnection))
+                    {
+                        // set the parameters
+                        commandToInsert.Parameters.Add("?SURVEY_SOURCE", MySqlDbType.VarChar, 100).Value = loan.SurveySource;
+                        commandToInsert.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = loan.SurveySourceId;
+                        commandToInsert.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = loan.CompanyId;
+                        commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.VarChar, 36).Value = "0";
+                        commandToInsert.Parameters.Add("?AGENT_NAME", MySqlDbType.VarChar, 100).Value = loan.AgentName;
+                        commandToInsert.Parameters.Add("?AGENT_EMAILID", MySqlDbType.VarChar, 250).Value = loan.AgentEmailId;
+                        commandToInsert.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
+                        commandToInsert.Parameters.Add("?CUSTOMER_LAST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerLastName;
+                        commandToInsert.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
+                        commandToInsert.Parameters.Add("?CUSTOMER_INTERACTION_DETAILS", MySqlDbType.VarChar, 500).Value = loan.CustomerInteractionDetails;
+                        commandToInsert.Parameters.Add("?ENGAGEMENT_CLOSED_TIME", MySqlDbType.DateTime).Value = loan.EngagementClosedTime;
+                        commandToInsert.Parameters.Add("?REMINDER_COUNTS", MySqlDbType.Int32).Value = loan.ReminderCounts;
+                        commandToInsert.Parameters.Add("?LAST_REMINDER_TIME", MySqlDbType.DateTime).Value = EPOCH_TIME;
+                        commandToInsert.Parameters.Add("?STATUS", MySqlDbType.Int32).Value = loan.Status;
+                        commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = loan.CreatedOn;
+                        commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
+                        commandToInsert.Parameters.Add("?COLLECTION_NAME", MySqlDbType.VarChar, 250).Value = "COMPANY_SETTINGS";
 
-                    // set the parameters
-                    commandToInsert.Parameters.Add("?SURVEY_SOURCE", MySqlDbType.VarChar, 100).Value = loan.SurveySource;
-                    commandToInsert.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = loan.SurveySourceId;
-                    commandToInsert.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = loan.CompanyId;
-                    commandToInsert.Parameters.Add("?AGENT_ID", MySqlDbType.VarChar, 36).Value = "0";
-                    commandToInsert.Parameters.Add("?AGENT_NAME", MySqlDbType.VarChar, 100).Value = loan.AgentName;
-                    commandToInsert.Parameters.Add("?AGENT_EMAILID", MySqlDbType.VarChar, 250).Value = loan.AgentEmailId;
-
-                    commandToInsert.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
-                    commandToInsert.Parameters.Add("?CUSTOMER_LAST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerLastName;
-                    commandToInsert.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
-                    commandToInsert.Parameters.Add("?CUSTOMER_INTERACTION_DETAILS", MySqlDbType.VarChar, 500).Value = loan.CustomerInteractionDetails;
-                    commandToInsert.Parameters.Add("?ENGAGEMENT_CLOSED_TIME", MySqlDbType.DateTime).Value = loan.EngagementClosedTime;
-                    commandToInsert.Parameters.Add("?REMINDER_COUNTS", MySqlDbType.Int32).Value = loan.ReminderCounts;
-                    commandToInsert.Parameters.Add("?LAST_REMINDER_TIME", MySqlDbType.DateTime).Value = EPOCH_TIME;
-                    commandToInsert.Parameters.Add("?STATUS", MySqlDbType.Int32).Value = loan.Status;
-                    commandToInsert.Parameters.Add("?CREATED_ON", MySqlDbType.DateTime).Value = loan.CreatedOn;
-                    commandToInsert.Parameters.Add("?MODIFIED_ON", MySqlDbType.DateTime).Value = DateTime.Now;
-                    commandToInsert.Parameters.Add("?COLLECTION_NAME", MySqlDbType.VarChar, 250).Value = "COMPANY_SETTINGS";
-
-                    //
-                    commandToInsert.ExecuteNonQuery();
+                        //
+                        commandToInsert.ExecuteNonQuery();
+                        noOfRecordsInserted++;
+                    }
                 }
             }
             catch (Exception ex)
@@ -266,10 +264,7 @@ namespace EncompassSocialSurvey.DAL
                 Logger.Error("Caught an exception: LoanRepository.InsertLoan()", ex);
                 throw ex;
             }
-            finally
-            {
-                if (null != commandToInsert) { commandToInsert.Dispose(); }
-            }
+            
 
             Logger.Info("Exiting the method LoanRepository.InsertLoan(): LoanId:" + loan.SurveySourceId + " : CustomerEmailId : " + loan.CustomerEmailId);
             return returnValue;
@@ -294,6 +289,7 @@ namespace EncompassSocialSurvey.DAL
                     {
 
                         #region set the command parameters
+
                         commandToInsert.Parameters.Add("?CRM_BATCH_TRACKER_ID", MySqlDbType.Int32, 100).Value = entity.CrmBatchTrackerID;
                         commandToInsert.Parameters.Add("?STATUS", MySqlDbType.Int32).Value = entity.Status;
                         commandToInsert.Parameters.Add("?COUNT_OF_RECORDS_FETCHED", MySqlDbType.Int32).Value = entity.CountOfRecordsFetched;
@@ -322,11 +318,10 @@ namespace EncompassSocialSurvey.DAL
         /// </summary>
         /// <param name="loans"></param>
         /// <returns></returns>
-        public bool InserLoan(List<LoanEntity> loans)
+        public int InserLoan(List<LoanEntity> loans)
         {
             Logger.Info("Entering the method LoanRepository.InsertLoan(List<>)");
-            bool returnValue = false;
-
+           
             MySqlConnection mySqlDbConnnection = null;
             try
             {
@@ -355,7 +350,7 @@ namespace EncompassSocialSurvey.DAL
 
             //
             Logger.Info("Exiting the method LoanRepository.InsertLoan(List<>)");
-            return returnValue;
+            return noOfRecordsInserted;
         }
 
         /// <summary>
@@ -364,38 +359,43 @@ namespace EncompassSocialSurvey.DAL
         /// <param name="companyId"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        public CRMBatchTrackerEntity getCrmBatchTrackerByCompanyAndSource(long companyId, string source)
+        public CRMBatchTrackerEntity GetCrmBatchTrackerByCompanyAndSource(long companyId, string source)
         {
             Logger.Debug("Inside method getCrmBatchTrackerByCompanyAndSource");
             String sqlQuery = CRM_BATCH_TRACKER_SELECT_QUERY;
-            MySqlCommand commandToSelect = null;
+            
             MySqlDataReader dataReader = null;
             CRMBatchTrackerEntity crmBatchTracker = null;
-            MySqlConnection mySqlDbConnection = null;
+
             try
             {
-                mySqlDbConnection = _socialSurveryContext.DBConnnection;
-                commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection);
-                commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = companyId;
-                commandToSelect.Parameters.Add("?SOURCE", MySqlDbType.VarChar, 250).Value = source;
-                dataReader = commandToSelect.ExecuteReader();
-                while (dataReader.Read())
+                using (MySqlConnection mySqlDbConnection = _socialSurveryContext.DBConnnection)
                 {
-                    crmBatchTracker = new CRMBatchTrackerEntity();
-                    crmBatchTracker.Id = dataReader.GetInt32("ID");
-                    crmBatchTracker.CompanyId = companyId;
-                    crmBatchTracker.LastRunStartDate = dataReader.GetDateTime("LAST_RUN_START_DATE");
-                    crmBatchTracker.LastRunEndDate = dataReader.GetDateTime("LAST_RUN_END_DATE");
-                    crmBatchTracker.RecentRecordFetchedDate = dataReader.GetDateTime("RECENT_RECORD_FETCHED_DATE");
-                    crmBatchTracker.Source = source;
-                    crmBatchTracker.CreatedOn = dataReader.GetDateTime("CREATED_ON");
-                    crmBatchTracker.ModifiedOn = dataReader.GetDateTime("MODIFIED_ON");
+                    using (MySqlCommand commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection))
+                    {
+                        commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = companyId;
+                        commandToSelect.Parameters.Add("?SOURCE", MySqlDbType.VarChar, 250).Value = source;
+                        using (dataReader = commandToSelect.ExecuteReader())
+                        {
+                            while (dataReader.Read())
+                            {
+                                crmBatchTracker = new CRMBatchTrackerEntity();
+                                crmBatchTracker.Id = dataReader.GetInt32("ID");
+                                crmBatchTracker.CompanyId = companyId;
+                                crmBatchTracker.LastRunStartDate = dataReader.GetDateTime("LAST_RUN_START_DATE");
+                                crmBatchTracker.LastRunEndDate = dataReader.GetDateTime("LAST_RUN_END_DATE");
+                                crmBatchTracker.RecentRecordFetchedDate = dataReader.GetDateTime("RECENT_RECORD_FETCHED_DATE");
+                                crmBatchTracker.Source = source;
+                                crmBatchTracker.CreatedOn = dataReader.GetDateTime("CREATED_ON");
+                                crmBatchTracker.ModifiedOn = dataReader.GetDateTime("MODIFIED_ON");
 
-                    var errorColunnIndex = dataReader.GetOrdinal("ERROR");
-                    if (!dataReader.IsDBNull(errorColunnIndex))
-                        crmBatchTracker.error = dataReader.GetString("ERROR");
-                    
+                                var errorColunnIndex = dataReader.GetOrdinal("ERROR");
+                                if (!dataReader.IsDBNull(errorColunnIndex))
+                                    crmBatchTracker.error = dataReader.GetString("ERROR");
 
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -403,13 +403,7 @@ namespace EncompassSocialSurvey.DAL
                 Logger.Error("Caught an exception: LoanRepository.getCrmBatchTrackerByCompanyAndSource(): ", ex);
                 throw ex;
             }
-            finally
-            {
-                if (null != dataReader && dataReader.IsClosed == false) { dataReader.Close(); }
-                if (null != dataReader) { dataReader.Dispose(); }
-                if (null != commandToSelect) { commandToSelect.Dispose(); }
-                if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
-            }
+            
             return crmBatchTracker;
         }
 
@@ -418,29 +412,31 @@ namespace EncompassSocialSurvey.DAL
         /// </summary>
         /// <param name="companyId"></param>
         /// <returns></returns>
-        public Company getCompanyById(long companyId)
+        public Company GetCompanyById(long companyId)
         {
             Logger.Debug("Inside method getCompanyById");
             String sqlQuery = COMPANY_SELECT_QUERY;
-            MySqlCommand commandToSelect = null;
-            MySqlDataReader dataReader = null;
             Company company = null;
-            MySqlConnection mySqlDbConnection = null;
+            
             try
             {
-                mySqlDbConnection = _socialSurveryContext.DBConnnection;
-                commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection);
-                commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = companyId;
-
-                dataReader = commandToSelect.ExecuteReader();
-                while (dataReader.Read())
+                using (MySqlConnection mySqlDbConnection = _socialSurveryContext.DBConnnection)
                 {
-                    company = new Company();
-                    company.companyId = companyId;
-                    company.company = dataReader.GetString("COMPANY");
-                    company.status = dataReader.GetString("STATUS");
+                    using (MySqlCommand commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection))
+                    {
+                        commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = companyId;
 
-
+                        using (MySqlDataReader dataReader = commandToSelect.ExecuteReader())
+                        {
+                            while (dataReader.Read())
+                            {
+                                company = new Company();
+                                company.companyId = companyId;
+                                company.company = dataReader.GetString("COMPANY");
+                                company.status = dataReader.GetString("STATUS");
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -448,13 +444,7 @@ namespace EncompassSocialSurvey.DAL
                 Logger.Error("Caught an exception: LoanRepository.getCrmBatchTrackerByCompanyAndSource(): ", ex);
                 throw ex;
             }
-            finally
-            {
-                if (null != dataReader && dataReader.IsClosed == false) { dataReader.Close(); }
-                if (null != dataReader) { dataReader.Dispose(); }
-                if (null != commandToSelect) { commandToSelect.Dispose(); }
-                if (null != mySqlDbConnection) { mySqlDbConnection.Close(); }
-            }
+            
             return company;
         }
 
@@ -471,23 +461,25 @@ namespace EncompassSocialSurvey.DAL
             bool returnValue = false;
 
             string sqlQuery = SELECT_QUERY;
-
-            MySqlCommand commandToSelect = null;
-            MySqlDataReader dataReader = null;
-
+            
             try
             {
-                // select spi.Survey_source_id, spi.CUSTOMER_EMAIL_ID, spi.CUSTOMER_FIRST_NAME from survey_pre_initiation as spi
-                commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection);
-                commandToSelect.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = loan.SurveySourceId;
-                commandToSelect.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
-                commandToSelect.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
 
-                dataReader = commandToSelect.ExecuteReader();
-                while (dataReader.Read())
+                // select spi.Survey_source_id, spi.CUSTOMER_EMAIL_ID, spi.CUSTOMER_FIRST_NAME from survey_pre_initiation as spi
+                using (MySqlCommand commandToSelect = new MySqlCommand(sqlQuery, mySqlDbConnection))
                 {
-                    returnValue = true;
-                    break;
+                    commandToSelect.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = loan.SurveySourceId;
+                    commandToSelect.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
+                    commandToSelect.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
+
+                    using (MySqlDataReader dataReader = commandToSelect.ExecuteReader())
+                    {
+                        while (dataReader.Read())
+                        {
+                            returnValue = true;
+                            break;
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -495,12 +487,7 @@ namespace EncompassSocialSurvey.DAL
                 Logger.Error("Caught an exception: LoanRepository.IsSurveySourceIdExists(): ", ex);
                 throw ex;
             }
-            finally
-            {
-                if (null != dataReader && dataReader.IsClosed == false) { dataReader.Close(); }
-                if (null != dataReader) { dataReader.Dispose(); }
-                if (null != commandToSelect) { commandToSelect.Dispose(); }
-            }
+          
 
             if (returnValue)
             {
