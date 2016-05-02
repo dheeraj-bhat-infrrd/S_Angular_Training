@@ -10104,22 +10104,6 @@ $(document).on('mouseover', '#prof-posts .tweet-panel-item' , function(e){
 $(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
 	$(this).find('.dlt-survey-wrapper').addClass('hide');
 });
-$(document).on('mouseover','.dsh-review-cont ',function(e){
-	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
-	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
-	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
-	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
-	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
-	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
-});
-$(document).on('mouseleave','.dsh-review-cont ',function(e){
-	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
-	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
-	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
-	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
-	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
-	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
-});
 
 
 $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
