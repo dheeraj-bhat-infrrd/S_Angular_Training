@@ -118,9 +118,9 @@ public class ProfileViewController
         OrganizationUnitSettings companyProfile = null;
         try {
             companyProfile = profileManagementService.getCompanyProfileByProfileName( profileName );
-            if ( companyProfile == null
-                || ( companyProfile.getStatus() != null && companyProfile.getStatus().equalsIgnoreCase(
-                    CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+            if ( companyProfile == null || ( companyProfile.getStatus() != null && (
+                companyProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) || companyProfile
+                    .getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for company while fetching company profile" );
             }
 
@@ -229,8 +229,9 @@ public class ProfileViewController
         OrganizationUnitSettings companyProfile = null;
         try {
             regionProfile = profileManagementService.getRegionSettingsByProfileName( companyProfileName, regionProfileName );
-            if ( regionProfile == null || ( regionProfile.getStatus() != null && regionProfile.getStatus().equalsIgnoreCase(
-                CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+            if ( regionProfile == null || ( regionProfile.getStatus() != null && (
+                regionProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) || regionProfile
+                    .getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for region while fetching region profile" );
             }
 
@@ -373,9 +374,9 @@ public class ProfileViewController
         OrganizationUnitSettings regionProfile = null;
         try {
             branchProfile = profileManagementService.getBranchSettingsByProfileName( companyProfileName, branchProfileName );
-            if ( branchProfile == null
-                || ( branchProfile.getStatus() != null && branchProfile.getStatus().equalsIgnoreCase(
-                    CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+            if ( branchProfile == null || ( branchProfile.getStatus() != null && (
+                branchProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) || branchProfile
+                    .getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO ) ) ) ) {
                 throw new ProfileNotFoundException( "No settings found for branch while fetching branch profile" );
             }
 
@@ -562,9 +563,8 @@ public class ProfileViewController
                 individualProfile = userCompositeObject.getAgentSettings();
 
 
-                if ( individualProfile == null
-                    || ( individualProfile.getStatus() != null && individualProfile.getStatus().equalsIgnoreCase(
-                        CommonConstants.STATUS_DELETED_MONGO ) ) ) {
+                if ( individualProfile == null || ( individualProfile.getStatus() != null && (
+                    individualProfile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO ) ) ) ) {
                     throw new ProfileNotFoundException( "Unable to find agent profile for profile name " + agentProfileName );
                 }
                 Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( individualProfile );

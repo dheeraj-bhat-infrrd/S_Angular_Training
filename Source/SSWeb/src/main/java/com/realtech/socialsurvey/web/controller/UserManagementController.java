@@ -1650,11 +1650,22 @@ public class UserManagementController
         String lastName = request.getParameter( "lastName" );
         String emailId = request.getParameter( "emailId" );
 
+        if ( firstName != null  && firstName != "" ) {
+            firstName = replaceQuoteInString( firstName );
+        }
+
+        if ( lastName != null  && lastName != "" ) {
+            lastName = replaceQuoteInString( lastName );
+        }
+
+        
+        
         String fullName = firstName;
         if ( lastName != null && lastName != "" ) {
             fullName += " " + lastName;
         }
-
+        
+        
         try {
             long userId = 0;
             try {
@@ -1934,6 +1945,15 @@ public class UserManagementController
                 DisplayMessageConstants.PASSWORDS_MISMATCH );
         }
         LOG.debug( "change password form parameters validated successfully" );
+    }
+    
+    
+    private String replaceQuoteInString( String str )
+    {
+        if ( str.contains( "\"" ) ) {
+            str = str.replace( "\"", "&quot;" );
+        }
+        return str;
     }
 }
 // JIRA SS-77 BY RM07 EOC

@@ -161,6 +161,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${MAX_SOCIAL_POST_REMINDER_INTERVAL}")
     private int maxSocialPostReminderInterval;
 
+    @Value( "${MAX_SURVEY_REMINDER_INTERVAL}" )
+    private int maxSurveyReminderInterval;
+
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
     String paramOrderTakeSurveySubject;
@@ -585,8 +588,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
             Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
+
+        //Get only those surveys that have lastReminderTime within the last N days
+        Criterion maxDaysBackCriteria = Restrictions.ge( CommonConstants.SURVEY_LAST_REMINDER_TIME,
+            new Timestamp( System.currentTimeMillis() - ( maxSurveyReminderInterval * 24 * 3600 * 1000l ) ) );
         incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
-            statusCriteria );
+            statusCriteria, maxDaysBackCriteria );
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
     }
@@ -908,7 +915,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                  preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource ); 
          }
         
-
+        
+        LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
+        surveyUrl = urlService.shortenUrl( surveyUrl );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
+        
         //get mail subject and body
         String mailBody = "";
         String mailSubject = "";
@@ -918,9 +929,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             MailContent restartSurvey = companySettings.getMail_content().getRestart_survey_mail();
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( restartSurvey.getMail_body(),
                 restartSurvey.getParam_order() );
-            LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
-            surveyUrl = urlService.shortenUrl( surveyUrl );
-            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
             mailSubject = restartSurvey.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1772,6 +1780,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         OrganizationUnitSettings companySettings = organizationManagementService
             .getCompanySettings( user.getCompany().getCompanyId() );
+        
+        LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
+        surveyUrl = urlService.shortenUrl( surveyUrl );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
         //get mail subject and body
         String mailBody = "";
@@ -1781,10 +1793,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
             MailContent takeSurvey = companySettings.getMail_content().getTake_survey_mail();
             mailBody = emailFormatHelper.replaceEmailBodyWithParams( takeSurvey.getMail_body(), takeSurvey.getParam_order() );
-
-            LOG.info( "Initiating URL Service to shorten the url " + surveyUrl );
-            surveyUrl = urlService.shortenUrl( surveyUrl );
-            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyUrl );
 
             // Adding mail subject
             mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName;

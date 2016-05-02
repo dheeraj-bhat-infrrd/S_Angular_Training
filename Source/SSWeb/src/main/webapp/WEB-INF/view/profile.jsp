@@ -537,7 +537,7 @@
                     </div>
                 </div>
                 <div class="people-say-wrapper rt-content-main" id="reviews-container" style="display: none;">
-                	<div class="clearfix hide">
+                	<div class="clearfix hide" style="display: block;border-bottom: 1px solid #dcdcdc;padding: 15px 0;">
 	                    <div class="main-con-header float-left" id="prof-reviews-header">
 	                    	<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>
 	                    	<span class="review-for-text-sm-screen"><spring:message code="label.reviewsfor.key"/></span>

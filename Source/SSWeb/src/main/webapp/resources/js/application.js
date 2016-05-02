@@ -1192,8 +1192,18 @@ function displayReviewOnDashboard() {
 function updateEventOnDashboardPageForReviews() {
 	$('.ppl-head-2[data-modified="false"]').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
-		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
-		$(this).html(date.toDateString()).attr("data-modified", "true");
+		var month=dateSplit[0];
+		var day=dateSplit[1];
+		var year=dateSplit[2];
+		var reviewDay=month+" "+day+","+year;
+		$(this).html(reviewDay).attr("data-modified", "true");
+	});
+	$('.completedOn[data-modified="false"]').each(function(index, currentElement) {
+		var dateSplit = $(this).attr('data-modifiedon').split('-');
+		var month=dateSplit[0];
+		var year=dateSplit[1];
+		var reviewDay=month+" "+year;
+		$(this).html(reviewDay).attr("data-modified", "true");
 	});
 	
 	$('.review-ratings[data-modified="false"]').each(function() {
@@ -10088,11 +10098,22 @@ $(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
 	$(this).find('.dlt-survey-wrapper').addClass('hide');
 });
 $(document).on('mouseover','.dsh-review-cont ',function(e){
-	$(this).find('.ppl-share-wrapper').css('visibility','visible');
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
+	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
 });
 $(document).on('mouseleave','.dsh-review-cont ',function(e){
-	$(this).find('.ppl-share-wrapper').css('visibility','hidden');;
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
+	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
 });
+
 
 $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
 	e.stopPropagation();

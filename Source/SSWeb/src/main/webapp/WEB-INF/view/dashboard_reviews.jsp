@@ -108,8 +108,28 @@
 				</c:if>
 				
 				<div class=" ppl-header-left review-sm-screen ">
-				<div class="ppl-head-1 ">
-					<span class="float-left"> &#8212; Reviewed by </span>
+
+
+
+
+					<c:choose>
+						<c:when test="${ not empty feedback.surveyCompletedDate}">
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${feedback.surveyCompletedDate}" />">
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${feedback.modifiedOn}" />">
+							</div>
+						</c:otherwise>
+					</c:choose>
+					<div class="ppl-head-1 " style="clear:both">
+					<span class="float-left"> Reviewed by </span>
 					<c:choose>
 						<c:when
 							test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
@@ -129,22 +149,64 @@
 							href="${feedback.completeProfileUrl}" target="_blank">
 								${feedback.agentName}</a></span>
 					</c:if>
-					<span class="float-left" style="margin: 0 5px;">&#8212;</span>
-					<div class="ppl-head-2 review-detail-profile float-left"
-						data-modified="false"
-						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
-						value="${feedback.modifiedOn}" />">
-					</div>
+
+						<c:choose>
+							<c:when test="${ not empty feedback.summary }">
+								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${feedback.summary}</div>
+							</c:when>
+							<c:otherwise>
+							<c:choose>
+							<c:when
+								test="${not (empty feedback.surveyGeoLocation and empty feedback.surveyType)}">
+								<div class="ppl-content " style="clear:both;padding-top:0px !important;">${feedback.surveyGeoLocation}
+									<span>${feedback.surveyType}</span>
+								</div>
+							</c:when>
+							<c:otherwise>
+								<div style="clear:both">
+									Completed transation in
+                                       <c:choose>
+									<c:when test="${ not empty feedback.surveyTransactionDate} ">
+										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+						value="${ feedback.surveyTransactionDate}" />"></span>
+									</c:when>
+									<c:otherwise>
+										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+						value="${feedback.modifiedOn}" />"></span>
+									</c:otherwise>
+									</c:choose>
+								</div>
+							</c:otherwise>
+						</c:choose>
+							</c:otherwise>
+						</c:choose>
+						
 				</div>
+				
+				
 			</div>
 			</div>
 
 
-			<c:if test="${ not empty feedback.summary }">
-				<div class="ppl-content">${feedback.summary}</div>
-			</c:if>
+			
 			<%-- <div class="ppl-content">${feedback.review}</div> --%>
-			<div class="ppl-share-wrapper clearfix share-plus-height" style="visibility:hidden;">
+			<c:choose>
+				<c:when test="${fn:length(feedback.review)>250}">
+					<div class="ppl-content review-height">
+						<span class="review-complete-txt">${feedback.review}</span>
+						<c:if test="${feedback.source=='Zillow' }">
+                          <br><span><a class="view-zillow-link hide" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
+						</c:if>
+						<span class="review-less-text">${fn:substring(feedback.review, 0, 250)}</span>
+							<span class="review-more-button">read full review</span>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<div class="ppl-content review-height">${feedback.review}</div>
+				</c:otherwise>
+			</c:choose>
+			
+			<div class="ppl-share-wrapper clearfix share-plus-height" >
 				<%-- <div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key" /></div> --%>
 				<!-- <div class="float-left icn-share icn-plus-open" style="display: block;"></div> -->
 				<div class="float-left clearfix ppl-share-social hide" style="display: block;">
@@ -172,7 +234,7 @@
                        
 				</div>
 				<!-- <div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div> -->
-				<div class="float-right">
+				<%-- <div class="float-right dash-flag-retake">
 					<div class="clearfix">
 						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
 							title="Report"></div>
@@ -181,25 +243,36 @@
 								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
 							
 						</c:if>
+						<c:if test="${feedback.source == 'Zillow'}">
+							<!-- <span class="report-resend-icn-container clearfix float-right"> -->
+								<div style="margin-top: 7px;height: 28px;width: 19px;"></div>
+							
+						</c:if>
+					</div>
+				</div> --%>
+				
+				<c:if test="${feedback.source != 'Zillow'}">
+				<div class="float-right dash-flag-retake">
+					<div class="clearfix">
+						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
+							title="Report"></div>
+								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
 					</div>
 				</div>
-			</div>
-			<c:choose>
-				<c:when test="${fn:length(feedback.review)>250}">
-					<div class="ppl-content">
-						<span class="review-complete-txt">${feedback.review}</span>
-						<c:if test="${feedback.source=='Zillow' }">
-                          <br><span><a class="view-zillow-link hide" href="{feedback.sourceId}"  target="_blank">View on zillow</a></span>
-						</c:if>
-						<span class="review-less-text">${fn:substring(feedback.review, 0, 250)}</span>
-							<span class="review-more-button">read full review</span>
+				</c:if>
+				<c:if test="${feedback.source == 'Zillow'}">
+				<div class="float-right dash-flag-retake" >
+					<div class="clearfix">
+						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
+							title="Report"></div>
+								<!-- <div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div> -->
 					</div>
-				</c:when>
-				<c:otherwise>
-					<div class="ppl-content">${feedback.review}</div>
-				</c:otherwise>
-			</c:choose>
-
+				</div>
+				</c:if>
+				
+				
+			</div>
+			
 		</div>
 	</c:forEach>
 </c:if>

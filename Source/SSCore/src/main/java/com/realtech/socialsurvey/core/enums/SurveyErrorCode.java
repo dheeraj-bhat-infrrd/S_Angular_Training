@@ -11,7 +11,8 @@ public enum SurveyErrorCode
     MISMATCH_RECORD_AGENT_NOT_FOUND( "Agent does not exist in social survey." ),
     MISMATCH_RECORD_INCORRECT_COMPANY( "Agent does not belong to correct company." ),
     CORRUPT_RECORD_INCORRECT_REGION_BRANCH( "Agent does not belong to correct region or branch." ),
-    NOT_KNOWN( "Reason not found." );
+    NOT_KNOWN( "Reason not found." ),
+    USER_DELETED( "Agent is deleted" );
 
     private String value;
 

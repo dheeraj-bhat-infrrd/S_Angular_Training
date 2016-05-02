@@ -438,7 +438,7 @@
 				</div>
 
 				<div id="reviews-container" class="people-say-wrapper rt-content-main pos-relative">
-					<div class="main-con-header">
+					<div class="main-con-header" style="display: block;border-bottom: 1px solid #dcdcdc;padding: 15px 0;">
 						<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>${contactdetail.name}
 					</div>
 					 <div id="review-ep" class="hide" > </div>

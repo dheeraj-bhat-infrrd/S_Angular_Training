@@ -111,10 +111,10 @@ namespace EncompassSocialSurvey.Service
         /// </summary>
         /// <param name="loansVM"></param>
         /// <returns></returns>
-        public bool InsertLoans(List<LoanViewModel> loansVM)
+        public int InsertLoans(List<LoanViewModel> loansVM)
         {
             Logger.Info("Entering the method LoanService.InsertLoans(List<>):");
-            bool returnValue = false;
+            int returnValue = 0;
 
             try
             {
