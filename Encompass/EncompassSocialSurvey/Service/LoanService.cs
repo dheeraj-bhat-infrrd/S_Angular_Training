@@ -29,7 +29,7 @@ namespace EncompassSocialSurvey.Service
             CRMBatchTrackerEntity entity = null;
             try
             {
-                entity = loanRepo.getCrmBatchTrackerByCompanyAndSource(companyId, source);
+                entity = loanRepo.GetCrmBatchTrackerByCompanyAndSource(companyId, source);
             }
             catch (Exception ex)
             {
@@ -51,7 +51,7 @@ namespace EncompassSocialSurvey.Service
             Company company = null;
             try
             {
-                company = loanRepo.getCompanyById(companyId);
+                company = loanRepo.GetCompanyById(companyId);
                 if(company.status.Equals(EncompassSocialSurveyConstant.COMPANY_INACTIVE)){
                     return false;
                 }else{
@@ -111,10 +111,10 @@ namespace EncompassSocialSurvey.Service
         /// </summary>
         /// <param name="loansVM"></param>
         /// <returns></returns>
-        public bool InsertLoans(List<LoanViewModel> loansVM)
+        public int InsertLoans(List<LoanViewModel> loansVM)
         {
             Logger.Info("Entering the method LoanService.InsertLoans(List<>):");
-            bool returnValue = false;
+            int returnValue = 0;
 
             try
             {
@@ -144,7 +144,7 @@ namespace EncompassSocialSurvey.Service
         /// <param name="filePath"></param>
         /// <param name="emailAddresses"></param>
         /// <param name="noOfDays"></param>
-        public void sendLoanReportToEmailAddresses(String filePath, String emailAddresses, int noOfDays)
+        public void SendLoanReportToEmailAddresses(String filePath, String emailAddresses, int noOfDays)
         {
             Logger.Info("Entering the method LoanService.sendLoanReportToEmailAddresses");
             try
@@ -174,7 +174,7 @@ namespace EncompassSocialSurvey.Service
         /// <param name="loansVM"></param>
         /// <param name="companyName"></param>
         /// <returns></returns>
-        public String createLoanListCSV(List<LoanViewModel> loansVM, String companyName)
+        public String CreateLoanListCSV(List<LoanViewModel> loansVM, String companyName)
         {
             Logger.Info("Entering the method LoanService.createLoanListCSV for company : " + companyName);
             try
@@ -209,7 +209,7 @@ namespace EncompassSocialSurvey.Service
         /// <param name="loansVM"></param>
         /// <param name="companyName"></param>
         /// <returns></returns>
-        public String createExcelSpreadSheetForLoanlist(List<LoanViewModel> loansVM , String companyName)
+        public String CreateExcelSpreadSheetForLoanlist(List<LoanViewModel> loansVM , String companyName)
         {
             Logger.Info("Entering the method LoanService.createExcelSpreadSheetForLoanlist for company : " + companyName);
             Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();

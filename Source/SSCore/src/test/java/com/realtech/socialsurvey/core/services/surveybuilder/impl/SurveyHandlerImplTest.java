@@ -279,33 +279,6 @@ public class SurveyHandlerImplTest
     }
 
 
-    @Test ( expected = DuplicateSurveyRequestException.class)
-    public void initiateSurveyRequestTestIncompleteSurveyCustomersExist() throws DuplicateSurveyRequestException,
-        InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException,
-        UndeliveredEmailException, ProfileNotFoundException
-    {
-        Mockito.when( userManagementService.getUserObjByUserId( Mockito.anyLong() ) ).thenReturn( user2 );
-        Mockito.when( organizationManagementService.validateEmail( Mockito.anyString() ) ).thenReturn( true );
-        Mockito.when(
-            surveyPreInitiationDao.findByCriteria( Mockito.eq( SurveyPreInitiation.class ), Mockito.any( Criterion.class ),
-                Mockito.any( Criterion.class ), Mockito.any( Criterion.class ) ) ).thenReturn( incompleteSurveyCustomers );
-        Mockito
-            .doNothing()
-            .when( surveyHandlerImpl )
-            .preInitiateSurvey( Matchers.any( User.class ), Matchers.anyString(), Matchers.anyString(), Matchers.anyString(),
-                Matchers.anyInt(), Matchers.anyString(), Matchers.anyString() );
-        Mockito.when( organizationUnitSettingsDao.fetchAgentSettingsById( Mockito.anyLong() ) )
-            .thenReturn( new AgentSettings() );
-        Map<String, Long> map = new HashMap<String, Long>();
-        map.put( CommonConstants.COMPANY_ID_COLUMN, 0l );
-        map.put( CommonConstants.REGION_ID_COLUMN, 0l );
-        map.put( CommonConstants.BRANCH_ID_COLUMN, 0l );
-        Mockito.when( profileManagementService.getPrimaryHierarchyByAgentProfile( Mockito.any( AgentSettings.class ) ) )
-            .thenReturn( map );
-        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "test", "test", "test" );
-    }
-
-
     @SuppressWarnings ( "unchecked")
     @Test ( expected = DuplicateSurveyRequestException.class)
     public void initiateSurveyRequestTestCompleteSurveyCustomersExist() throws DuplicateSurveyRequestException,
@@ -317,7 +290,10 @@ public class SurveyHandlerImplTest
         Mockito.when( surveyPreInitiationDao.findByKeyValue( Mockito.eq( SurveyPreInitiation.class ), Mockito.anyMap() ) )
             .thenReturn( null );
         Mockito.when(
-            surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(),
+            surveyDetailsDao.getSurveyByAgentIdAndCustomerEmailAndNoOfDays( Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), 
+                Mockito.anyString() , Mockito.anyInt()) ).thenReturn( new SurveyDetails() );
+        Mockito.when(
+            surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), 
                 Mockito.anyString() ) ).thenReturn( new SurveyDetails() );
         surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "test", "test", "test" );
     }

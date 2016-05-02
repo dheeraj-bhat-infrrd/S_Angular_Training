@@ -705,7 +705,7 @@ function paintReviews(result){
 	//Check if there are more reviews left
 	if(reviewsNextBatch == undefined || reviewsNextBatch.length <= numOfRows)
 		fetchReviewsScroll(true);
-	
+	var profileLevel = $("#profile-fetch-info").attr('profile-level');
 	var resultSize = result.length;
 	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 	
@@ -720,9 +720,9 @@ function paintReviews(result){
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
         }
-		var custName = reviewItem.customerFirstName;
+		var custName = reviewItem.customerFirstName.trim();
 		if(reviewItem.customerLastName != undefined){
-			custName += ' ' + reviewItem.customerLastName;
+			custName += ' ' + reviewItem.customerLastName.trim();
 		}
 		custName = custName || "";
 		var custNameArray = custName.split(' ');
@@ -736,41 +736,95 @@ function paintReviews(result){
 				+ ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="'
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
-		reviewsHtml += '		<div class="float-left ppl-header-left">';    
-		reviewsHtml += '			<div class="ppl-head-1">'+custDispName+'</div>';
-		if (date != null) {
-			date = convertUserDateToLocale(date);
-			reviewsHtml += '		<div class="ppl-head-2">' + date.toString("MMMM d, yyyy") + '</div>'; 
-		}
-		
-		reviewsHtml += '		</div>';
-		reviewsHtml += '    	<div class="float-right ppl-header-right">';
+		reviewsHtml += '    	<div class="float-left ppl-header-right">';
 		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
 		reviewsHtml += '		</div>';
+		if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"){
+			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
+			}
+		if(reviewItem.source=="Zillow"){
+			reviewsHtml +=' <div class="zillow-badge  verify-image float-right" ></div>';
+			}
+		reviewsHtml += '		<div class=" ppl-header-left review-detail-profile review-sm-screen" >';   
+		if(reviewItem.surveyCompletedDate!=null){
+			reviewsHtml += '<div class="ppl-head-2 float-left">' + new Date(reviewItem.surveyCompletedDate).toString("MMMM d yyyy")+'</div>'
+		}else{
+			reviewsHtml += '<div class="ppl-head-2 float-left">' + new Date(reviewItem.modifiedOn).toString("MMMM d, yyyy")+'</div>'
+		}
+		
+		
+		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'</span></span>';
+		if(profileLevel!= 'INDIVIDUAL'){
+			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
+		}
+		if (date != null) {
+			date = convertUserDateToLocale(date);
+			reviewsHtml += '	<span class="float-left" style="margin: 0 5px;"></span>	' ; 
+		}
+		
+		
+		if(reviewItem.summary!=null){
+			reviewsHtml +='<div class="ppl-content" style="clear:both;padding-top:0px !important;">'+reviewItem.summary+'</div>';
+		}else{
+			if(reviewItem.surveyGeoLocation!=null && reviewItem.surveyType){
+				reviewsHtml +='<div class="ppl-content" style="clear:both;padding-top:0px !important;">'+reviewItem.surveyGeoLocation+'<span>'+reviewItem.surveyType+'</span></div>';
+			
+			}else{
+				reviewsHtml +='<div style="clear:both">Completed transation in';
+				if(reviewsHtml.surveyTransactionDate !=null){
+					reviewsHtml +=' <span>'+ new Date(reviewItem.surveyTransactionDate).toString("MMMM  yyyy")+'</span></div>';
+				}else{
+					reviewsHtml +=' <span>'+new Date(reviewItem.modifiedOn).toString("MMMM  yyyy")+'</span></div>';
+				}
+			}
+			
+		}
+		
+		
+		
+		
+		
+		reviewsHtml +='</div>';
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
+		
+		reviewsHtml += '		</div>';
+		
+		
+		
 		reviewsHtml += '	</div>';
 		
-		if(reviewItem.summary != null && reviewItem.summary.length > 0){
-			reviewsHtml += '<div class="ppl-content">'+reviewItem.summary+'</div>';
-		}
 		
-		if (reviewItem.review.length > 250) {
-			reviewsHtml += '<div class="ppl-content"><span class="review-complete-txt">'+reviewItem.review+'</span><span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">More</span>';
-		} else {
-			reviewsHtml += '<div class="ppl-content">'+reviewItem.review;
-		}
-		if(reviewItem.source == "Zillow") {
-			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
-		}
-		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
-			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";
-		else
-			reviewItem.customerLastName = "";
-		if(reviewItem.agentName == undefined || reviewItem.agentName == null)
-			reviewItem.agentName = "us";
+		
+		
+		
 		
 			
+			
+			
+			
+			/*<c:if test="${reviewItem.source =='encompass'}">
+		<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+		</c:if>
+		<c:if test="${reviewItem.source =='DOTLOOP'}">
+		<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
+		</c:if>
+			*/
 		
-		reviewsHtml += '	</div>';
+		/*reviewsHtml += '	</div>';
 		
 		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height">';
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
@@ -788,6 +842,51 @@ function paintReviews(result){
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
 		reviewsHtml += '	</div>';
+		reviewsHtml += '</div>';*/
+
+
+		if (reviewItem.review.length > 250) {
+			reviewsHtml += '<div class="ppl-content review-height"><span class="review-complete-txt">'+reviewItem.review+'';
+			if(reviewItem.source == "Zillow") {
+				reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a></span>';
+			}else{
+				reviewsHtml += '</span>';
+			}
+			reviewsHtml +='<span class="review-less-text">' + reviewItem.review.substr(0,250) + '</span><span class="review-more-button">read full review</span>';
+		} else {
+			reviewsHtml += '<div class="ppl-content review-height">'+reviewItem.review;
+		}
+		reviewsHtml += '	</div>';
+		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height" >';
+		reviewsHtml += '		<div class="float-left clearfix ppl-share-social ">';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb-rev icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/feed?' + reviewItem.faceBookShareUrl + '&link=' +reviewItem.completeProfileUrl.replace("localhost","127.0.0.1")+ '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit-rev icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ reviewItem.completeProfileUrl +'"></span>';	
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin-rev icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
+		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus-rev" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		reviewsHtml += '		</div>';
+		if(reviewItem.source != "Zillow")
+		reviewsHtml += '		<span class="icn-flag float-right report-abuse-txt prof-report-abuse-txt cursor-pointer public-report " title="Report Abuse"></span> ';
+		reviewsHtml += '	</div>';
+		
+		
+		/*if(reviewItem.summary != null && reviewItem.summary.length > 0){
+			reviewsHtml += '<div class="ppl-content">'+reviewItem.summary+'</div>';
+		}*/
+		
+		
+		/*if(reviewItem.source == "Zillow") {
+			reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a>';
+		}*/
+		if(reviewItem.customerLastName != null && reviewItem.customerLastName != "")
+			reviewItem.customerLastName = reviewItem.customerLastName.substring( 0, 1 ).toUpperCase() + ".";
+		else
+			reviewItem.customerLastName = "";
+		if(reviewItem.agentName == undefined || reviewItem.agentName == null)
+			reviewItem.agentName = "us";
+		
+		
+		
 		reviewsHtml += '</div>';
 	});
 	
@@ -812,6 +911,51 @@ function paintReviews(result){
 	}, 100);
 }
 
+/*$(document).on('mouseover','.ppl-review-item ',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','visible');
+});
+$(document).on('mouseleave','.ppl-review-item ',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','hidden');;
+});*/
+/*$(document).on('mouseover','.ppl-review-item-last ',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','visible');
+});
+$(document).on('mouseleave','.ppl-review-item-last',function(e){
+	$(this).find('.ppl-share-wrapper').css('visibility','hidden');
+});*/
+
+$(document).on('mouseover','.ppl-review-item ',function(e){
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
+	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
+});
+$(document).on('mouseleave','.ppl-review-item ',function(e){
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
+	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
+});
+$(document).on('mouseover','.ppl-review-item-last ',function(e){
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
+	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
+});
+$(document).on('mouseleave','.ppl-review-item-last',function(e){
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
+	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
+});
 $(document).on('click','.review-more-button',function(){
 	$(this).parent().find('.review-less-text').hide();
 	$(this).parent().find('.review-complete-txt').show();
@@ -824,7 +968,7 @@ $(document).on('click', '#report-abuse-pop-up', function(e){
 // Report abuse click event.
 $(document).on('click', '.prof-report-abuse-txt', function(e) {
 	e.stopPropagation();
-	var reviewElement = $(this).parent().parent().parent();
+	var reviewElement = $(this).parent().parent();
 	var payload = {
 		"customerEmail" : reviewElement.attr('data-customeremail'),
 		"agentId" : reviewElement.attr('data-agentid'),
@@ -834,6 +978,7 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 		"review" : reviewElement.attr('data-review'),
 		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
+	
 	$("#report-abuse-txtbox").val('');
 	$('#report-abuse-cus-name').val('');
 	$('#report-abuse-cus-email').val('');

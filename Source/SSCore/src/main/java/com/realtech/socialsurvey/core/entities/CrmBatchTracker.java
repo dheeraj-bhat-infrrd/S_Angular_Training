@@ -46,7 +46,10 @@ public class CrmBatchTracker implements Serializable
     @Column ( name = "RECENT_RECORD_FETCHED_DATE")
     private Timestamp recentRecordFetchedDate;
     
-    @Column ( name = "CREATED_ON")
+    @Column (name="LAST_RUN_RECORD_FETCHED_COUNT")
+    private int LastRunRecordFetchedCount; 
+    
+	@Column ( name = "CREATED_ON")
     private Timestamp createdOn;
 
     @Column ( name = "MODIFIED_ON")
@@ -170,6 +173,14 @@ public class CrmBatchTracker implements Serializable
     {
         this.recentRecordFetchedDate = recentRecordFetchedDate;
     }
+    
+    public int getLastRunRecordFetchedCount() {
+		return LastRunRecordFetchedCount;
+	}
+
+	public void setLastRunRecordFetchedCount(int lastRunRecordFetchedCount) {
+		LastRunRecordFetchedCount = lastRunRecordFetchedCount;
+	}
 
     public Timestamp getCreatedOn()
     {

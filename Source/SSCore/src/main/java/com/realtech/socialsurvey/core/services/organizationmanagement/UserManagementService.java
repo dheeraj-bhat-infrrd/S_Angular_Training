@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -77,12 +78,12 @@ public interface UserManagementService
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
      */
-    public User inviteNewUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
-        UserAlreadyExistsException, UndeliveredEmailException;
+    public User inviteNewUser( User admin, String firstName, String lastName, String emailId )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
 
 
     // Method to remove an existing user. Soft deletion is done.
-    public void removeExistingUser( User admin, long userIdToBeDeactivated ) throws InvalidInputException;
+    public void removeExistingUser( User admin, long userIdToBeDeactivated, int status ) throws InvalidInputException;
 
 
     // Method to remove profile of a branch admin.
@@ -98,8 +99,8 @@ public interface UserManagementService
 
 
     // Method to return user with provided email and company
-    public User getUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public User getUserByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     // Method to return user with provided email
@@ -153,8 +154,8 @@ public interface UserManagementService
      * @throws NoRecordsFetchedException
      * @throws SolrException
      */
-    public void assignUserToCompany( User admin, long userId ) throws InvalidInputException, NoRecordsFetchedException,
-        SolrException;
+    public void assignUserToCompany( User admin, long userId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 
     /**
@@ -167,8 +168,8 @@ public interface UserManagementService
      * @throws NoRecordsFetchedException
      * @throws SolrException
      */
-    public void assignUserToRegion( User admin, long userId, long regionId ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException;
+    public void assignUserToRegion( User admin, long userId, long regionId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 
     // Method to unassign a user from branch.
@@ -213,8 +214,8 @@ public interface UserManagementService
      * 
      * @throws NonFatalException
      */
-    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation, String referralCode )
-        throws InvalidInputException, UndeliveredEmailException, NonFatalException;
+    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation,
+        String referralCode ) throws InvalidInputException, UndeliveredEmailException, NonFatalException;
 
 
     /**
@@ -227,9 +228,8 @@ public interface UserManagementService
      * @throws InvalidInputException
      * @throws UserAlreadyExistsException
      */
-    public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId,
-        boolean isReinvitation, String referralCode ) throws InvalidInputException, UserAlreadyExistsException,
-        NonFatalException;
+    public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation,
+        String referralCode ) throws InvalidInputException, UserAlreadyExistsException, NonFatalException;
 
 
     /**
@@ -280,8 +280,8 @@ public interface UserManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public UserSettings getCanonicalUserSettings( User user, AccountType accountType ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public UserSettings getCanonicalUserSettings( User user, AccountType accountType )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     /**
@@ -408,13 +408,13 @@ public interface UserManagementService
     public void updateUser( User user, Map<String, Object> map ) throws SolrException, InvalidInputException;
 
 
-    public User inviteUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
-        UserAlreadyExistsException, UndeliveredEmailException, SolrException;
+    public User inviteUser( User admin, String firstName, String lastName, String emailId )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException;
 
 
     public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
-        boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
-        SolrException;
+        boolean isDirectRegistration )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException;
 
 
     public String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException;
@@ -444,8 +444,8 @@ public interface UserManagementService
     public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId );
 
 
-    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId ) throws InvalidInputException,
-        ProfileNotFoundException;
+    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
+        throws InvalidInputException, ProfileNotFoundException;
 
 
     void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings )
@@ -464,8 +464,8 @@ public interface UserManagementService
         throws InvalidInputException;
 
 
-    public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException;
+    public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException;
 
 
     void updatePrimaryProfileOfUser( User user ) throws InvalidInputException;
@@ -511,8 +511,8 @@ public interface UserManagementService
     public void updateUser( User user );
 
 
-    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     /**
@@ -531,8 +531,8 @@ public interface UserManagementService
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
      */
-    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
@@ -547,8 +547,8 @@ public interface UserManagementService
     public User getUserByEmailAddress( String emailId ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    User createSocialSurveyAdmin( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
-        UserAlreadyExistsException, UndeliveredEmailException;
+    User createSocialSurveyAdmin( User admin, String firstName, String lastName, String emailId )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
 
 
     List<User> getSocialSurveyAdmins( User admin );
@@ -560,15 +560,15 @@ public interface UserManagementService
     User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     public void removeUserProfile( User user, User adminUser, Long profileId ) throws UserAssignmentException;
 
 
-    UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize ) throws InvalidInputException,
-        NoRecordsFetchedException;
+    UserList getUsersAndEmailMappingForCompany( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 
     List<UserEmailMapping> getUserEmailMappingsForUser( long agentId ) throws InvalidInputException, NoRecordsFetchedException;
@@ -584,5 +584,25 @@ public interface UserManagementService
 
 
     void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
+
+
+    /**
+     * Method to get user api key
+     * @return
+     */
+    public UserApiKey getApiKey();
+
+
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
+        throws InvalidInputException, SolrException;
+
+    /**
+     * Method to map CRM Data with AgentIds
+     */
+    public void crmDataAgentIdMApper();
+
+    public User getAdminUserByCompanyId(long companyId);
+
+    public void incompleteSurveyReminderSender();
 }
 // JIRA SS-34 BY RM02 BOC

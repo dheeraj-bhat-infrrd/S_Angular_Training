@@ -43,8 +43,8 @@ public class AgentRankingReportComparatorTest
     @Test
     public void testComparingWithHigherFirstAgentRankingReport()
     {
-        agentRankingReportA.setAverageScore( 4 );
-        agentRankingReportB.setAverageScore( 2 );
+        agentRankingReportA.setCompletedSurveys( 4 );
+        agentRankingReportB.setCompletedSurveys( 2 );
         assertEquals( "Agent Ranking Report A is not higher than B", -1,
             comparator.compare( agentRankingReportA, agentRankingReportB ) );
     }
@@ -53,8 +53,8 @@ public class AgentRankingReportComparatorTest
     @Test
     public void testComparingWithHigherSecondAgentRankingReport()
     {
-        agentRankingReportA.setAverageScore( 2 );
-        agentRankingReportB.setAverageScore( 4 );
+        agentRankingReportA.setCompletedSurveys( 2 );
+        agentRankingReportB.setCompletedSurveys( 4 );
         assertEquals( "Agent Ranking Report B is not higher than A", 1,
             comparator.compare( agentRankingReportA, agentRankingReportB ) );
     }

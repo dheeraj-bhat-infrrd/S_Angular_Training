@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -309,8 +310,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		// Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
 		Query query = new Query();
 		query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
-		// query records which are not deleted
-		query.addCriteria(Criteria.where(KEY_STATUS).ne(CommonConstants.STATUS_DELETED_MONGO));
+		// query records which are not deleted or incomplete
+        query.addCriteria( Criteria.where( KEY_STATUS ).nin(
+            Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
 		query.fields().include(KEY_PROFILE_URL).include(KEY_MODIFIED_ON).exclude("_id");
 		query.with(new Sort(Sort.Direction.DESC,KEY_MODIFIED_ON));
 		if (skipCount > 0) {
@@ -725,8 +727,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      * @throws InvalidInputException
      */
     @Override
-    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings, boolean restoreSocial )
-        throws InvalidInputException
+    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings,
+        boolean restoreSocial, boolean isVerified ) throws InvalidInputException
     {
         if ( agentSettings == null ) {
             throw new InvalidInputException( "AgentSettings cannot be null" );
@@ -737,7 +739,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         Update update = new Update();
         query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( agentSettings.getIden() ) );
-        update.set( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO );
+        if ( isVerified ) {
+            update.set( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE_MONGO );
+        } else {
+            update.set( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE_MONGO );
+        }
 
         //If newProfileName is present, then update profileName and profileUrl in mongo
         if ( newProfileName != null && !( newProfileName.isEmpty() ) ) {

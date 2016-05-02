@@ -11,6 +11,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,6 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.BooleanUploadHistory;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -39,13 +40,10 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Licenses;
-import com.realtech.socialsurvey.core.entities.LongUploadHistory;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
-import com.realtech.socialsurvey.core.entities.StringListUploadHistory;
-import com.realtech.socialsurvey.core.entities.StringUploadHistory;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -73,6 +71,9 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 {
 
     private static Logger LOG = LoggerFactory.getLogger( HierarchyStructureUploadServiceImpl.class );
+
+    @Autowired
+    private MessageUtils messageUtils;
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
@@ -107,11 +108,11 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
     @Autowired
     private HierarchyUploadDao hierarchyUploadDao;
-    
+
     @Resource
     @Qualifier ( "user")
     private UserDao userDao;
-    
+
     @Autowired
     GenericDao<UploadStatus, Long> uploadStatusDao;
 
@@ -152,7 +153,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadBranches( upload, user, company, branchUploadErrors );
         // Uploading users
         uploadUsers( upload, user, userUploadErrors );
-        
+
         //Append mode doesn't deal with deletion, you can either add or delete users
         if ( !isAppend ) {
             // Delete users
@@ -164,7 +165,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
 
         hierarchyUploadDao.saveHierarchyUploadObject( upload );
-        
+
         Map<String, List<String>> errorMap = new HashMap<String, List<String>>();
         if ( userUploadErrors != null && !userUploadErrors.isEmpty() ) {
             errorMap.put( CommonConstants.USER_UPLOAD_ERROR_LIST, userUploadErrors );
@@ -193,14 +194,14 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     public void deleteUsers( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.debug( "Deleting removed users" );
-        
+
         //Keep a count of deleted users
         int deletedUsers = 0;
         int deletedUsersOldCount = 0;
         Long nextTime = System.currentTimeMillis();
-        
+
         UploadStatus deletedUsersStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_DELETED_USERS, deletedUsers );
-        
+
         List<UserUploadVO> userList = upload.getUsers();
         if ( userList == null || userList.isEmpty() ) {
             LOG.warn( "Empty userList" );
@@ -211,32 +212,27 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             if ( user.isDeletedRecord() ) {
                 // Delete the user
                 try {
-                    userManagementService.removeExistingUser( adminUser, user.getUserId() );
-                    // update the user count modificaiton notification
-                    userManagementService.updateUserCountModificationNotification( adminUser.getCompany() );
-                    LOG.debug( "Removing user {} from solr.", user.getUserId() );
-                    solrSearchService.removeUserFromSolr( user.getUserId() );
+                    userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId(), CommonConstants.STATUS_INACTIVE );
                     deletedUsersList.add( user );
                     upload.getUserSourceMapping().remove( user.getSourceUserId() );
                     deletedUsers += 1;
-                    
+
                     if ( deletedUsers > deletedUsersOldCount && System.currentTimeMillis() > nextTime ) {
                         deletedUsersStatus = updateUploadStatus( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS,
                             deletedUsers );
                         deletedUsersOldCount = deletedUsers;
-                        nextTime = nextTime + 2*1000;
+                        nextTime = nextTime + 2 * 1000;
                     }
                 } catch ( Exception e ) {
                     // process errors and return them to the user
                     errorList.add( e.getMessage() );
-                    deletedUsersStatus = updateUploadStatusForError( deletedUsersStatus,
-                        CommonConstants.UPLOAD_DELETED_USERS, deletedUsers );
+                    deletedUsersStatus = updateUploadStatusForError( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS,
+                        deletedUsers );
                 }
             }
         }
         upload.getUsers().removeAll( deletedUsersList );
-        deletedUsersStatus = updateUploadStatusToDone( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS,
-            deletedUsers );
+        deletedUsersStatus = updateUploadStatusToDone( deletedUsersStatus, CommonConstants.UPLOAD_DELETED_USERS, deletedUsers );
         LOG.debug( "Finished deleting removed users" );
     }
 
@@ -246,14 +242,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     public void deleteBranches( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.info( "Deleting branches" );
-        
+
         //Keep a count of deleted users
         int deletedBranches = 0;
         int deletedBranchesOldCount = 0;
         Long nextTime = System.currentTimeMillis();
-        
-        UploadStatus deletedBranchesStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_DELETED_BRANCHES, deletedBranches );
-        
+
+        UploadStatus deletedBranchesStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_DELETED_BRANCHES,
+            deletedBranches );
+
         List<BranchUploadVO> branches = upload.getBranches();
         if ( branches == null || branches.isEmpty() ) {
             LOG.warn( "Empty branch list" );
@@ -276,24 +273,16 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                             "Cannot delete branch : " + branch.getBranchName() + ". There are active users in the branch." );
                     } else {
                         //Delete the branch
-                        LOG.debug( "Calling service to deactivate branch" );
-                        organizationManagementService.updateBranchStatus( adminUser, branch.getBranchId(),
-                            CommonConstants.STATUS_INACTIVE );
-                        //update profile name and url
-                        organizationManagementService.updateProfileUrlAndStatusForDeletedEntity(
-                            CommonConstants.BRANCH_ID_COLUMN, branch.getBranchId() );
-                        //remove social media connections
-                        socialManagementService.disconnectAllSocialConnections( CommonConstants.BRANCH_ID_COLUMN,
-                            branch.getBranchId() );
+                        organizationManagementService.deleteBranchDataFromAllSources( branch.getBranchId(), adminUser, null, CommonConstants.STATUS_INACTIVE );
                         deletedBranchesList.add( branch );
                         upload.getBranchSourceMapping().remove( branch.getSourceBranchId() );
                         deletedBranches += 1;
-                        
+
                         if ( deletedBranches > deletedBranchesOldCount && System.currentTimeMillis() > nextTime ) {
                             deletedBranchesStatus = updateUploadStatus( deletedBranchesStatus,
                                 CommonConstants.UPLOAD_DELETED_BRANCHES, deletedBranches );
                             deletedBranchesOldCount = deletedBranches;
-                            nextTime = nextTime + 2*1000;
+                            nextTime = nextTime + 2 * 1000;
                         }
                     }
 
@@ -307,7 +296,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
         }
         upload.getBranches().removeAll( deletedBranchesList );
-        
+
         deletedBranchesStatus = updateUploadStatusToDone( deletedBranchesStatus, CommonConstants.UPLOAD_DELETED_BRANCHES,
             deletedBranches );
         LOG.info( "Finished deleting branches" );
@@ -319,14 +308,15 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     public void deleteRegions( HierarchyUpload upload, User adminUser, Company company, List<String> errorList )
     {
         LOG.info( "Deleting regions" );
-        
+
         //Keep a count of deleted users
         int deletedRegions = 0;
         int deletedRegionsOldCount = 0;
         Long nextTime = System.currentTimeMillis();
-        
-        UploadStatus deletedRegionsStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_DELETED_REGIONS, deletedRegions );
-        
+
+        UploadStatus deletedRegionsStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_DELETED_REGIONS,
+            deletedRegions );
+
         List<RegionUploadVO> regions = upload.getRegions();
         if ( regions == null || regions.isEmpty() ) {
             LOG.warn( "Empty region list" );
@@ -350,16 +340,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                             "Cannot delete region: " + region.getRegionName() + ". There are active branches in the region." );
                     } else {
                         // Delete the region
-                        LOG.debug( "Calling service to deactivate region" );
-                        organizationManagementService.updateRegionStatus( adminUser, region.getRegionId(),
-                            CommonConstants.STATUS_INACTIVE );
-
-                        //update profile name and url
-                        organizationManagementService.updateProfileUrlAndStatusForDeletedEntity(
-                            CommonConstants.REGION_ID_COLUMN, region.getRegionId() );
-                        //remove social media connections
-                        socialManagementService.disconnectAllSocialConnections( CommonConstants.REGION_ID_COLUMN,
-                            region.getRegionId() );
+                        organizationManagementService.deleteRegionDataFromAllSources( region.getRegionId(), adminUser, null, CommonConstants.STATUS_INACTIVE );
                         deletedRegionsList.add( region );
                         upload.getRegionSourceMapping().remove( region.getSourceRegionId() );
                         deletedRegions += 1;
@@ -367,7 +348,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                             deletedRegionsStatus = updateUploadStatus( deletedRegionsStatus,
                                 CommonConstants.UPLOAD_DELETED_REGIONS, deletedRegions );
                             deletedRegionsOldCount = deletedRegions;
-                            nextTime = nextTime + 2*1000;
+                            nextTime = nextTime + 2 * 1000;
                         }
                     }
 
@@ -381,7 +362,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
         }
         upload.getRegions().removeAll( deletedRegionsList );
-        
+
         deletedRegionsStatus = updateUploadStatusToDone( deletedRegionsStatus, CommonConstants.UPLOAD_DELETED_REGIONS,
             deletedRegions );
     }
@@ -392,18 +373,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     public void uploadBranches( HierarchyUpload upload, User user, Company company, List<String> errorList )
     {
         LOG.debug( "Uploading new branches" );
-        
+
         //Keep a count of added and modified regions
         int addedBranches = 0;
         int modifiedBranches = 0;
         int addedBranchesOldCount = 0;
         int modifiedBranchesOldCount = 0;
         Long nextTime = System.currentTimeMillis();
-        
+
         UploadStatus addedBranchesStatus = createUploadStatus( user, CommonConstants.UPLOAD_ADDED_BRANCHES, addedBranches );
-        
-        UploadStatus modifiedBranchesStatus = createUploadStatus( user, CommonConstants.UPLOAD_MODIFIED_BRANCHES, modifiedBranches );
-        
+
+        UploadStatus modifiedBranchesStatus = createUploadStatus( user, CommonConstants.UPLOAD_MODIFIED_BRANCHES,
+            modifiedBranches );
+
         List<BranchUploadVO> branchesToBeUploaded = upload.getBranches();
         if ( branchesToBeUploaded != null && !branchesToBeUploaded.isEmpty() ) {
             Branch branch = null;
@@ -461,7 +443,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                                 CommonConstants.UPLOAD_MODIFIED_BRANCHES, modifiedBranches );
                             modifiedBranchesOldCount = modifiedBranches;
                         }
-                        nextTime = nextTime + 2*1000;
+                        nextTime = nextTime + 2 * 1000;
                     }
                 } catch ( InvalidInputException | BranchAdditionException | SolrException | NoRecordsFetchedException
                     | UserAssignmentException e ) {
@@ -481,8 +463,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         //Update upload status to show the latest counts
         addedBranchesStatus = updateUploadStatusToDone( addedBranchesStatus, CommonConstants.UPLOAD_ADDED_BRANCHES,
             addedBranches );
-        modifiedBranchesStatus = updateUploadStatusToDone( modifiedBranchesStatus,
-            CommonConstants.UPLOAD_MODIFIED_BRANCHES, modifiedBranches );
+        modifiedBranchesStatus = updateUploadStatusToDone( modifiedBranchesStatus, CommonConstants.UPLOAD_MODIFIED_BRANCHES,
+            modifiedBranches );
     }
 
 
@@ -590,18 +572,19 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     public void uploadRegions( HierarchyUpload upload, User user, Company company, List<String> errorList )
     {
         LOG.debug( "Uploading new regions." );
-        
+
         //Keep a count of added and modified regions
         int addedRegions = 0;
         int modifiedRegions = 0;
         int addedRegionsOldCount = 0;
         int modifiedRegionsOldCount = 0;
         Long nextTime = System.currentTimeMillis();
-        
+
         UploadStatus addedRegionsStatus = createUploadStatus( user, CommonConstants.UPLOAD_ADDED_REGIONS, addedRegions );
-        UploadStatus modifiedRegionsStatus = createUploadStatus( user, CommonConstants.UPLOAD_MODIFIED_REGIONS, modifiedRegions );
-        
-        
+        UploadStatus modifiedRegionsStatus = createUploadStatus( user, CommonConstants.UPLOAD_MODIFIED_REGIONS,
+            modifiedRegions );
+
+
         List<RegionUploadVO> regionsToBeUploaded = upload.getRegions();
         if ( regionsToBeUploaded != null && !regionsToBeUploaded.isEmpty() ) {
             Region region = null;
@@ -609,7 +592,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
                 //Reset inAppendMode flag
                 regionUpload.setInAppendMode( false );
-                
+
                 // create the region. add the field to history for all fields as its new region and map source id to the id mapping list
                 try {
                     //If the region wasn't added, modified nor deleted, skip the next step
@@ -634,12 +617,12 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
                     //Store the updated regionUploads in upload
                     upload.setRegions( regionsToBeUploaded );
-                    
+
                     if ( System.currentTimeMillis() > nextTime ) {
                         //Update count in upload_status
                         if ( addedRegions > addedRegionsOldCount ) {
-                            addedRegionsStatus = updateUploadStatus( addedRegionsStatus,
-                                CommonConstants.UPLOAD_ADDED_REGIONS, addedRegions );
+                            addedRegionsStatus = updateUploadStatus( addedRegionsStatus, CommonConstants.UPLOAD_ADDED_REGIONS,
+                                addedRegions );
                             addedRegionsOldCount = addedRegions;
                         }
                         if ( modifiedRegions > modifiedRegionsOldCount ) {
@@ -654,8 +637,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     errorList.add( e.getMessage() );
                     e.printStackTrace();
                     //Update upload status to show the latest counts
-                    addedRegionsStatus = updateUploadStatusForError( addedRegionsStatus,
-                        CommonConstants.UPLOAD_ADDED_REGIONS, addedRegions );
+                    addedRegionsStatus = updateUploadStatusForError( addedRegionsStatus, CommonConstants.UPLOAD_ADDED_REGIONS,
+                        addedRegions );
 
                     modifiedRegionsStatus = updateUploadStatusForError( modifiedRegionsStatus,
                         CommonConstants.UPLOAD_MODIFIED_REGIONS, modifiedRegions );
@@ -663,8 +646,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             }
         }
         //Update upload status to show the latest counts
-        addedRegionsStatus = updateUploadStatusToDone( addedRegionsStatus, CommonConstants.UPLOAD_ADDED_REGIONS,
-            addedRegions );
+        addedRegionsStatus = updateUploadStatusToDone( addedRegionsStatus, CommonConstants.UPLOAD_ADDED_REGIONS, addedRegions );
         modifiedRegionsStatus = updateUploadStatusToDone( modifiedRegionsStatus, CommonConstants.UPLOAD_MODIFIED_REGIONS,
             modifiedRegions );
     }
@@ -703,13 +685,14 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     }
 
 
+    //TODO: Remove history update from here?
     RegionUploadVO mapRegionModificationHistory( RegionUploadVO regionUpload, Region region )
     {
         LOG.debug( "mapping region history" );
         Date currentDate = new Date( System.currentTimeMillis() );
         // map region id history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionIdModified() ) {
-            List<LongUploadHistory> regionIdHistoryList = regionUpload.getRegionIdHistory();
+            /*List<LongUploadHistory> regionIdHistoryList = regionUpload.getRegionIdHistory();
             if ( regionIdHistoryList == null ) {
                 regionIdHistoryList = new ArrayList<LongUploadHistory>();
             }
@@ -717,13 +700,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionIdHistory.setValue( region.getRegionId() );
             regionIdHistory.setTime( currentDate );
             regionIdHistoryList.add( regionIdHistory );
-            regionUpload.setRegionIdHistory( regionIdHistoryList );
+            regionUpload.setRegionIdHistory( regionIdHistoryList );*/
             regionUpload.setRegionIdModified( false );
         }
 
         // map source region id history
         if ( regionUpload.isRegionAdded() || regionUpload.isSourceRegionIdModified() ) {
-            List<StringUploadHistory> sourceIdHistoryList = regionUpload.getSourceRegionIdHistory();
+            /*List<StringUploadHistory> sourceIdHistoryList = regionUpload.getSourceRegionIdHistory();
             if ( sourceIdHistoryList == null ) {
                 sourceIdHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -731,13 +714,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             sourceIdHistory.setValue( regionUpload.getSourceRegionId() );
             sourceIdHistory.setTime( currentDate );
             sourceIdHistoryList.add( sourceIdHistory );
-            regionUpload.setSourceRegionIdHistory( sourceIdHistoryList );
+            regionUpload.setSourceRegionIdHistory( sourceIdHistoryList );*/
             regionUpload.setSourceRegionIdModified( false );
         }
 
         // map region name history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionNameModified() ) {
-            List<StringUploadHistory> regionNameHistoryList = regionUpload.getRegionNameHistory();
+            /*List<StringUploadHistory> regionNameHistoryList = regionUpload.getRegionNameHistory();
             if ( regionNameHistoryList == null ) {
                 regionNameHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -745,13 +728,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionNameHistory.setValue( regionUpload.getRegionName() );
             regionNameHistory.setTime( currentDate );
             regionNameHistoryList.add( regionNameHistory );
-            regionUpload.setRegionNameHistory( regionNameHistoryList );
+            regionUpload.setRegionNameHistory( regionNameHistoryList );*/
             regionUpload.setRegionNameModified( false );
         }
 
         // map region address 1 history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionAddress1Modified() ) {
-            List<StringUploadHistory> regionAddress1HistoryList = regionUpload.getRegionAddress1History();
+            /*List<StringUploadHistory> regionAddress1HistoryList = regionUpload.getRegionAddress1History();
             if ( regionAddress1HistoryList == null ) {
                 regionAddress1HistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -759,13 +742,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionAddress1History.setValue( regionUpload.getRegionAddress1() );
             regionAddress1History.setTime( currentDate );
             regionAddress1HistoryList.add( regionAddress1History );
-            regionUpload.setRegionAddress1History( regionAddress1HistoryList );
+            regionUpload.setRegionAddress1History( regionAddress1HistoryList );*/
             regionUpload.setRegionAddress1Modified( false );
         }
 
         // map region address 2 history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionAddress2Modified() ) {
-            List<StringUploadHistory> regionAddress2HistoryList = regionUpload.getRegionAddress2History();
+            /*List<StringUploadHistory> regionAddress2HistoryList = regionUpload.getRegionAddress2History();
             if ( regionAddress2HistoryList == null ) {
                 regionAddress2HistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -773,13 +756,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionAddress2History.setValue( regionUpload.getRegionAddress2() );
             regionAddress2History.setTime( currentDate );
             regionAddress2HistoryList.add( regionAddress2History );
-            regionUpload.setRegionAddress2History( regionAddress2HistoryList );
+            regionUpload.setRegionAddress2History( regionAddress2HistoryList );*/
             regionUpload.setRegionAddress2Modified( false );
         }
 
         // map city history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionCityModified() ) {
-            List<StringUploadHistory> regionCityHistoryList = regionUpload.getRegionCityHistory();
+            /*List<StringUploadHistory> regionCityHistoryList = regionUpload.getRegionCityHistory();
             if ( regionCityHistoryList == null ) {
                 regionCityHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -787,13 +770,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionCityHistory.setValue( regionUpload.getRegionCity() );
             regionCityHistory.setTime( currentDate );
             regionCityHistoryList.add( regionCityHistory );
-            regionUpload.setRegionCityHistory( regionCityHistoryList );
+            regionUpload.setRegionCityHistory( regionCityHistoryList );*/
             regionUpload.setRegionCityModified( false );
         }
 
         // map state history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionStateModified() ) {
-            List<StringUploadHistory> regionStateHistoryList = regionUpload.getRegionStateHistory();
+            /*List<StringUploadHistory> regionStateHistoryList = regionUpload.getRegionStateHistory();
             if ( regionStateHistoryList == null ) {
                 regionStateHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -801,13 +784,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionStateHistory.setValue( regionUpload.getRegionState() );
             regionStateHistory.setTime( currentDate );
             regionStateHistoryList.add( regionStateHistory );
-            regionUpload.setRegionStateHistory( regionStateHistoryList );
+            regionUpload.setRegionStateHistory( regionStateHistoryList );*/
             regionUpload.setRegionStateModified( false );
         }
 
         // map zip history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionZipcodeModified() ) {
-            List<StringUploadHistory> regionZipCodeHistoryList = regionUpload.getRegionZipcodeHistory();
+            /*List<StringUploadHistory> regionZipCodeHistoryList = regionUpload.getRegionZipcodeHistory();
             if ( regionZipCodeHistoryList == null ) {
                 regionZipCodeHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -815,13 +798,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionZipCodeHistory.setValue( regionUpload.getRegionZipcode() );
             regionZipCodeHistory.setTime( currentDate );
             regionZipCodeHistoryList.add( regionZipCodeHistory );
-            regionUpload.setRegionZipcodeHistory( regionZipCodeHistoryList );
+            regionUpload.setRegionZipcodeHistory( regionZipCodeHistoryList );*/
             regionUpload.setRegionZipcodeModified( false );
         }
 
         //map country history
         if ( regionUpload.isRegionAdded() || regionUpload.isRegionCountryModified() ) {
-            List<StringUploadHistory> regionCountryHistoryList = regionUpload.getRegionCountryHistory();
+            /*List<StringUploadHistory> regionCountryHistoryList = regionUpload.getRegionCountryHistory();
             if ( regionCountryHistoryList == null ) {
                 regionCountryHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -829,7 +812,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionCountryHistory.setTime( currentDate );
             regionCountryHistory.setValue( regionUpload.getRegionCountry() );
             regionCountryHistoryList.add( regionCountryHistory );
-            regionUpload.setRegionCountryHistory( regionCountryHistoryList );
+            regionUpload.setRegionCountryHistory( regionCountryHistoryList );*/
             regionUpload.setRegionCountryModified( false );
         }
 
@@ -881,7 +864,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         Timestamp currentTimestamp = new Timestamp( System.currentTimeMillis() );
         //map user first name history
         if ( userUpload.isUserAdded() || userUpload.isFirstNameModified() ) {
-            List<StringUploadHistory> firstNameHistoryList = userUpload.getFirstNameHistory();
+            /*List<StringUploadHistory> firstNameHistoryList = userUpload.getFirstNameHistory();
             if ( firstNameHistoryList == null ) {
                 firstNameHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -889,13 +872,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             firstNameHistory.setTime( currentTimestamp );
             firstNameHistory.setValue( userUpload.getFirstName() );
             firstNameHistoryList.add( firstNameHistory );
-            userUpload.setFirstNameHistory( firstNameHistoryList );
+            userUpload.setFirstNameHistory( firstNameHistoryList );*/
             userUpload.setFirstNameModified( false );
         }
 
         //map user last name history
         if ( userUpload.isUserAdded() || userUpload.isLastNameModified() ) {
-            List<StringUploadHistory> lastNameHistoryList = userUpload.getLastNameHistory();
+            /*List<StringUploadHistory> lastNameHistoryList = userUpload.getLastNameHistory();
             if ( lastNameHistoryList == null ) {
                 lastNameHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -903,13 +886,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             lastNameHistory.setTime( currentTimestamp );
             lastNameHistory.setValue( userUpload.getLastName() );
             lastNameHistoryList.add( lastNameHistory );
-            userUpload.setLastNameHistory( lastNameHistoryList );
+            userUpload.setLastNameHistory( lastNameHistoryList );*/
             userUpload.setLastNameModified( false );
         }
 
         //map user title history
         if ( userUpload.isUserAdded() || userUpload.isTitleModified() ) {
-            List<StringUploadHistory> titleHistoryList = userUpload.getTitleHistory();
+            /*List<StringUploadHistory> titleHistoryList = userUpload.getTitleHistory();
             if ( titleHistoryList == null ) {
                 titleHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -917,13 +900,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             titleHistory.setTime( currentTimestamp );
             titleHistory.setValue( userUpload.getTitle() );
             titleHistoryList.add( titleHistory );
-            userUpload.setTitleHistory( titleHistoryList );
+            userUpload.setTitleHistory( titleHistoryList );*/
             userUpload.setTitleModified( false );
         }
 
         //map branch id history
         if ( userUpload.isUserAdded() || userUpload.isBranchIdModified() ) {
-            List<LongUploadHistory> branchIdHistoryList = userUpload.getBranchIdHistory();
+            /*List<LongUploadHistory> branchIdHistoryList = userUpload.getBranchIdHistory();
             if ( branchIdHistoryList == null ) {
                 branchIdHistoryList = new ArrayList<LongUploadHistory>();
             }
@@ -931,13 +914,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             branchIdHistory.setTime( currentTimestamp );
             branchIdHistory.setValue( userUpload.getBranchId() );
             branchIdHistoryList.add( branchIdHistory );
-            userUpload.setBranchIdHistory( branchIdHistoryList );
+            userUpload.setBranchIdHistory( branchIdHistoryList );*/
             userUpload.setBranchIdModified( false );
         }
 
         //map source branch id history
         if ( userUpload.isUserAdded() || userUpload.isSourceBranchIdModified() ) {
-            List<StringUploadHistory> sourceBranchIdHistoryList = userUpload.getSourceBranchIdHistory();
+            /*List<StringUploadHistory> sourceBranchIdHistoryList = userUpload.getSourceBranchIdHistory();
             if ( sourceBranchIdHistoryList == null ) {
                 sourceBranchIdHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -945,13 +928,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             sourceBranchIdHistory.setTime( currentTimestamp );
             sourceBranchIdHistory.setValue( userUpload.getSourceBranchId() );
             sourceBranchIdHistoryList.add( sourceBranchIdHistory );
-            userUpload.setSourceBranchIdHistory( sourceBranchIdHistoryList );
+            userUpload.setSourceBranchIdHistory( sourceBranchIdHistoryList );*/
             userUpload.setSourceBranchIdModified( false );
         }
 
         //map region id history
         if ( userUpload.isUserAdded() || userUpload.isRegionIdModified() ) {
-            List<LongUploadHistory> regionIdHistoryList = userUpload.getRegionIdHistory();
+            /*List<LongUploadHistory> regionIdHistoryList = userUpload.getRegionIdHistory();
             if ( regionIdHistoryList == null ) {
                 regionIdHistoryList = new ArrayList<LongUploadHistory>();
             }
@@ -959,13 +942,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionIdHistory.setTime( currentTimestamp );
             regionIdHistory.setValue( userUpload.getRegionId() );
             regionIdHistoryList.add( regionIdHistory );
-            userUpload.setRegionIdHistory( regionIdHistoryList );
+            userUpload.setRegionIdHistory( regionIdHistoryList );*/
             userUpload.setRegionIdModified( false );
         }
 
         //map source region id history
         if ( userUpload.isUserAdded() || userUpload.isSourceRegionIdModified() ) {
-            List<StringUploadHistory> sourceRegionIdHistoryList = userUpload.getSourceRegionIdHistory();
+            /*List<StringUploadHistory> sourceRegionIdHistoryList = userUpload.getSourceRegionIdHistory();
             if ( sourceRegionIdHistoryList == null ) {
                 sourceRegionIdHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -973,13 +956,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             sourceRegionIdHistory.setTime( currentTimestamp );
             sourceRegionIdHistory.setValue( userUpload.getSourceRegionId() );
             sourceRegionIdHistoryList.add( sourceRegionIdHistory );
-            userUpload.setSourceRegionIdHistory( sourceRegionIdHistoryList );
+            userUpload.setSourceRegionIdHistory( sourceRegionIdHistoryList );*/
             userUpload.setSourceRegionIdModified( false );
         }
 
         //map is agent history
         if ( userUpload.isUserAdded() || userUpload.isAgentModified() ) {
-            List<BooleanUploadHistory> isAgentHistoryList = userUpload.getIsAgentHistory();
+            /*List<BooleanUploadHistory> isAgentHistoryList = userUpload.getIsAgentHistory();
             if ( isAgentHistoryList == null ) {
                 isAgentHistoryList = new ArrayList<BooleanUploadHistory>();
             }
@@ -987,13 +970,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             isAgentHistory.setTime( currentTimestamp );
             isAgentHistory.setValue( userUpload.isAgent() );
             isAgentHistoryList.add( isAgentHistory );
-            userUpload.setIsAgentHistory( isAgentHistoryList );
+            userUpload.setIsAgentHistory( isAgentHistoryList );*/
             userUpload.setAgentModified( false );
         }
 
         //map email ID history
         if ( userUpload.isUserAdded() || userUpload.isEmailIdModified() ) {
-            List<StringUploadHistory> emailIdHistoryList = userUpload.getEmailIdHistory();
+            /*List<StringUploadHistory> emailIdHistoryList = userUpload.getEmailIdHistory();
             if ( emailIdHistoryList == null ) {
                 emailIdHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1001,13 +984,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             emailIdHistory.setTime( currentTimestamp );
             emailIdHistory.setValue( userUpload.getEmailId() );
             emailIdHistoryList.add( emailIdHistory );
-            userUpload.setEmailIdHistory( emailIdHistoryList );
+            userUpload.setEmailIdHistory( emailIdHistoryList );*/
             userUpload.setEmailIdModified( false );
         }
 
         //map belongs to company history
         if ( userUpload.isUserAdded() || userUpload.isBelongsToCompanyModified() ) {
-            List<BooleanUploadHistory> belongsToCompanyHistoryList = userUpload.getBelongsToCompanyHistory();
+            /*List<BooleanUploadHistory> belongsToCompanyHistoryList = userUpload.getBelongsToCompanyHistory();
             if ( belongsToCompanyHistoryList == null ) {
                 belongsToCompanyHistoryList = new ArrayList<BooleanUploadHistory>();
             }
@@ -1015,13 +998,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             belongsToCompanyHistory.setTime( currentTimestamp );
             belongsToCompanyHistory.setValue( userUpload.isBelongsToCompany() );
             belongsToCompanyHistoryList.add( belongsToCompanyHistory );
-            userUpload.setBelongsToCompanyHistory( belongsToCompanyHistoryList );
+            userUpload.setBelongsToCompanyHistory( belongsToCompanyHistoryList );*/
             userUpload.setBelongsToCompanyModified( false );
         }
 
         //map assign to company history
         if ( userUpload.isUserAdded() || userUpload.isAssignToCompany() ) {
-            List<BooleanUploadHistory> assignedToCompanyHistoryList = userUpload.getAssignToCompanyHistory();
+            /*List<BooleanUploadHistory> assignedToCompanyHistoryList = userUpload.getAssignToCompanyHistory();
             if ( assignedToCompanyHistoryList == null ) {
                 assignedToCompanyHistoryList = new ArrayList<BooleanUploadHistory>();
             }
@@ -1029,13 +1012,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             assignedToCompanyHistory.setTime( currentTimestamp );
             assignedToCompanyHistory.setValue( userUpload.isAssignToCompany() );
             assignedToCompanyHistoryList.add( assignedToCompanyHistory );
-            userUpload.setAssignToCompanyHistory( assignedToCompanyHistoryList );
+            userUpload.setAssignToCompanyHistory( assignedToCompanyHistoryList );*/
             userUpload.setAssignToCompanyModified( false );
         }
 
         //map assigned branch name history
         if ( userUpload.isUserAdded() || userUpload.isAssignedBranchNameModified() ) {
-            List<StringUploadHistory> branchNameHistoryList = userUpload.getAssignedBranchNameHistory();
+            /*List<StringUploadHistory> branchNameHistoryList = userUpload.getAssignedBranchNameHistory();
             if ( branchNameHistoryList == null ) {
                 branchNameHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1043,13 +1026,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             branchNameHistory.setTime( currentTimestamp );
             branchNameHistory.setValue( userUpload.getAssignedBranchName() );
             branchNameHistoryList.add( branchNameHistory );
-            userUpload.setAssignedBranchNameHistory( branchNameHistoryList );
+            userUpload.setAssignedBranchNameHistory( branchNameHistoryList );*/
             userUpload.setAssignedBranchNameModified( false );
         }
 
         //map assigned branches history
         if ( userUpload.isUserAdded() || userUpload.isAssignedBranchesModified() ) {
-            List<StringListUploadHistory> assignedBranchesHistoryList = userUpload.getAssignedBranchesHistory();
+            /*List<StringListUploadHistory> assignedBranchesHistoryList = userUpload.getAssignedBranchesHistory();
             if ( assignedBranchesHistoryList == null ) {
                 assignedBranchesHistoryList = new ArrayList<StringListUploadHistory>();
             }
@@ -1057,13 +1040,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             assignedBranchesHistory.setTime( currentTimestamp );
             assignedBranchesHistory.setValue( userUpload.getAssignedBranches() );
             assignedBranchesHistoryList.add( assignedBranchesHistory );
-            userUpload.setAssignedBranchesHistory( assignedBranchesHistoryList );
+            userUpload.setAssignedBranchesHistory( assignedBranchesHistoryList );*/
             userUpload.setAssignedBranchesModified( false );
         }
 
         //map assigned region name history
         if ( userUpload.isUserAdded() || userUpload.isAssignedRegionNameModified() ) {
-            List<StringUploadHistory> regionNameHistoryList = userUpload.getAssignedRegionNameHistory();
+            /*List<StringUploadHistory> regionNameHistoryList = userUpload.getAssignedRegionNameHistory();
             if ( regionNameHistoryList == null ) {
                 regionNameHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1071,13 +1054,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionNameHistory.setTime( currentTimestamp );
             regionNameHistory.setValue( userUpload.getAssignedRegionName() );
             regionNameHistoryList.add( regionNameHistory );
-            userUpload.setAssignedRegionNameHistory( regionNameHistoryList );
+            userUpload.setAssignedRegionNameHistory( regionNameHistoryList );*/
             userUpload.setAssignedRegionNameModified( false );
         }
 
         //map assigned regions history
         if ( userUpload.isUserAdded() || userUpload.isAssignedRegionsModified() ) {
-            List<StringListUploadHistory> assignedRegionsHistoryList = userUpload.getAssignedRegionsHistory();
+            /*List<StringListUploadHistory> assignedRegionsHistoryList = userUpload.getAssignedRegionsHistory();
             if ( assignedRegionsHistoryList == null ) {
                 assignedRegionsHistoryList = new ArrayList<StringListUploadHistory>();
             }
@@ -1085,13 +1068,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             assignedRegionsHistory.setTime( currentTimestamp );
             assignedRegionsHistory.setValue( userUpload.getAssignedRegions() );
             assignedRegionsHistoryList.add( assignedRegionsHistory );
-            userUpload.setAssignedRegionsHistory( assignedRegionsHistoryList );
+            userUpload.setAssignedRegionsHistory( assignedRegionsHistoryList );*/
             userUpload.setAssignedRegionsModified( false );
         }
 
         //map is branch admin history
         if ( userUpload.isUserAdded() || userUpload.isBranchAdminModified() ) {
-            List<BooleanUploadHistory> isBranchAdminHistoryList = userUpload.getIsBranchAdminHistory();
+            /*List<BooleanUploadHistory> isBranchAdminHistoryList = userUpload.getIsBranchAdminHistory();
             if ( isBranchAdminHistoryList == null ) {
                 isBranchAdminHistoryList = new ArrayList<BooleanUploadHistory>();
             }
@@ -1099,13 +1082,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             isBranchAdminHistory.setTime( currentTimestamp );
             isBranchAdminHistory.setValue( userUpload.isBranchAdmin() );
             isBranchAdminHistoryList.add( isBranchAdminHistory );
-            userUpload.setIsBranchAdminHistory( isBranchAdminHistoryList );
+            userUpload.setIsBranchAdminHistory( isBranchAdminHistoryList );*/
             userUpload.setBranchAdminModified( false );
         }
 
         //map assigned branches admin history
         if ( userUpload.isUserAdded() || userUpload.isAssignedBrachesAdminModified() ) {
-            List<StringListUploadHistory> assignedBranchesAdminHistoryList = userUpload.getAssignedBrachesAdminHistory();
+            /*List<StringListUploadHistory> assignedBranchesAdminHistoryList = userUpload.getAssignedBrachesAdminHistory();
             if ( assignedBranchesAdminHistoryList == null ) {
                 assignedBranchesAdminHistoryList = new ArrayList<StringListUploadHistory>();
             }
@@ -1113,13 +1096,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             assignedBranchesAdminHistory.setTime( currentTimestamp );
             assignedBranchesAdminHistory.setValue( userUpload.getAssignedBranchesAdmin() );
             assignedBranchesAdminHistoryList.add( assignedBranchesAdminHistory );
-            userUpload.setAssignedBrachesAdminHistory( assignedBranchesAdminHistoryList );
+            userUpload.setAssignedBrachesAdminHistory( assignedBranchesAdminHistoryList );*/
             userUpload.setAssignedBrachesAdminModified( false );
         }
 
         //map is region admin history
         if ( userUpload.isUserAdded() || userUpload.isRegionAdminModified() ) {
-            List<BooleanUploadHistory> isRegionAdminHistoryList = userUpload.getIsRegionAdminHistory();
+            /*List<BooleanUploadHistory> isRegionAdminHistoryList = userUpload.getIsRegionAdminHistory();
             if ( isRegionAdminHistoryList == null ) {
                 isRegionAdminHistoryList = new ArrayList<BooleanUploadHistory>();
             }
@@ -1127,13 +1110,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             isRegionAdminHistory.setTime( currentTimestamp );
             isRegionAdminHistory.setValue( userUpload.isRegionAdmin() );
             isRegionAdminHistoryList.add( isRegionAdminHistory );
-            userUpload.setIsRegionAdminHistory( isRegionAdminHistoryList );
+            userUpload.setIsRegionAdminHistory( isRegionAdminHistoryList );*/
             userUpload.setRegionAdminModified( false );
         }
 
         //map assigned regions admin history
         if ( userUpload.isUserAdded() || userUpload.isAssignedRegionsAdminModified() ) {
-            List<StringListUploadHistory> assignedRegionsAdminHistoryList = userUpload.getAssignedRegionsAdminHistory();
+            /*List<StringListUploadHistory> assignedRegionsAdminHistoryList = userUpload.getAssignedRegionsAdminHistory();
             if ( assignedRegionsAdminHistoryList == null ) {
                 assignedRegionsAdminHistoryList = new ArrayList<StringListUploadHistory>();
             }
@@ -1141,13 +1124,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             assignedRegionsAdminHistory.setTime( currentTimestamp );
             assignedRegionsAdminHistory.setValue( userUpload.getAssignedRegionsAdmin() );
             assignedRegionsAdminHistoryList.add( assignedRegionsAdminHistory );
-            userUpload.setAssignedRegionsAdminHistory( assignedRegionsAdminHistoryList );
+            userUpload.setAssignedRegionsAdminHistory( assignedRegionsAdminHistoryList );*/
             userUpload.setAssignedRegionsAdminModified( false );
         }
 
         //map phone number history
         if ( userUpload.isUserAdded() || userUpload.isPhoneNumberModified() ) {
-            List<StringUploadHistory> phoneNumberHistoryList = userUpload.getPhoneNumberHistory();
+            /*List<StringUploadHistory> phoneNumberHistoryList = userUpload.getPhoneNumberHistory();
             if ( phoneNumberHistoryList == null ) {
                 phoneNumberHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1155,13 +1138,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             phoneNumberHistory.setTime( currentTimestamp );
             phoneNumberHistory.setValue( userUpload.getPhoneNumber() );
             phoneNumberHistoryList.add( phoneNumberHistory );
-            userUpload.setPhoneNumberHistory( phoneNumberHistoryList );
+            userUpload.setPhoneNumberHistory( phoneNumberHistoryList );*/
             userUpload.setPhoneNumberModified( false );
         }
 
         //map website url history
         if ( userUpload.isUserAdded() || userUpload.isWebsiteUrlModified() ) {
-            List<StringUploadHistory> websiteUrlHistoryList = userUpload.getWebsiteUrlHistory();
+            /*List<StringUploadHistory> websiteUrlHistoryList = userUpload.getWebsiteUrlHistory();
             if ( websiteUrlHistoryList == null ) {
                 websiteUrlHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1169,13 +1152,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             websiteUrlHistory.setTime( currentTimestamp );
             websiteUrlHistory.setValue( userUpload.getWebsiteUrl() );
             websiteUrlHistoryList.add( websiteUrlHistory );
-            userUpload.setWebsiteUrlHistory( websiteUrlHistoryList );
+            userUpload.setWebsiteUrlHistory( websiteUrlHistoryList );*/
             userUpload.setWebsiteUrlModified( false );
         }
 
         //map license history
         if ( userUpload.isUserAdded() || userUpload.isLicenseModified() ) {
-            List<StringUploadHistory> licenseHistoryList = userUpload.getLicenseHistory();
+            /*List<StringUploadHistory> licenseHistoryList = userUpload.getLicenseHistory();
             if ( licenseHistoryList == null ) {
                 licenseHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1183,13 +1166,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             licenseHistory.setTime( currentTimestamp );
             licenseHistory.setValue( userUpload.getLicense() );
             licenseHistoryList.add( licenseHistory );
-            userUpload.setLicenseHistory( licenseHistoryList );
+            userUpload.setLicenseHistory( licenseHistoryList );*/
             userUpload.setLicenseModified( false );
         }
 
         //map legal disclaimer history
         if ( userUpload.isUserAdded() || userUpload.isLegalDisclaimerModified() ) {
-            List<StringUploadHistory> legalDisclaimerHistoryList = userUpload.getLegalDisclaimerHistory();
+            /*List<StringUploadHistory> legalDisclaimerHistoryList = userUpload.getLegalDisclaimerHistory();
             if ( legalDisclaimerHistoryList == null ) {
                 legalDisclaimerHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1197,13 +1180,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             legalDisclaimerHistory.setTime( currentTimestamp );
             legalDisclaimerHistory.setValue( userUpload.getLegalDisclaimer() );
             legalDisclaimerHistoryList.add( legalDisclaimerHistory );
-            userUpload.setLegalDisclaimerHistory( legalDisclaimerHistoryList );
+            userUpload.setLegalDisclaimerHistory( legalDisclaimerHistoryList );*/
             userUpload.setLegalDisclaimerModified( false );
         }
 
         //map about me history
         if ( userUpload.isUserAdded() || userUpload.isAboutMeDescriptionModified() ) {
-            List<StringUploadHistory> aboutMeHistoryList = userUpload.getAboutMeDescriptionHistory();
+            /*List<StringUploadHistory> aboutMeHistoryList = userUpload.getAboutMeDescriptionHistory();
             if ( aboutMeHistoryList == null ) {
                 aboutMeHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1211,13 +1194,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             aboutMeHistory.setTime( currentTimestamp );
             aboutMeHistory.setValue( userUpload.getAboutMeDescription() );
             aboutMeHistoryList.add( aboutMeHistory );
-            userUpload.setAboutMeDescriptionHistory( aboutMeHistoryList );
+            userUpload.setAboutMeDescriptionHistory( aboutMeHistoryList );*/
             userUpload.setAboutMeDescriptionModified( false );
         }
 
         //map user profile photo
         if ( userUpload.isUserAdded() || userUpload.isUserPhotoUrlModified() ) {
-            List<StringUploadHistory> photoHistoryList = userUpload.getUserPhotoUrlHistory();
+            /*List<StringUploadHistory> photoHistoryList = userUpload.getUserPhotoUrlHistory();
             if ( photoHistoryList == null ) {
                 photoHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1225,7 +1208,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             photoHistory.setTime( currentTimestamp );
             photoHistory.setValue( userUpload.getUserPhotoUrl() );
             photoHistoryList.add( photoHistory );
-            userUpload.setLegalDisclaimerHistory( photoHistoryList );
+            userUpload.setLegalDisclaimerHistory( photoHistoryList );*/
             userUpload.setUserPhotoUrlModified( false );
         }
         userUpload.setUserAdded( false );
@@ -1245,7 +1228,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         Timestamp currentTimestamp = new Timestamp( System.currentTimeMillis() );
         //map branch id history
         if ( branchUpload.isBranchIdModified() || branchUpload.isBranchAdded() ) {
-            List<LongUploadHistory> branchIdHistoryList = branchUpload.getBranchIdHistory();
+            /*List<LongUploadHistory> branchIdHistoryList = branchUpload.getBranchIdHistory();
             if ( branchIdHistoryList == null ) {
                 branchIdHistoryList = new ArrayList<LongUploadHistory>();
             }
@@ -1253,13 +1236,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             branchIdHistory.setTime( currentTimestamp );
             branchIdHistory.setValue( branch.getBranchId() );
             branchIdHistoryList.add( branchIdHistory );
-            branchUpload.setBranchIdHistory( branchIdHistoryList );
+            branchUpload.setBranchIdHistory( branchIdHistoryList );*/
             branchUpload.setBranchIdModified( false );
         }
 
         //map source branch id history
         if ( branchUpload.isSourceBranchIdModified() || branchUpload.isBranchAdded() ) {
-            List<StringUploadHistory> branchSourceIdHistoryList = branchUpload.getSourceBranchIdHistory();
+            /*List<StringUploadHistory> branchSourceIdHistoryList = branchUpload.getSourceBranchIdHistory();
             if ( branchSourceIdHistoryList == null ) {
                 branchSourceIdHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1267,13 +1250,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             branchSourceIdHistory.setTime( currentTimestamp );
             branchSourceIdHistory.setValue( branchUpload.getSourceBranchId() );
             branchSourceIdHistoryList.add( branchSourceIdHistory );
-            branchUpload.setSourceBranchIdHistory( branchSourceIdHistoryList );
+            branchUpload.setSourceBranchIdHistory( branchSourceIdHistoryList );*/
             branchUpload.setSourceBranchIdModified( false );
         }
 
         //map region id history
         if ( branchUpload.isRegionIdModified() || branchUpload.isBranchAdded() ) {
-            List<LongUploadHistory> regionIdHistoryList = branchUpload.getRegionIdHistory();
+            /*List<LongUploadHistory> regionIdHistoryList = branchUpload.getRegionIdHistory();
             if ( regionIdHistoryList == null ) {
                 regionIdHistoryList = new ArrayList<LongUploadHistory>();
             }
@@ -1281,13 +1264,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionIdHistory.setTime( currentTimestamp );
             regionIdHistory.setValue( branchUpload.getRegionId() );
             regionIdHistoryList.add( regionIdHistory );
-            branchUpload.setRegionIdHistory( regionIdHistoryList );
+            branchUpload.setRegionIdHistory( regionIdHistoryList );*/
             branchUpload.setRegionIdModified( false );
         }
 
         //map region source id history
         if ( branchUpload.isSourceRegionIdModified() || branchUpload.isBranchAdded() ) {
-            List<StringUploadHistory> regionSourceIdHistoryList = branchUpload.getSourceRegionIdHistory();
+            /*List<StringUploadHistory> regionSourceIdHistoryList = branchUpload.getSourceRegionIdHistory();
             if ( regionSourceIdHistoryList == null ) {
                 regionSourceIdHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1295,13 +1278,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             regionSourceIdHistory.setTime( currentTimestamp );
             regionSourceIdHistory.setValue( branchUpload.getSourceRegionId() );
             regionSourceIdHistoryList.add( regionSourceIdHistory );
-            branchUpload.setSourceRegionIdHistory( regionSourceIdHistoryList );
+            branchUpload.setSourceRegionIdHistory( regionSourceIdHistoryList );*/
             branchUpload.setSourceRegionIdModified( false );
         }
 
         //map branch name history
         if ( branchUpload.isBranchNameModified() || branchUpload.isBranchAdded() ) {
-            List<StringUploadHistory> branchNameHistoryList = branchUpload.getBranchNameHistory();
+            /*List<StringUploadHistory> branchNameHistoryList = branchUpload.getBranchNameHistory();
             if ( branchNameHistoryList == null ) {
                 branchNameHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1309,13 +1292,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             branchNameHistory.setTime( currentTimestamp );
             branchNameHistory.setValue( branchUpload.getBranchName() );
             branchNameHistoryList.add( branchNameHistory );
-            branchUpload.setBranchNameHistory( branchNameHistoryList );
+            branchUpload.setBranchNameHistory( branchNameHistoryList );*/
             branchUpload.setBranchNameModified( false );
         }
 
         //map branch address 1 history
         if ( branchUpload.isBranchAdded() || branchUpload.isBranchAddress1Modified() ) {
-            List<StringUploadHistory> address1HistoryList = branchUpload.getBranchAddress1History();
+            /*List<StringUploadHistory> address1HistoryList = branchUpload.getBranchAddress1History();
             if ( address1HistoryList == null ) {
                 address1HistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1323,13 +1306,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             address1History.setTime( currentTimestamp );
             address1History.setValue( branchUpload.getBranchAddress1() );
             address1HistoryList.add( address1History );
-            branchUpload.setBranchAddress1History( address1HistoryList );
+            branchUpload.setBranchAddress1History( address1HistoryList );*/
             branchUpload.setBranchAddress1Modified( false );
         }
 
         //map branch address 2 history
         if ( branchUpload.isBranchAdded() || branchUpload.isBranchAddress2Modified() ) {
-            List<StringUploadHistory> address2HistoryList = branchUpload.getBranchAddress2History();
+            /*List<StringUploadHistory> address2HistoryList = branchUpload.getBranchAddress2History();
             if ( address2HistoryList == null ) {
                 address2HistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1337,13 +1320,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             address2History.setTime( currentTimestamp );
             address2History.setValue( branchUpload.getBranchAddress2() );
             address2HistoryList.add( address2History );
-            branchUpload.setBranchAddress2History( address2HistoryList );
+            branchUpload.setBranchAddress2History( address2HistoryList );*/
             branchUpload.setBranchAddress2Modified( false );
         }
 
         //map branch country history
         if ( branchUpload.isBranchAdded() || branchUpload.isBranchCountryModified() ) {
-            List<StringUploadHistory> countryHistoryList = branchUpload.getBranchCountryHistory();
+            /*List<StringUploadHistory> countryHistoryList = branchUpload.getBranchCountryHistory();
             if ( countryHistoryList == null ) {
                 countryHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1351,13 +1334,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             countryHistory.setTime( currentTimestamp );
             countryHistory.setValue( branchUpload.getBranchCountry() );
             countryHistoryList.add( countryHistory );
-            branchUpload.setBranchCountryHistory( countryHistoryList );
+            branchUpload.setBranchCountryHistory( countryHistoryList );*/
             branchUpload.setBranchCountryModified( false );
         }
 
         //map branch country code history
         if ( branchUpload.isBranchAdded() || branchUpload.isBranchCountryCodeModified() ) {
-            List<StringUploadHistory> countryCodeHistoryList = branchUpload.getBranchCountryCodeHistory();
+            /*List<StringUploadHistory> countryCodeHistoryList = branchUpload.getBranchCountryCodeHistory();
             if ( countryCodeHistoryList == null ) {
                 countryCodeHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1365,13 +1348,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             countryCodeHistory.setTime( currentTimestamp );
             countryCodeHistory.setValue( branchUpload.getBranchCountryCode() );
             countryCodeHistoryList.add( countryCodeHistory );
-            branchUpload.setBranchCountryCodeHistory( countryCodeHistoryList );
+            branchUpload.setBranchCountryCodeHistory( countryCodeHistoryList );*/
             branchUpload.setBranchCountryCodeModified( false );
         }
 
         //map branch state history
         if ( branchUpload.isBranchAdded() || branchUpload.isBranchStateModified() ) {
-            List<StringUploadHistory> stateHistoryList = branchUpload.getBranchStateHistory();
+            /*List<StringUploadHistory> stateHistoryList = branchUpload.getBranchStateHistory();
             if ( stateHistoryList == null ) {
                 stateHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1379,13 +1362,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             stateHistory.setTime( currentTimestamp );
             stateHistory.setValue( branchUpload.getBranchState() );
             stateHistoryList.add( stateHistory );
-            branchUpload.setBranchStateHistory( stateHistoryList );
+            branchUpload.setBranchStateHistory( stateHistoryList );*/
             branchUpload.setBranchStateModified( false );
         }
 
         //map branch city history
         if ( branchUpload.isBranchAdded() || branchUpload.isBranchCityModified() ) {
-            List<StringUploadHistory> cityHistoryList = branchUpload.getBranchCityHistory();
+            /*List<StringUploadHistory> cityHistoryList = branchUpload.getBranchCityHistory();
             if ( cityHistoryList == null ) {
                 cityHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1393,13 +1376,13 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             cityHistory.setTime( currentTimestamp );
             cityHistory.setValue( branchUpload.getBranchCity() );
             cityHistoryList.add( cityHistory );
-            branchUpload.setBranchCityHistory( cityHistoryList );
+            branchUpload.setBranchCityHistory( cityHistoryList );*/
             branchUpload.setBranchCityModified( false );
         }
 
         //map branch zipcode history
         if ( branchUpload.isBranchAdded() || branchUpload.isBranchZipcodeModified() ) {
-            List<StringUploadHistory> zipcodeHistoryList = branchUpload.getBranchZipcodeHistory();
+            /*List<StringUploadHistory> zipcodeHistoryList = branchUpload.getBranchZipcodeHistory();
             if ( zipcodeHistoryList == null ) {
                 zipcodeHistoryList = new ArrayList<StringUploadHistory>();
             }
@@ -1407,7 +1390,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             zipcodeHistory.setTime( currentTimestamp );
             zipcodeHistory.setValue( branchUpload.getBranchZipcode() );
             zipcodeHistoryList.add( zipcodeHistory );
-            branchUpload.setBranchZipcodeHistory( zipcodeHistoryList );
+            branchUpload.setBranchZipcodeHistory( zipcodeHistoryList );*/
             branchUpload.setBranchZipcodeModified( false );
         }
         branchUpload.setBranchAdded( false );
@@ -1460,8 +1443,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      */
     @Transactional
     @Override
-    public User assignBranchesToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
-        HierarchyUpload upload, boolean isAdmin )
+    public User assignBranchesToUser( UserUploadVO user, User adminUser, User assigneeUser,
+        Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload, boolean isAdmin )
         throws UserAssignmentException, InvalidInputException, NoRecordsFetchedException, SolrException, UserAdditionException
     {
         LOG.info( "Method assignBranchesToUser() for user : " + user.getEmailId() + " isAdmin : " + isAdmin + " started." );
@@ -1597,8 +1580,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      */
     @Transactional
     @Override
-    public User assignRegionsToUser( UserUploadVO user, User adminUser, User assigneeUser, Map<String, UserUploadVO> currentUserMap,
-        HierarchyUpload upload, boolean isAdmin )
+    public User assignRegionsToUser( UserUploadVO user, User adminUser, User assigneeUser,
+        Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload, boolean isAdmin )
         throws UserAssignmentException, InvalidInputException, NoRecordsFetchedException, SolrException, UserAdditionException
     {
         LOG.info( "Method assignRegionsToUser started for user : " + user.getEmailId() );
@@ -1710,21 +1693,23 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         return assigneeUser;
     }
 
+
     @Transactional
     @Override
-    public User modifyUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
-        throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException,
-        UndeliveredEmailException
+    public User modifyUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap,
+        HierarchyUpload upload ) throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException,
+        UserAssignmentException, UndeliveredEmailException
     {
         LOG.info( "Method modifyUser() started for user : " + user.getEmailId() );
         if ( !( ( checkIfUserExistsWithinCompany( user, adminUser.getCompany() ) )
             || ( checkIfEmailIdExistsWithCompany( user.getEmailId(), adminUser.getCompany() ) ) ) ) {
-            throw new UserAdditionException( "User : " + user.getEmailId() + "either belongs to a different company or doesn't exist" );
+            throw new UserAdditionException(
+                "User : " + user.getEmailId() + "either belongs to a different company or doesn't exist" );
         }
         User assigneeUser = null;
         try {
             assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
-        } catch ( InvalidInputException e ){
+        } catch ( InvalidInputException e ) {
             LOG.warn( e.getMessage() );
         }
         if ( assigneeUser == null ) {
@@ -1757,21 +1742,21 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             userProfileDao.updateEmailIdForUserProfile( assigneeUser.getUserId(), user.getEmailId() );
         }
 
-        
+
         assignUser( user, adminUser, currentUserMap, upload );
-        
+
         //send verification mail if needed
         if ( user.isSendMail() ) {
             resendVerificationMail( user );
         }
-        
+
         //Add user to Solr
         solrSearchService.addUserToSolr( assigneeUser );
 
         return assigneeUser;
     }
-    
-    
+
+
     /**
      * Method to check if a user exists within a company
      * @param user
@@ -1791,18 +1776,18 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         return false;
     }
-    
+
 
     /**
      * Method to send/resend user verification mail
-     * @param user
      * @param userUpload
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      * @throws NoRecordsFetchedException 
      */
     @Transactional
-    void resendVerificationMail( UserUploadVO userUpload ) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+    void resendVerificationMail( UserUploadVO userUpload )
+        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
     {
         LOG.info( "Method to resend verification mail started for user : " + userUpload.getSourceUserId() );
         //Resend verification mail if sendMail is true
@@ -1815,7 +1800,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         LOG.info( "Method to resend verification mail finished for user : " + userUpload.getSourceUserId() );
     }
-    
+
 
     /**
      * Method to assign/unassign user to regions and branches
@@ -1832,7 +1817,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      */
     @Transactional
     @Override
-    public User assignUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap, HierarchyUpload upload )
+    public User assignUser( UserUploadVO user, User adminUser, Map<String, UserUploadVO> currentUserMap,
+        HierarchyUpload upload )
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         LOG.info( "Method assignUser() started for user : " + user.getEmailId() );
@@ -1842,12 +1828,12 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         User assigneeUser = null;
         try {
-        assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
+            assigneeUser = userManagementService.getUserByUserId( user.getUserId() );
         } catch ( InvalidInputException e ) {
             LOG.warn( e.getMessage() );
         }
         if ( assigneeUser == null ) {
-            assigneeUser = userManagementService.getUserByEmailAddress(  extractEmailId( user.getEmailId() )  );
+            assigneeUser = userManagementService.getUserByEmailAddress( extractEmailId( user.getEmailId() ) );
         }
         if ( assigneeUser == null ) {
             throw new InvalidInputException( "Couldn't find user : " + user.getSourceUserId() );
@@ -1871,9 +1857,12 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 user.setRegionAdmin( false );
                 assigneeUser.setBranchAdmin( false );
                 assigneeUser.setRegionAdmin( false );
-            } catch ( InvalidInputException e ) {
-                if ( e.getMessage() == DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS ) {
-                    LOG.debug( "User assignment already exists" );
+            } catch (InvalidInputException e) {
+                if (e.getMessage().equals(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS)
+                    || e.getMessage().equals(messageUtils
+                    .getDisplayMessage(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
+                        DisplayMessageType.ERROR_MESSAGE).getMessage())) {
+                    LOG.debug("User assignment already exists");
                 }
             }
         }
@@ -2066,19 +2055,20 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
     public void uploadUsers( HierarchyUpload upload, User adminUser, List<String> errorList )
     {
         LOG.debug( "Uploading users to database" );
-        
+
         //Keep a count of added and modified regions
         int addedUsers = 0;
         int modifiedUsers = 0;
         int addedUsersOldCount = 0;
         int modifiedUsersOldCount = 0;
         Long nextTime = System.currentTimeMillis();
-        
+
         UploadStatus addedUsersStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_ADDED_USERS, addedUsers );
-        
-        
-        UploadStatus modifiedUsersStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_MODIFIED_USERS, modifiedUsers );
-        
+
+
+        UploadStatus modifiedUsersStatus = createUploadStatus( adminUser, CommonConstants.UPLOAD_MODIFIED_USERS,
+            modifiedUsers );
+
         Map<String, UserUploadVO> currentUserMap = new HashMap<String, UserUploadVO>();
         try {
             HierarchyUpload currentUpload = hierarchyUploadDao
@@ -2108,7 +2098,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                     }
                     continue;
                 }
-                
+
                 if ( userToBeUploaded.isUserModified() ) {
                     user = modifyUser( userToBeUploaded, adminUser, currentUserMap, upload );
                     modifiedUsers += 1;
@@ -2127,7 +2117,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 }
                 //Store the updated userUploads in upload
                 upload.setUsers( usersToUpload );
-                
+
                 if ( System.currentTimeMillis() > nextTime ) {
                     //Update count in upload_status
                     if ( addedUsers > addedUsersOldCount ) {
@@ -2136,8 +2126,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                         addedUsersOldCount = addedUsers;
                     }
                     if ( modifiedUsers > modifiedUsersOldCount ) {
-                        modifiedUsersStatus = updateUploadStatus( modifiedUsersStatus,
-                            CommonConstants.UPLOAD_MODIFIED_USERS, modifiedUsers );
+                        modifiedUsersStatus = updateUploadStatus( modifiedUsersStatus, CommonConstants.UPLOAD_MODIFIED_USERS,
+                            modifiedUsers );
                         modifiedUsersOldCount = modifiedUsers;
                     }
                     nextTime = nextTime + 2 * 1000;
@@ -2148,8 +2138,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             e.printStackTrace();
             errorList.add( e.getMessage() );
             //Update upload status to show the latest counts
-            addedUsersStatus = updateUploadStatusForError( addedUsersStatus, CommonConstants.UPLOAD_ADDED_USERS,
-                addedUsers );
+            addedUsersStatus = updateUploadStatusForError( addedUsersStatus, CommonConstants.UPLOAD_ADDED_USERS, addedUsers );
             modifiedUsersStatus = updateUploadStatusForError( modifiedUsersStatus, CommonConstants.UPLOAD_MODIFIED_USERS,
                 modifiedUsers );
         }
@@ -2182,7 +2171,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         User uploadedUser = null;
         List<User> userList = new ArrayList<User>();
         if ( checkIfEmailIdExists( user.getEmailId(), adminUser.getCompany() ) ) {
-            throw new UserAdditionException( "The user "+user.getSourceUserId()+" already exists" );
+            throw new UserAdditionException( "The user " + user.getSourceUserId() + " already exists" );
         }
         //Mask email address if needed
         String emailId = user.getEmailId();
@@ -2190,8 +2179,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             throw new InvalidInputException( "User email ID cannot be null" );
         }
 
-        user.setEmailId( user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) + " <" + emailId
-            + ">" );
+        user.setEmailId(
+            user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ) + " <" + emailId + ">" );
 
         //Add user and call assignUser method
         //Add user
@@ -2200,7 +2189,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             .getUsersFromEmailIdsAndInvite( new String[] { user.getEmailId() }, adminUser, false, user.isSendMail() );
         //Reset sendMail to false
         user.setSendMail( false );
-        
+
         if ( resultMap != null ) {
             userList = (List<User>) resultMap.get( CommonConstants.VALID_USERS_LIST );
             if ( userList != null && !userList.isEmpty() ) {
@@ -2240,7 +2229,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             if ( contactNumberSettings == null ) {
                 contactNumberSettings = new ContactNumberSettings();
             }
-            
+
             //Change email if user is not verified
             if ( userUploadVO.isEmailIdModified() && !userUploadVO.isUserVerified() ) {
                 MailIdSettings mail_ids = contactDetailsSettings.getMail_ids();
@@ -2249,7 +2238,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
                 }
                 mail_ids.setWork( userUploadVO.getEmailId() );
             }
-            
+
             contactNumberSettings.setWork( userUploadVO.getPhoneNumber() );
             contactDetailsSettings.setContact_numbers( contactNumberSettings );
             contactDetailsSettings.setAbout_me( userUploadVO.getAboutMeDescription() );
@@ -2342,7 +2331,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
             agentSettings, userPhotoUrl );
     }
-    
+
 
     /**
      * Method to search for initiated hierarchy upload entries in the upload status table
@@ -2362,8 +2351,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         return initiatedUploads;
     }
-    
-    
+
+
     /**
      * Method to update an uploadStatus entry
      * @param uploadStatus
@@ -2377,19 +2366,18 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadStatus.setModifiedOn( currentTime );
         uploadStatusDao.update( uploadStatus );
     }
-    
-    
-    
+
+
     @Override
     @Transactional
-    public void updateUploadStatusToNoUpload(UploadStatus uploadStatus)
+    public void updateUploadStatusToNoUpload( UploadStatus uploadStatus )
     {
         LOG.info( "Upadting uploadStatus to no upload" );
         uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_NO_UPLOAD );
         uploadStatusDao.update( uploadStatus );
     }
-    
-    
+
+
     /**
      * Method to add an uploadStatus entry
      * @param uploadStatus
@@ -2404,8 +2392,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         uploadStatus.setCreatedOn( currentTime );
         uploadStatusDao.save( uploadStatus );
     }
-    
-    
+
+
     /**
      * Method to add an error upload status entry
      * @param adminUser
@@ -2425,8 +2413,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         errorStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_ENTITY_ERROR );
         addUploadStatusEntry( errorStatus );
     }
-    
-    
+
+
     /**
      * Method to fetch the latest upload status
      * @param company
@@ -2449,8 +2437,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
 
         return latestStatus;
     }
-    
-    
+
+
     /**
      * Method to fetch all the upload statuses for a company
      * @param company
@@ -2475,7 +2463,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         return returnedStatuses;
     }
-    
+
 
     /**
      * Method to select the newer status
@@ -2497,8 +2485,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
             return newStatus;
         }
     }
-    
-    
+
+
     /**
      * Method to determine the latest status
      * @param uploadStatuses
@@ -2517,9 +2505,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         return null;
     }
-    
-    
-    
+
+
     /**
      * Method to initiate hierarchy upload
      * @param adminUser
@@ -2543,8 +2530,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         }
         addUploadStatusEntry( newStatus );
     }
-    
-    
+
+
     /**
      * Method to create an upload status initiated entry
      * @param adminUser
@@ -2552,7 +2539,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
      * @param value
      * @return
      */
-    UploadStatus createUploadStatus(User adminUser, String message, int value)
+    UploadStatus createUploadStatus( User adminUser, String message, int value )
     {
         UploadStatus status = new UploadStatus();
         status.setAdminUserId( adminUser.getUserId() );
@@ -2562,8 +2549,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         addUploadStatusEntry( status );
         return status;
     }
-    
-    
+
+
     /**
      * Method to update the message of an existing upload status entry
      * @param status
@@ -2578,8 +2565,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         updateUploadStatus( status );
         return status;
     }
-    
-    
+
+
     /**
      * Method to update the message on error for an upload status entry
      * @param status
@@ -2593,8 +2580,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         updateUploadStatus( status );
         return status;
     }
-    
-    
+
+
     /**
      * Method to update an upload status entry to done
      * @param status
@@ -2608,8 +2595,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         updateUploadStatus( status );
         return status;
     }
-    
-    
+
+
     /**
      * Method to fetch the hierarchy to be uploaded
      * @param company
@@ -2625,7 +2612,8 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         LOG.info( "Fetching hierarchy to be uploaded for company : " + company.getCompany() );
         return hierarchyUploadDao.getUploadHierarchyDetailsByCompany( company.getCompanyId() );
     }
-    
+
+
     /**
      * Used to get user from userId
      * 
@@ -2638,6 +2626,7 @@ public class HierarchyStructureUploadServiceImpl implements HierarchyStructureUp
         User user = userDao.findById( User.class, userId );
         return user;
     }
+
 
     @Override
     public void saveHierarchyUploadInMongo( HierarchyUpload upload ) throws InvalidInputException

@@ -549,7 +549,7 @@ input#find-pro-submit{
     padding: 20px;
     min-height: 108px;
     border-bottom: 1px solid #EEEDE9;
-    padding: 15px 20px 20px 20px;
+    padding: 15px 10px 20px 10px;
     cursor: pointer;
 }
 
@@ -582,11 +582,17 @@ input#find-pro-submit{
 .ctnt-list-item-img{
 	width : 70px;
 	height : 70px;
-	margin: auto 15px;
+	margin: auto 10px;
 	background: url(../images/place-holder-individual.png) no-repeat center;
 	background-size: contain;
 	border-radius: 3px;
     margin-left: 0;
+}
+.ppl-share-social{
+	position:absolute;
+	left: 10px;
+    top: 93%;
+	
 }
 .pro-list-default-img {
 	background: url(../images/place-holder-individual.png) no-repeat center;
@@ -595,7 +601,7 @@ input#find-pro-submit{
 
 .ctnt-list-item-txt-wrap{
 	overflow: hidden;
-    margin-right: 25px;
+	width:60%;
 }
 
 .ctnt-list-header{
@@ -1206,8 +1212,7 @@ span.wc-highlight {
 }
 
 .report-resend-icn-container {
-    clear: both;
-    margin: 3px -5px 0;
+    /* margin: 3px -5px 0; */
 }
 
 .report-txt {
@@ -1413,7 +1418,6 @@ span.footer-ul a:hover {
 	margin-left: 60px;
 }
 
-
 /*changes for help page*/
 .help {
 	width: 800px;
@@ -1428,5 +1432,5 @@ span.footer-ul a:hover {
 }
 .verify-image{
 	height: 30px;
-    width: 90px;
+    width: 97px;
 }

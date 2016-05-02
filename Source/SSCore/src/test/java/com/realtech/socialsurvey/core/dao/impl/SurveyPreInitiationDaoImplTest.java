@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -64,7 +65,7 @@ public class SurveyPreInitiationDaoImplTest
     @Test ( expected = InvalidInputException.class)
     public void deletePreInitiatedSurveysForAgentTestInvalidAgentId() throws InvalidInputException
     {
-        surveyPreInitiationDaoImpl.deletePreInitiatedSurveysForAgent( 0l );
+        surveyPreInitiationDaoImpl.deletePreInitiatedSurveysForAgent( 0l, CommonConstants.STATUS_INACTIVE );
     }
 
 

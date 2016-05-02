@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +67,6 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -85,13 +86,13 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyStructureUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
-import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 
@@ -152,12 +153,6 @@ public class OrganizationManagementController
     @Autowired
     private HierarchyStructureUploadService hierarchyStructureUploadService;
 
-    @Autowired
-    private UploadValidationService uploadValidationService;
-
-    @Autowired
-    private EmailServices emailServices;
-
     @Value ( "${CDN_PATH}")
     private String endpoint;
 
@@ -189,6 +184,9 @@ public class OrganizationManagementController
 
     @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
     private String salesLeadEmail;
+
+    @Autowired
+    private WorkbookData workbookData;
 
 
     /**
@@ -633,6 +631,15 @@ public class OrganizationManagementController
             }
             model.addAttribute( CommonConstants.USER_APP_SETTINGS, unitSettings );
 
+            //REALTECH_USER_ID is set only for real tech and SS admin
+            boolean isRealTechOrSSAdmin = false;
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null ) {
+                isRealTechOrSSAdmin = true;
+            }
+            model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
+
+
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException while showing app settings. Reason: " + e.getMessage(), e );
             model.addAttribute( "message",
@@ -853,6 +860,9 @@ public class OrganizationManagementController
     {
         LOG.info( "Updating encompass details to 'Enabled'" );
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        String eventFiredBy = adminUserid != null ? CommonConstants.ADMIN_USER_NAME : String.valueOf( user.getUserId() );
         String message;
 
         try {
@@ -865,6 +875,8 @@ public class OrganizationManagementController
             encompassCrmInfo.setGenerateReport( false );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_ENABLED,
+                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
@@ -889,6 +901,9 @@ public class OrganizationManagementController
     {
         LOG.info( "Updating encompass details to 'Disabled'" );
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        String eventFiredBy = adminUserid != null ? CommonConstants.ADMIN_USER_NAME : String.valueOf( user.getUserId() );
         String message;
 
         try {
@@ -898,6 +913,8 @@ public class OrganizationManagementController
             encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+            organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_DISABLED,
+                eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
@@ -1609,6 +1626,13 @@ public class OrganizationManagementController
                 companySettings.setSurvey_settings( originalSurveySettings );
                 LOG.info( "Updated Survey Settings" );
             }
+            // Updating settings in session
+            HttpSession session = request.getSession();
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            if ( userSettings != null )
+                userSettings.setCompanySettings( companySettings );
+
         } catch ( NumberFormatException e ) {
             LOG.error( "NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e );
             message = messageUtils
@@ -1729,7 +1753,7 @@ public class OrganizationManagementController
                 // Calling services to update DB
                 organizationManagementService.updateAccountDisabled( companySettings, isAccountDisabled );
                 if ( isAccountDisabled ) {
-                    organizationManagementService.addDisabledAccount( companySettings.getIden(), false );
+                    organizationManagementService.addDisabledAccount( companySettings.getIden(), false, user.getUserId() );
                 } else {
                     organizationManagementService.deleteDisabledAccount( companySettings.getIden() );
                 }
@@ -2213,9 +2237,9 @@ public class OrganizationManagementController
     }
 
 
-    // Method to delete all the records of a company.
-    @RequestMapping ( value = "/deletecompany", method = RequestMethod.GET)
-    public String deleteCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
+    // Method to deactivate company.
+    @RequestMapping ( value = "/deactivatecompany", method = RequestMethod.GET)
+    public String deactivateCompany( HttpServletRequest request, Model model, RedirectAttributes redirectAttributes )
         throws NonFatalException
     {
         User user = sessionHelper.getCurrentUser();
@@ -2226,16 +2250,25 @@ public class OrganizationManagementController
                 // Add an entry into Disabled_Accounts table with disable_date as current date
                 // and status as inactive.
                 try {
-                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true );
+                    organizationManagementService.addDisabledAccount( user.getCompany().getCompanyId(), true,
+                        user.getUserId() );
                 } catch ( NoRecordsFetchedException | PaymentException e ) {
-                    LOG.error( "Exception caught in deleteCompany() of OrganizationManagementController. Nested exception is ",
+                    LOG.error(
+                        "Exception caught in deactivateCompany() of OrganizationManagementController. Nested exception is ",
                         e );
                     throw e;
                 }
 
                 // Modify the company status to inactive.
                 user.getCompany().setStatus( CommonConstants.STATUS_INACTIVE );
+
                 organizationManagementService.updateCompany( user.getCompany() );
+
+                //Update company settings to deleted
+                organizationManagementService.deactivateCompanyInMongo( user.getCompany() );
+
+                //Deactivate company in solr
+                organizationManagementService.deleteCompanyFromSolr( user.getCompany() );
 
                 LOG.info( "Company deactivated successfully, logging out now." );
                 request.getSession( false ).invalidate();
@@ -2245,7 +2278,7 @@ public class OrganizationManagementController
                     DisplayMessageType.SUCCESS_MESSAGE ).toString();
             }
         } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in purgeCompany(). Nested exception is ", e );
+            LOG.error( "InvalidInputException caught in deactivateCompany(). Nested exception is ", e );
             message = messageUtils
                 .getDisplayMessage( DisplayMessageConstants.ACCOUNT_DELETION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE )
                 .toString();
@@ -2881,11 +2914,11 @@ public class OrganizationManagementController
                     uploadStatus.setStatus( latestStatus );
                     //TODO: Refresh session
                     // get the user's canonical settings
-                    LOG.info("Fetching the user's canonical settings and setting it in session");
+                    LOG.info( "Fetching the user's canonical settings and setting it in session" );
                     HttpSession session = request.getSession( false );
-                    sessionHelper.getCanonicalSettings(session);
+                    sessionHelper.getCanonicalSettings( session );
                     // Set the session variables
-                    sessionHelper.setSettingVariablesInSession(session);
+                    sessionHelper.setSettingVariablesInSession( session );
                     sessionHelper.processAssignments( session, user );
                 }
             }
@@ -3020,6 +3053,47 @@ public class OrganizationManagementController
 
 
     @ResponseBody
+    @RequestMapping ( value = "/getcorruptpreinitiatedsurveys", method = RequestMethod.GET)
+    public String getCorruptPreInitiatedSurveys( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to getCorruptPreInitiatedSurveys started" );
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+        if ( startIndexStr == null || batchSizeStr == null ) {
+            LOG.error( "Null value found for startIndex or batch size." );
+            return "Null value found for startIndex or batch size.";
+        }
+
+        SurveyPreInitiationList surveyPreInitiationList = new SurveyPreInitiationList();
+        int startIndex;
+        int batchSize;
+        try {
+            User user = sessionHelper.getCurrentUser();
+            if ( user == null || user.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
+            try {
+                startIndex = Integer.parseInt( startIndexStr );
+                batchSize = Integer.parseInt( batchSizeStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while trying to convert startIndex or batchSize or companyId  Nested exception is ",
+                    e );
+                throw e;
+            }
+            surveyPreInitiationList = socialManagementService.getCorruptPreInitiatedSurveys( user.getCompany().getCompanyId(),
+                startIndex, batchSize );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_CORRUPT_PREINITIATED_SURVEYS_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        LOG.info( "Method to getCorruptPreInitiatedSurveys() finished" );
+        return new Gson().toJson( surveyPreInitiationList );
+    }
+
+
+    @ResponseBody
     @RequestMapping ( value = "/saveemailmapping", method = RequestMethod.GET)
     public String saveUserEmailMapping( HttpServletRequest request, Model model )
     {
@@ -3149,9 +3223,10 @@ public class OrganizationManagementController
 
 
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while getting EmailMappingsForUser. Reason :" + nonFatalException.getMessage(), nonFatalException );
-            return messageUtils.getDisplayMessage(
-                DisplayMessageConstants.FETCH_EMAIL_MAPPINGS_FOR_USER_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            LOG.error( "NonFatalException while getting EmailMappingsForUser. Reason :" + nonFatalException.getMessage(),
+                nonFatalException );
+            return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_EMAIL_MAPPINGS_FOR_USER_UNSUCCESSFUL,
+                DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         LOG.info( "Method getEmailMappingsForUser() finished" );
         return new Gson().toJson( userEmailMappings );
@@ -3187,7 +3262,7 @@ public class OrganizationManagementController
                 throw new NonFatalException( "Insufficient permission for this process" );
             }
 
-            userManagementService.updateUserEmailMapping( user, emailMappingId , status);
+            userManagementService.updateUserEmailMapping( user, emailMappingId, status );
 
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.UPDATE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
@@ -3281,5 +3356,78 @@ public class OrganizationManagementController
     }
 
 
+    @RequestMapping ( value = "/downloadusersurveyreport")
+    public void getUserSurveyReport( Model model, HttpServletRequest request, HttpServletResponse response )
+    {
+        LOG.info( "Method getUserSurveyReport() started." );
+        try {
+            String companyIdStr = request.getParameter( "companyId" );
+            String tabIdStr = request.getParameter( "tabId" );
+            long companyId;
+            int tabId;
+            if ( companyIdStr == null || companyIdStr.isEmpty() ) {
+                throw new InvalidInputException( "Passed parameter companyId is invalid" );
+            }
+            if ( tabIdStr == null || tabIdStr.isEmpty() ) {
+                throw new InvalidInputException( "Passed parameter tabIdStr is invalid" );
+            }
+
+            try {
+                companyId = Long.parseLong( companyIdStr );
+                tabId = Integer.parseInt( tabIdStr );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while parsing companyId/tabId in getUserSurveyReport(). Nested exception is ",
+                    e );
+                throw e;
+            }
+
+            try {
+                User user = sessionHelper.getCurrentUser();
+                String fileName = getSurveyReportFileNameByTabId().get( tabId ) + "_" + user.getCompany().getCompany() + "_"
+                    + new DateTime( System.currentTimeMillis() ).toString() + workbookData.EXCEL_FILE_EXTENSION;
+                XSSFWorkbook workbook = socialManagementService.getUserSurveyReportByTabId( tabId, companyId );
+                response.setContentType( workbookData.EXCEL_FORMAT );
+                String headerKey = workbookData.CONTENT_DISPOSITION_HEADER;
+                String headerValue = String.format( "attachment; filename=\"%s\"", new File( fileName ).getName() );
+                response.setHeader( headerKey, headerValue );
+                OutputStream responseStream = null;
+
+                try {
+                    responseStream = response.getOutputStream();
+                    workbook.write( responseStream );
+                } catch ( IOException e ) {
+                    LOG.error( "IOException caught in getUserSurveyReport(). Nested exception is ", e );
+                } finally {
+                    try {
+                        responseStream.close();
+                    } catch ( IOException e ) {
+                        LOG.error( "IOException caught in getUserSurveyReport(). Nested exception is ", e );
+                    }
+                }
+
+                response.flushBuffer();
+            } catch ( InvalidInputException e ) {
+                LOG.error( "InvalidInputException caught in getUserSurveyReport(). Nested exception is ", e );
+                throw e;
+            } catch ( IOException e ) {
+                LOG.error( "IOException caught in getUserSurveyReport(). Nested exception is ", e );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "Error while getting survey Report", e );
+        }
+        LOG.info( "Method getUserSurveyReport() ended." );
+    }
+
+
+    private Map<Integer, String> getSurveyReportFileNameByTabId()
+    {
+        Map<Integer, String> fineNameMap = new HashMap<Integer, String>();
+        fineNameMap.put( CommonConstants.UNMATCHED_USER_TABID, "Unmatched-Survey-Report" );
+        fineNameMap.put( CommonConstants.PROCESSED_USER_TABID, "Processed-Survey-Report" );
+        fineNameMap.put( CommonConstants.MAPPED_USER_TABID, "Mapped-Survey-Report" );
+        fineNameMap.put( CommonConstants.CORRUPT_USER_TABID, "Corrupt-Survey-Report" );
+        return fineNameMap;
+    }
 }
 // JIRA: SS-24 BY RM02 EOC

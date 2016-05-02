@@ -231,8 +231,8 @@ public interface OrganizationUnitSettingsDao
         NoRecordsFetchedException;
 
 
-    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings, boolean restoreSocial  )
-        throws InvalidInputException;
+    public void updateAgentSettingsForUserRestoration( String newProfileName, AgentSettings agentSettings,
+        boolean restoreSocial, boolean isVerified ) throws InvalidInputException;
 
 
     public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> identifiers );

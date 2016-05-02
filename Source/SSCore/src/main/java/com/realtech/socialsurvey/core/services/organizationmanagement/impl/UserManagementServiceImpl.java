@@ -1,16 +1,25 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.io.*;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
+import com.realtech.socialsurvey.core.services.generator.UrlService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.FileOperations;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -35,29 +44,6 @@ import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.MailIdSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProListUser;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RemovedUser;
-import com.realtech.socialsurvey.core.entities.SettingsDetails;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserApiKey;
-import com.realtech.socialsurvey.core.entities.UserEmailMapping;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserInvite;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -98,12 +84,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     private static final Logger LOG = LoggerFactory.getLogger( UserManagementServiceImpl.class );
     private static Map<Integer, ProfilesMaster> profileMasters = new HashMap<Integer, ProfilesMaster>();
+    private String companyAdminEnabled;
+    private String adminEmailId;
+    private String adminName;
+    private String fileDirectoryLocation;
 
     @Autowired
     private URLGenerator urlGenerator;
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
+
+    @Autowired
+    private SurveyHandler surveyHandler;
 
     @Autowired
     private EmailServices emailServices;
@@ -200,6 +193,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
+    @Autowired
+    private UrlService urlService;
+
+    @Autowired
+    private FileOperations fileOperations;
+
+    @Value( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}" )
+    private String paramOrderTakeSurveyReminder;
+
+    @Value( "${PARAM_ORDER_TAKE_SURVEY}" )
+    private String paramOrderTakeSurvey;
+
+    @Autowired
+    private EmailFormatHelper emailFormatHelper;
+
+    @Value( "${APPLICATION_LOGO_URL}" )
+    private String applicationLogoUrl;
+
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -228,8 +239,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation, String referralCode )
-        throws InvalidInputException, UndeliveredEmailException, NonFatalException
+    public void inviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation,
+        String referralCode ) throws InvalidInputException, UndeliveredEmailException, NonFatalException
     {
         LOG.info( "Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName
             + "\t email id: " + emailId );
@@ -240,12 +251,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         urlParams.put( CommonConstants.EMAIL_ID, emailId );
         urlParams.put( CommonConstants.CURRENT_TIMESTAMP, String.valueOf( System.currentTimeMillis() ) );
         urlParams.put( CommonConstants.UNIQUE_IDENTIFIER, generateUniqueIdentifier() );
-        if(referralCode != null && !referralCode.isEmpty()){
+        if ( referralCode != null && !referralCode.isEmpty() ) {
             urlParams.put( CommonConstants.REFERRAL_CODE, referralCode );
         }
         LOG.debug( "Generating URL" );
-        String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl
-            + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION );
+        String url = urlGenerator.generateUrl( urlParams,
+            applicationBaseUrl + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION );
         LOG.debug( "Sending invitation for registration" );
         inviteUser( url, emailId, firstName, lastName, isReinvitation );
 
@@ -255,20 +266,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId,
-        boolean isReinvitation, String referralCode ) throws InvalidInputException, UserAlreadyExistsException, NonFatalException
+    public void validateAndInviteCorporateToRegister( String firstName, String lastName, String emailId, boolean isReinvitation,
+        String referralCode ) throws InvalidInputException, UserAlreadyExistsException, NonFatalException
     {
         LOG.info( "Validating and inviting corporate to register. Details\t first name:" + firstName + "\t lastName: "
             + lastName + "\t email id: " + emailId );
         LOG.debug( "Validating form elements" );
         validateFormParametersForInvitation( firstName, lastName, emailId );
-        LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName
-            + " and emailID: " + emailId );
+        LOG.debug( "Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: "
+            + emailId );
         // validating referral code if exists
-        if(referralCode != null && !referralCode.isEmpty()){
-            if(!referralService.validateReferralCode( referralCode )){
+        if ( referralCode != null && !referralCode.isEmpty() ) {
+            if ( !referralService.validateReferralCode( referralCode ) ) {
                 LOG.warn( "Invalid referral code" );
-                throw new InvalidInputException("Could not find referral code "+referralCode);
+                throw new InvalidInputException( "Could not find referral code " + referralCode );
             }
         }
         // check if email id already exists
@@ -292,7 +303,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         // check if first name is null or empty and only contains alphabets
         if ( firstName == null || firstName.isEmpty() || !firstName.matches( CommonConstants.FIRST_NAME_REGEX ) ) {
-            throw new InvalidInputException( "Firstname is invalid in registration", DisplayMessageConstants.INVALID_FIRSTNAME );
+            throw new InvalidInputException( "Firstname is invalid in registration",
+                DisplayMessageConstants.INVALID_FIRSTNAME );
         }
 
         // check if last name only contains alphabets
@@ -399,17 +411,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // set the status as active as with the new sign up path, validation is not required.
         status = CommonConstants.STATUS_ACTIVE;
         LOG.debug( "Creating new user with emailId : " + emailId + " and verification status : " + status );
-        User user = createUser( company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
-            status, CommonConstants.ADMIN_USER_NAME );
+        User user = createUser( company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE, status,
+            CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
         //delete the record if marked as ignored
         deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
-        
 
-        LOG.debug( "Creating user profile for :" + emailId + " with profile completion stage : "
-            + CommonConstants.ADD_COMPANY_STAGE );
+
+        LOG.debug(
+            "Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE );
         //the newlely creted profile will be primary because this is will be the first profile of user
         UserProfile userProfile = createUserProfile( user, company, emailId, CommonConstants.DEFAULT_AGENT_ID,
             CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID,
@@ -535,7 +547,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, CommonConstants.ADMIN_USER_NAME );
         user = userDao.save( user );
-      //delete the record if marked as ignored
+        //delete the record if marked as ignored
         deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
@@ -558,8 +570,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Override
     @Transactional
-    public User inviteNewUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
-        UserAlreadyExistsException, UndeliveredEmailException
+    public User inviteNewUser( User admin, String firstName, String lastName, String emailId )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
     {
         if ( firstName == null || firstName.isEmpty() ) {
             throw new InvalidInputException( "First name is either null or empty in inviteUserToRegister()." );
@@ -576,7 +588,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = createUser( admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
             CommonConstants.STATUS_NOT_VERIFIED, String.valueOf( admin.getUserId() ) );
         user = userDao.save( user );
-      //delete the record if marked as ignored
+        //delete the record if marked as ignored
         deleteIgnoredEmailMapping( user.getEmailId() );
         //update the corrupted record for newly registered user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
@@ -591,7 +603,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public void removeExistingUser( User admin, long userIdToRemove ) throws InvalidInputException
+    public void removeExistingUser( User admin, long userIdToRemove, int status ) throws InvalidInputException
     {
         if ( admin == null ) {
             throw new InvalidInputException( "Admin user is null in deactivateExistingUser" );
@@ -607,7 +619,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
-        userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
+        userToBeDeactivated.setStatus( status );
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
         userToBeDeactivated.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
@@ -625,12 +637,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Deactivate all email addresses for the user
         List<UserEmailMapping> userEmailMappings = userToBeDeactivated.getUserEmailMappings();
         for ( UserEmailMapping userEmailMapping : userEmailMappings ) {
-            userEmailMapping.setStatus( CommonConstants.STATUS_INACTIVE );
+            userEmailMapping.setStatus( status );
             userEmailMappingDao.update( userEmailMapping );
         }
 
         // Marks all the user profiles for given user as inactive.
-        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
+        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated, status );
 
         //update profile url in mongo if needed
         organizationManagementService.updateProfileUrlAndStatusForDeletedEntity( CommonConstants.AGENT_ID_COLUMN,
@@ -640,7 +652,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         socialManagementService.disconnectAllSocialConnections( CommonConstants.AGENT_ID_COLUMN, userIdToRemove );
 
         //Delete entries from SurveyPreInitiation table
-        surveyPreInitiationDao.deletePreInitiatedSurveysForAgent( userIdToRemove );
+        surveyPreInitiationDao.deletePreInitiatedSurveysForAgent( userIdToRemove, status );
 
         //Delete entries from the Survey Details Collection
         surveyDetailsDao.deleteIncompleteSurveysForAgent( userIdToRemove );
@@ -676,8 +688,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         try {
             User userWithSameEmail = getUserByEmailAddress( user.getEmailId() );
             if ( user.getUserId() != userWithSameEmail.getUserId() ) {
-                throw new InvalidInputException( "Another User exists with the same Email ID. UserId : "
-                    + userWithSameEmail.getUserId() );
+                throw new InvalidInputException(
+                    "Another User exists with the same Email ID. UserId : " + userWithSameEmail.getUserId() );
             }
         } catch ( NoRecordsFetchedException e1 ) {
             LOG.debug( "No existing user found. Restoring." );
@@ -685,8 +697,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //Start restoring the user
         //Set status = 1 if password field is present, 2 otherwise, and loginId = emailId
+        boolean isVerified = true;
         if ( user.getLoginPassword() == null || user.getLoginPassword().isEmpty() ) {
             user.setStatus( CommonConstants.STATUS_NOT_VERIFIED );
+            isVerified = false;
         } else {
             user.setStatus( CommonConstants.STATUS_ACTIVE );
         }
@@ -739,7 +753,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
 
-        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings, restoreSocial );
+        organizationUnitSettingsDao.updateAgentSettingsForUserRestoration( profileNameForUpdate, agentSettings, restoreSocial,
+            isVerified );
 
         //Add user to Solr
         solrSearchService.addUserToSolr( user );
@@ -753,8 +768,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             agentsReviewCount = batchTrackerService.getReviewCountForAgents( userIdList );
         } catch ( ParseException e ) {
             LOG.error( "Error while parsing the data fetched from mongo for survey count", e );
-            throw new InvalidInputException( "Error while parsing the data fetched from mongo for survey count. Reason :"
-                + e.getMessage() );
+            throw new InvalidInputException(
+                "Error while parsing the data fetched from mongo for survey count. Reason :" + e.getMessage() );
         }
         if ( agentsReviewCount != null && !agentsReviewCount.isEmpty() )
             solrSearchService.updateCompletedSurveyCountForMultipleUserInSolr( agentsReviewCount );
@@ -842,8 +857,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // Method to return user with provided email and company
     @Transactional
     @Override
-    public User getUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public User getUserByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
 
@@ -930,8 +945,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         if ( licenseDetails == null || licenseDetails.isEmpty() ) {
             LOG.error( "Could not find any record in License_Details for : " + user.getCompany().getCompany() );
-            throw new NoRecordsFetchedException( "Could not find any record in License_Details for : "
-                + user.getCompany().getCompany() );
+            throw new NoRecordsFetchedException(
+                "Could not find any record in License_Details for : " + user.getCompany().getCompany() );
         }
 
         int maxUsersAllowed = licenseDetails.get( CommonConstants.INITIAL_INDEX ).getAccountsMaster().getMaxUsersAllowed();
@@ -1335,8 +1350,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void updateUserStatus( long userId, int status ) throws InvalidInputException, SolrException
     {
-        LOG.info( "Method updateUserStatus of user management services called for userId : " + userId + " and status :"
-            + status );
+        LOG.info(
+            "Method updateUserStatus of user management services called for userId : " + userId + " and status :" + status );
         User user = getUserByUserId( userId );
         if ( user == null ) {
             throw new InvalidInputException( "No user present for the specified userId" );
@@ -1400,8 +1415,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userProfile = userProfiles.get( CommonConstants.INITIAL_INDEX );
             if ( userProfile.getStatus() == CommonConstants.STATUS_INACTIVE ) {
                 userProfile.setStatus( CommonConstants.STATUS_ACTIVE );
-                userProfile.setProfilesMaster( profilesMasterDao.findById( ProfilesMaster.class,
-                    CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+                userProfile.setProfilesMaster(
+                    profilesMasterDao.findById( ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
                 userProfile.setModifiedBy( String.valueOf( admin.getUserId() ) );
                 userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             }
@@ -1448,8 +1463,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         UserProfile userProfile = null;
         if ( userProfiles == null || userProfiles.isEmpty() ) {
             LOG.error( "No user profile present for the user with user Id " + userId + " with the branch " + branchId );
-            throw new InvalidInputException( "No user profile present for the user with user Id " + userId
-                + " with the branch " + branchId );
+            throw new InvalidInputException(
+                "No user profile present for the user with user Id " + userId + " with the branch " + branchId );
         } else {
             userProfile = userProfiles.get( CommonConstants.INITIAL_INDEX );
             if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
@@ -1660,14 +1675,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                         && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_NO ) {
                         agentProfileWithoutDefaultBranch = currentProfile;
-                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
+                    } else if ( currentProfile.getProfilesMaster()
+                        .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                         && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
                         agentProfileWithDefaultBranch = currentProfile;
-                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                    } else if ( currentProfile.getProfilesMaster()
+                        .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                         branchAdminProfile = currentProfile;
-                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                    } else if ( currentProfile.getProfilesMaster()
+                        .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                         regionAdminProfile = currentProfile;
-                    } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+                    } else if ( currentProfile.getProfilesMaster()
+                        .getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
                         companyAdminProfile = currentProfile;
                     }
                 }
@@ -1727,7 +1746,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         urlParams.put( CommonConstants.COMPANY, String.valueOf( companyId ) );
 
         LOG.info( "Generating URL" );
-        String url = urlGenerator.generateUrl( urlParams, applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE );
+        String url = urlGenerator.generateUrl( urlParams,
+            applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE );
         String name = firstName;
         if ( lastName != null && !lastName.isEmpty() ) {
             name = name + " " + lastName;
@@ -1744,7 +1764,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void setProfilesOfUser( User user )
     {
-        LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started." );
+        LOG.debug(
+            "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started." );
         if ( user != null ) {
             List<UserProfile> userProfiles = user.getUserProfiles();
             if ( userProfiles != null ) {
@@ -1764,14 +1785,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                                 user.setAgent( true );
                                 continue;
                             default:
-                                LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName() );
+                                LOG.error( "Invalid profile id found for user {} in setProfilesOfUser().",
+                                    user.getFirstName() );
                         }
                     }
                 }
             }
         }
 
-        LOG.debug( "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user finished." );
+        LOG.debug(
+            "Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user finished." );
     }
 
 
@@ -1819,8 +1842,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             params.put( CommonConstants.USER_ID, String.valueOf( user.getUserId() ) );
 
             LOG.debug( "Calling url generator to generate verification link" );
-            verificationUrl = urlGenerator.generateUrl( params, applicationBaseUrl
-                + CommonConstants.REQUEST_MAPPING_MAIL_VERIFICATION );
+            verificationUrl = urlGenerator.generateUrl( params,
+                applicationBaseUrl + CommonConstants.REQUEST_MAPPING_MAIL_VERIFICATION );
         } catch ( InvalidInputException e ) {
             throw new InvalidInputException( "Could not generate url for verification.Reason : " + e.getMessage(), e );
         }
@@ -1983,7 +2006,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param company
      * @param password
      * @param emailId
-     * @param displayName
      * @return
      */
     private User createUser( Company company, String password, String emailId, String firstName, String lastName,
@@ -2100,8 +2122,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // JIRA: SS-27: By RM05: EOC
 
     @Override
-    public UserSettings getCanonicalUserSettings( User user, AccountType accountType ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public UserSettings getCanonicalUserSettings( User user, AccountType accountType )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         if ( user == null ) {
             throw new InvalidInputException( "User is not set." );
@@ -2154,7 +2176,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( branchesSettings != null && branchesSettings.size() > 0 ) {
             LOG.debug( "Resolving regions settings for branch profiles" );
             for ( UserProfile userProfile : userProfiles ) {
-                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                     // get the branch profile if it is not present in the branch settings
                     if ( userProfile.getRegionId() > 0l ) {
                         if ( regionsSettings == null ) {
@@ -2195,8 +2218,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                             branchesSettings = new HashMap<Long, OrganizationUnitSettings>();
                         }
                         if ( !branchesSettings.containsKey( userProfile.getBranchId() ) ) {
-                            BranchSettings branchSetting = organizationManagementService.getBranchSettings( userProfile
-                                .getBranchId() );
+                            BranchSettings branchSetting = organizationManagementService
+                                .getBranchSettings( userProfile.getBranchId() );
                             branchesSettings.put( userProfile.getBranchId(), branchSetting.getOrganizationUnitSettings() );
                         }
                     }
@@ -2216,7 +2239,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( agentId );
         if ( agentSettings != null && agentSettings.getProfileStages() != null ) {
-            agentSettings.setProfileStages( profileCompletionList.getProfileCompletionList( agentSettings.getProfileStages() ) );
+            agentSettings
+                .setProfileStages( profileCompletionList.getProfileCompletionList( agentSettings.getProfileStages() ) );
         }
         return agentSettings;
     }
@@ -2236,7 +2260,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     private boolean isAssigningAllowed( long branchId, User admin )
     {
-        LOG.debug( "Method isAssigningAllowed() started to check if current user is authorized to assign a user to the given branch" );
+        LOG.debug(
+            "Method isAssigningAllowed() started to check if current user is authorized to assign a user to the given branch" );
         Branch branch = branchDao.findById( Branch.class, branchId );
         if ( admin.isCompanyAdmin() )
             return true;
@@ -2332,8 +2357,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @throws SolrException
      */
     @Override
-    public void assignUserToCompany( User admin, long userId ) throws InvalidInputException, NoRecordsFetchedException,
-        SolrException
+    public void assignUserToCompany( User admin, long userId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
         if ( admin == null ) {
             LOG.error( "assignUserToCompany : admin parameter is null" );
@@ -2404,7 +2429,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private boolean canAddUsersToRegion( User admin, long regionId ) throws InvalidInputException
     {
 
-        LOG.debug( "Method canAddUsersToRegion() called to check if current user is authorized to assign a user to the given region" );
+        LOG.debug(
+            "Method canAddUsersToRegion() called to check if current user is authorized to assign a user to the given region" );
 
         if ( admin == null ) {
             LOG.error( "canAddUsersToRegion : admin parameter is null" );
@@ -2446,8 +2472,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @throws SolrException
      */
     @Override
-    public void assignUserToRegion( User admin, long userId, long regionId ) throws InvalidInputException,
-        NoRecordsFetchedException, SolrException
+    public void assignUserToRegion( User admin, long userId, long regionId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
 
         if ( admin == null ) {
@@ -2477,8 +2503,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Checking if admin can assign a user to the given region.
         if ( !canAddUsersToRegion( admin, regionId ) ) {
             LOG.error( "User : " + admin.getUserId() + " is not authorized to assign users to region " + regionId );
-            throw new InvalidInputException( "User : " + admin.getUserId() + " is not authorized to assign users to region "
-                + regionId );
+            throw new InvalidInputException(
+                "User : " + admin.getUserId() + " is not authorized to assign users to region " + regionId );
         }
 
         // Get the region from the database
@@ -2538,6 +2564,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         agentSettings.setModifiedBy( user.getModifiedBy() );
         agentSettings.setModifiedOn( System.currentTimeMillis() );
         agentSettings.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
+
+        //Set status to incomplete
+        agentSettings.setStatus( CommonConstants.STATUS_INCOMPLETE_MONGO );
 
         // set the seo flag to true
         agentSettings.setSeoContentModified( true );
@@ -2663,8 +2692,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param branchSettings
      */
     @Override
-    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl, OrganizationUnitSettings branchSettings )
-        throws InvalidInputException
+    public void updateProfileUrlInBranchSettings( String profileName, String profileUrl,
+        OrganizationUnitSettings branchSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in BRANCH SETTINGS started" );
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
@@ -2691,8 +2720,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param regionSettings
      */
     @Override
-    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl, OrganizationUnitSettings regionSettings )
-        throws InvalidInputException
+    public void updateProfileUrlInRegionSettings( String profileName, String profileUrl,
+        OrganizationUnitSettings regionSettings ) throws InvalidInputException
     {
         LOG.info( "Method to update profile name and url in REGION SETTINGS started" );
         LOG.info( "Method to update profile name and url in AGENT SETTINGS started" );
@@ -2828,6 +2857,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         String profileUrl = utils.generateAgentProfileUrl( profileName );
         agentSettings.setProfileName( profileName );
         agentSettings.setProfileUrl( profileUrl );
+        //Update status from incomplete to active
+        agentSettings.setStatus( CommonConstants.STATUS_ACTIVE_MONGO );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE_MONGO, agentSettings );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME,
             profileName, agentSettings );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL,
@@ -2847,8 +2880,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName() );
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR,
             ( user.getLastName() != null ? user.getLastName() : "" ) );
-        solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " "
-            + ( user.getLastName() != null ? user.getLastName() : "" ) );
+        solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR,
+            user.getFirstName() + " " + ( user.getLastName() != null ? user.getLastName() : "" ) );
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.PROFILE_URL_SOLR, profileUrl );
         solrSearchService.editUserInSolr( user.getUserId(), CommonConstants.PROFILE_NAME_SOLR, profileName );
         LOG.debug( "Successfully modified user detail in solr" );
@@ -2919,8 +2952,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         LOG.info( "Adding a record in user count modification notification table for company " + company.getCompany() );
         // search for the record in the table. it might be possible that record is already present.
-        List<UsercountModificationNotification> userCountNotifications = userCountModificationDao.findByColumn(
-            UsercountModificationNotification.class, CommonConstants.COMPANY_COLUMN, company );
+        List<UsercountModificationNotification> userCountNotifications = userCountModificationDao
+            .findByColumn( UsercountModificationNotification.class, CommonConstants.COMPANY_COLUMN, company );
         UsercountModificationNotification userCountNotification = null;
         if ( userCountNotifications != null && !userCountNotifications.isEmpty() ) {
             // record is already present. if the status is active do nothing. if status is under
@@ -2941,7 +2974,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             userCountModificationDao.save( userCountNotification );
         }
 
-        LOG.info( "Finished adding a record in user count modification notification table for company " + company.getCompany() );
+        LOG.info(
+            "Finished adding a record in user count modification notification table for company " + company.getCompany() );
     }
 
 
@@ -2970,6 +3004,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             isApiKeyValid = true;
         }
         return isApiKeyValid;
+    }
+
+
+    /**
+     * Method to get user api key
+     * @return
+     */
+    @Transactional
+    @Override
+    public UserApiKey getApiKey()
+    {
+        LOG.info( "Method to get user api key started" );
+        List<UserApiKey> keys = apiKeyDao.findByColumn( UserApiKey.class, CommonConstants.STATUS_COLUMN,
+            CommonConstants.STATUS_ACTIVE );
+        if ( keys == null || keys.isEmpty() ) {
+            return null;
+        }
+        LOG.info( "Method to get user api key finished" );
+        return keys.get( 0 );
     }
 
 
@@ -3012,8 +3065,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // Moved user addition from Controller.
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public User inviteUser( User admin, String firstName, String lastName, String emailId ) throws InvalidInputException,
-        UserAlreadyExistsException, UndeliveredEmailException, SolrException
+    public User inviteUser( User admin, String firstName, String lastName, String emailId )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException
     {
         User user = inviteNewUser( admin, firstName, lastName, emailId );
         LOG.debug( "Adding user {} to solr server.", user.getFirstName() );
@@ -3040,8 +3093,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
-        boolean isDirectRegistration ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException,
-        SolrException
+        boolean isDirectRegistration )
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException
     {
 
         User user = addCorporateAdminAndUpdateStage( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
@@ -3075,8 +3128,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     private int checkWillNewProfileBePrimary( UserProfile userProfileNew, List<UserProfile> userProfiles )
     {
 
-        LOG.debug( "Method checkWillNewProfileBePrimary called in UserManagementService for email id"
-            + userProfileNew.getEmailId() );
+        LOG.debug(
+            "Method checkWillNewProfileBePrimary called in UserManagementService for email id" + userProfileNew.getEmailId() );
 
         int isPrimary = CommonConstants.IS_PRIMARY_FALSE;
         boolean noOldProfileIsPrimary = true;
@@ -3112,7 +3165,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         //if new profile's branch is default than new profile will not be primary
                         if ( newProfileBranch != null
                             && newProfileBranch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES
-                            && userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                            && userProfileNew.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
 
                             Region newProfileRegion = regionDao.findById( Region.class, userProfileNew.getRegionId() );
 
@@ -3131,10 +3185,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         }
 
                     } else if ( isOldProfileAdmin ) {
-                        LOG.debug( "Old primary profile is an admin profile of type "
-                            + profile.getProfilesMaster().getProfile() );
+                        LOG.debug(
+                            "Old primary profile is an admin profile of type " + profile.getProfilesMaster().getProfile() );
                         //if old profile is for admin and new is for agent than remove primary from old and mark new profile as primary
-                        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                        if ( userProfileNew.getProfilesMaster()
+                            .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
                             profile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
                             userProfileDao.update( profile );
                             isPrimary = CommonConstants.IS_PRIMARY_TRUE;
@@ -3166,8 +3221,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId ) throws InvalidInputException,
-        NoRecordsFetchedException, ProfileNotFoundException
+    public String fetchAppropriateLogoUrlFromHierarchyForUser( long userId )
+        throws InvalidInputException, NoRecordsFetchedException, ProfileNotFoundException
 
     {
 
@@ -3264,11 +3319,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID
                 && branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
                 agentProfileWithDefaultBranch = currentProfile;
-            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+            } else if ( currentProfile.getProfilesMaster()
+                .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
                 branchAdminProfile = currentProfile;
-            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+            } else if ( currentProfile.getProfilesMaster()
+                .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
                 regionAdminProfile = currentProfile;
-            } else if ( currentProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
+            } else if ( currentProfile.getProfilesMaster()
+                .getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) {
                 companyAdminProfile = currentProfile;
             }
         }
@@ -3299,7 +3357,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId )
     {
-        LOG.info( "Inside method getSettingScoresById for company " + companyId + " region " + regionId + " branch " + branchId );
+        LOG.info(
+            "Inside method getSettingScoresById for company " + companyId + " region " + regionId + " branch " + branchId );
         return settingsSetterDao.getScoresById( companyId, regionId, branchId );
     }
 
@@ -3369,8 +3428,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId ) throws InvalidInputException,
-        ProfileNotFoundException
+    public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
+        throws InvalidInputException, ProfileNotFoundException
     {
         LOG.debug( "method getPrimaryUserProfileByAgentId started with user id " + entityId );
         Map<String, Long> userProfileDetailMap = userProfileDao.findPrimaryUserProfileByAgentId( entityId );
@@ -3477,8 +3536,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // Method to return active user with provided email and company
     @Transactional
     @Override
-    public User getActiveUserByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public User getActiveUserByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method getUserByEmailAndCompany() called from UserManagementService" );
 
@@ -3533,8 +3592,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Override
     @Transactional
-    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<User> searchUsersInCompanyByMultipleCriteria( Map<String, Object> queries )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method searchUsersInCompanyByMultipleCriteria started." );
 
@@ -3617,8 +3676,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             String.valueOf( admin.getUserId() ) );
 
         userProfileDao.save( userProfileNew );
-        sendInviteMailToSocialSurveyAdmin( emailId, user.getFirstName() + " " + user.getLastName(), admin.getCompany()
-            .getCompanyId() );
+        sendInviteMailToSocialSurveyAdmin( emailId, user.getFirstName() + " " + user.getLastName(),
+            admin.getCompany().getCompanyId() );
 
 
         LOG.info( "Method to add a new user, inviteUserToRegister finished for email id : " + emailId );
@@ -3626,8 +3685,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
-    private void sendInviteMailToSocialSurveyAdmin( String emailId, String name, long companyId ) throws InvalidInputException,
-        UndeliveredEmailException
+    private void sendInviteMailToSocialSurveyAdmin( String emailId, String name, long companyId )
+        throws InvalidInputException, UndeliveredEmailException
     {
         Map<String, String> urlParams = new HashMap<String, String>();
         urlParams.put( CommonConstants.EMAIL_ID, emailId );
@@ -3685,7 +3744,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         removedUser.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         removedUserDao.save( removedUser );
 
-        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated );
+        userProfileDao.deactivateAllUserProfilesForUser( admin, userToBeDeactivated, CommonConstants.STATUS_INACTIVE );
 
         userToBeDeactivated.setLoginName( userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis() );
         userToBeDeactivated.setStatus( CommonConstants.STATUS_INACTIVE );
@@ -3718,10 +3777,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
 
         userEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setCreatedBy( user.getCompany().getCompany() );
+        //TODO : Modify createdBy and modifiedBy to store the actual admin's ID
+        userEmailMapping.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setModifiedBy( user.getCompany().getCompany() );
-
+        userEmailMapping.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
         userEmailMappingDao.save( userEmailMapping );
         return user;
     }
@@ -3743,32 +3802,33 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         CompanyIgnoredEmailMapping companyIgnoredEmailMapping = new CompanyIgnoredEmailMapping();
-        
-        
+
+
         //check if entry is already there with the eamil id
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( CommonConstants.EMAIL_ID, emailId );
         queries.put( CommonConstants.COMPANY, company );
-        List<CompanyIgnoredEmailMapping> CompanyIgnoredEmailMappingList = companyIgnoredEmailMappingDao.findByKeyValue( CompanyIgnoredEmailMapping.class, queries );
-        
-        if(CompanyIgnoredEmailMappingList != null && CompanyIgnoredEmailMappingList.size() > 0 ){
+        List<CompanyIgnoredEmailMapping> CompanyIgnoredEmailMappingList = companyIgnoredEmailMappingDao
+            .findByKeyValue( CompanyIgnoredEmailMapping.class, queries );
+
+        if ( CompanyIgnoredEmailMappingList != null && CompanyIgnoredEmailMappingList.size() > 0 ) {
             companyIgnoredEmailMapping = CompanyIgnoredEmailMappingList.get( CommonConstants.INITIAL_INDEX );
             companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
             companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        }else{
+        } else {
             companyIgnoredEmailMapping.setCompany( company );
             companyIgnoredEmailMapping.setEmailId( emailId );
             companyIgnoredEmailMapping.setStatus( CommonConstants.STATUS_ACTIVE );
-            
+
             companyIgnoredEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
             companyIgnoredEmailMapping.setCreatedBy( "ADMIN" );
             companyIgnoredEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             companyIgnoredEmailMapping.setModifiedBy( "ADMIN" );
         }
-        
+
         companyIgnoredEmailMapping = companyIgnoredEmailMappingDao.saveOrUpdate( companyIgnoredEmailMapping );
-        
-                return companyIgnoredEmailMapping;
+
+        return companyIgnoredEmailMapping;
     }
 
 
@@ -3796,10 +3856,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
             StringBuilder mappedEmails = new StringBuilder();
             for ( UserEmailMapping emailMapping : user.getUserEmailMappings() ) {
-            	if(emailMapping.getStatus() == CommonConstants.STATUS_ACTIVE){
-            		mappedEmails.append( emailMapping.getEmailId() );
+                if ( emailMapping.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    mappedEmails.append( emailMapping.getEmailId() );
                     mappedEmails.append( ", " );
-            	}             
+                }
             }
             String mappedEmailsString = mappedEmails.toString();
             if ( mappedEmailsString != null && mappedEmailsString.contains( "," ) )
@@ -3817,8 +3877,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public List<UserEmailMapping> getUserEmailMappingsForUser( long agentId ) throws InvalidInputException,
-        NoRecordsFetchedException
+    public List<UserEmailMapping> getUserEmailMappingsForUser( long agentId )
+        throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Method to getUserEmailMappingsForUser for  agentId : " + agentId + " started." );
 
@@ -3828,9 +3888,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "No user found for agent id : " + agentId );
         }
 
-        
-       
-        List<UserEmailMapping> emailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class, CommonConstants.USER_COLUMN, user );
+
+        List<UserEmailMapping> emailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class,
+            CommonConstants.USER_COLUMN, user );
         List<UserEmailMapping> emailMappingsVO = new ArrayList<UserEmailMapping>();
         for ( UserEmailMapping emailMapping : emailMappings ) {
             UserEmailMapping emailMappingVO = new UserEmailMapping();
@@ -3844,110 +3904,828 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         return emailMappingsVO;
     }
-    
-    
+
+
     @Transactional
     @Override
-    public void deleteUserEmailMapping( User agent , long emailMappingId ) throws InvalidInputException
+    public void deleteUserEmailMapping( User agent, long emailMappingId ) throws InvalidInputException
     {
         LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
         if ( agent == null ) {
             throw new InvalidInputException( "Passed parameter agent is null " );
         }
-        
+
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( "userEmailMappingId", emailMappingId );
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
-       
-        
-        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null) {
+
+
+        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null ) {
             throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + emailMappingId );
         }
 
         UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
         userEmailMapping.setStatus( CommonConstants.STATUS_INACTIVE );
-        userEmailMapping.setModifiedBy( String.valueOf(agent.getUserId() ));
+        userEmailMapping.setModifiedBy( String.valueOf( agent.getUserId() ) );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMappingDao.update( userEmailMapping );
-        
+
         LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
-    
-    
+
+
     @Transactional
     @Override
-    public void updateUserEmailMapping( User agent , long emailMappingId , int status ) throws InvalidInputException
+    public void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException
     {
         LOG.info( "Method to updateUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
         if ( agent == null ) {
             throw new InvalidInputException( "Passed parameter agent is null " );
         }
-        
+
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( "userEmailMappingId", emailMappingId );
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
-       
-        
-        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null) {
+
+
+        if ( userEmailMappings == null || userEmailMappings.size() <= 0 || userEmailMappings.get( 0 ) == null ) {
             throw new InvalidInputException( "No userEmailMapping found for emailMapping id : " + emailMappingId );
         }
 
         UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
         userEmailMapping.setStatus( status );
-        userEmailMapping.setModifiedBy( String.valueOf(agent.getUserId() ));
+        userEmailMapping.setModifiedBy( String.valueOf( agent.getUserId() ) );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMappingDao.update( userEmailMapping );
-        
+
         LOG.info( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
-    
+
+
     @Transactional
     @Override
-    public void deleteIgnoredEmailMapping(String emailId) throws InvalidInputException{
+    public void deleteIgnoredEmailMapping( String emailId ) throws InvalidInputException
+    {
         LOG.info( "method deleteIgnoredEmailMapping  started for email id : " + emailId );
-        
-        if(emailId == null || emailId.isEmpty()){
-            throw new InvalidInputException("Passed parameter emailId is invalid");
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Passed parameter emailId is invalid" );
         }
-        
-        List<CompanyIgnoredEmailMapping> ignoredEmails = companyIgnoredEmailMappingDao.findByColumn( CompanyIgnoredEmailMapping.class, CommonConstants.EMAIL_ID, emailId );
-        if(ignoredEmails != null && !ignoredEmails.isEmpty()){
-            for(CompanyIgnoredEmailMapping ignoredEmail : ignoredEmails){
+
+        List<CompanyIgnoredEmailMapping> ignoredEmails = companyIgnoredEmailMappingDao
+            .findByColumn( CompanyIgnoredEmailMapping.class, CommonConstants.EMAIL_ID, emailId );
+        if ( ignoredEmails != null && !ignoredEmails.isEmpty() ) {
+            for ( CompanyIgnoredEmailMapping ignoredEmail : ignoredEmails ) {
                 ignoredEmail.setStatus( CommonConstants.STATUS_INACTIVE );
                 ignoredEmail.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                 companyIgnoredEmailMappingDao.update( ignoredEmail );
             }
         }
-        
+
         LOG.info( "method deleteIgnoredEmailMapping finished" );
     }
-    
-    /**
-     * 
-     * @param userId
-     * @return
-     * @throws InvalidInputException 
-     */
+
+
     @Transactional
     @Override
-    public boolean isUserSocialSurveyAdmin(long userId) throws InvalidInputException{
+    public boolean isUserSocialSurveyAdmin( long userId ) throws InvalidInputException
+    {
         LOG.info( "method isUserIsSocialSurveyAdmin  started for userId : " + userId );
-        
+
         User user = null;
         user = userDao.findById( User.class, userId );
         if ( user == null ) {
             throw new InvalidInputException( "User not found for userId:" + userId );
         }
-        
+
         //get primary profile profile of user
         List<UserProfile> userProfiles = user.getUserProfiles();
-            for ( UserProfile userProfile : userProfiles ) {
-                if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID){
-                    // social survey admin
-                    return true;
+        for ( UserProfile userProfile : userProfiles ) {
+            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID ) {
+                // social survey admin
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
+        throws InvalidInputException, SolrException
+    {
+        LOG.info( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
+
+        // Removing user data from MySql DB & MongoDB.
+        this.removeExistingUser( loggedInUser, userIdToBeDeleted, status );
+
+        // Updating user count modification notification.
+        this.updateUserCountModificationNotification( loggedInUser.getCompany() );
+
+        // Removing user data from solr.
+        solrSearchService.removeUserFromSolr( userIdToBeDeleted );
+
+        LOG.info( "Method deleteUserDataFromAllSources executed successfully" );
+    }
+
+
+    @Override
+    public void crmDataAgentIdMApper()
+    {
+        try {
+            // update last start time
+            batchTrackerService
+                .getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER,
+                    CommonConstants.BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER );
+
+            Map<String, Object> corruptRecords = surveyHandler.mapAgentsInSurveyPreInitiation();
+            sendCorruptDataFromCrmNotificationMail( corruptRecords );
+
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER );
+            LOG.info( "Completed CrmDataAgentIdMapper" );
+        } catch ( Exception e ) {
+            LOG.error( "Error in CrmDataAgentIdMapper", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_CRM_DATA_AGENT_ID_MAPPER,
+                    e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_CRM_DATA_AGENT_ID_MAPPER,
+                    System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in CrmDataAgentIdMapper " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+
+    private void sendCorruptDataFromCrmNotificationMail( Map<String, Object> corruptRecords )
+    {
+        List<SurveyPreInitiation> unavailableAgents = (List<SurveyPreInitiation>) corruptRecords.get( "unavailableAgents" );
+        List<SurveyPreInitiation> invalidAgents = (List<SurveyPreInitiation>) corruptRecords.get( "invalidAgents" );
+        List<SurveyPreInitiation> customersWithoutName = (List<SurveyPreInitiation>) corruptRecords
+            .get( "customersWithoutName" );
+        List<SurveyPreInitiation> customersWithoutEmailId = (List<SurveyPreInitiation>) corruptRecords
+            .get( "customersWithoutEmailId" );
+
+        List<SurveyPreInitiation> ignoredEmailRecords = (List<SurveyPreInitiation>) corruptRecords.get( "ignoredEmailRecords" );
+        List<SurveyPreInitiation> oldRecords = (List<SurveyPreInitiation>) corruptRecords.get( "oldRecords" );
+
+        Set<Long> companies = (Set<Long>) corruptRecords.get( "companies" );
+
+        for ( Long companyId : companies ) {
+            int rownum = 1;
+            int count = 1;
+            boolean excelCreated = false;
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet = workbook.createSheet( "Corrupt Records" );
+            sheet = fillHeaders( sheet );
+
+            for ( SurveyPreInitiation survey : unavailableAgents ) {
+
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Agent Not Available For This Organization " );
                 }
             }
-            
-            return false;
+            for ( SurveyPreInitiation survey : invalidAgents ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Agent Does Not Exist" );
+                }
+            }
+            for ( SurveyPreInitiation survey : customersWithoutName ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Customer Name Is Not Present" );
+                }
+            }
+            for ( SurveyPreInitiation survey : customersWithoutEmailId ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Customer Email Id Is Not Present" );
+                }
+            }
+
+            for ( SurveyPreInitiation survey : ignoredEmailRecords ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Agent Email Id is ignored" );
+                }
+            }
+
+            for ( SurveyPreInitiation survey : oldRecords ) {
+                if ( survey.getCompanyId() == companyId ) {
+                    Row row = sheet.createRow( rownum++ );
+                    row = fillCellsInRow( row, survey, count++, "Old record" );
+                }
+            }
+
+            String fileName = companyId + "_" + System.currentTimeMillis();
+            FileOutputStream fileOutput = null;
+            InputStream inputStream = null;
+            File file = null;
+            String filePath = null;
+            try {
+                file = new File( fileDirectoryLocation + File.separator + fileName + ".xls" );
+                fileOutput = new FileOutputStream( file );
+                file.createNewFile();
+                workbook.write( fileOutput );
+                filePath = file.getPath();
+                excelCreated = true;
+            } catch ( FileNotFoundException fe ) {
+                LOG.error( "Exception caught " + fe.getMessage() );
+                excelCreated = false;
+            } catch ( IOException e ) {
+                LOG.error( "Exception caught " + e.getMessage() );
+                excelCreated = false;
+            } finally {
+                try {
+                    fileOutput.close();
+                    if ( inputStream != null ) {
+                        inputStream.close();
+                    }
+                } catch ( IOException e ) {
+                    LOG.error( "Exception caught " + e.getMessage() );
+                    excelCreated = false;
+                }
+            }
+            try {
+                if ( excelCreated ) {
+                    Map<String, String> attachmentsDetails = new HashMap<String, String>();
+                    attachmentsDetails.put( "CorruptRecords.xls", filePath );
+
+                    if ( companyAdminEnabled == "1" ) {
+                        User companyAdmin = getCompanyAdmin( companyId );
+                        if ( companyAdmin != null ) {
+                            emailServices.sendCorruptDataFromCrmNotificationMail( companyAdmin.getFirstName(),
+                                companyAdmin.getLastName(), companyAdmin.getEmailId(), attachmentsDetails );
+                        }
+                    } else {
+                        emailServices.sendCorruptDataFromCrmNotificationMail( adminName, "", adminEmailId, attachmentsDetails );
+                    }
+                }
+            } catch ( InvalidInputException | UndeliveredEmailException e ) {
+                LOG.error( "Exception caught in sendCorruptDataFromCrmNotificationMail() while sending mail to company admin" );
+            }
+        }
+    }
+
+
+    private Row fillCellsInRow( Row row, SurveyPreInitiation survey, int counter, String reasonForFailure )
+    {
+        int cellnum = 0;
+        Cell cell1 = row.createCell( cellnum++ );
+        cell1.setCellValue( counter );
+        Cell cell2 = row.createCell( cellnum++ );
+        cell2.setCellValue( survey.getSurveySource() );
+        Cell cell3 = row.createCell( cellnum++ );
+        if ( survey.getAgentEmailId() != null ) {
+            cell3.setCellValue( survey.getAgentEmailId() );
+        } else {
+            cell3.setCellValue( "" );
+        }
+        Cell cell4 = row.createCell( cellnum++ );
+        if ( survey.getCustomerFirstName() != null ) {
+            cell4.setCellValue( survey.getCustomerFirstName() );
+        } else {
+            cell4.setCellValue( "" );
+        }
+        Cell cell5 = row.createCell( cellnum++ );
+        if ( survey.getCustomerLastName() != null ) {
+            cell5.setCellValue( survey.getCustomerLastName() );
+        } else {
+            cell5.setCellValue( "" );
+        }
+        Cell cell6 = row.createCell( cellnum++ );
+        if ( survey.getCustomerEmailId() != null ) {
+            cell6.setCellValue( survey.getCustomerEmailId() );
+        } else {
+            cell6.setCellValue( "" );
+        }
+        Cell cell7 = row.createCell( cellnum++ );
+        cell7.setCellValue( reasonForFailure );
+        return row;
+
+    }
+
+
+    public HSSFSheet fillHeaders( HSSFSheet sheet )
+    {
+        int cellnum = 0;
+        Row row = sheet.createRow( 0 );
+        Cell cell1 = row.createCell( cellnum++ );
+        cell1.setCellValue( "S.No" );
+        Cell cell2 = row.createCell( cellnum++ );
+        cell2.setCellValue( "Source" );
+        Cell cell3 = row.createCell( cellnum++ );
+        cell3.setCellValue( "Agent Email Id" );
+        Cell cell4 = row.createCell( cellnum++ );
+        cell4.setCellValue( "Customer First Name" );
+        Cell cell5 = row.createCell( cellnum++ );
+        cell5.setCellValue( "Customer Last Name" );
+        Cell cell6 = row.createCell( cellnum++ );
+        cell6.setCellValue( "Customer Email Id" );
+        Cell cell7 = row.createCell( cellnum++ );
+        cell7.setCellValue( "Reason For Failure" );
+        return sheet;
+    }
+    @Override
+    @Transactional
+    public User getAdminUserByCompanyId( long companyId )
+    {
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( "company.companyId", companyId );
+        queries.put( "isOwner", CommonConstants.STATUS_ACTIVE );
+        List<User> user = userDao.findByKeyValue( User.class, queries );
+        if ( user != null && !user.isEmpty() ) {
+            return user.get( CommonConstants.INITIAL_INDEX );
+        }
+        return null;
+    }
+
+
+    @Override
+    public void incompleteSurveyReminderSender()
+    {
+        try {
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
+                CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER );
+
+            for ( Company company : organizationManagementService.getAllCompanies() ) {
+                Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
+                int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
+                int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
+                LOG.debug( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
+                Date epochReminderDate = null;
+                List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler
+                    .getIncompleteSurveyCustomersEmail( company );
+                LOG.debug( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
+                    + " surveys sent for company id " + company.getCompanyId() );
+                for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
+                    LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
+
+                    LOG.debug( "Survey pre initiation id: " + survey.getSurveyPreIntitiationId() + " within reminder counts" );
+
+                    User user = getUserByUserId( survey.getAgentId() );
+                    //If agent is deleted, mark survey as corrupt and fetch next survey
+                    if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
+                        LOG.debug( "The agent id : " + survey.getAgentId() + " is deleted. Skipping record." );
+                        continue;
+                    }
+
+                    boolean reminder = false;
+                    try {
+                        epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
+                    } catch ( Exception e ) {
+                        LOG.error( "Exception caught " + e.getMessage() );
+                        continue;
+                    }
+                    LOG.debug( "Last reminder time: " + String.valueOf( survey.getLastReminderTime() ) );
+                    if ( survey.getLastReminderTime().after( epochReminderDate ) ) {
+                        LOG.debug( "Reminder mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
+                        reminder = true;
+                    } else {
+                        LOG.debug(
+                            "Initial survey request mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
+                        reminder = false;
+                    }
+                    long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
+                    long currentTime = System.currentTimeMillis();
+                    if ( surveyHandler
+                        .checkIfTimeIntervalHasExpired( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
+                        LOG.debug( "Survey eligible for sending mail with id: " + survey.getSurveyPreIntitiationId() );
+                        try {
+                            /*
+                             * if ( survey.getSurveySource().equalsIgnoreCase(
+                             * CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
+                             * sendMailToAgent( survey ); }
+                             */
+                            if ( reminder ) {
+                                if ( survey.getReminderCounts() < reminderCount ) {
+                                    sendSurveyReminderEmail( emailServices, organizationManagementService, survey,
+                                        company.getCompanyId() );
+                                    surveyHandler.markSurveyAsSent( survey );
+                                    surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
+                                } else {
+                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
+                                        + " has exceeded the reminder count " );
+                                }
+                            } else {
+                                sendSurveyInitiationEmail( emailServices, organizationManagementService, survey,
+                                    company.getCompanyId() );
+                                surveyHandler.markSurveyAsSent( survey );
+                                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
+                            }
+
+                        } catch ( InvalidInputException e ) {
+                            LOG.error(
+                                "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
+                                e );
+                        } catch ( ProfileNotFoundException e ) {
+                            LOG.error( "Error while sending incomplete survey mail ", e );
+                        }
+                    }
+
+                }
+            }
+            LOG.info( "Completed IncompleteSurveyReminderSender" );
+            //Update last build time in batch tracker table
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER );
+        } catch ( Exception e ) {
+            LOG.error( "Error in IncompleteSurveyReminderSender", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService
+                    .updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SENDER,
+                        e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService
+                    .sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SENDER,
+                        System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in IncompleteSurveyReminderSender " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+
+    private void sendSurveyReminderEmail( EmailServices emailServices,
+        OrganizationManagementService organizationManagementService, SurveyPreInitiation survey, long companyId )
+        throws InvalidInputException, ProfileNotFoundException
+    {
+        // Send email to complete survey to each customer.
+        OrganizationUnitSettings companySettings = null;
+        String agentName = "";
+        User user = null;
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
+        user = getUserByUserId( survey.getAgentId() );
+
+        if ( user != null ) {
+            agentName = user.getFirstName();
+        }
+
+        String surveyLink = surveyHandler
+            .composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+        try {
+            companySettings = organizationManagementService.getCompanySettings( companyId );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException occured while trying to fetch company settings." );
+        }
+
+        // Fetching agent settings.
+        AgentSettings agentSettings = getUserSettings( survey.getAgentId() );
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
+            }
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        String agentTitle = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+            agentTitle = agentSettings.getContact_details().getTitle();
+        }
+
+        String agentEmailId = "";
+        if ( agentSettings.getContact_details().getMail_ids().getWork() != null ) {
+            agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+        }
+
+        String agentPhone = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+            && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+            agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+        }
+
+
+        String companyName = user.getCompany().getCompany();
+        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
+        String fullAddress = "";
+
+        // Null check
+
+
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogoThumbnail();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+
+        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+            logoUrl = applicationLogoUrl;
+        }
+
+        //JIRA SS-1363 end
+
+        LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+        surveyLink = urlService.shortenUrl( surveyLink );
+        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
+        
+        String mailBody = "";
+        String mailSubject = "";
+        if ( companySettings != null && companySettings.getMail_content() != null
+            && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
+
+            MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
+
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(), mailContent.getParam_order() );
+            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
+            if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
+                mailSubject = mailContent.getMail_subject();
+            }
+
+
+        } else {
+            mailSubject = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT );
+
+            mailBody = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY );
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
+        }
+        //replace legends
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+
+        //send mail
+        try {
+            emailServices
+                .sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
+        }
+    }
+
+
+    private void sendSurveyInitiationEmail( EmailServices emailServices,
+        OrganizationManagementService organizationManagementService, SurveyPreInitiation survey, long companyId )
+        throws InvalidInputException, ProfileNotFoundException
+    {
+        // Send email to complete survey to each customer.
+        OrganizationUnitSettings companySettings = null;
+        String agentName = "";
+        User user = null;
+        Map<String, Long> hierarchyMap = null;
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        String logoUrl = null;
+        user = getUserByUserId( survey.getAgentId() );
+
+        if ( user != null ) {
+            agentName = user.getFirstName();
+        }
+
+        String surveyLink = surveyHandler
+            .composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+        try {
+            companySettings = organizationManagementService.getCompanySettings( companyId );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException occured while trying to fetch company settings." );
+        }
+
+        // Fetching agent settings.
+        AgentSettings agentSettings = getUserSettings( survey.getAgentId() );
+        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+        try {
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, user.getUserId() );
+            if ( map == null ) {
+                LOG.error( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile this user " + user.getUserId() );
+            }
+        } catch ( InvalidSettingsStateException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        String agentTitle = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getTitle() != null ) {
+            agentTitle = agentSettings.getContact_details().getTitle();
+        }
+
+        String agentEmailId = "";
+        if ( agentSettings.getContact_details().getMail_ids().getWork() != null ) {
+            agentEmailId = agentSettings.getContact_details().getMail_ids().getWork();
+        }
+
+        String agentPhone = "";
+        if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getContact_numbers() != null
+            && agentSettings.getContact_details().getContact_numbers().getWork() != null ) {
+            agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
+        }
+
+
+        String companyName = user.getCompany().getCompany();
+        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
+        String fullAddress = "";
+
+        // Null check
+
+
+        OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+        //JIRA SS-1363 begin
+        /*if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogoThumbnail();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogoThumbnail();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogoThumbnail();
+        }*/
+        if ( organizationUnit == OrganizationUnit.COMPANY ) {
+            logoUrl = companySettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.REGION ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+            logoUrl = regionSettings.getLogo();
+        } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+            OrganizationUnitSettings branchSettings = null;
+            try {
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            } catch ( NoRecordsFetchedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( branchSettings != null ) {
+                logoUrl = branchSettings.getLogo();
+            }
+        } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+            logoUrl = agentSettings.getLogo();
+        }
+        //JIRA SS-1363 end
+
+        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
+            logoUrl = applicationLogoUrl;
+        }
+        LOG.info( "Initiating URL Service to shorten the url " + surveyLink );
+        try {
+            surveyLink = urlService.shortenUrl( surveyLink );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
+        }
+
+        //get mail subject and body
+        String mailBody = "";
+        String mailSubject = "";
+        if ( companySettings != null && companySettings.getMail_content() != null
+            && companySettings.getMail_content().getTake_survey_mail() != null ) {
+
+            MailContent mailContent = companySettings.getMail_content().getTake_survey_mail();
+
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(), mailContent.getParam_order() );
+
+
+            LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + surveyLink );
+
+            mailBody = emailFormatHelper
+                .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                    survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+            if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
+                mailSubject = mailContent.getMail_subject();
+            }
+            mailSubject = emailFormatHelper
+                .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                    survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                    companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+
+        } else {
+
+            mailSubject = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
+
+            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( agentName ) );
+
+            mailBody = fileOperations.getContentFromFile(
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
+
+            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
+                new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) ) );
+        }
+
+        //replace the legends
+        mailBody = emailFormatHelper
+            .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+        mailSubject = emailFormatHelper
+            .replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
+                survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
+                companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
+
+        //send the mail
+        try {
+            emailServices
+                .sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
+        }
+    }
+
+    private void sendMailToAgent( SurveyPreInitiation survey )
+    {
+        try {
+            emailServices.sendAgentSurveyReminderMail( survey.getCustomerEmailId(), survey );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Exception caught " + e.getMessage() );
+        }
+    }
+
+
+    /**
+     * Method to check if agent is deleted and mark the corresponding survey as corrupted, if it is.
+     *
+     * @param user
+     * @param survey
+     * @return
+     */
+    private boolean checkIfSurveyAgentIsDeleted( User user, SurveyPreInitiation survey )
+    {
+        //If user is deleted, mark the survey status as corrupt
+        if ( user.getStatus() == CommonConstants.STATUS_INACTIVE ) {
+            survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD );
+            survey.setErrorCode( SurveyErrorCode.USER_DELETED.name() );
+            surveyPreInitiationDao.update( survey );
+            return true;
+        }
+        return false;
     }
 }
