@@ -1907,21 +1907,16 @@ button.paypal.is-active {
 .ppl-review-item:hover .icn-lin-rev{ 
 	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
 	}
- .ppl-review-item:hover .icn-gplus-rev { 
+.ppl-review-item:hover .icn-gplus-rev { 
 	background:url(../images/ss-icon-small-gplus.png) no-repeat;
 	}
-/* .dsh-review-cont:hover .icn-fb-rev{
-	background:url(../images/colfb.png) no-repeat;
-}
-.dsh-review-cont:hover .icn-twit-rev{
-	background:url(../images/ss-icon-small-twitter.png) no-repeat;
-}
-.dsh-review-cont:hover .icn-lin-rev{
-	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
-}
-.dsh-review-cont:hover .icn-gplus-rev {
-	background:url(../images/ss-icon-small-gplus.png) no-repeat;
-} */
+.ppl-review-item:hover .icn-flag  { 
+	background:url(../images/ss-icon-small-circle-flag.png) no-repeat;
+	}
+.ppl-review-item:hover .retake-icn  { 
+	background:url(../images/ss-icon-small-circle-retake.png) no-repeat;
+	}
+
 .icn-fax {
 	background: url(../images/fax.png) no-repeat center;
 }
