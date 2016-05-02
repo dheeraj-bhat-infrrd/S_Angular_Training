@@ -69,9 +69,26 @@
 				<div class='zillow-badge   verify-image float-right' title='Click here to know more'></div>
 				</c:if>
 				<div class="ppl-header-left review-sm-screen " >
-				<div class="ppl-head-2 float-left" data-modified="false" 
-						data-modifiedon="<fmt:formatDate type="date" pattern="yyyy-MM-dd-H-mm-ss"
-						value="${reviewItem.modifiedOn}" />"></div>
+				
+				<c:choose>
+						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.surveyCompletedDate}" />">
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="ppl-head-2 review-detail-profile float-left"
+								data-modified="false"
+								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.modifiedOn}" />">
+							</div>
+						</c:otherwise>
+					</c:choose>
+				<%-- <div class="ppl-head-2 float-left" data-modified="false" 
+						data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+						value="${reviewItem.modifiedOn}" />"></div> --%>
 					<div class="ppl-head-1 review-detail-profile" style="clear:both">
 					<span class="float-left">  Reviewed by </span>
 						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
@@ -90,15 +107,18 @@
 									<span>${reviewItem.surveyType}</span>
 								</div>
 							</c:when>
+							
 							<c:otherwise>
 								<div style="clear:both">
-									Completed transation on
+									Completed transation in
                                        <c:choose>
 									<c:when test="${ not empty reviewItem.surveyTransactionDate} ">
-										<span>${ reviewItem.surveyTransactionDate}</span>
+										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+						value="${ reviewItem.surveyTransactionDate}" />"></span>
 									</c:when>
 									<c:otherwise>
-										<span>${reviewItem.modifiedOn}</span>
+										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+						value="${reviewItem.modifiedOn}" />"></span>
 									</c:otherwise>
 									</c:choose>
 								</div>

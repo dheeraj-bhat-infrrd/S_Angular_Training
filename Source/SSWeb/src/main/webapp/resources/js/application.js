@@ -1192,8 +1192,18 @@ function displayReviewOnDashboard() {
 function updateEventOnDashboardPageForReviews() {
 	$('.ppl-head-2[data-modified="false"]').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
-		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
-		$(this).html(date.toDateString()).attr("data-modified", "true");
+		var month=dateSplit[0];
+		var day=dateSplit[1];
+		var year=dateSplit[2];
+		var reviewDay=month+" "+day+","+year;
+		$(this).html(reviewDay).attr("data-modified", "true");
+	});
+	$('.completedOn[data-modified="false"]').each(function(index, currentElement) {
+		var dateSplit = $(this).attr('data-modifiedon').split('-');
+		var month=dateSplit[0];
+		var year=dateSplit[1];
+		var reviewDay=month+" "+year;
+		$(this).html(reviewDay).attr("data-modified", "true");
 	});
 	
 	$('.review-ratings[data-modified="false"]').each(function() {
