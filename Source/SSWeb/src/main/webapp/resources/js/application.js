@@ -5934,7 +5934,14 @@ function showMasterQuestionPage(){
 		$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
 		var fmt_rating = Number(rating).toFixed(1);
 		$('#linkedin-btn').attr("href","https://www.linkedin.com/shareArticle?mini=true&url="+agentFullProfileLink+"&title=&summary="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&source=");
-		$('#twitter-btn').attr("href","https://twitter.com/intent/tweet?text="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ feedback + ".&url='"+agentFullProfileLink+"'");
+        var twitterFeedback = feedback;
+        if(twitterFeedback.length > 109) {
+            twitterFeedback = twitterFeedback.substring(0, 70);
+            twitterFeedback = twitterFeedback + "...";
+        } else {
+            twitterFeedback = feedback;
+        }
+		$('#twitter-btn').attr("href","https://twitter.com/intent/tweet?text="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+ twitterFeedback + "&url='"+agentFullProfileLink+"'");
 		$('#fb-btn').attr("href","https://www.facebook.com/dialog/feed?app_id="+fb_app_id+"&link="+agentFullProfileLink+"&description="+fmt_rating+"-star response from " +firstName+ " " +lastName+ " for "+agentName+ " at SocialSurvey - "+feedback+".&redirect_uri=https://www.facebook.com");
 
 		$('#content-head').html('Survey Completed');
