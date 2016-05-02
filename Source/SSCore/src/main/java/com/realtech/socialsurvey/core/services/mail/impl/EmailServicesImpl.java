@@ -22,6 +22,7 @@ import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.dao.ForwardMailDetailsDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
@@ -1726,7 +1727,11 @@ public class EmailServicesImpl implements EmailServices
         EmailEntity emailEntity = new EmailEntity();
         emailEntity.setRecipients( recipients );
         emailEntity.setSenderName( name );
-        emailEntity.setSenderEmailId( "u" + userId + "@" + defaultEmailDomain );
+        
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+        
+        //JIRA SS-60 //pass stored encrypted id in mongo for the user
+        emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
 
         LOG.debug( "Prepared email entity for sending mail" );

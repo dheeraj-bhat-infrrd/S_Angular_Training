@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +14,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -136,11 +139,11 @@ public class IncomingMailController
         Matcher matcher = pattern.matcher( mailTo );
         if ( matcher.find() ) {
             LOG.info( "Mail id belongs to agent mail id format" );
-            String encryptedUserId = matcher.group( 1 );
-            String userId = encryptionHelper.decodeBase64( encryptedUserId );
-            LOG.info( "agent id from the mail id is " + userId );
-            User user = userManagementService.getUserObjByUserId( Long.parseLong( userId ) );
-            resolvedMailId = user.getEmailId();
+            String userEncryptedId = matcher.group( 1 );
+            LOG.info( "userEncryptedId id from the mail id is " + userEncryptedId );
+            ContactDetailsSettings contactDetailsSettings = userManagementService.fetchAgentContactDetailByEncryptedId( userEncryptedId );
+            if(contactDetailsSettings != null && contactDetailsSettings.getMail_ids() != null  )
+                resolvedMailId = contactDetailsSettings.getMail_ids().getWork();
         } else if ( mailTo.contains( defaultFromAddress ) || mailTo.contains( applicationAdminEmail ) ) {
             resolvedMailId = applicationAdminEmail;
         }

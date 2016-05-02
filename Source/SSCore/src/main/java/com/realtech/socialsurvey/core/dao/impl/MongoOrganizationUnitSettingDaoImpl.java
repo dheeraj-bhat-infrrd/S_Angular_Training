@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
@@ -90,6 +91,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_CONTACT_NAME = "contact_details.name";
 	public static final String KEY_POSTIONS = "positions";
 	public static final String KEY_STATUS = "status";
+	public static final String KEY_USER_ENCRYPTED_ID = "userEncryptedId";
 	
 	@Value("${CDN_PATH}")
 	private String amazonEndPoint;
@@ -148,6 +150,21 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		return settings;
 	}
 	
+	
+	@Override
+    public ContactDetailsSettings fetchAgentContactDetailByEncryptedId(String userEncryptedId) {
+        LOG.info("Fetch agent settings from for userEncruptedId: " + userEncryptedId);
+        Query query = new Query();
+        query.addCriteria(Criteria.where(KEY_USER_ENCRYPTED_ID).is(userEncryptedId));
+        query.fields().include(KEY_CONTACT_DETAILS);
+        AgentSettings settings = mongoTemplate.findOne(query, AgentSettings.class,
+                AGENT_SETTINGS_COLLECTION);
+        ContactDetailsSettings contactDetails = null;
+        if(settings != null)
+            contactDetails = settings.getContact_details();
+        return contactDetails;
+    }
+	
 	@Override
 	public List<AgentSettings> fetchMultipleAgentSettingsById(List<Long> identifiers) {
 		LOG.info("Fetch multiple agent settings from list of Ids: " + identifiers);
@@ -160,6 +177,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		}
 		return settingsList;
 	}
+	
+	
+	@Override
+    public List<AgentSettings> getAllAgentSettings() {
+        LOG.info("Fetch multiple getAllAgentSettings: ");
+        Query query = new Query();
+        query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
+        List<AgentSettings> settingsList = mongoTemplate.find(query, AgentSettings.class,AGENT_SETTINGS_COLLECTION);
+        for (AgentSettings settings : settingsList) {
+            setCompleteUrlForSettings(settings, CommonConstants.AGENT_SETTINGS_COLLECTION);
+        }
+        return settingsList;
+    }
 
 	@Override
 	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings,

@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -603,6 +604,11 @@ public interface UserManagementService
 
     public User getAdminUserByCompanyId(long companyId);
 
+
+    public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId ) throws InvalidInputException;
+
+
+    public String generateUserEncryptedId( long userId ) throws InvalidInputException;
     public void incompleteSurveyReminderSender();
 }
 // JIRA SS-34 BY RM02 BOC
