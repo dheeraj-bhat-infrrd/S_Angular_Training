@@ -93,9 +93,21 @@
 					<span class="float-left">  Reviewed by </span>
 						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
 						<c:if test="${profilemasterid !=4}">
-					<span class="float-left" style="margin-left:5px;">for<a class="cursor-pointer" style="color:#236CAF;font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank"> ${reviewItem.agentName}</a></span>
-					</c:if>
-					<c:choose>
+							<c:if test="${not empty reviewItem.agentName}">
+								<span class="float-left" style="margin-left: 5px;">for<a
+									class="cursor-pointer"
+									style="color: #236CAF; font-weight: 600 !important;"
+									href="${reviewItem.completeProfileUrl}" target="_blank">
+										${reviewItem.agentName}</a></span>
+							</c:if>
+						</c:if>
+						
+						
+						
+						
+						
+						
+						<c:choose>
 							<c:when test="${ not empty reviewItem.summary }">
 								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
 							</c:when>
