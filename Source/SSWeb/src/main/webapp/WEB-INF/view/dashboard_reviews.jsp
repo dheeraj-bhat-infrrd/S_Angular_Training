@@ -168,8 +168,7 @@
 								</div>
 							</c:when>
 							<c:otherwise>
-								<div style="clear:both">
-									Completed transation in
+								<div style="clear:both"><spring:message code="label.completedTransaction.key"/>
                                        <c:choose>
 									<c:when test="${ not empty feedback.surveyTransactionDate} ">
 										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
