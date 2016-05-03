@@ -127,7 +127,7 @@ public class UserController
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while initiating account registration: " + ex.getMessage() );
+                LOGGER.debug( "Exception thrown while connecting to linkedIn: " + ex.getMessage() );
             }
             return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
         }
