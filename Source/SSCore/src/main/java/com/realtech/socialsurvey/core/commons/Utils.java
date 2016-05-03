@@ -212,6 +212,9 @@ public class Utils
                 return emailAddress;
             }
             int lastPlus = emailAddress.lastIndexOf( '+' );
+            if ( lastPlus < 0 ) {
+                return emailAddress;
+            }
             String unmaskedemailAddress = new StringBuilder(emailAddress).replace( lastPlus, lastPlus + 1, "@" ).toString();
             int lastSuffix = unmaskedemailAddress.lastIndexOf( maskingSuffix );
             if ( lastSuffix <= 0 ) {
