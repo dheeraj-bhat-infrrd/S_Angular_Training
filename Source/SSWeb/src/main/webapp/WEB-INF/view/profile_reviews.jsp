@@ -35,9 +35,9 @@
 	</c:when>
 	
 	
-	<c:set value="${fn:escapeXml(reviewItem.review)}" var="review"></c:set>
-	
+
 </c:choose>
+        <c:set value="${fn:escapeXml(reviewItem.review)}" var="review"></c:set>
 		<div data-firstname="${reviewItem.customerFirstName}"
 			data-lastname="${reviewItem.customerLastName}" data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
 			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}" data-customeremail="${reviewItem.customerEmail}"
