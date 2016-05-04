@@ -63,15 +63,25 @@
 						value="${reviewItem.modifiedOn}" />"></div>
 						
 				</div> --%>
-				<c:if test="${reviewItem.source =='encompass'}">
-				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
-				</c:if>
-				<c:if test="${reviewItem.source =='DOTLOOP'}">
-				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
-				</c:if>
-				<c:if test="${reviewItem.source =='Zillow'}">
-				<div class='zillow-badge   verify-image float-right' title='Click here to know more'></div>
-				</c:if>
+				
+				
+				<c:choose>
+					<c:when test="${reviewItem.source =='encompass'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
+					<c:when test="${reviewItem.source =='DOTLOOP'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
+					<c:when test="${reviewItem.source =='Zillow'}">
+						<div class='zillow-badge  verify-image float-right'></div>
+					</c:when>
+					<c:otherwise>
+						<div class='unverified-badge  verify-image float-right'></div>
+					</c:otherwise>
+				</c:choose>
+				
 				<div class="ppl-header-left review-sm-screen " >
 				
 				<c:choose>

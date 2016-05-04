@@ -97,16 +97,27 @@
 					</div>
 					
 				</div> --%>
-				<c:if test="${feedback.source =='encompass'}">
-				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
-				</c:if>
-				<c:if test="${feedback.source =='DOTLOOP'}">
-				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
-				</c:if>
-				<c:if test="${feedback.source =='Zillow'}">
-				<div class='zillow-badge  verify-image float-right'></div>
-				</c:if>
-				
+
+
+
+				<c:choose>
+					<c:when test="${feedback.source =='encompass'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
+					<c:when test="${feedback.source =='DOTLOOP'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
+					<c:when test="${feedback.source =='Zillow'}">
+						<div class='zillow-badge  verify-image float-right'></div>
+					</c:when>
+					<c:otherwise>
+						<div class='unverified-badge  verify-image float-right'></div>
+					</c:otherwise>
+				</c:choose>
+
+
 				<div class=" ppl-header-left review-sm-screen ">
 
 				<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
