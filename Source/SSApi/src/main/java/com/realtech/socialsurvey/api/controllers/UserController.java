@@ -1,29 +1,21 @@
 package com.realtech.socialsurvey.api.controllers;
 
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.Base64Utils;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestOperations;
-
+import com.realtech.socialsurvey.api.annotations.ValidateAuthHeader;
 import com.realtech.socialsurvey.api.models.request.LoginRequest;
 import com.realtech.socialsurvey.api.models.response.AuthResponse;
 import com.realtech.socialsurvey.api.validators.LoginValidator;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.util.Base64Utils;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestOperations;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -83,5 +75,11 @@ public class UserController {
 
 			return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
 		}
+	}
+
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	@ValidateAuthHeader
+	public String helloWorld(){
+		return "hello world";
 	}
 }
