@@ -1898,6 +1898,46 @@ button.paypal.is-active {
 .icn-phone {
 	background: url(../images/tele.png) no-repeat center;
 }
+.ppl-review-item:hover .icn-fb-rev{ 
+	background:url(../images/colfb.png) no-repeat;
+	}
+.ppl-review-item:hover .icn-twit-rev{ 
+	background:url(../images/ss-icon-small-twitter.png) no-repeat;
+	}
+.ppl-review-item:hover .icn-lin-rev{ 
+	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
+	}
+.ppl-review-item:hover .icn-gplus-rev { 
+	background:url(../images/ss-icon-small-gplus.png) no-repeat;
+	}
+.ppl-review-item:hover .icn-flag  { 
+	background:url(../images/ss-icon-small-circle-flag.png) no-repeat;
+	}
+.ppl-review-item:hover .retake-icn  { 
+	background:url(../images/ss-icon-small-circle-retake.png) no-repeat;
+	}
+	
+/*last review*/
+.ppl-review-item-last:hover .icn-fb-rev{ 
+	background:url(../images/colfb.png) no-repeat;
+	}
+.ppl-review-item-last:hover .icn-twit-rev{ 
+	background:url(../images/ss-icon-small-twitter.png) no-repeat;
+	}
+.ppl-review-item-last:hover .icn-lin-rev{ 
+	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
+	}
+.ppl-review-item-last:hover .icn-gplus-rev { 
+	background:url(../images/ss-icon-small-gplus.png) no-repeat;
+	}
+.ppl-review-item-last:hover .icn-flag  { 
+	background:url(../images/ss-icon-small-circle-flag.png) no-repeat;
+	}
+.ppl-review-item-last:hover .retake-icn  { 
+	background:url(../images/ss-icon-small-circle-retake.png) no-repeat;
+	}	
+	
+
 
 .icn-fax {
 	background: url(../images/fax.png) no-repeat center;
