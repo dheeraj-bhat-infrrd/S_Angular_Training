@@ -26,7 +26,9 @@
         // add or remove input placeholder with an example number for the selected country
         autoPlaceholder: true,
         // modify the auto placeholder
-        customPlaceholder: null,
+        customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+        	  return selectedCountryPlaceholder;
+        },
         // append menu to a specific element
         dropdownContainer: "",
         // don't display these countries
@@ -44,7 +46,7 @@
         // display only these countries
         onlyCountries: [],
         // the countries at the top of the list. defaults to united states and united kingdom
-        preferredCountries: [ "us", "gb" ],
+        preferredCountries: [ "us" ],
         // display the country dial code next to the selected flag so it's not part of the typed number
         separateDialCode: false,
         // specify the path to the libphonenumber script to enable validation/formatting
@@ -215,7 +217,11 @@
             var selectedFlag = $("<div>", {
                 "class": "selected-flag"
             });
+             var dialCode= $("<div>", {
+                "class": "dial-country-code"
+            });
             selectedFlag.appendTo(this.flagsContainer);
+             dialCode.appendTo(this.flagsContainer);
             this.selectedFlagInner = $("<div>", {
                 "class": "iti-flag"
             }).appendTo(selectedFlag);
@@ -720,7 +726,19 @@
             this.selectedFlagInner.attr("class", "iti-flag " + countryCode);
             // update the selected country's title attribute
             var title = countryCode ? this.selectedCountryData.name + ": +" + this.selectedCountryData.dialCode : "Unknown";
+            var codelength=this.selectedCountryData.dialCode.length;
+            console.log(codelength);
             this.selectedFlagInner.parent().attr("title", title);
+            if( codelength == 1){
+            	 this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','75px');
+            }else if(codelength == 2){
+            	this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','85px');
+            }else if(codelength == 3){
+            	this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','95px');
+            }else{
+            	this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','103px');
+            }
+            this.selectedFlagInner.parent().parent().find('.dial-country-code').html("+"+this.selectedCountryData.dialCode);
             if (this.options.separateDialCode) {
                 var dialCode = this.selectedCountryData.dialCode ? "+" + this.selectedCountryData.dialCode : "", parent = this.telInput.parent();
                 if (prevCountry.dialCode) {

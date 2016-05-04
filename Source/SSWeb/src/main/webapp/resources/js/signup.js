@@ -34,7 +34,9 @@ app.controller('linkedInController',['$http','$location',function($http,$locatio
     vm.title = 'AngularJS for SocialSurvey';
 }]);
 app.controller('accountSignupController',['$http','$location',function($http,$location){
-	$('#reg-phone').intlTelInput();
+	$('#reg-phone').intlTelInput({
+		utilsScript: "../resources/js/utils.js"
+	});
 }]);
 
 /*app.controller('dropZoneCtrl',['$http','$location',function($http,$location){

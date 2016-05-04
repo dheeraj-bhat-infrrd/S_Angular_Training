@@ -80,7 +80,7 @@
     border: 1px solid #CCC;
     white-space: nowrap;
     max-height: 200px;
-    /*overflow-y: scroll*/
+    overflow-y: scroll
 }
 
 .intl-tel-input .country-list.dropup {
@@ -132,7 +132,7 @@
 .intl-tel-input.allow-dropdown input[type=text],
 .intl-tel-input.allow-dropdown input[type=tel] {
     padding-right: 6px;
-    padding-left: 52px;
+    padding-left: 75px;
     margin-left: 0
 }
 
@@ -142,7 +142,9 @@
 }
 
 .intl-tel-input.allow-dropdown .selected-flag {
-    width: 46px
+    width: 46px;
+    border-right: 1px solid #dcdcdc;
+    float:left;
 }
 
 .intl-tel-input.allow-dropdown .flag-container:hover {
@@ -1591,4 +1593,16 @@ only screen and (min-resolution: 2dppx) {
 
 .iti-flag.np {
     background-color: transparent
+}
+.dial-country-code{
+	color: #dcdcdc;
+    float: left;
+    z-index: 1;
+    position: relative;
+    width: 36px;
+    height: 100%;
+    padding: 0 0 0 8px;
+    font-size: 15px;
+    line-height: 36px;
+    float:left;
 }
