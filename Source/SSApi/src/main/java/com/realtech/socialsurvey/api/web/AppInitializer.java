@@ -27,7 +27,7 @@ public class AppInitializer implements WebApplicationInitializer {
 				new DispatcherServlet(context));
 
 		dispatcher.setLoadOnStartup(1);
-		dispatcher.addMapping("/");
+		dispatcher.addMapping("/*");
 	}
 
 	private AnnotationConfigWebApplicationContext getContext() {

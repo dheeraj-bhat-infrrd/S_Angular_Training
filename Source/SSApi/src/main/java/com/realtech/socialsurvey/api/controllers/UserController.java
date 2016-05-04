@@ -20,68 +20,116 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestOperations;
 
+import com.realtech.socialsurvey.api.models.request.LinkedInConnectRequest;
 import com.realtech.socialsurvey.api.models.request.LoginRequest;
 import com.realtech.socialsurvey.api.models.response.AuthResponse;
+import com.realtech.socialsurvey.api.transformers.LinkedInConnectTransformer;
+import com.realtech.socialsurvey.api.validators.LinkedInConnectValidator;
 import com.realtech.socialsurvey.api.validators.LoginValidator;
+import com.realtech.socialsurvey.core.entities.api.LinkedInConnect;
+import com.realtech.socialsurvey.core.services.api.UserService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
+
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping ( "/users")
+public class UserController
+{
 
-	@Value("http://localhost:8082")
-	private String authUrl;
+    @Value ( "http://localhost:8082")
+    private String authUrl;
 
-	@Value("socialsurvey")
-	private String clientId;
+    @Value ( "socialsurvey")
+    private String clientId;
 
-	@Value("secret")
-	private String clientSecret;
+    @Value ( "secret")
+    private String clientSecret;
 
-	@Autowired
-	private RestOperations restTemplate;
-	
-	@Autowired
-	private LoginValidator loginValidator;
+    @Autowired
+    private RestOperations restTemplate;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    @Autowired
+    private LoginValidator loginValidator;
 
-	@InitBinder("loginRequest")
-	public void signUpBinder(WebDataBinder binder) {
-		binder.setValidator(loginValidator);
-	}
+    @Autowired
+    private LinkedInConnectValidator linkedInConnectValidator;
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	@ApiOperation(value = "User login")
-	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+    @Autowired
+    private LinkedInConnectTransformer linkedInConnectTransformer;
 
-		String endPoint = authUrl + "/oauth/token";
-		String clientCredential = clientId + ":" + clientSecret;
-		String authData = Base64Utils.encodeToString(clientCredential.getBytes());
-		String data = String.format("grant_type=password&username=%s&password=%s", loginRequest.getEmail(),
-				loginRequest.getPassword());
+    @Autowired
+    private UserService userService;
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Basic " + authData);
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    private static final Logger LOGGER = LoggerFactory.getLogger( UserController.class );
 
-		HttpEntity<String> httpEntity = new HttpEntity<String>(data, headers);
 
-		try {
-			ResponseEntity<AuthResponse> authResponse = 
-					restTemplate.postForEntity(endPoint, httpEntity, AuthResponse.class);
+    @InitBinder ( "loginRequest")
+    public void signUpLoginBinder( WebDataBinder binder )
+    {
+        binder.setValidator( loginValidator );
+    }
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Response from Auth Service is: " + authResponse);
-			}
 
-			return authResponse;
-		} catch (Exception ex) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Exception thrown while login: " + ex.getMessage());
-			}
+    @InitBinder ( "linkedInConnectRequest")
+    public void signUpLinkedInConnectBinder( WebDataBinder binder )
+    {
+        binder.setValidator( linkedInConnectValidator );
+    }
 
-			return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
-		}
-	}
+
+    @RequestMapping ( value = "/login", method = RequestMethod.POST)
+    @ApiOperation ( value = "User login")
+    public ResponseEntity<?> login( @Valid @RequestBody LoginRequest loginRequest )
+    {
+
+        String endPoint = authUrl + "/oauth/token";
+        String clientCredential = clientId + ":" + clientSecret;
+        String authData = Base64Utils.encodeToString( clientCredential.getBytes() );
+        String data = String.format( "grant_type=password&username=%s&password=%s", loginRequest.getEmail(),
+            loginRequest.getPassword() );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add( "Authorization", "Basic " + authData );
+        headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+
+        HttpEntity<String> httpEntity = new HttpEntity<String>( data, headers );
+
+        try {
+            ResponseEntity<AuthResponse> authResponse = restTemplate.postForEntity( endPoint, httpEntity, AuthResponse.class );
+
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Response from Auth Service is: " + authResponse );
+            }
+
+            return authResponse;
+        } catch ( Exception ex ) {
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Exception thrown while login: " + ex.getMessage() );
+            }
+
+            return new ResponseEntity<Void>( HttpStatus.UNAUTHORIZED );
+        }
+    }
+
+
+    @RequestMapping ( value = "/profile/social/linkedin/connect", method = RequestMethod.POST)
+    @ApiOperation ( value = "Connect linkedIn")
+    public ResponseEntity<?> connectLinkedIn( @Valid @RequestBody LinkedInConnectRequest linkedInConnectRequest )
+    {
+        try {
+            //Transform the request into DO.
+            LinkedInConnect linkedInConnect = linkedInConnectTransformer
+                .transformApiRequestToDomainObject( linkedInConnectRequest );
+
+            //Call service layer and pass DO to this service to save the data in db.
+            userService.connectLinkedIn( linkedInConnect );
+
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( Exception ex ) {
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Exception thrown while connecting to linkedIn: " + ex.getMessage() );
+            }
+            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
+        }
+    }
 }
