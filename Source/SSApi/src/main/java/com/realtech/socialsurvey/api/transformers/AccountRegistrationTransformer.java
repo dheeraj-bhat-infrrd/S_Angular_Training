@@ -19,17 +19,19 @@ public class AccountRegistrationTransformer
     public AccountRegistration transformApiRequestToDomainObject( AccountRegistrationRequest request )
     {
         AccountRegistration accountRegistration = new AccountRegistration();
-        accountRegistration.setFirstName( request.getFirstName() );
-        accountRegistration.setLastName( request.getLastName() );
-        accountRegistration.setCompanyName( request.getCompanyName() );
-        accountRegistration.setEmail( request.getEmail() );
+        if ( request != null ) {
+            accountRegistration.setFirstName( request.getFirstName() );
+            accountRegistration.setLastName( request.getLastName() );
+            accountRegistration.setCompanyName( request.getCompanyName() );
+            accountRegistration.setEmail( request.getEmail() );
 
-        if ( request.getPhone() != null ) {
-            Phone phone = new Phone();
-            phone.setCountryCode( request.getPhone().getCountryCode() );
-            phone.setExtension( request.getPhone().getExtension() );
-            phone.setNumber( request.getPhone().getNumber() );
-            accountRegistration.setPhone( phone );
+            if ( request.getPhone() != null ) {
+                Phone phone = new Phone();
+                phone.setCountryCode( request.getPhone().getCountryCode() );
+                phone.setExtension( request.getPhone().getExtension() );
+                phone.setNumber( request.getPhone().getNumber() );
+                accountRegistration.setPhone( phone );
+            }
         }
 
         return accountRegistration;
@@ -39,8 +41,10 @@ public class AccountRegistrationTransformer
     public AccountRegistrationResponse transformDomainObjectToApiResponse( AccountRegistration accountRegistration )
     {
         AccountRegistrationResponse response = new AccountRegistrationResponse();
-        response.setCompanyId( accountRegistration.getCompanyId() );
-        response.setUserId( accountRegistration.getUserId() );
+        if ( accountRegistration != null ) {
+            response.setCompanyId( accountRegistration.getCompanyId() );
+            response.setUserId( accountRegistration.getUserId() );
+        }
         return response;
     }
 }
