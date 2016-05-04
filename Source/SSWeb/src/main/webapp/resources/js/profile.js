@@ -742,8 +742,10 @@ function paintReviews(result){
 		if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"){
 			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
 			}
-		if(reviewItem.source=="Zillow"){
+		else if(reviewItem.source=="Zillow"){
 			reviewsHtml +=' <div class="zillow-badge  verify-image float-right" ></div>';
+			}else{
+				reviewsHtml +='<div class="unverified-badge  verify-image float-right"></div>'
 			}
 		reviewsHtml += '		<div class=" ppl-header-left review-detail-profile review-sm-screen" >';   
 		if(reviewItem.surveyCompletedDate!=null){
@@ -866,7 +868,7 @@ function paintReviews(result){
 		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus-rev" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + stringEscape(custDispName) + ' for ' + stringEscape(reviewItem.agentName) + ' at SocialSurvey - ' + stringEscape(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '		</div>';
 		if(reviewItem.source != "Zillow")
-		reviewsHtml += '		<span class="icn-flag float-right report-abuse-txt prof-report-abuse-txt cursor-pointer public-report " title="Report Abuse"></span> ';
+		reviewsHtml += '		<span class="icn-flag float-right report-abuse-txt prof-report-abuse-txt cursor-pointer  " title="Report Abuse"></span> ';
 		reviewsHtml += '	</div>';
 		
 		
