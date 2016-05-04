@@ -10,4 +10,7 @@ public class ErrorCodes
     public static final String TITLE_INVALID = "title.invalid";
     public static final String PROFILEPHOTOURL_INVALID = "profilePhotoUrl.invalid";
     public static final String USERID_INVALID = "userId.invalid";
+    public static final String PHONE_INVALID = "phone.invalid";
+    public static final String PHONE1_INVALID = "phone1.invalid";
+    public static final String PHONE2_INVALID = "phone2.invalid";
 }

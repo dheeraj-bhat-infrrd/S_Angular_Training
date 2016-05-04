@@ -39,10 +39,10 @@ public class AccountRegistrationValidator implements Validator
             "lastName cannot be empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "companyName", ErrorCodes.COMPANYNAME_INVALID,
             "companyName cannot be empty" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", ErrorCodes.EMAIL_INVALID,
-            "email cannot be empty" );
-        ValidationUtils.invokeValidator( emailValidator, request.getEmail(), errors );
-        ValidationUtils.invokeValidator( phoneValidator, request.getPhone(), errors );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", ErrorCodes.EMAIL_INVALID, "email cannot be empty" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "phone", ErrorCodes.PHONE_INVALID, "phone cannot be empty" );
+        ValidationUtils.invokeValidator( emailValidator, request.getEmail(), errors, "email", ErrorCodes.EMAIL_INVALID );
+        ValidationUtils.invokeValidator( phoneValidator, request.getPhone(), errors, "phone", ErrorCodes.PHONE_INVALID );
 
         if ( errors.hasErrors() ) {
             throw new BadRequestException( "Validation errors", errors );

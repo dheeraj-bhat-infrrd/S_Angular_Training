@@ -60,18 +60,12 @@ public class AccountController
     public ResponseEntity<?> initAccountRegsitration(
         @Valid @RequestBody AccountRegistrationRequest accountRegistrationRequest )
     {
-        AccountRegistrationResponse response = new AccountRegistrationResponse();
         try {
-            //Transform the request into DO.
             AccountRegistration accountRegistration = accountRegistrationTransformer
                 .transformApiRequestToDomainObject( accountRegistrationRequest );
-
-            //Call service layer and pass DO to this service to save the data in db and set userId, companyId in DO itself.
             accountService.saveAccountRegistrationDetailsAndSetDataInDO( accountRegistration );
-
-            //Transform DO into response
-            response = accountRegistrationTransformer.transformDomainObjectToApiResponse( accountRegistration );
-
+            AccountRegistrationResponse response = accountRegistrationTransformer
+                .transformDomainObjectToApiResponse( accountRegistration );
             return new ResponseEntity<AccountRegistrationResponse>( response, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {

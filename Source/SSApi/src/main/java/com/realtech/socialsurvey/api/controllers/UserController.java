@@ -12,21 +12,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Base64Utils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestOperations;
 
-import com.realtech.socialsurvey.api.models.request.LinkedInConnectRequest;
+import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.models.request.LoginRequest;
+import com.realtech.socialsurvey.api.models.request.UserProfileRequest;
 import com.realtech.socialsurvey.api.models.response.AuthResponse;
-import com.realtech.socialsurvey.api.transformers.LinkedInConnectTransformer;
+import com.realtech.socialsurvey.api.models.response.UserProfileResponse;
+import com.realtech.socialsurvey.api.transformers.UserProfileTransformer;
 import com.realtech.socialsurvey.api.validators.LinkedInConnectValidator;
 import com.realtech.socialsurvey.api.validators.LoginValidator;
-import com.realtech.socialsurvey.core.entities.api.LinkedInConnect;
+import com.realtech.socialsurvey.api.validators.UserProfilePhase1Validator;
+import com.realtech.socialsurvey.api.validators.UserProfilePhase2Validator;
+import com.realtech.socialsurvey.core.entities.api.UserProfile;
 import com.realtech.socialsurvey.core.services.api.UserService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -35,6 +42,15 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @RequestMapping ( "/users")
 public class UserController
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( UserController.class );
+    private RestOperations restTemplate;
+    private LoginValidator loginValidator;
+    private LinkedInConnectValidator linkedInConnectValidator;
+    private UserProfilePhase1Validator userProfilePhase1Validator;
+    private UserProfilePhase2Validator userProfilePhase2Validator;
+    private UserProfileTransformer userProfileTransformer;
+    private UserService userService;
+    private GlobalControllerExceptionHandler exceptionHandler;
 
     @Value ( "http://localhost:8082")
     private String authUrl;
@@ -45,35 +61,28 @@ public class UserController
     @Value ( "secret")
     private String clientSecret;
 
-    @Autowired
-    private RestOperations restTemplate;
 
     @Autowired
-    private LoginValidator loginValidator;
-
-    @Autowired
-    private LinkedInConnectValidator linkedInConnectValidator;
-
-    @Autowired
-    private LinkedInConnectTransformer linkedInConnectTransformer;
-
-    @Autowired
-    private UserService userService;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger( UserController.class );
+    public UserController( RestOperations restTemplate, LoginValidator loginValidator,
+        UserProfilePhase1Validator userProfilePhase1Validator, UserProfileTransformer userProfileTransformer,
+        UserService userService, LinkedInConnectValidator linkedInConnectValidator,
+        UserProfilePhase2Validator userProfilePhase2Validator, GlobalControllerExceptionHandler exceptionHandler )
+    {
+        this.restTemplate = restTemplate;
+        this.loginValidator = loginValidator;
+        this.userProfilePhase1Validator = userProfilePhase1Validator;
+        this.userProfileTransformer = userProfileTransformer;
+        this.userService = userService;
+        this.linkedInConnectValidator = linkedInConnectValidator;
+        this.userProfilePhase2Validator = userProfilePhase2Validator;
+        this.exceptionHandler = exceptionHandler;
+    }
 
 
     @InitBinder ( "loginRequest")
     public void signUpLoginBinder( WebDataBinder binder )
     {
         binder.setValidator( loginValidator );
-    }
-
-
-    @InitBinder ( "linkedInConnectRequest")
-    public void signUpLinkedInConnectBinder( WebDataBinder binder )
-    {
-        binder.setValidator( linkedInConnectValidator );
     }
 
 
@@ -112,22 +121,80 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/social/linkedin/connect", method = RequestMethod.POST)
+    @RequestMapping ( value = "/profile/social/linkedin/connect/{userid}", method = RequestMethod.POST)
     @ApiOperation ( value = "Connect linkedIn")
-    public ResponseEntity<?> connectLinkedIn( @Valid @RequestBody LinkedInConnectRequest linkedInConnectRequest )
+    public ResponseEntity<?> connectLinkedIn( @PathVariable ( "userid") String userId,
+        @RequestBody UserProfileRequest userProfileRequest, BindingResult errors )
     {
         try {
-            //Transform the request into DO.
-            LinkedInConnect linkedInConnect = linkedInConnectTransformer
-                .transformApiRequestToDomainObject( linkedInConnectRequest );
-
-            //Call service layer and pass DO to this service to save the data in db.
-            userService.connectLinkedIn( linkedInConnect );
-
+            linkedInConnectValidator.validate( userProfileRequest, errors );
+            UserProfile userProfile = userProfileTransformer.transformApiRequestToDomainObject( userProfileRequest );
+            userService.connectLinkedIn( Integer.parseInt( userId ), userProfile );
             return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( BadRequestException ex ) {
+            return exceptionHandler.handleBadRequestException( ex );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug( "Exception thrown while connecting to linkedIn: " + ex.getMessage() );
+            }
+            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
+        }
+    }
+
+
+    @RequestMapping ( value = "/profile/phase1/update/{userid}", method = RequestMethod.PUT)
+    @ApiOperation ( value = "Update user profile phase 1")
+    public ResponseEntity<?> updateUserProfilePhase1( @PathVariable ( "userid") String userId,
+        @Valid @RequestBody UserProfileRequest userProfileRequest, BindingResult errors )
+    {
+        try {
+            userProfilePhase1Validator.validate( userProfileRequest, errors );
+            UserProfile userProfile = userProfileTransformer.transformApiRequestToDomainObject( userProfileRequest );
+            userService.updateUserProfile( Integer.parseInt( userId ), userProfile );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( BadRequestException ex ) {
+            return exceptionHandler.handleBadRequestException( ex );
+        } catch ( Exception ex ) {
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Exception thrown while updating user profile: " + ex.getMessage() );
+            }
+            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
+        }
+    }
+
+
+    @RequestMapping ( value = "/profile/phase2/update/{userid}", method = RequestMethod.PUT)
+    @ApiOperation ( value = "Update user profile phase 2")
+    public ResponseEntity<?> updateUserProfilePhase2( @PathVariable ( "userid") String userId,
+        @Valid @RequestBody UserProfileRequest userProfileRequest, BindingResult errors )
+    {
+        try {
+            userProfilePhase2Validator.validate( userProfileRequest, errors );
+            UserProfile userProfile = userProfileTransformer.transformApiRequestToDomainObject( userProfileRequest );
+            userService.updateUserProfile( Integer.parseInt( userId ), userProfile );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( BadRequestException ex ) {
+            return exceptionHandler.handleBadRequestException( ex );
+        } catch ( Exception ex ) {
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Exception thrown while updating user profile: " + ex.getMessage() );
+            }
+            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
+        }
+    }
+
+
+    @RequestMapping ( value = "/profile/details/{userid}", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get user profile")
+    public ResponseEntity<?> getUserProfile( @PathVariable ( "userid") String userId )
+    {
+        try {
+            UserProfile userProfile = userService.getUserProfileDetails( Integer.parseInt( userId ) );
+            UserProfileResponse userProfileResponse = userProfileTransformer.transformDomainObjectToApiResponse( userProfile );
+            return new ResponseEntity<UserProfileResponse>( userProfileResponse, HttpStatus.OK );
+        } catch ( Exception ex ) {
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Exception thrown while updating user profile: " + ex.getMessage() );
             }
             return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
         }

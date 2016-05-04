@@ -14,7 +14,7 @@ import com.realtech.socialsurvey.api.models.request.UserProfileRequest;
  *
  */
 @Component
-public class LinkedInConnectValidator implements Validator
+public class UserProfilePhase1Validator implements Validator
 {
     public boolean supports( Class<?> clazz )
     {
