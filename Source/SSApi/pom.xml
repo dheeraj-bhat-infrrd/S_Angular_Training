@@ -157,6 +157,13 @@
 			<scope>test</scope>
 			<version>${junit.version}</version>
 		</dependency>
+		
+		<!-- Dependency of SSCore -->
+		<dependency>
+			<groupId>com.realtech.socialsurvey</groupId>
+			<artifactId>SSCore</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
