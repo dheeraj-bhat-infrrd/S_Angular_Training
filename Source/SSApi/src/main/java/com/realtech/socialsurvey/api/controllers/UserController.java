@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.api.controllers;
 
-import com.realtech.socialsurvey.api.annotations.ValidateAuthHeader;
 import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.models.request.LoginRequest;
 import com.realtech.socialsurvey.api.models.request.UserProfileRequest;
@@ -188,11 +187,5 @@ public class UserController
             }
             return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
         }
-    }
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    @ValidateAuthHeader
-    public String helloWorld(){
-        return "hello world";
     }
 }
