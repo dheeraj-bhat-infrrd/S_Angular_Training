@@ -37,4 +37,20 @@ public class UserServiceImpl implements UserService
         return null;
     }
 
+
+    @Override
+    public void deleteUserProfileImage( int userId )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public void updateUserProfileImage( int userId, String imageUrl )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }
