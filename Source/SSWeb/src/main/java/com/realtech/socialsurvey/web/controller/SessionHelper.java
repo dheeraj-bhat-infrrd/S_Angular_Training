@@ -140,8 +140,9 @@ public class SessionHelper {
 
 	// JIRA SS-97 by RM-06 : EOC
 
-	private void setLogo(HttpSession session, UserSettings userSettings) {
-		LOG.debug("Setting logo name in the session");
+	private void setLogo(HttpSession session, UserSettings userSettings)
+	{
+		LOG.debug( "Setting logo name in the session" );
 		// check if company has a logo
 		//JIRA SS-1363 begin
 		/*if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogoThumbnail() != null) {
@@ -149,14 +150,18 @@ public class SessionHelper {
 			String logoUrl = userSettings.getCompanySettings().getLogoThumbnail();
 			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
 		}*/
-		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogo() != null) {
-            LOG.debug("Settings logo image from company settings");
-            String logoUrl = userSettings.getCompanySettings().getLogo();
-            session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
-        }
+		//In case of individual accounts, give priority to agentSettings before companySettings
+		if ( userSettings.getAgentSettings() != null && userSettings.getAgentSettings().getLogo() != null ) {
+			String logoUrl = userSettings.getAgentSettings().getLogo();
+			session.setAttribute( CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl );
+		} else if ( userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogo() != null ) {
+			LOG.debug( "Settings logo image from company settings" );
+			String logoUrl = userSettings.getCompanySettings().getLogo();
+			session.setAttribute( CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl );
+		}
 		//JIRA SS-1363 end
 		else {
-			LOG.debug("Could not find logo settings in company. Checking in lower heirarchy.");
+			LOG.debug( "Could not find logo settings in company. Checking in lower heirarchy." );
 			// TODO: Check the lower level hierarchy for logo
 		}
 	}
