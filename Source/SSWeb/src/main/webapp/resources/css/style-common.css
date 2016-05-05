@@ -3582,7 +3582,6 @@ button.paypal.is-active {
 	padding-bottom: 10px;
 	margin-top: 10px;
 	word-break: break-word;
-	padding-top: 25px;
 }
 
 
@@ -3591,13 +3590,11 @@ button.paypal.is-active {
 }
 
 .ppl-review-item-last {
-	/* padding-bottom: 10px;
-	margin-top: 10px; */
 	border-bottom: 1px solid #dcdcdc;
     padding-bottom: 10px;
     margin-top: 10px;
     word-break: break-word;
-    padding-top: 20px;
+   
 }
 
 .survery-header-2 {
