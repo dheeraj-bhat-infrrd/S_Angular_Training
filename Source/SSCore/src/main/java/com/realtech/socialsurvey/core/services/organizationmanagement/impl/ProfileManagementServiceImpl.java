@@ -2643,12 +2643,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public void setAgentProfileUrlForReview( List<SurveyDetails> reviews ) throws InvalidInputException
     {
         String profileUrl;
-        String baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
         String facebookShareUrl = "app_id=" + facebookAppId;
         String googleApiKey = googlePlusId;
         if ( reviews != null && !reviews.isEmpty() ) {
             for ( SurveyDetails review : reviews ) {
-
+                String baseProfileUrl;
                 //JIRA SS-1286
                 /*Collection<UserFromSearch> documents = solrSearchService.searchUsersByIden( review.getAgentId(),
                     CommonConstants.USER_ID_SOLR, true, 0, 1 );*/
@@ -2656,25 +2655,30 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 OrganizationUnitSettings unitSetting = null;
                 if ( review.getSource() != null && !review.getSource().isEmpty()
                     && review.getSource().equals( CommonConstants.SURVEY_SOURCE_ZILLOW ) ) {
-                    if ( review.getCompanyId() > 0 ) {
-                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getCompanyId(),
-                            CommonConstants.COMPANY_SETTINGS_COLLECTION );
-                    } else if ( review.getRegionId() > 0 ) {
-                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getRegionId(),
-                            CommonConstants.REGION_SETTINGS_COLLECTION );
+                    if ( review.getAgentId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
+                            CommonConstants.AGENT_SETTINGS_COLLECTION );
+                        baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
                     } else if ( review.getBranchId() > 0 ) {
                         unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getBranchId(),
                             CommonConstants.BRANCH_SETTINGS_COLLECTION );
-                    } else if ( review.getAgentId() > 0 ) {
-                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
-                            CommonConstants.AGENT_SETTINGS_COLLECTION );
+                        baseProfileUrl = applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL;
+                    } else if ( review.getRegionId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getRegionId(),
+                            CommonConstants.REGION_SETTINGS_COLLECTION );
+                        baseProfileUrl = applicationBaseUrl + CommonConstants.REGION_PROFILE_FIXED_URL;
+                    } else if ( review.getCompanyId() > 0 ) {
+                        unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getCompanyId(),
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                        baseProfileUrl = applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL;
                     } else {
-                        throw new InvalidInputException( "The zillow review with ID : " + review.get_id()
-                            + "does not have any hierarchy ID set" );
+                        throw new InvalidInputException(
+                            "The zillow review with ID : " + review.get_id() + "does not have any hierarchy ID set" );
                     }
                 } else {
                     unitSetting = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( review.getAgentId(),
                         CommonConstants.AGENT_SETTINGS_COLLECTION );
+                    baseProfileUrl = applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL;
                 }
                 if ( unitSetting != null ) {
                     profileUrl = (String) unitSetting.getProfileUrl();
