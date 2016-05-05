@@ -8,10 +8,6 @@ import com.realtech.socialsurvey.core.entities.api.Phone;
 import com.realtech.socialsurvey.core.entities.api.UserProfile;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 @Component
 public class UserProfileTransformer implements Transformer<UserProfileRequest, UserProfile, UserProfileResponse>
 {

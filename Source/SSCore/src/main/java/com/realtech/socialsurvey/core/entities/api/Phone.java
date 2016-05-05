@@ -1,9 +1,5 @@
 package com.realtech.socialsurvey.core.entities.api;
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 public class Phone
 {
     private String countryCode;

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,16 +22,12 @@ import com.realtech.socialsurvey.api.models.response.CompanyProfileResponse;
 import com.realtech.socialsurvey.api.transformers.AccountRegistrationTransformer;
 import com.realtech.socialsurvey.api.transformers.CompanyProfileTransformer;
 import com.realtech.socialsurvey.api.validators.AccountRegistrationValidator;
+import com.realtech.socialsurvey.api.validators.CompanyProfileValidator;
 import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
-
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 
 @RestController
 @RequestMapping ( "/account")
@@ -43,24 +38,33 @@ public class AccountController
     private AccountRegistrationTransformer accountRegistrationTransformer;
     private AccountService accountService;
     private CompanyProfileTransformer companyProfileTransformer;
+    private CompanyProfileValidator companyProfileValidator;
 
 
     @Autowired
     public AccountController( AccountRegistrationValidator accountRegistrationValidator,
         AccountRegistrationTransformer accountRegistrationTransformer, AccountService accountService,
-        CompanyProfileTransformer companyProfileTransformer )
+        CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator )
     {
         this.accountRegistrationValidator = accountRegistrationValidator;
         this.accountRegistrationTransformer = accountRegistrationTransformer;
         this.accountService = accountService;
         this.companyProfileTransformer = companyProfileTransformer;
+        this.companyProfileValidator = companyProfileValidator;
     }
 
 
-    @InitBinder
-    public void signUpBinder( WebDataBinder binder )
+    @InitBinder ( "accountRegistrationRequest")
+    public void signUpAccountRegistrationBinder( WebDataBinder binder )
     {
         binder.setValidator( accountRegistrationValidator );
+    }
+
+
+    @InitBinder ( "companyProfileRequest")
+    public void signUpCompanyProfileBinder( WebDataBinder binder )
+    {
+        binder.setValidator( companyProfileValidator );
     }
 
 
@@ -70,11 +74,13 @@ public class AccountController
         @Valid @RequestBody AccountRegistrationRequest accountRegistrationRequest )
     {
         try {
+            LOGGER.info( "initAccountRegsitration started" );
             AccountRegistration accountRegistration = accountRegistrationTransformer
                 .transformApiRequestToDomainObject( accountRegistrationRequest );
             accountService.saveAccountRegistrationDetailsAndSetDataInDO( accountRegistration );
             AccountRegistrationResponse response = accountRegistrationTransformer
                 .transformDomainObjectToApiResponse( accountRegistration );
+            LOGGER.info( "initAccountRegsitration completed successfully" );
             return new ResponseEntity<AccountRegistrationResponse>( response, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -90,8 +96,10 @@ public class AccountController
     public ResponseEntity<?> getCompanyProfile( @PathVariable ( "userId") String userId )
     {
         try {
+            LOGGER.info( "getCompanyProfile started" );
             CompanyProfile companyProfile = accountService.getCompanyProfileDetails( Integer.parseInt( userId ) );
             CompanyProfileResponse response = companyProfileTransformer.transformDomainObjectToApiResponse( companyProfile );
+            LOGGER.info( "getCompanyProfile completed successfully" );
             return new ResponseEntity<CompanyProfileResponse>( response, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -102,38 +110,21 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/phase1/update/{companyId}", method = RequestMethod.PUT)
-    @ApiOperation ( value = "Update company profile phase 1 details")
-    public ResponseEntity<?> updateCompanyProfilePhase1( @PathVariable ( "companyId") String companyId,
-        @Valid @RequestBody CompanyProfileRequest companyProfilePhase1Request )
+    @RequestMapping ( value = "/company/profile/update/{companyId}", method = RequestMethod.PUT)
+    @ApiOperation ( value = "Update company profile details")
+    public ResponseEntity<?> updateCompanyProfile( @PathVariable ( "companyId") String companyId,
+        @Valid @RequestBody CompanyProfileRequest companyProfileRequest )
     {
         try {
+            LOGGER.info( "updateCompanyProfile started" );
             CompanyProfile companyProfile = companyProfileTransformer
-                .transformApiRequestToDomainObject( companyProfilePhase1Request );
+                .transformApiRequestToDomainObject( companyProfileRequest );
             accountService.updateCompanyProfile( Integer.parseInt( companyId ), companyProfile );
+            LOGGER.info( "updateCompanyProfile completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while updating company profile phase 1 details: " + ex.getMessage() );
-            }
-            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
-        }
-    }
-
-
-    @RequestMapping ( value = "/company/profile/phase2/update/{companyId}", method = RequestMethod.PUT)
-    @ApiOperation ( value = "Update company profile phase 2 details")
-    public ResponseEntity<?> updateCompanyProfilePhase2( @PathVariable ( "companyId") String companyId,
-        @Valid @RequestBody CompanyProfileRequest companyProfilePhase2Request )
-    {
-        try {
-            CompanyProfile companyProfile = companyProfileTransformer
-                .transformApiRequestToDomainObject( companyProfilePhase2Request );
-            accountService.updateCompanyProfile( Integer.parseInt( companyId ), companyProfile );
-            return new ResponseEntity<Void>( HttpStatus.OK );
-        } catch ( Exception ex ) {
-            if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while updating company profile phase 2 details: " + ex.getMessage() );
+                LOGGER.debug( "Exception thrown while updating company profile details: " + ex.getMessage() );
             }
             return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
         }
@@ -145,7 +136,9 @@ public class AccountController
     public ResponseEntity<?> deleteCompanyProfileImage( @PathVariable ( "companyId") String companyId )
     {
         try {
+            LOGGER.info( "deleteCompanyProfileImage started" );
             accountService.deleteCompanyProfileImage( Integer.parseInt( companyId ) );
+            LOGGER.info( "deleteCompanyProfileImage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -159,16 +152,34 @@ public class AccountController
     @RequestMapping ( value = "/company/profile/profileimage/update/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile image")
     public ResponseEntity<?> updateCompanyProfileImage( @PathVariable ( "companyId") String companyId,
-        @Valid @RequestBody CompanyProfileRequest companyProfileImageRequest, BindingResult errors )
+        @RequestBody CompanyProfileRequest companyProfileRequest )
     {
         try {
-            CompanyProfile companyProfile = companyProfileTransformer
-                .transformApiRequestToDomainObject( companyProfileImageRequest );
-            accountService.updateCompanyProfileImage( Integer.parseInt( companyId ), companyProfile.getCompanyLogo() );
+            LOGGER.info( "updateCompanyProfileImage started" );
+            accountService.updateCompanyProfileImage( Integer.parseInt( companyId ), companyProfileRequest.getCompanyLogo() );
+            LOGGER.info( "updateCompanyProfileImage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while updating user profile image: " + ex.getMessage() );
+                LOGGER.debug( "Exception thrown while updating company profile image: " + ex.getMessage() );
+            }
+            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
+        }
+    }
+
+
+    @RequestMapping ( value = "/company/profile/stage/update/{companyId}/{stage}", method = RequestMethod.PUT)
+    @ApiOperation ( value = "Update stage")
+    public ResponseEntity<?> updateStage( @PathVariable ( "companyId") String companyId, @PathVariable ( "stage") String stage )
+    {
+        try {
+            LOGGER.info( "updateStage started" );
+            accountService.updateStage( Integer.parseInt( companyId ), stage );
+            LOGGER.info( "updateStage completed successfully" );
+            return new ResponseEntity<Void>( HttpStatus.OK );
+        } catch ( Exception ex ) {
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Exception thrown while updating stage: " + ex.getMessage() );
             }
             return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
         }

@@ -8,10 +8,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 @Component
 public class EmailValidator implements SmartValidator
 {
