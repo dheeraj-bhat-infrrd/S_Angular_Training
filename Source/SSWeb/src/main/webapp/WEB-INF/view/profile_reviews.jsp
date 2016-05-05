@@ -71,10 +71,10 @@
 							title='Click here to know more'></div>
 					</c:when>
 					<c:when test="${reviewItem.source =='Zillow'}">
-						<div class='zillow-badge  verify-image float-right'></div>
+						<div class='zillow-badge  verify-image-zillow float-right'></div>
 					</c:when>
 					<c:otherwise>
-						<div class='unverified-badge  verify-image float-right'></div>
+						<div class='unverified-badge  verify-image-ss float-right'></div>
 					</c:otherwise>
 				</c:choose>
 				

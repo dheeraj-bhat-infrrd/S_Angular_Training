@@ -743,9 +743,9 @@ function paintReviews(result){
 			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
 			}
 		else if(reviewItem.source=="Zillow"){
-			reviewsHtml +=' <div class="zillow-badge  verify-image float-right" ></div>';
+			reviewsHtml +=' <div class="zillow-badge  verify-image-zillow float-right" ></div>';
 			}else{
-				reviewsHtml +='<div class="unverified-badge  verify-image float-right"></div>'
+				reviewsHtml +='<div class="unverified-badge  verify-image-ss float-right"></div>'
 			}
 		reviewsHtml += '		<div class=" ppl-header-left review-detail-profile review-sm-screen" >';   
 		if(reviewItem.surveyCompletedDate!=null){
