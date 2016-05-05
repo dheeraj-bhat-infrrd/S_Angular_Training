@@ -16,4 +16,10 @@ public interface UserService
 
 
     public UserProfile getUserProfileDetails( int userId );
+
+
+    public void deleteUserProfileImage( int userId );
+
+
+    public void updateUserProfileImage( int userId, String imageUrl );
 }
