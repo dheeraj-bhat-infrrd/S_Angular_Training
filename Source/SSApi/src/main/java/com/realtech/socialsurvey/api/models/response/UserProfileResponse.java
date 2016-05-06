@@ -3,10 +3,6 @@ package com.realtech.socialsurvey.api.models.response;
 import com.realtech.socialsurvey.api.models.Phone;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 public class UserProfileResponse
 {
     private int userId;

@@ -10,10 +10,6 @@ import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.models.request.AccountRegistrationRequest;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 @Component
 public class AccountRegistrationValidator implements Validator
 {

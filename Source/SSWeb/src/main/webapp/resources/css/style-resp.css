@@ -1708,6 +1708,12 @@
 	.sq-btn-post-social-btn{
 	margin-left:auto;
 	}
+
+	/* new registraion */
+	#reg-left-view{
+	 display:none;
+	}
+   
 	.dsh-resp-review{
 	 display:none;
 	}
@@ -1718,6 +1724,7 @@
 	 float:none;
 	 margin-left:55px;
 	}
+
 
 }
 
@@ -2103,9 +2110,20 @@
    .admin-sel-item{
     width:200px;
    }
+
+   /*=========new_registration====================*/
+   #reg-left-view{
+	 display:none;
+	}
+	.reg-right-container{
+	  margin-top:126px;
+	}
+	
+
    .review-sm-screen{
 	 clear:both;
 	}
+
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/

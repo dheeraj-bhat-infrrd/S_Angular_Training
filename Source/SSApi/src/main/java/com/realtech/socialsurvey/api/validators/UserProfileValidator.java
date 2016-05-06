@@ -10,15 +10,11 @@ import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.models.request.UserProfileRequest;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 @Component
-public class UserProfilePhase1Validator implements Validator
+public class UserProfileValidator implements Validator
 {
     @Autowired
-    private ImageValidator imageValidator;
+    private PhoneValidator phoneValidator;
 
 
     public boolean supports( Class<?> clazz )
@@ -36,9 +32,10 @@ public class UserProfilePhase1Validator implements Validator
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "lastName", ErrorCodes.LASTNAME_INVALID,
             "lastName cannot be empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "title", ErrorCodes.TITLE_INVALID, "title cannot be empty" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "phone1", ErrorCodes.PHONE1_INVALID, "phone1 cannot be empty" );
 
-        ValidationUtils.invokeValidator( imageValidator, request.getProfilePhotoUrl(), errors, "profilePhotoUrl",
-            ErrorCodes.PROFILEPHOTOURL_INVALID );
+        ValidationUtils.invokeValidator( phoneValidator, request.getPhone1(), errors, "phone1", ErrorCodes.PHONE1_INVALID );
+        ValidationUtils.invokeValidator( phoneValidator, request.getPhone2(), errors, "phone2", ErrorCodes.PHONE2_INVALID );
 
         if ( request.getUserId() <= 0 ) {
             errors.rejectValue( "userId", ErrorCodes.USERID_INVALID, "userId is invalid" );

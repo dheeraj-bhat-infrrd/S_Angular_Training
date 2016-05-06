@@ -1,6 +1,6 @@
 package com.realtech.socialsurvey.core.services.api.impl;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
@@ -8,10 +8,6 @@ import com.realtech.socialsurvey.core.services.api.AccountService;
 import org.springframework.stereotype.Service;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 @Service
 public class AccountServiceImpl implements AccountService
 {
@@ -49,7 +45,7 @@ public class AccountServiceImpl implements AccountService
     public void deleteCompanyProfileImage( int companyId )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
 
@@ -57,6 +53,14 @@ public class AccountServiceImpl implements AccountService
     public void updateCompanyProfileImage( int companyId, String imageUrl )
     {
         // TODO Auto-generated method stub
-        
+
+    }
+
+
+    @Override
+    public void updateStage( int parseInt, String stage )
+    {
+        // TODO Auto-generated method stub
+
     }
 }
