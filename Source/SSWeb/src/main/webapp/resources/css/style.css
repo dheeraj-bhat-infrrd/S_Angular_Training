@@ -460,10 +460,9 @@
     margin-bottom: 20px;
     padding: 0;
 }
-.reg-next{
+#reg-next{
 	float: right;
-    margin-top: 190px;
-    background-color: #4C84C7;
+	background-color: #C4C4C4;
     height: 45px;
     line-height: 45px;
     width: 115px;
@@ -474,6 +473,12 @@
     font-family: 'opensanssemibold';
     cursor: pointer;
     margin-right: 10px;
+}
+.regen{
+	background-color: #326AAD !important;
+}
+.regdis{
+	background-color: #C4C4C4 !important;
 }
 .step-tab{
 	background:url('../images/step-1.png') no-repeat;

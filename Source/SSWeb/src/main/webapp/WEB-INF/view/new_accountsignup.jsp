@@ -73,7 +73,6 @@
  <script src="${initParam.resourcesPath}/resources/js/signup.js"></script> 
  <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 
 </body>
 </html>

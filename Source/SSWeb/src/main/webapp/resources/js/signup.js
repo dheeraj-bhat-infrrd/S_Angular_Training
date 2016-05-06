@@ -33,10 +33,14 @@ app.controller('linkedInController',['$http','$location',function($http,$locatio
 	var vm = this;
     vm.title = 'AngularJS for SocialSurvey';
 }]);
-app.controller('accountSignupController',['$http','$location',function($http,$location){
+app.controller('accountSignupController',['$scope','$http','$location',function($scope,$http,$location){
 	$('#reg-phone').intlTelInput({
 		utilsScript: "../resources/js/utils.js"
 	});
+	$scope.register =function(){
+		 $location.path('/linkedin').replace();
+	};
+	
 }]);
 
 /*app.controller('dropZoneCtrl',['$http','$location',function($http,$location){

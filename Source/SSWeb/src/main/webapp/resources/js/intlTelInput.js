@@ -27,7 +27,7 @@
         autoPlaceholder: true,
         // modify the auto placeholder
         customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
-        	  return selectedCountryPlaceholder;
+        	  return "eg. "+selectedCountryPlaceholder;
         },
         // append menu to a specific element
         dropdownContainer: "",
@@ -727,7 +727,6 @@
             // update the selected country's title attribute
             var title = countryCode ? this.selectedCountryData.name + ": +" + this.selectedCountryData.dialCode : "Unknown";
             var codelength=this.selectedCountryData.dialCode.length;
-            console.log(codelength);
             this.selectedFlagInner.parent().attr("title", title);
             if( codelength == 1){
             	 this.selectedFlagInner.parent().parent().parent().find('.reg-details').css('padding-left','75px');
@@ -1138,5 +1137,3 @@
         };
     }
 });
-$('.country-list').perfectScrollbar();
-$('.country-list').perfectScrollbar('update');
