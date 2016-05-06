@@ -1,13 +1,10 @@
 package com.realtech.socialsurvey.core.services.social;
 
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.auth.RequestToken;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
@@ -29,6 +26,9 @@ import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.auth.RequestToken;
 
 
 /**
@@ -105,7 +105,8 @@ public interface SocialManagementService
 
 
     public boolean updateLinkedin( OrganizationUnitSettings settings, String message, String linkedinProfileUrl,
-        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow, AgentSettings agentSettings, SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException;
+        String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow, AgentSettings agentSettings,
+        SocialMediaPostResponse linkedinPostResponse ) throws NonFatalException;
 
 
     public OrganizationUnitSettings disconnectSocialNetwork( String socialMedia, OrganizationUnitSettings unitSettings,
@@ -125,7 +126,7 @@ public interface SocialManagementService
 
 
     public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
-        long agentId, double rating, String customerEmail, String feedback, boolean isAbusive, String serverBaseUrl,
+        long agentId, double rating, String surveyId, String feedback, boolean isAbusive, String serverBaseUrl,
         boolean onlyPostToSocialSurvey ) throws NonFatalException;
 
 
@@ -143,6 +144,7 @@ public interface SocialManagementService
     void updateSocialConnectionsHistory( String entityType, long entityId, SocialMediaTokens mediaTokens, String socialMedia,
         String action ) throws InvalidInputException, ProfileNotFoundException;
 
+
     /**
      * Method to disconnect user from all social connections
      * 
@@ -154,13 +156,14 @@ public interface SocialManagementService
 
 
     void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
-        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails, boolean isZillow )
-        throws InvalidInputException, NoRecordsFetchedException;
+        SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails,
+        boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,
         String linkedinMessageFeedback, int accountMasterId, SocialMediaPostDetails socialMediaPostDetails,
-        SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings, boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException;
+        SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings,
+        boolean isZillow ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     void postToTwitterForHierarchy( String twitterMessage, double rating, String serverBaseUrl, int accountMasterId,
@@ -188,7 +191,8 @@ public interface SocialManagementService
 
 
     public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate, String postedOn );
+        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate,
+        String postedOn );
 
 
     public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds );
@@ -202,25 +206,37 @@ public interface SocialManagementService
         throws InvalidInputException;
 
 
+    SurveyPreInitiationList getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize )
+        throws InvalidInputException;
+
+
     void updateAgentIdOfSurveyPreinitiationRecordsForEmail( User user, String emailAddress ) throws InvalidInputException;
 
 
     void updateSurveyPreinitiationRecordsAsIgnored( String emailAddress ) throws InvalidInputException;
 
 
-    public String buildFacebookAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        String feedback, String linkUrl, boolean isZillow );
+    public String buildFacebookAutoPostMessage( String customerDisplayName, String agentName, double rating, String feedback,
+        String linkUrl, boolean isZillow );
 
 
-    public String buildLinkedInAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        String feedback, String linkUrl, boolean isZillow );
+    public String buildLinkedInAutoPostMessage( String customerDisplayName, String agentName, double rating, String feedback,
+        String linkUrl, boolean isZillow );
 
 
-    public String buildTwitterAutoPostMessage( String customerDisplayName, String agentName, double rating,
-        String feedback, String linkUrl, boolean isZillow );
+    public String buildTwitterAutoPostMessage( String customerDisplayName, String agentName, double rating, String feedback,
+        String linkUrl, boolean isZillow );
 
 
     Map<Long, List<SocialUpdateAction>> getSocialConnectionsHistoryForEntities( String entityType, List<Long> entityIds )
         throws InvalidInputException, ProfileNotFoundException;
+
+
+    public XSSFWorkbook getUserSurveyReportByTabId( int tabId, long companyId )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+    public void imcompleteSocialPostReminderSender();
+
+    public void zillowReviewProcessorStarter();
 }
 // JIRA SS-34 BY RM02 BOC

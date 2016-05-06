@@ -4,6 +4,9 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,9 @@ public class ReviseSubscriptionPrice {
 	@Autowired
 	private EmailServices emailServices;
 
+	@Autowired
+	private BatchTrackerService batchTrackerService;
+
 	@Transactional
 	public List<UsercountModificationNotification> getCompaniesWithUserCountModified() {
 		LOG.info("Getting the list of companies whose subscription needs to be modified");
@@ -76,11 +82,11 @@ public class ReviseSubscriptionPrice {
 	/**
 	 * Calculates the subscription amount for a company id and number of users. The amount is based
 	 * on the account type for the company. After calculating the batch will charge the account
-	 * 
-	 * @param companyId
-	 * @param numOfUsers
+	 *
+	 * @param company
+	 * @return
 	 * @throws NonFatalException
-	 */
+     */
 	@Transactional
 	public Map<String, Object> calculateSubscriptionAmountAndCharge(Company company) throws NonFatalException {
 		Map<String, Object> paymentResult = null;
@@ -94,9 +100,9 @@ public class ReviseSubscriptionPrice {
 
 	/**
 	 * Deletes the record from notification table.
-	 * 
-	 * @param company
-	 */
+	 *
+	 * @param userCountModificationCount
+     */
 	@Transactional
 	public void deleteUserCountNotificationTable(UsercountModificationNotification userCountModificationCount) {
 		LOG.info("Deleting the record for user count modification: " + userCountModificationCount.getUsercountModificationNotificationId());
@@ -135,6 +141,51 @@ public class ReviseSubscriptionPrice {
 			}
 		}
 		
+	}
+
+	@Transactional
+	public void updateSubscriptionPriceStarter() {
+		try {
+			//update last run start time
+			batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+				CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER,
+				CommonConstants.BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER );
+
+			List<UsercountModificationNotification> userModificatonRecords = getCompaniesWithUserCountModified();
+			if ( userModificatonRecords != null && !userModificatonRecords.isEmpty() ) {
+				LOG.debug( "Found " + userModificatonRecords.size() + " to process" );
+				for ( UsercountModificationNotification userModificationRecord : userModificatonRecords ) {
+					LOG.debug( "Fetching data for user modification record: "
+						+ userModificationRecord.getUsercountModificationNotificationId() );
+					try {
+						processChargeOnSubscription( userModificationRecord );
+					} catch ( NonFatalException e ) {
+						LOG.error( "Could not process subscription for " + userModificationRecord.getCompany(), e );
+					} catch ( Exception e ) {
+						LOG.error( "Could not process subscription for " + userModificationRecord.getCompany(), e );
+					}
+				}
+			} else {
+				LOG.info( "No records to modify subscription price" );
+			}
+
+			//Update last build time in batch tracker table
+			batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER );
+		} catch ( Exception e ) {
+			LOG.error( "Error in UpdateSubscriptionPriceStarter", e );
+			try {
+				//update batch tracker with error message
+				batchTrackerService.updateErrorForBatchTrackerByBatchType(
+					CommonConstants.BATCH_TYPE_UPDATE_SUBSCRIPTION_PRICE_STARTER, e.getMessage() );
+				//send report bug mail to admin
+				batchTrackerService.sendMailToAdminRegardingBatchError(
+					CommonConstants.BATCH_NAME_UPDATE_SUBSCRIPTION_PRICE_STARTER, System.currentTimeMillis(), e );
+			} catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+				LOG.error( "Error while updating error message in UpdateSubscriptionPriceStarter " );
+			} catch ( UndeliveredEmailException e1 ) {
+				LOG.error( "Error while sending report excption mail to admin " );
+			}
+		}
 	}
 
 }

@@ -1906,14 +1906,24 @@ button.paypal.is-active {
 .icn-fb {
 	background: url(../csssprites/icons_social.png) no-repeat 0 0;
 }
+.icn-fb-rev {
+	background: url(../images/greyfb.png) no-repeat;
+}
 
 .icn-twit {
 	background: url(../csssprites/icons_social.png) no-repeat -350px 0;
+}
+.icn-twit-rev {
+	background: url(../images/ss-icon-grey-small-twitter.png) no-repeat;
 }
 
 .icn-lin {
 	background: url(../csssprites/icons_social.png) no-repeat -150px 0;
 }
+.icn-lin-rev {
+	background: url(../images/ss-icon-grey-small-linkedin.png) no-repeat;
+}
+
 
 .icn-ss {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
@@ -1935,17 +1945,17 @@ button.paypal.is-active {
 	background: url(../csssprites/icons_social.png) no-repeat -200px 0;
 }
 .icn-flag {
-	background: url(../csssprites/hover-icons.png) no-repeat -84px  0;
+	background: url(../images/ss-icon-small-grey-circle-flag.png) no-repeat;
 	margin-top: 7px;
-    height: 28px;
-    width: 19px;
+    height: 20px;
+    width: 20px;
 }
 
 .retake-icn {
-    background: url(../images/ss-icon-small-retake.png) no-repeat;
+    background: url(../images/ss-icon-small-grey-circle-retake.png) no-repeat;
     margin: 7px 0 0 10px !important;
-    height: 28px;
-    width: 19px;
+    height: 20px;
+    width: 20px;
 }
 
 .icn-tele-blue {
@@ -1954,6 +1964,10 @@ button.paypal.is-active {
 
 .icn-gplus {
 	background: url(../csssprites/icons_social.png) no-repeat -50px 0;
+	border: 0px;
+}
+.icn-gplus-rev {
+	background: url(../images/ss-icon-grey-small-gplus.png) no-repeat;
 	border: 0px;
 }
 
@@ -1995,15 +2009,16 @@ button.paypal.is-active {
 }
 
 .ppl-head-1 {
-	font-size: 14px;
+	font-size: 15px;
 	font-weight: bold !important;
-	text-transform: capitalize;
+    line-height: 22px;
 }
 
 .ppl-head-2 {
-	font-size: 13px;
+	font-size: 15px;
 	color: #666;
-	font-family: opensanslight;
+	margin-left: 10px;
+    line-height: 22px;
 }
 
 .ppl-header-left {
@@ -2017,7 +2032,9 @@ button.paypal.is-active {
 }
 
 .ppl-content {
-	line-height: 24px;
+	line-height: 22px;
+	font-size:15px;
+	padding-top: 10px;
 }
 
 .rev-ppl-share-wrapper {
@@ -2026,8 +2043,9 @@ button.paypal.is-active {
 }
 
 .ppl-share-wrapper {
-	margin: 10px 0 10px 0;
+	margin: 5px 0 5px 0;
 	line-height: 36px;
+	/* opacity:0.1; */
 }
 
 .icn-rem-size {
@@ -2038,8 +2056,8 @@ button.paypal.is-active {
 	cursor: pointer;
 	margin-top: 3px;
 	margin-right: 5px;
-	height: 28px;
-	width: 28px;
+	height: 20px;
+	width: 20px;
 }
 
 .mobile-tabs {
@@ -3386,11 +3404,11 @@ button.paypal.is-active {
 }
 
 .review-count-left {
-	line-height: 30px;
+	line-height: 22px;
 	height: 30px;
 	font-size: 14px;
 	color: #009FE0;
-	margin-left: 15px;
+	margin-left: 5px;
 }
 
 .prof-user-logo {
@@ -3524,6 +3542,14 @@ button.paypal.is-active {
 	padding-bottom: 10px;
 	margin-top: 10px;
 	word-break: break-word;
+	position: relative;
+	padding-top: 25px;
+}
+.dash-flag-retake{
+	position:absolute;
+	top:92%;
+	right:10px;
+	
 }
 
 .ppl-review-item:last-child {
@@ -3531,8 +3557,14 @@ button.paypal.is-active {
 }
 
 .ppl-review-item-last {
-	padding-bottom: 10px;
-	margin-top: 10px;
+	/* padding-bottom: 10px;
+	margin-top: 10px; */
+	border-bottom: 1px solid #dcdcdc;
+    padding-bottom: 10px;
+    margin-top: 10px;
+    word-break: break-word;
+    position: relative;
+    padding-top: 20px;
 }
 
 .survery-header-2 {
@@ -4668,6 +4700,11 @@ img.prof-image {
 }
 .color-blue{
 	color:#009FE0;
+}
+
+
+.not-verified {
+	color: #FF1A10 !important;
 }
 
 .dash-main-left {
@@ -6815,8 +6852,8 @@ tr.u-tbl-header td {
 }
 
 .rating-rounded {
-	margin-left: 5px;
-	line-height: 30px;
+	margin-left: 8px;
+	line-height: 21px;
 }
 
 .settings-rating-wrapper .rating-image {
@@ -6852,9 +6889,9 @@ tr.u-tbl-header td {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 .verified-badge {
-	background: url(../images/ss-badge.png) no-repeat;
+	background: url(../images/ss-verified-customer.png) no-repeat;
 	cursor: pointer;
-	margin-top: 5px;
+	background-size: contain;
 }
 .star-rating{
 	background: url(../images/ss-stars.png) no-repeat;
@@ -6863,42 +6900,42 @@ tr.u-tbl-header td {
  .star-rating-5\.00{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-100-full.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-5\.00{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png) ;
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 }
 .star-rating-4\.75{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-075-three-quaters.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-4\.75{
 	background-image:  url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-075-three-quaters.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-4\.50{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-050-half.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-4\.50{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-050-half.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
@@ -6906,252 +6943,252 @@ tr.u-tbl-header td {
 .star-rating-4\.25{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-025-one-quater.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-4\.25{
 	background-image:url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-025-one-quater.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-4\.00{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-4\.00{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-3\.75{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-075-three-quaters.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-3\.75{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png) url(../images/zillow-star-075-three-quaters.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-3\.50{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-050-half.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-3\.50{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-050-half.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-3\.25{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-025-one-quater.png),url(../images/ss-star-000-empty.png );
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-3\.25{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-025-one-quater.png),url(../images/zillow-star-000-empty.png );
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-3\.00{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-3\.00{
 	background-image:url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-2\.75{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-075-three-quaters.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-2\.75{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png),url(../images/zillow-star-075-three-quaters.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-2\.50{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-050-half.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-2\.50{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png), url(../images/zillow-star-050-half.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-2\.25{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png),url(../images/ss-star-025-one-quater.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-2\.25{
 	background-image: url(../images/zillow-star-100-full.png), url(../images/zillow-star-100-full.png),url(../images/zillow-star-025-one-quater.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-2\.00{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-100-full.png), url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-2\.00{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-100-full.png), url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-1\.75{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-075-three-quaters.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-1\.75{
 	background-image: url(../images/zillow-star-100-full.png), url(../images/zillow-star-075-three-quaters.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-1\.50{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-050-half.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-1\.50{
 	background-image: url(../images/zillow-star-100-full.png), url(../images/zillow-star-050-half.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-1\.25{
 	background-image: url(../images/ss-star-100-full.png),url(../images/ss-star-025-one-quater.png) , url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-1\.25{
 	background-image: url(../images/zillow-star-100-full.png),url(../images/zillow-star-025-one-quater.png) , url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-1\.00{
 	background-image: url(../images/ss-star-100-full.png), url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-1\.00{
 	background-image: url(../images/zillow-star-100-full.png), url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-0\.75{
 	background-image: url(../images/ss-star-075-three-quaters.png), url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-0\.75{
 	background-image: url(../images/zillow-star-075-three-quaters.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-0\.50{
 	background-image: url(../images/ss-star-050-half.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-0\.50{
 	background-image: url(../images/zillow-star-050-half.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-0\.25{
 	background-image: url(../images/ss-star-025-one-quater.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-0\.25{
 	background-image: url(../images/zillow-star-025-one-quater.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-0\.00{
 	background-image: url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png),url(../images/ss-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
 .star-rating-green-0\.00{
 	background-image: url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png),url(../images/zillow-star-000-empty.png);
     background-repeat: no-repeat;
-    width: 100px;
+    width: 102px;
     height: 20px;
     background-position: 0% 0%,25% 0%,50% 0%,75% 0%,100% 0%;
 } 
@@ -7167,7 +7204,7 @@ tr.u-tbl-header td {
 	background: url(../images/zillow-badge.png) no-repeat;
 	width: 26px;
     float: right;
-    margin-top: 5px;
+    background-size: contain;
 }
 .smiley-bg-rat-1 {
 	background: url(../images/smiley-bg-rat-1.png) no-repeat center;
@@ -7589,7 +7626,7 @@ tr.u-tbl-header td {
 }
 
 .ctnt-review-count {
-	line-height: 30px;
+	line-height: 20px;
 	margin-left: 5px;
 	color: #3E9DCB;
 }
@@ -8468,7 +8505,7 @@ label.url-change-input-label {
 
 #widget-code-area {
 	width: 100%;
-	height: 80px;
+	height: 200px;
 }
 
 .v-tbl-wid {
@@ -8668,7 +8705,7 @@ label.url-change-input-label {
 }
 
 .share-plus-height {
-	height: 33px;
+	height: 0px;
 }
 
 .en-icn {
@@ -8709,12 +8746,6 @@ label.url-change-input-label {
 .un-row{
 	border-bottom:1px solid #dcdcdc;
 	    height: 58px;
-}
-.un-heading{
-	border-top: #d2dedf 1px solid;
-    font-weight: 600 !important;
-    margin-top: 30px;
-    padding: 10px;
 }
 
 .hierarchy-btn {
@@ -8835,6 +8866,21 @@ label.url-change-input-label {
 	font-size: 18px;
     padding: 5px;
 }
+
 .reg-ss-logo{
 	background:url(../images/Social-Survey-Logo.png) no-repeat;
 }
+
+.pro-star-mar{
+	margin-right:-7px;
+}
+.public-report{
+	    position: absolute;
+    top: 93%; 
+    right: 10px;
+
+}
+/* .review-height{
+	height:100px;
+} */
+

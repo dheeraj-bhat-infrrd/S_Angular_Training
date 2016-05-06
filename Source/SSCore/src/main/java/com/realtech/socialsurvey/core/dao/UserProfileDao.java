@@ -18,7 +18,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 public interface UserProfileDao extends GenericDao<UserProfile, Long>
 {
 
-    public void deactivateAllUserProfilesForUser( User admin, User userToBeDeactivated );
+    public void deactivateAllUserProfilesForUser( User admin, User userToBeDeactivated, int status );
 
 
     public void deactivateUserProfileForBranch( User admin, long branchId, User userToBeDeactivated );

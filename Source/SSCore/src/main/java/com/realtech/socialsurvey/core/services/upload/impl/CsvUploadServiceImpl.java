@@ -16,6 +16,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -114,6 +116,9 @@ public class CsvUploadServiceImpl implements CsvUploadService
 
     private static final String COUNTRY = "United States";
     private static final String COUNTRY_CODE = "US";
+
+    @Autowired
+    private MessageUtils messageUtils;
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
@@ -1616,13 +1621,18 @@ public class CsvUploadServiceImpl implements CsvUploadService
                     LOG.error( "ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage() );
                     errorList.add( "ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage() );
                 } catch ( InvalidInputException e ) {
-                    if ( e.getMessage() != null
-                        && e.getMessage().equals( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS ) ) {
-                        LOG.error( "ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage() );
-                        errorList.add( "ERROR : " + " while adding user : " + user.getEmailId()
-                            + " message : User aleardy exists and assigned!" );
+                    if (e.getMessage() != null && (e.getMessage()
+                        .equals(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS) || e
+                        .getMessage().equals(messageUtils.getDisplayMessage(
+                            DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
+                            DisplayMessageType.ERROR_MESSAGE).getMessage()))) {
+                        LOG.error(
+                            "ERROR : " + " while adding user : " + user.getEmailId() + " message : "
+                                + e.getMessage());
+                        errorList.add("ERROR : " + " while adding user : " + user.getEmailId()
+                            + " message : User aleardy exists and assigned!");
                     } else {
-                        LOG.info( e.getErrorCode() );
+                        LOG.info(e.getErrorCode());
                         throw e;
                     }
                 }

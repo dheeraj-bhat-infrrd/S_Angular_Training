@@ -75,6 +75,7 @@ var agentId;
 var agentName;
 var customerResponse;
 var customerEmail;
+var surveyId;
 var mood;
 var stage;
 var isSmileTypeQuestion=true;
@@ -372,12 +373,15 @@ function retakeSurveyReminderMail(element) {
 	var agentName = $(element).parent().parent().parent().parent().attr('data-agentname');
 	var customerEmail = $(element).parent().parent().parent().parent().attr('data-customeremail');
 	var agentId = $(element).parent().parent().parent().parent().attr('data-agentid');
+	var surveyId = $(element).parent().parent().parent().parent().attr('survey-mongo-id');
+	
 	var payload = {
 			"customerEmail" : customerEmail,
 			"agentId" : agentId,
 			"firstName" : firstName,
 			"lastName" : lastName,
-			"agentName" : agentName
+			"agentName" : agentName,
+			"surveyId" : surveyId
 	};
 	
 	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
@@ -1188,8 +1192,18 @@ function displayReviewOnDashboard() {
 function updateEventOnDashboardPageForReviews() {
 	$('.ppl-head-2[data-modified="false"]').each(function(index, currentElement) {
 		var dateSplit = $(this).attr('data-modifiedon').split('-');
-		var date = convertUserDateToLocale(new Date(dateSplit[0], dateSplit[1]-1, dateSplit[2], dateSplit[3], dateSplit[4], dateSplit[5]));
-		$(this).html(date.toDateString()).attr("data-modified", "true");
+		var month=dateSplit[0];
+		var day=dateSplit[1];
+		var year=dateSplit[2];
+		var reviewDay=month+" "+day+","+year;
+		$(this).html(reviewDay).attr("data-modified", "true");
+	});
+	$('.completedOn[data-modified="false"]').each(function(index, currentElement) {
+		var dateSplit = $(this).attr('data-modifiedon').split('-');
+		var month=dateSplit[0];
+		var year=dateSplit[1];
+		var reviewDay=month+" "+year;
+		$(this).html(reviewDay).attr("data-modified", "true");
 	});
 	
 	$('.review-ratings[data-modified="false"]').each(function() {
@@ -3434,8 +3448,9 @@ function bindRegionListClicks() {
 			 $(this).attr('clicked','true');
 		}
 		else {
-			$("tr[class*='sel-r"+regionId+"'").html("").hide();
+			$("tr[class*='sel-r"+regionId+"']").html("").hide();
             $(this).attr('clicked','false');
+   
 		}
 	});
 	$(".region-edit-icn").click(function(e){
@@ -5401,7 +5416,10 @@ function initSurveyWithUrl(q) {
 				customerEmail = data.responseJSON.customerEmail;
 				firstName = data.responseJSON.customerFirstName;
 				lastName = data.responseJSON.customerLastName;
+				surveyId = data.responseJSON.surveyId;
 				paintSurveyPage(data);
+                var message = $("#pst-srvy-div .bd-check-txt").html();
+                $("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 			}
 		},
 		error : function(e) {
@@ -5653,7 +5671,8 @@ function retakeSurveyRequest(){
 			"agentId" : agentId,
 			"firstName" : firstName,
 			"lastName" : lastName,
-			"agentName" : agentName
+			"agentName" : agentName,
+			"surveyId" : surveyId
 	};
 	callAjaxGetWithPayloadData(getLocationOrigin() + surveyUrl + 'restartsurvey', '', payload, true);
 	$('#overlay-toast').html('Mail sent to your registered email id for retaking the survey for '+agentName);
@@ -5671,8 +5690,7 @@ function storeCustomerAnswer(customerResponse) {
 		"question" : questionDetails.question,
 		"questionType" : questionDetails.questionType,
 		"stage" : qno + 1,
-		"agentId" : agentId,
-		"customerEmail" : customerEmail
+		"surveyId" : surveyId
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -5716,7 +5734,8 @@ function updateCustomerResponse(feedback, agreedToShare , isAbusive, isIsoEncode
 		"lastName" : lastName,
 		"isAbusive" : isAbusive,
 		"agreedToShare" : agreedToShare,
-		"isIsoEncoded" : isIsoEncoded
+		"isIsoEncoded" : isIsoEncoded,
+		"surveyId" : surveyId
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -5943,7 +5962,8 @@ function postToSocialMedia(feedback , isAbusive , onlyPostToSocialSurvey, isIsoE
 		"feedback" : feedback,
 		"agentProfileLink" : agentProfileLink,
 		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey,
-		"isIsoEncoded" : isIsoEncoded
+		"isIsoEncoded" : isIsoEncoded,
+		"surveyId" : surveyId
 	};
 	$.ajax({
 		url : getLocationOrigin() + surveyUrl + "posttosocialnetwork",
@@ -6607,7 +6627,7 @@ $(document).on(
 					|| $(this).is('[readonly]')) {
 				return;
 			}
-			if (!phoneRegex.test(this.value)) {
+			if (!phoneRegex.test(this.value) && !ausPhoneRegex.test(this.value) ) {
 				$('#overlay-toast').html("Please add a valid phone number");
 				showToast();
 				return;
@@ -6617,7 +6637,7 @@ $(document).on(
 				var phoneNumbers = [];
 				$('#contant-info-container input[data-phone-number]').each(
 						function() {
-							if (this.value != "" && phoneRegex.test(this.value)
+							if (this.value != "" && (phoneRegex.test(this.value) || ausPhoneRegex.test(this.value))
 									&& !$(this).is('[readonly]')) {
 								var phoneNumber = {};
 								phoneNumber.key = $(this).attr(
@@ -10078,11 +10098,22 @@ $(document).on('mouseleave', '#prof-posts .tweet-panel-item', function(e){
 	$(this).find('.dlt-survey-wrapper').addClass('hide');
 });
 $(document).on('mouseover','.dsh-review-cont ',function(e){
-	$(this).find('.ppl-share-wrapper').css('visibility','visible');
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/colfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-small-twitter.png)"});
+	$(this).find('.icn-lin-rev ').css({'background-image':"url(../resources/images/ss-icon-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-circle-retake.png)"});
 });
 $(document).on('mouseleave','.dsh-review-cont ',function(e){
-	$(this).find('.ppl-share-wrapper').css('visibility','hidden');;
+	$(this).find('.icn-fb-rev').css({'background-image':"url(../resources/images/greyfb.png)"});
+	$(this).find('.icn-twit-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-twitter.png)"});
+	$(this).find('.icn-lin-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-linkedin.png)"});
+	$(this).find('.icn-gplus-rev').css({'background-image':"url(../resources/images/ss-icon-grey-small-gplus.png)"});
+	$(this).find('.icn-flag').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-flag.png)"});
+	$(this).find('.retake-icn').css({'background-image':"url(../resources/images/ss-icon-small-grey-circle-retake.png)"});
 });
+
 
 $(document).on('click' , '#prof-posts .post-dlt-icon' , function(e){
 	e.stopPropagation();
@@ -10994,3 +11025,14 @@ function paintReviews(result, isRequestFromDashBoard){
 		$(window).trigger('scroll');
 	}, 100);
 }
+$(document).on('click','.review-more-button',function(){
+	$(this).parent().find('.review-less-text').hide();
+	$(this).parent().find('.review-complete-txt').show();
+	$(this).parent().find('.view-zillow-link').show();
+	$(this).hide();
+});
+/*$('.review-more-button').click(function(){
+	$(this).parent().find('.review-less-text').hide();
+	$(this).parent().find('.review-complete-txt').show();
+	$(this).hide();
+});*/

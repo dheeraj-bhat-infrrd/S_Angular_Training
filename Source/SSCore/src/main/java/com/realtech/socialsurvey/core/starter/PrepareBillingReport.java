@@ -63,7 +63,7 @@ public class PrepareBillingReport implements Runnable
 
                         if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_BILLING_REPORT){
                          // prepare and send the billing report to admin
-                            Map<String, List<Object>> dataToGenerateBillingReport = billingReportsService.generateBillingReportDataForCompanies();
+                            Map<Integer, List<Object>> dataToGenerateBillingReport = billingReportsService.generateBillingReportDataForCompanies();
                             billingReportsService.generateBillingReportAndMail( dataToGenerateBillingReport , recipientMailId , null );
                             
                         }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_COMPANY_USERS_REPORT){

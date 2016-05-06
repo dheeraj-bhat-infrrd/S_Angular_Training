@@ -430,4 +430,26 @@ public interface EmailServices
      */
     void sendEmailVerificationRequestMailToAdmin( String url, String recipientMailId, String recipientName,
         String emailToVerify , String entityName ) throws InvalidInputException, UndeliveredEmailException;
+
+    /**
+     * 
+     * @param recipientMailId
+     * @param recipientName
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    void sendEmailVerifiedNotificationMail( String recipientMailId, String recipientName ) throws InvalidInputException,
+        UndeliveredEmailException;
+
+    /**
+     * 
+     * @param recipientMailId
+     * @param recipientName
+     * @param verifiedEmail
+     * @param entityName
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    void sendEmailVerifiedNotificationMailToAdmin( String recipientMailId, String recipientName, String verifiedEmail,
+        String entityName ) throws InvalidInputException, UndeliveredEmailException;
 }

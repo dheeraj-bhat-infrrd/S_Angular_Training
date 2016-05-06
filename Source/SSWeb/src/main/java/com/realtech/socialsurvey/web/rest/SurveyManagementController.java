@@ -177,9 +177,9 @@ public class SurveyManagementController
         String question = request.getParameter( "question" );
         String questionType = request.getParameter( "questionType" );
         int stage = Integer.parseInt( request.getParameter( "stage" ) );
-        String customerEmail = request.getParameter( "customerEmail" );
-        long agentId = Long.valueOf( request.getParameter( "agentId" ) );
-        surveyHandler.updateCustomerAnswersInSurvey( agentId, customerEmail, question, questionType, answer, stage );
+        String surveyId = request.getParameter( "surveyId" );
+        
+        surveyHandler.updateCustomerAnswersInSurvey( surveyId, question, questionType, answer, stage );
         LOG.info( "Method storeSurveyAnswer() finished to store response of customer." );
         return surveyHandler.getSwearWords();
     }
@@ -203,6 +203,12 @@ public class SurveyManagementController
             String lastName = request.getParameter( "lastName" );
             String agreedToShare = request.getParameter( "agreedToShare" );
             String strIsIsoEncoded = request.getParameter( "isIsoEncoded" );
+            String surveyId = request.getParameter( "surveyId" );
+            
+            if(surveyId == null || surveyId.isEmpty()){
+                throw new InvalidInputException("Passed parameter survey id is null or empty");
+            }
+            
             boolean isIsoEncoded = Boolean.parseBoolean( strIsIsoEncoded );
             if ( isIsoEncoded ) {
                 feedback = new String(feedback.getBytes( Charset.forName( "ISO-8859-1" ) ), "UTF-8");
@@ -221,11 +227,11 @@ public class SurveyManagementController
             }
 
             boolean isAbusive = Boolean.parseBoolean( request.getParameter( "isAbusive" ) );
-            surveyHandler.updateGatewayQuestionResponseAndScore( agentId, customerEmail, mood, feedback, isAbusive,
+            surveyHandler.updateGatewayQuestionResponseAndScore( surveyId, mood, feedback, isAbusive,
                 agreedToShare );
             surveyHandler.increaseSurveyCountForAgent( agentId );
-            SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, firstName,
-                lastName );
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyId );
+            SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( surveyDetails.getSurveyPreIntitiationId() );
             surveyHandler.deleteSurveyPreInitiationDetailsPermanently( surveyPreInitiation );
 
             // update the modified time of hierarchy for seo
@@ -257,7 +263,7 @@ public class SurveyManagementController
                 }
             }
 
-            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
+            SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId);
             // Sending email to the customer telling about successful completion of survey.
             try {
                 String customerName = emailFormatHelper.getCustomerDisplayNameForEmail( survey.getCustomerFirstName(),
@@ -543,7 +549,20 @@ public class SurveyManagementController
                 String customerEmail = urlParams.get( CommonConstants.CUSTOMER_EMAIL_COLUMN );
                 String custFirstName = urlParams.get( CommonConstants.FIRST_NAME );
                 String custLastName = urlParams.get( CommonConstants.LAST_NAME );
-
+                long surveyPreInitiationId = 0;
+                
+                String surveyPreInitiationIdStr = urlParams.get( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN );
+                if(surveyPreInitiationIdStr != null && !surveyPreInitiationIdStr.isEmpty()){
+                    surveyPreInitiationId = Long.parseLong( surveyPreInitiationIdStr );
+                }
+                
+                boolean retakeSurvey = false;
+                String retakeSurveyString = urlParams.get( CommonConstants.URL_PARAM_RETAKE_SURVEY );
+                if(retakeSurveyString != null && !retakeSurveyString.isEmpty()){
+                    retakeSurvey = Boolean.parseBoolean( retakeSurveyString );
+                }
+                    
+                
                 if ( custFirstName != null && !custFirstName.isEmpty() ) {
                     //check if name is null for dotloop data
                     if ( custFirstName.equalsIgnoreCase( "null" ) ) {
@@ -557,24 +576,47 @@ public class SurveyManagementController
                     }
                 }
 
-                SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail,
-                    custFirstName, custLastName );
-                if ( surveyPreInitiation == null ) {
-                    surveyAndStage = getSurvey( agentId, customerEmail, custFirstName, custLastName, 0, null,
-                        surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ),
-                        MongoSocialPostDaoImpl.KEY_SOURCE_SS );
-                } else {
-                    surveyAndStage = getSurvey( agentId, urlParams.get( CommonConstants.CUSTOMER_EMAIL_COLUMN ),
-                        surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(),
-                        surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
-                        surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName ),
-                        surveyPreInitiation.getSurveySource() );
-
-                    surveyHandler.markSurveyAsStarted( surveyPreInitiation );
+                User user = userManagementService.getUserByUserId( agentId );
+                
+                boolean isOldRecord = true;
+                
+                SurveyPreInitiation surveyPreInitiation = null;
+                if(surveyPreInitiationId > 0){
+                    isOldRecord = false;
+                    surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( surveyPreInitiationId );
+                }else{
+                    surveyPreInitiation = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail,
+                        custFirstName, custLastName );
                 }
+               
+                // if no old survey pre initiation entry found than insert in survey pre initiation 
+                //first get the survey from mmongo
+                SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( agentId, customerEmail, custFirstName, custLastName );
+                String surveySource;
+                if(surveyPreInitiation != null)
+                    surveySource = surveyPreInitiation.getSurveySource();
+                else if(surveyDetails != null)
+                    surveySource = surveyDetails.getSource();
+                else
+                    surveySource = MongoSocialPostDaoImpl.KEY_SOURCE_SS;
+                
+                
+                if ( surveyPreInitiation == null ) {
+                    surveyPreInitiation = surveyHandler.preInitiateSurvey( user, customerEmail, custFirstName, custLastName, 0, null, surveySource );
+
+                } 
+               
+                surveyAndStage = getSurvey( agentId, urlParams.get( CommonConstants.CUSTOMER_EMAIL_COLUMN ),
+                    surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(),
+                    surveyPreInitiation.getReminderCounts(), surveyPreInitiation.getCustomerInteractionDetails(),
+                    surveyHandler.composeLink( agentId, customerEmail, custFirstName, custLastName , surveyPreInitiation.getSurveyPreIntitiationId() , retakeSurvey ),
+                    surveyPreInitiation.getSurveySource() , surveyPreInitiation.getSurveyPreIntitiationId() , isOldRecord , retakeSurvey);
+
+                if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED)
+                    surveyHandler.markSurveyAsStarted( surveyPreInitiation );
+               
 
                 // fetching company logo
-                User user = userManagementService.getUserByUserId( agentId );
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
                 //JIRA SS-1363 begin
                 /*if ( companySettings != null && companySettings.getLogoThumbnail() != null ) {
@@ -618,6 +660,11 @@ public class SurveyManagementController
             String serverBaseUrl = requestUtils.getRequestServerName( request );
             String onlyPostToSocialSurveyStr = request.getParameter( "onlyPostToSocialSurvey" );
             String strIsIsoEncoded = request.getParameter( "isIsoEncoded" );
+            String surveyId = request.getParameter( "surveyId" );
+            
+            if(surveyId == null || surveyId.isEmpty()){
+                throw new InvalidInputException("Passed parameter survey id is null or empty");
+            }
             boolean isIsoEncoded = Boolean.parseBoolean( strIsIsoEncoded );
             if ( isIsoEncoded ) {
                 feedback = new String(feedback.getBytes( Charset.forName( "ISO-8859-1" ) ), "UTF-8");
@@ -640,7 +687,7 @@ public class SurveyManagementController
             }
 
             if ( socialManagementService.postToSocialMedia( agentName, agentProfileLink, custFirstName, custLastName, agentId,
-                rating, customerEmail, feedback, isAbusive, serverBaseUrl, onlyPostToSocialSurvey ) ) {
+                rating, surveyId, feedback, isAbusive, serverBaseUrl, onlyPostToSocialSurvey ) ) {
                 return "Successfully posted to all the places in hierarchy";
             }
 
@@ -1438,16 +1485,27 @@ public class SurveyManagementController
         String customerEmail = request.getParameter( "customerEmail" );
         String firstName = request.getParameter( "firstName" );
         String lastName = request.getParameter( "lastName" );
+        String surveyId = request.getParameter( "surveyId" );
+        
+        
         try {
+            
+            if(surveyId == null || surveyId.isEmpty()){
+                throw new InvalidInputException("Passed parameter survey id is null or empty");
+            }
+            
             if ( agentIdStr == null || agentIdStr.isEmpty() ) {
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
             }
             long agentId = Long.parseLong( agentIdStr );
-            surveyHandler.changeStatusOfSurvey( agentId, customerEmail, firstName, lastName, true );
-            SurveyDetails survey = surveyHandler.getSurveyDetails( agentId, customerEmail, firstName, lastName );
+            surveyHandler.changeStatusOfSurvey( surveyId , true );
+            SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
             User user = userManagementService.getUserByUserId( agentId );
+            Map<String , String> urlParams  = urlGenerator.decryptUrl( survey.getUrl() );
+            urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
+            String updatedUrl = urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
             surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
-                survey.getUrl() );
+                updatedUrl);
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
         }
@@ -1464,16 +1522,22 @@ public class SurveyManagementController
         String customerEmail = request.getParameter( "customerEmail" );
         String firstName = request.getParameter( "firstName" );
         String lastName = request.getParameter( "lastName" );
+        String surveyId = request.getParameter( "surveyId" );
+        
         try {
             if ( agentIdStr == null || agentIdStr.isEmpty() ) {
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
             }
             long agentId = Long.parseLong( agentIdStr );
-            SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurvey( agentId, customerEmail, firstName, lastName );
+            surveyHandler.changeStatusOfSurvey( surveyId , true );
+            SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
             User user = userManagementService.getUserByUserId( agentId );
-            surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustomerInteractionDetails(),
-                user, surveyHandler.composeLink( agentId, customerEmail, firstName, lastName ) );
-        } catch ( NonFatalException e ) {
+            Map<String , String> urlParams  = urlGenerator.decryptUrl( survey.getUrl() );
+            urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
+            String updatedUrl = urlGenerator.generateUrl( urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
+            surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
+                updatedUrl);
+            } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
         }
     }
@@ -1487,11 +1551,11 @@ public class SurveyManagementController
 
 
     private SurveyDetails storeInitialSurveyDetails( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source ) throws SolrException,
+        int reminderCount, String custRelationWithAgent, String url, String source , long surveyPreIntitiationId , boolean isOldRecord , boolean retakeSurvey ) throws SolrException,
         NoRecordsFetchedException, InvalidInputException
     {
         return surveyHandler.storeInitialSurveyDetails( agentId, customerEmail, firstName, lastName, reminderCount,
-            custRelationWithAgent, url, source );
+            custRelationWithAgent, url, source ,surveyPreIntitiationId , isOldRecord , retakeSurvey );
     }
 
 
@@ -1502,7 +1566,7 @@ public class SurveyManagementController
 
 
     private Map<String, Object> getSurvey( long agentId, String customerEmail, String firstName, String lastName,
-        int reminderCount, String custRelationWithAgent, String url, String source ) throws InvalidInputException,
+        int reminderCount, String custRelationWithAgent, String url, String source , long surveyPreIntitiationId , boolean isOldRecord , boolean retakeSurvey) throws InvalidInputException,
         SolrException, NoRecordsFetchedException
     {
         Integer stage = null;
@@ -1513,16 +1577,19 @@ public class SurveyManagementController
         OrganizationUnitSettings regionSettings = null;
         try {
             SurveyDetails survey = storeInitialSurveyDetails( agentId, customerEmail, firstName, lastName, reminderCount,
-                custRelationWithAgent, url, source );
-            surveyHandler.updateSurveyAsClicked( agentId, customerEmail );
+                custRelationWithAgent, url, source , surveyPreIntitiationId , isOldRecord , retakeSurvey);
 
             if ( survey != null ) {
+                
+                surveyHandler.updateSurveyAsClicked( survey.get_id() );
+                
                 stage = survey.getStage();
                 editable = survey.getEditable();
                 surveyAndStage.put( "agentName", survey.getAgentName() );
                 surveyAndStage.put( "customerFirstName", survey.getCustomerFirstName() );
                 surveyAndStage.put( "customerLastName", survey.getCustomerLastName() );
                 surveyAndStage.put( "customerEmail", survey.getCustomerEmail() );
+                surveyAndStage.put( "surveyId", survey.get_id() );
                 for ( SurveyQuestionDetails surveyDetails : surveyQuestionDetails ) {
                     for ( SurveyResponse surveyResponse : survey.getSurveyResponse() ) {
                         if ( surveyDetails.getQuestion().trim().equalsIgnoreCase( surveyResponse.getQuestion() ) ) {
@@ -1537,6 +1604,7 @@ public class SurveyManagementController
                 surveyAndStage.put( "customerEmail", customerEmail );
                 surveyAndStage.put( "customerFirstName", firstName );
                 surveyAndStage.put( "customerLastName", lastName );
+                surveyAndStage.put( "surveyId", "" );
                 try {
                     UserProfile userProfile = userManagementService.getAgentUserProfileForUserId( agentId );
                     if ( userProfile != null ) {

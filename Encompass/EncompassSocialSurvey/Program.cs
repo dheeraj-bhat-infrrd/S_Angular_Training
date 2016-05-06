@@ -104,6 +104,7 @@ namespace EncompassSocialSurvey
                         try
                         {
                             LoanUtility _loanUtility = new LoanUtility();
+                            int noOfRecordsInserted=0;
 
                             var loansVM = _loanUtility.PopulateLoanList(encompassGlobal,forCompCredential.EncompassCredential.CompanyId, fieldId, isProductionRun, forCompCredential.EncompassCredential.numberOfDays, emailDomain, emailPrefix);
 
@@ -116,7 +117,21 @@ namespace EncompassSocialSurvey
                                     Logger.Debug("Saving loans for company : " + forCompCredential.CompanyName + " id : " + forCompCredential.EncompassCredential.CompanyId);
                                     // process for insert
                                     if (loansVM != null && loansVM.Count > 0)
-                                        loanSerivce.InsertLoans(loansVM);
+                                    {
+                                       noOfRecordsInserted= loanSerivce.InsertLoans(loansVM);
+                                       
+                                    }
+                                    CRMBatchTrackerEntity crmBatchTracker = loanSerivce.getCrmBatchTracker(forCompCredential.EncompassCredential.CompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
+                                    if (crmBatchTracker != null)
+                                    {
+                                        //update recent records fetched count in crm batch tracker
+                                        _loanUtility.UpdateLastRunRecordFetechedCountInCrmBatchTracker(loanSerivce,
+                                            crmBatchTracker, noOfRecordsInserted);
+
+                                        //insert count of records fetched in crm batch tracker history  
+                                        _loanUtility.InsertCrmBatchTrackerHistory(loanSerivce, crmBatchTracker.Id,
+                                            noOfRecordsInserted);
+                                    }
                                 }
                                 catch (Exception ex)
                                 {

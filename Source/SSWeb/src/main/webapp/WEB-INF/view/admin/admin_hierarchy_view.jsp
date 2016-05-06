@@ -14,6 +14,7 @@
 					<option value="active">Active</option>
 					<option value="inactive">Inactive</option>
 					<option value="incomplete">Incomplete</option>
+					<option value="deleted">Deleted</option>
 				</select>
 			</div>
 		</div>

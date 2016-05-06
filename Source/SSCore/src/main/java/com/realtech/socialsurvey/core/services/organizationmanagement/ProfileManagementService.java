@@ -649,4 +649,6 @@ public interface ProfileManagementService
      */
     void generateAndSendEmailVerificationRequestLinkToAdmin( List<MiscValues> mailIds, long companyId, String entityType,
         OrganizationUnitSettings entitySettings ) throws InvalidInputException, UndeliveredEmailException;
+
+    public void imageLoader();
 }
