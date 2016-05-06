@@ -5,19 +5,27 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
 import com.realtech.socialsurvey.core.services.api.AccountService;
+import org.springframework.stereotype.Service;
 
 
 /**
  * @author Shipra Goyal, RareMile
  *
  */
-@Component
+@Service
 public class AccountServiceImpl implements AccountService
 {
+    // Validation of the object is expected by the calller of the method.
     @Override
     public void saveAccountRegistrationDetailsAndSetDataInDO( AccountRegistration accountRegistration )
     {
         // TODO Auto-generated method stub
+        // validate if the email address is not taken already.
+        // Create a company with registration stage as 1. Insert into mongo with status 'I'
+        // Create a user in user table with registration stage as 1 and status 1, solr, mongo with status 'I'. Set the force password column to 1.
+        // Create user profile with 'CA' (1)
+        // Send registration email to user.
+        // Send mail to sales lead, maybe to support
     }
 
 

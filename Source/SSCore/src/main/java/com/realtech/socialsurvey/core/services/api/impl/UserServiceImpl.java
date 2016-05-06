@@ -18,6 +18,7 @@ public class UserServiceImpl implements UserService
     public void connectLinkedIn( int userId, UserProfile userProfile )
     {
         // TODO Auto-generated method stub
+        // Registration stage should be set as 2 for user
 
     }
 
