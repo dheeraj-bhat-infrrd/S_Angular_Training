@@ -1820,7 +1820,9 @@ public class DashboardController
         User user = sessionHelper.getCurrentUser();
         List<SurveyRecipient> surveyRecipients = null;
         long agentId = 0;
-        String errorMsg = null;
+        String selfSurveyErrorMsg = null;
+        String duplicateSurveyErrorMsg = null;
+        String errorMsg = "";
 
         try {
             String source = request.getParameter( "source" );
@@ -1830,8 +1832,8 @@ public class DashboardController
                 if ( payload == null ) {
                     throw new InvalidInputException( "SurveyRecipients passed was null or empty" );
                 }
-                surveyRecipients = new ObjectMapper().readValue( payload, TypeFactory.defaultInstance()
-                    .constructCollectionType( List.class, SurveyRecipient.class ) );
+                surveyRecipients = new ObjectMapper().readValue( payload,
+                    TypeFactory.defaultInstance().constructCollectionType( List.class, SurveyRecipient.class ) );
             } catch ( IOException ioException ) {
                 throw new NonFatalException( "Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR,
                     ioException );
@@ -1851,10 +1853,12 @@ public class DashboardController
             if ( !surveyRecipients.isEmpty() ) {
                 for ( int i = 0; i < surveyRecipients.size(); i++ ) {
                     for ( int j = i + 1; j < surveyRecipients.size(); j++ ) {
-                        if ( surveyRecipients.get( i ).getEmailId().equalsIgnoreCase( surveyRecipients.get( j ).getEmailId() ) ) {
+                        if ( surveyRecipients.get( i ).getEmailId()
+                            .equalsIgnoreCase( surveyRecipients.get( j ).getEmailId() ) ) {
                             if ( surveyRecipients.get( i ).getAgentEmailId()
                                 .equalsIgnoreCase( surveyRecipients.get( j ).getAgentEmailId() ) ) {
-                                throw new InvalidInputException( "Can't enter same email address multiple times for same user" );
+                                throw new InvalidInputException(
+                                    "Can't enter same email address multiple times for same user" );
                             }
                         }
                     }
@@ -1878,16 +1882,28 @@ public class DashboardController
                         surveyHandler.initiateSurveyRequest( currentAgentId, recipient.getEmailId(), recipient.getFirstname(),
                             recipient.getLastname(), source );
                     } catch ( SelfSurveyInitiationException e ) {
-                        errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
-                            DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                        throw new NonFatalException( e.getMessage(), e.getErrorCode() );
+                        if ( selfSurveyErrorMsg == null ) {
+                            selfSurveyErrorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION,
+                                DisplayMessageType.ERROR_MESSAGE ).getMessage();
+                        }
                     } catch ( DuplicateSurveyRequestException e ) {
-                        errorMsg = messageUtils.getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
-                            DisplayMessageType.ERROR_MESSAGE ).getMessage();
-                        throw new NonFatalException( e.getMessage(), e.getErrorCode() );
-
+                        if ( duplicateSurveyErrorMsg == null ) {
+                            duplicateSurveyErrorMsg = messageUtils
+                                .getDisplayMessage( DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST,
+                                    DisplayMessageType.ERROR_MESSAGE ).getMessage() + " The duplicate addresses are : " + recipient.getEmailId();
+                        } else {
+                            duplicateSurveyErrorMsg += ", " + recipient.getEmailId();
+                        }
                     }
-
+                }
+                if ( selfSurveyErrorMsg != null ) {
+                    errorMsg += selfSurveyErrorMsg + "\n";
+                }
+                if ( duplicateSurveyErrorMsg != null ) {
+                    errorMsg += duplicateSurveyErrorMsg;
+                }
+                if ( !errorMsg.isEmpty() ) {
+                    throw new NonFatalException( "NonFatalException occurred while sending surveys" );
                 }
             }
         } catch ( NonFatalException e ) {
