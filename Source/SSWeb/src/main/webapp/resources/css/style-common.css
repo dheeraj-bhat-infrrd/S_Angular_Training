@@ -8866,6 +8866,11 @@ label.url-change-input-label {
 	font-size: 18px;
     padding: 5px;
 }
+
+.reg-ss-logo{
+	background:url(../images/Social-Survey-Logo.png) no-repeat;
+}
+
 .pro-star-mar{
 	margin-right:-7px;
 }
@@ -8878,3 +8883,4 @@ label.url-change-input-label {
 /* .review-height{
 	height:100px;
 } */
+

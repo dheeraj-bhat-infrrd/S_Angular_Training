@@ -22,6 +22,8 @@ public interface JspResolver {
 	public static final String NO_ACTIVE_PROFILES = "noactiveprofiles";
 	public static final String LINK_EXPIRED = "link_expired";
 	public static final String LINK_EXPIRED_PAGE = "link_expired_page";
+	public static final String NEWREGISTRATION = "new_registration";
+	public static final String NEW_ACCOUNT_SIGNUP ="new_accountsignup";
 
 	// Generic pages
 	public static final String INDEX = "index";
