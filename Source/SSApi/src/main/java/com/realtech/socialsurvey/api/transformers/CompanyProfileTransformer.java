@@ -1,26 +1,90 @@
 package com.realtech.socialsurvey.api.transformers;
 
+import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.api.models.request.CompanyProfileRequest;
 import com.realtech.socialsurvey.api.models.response.CompanyProfileResponse;
 import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
+import com.realtech.socialsurvey.core.entities.api.Country;
+import com.realtech.socialsurvey.core.entities.api.Industry;
+import com.realtech.socialsurvey.core.entities.api.Phone;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
+@Component
 public class CompanyProfileTransformer implements Transformer<CompanyProfileRequest, CompanyProfile, CompanyProfileResponse>
 {
-    public CompanyProfile transformApiRequestToDomainObject( CompanyProfileRequest a )
+    public CompanyProfile transformApiRequestToDomainObject( CompanyProfileRequest request )
     {
-        // TODO Auto-generated method stub
-        return null;
+        CompanyProfile companyProfile = new CompanyProfile();
+        if ( request != null ) {
+            companyProfile.setAddress( request.getAddress() );
+            companyProfile.setCity( request.getCity() );
+            companyProfile.setCompanyLogo( request.getCompanyLogo() );
+            companyProfile.setCompanyName( request.getCompanyName() );
+            companyProfile.setState( request.getState() );
+            companyProfile.setZip( request.getZip() );
+
+            if ( request.getCountry() != null ) {
+                Country country = new Country();
+                country.setCountryCode( request.getCountry().getCountryCode() );
+                country.setCountryName( request.getCountry().getCountryName() );
+                companyProfile.setCountry( country );
+            }
+
+            if ( request.getIndustry() != null ) {
+                Industry industry = new Industry();
+                industry.setId( request.getIndustry().getId() );
+                industry.setPriorityOrder( request.getIndustry().getPriorityOrder() );
+                industry.setVertical( request.getIndustry().getVertical() );
+                companyProfile.setIndustry( industry );
+            }
+
+            if ( request.getOfficePhone() != null ) {
+                Phone officePhone = new Phone();
+                officePhone.setCountryCode( request.getOfficePhone().getCountryCode() );
+                officePhone.setExtension( request.getOfficePhone().getExtension() );
+                officePhone.setNumber( request.getOfficePhone().getNumber() );
+                companyProfile.setOfficePhone( officePhone );
+            }
+        }
+        return companyProfile;
     }
 
 
-    public CompanyProfileResponse transformDomainObjectToApiResponse( CompanyProfile d )
+    public CompanyProfileResponse transformDomainObjectToApiResponse( CompanyProfile companyProfile )
     {
-        // TODO Auto-generated method stub
-        return null;
+        CompanyProfileResponse response = new CompanyProfileResponse();
+        if ( companyProfile != null ) {
+            response.setAddress( companyProfile.getAddress() );
+            response.setCity( companyProfile.getCity() );
+            response.setCompanyLogo( companyProfile.getCompanyLogo() );
+            response.setCompanyName( companyProfile.getCompanyName() );
+            response.setState( companyProfile.getState() );
+            response.setZip( companyProfile.getZip() );
+
+            if ( companyProfile.getCountry() != null ) {
+                com.realtech.socialsurvey.api.models.Country country = new com.realtech.socialsurvey.api.models.Country();
+                country.setCountryCode( companyProfile.getCountry().getCountryCode() );
+                country.setCountryName( companyProfile.getCountry().getCountryName() );
+                response.setCountry( country );
+            }
+
+            if ( companyProfile.getIndustry() != null ) {
+                com.realtech.socialsurvey.api.models.Industry industry = new com.realtech.socialsurvey.api.models.Industry();
+                industry.setId( companyProfile.getIndustry().getId() );
+                industry.setPriorityOrder( companyProfile.getIndustry().getPriorityOrder() );
+                industry.setVertical( companyProfile.getIndustry().getVertical() );
+                response.setIndustry( industry );
+            }
+
+            if ( companyProfile.getOfficePhone() != null ) {
+                com.realtech.socialsurvey.api.models.Phone officePhone = new com.realtech.socialsurvey.api.models.Phone();
+                officePhone.setCountryCode( companyProfile.getOfficePhone().getCountryCode() );
+                officePhone.setExtension( companyProfile.getOfficePhone().getExtension() );
+                officePhone.setNumber( companyProfile.getOfficePhone().getNumber() );
+                response.setOfficePhone( officePhone );
+            }
+        }
+        return response;
     }
 }

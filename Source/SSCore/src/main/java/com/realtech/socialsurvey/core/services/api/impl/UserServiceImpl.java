@@ -1,26 +1,14 @@
 package com.realtech.socialsurvey.core.services.api.impl;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.realtech.socialsurvey.core.entities.api.UserProfile;
 import com.realtech.socialsurvey.core.services.api.UserService;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
-@Component
+@Service
 public class UserServiceImpl implements UserService
 {
-
-    @Override
-    public void connectLinkedIn( int userId, UserProfile userProfile )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
 
     @Override
     public void updateUserProfile( int userId, UserProfile userProfile )
@@ -42,7 +30,7 @@ public class UserServiceImpl implements UserService
     public void deleteUserProfileImage( int userId )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
 
@@ -50,7 +38,15 @@ public class UserServiceImpl implements UserService
     public void updateUserProfileImage( int userId, String imageUrl )
     {
         // TODO Auto-generated method stub
-        
+
+    }
+
+
+    @Override
+    public void updateStage( int parseInt, String stage )
+    {
+        // TODO Auto-generated method stub
+
     }
 
 }

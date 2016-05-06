@@ -7,10 +7,6 @@ import org.springframework.validation.SmartValidator;
 import com.realtech.socialsurvey.api.models.Phone;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 @Component
 public class PhoneValidator implements SmartValidator
 {

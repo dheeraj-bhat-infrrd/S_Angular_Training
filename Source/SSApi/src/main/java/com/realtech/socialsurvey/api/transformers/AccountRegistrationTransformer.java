@@ -8,10 +8,6 @@ import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.core.entities.api.Phone;
 
 
-/**
- * @author Shipra Goyal, RareMile
- *
- */
 @Component
 public class AccountRegistrationTransformer
     implements Transformer<AccountRegistrationRequest, AccountRegistration, AccountRegistrationResponse>
