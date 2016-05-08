@@ -1,10 +1,13 @@
 package com.realtech.socialsurvey.core.entities.api;
 
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+
+
 public class CompanyProfile
 {
     private String companyName;
     private String companyLogo;
-    private Industry industry;
+    private VerticalsMaster industry;
     private Country country;
     private String address;
     private String city;
@@ -13,13 +16,13 @@ public class CompanyProfile
     private Phone officePhone;
 
 
-    public Industry getIndustry()
+    public VerticalsMaster getIndustry()
     {
         return industry;
     }
 
 
-    public void setIndustry( Industry industry )
+    public void setIndustry( VerticalsMaster industry )
     {
         this.industry = industry;
     }

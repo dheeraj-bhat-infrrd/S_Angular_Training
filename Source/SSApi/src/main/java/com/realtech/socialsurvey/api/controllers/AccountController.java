@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.api.controllers;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -21,10 +23,14 @@ import com.realtech.socialsurvey.api.models.response.AccountRegistrationResponse
 import com.realtech.socialsurvey.api.models.response.CompanyProfileResponse;
 import com.realtech.socialsurvey.api.transformers.AccountRegistrationTransformer;
 import com.realtech.socialsurvey.api.transformers.CompanyProfileTransformer;
+import com.realtech.socialsurvey.api.transformers.IndustryTransformer;
+import com.realtech.socialsurvey.api.transformers.PaymentPlanTransformer;
 import com.realtech.socialsurvey.api.validators.AccountRegistrationValidator;
 import com.realtech.socialsurvey.api.validators.CompanyProfileValidator;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
+import com.realtech.socialsurvey.core.entities.api.PaymentPlan;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -39,18 +45,23 @@ public class AccountController
     private AccountService accountService;
     private CompanyProfileTransformer companyProfileTransformer;
     private CompanyProfileValidator companyProfileValidator;
+    private IndustryTransformer industryTransformer;
+    private PaymentPlanTransformer paymentPlanTransformer;
 
 
     @Autowired
     public AccountController( AccountRegistrationValidator accountRegistrationValidator,
         AccountRegistrationTransformer accountRegistrationTransformer, AccountService accountService,
-        CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator )
+        CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator,
+        IndustryTransformer industryTransformer, PaymentPlanTransformer paymentPlanTransformer )
     {
         this.accountRegistrationValidator = accountRegistrationValidator;
         this.accountRegistrationTransformer = accountRegistrationTransformer;
         this.accountService = accountService;
         this.companyProfileTransformer = companyProfileTransformer;
         this.companyProfileValidator = companyProfileValidator;
+        this.industryTransformer = industryTransformer;
+        this.paymentPlanTransformer = paymentPlanTransformer;
     }
 
 
@@ -74,13 +85,13 @@ public class AccountController
         @Valid @RequestBody AccountRegistrationRequest accountRegistrationRequest )
     {
         try {
-            LOGGER.info( "initAccountRegsitration started" );
+            LOGGER.info( "AccountController.initAccountRegsitration started" );
             AccountRegistration accountRegistration = accountRegistrationTransformer
                 .transformApiRequestToDomainObject( accountRegistrationRequest );
             accountService.saveAccountRegistrationDetailsAndSetDataInDO( accountRegistration );
             AccountRegistrationResponse response = accountRegistrationTransformer
                 .transformDomainObjectToApiResponse( accountRegistration );
-            LOGGER.info( "initAccountRegsitration completed successfully" );
+            LOGGER.info( "AccountController.initAccountRegsitration completed successfully" );
             return new ResponseEntity<AccountRegistrationResponse>( response, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -96,10 +107,10 @@ public class AccountController
     public ResponseEntity<?> getCompanyProfile( @PathVariable ( "userId") String userId )
     {
         try {
-            LOGGER.info( "getCompanyProfile started" );
+            LOGGER.info( "AccountController.getCompanyProfile started" );
             CompanyProfile companyProfile = accountService.getCompanyProfileDetails( Integer.parseInt( userId ) );
             CompanyProfileResponse response = companyProfileTransformer.transformDomainObjectToApiResponse( companyProfile );
-            LOGGER.info( "getCompanyProfile completed successfully" );
+            LOGGER.info( "AccountController.getCompanyProfile completed successfully" );
             return new ResponseEntity<CompanyProfileResponse>( response, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -116,11 +127,11 @@ public class AccountController
         @Valid @RequestBody CompanyProfileRequest companyProfileRequest )
     {
         try {
-            LOGGER.info( "updateCompanyProfile started" );
+            LOGGER.info( "AccountController.updateCompanyProfile started" );
             CompanyProfile companyProfile = companyProfileTransformer
                 .transformApiRequestToDomainObject( companyProfileRequest );
             accountService.updateCompanyProfile( Integer.parseInt( companyId ), companyProfile );
-            LOGGER.info( "updateCompanyProfile completed successfully" );
+            LOGGER.info( "AccountController.updateCompanyProfile completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -136,9 +147,9 @@ public class AccountController
     public ResponseEntity<?> deleteCompanyProfileImage( @PathVariable ( "companyId") String companyId )
     {
         try {
-            LOGGER.info( "deleteCompanyProfileImage started" );
+            LOGGER.info( "AccountController.deleteCompanyProfileImage started" );
             accountService.deleteCompanyProfileImage( Integer.parseInt( companyId ) );
-            LOGGER.info( "deleteCompanyProfileImage completed successfully" );
+            LOGGER.info( "AccountController.deleteCompanyProfileImage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -155,9 +166,9 @@ public class AccountController
         @RequestBody CompanyProfileRequest companyProfileRequest )
     {
         try {
-            LOGGER.info( "updateCompanyProfileImage started" );
+            LOGGER.info( "AccountController.updateCompanyProfileImage started" );
             accountService.updateCompanyProfileImage( Integer.parseInt( companyId ), companyProfileRequest.getCompanyLogo() );
-            LOGGER.info( "updateCompanyProfileImage completed successfully" );
+            LOGGER.info( "AccountController.updateCompanyProfileImage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -173,13 +184,53 @@ public class AccountController
     public ResponseEntity<?> updateStage( @PathVariable ( "companyId") String companyId, @PathVariable ( "stage") String stage )
     {
         try {
-            LOGGER.info( "updateStage started" );
+            LOGGER.info( "AccountController.updateStage started" );
             accountService.updateStage( Integer.parseInt( companyId ), stage );
-            LOGGER.info( "updateStage completed successfully" );
+            LOGGER.info( "AccountController.updateStage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug( "Exception thrown while updating stage: " + ex.getMessage() );
+            }
+            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
+        }
+    }
+
+
+    @RequestMapping ( value = "/company/profile/industries", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get industries drop down data")
+    public ResponseEntity<?> getIndustries()
+    {
+        try {
+            LOGGER.info( "AccountController.getIndustries started" );
+            List<VerticalsMaster> industryDOs = accountService.getIndustries();
+            List<com.realtech.socialsurvey.api.models.Industry> industries = industryTransformer
+                .transformDomainObjectListToApiResponseList( industryDOs );
+            LOGGER.info( "AccountController.getIndustries completed successfully" );
+            return new ResponseEntity<List<com.realtech.socialsurvey.api.models.Industry>>( industries, HttpStatus.OK );
+        } catch ( Exception ex ) {
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Exception thrown while getting industries drop down data: " + ex.getMessage() );
+            }
+            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
+        }
+    }
+
+
+    @RequestMapping ( value = "/payment/plans", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get payment plans")
+    public ResponseEntity<?> getPaymentPlans()
+    {
+        try {
+            LOGGER.info( "AccountController.getPaymentPlans started" );
+            List<PaymentPlan> planDOs = accountService.getPaymentPlans();
+            List<com.realtech.socialsurvey.api.models.PaymentPlan> plans = paymentPlanTransformer
+                .transformDomainObjectListToApiResponseList( planDOs );
+            LOGGER.info( "AccountController.getPaymentPlans completed successfully" );
+            return new ResponseEntity<List<com.realtech.socialsurvey.api.models.PaymentPlan>>( plans, HttpStatus.OK );
+        } catch ( Exception ex ) {
+            if ( LOGGER.isDebugEnabled() ) {
+                LOGGER.debug( "Exception thrown while getting payment plans: " + ex.getMessage() );
             }
             return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
         }
