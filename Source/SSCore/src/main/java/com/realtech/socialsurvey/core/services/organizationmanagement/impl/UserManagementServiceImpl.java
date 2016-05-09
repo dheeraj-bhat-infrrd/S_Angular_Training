@@ -4276,7 +4276,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
                     LOG.debug( "Survey pre initiation id: " + survey.getSurveyPreIntitiationId() + " within reminder counts" );
 
-                    User user = getUserByUserId( survey.getAgentId() );
+                    User user = null;
+                    try {
+                        user = getUserByUserId( survey.getAgentId() );
+                    }catch(InvalidInputException ie){
+                        LOG.warn( "Invalid user mapped to the agent id" );
+                        continue;
+                    }
                     //If agent is deleted, mark survey as corrupt and fetch next survey
                     if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
                         LOG.debug( "The agent id : " + survey.getAgentId() + " is deleted. Skipping record." );
