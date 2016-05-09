@@ -149,7 +149,7 @@ public interface SurveyHandler
     public Map<String, Integer> getReminderInformationForCompany( long companyId );
 
 
-    public Boolean checkIfTimeIntervalHasExpired( long lastRemindedTime, long systemTime, int reminderInterval );
+    public boolean checkSurveyReminderEligibility( long lastRemindedTime, long systemTime, int reminderInterval );
 
 
     void insertSurveyDetails( SurveyDetails surveyDetails );

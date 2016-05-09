@@ -4299,43 +4299,38 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                             "Initial survey request mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
                         reminder = false;
                     }
-                    long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
-                    long currentTime = System.currentTimeMillis();
-                    if ( surveyHandler
-                        .checkIfTimeIntervalHasExpired( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
-                        LOG.debug( "Survey eligible for sending mail with id: " + survey.getSurveyPreIntitiationId() );
-                        try {
-                            /*
-                             * if ( survey.getSurveySource().equalsIgnoreCase(
-                             * CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
-                             * sendMailToAgent( survey ); }
-                             */
-                            if ( reminder ) {
+
+                    // send a survey invitation mail if reminder is false or a reminder mail if reminder is true
+                    try {
+                        if ( reminder ) {
+                            LOG.debug( "Check if survey is eligible for a reminder mail" );
+                            long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
+                            long currentTime = System.currentTimeMillis();
+                            if ( surveyHandler
+                                .checkSurveyReminderEligibility( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
                                 if ( survey.getReminderCounts() < reminderCount ) {
-                                    sendSurveyReminderEmail( emailServices, organizationManagementService, survey,
-                                        company.getCompanyId() );
+                                    sendSurveyReminderEmail( emailServices, organizationManagementService, survey, company.getCompanyId() );
                                     surveyHandler.markSurveyAsSent( survey );
                                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                                 } else {
-                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
-                                        + " has exceeded the reminder count " );
+                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId() + " has exceeded the reminder count " );
                                 }
-                            } else {
-                                sendSurveyInitiationEmail( emailServices, organizationManagementService, survey,
-                                    company.getCompanyId() );
-                                surveyHandler.markSurveyAsSent( survey );
-                                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                             }
+                        } else {
+                            LOG.debug( "Sending survey initiation mail" );
+                            // check if the mail is an older mail
+                            sendSurveyInitiationEmail( emailServices, organizationManagementService, survey, company.getCompanyId() );
+                            surveyHandler.markSurveyAsSent( survey );
+                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
 
-                        } catch ( InvalidInputException e ) {
-                            LOG.error(
-                                "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
-                                e );
-                        } catch ( ProfileNotFoundException e ) {
-                            LOG.error( "Error while sending incomplete survey mail ", e );
                         }
+                    } catch ( InvalidInputException e ) {
+                        LOG.error(
+                            "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
+                            e );
+                    } catch ( ProfileNotFoundException e ) {
+                        LOG.error( "Error while sending incomplete survey mail ", e );
                     }
-
                 }
             }
             LOG.info( "Completed IncompleteSurveyReminderSender" );

@@ -589,11 +589,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
             Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
 
-        //Get only those surveys that have lastReminderTime within the last N days
-        Criterion maxDaysBackCriteria = Restrictions.ge( CommonConstants.SURVEY_LAST_REMINDER_TIME,
-            new Timestamp( System.currentTimeMillis() - ( maxSurveyReminderInterval * 24 * 3600 * 1000l ) ) );
         incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
-            statusCriteria, maxDaysBackCriteria );
+            statusCriteria );
         LOG.info( "finished." );
         return incompleteSurveyCustomers;
     }
@@ -1915,14 +1912,19 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public Boolean checkIfTimeIntervalHasExpired( long lastRemindedTime, long systemTime, int reminderInterval )
+    public boolean checkSurveyReminderEligibility( long lastRemindedTime, long systemTime, int reminderInterval )
     {
         LOG.debug( "Checking time interval expiry: lastRemindedTime " + lastRemindedTime + "\t systemTime: " + systemTime
             + "\t reminderInterval: " + reminderInterval );
         long remainingTime = systemTime - lastRemindedTime;
         int remainingDays = (int) ( remainingTime / ( 1000 * 60 * 60 * 24 ) );
         if ( remainingDays >= reminderInterval ) {
-            return true;
+            // check if reminder is older than configured value
+            if(remainingDays <= maxSurveyReminderInterval){
+                return true;
+            }else{
+                return false;
+            }
         } else {
             return false;
         }
