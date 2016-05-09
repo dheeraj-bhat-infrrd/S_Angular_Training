@@ -3964,7 +3964,7 @@ var hierarchyUpload = {
 					}
 					$('#branch-sum-btn').show();
 					if (regionlength == 0) {
-						('#branch-sum-btn').addClass('active');
+						$('#branch-sum-btn').addClass('active');
 						$('#upload-summary-region').removeClass('active in');
 						$('#upload-summary-branch').addClass('active in');
 						$('#summary').show();
