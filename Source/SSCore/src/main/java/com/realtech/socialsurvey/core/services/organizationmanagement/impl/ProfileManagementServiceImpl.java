@@ -3359,7 +3359,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         companyProfileData.setCompanyLogo( logoUrl );
 
         if ( agentSettings != null ) {
-            if ( !parentLockSettings.getIsLogoLocked() && logoUrl != null && !logoUrl.isEmpty() ) {
+            if ( !parentLockSettings.getIsLogoLocked() && logoUrl != null && !logoUrl.isEmpty() && (
+                agentSettings.getLogo() == null || agentSettings.getLogo().isEmpty() ) ) {
                 agentSettings.setLogo( logoUrl );
             }
             agentSettings.setCompanyProfileData( companyProfileData );
