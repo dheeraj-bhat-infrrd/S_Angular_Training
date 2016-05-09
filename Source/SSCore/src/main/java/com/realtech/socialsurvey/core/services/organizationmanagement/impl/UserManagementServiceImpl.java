@@ -205,6 +205,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value( "${PARAM_ORDER_TAKE_SURVEY}" )
     private String paramOrderTakeSurvey;
+    
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
+    String paramOrderTakeSurveySubject;
+
 
     @Autowired
     private EmailFormatHelper emailFormatHelper;
@@ -4660,7 +4664,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
                     survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
                     companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
-            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName; 
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
             }
@@ -4674,7 +4678,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             mailSubject = fileOperations.getContentFromFile(
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
 
-            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( agentName ) );
+            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( paramOrderTakeSurveySubject.split( "," ) ) );
 
             mailBody = fileOperations.getContentFromFile(
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
