@@ -77,6 +77,9 @@ public class AccountServiceImpl implements AccountService
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public void saveAccountRegistrationDetailsAndSetDataInDO( AccountRegistration accountRegistration ) throws NonFatalException
     {
+        LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO started for company: "
+            + accountRegistration.getCompanyName() );
+
         // validate if the email address is not taken already.
         if ( userManagementService.userExists( accountRegistration.getEmail() ) ) {
             throw new UserAlreadyExistsException( "User with User ID : " + accountRegistration.getEmail() + " already exists" );
@@ -94,12 +97,16 @@ public class AccountServiceImpl implements AccountService
             // Send registration email to user, Send mail to sales lead, maybe to support
             userService.sendRegistrationEmail( user );
         }
+
+        LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO finished for company: "
+            + accountRegistration.getCompanyName() );
     }
 
 
     @Override
     public CompanyProfile getCompanyProfileDetails( int companyId ) throws InvalidInputException
     {
+        LOGGER.info( "Method getCompanyProfileDetails started for company: " + companyId );
         CompanyProfile companyProfile = new CompanyProfile();
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
         Company company = companyDao.findById( Company.class, (long) companyId );
@@ -125,6 +132,7 @@ public class AccountServiceImpl implements AccountService
             country.setCountryName( unitSettings.getContact_details().getCountry() );
             companyProfile.setCountry( country );
         }
+        LOGGER.info( "Method getCompanyProfileDetails finished for company: " + company.getCompany() );
         return companyProfile;
     }
 
@@ -132,34 +140,46 @@ public class AccountServiceImpl implements AccountService
     @Override
     public void updateCompanyProfile( int companyId, CompanyProfile companyProfile ) throws InvalidInputException
     {
+        LOGGER.info( "Method updateCompanyProfile started for company: " + companyProfile.getCompanyName() );
         Company company = companyDao.findById( Company.class, (long) companyId );
         updateCompanyDetailsInMySql( company, companyProfile );
         updateCompanyDetailsInMongo( company, companyProfile );
+        LOGGER.info( "Method updateCompanyProfile finished for company: " + companyProfile.getCompanyName() );
     }
 
 
     @Override
-    public void deleteCompanyProfileImage( int companyId )
+    public void deleteCompanyProfileImage( int companyId ) throws InvalidInputException
     {
-        // TODO Auto-generated method stub
-
+        LOGGER.info( "Method deleteCompanyProfileImage started for company: " + companyId );
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+        unitSettings.setLogo( null );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
+            unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOGGER.info( "Method deleteCompanyProfileImage finished for company: " + companyId );
     }
 
 
     @Override
-    public void updateCompanyProfileImage( int companyId, String imageUrl )
+    public void updateCompanyProfileImage( int companyId, String imageUrl ) throws InvalidInputException
     {
-        // TODO Auto-generated method stub
-
+        LOGGER.info( "Method updateCompanyProfileImage started for company: " + companyId );
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+        unitSettings.setLogo( imageUrl );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
+            unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOGGER.info( "Method updateCompanyProfileImage finished for company: " + companyId );
     }
 
 
     @Override
     public void updateStage( int companyId, String stage )
     {
+        LOGGER.info( "Method updateStage started for company: " + companyId + ", stage: " + stage );
         Company company = companyDao.findById( Company.class, (long) companyId );
         company.setRegistrationStage( stage );
         companyDao.update( company );
+        LOGGER.info( "Method updateStage finished for company: " + companyId + ", stage: " + stage );
     }
 
 
@@ -195,6 +215,7 @@ public class AccountServiceImpl implements AccountService
 
     private void updateCompanyDetailsInMongo( Company company, CompanyProfile companyProfile ) throws InvalidInputException
     {
+        LOGGER.info( "Method updateCompanyDetailsInMongo started for company: " + companyProfile.getCompanyName() );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( company.getCompanyId() );
         ContactDetailsSettings contactDetails = unitSettings.getContact_details();
         if ( contactDetails == null ) {
@@ -241,14 +262,18 @@ public class AccountServiceImpl implements AccountService
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, unitSettings.getProfileUrl(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyProfile.getCompanyName() );
     }
 
 
     private void updateCompanyDetailsInMySql( Company company, CompanyProfile companyProfile )
     {
+        LOGGER.info( "Method updateCompanyDetailsInMySql started for company: " + companyProfile.getCompanyName() );
         company.setCompany( companyProfile.getCompanyName() );
         company.setVerticalsMaster( companyProfile.getIndustry() );
         companyDao.merge( company );
+        LOGGER.info( "Method updateCompanyDetailsInMySql finished for company: " + companyProfile.getCompanyName() );
     }
 
 
@@ -269,10 +294,10 @@ public class AccountServiceImpl implements AccountService
 
     private Company addCompany( AccountRegistration accountRegistration ) throws InvalidInputException
     {
-        LOGGER.debug( "Method addCompany started for company: " + accountRegistration.getCompanyName() );
+        LOGGER.info( "Method addCompany started for company: " + accountRegistration.getCompanyName() );
         Company company = addCompanyDetailsInMySql( accountRegistration.getCompanyName() );
         addCompanyDetailsInMongo( accountRegistration, company );
-        LOGGER.debug( "Method addCompany finished for company: " + accountRegistration.getCompanyName() );
+        LOGGER.info( "Method addCompany finished for company: " + accountRegistration.getCompanyName() );
         return company;
     }
 
@@ -280,7 +305,7 @@ public class AccountServiceImpl implements AccountService
     @Transactional
     private Company addCompanyDetailsInMySql( String companyName )
     {
-        LOGGER.debug( "Method addCompanyDetailsInMySql started for company: " + companyName );
+        LOGGER.info( "Method addCompanyDetailsInMySql started for company: " + companyName );
         Company company = new Company();
         company.setCompany( companyName );
         company.setIsRegistrationComplete( 0 );
@@ -300,14 +325,14 @@ public class AccountServiceImpl implements AccountService
             .get( CommonConstants.INITIAL_INDEX );
         company.setVerticalsMaster( verticalsMaster );
         company = companyDao.save( company );
-        LOGGER.debug( "Method addCompanyDetailsInMySql finished." );
+        LOGGER.info( "Method addCompanyDetailsInMySql finished for company: " + companyName );
         return company;
     }
 
 
     private void addCompanyDetailsInMongo( AccountRegistration accountReg, Company company ) throws InvalidInputException
     {
-        LOGGER.debug( "Method addCompanyDetailsInMongo called." );
+        LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + accountReg.getCompanyName() );
 
         User user = new User();
         user.setEmailId( accountReg.getEmail() );
@@ -341,6 +366,6 @@ public class AccountServiceImpl implements AccountService
             CommonConstants.STATUS_INCOMPLETE_MONGO, unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-        LOGGER.debug( "Method addCompanyDetailsInMongo finished" );
+        LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + accountReg.getCompanyName() );
     }
 }

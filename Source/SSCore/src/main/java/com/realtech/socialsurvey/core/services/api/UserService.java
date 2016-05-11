@@ -17,10 +17,10 @@ public interface UserService
     public UserProfile getUserProfileDetails( int userId ) throws InvalidInputException;
 
 
-    public void deleteUserProfileImage( int userId );
+    public void deleteUserProfileImage( int userId ) throws InvalidInputException;
 
 
-    public void updateUserProfileImage( int userId, String imageUrl );
+    public void updateUserProfileImage( int userId, String imageUrl ) throws InvalidInputException;
 
 
     public void updateStage( int parseInt, String stage );
