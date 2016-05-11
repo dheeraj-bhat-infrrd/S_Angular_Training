@@ -361,12 +361,12 @@
 }
 .reg-right-container{
 	background-color:#326AAD;
-	height:770px;
+	height:100%;
 }
 
 .reg-create-account{
-	font-size: 30px;
-    margin-top: 40px;
+	font-size: 35px;
+    margin-top: 10px;
 }
 
 .reg-name{
@@ -460,8 +460,8 @@
     margin-bottom: 20px;
     padding: 0;
 }
-#reg-next{
-	float: right;
+.reg-next{
+	
 	background-color: #C4C4C4;
     height: 45px;
     line-height: 45px;
@@ -472,7 +472,7 @@
     font-size: 15px;
     font-family: 'opensanssemibold';
     cursor: pointer;
-    margin-right: 10px;
+    
 }
 .regen{
 	background-color: #326AAD !important;
@@ -496,9 +496,66 @@
 .stretch {
     width:100%;
 }
+.reg-side-image{
+	background:url(../images/sidebar-survey.png)center no-repeat;
+	width: 201px;
+    height: 322px;
+    margin: auto;
+    margin-top: 35px;
+}
+.reg-right-description{
+	color:#fff;
+	font-size: 15px;
+    opacity: 0.6;
+    font-family: 'OpenSans';
+     margin: auto;
+    
+}
+.reg-line-1{
+	width: 280px;
+}
+.reg-line-3{
+	width: 332px;
+}
+.reg-line-4{
+	width: 185px;
+}
+.reg-side-linkedin-img{
+	background:url(../images/sidebar-import-profile.png)center no-repeat;
+	width: 270px;
+    height: 100px;
+    margin: auto;
+}
+.reg-import-linedin{
+	color: #fff;
+    font-size: 25px;
+    width: 225px;
+    margin: 45% auto 20px;
+    opacity: 0.6;
+}
+.reg-prof-img{
+	background:url(../images/sidebar-public-profile.png)center no-repeat;
+	width: 300px;
+    height: 207px;
+    margin: auto;
+    margin-top: 35px;
+}
+.prof-line-1{
+	width: 314px; 
+    
+}
+.prof-line-2{
+	width:305px;
+}
+.prof-line-3{
+	width:334px;
+}
+.reg-back{
+	color:#dcdcdc;
+	float:left;
+}
 
-
-//drop down
+/* //drop down
 .dropzone,
 .dropzone * {
   -webkit-box-sizing: border-box;
@@ -774,3 +831,4 @@
     background-position: -14px -407px;
   }
 }
+ */
