@@ -9,7 +9,7 @@
 			<div>
 				<img src="../resources/images/step-1.png" class="stretch" alt="" />
 			</div>
-			<form name="signInForm" ng-submit="submit()">
+			<form name="signInForm" ng-submit="submitLogin(firstName,lastName,companyName,email)">
 
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
 					style="margin-top: 20px;">
@@ -19,26 +19,26 @@
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12"
 						style="margin-top: 30px;">Your Name *</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<input class=" reg-name" type="text" placeholder="First Name"
-							name="firstName" required /> <input class=" reg-name float-right"
+						<input class=" reg-name" type="text" placeholder="First Name" ng-model="firstName"
+							name="firstName" required /> <input class=" reg-name float-right" ng-model="lastName"
 							style="margin-left: 2%;" type="text" placeholder="Last Name" />
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Company
 						Name *</div>
 					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<input class="reg-details" type="text" placeholder="Company Name"
-							name="companyName" required />
+							name="companyName" required ng-model="companyName" />
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Phone
 					</div>
 					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<input class="reg-details" type="tel" id="reg-phone" />
+						<input class="reg-details" type="tel" id="reg-phone" ng-model="phone"/>
 					</div>
 					<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Email
 						Address *</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<input class="reg-details" type="email"
-							placeholder="email@example.com" name="email" required />
+							placeholder="email@example.com" name="email" required ng-model="email"/>
 					</div>
 					<div class="reg-pswd-info col-lg-12 col-md-12 col-sm-12 col-xs-12">(Don't
 						worry about setting a password right now,we'll email you a link to
