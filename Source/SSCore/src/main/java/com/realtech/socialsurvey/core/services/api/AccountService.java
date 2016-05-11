@@ -6,6 +6,7 @@ import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
 import com.realtech.socialsurvey.core.entities.api.PaymentPlan;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 
 
@@ -15,10 +16,10 @@ public interface AccountService
         throws NonFatalException;
 
 
-    public CompanyProfile getCompanyProfileDetails( int parseInt );
+    public CompanyProfile getCompanyProfileDetails( int companyId ) throws InvalidInputException;
 
 
-    public void updateCompanyProfile( int companyId, CompanyProfile companyProfile );
+    public void updateCompanyProfile( int companyId, CompanyProfile companyProfile ) throws InvalidInputException;
 
 
     public void deleteCompanyProfileImage( int companyId );
@@ -27,7 +28,7 @@ public interface AccountService
     public void updateCompanyProfileImage( int companyId, String imageUrl );
 
 
-    public void updateStage( int parseInt, String stage );
+    public void updateStage( int companyId, String stage );
 
 
     public List<VerticalsMaster> getIndustries();
