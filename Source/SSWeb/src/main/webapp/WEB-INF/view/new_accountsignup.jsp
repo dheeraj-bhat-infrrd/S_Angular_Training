@@ -79,13 +79,15 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-route.min.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/intlTelInput.js"></script>
- <script src="${initParam.resourcesPath}/resources/js/signup.js"></script> 
- <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/intlTelInput.js"></script> 
+<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/angular-recaptcha.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery.mask.js"></script>
-<script src="${initParam.resourcesPath}/resources/js/countrySelect.js"></script>"
+<script src="${initParam.resourcesPath}/resources/js/countrySelect.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/app.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/controllers/signup.js"></script> 
+<script src="${initParam.resourcesPath}/resources/js/services/login.js"></script>
 
 
 
