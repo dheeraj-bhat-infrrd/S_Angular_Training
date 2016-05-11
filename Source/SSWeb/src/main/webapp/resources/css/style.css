@@ -461,8 +461,6 @@
     padding: 0;
 }
 .reg-next{
-	
-	background-color: #C4C4C4;
     height: 45px;
     line-height: 45px;
     width: 115px;
@@ -472,14 +470,13 @@
     font-size: 15px;
     font-family: 'opensanssemibold';
     cursor: pointer;
+        border: none;
     
 }
 .regen{
 	background-color: #326AAD !important;
 }
-.regdis{
-	background-color: #C4C4C4 !important;
-}
+
 .step-tab{
 	background:url('../images/step-1.png') no-repeat;
 	height:25px;
@@ -553,6 +550,10 @@
 .reg-back{
 	color:#dcdcdc;
 	float:left;
+}
+.reg-error{
+    height: 33px;
+    margin-top: 20px;
 }
 
 /* //drop down
