@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
@@ -236,4 +237,10 @@ public interface OrganizationUnitSettingsDao
 
 
     public List<OrganizationUnitSettings> fetchUnitSettingsConnectedToZillow( String collectionName, List<Long> identifiers );
+
+
+    public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId );
+
+
+    public List<AgentSettings> getAllAgentSettings();
 }

@@ -204,6 +204,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value( "${PARAM_ORDER_TAKE_SURVEY}" )
     private String paramOrderTakeSurvey;
+    
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY_SUBJECT}")
+    String paramOrderTakeSurveySubject;
+
 
     @Autowired
     private EmailFormatHelper emailFormatHelper;
@@ -2244,6 +2248,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return agentSettings;
     }
+    
+    @Override
+    public ContactDetailsSettings fetchAgentContactDetailByEncryptedId( String userEncryptedId ) throws InvalidInputException
+    {
+        LOG.info( "Getting agent settings for userEncryptedId id: " + userEncryptedId );
+        if ( userEncryptedId == null || userEncryptedId.isEmpty()) {
+            throw new InvalidInputException( "Invalid userEncrypted id for fetching user settings" );
+        }
+        ContactDetailsSettings contactDetailsSettings = organizationUnitSettingsDao.fetchAgentContactDetailByEncryptedId( userEncryptedId );
+        
+        return contactDetailsSettings;
+    }
 
 
     @Override
@@ -2564,6 +2580,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         agentSettings.setModifiedBy( user.getModifiedBy() );
         agentSettings.setModifiedOn( System.currentTimeMillis() );
         agentSettings.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
+        
+        //set encrypted id
+        agentSettings.setUserEncryptedId( generateUserEncryptedId( user.getUserId() ) );
+        
 
         //Set status to incomplete
         agentSettings.setStatus( CommonConstants.STATUS_INCOMPLETE_MONGO );
@@ -2615,6 +2635,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.info( "Inserted into agent settings" );
     }
 
+    
+    @Override
+    public String generateUserEncryptedId(long userId) throws InvalidInputException{
+        LOG.debug( "method generateUserEncryptedId started for user id  " + userId );
+        
+        long hashedUserId = String.valueOf( userId ).hashCode();
+        String hashedUserIdStr = String.valueOf( hashedUserId );
+        String paddedBitString = "";
+        if(hashedUserIdStr.length() < 12){
+            for(int i=0 ; i< 12-hashedUserIdStr.length() ; i++){
+                paddedBitString += (int)(10.0 * Math.random());
+            }
+            hashedUserIdStr += paddedBitString;
+        }
+        
+        String userEncryptedId = encryptionHelper.encodeBase64( hashedUserIdStr );
+        return userEncryptedId;
+        
+    }
 
     /**
      * Method to generate a unique profile name from emailid and userId of individual
@@ -4275,7 +4314,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
                     LOG.debug( "Survey pre initiation id: " + survey.getSurveyPreIntitiationId() + " within reminder counts" );
 
-                    User user = getUserByUserId( survey.getAgentId() );
+                    User user = null;
+                    try {
+                        user = getUserByUserId( survey.getAgentId() );
+                    }catch(InvalidInputException ie){
+                        LOG.warn( "Invalid user mapped to the agent id" );
+                        continue;
+                    }
                     //If agent is deleted, mark survey as corrupt and fetch next survey
                     if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
                         LOG.debug( "The agent id : " + survey.getAgentId() + " is deleted. Skipping record." );
@@ -4298,43 +4343,38 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                             "Initial survey request mail for incomplete survey id: " + survey.getSurveyPreIntitiationId() );
                         reminder = false;
                     }
-                    long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
-                    long currentTime = System.currentTimeMillis();
-                    if ( surveyHandler
-                        .checkIfTimeIntervalHasExpired( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
-                        LOG.debug( "Survey eligible for sending mail with id: " + survey.getSurveyPreIntitiationId() );
-                        try {
-                            /*
-                             * if ( survey.getSurveySource().equalsIgnoreCase(
-                             * CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
-                             * sendMailToAgent( survey ); }
-                             */
-                            if ( reminder ) {
+
+                    // send a survey invitation mail if reminder is false or a reminder mail if reminder is true
+                    try {
+                        if ( reminder ) {
+                            LOG.debug( "Check if survey is eligible for a reminder mail" );
+                            long surveyLastRemindedTime = survey.getLastReminderTime().getTime();
+                            long currentTime = System.currentTimeMillis();
+                            if ( surveyHandler
+                                .checkSurveyReminderEligibility( surveyLastRemindedTime, currentTime, reminderInterval ) ) {
                                 if ( survey.getReminderCounts() < reminderCount ) {
-                                    sendSurveyReminderEmail( emailServices, organizationManagementService, survey,
-                                        company.getCompanyId() );
+                                    sendSurveyReminderEmail( emailServices, organizationManagementService, survey, company.getCompanyId() );
                                     surveyHandler.markSurveyAsSent( survey );
                                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                                 } else {
-                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId()
-                                        + " has exceeded the reminder count " );
+                                    LOG.debug( "This survey " + survey.getSurveyPreIntitiationId() + " has exceeded the reminder count " );
                                 }
-                            } else {
-                                sendSurveyInitiationEmail( emailServices, organizationManagementService, survey,
-                                    company.getCompanyId() );
-                                surveyHandler.markSurveyAsSent( survey );
-                                surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
                             }
+                        } else {
+                            LOG.debug( "Sending survey initiation mail" );
+                            // check if the mail is an older mail
+                            sendSurveyInitiationEmail( emailServices, organizationManagementService, survey, company.getCompanyId() );
+                            surveyHandler.markSurveyAsSent( survey );
+                            surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), reminder );
 
-                        } catch ( InvalidInputException e ) {
-                            LOG.error(
-                                "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
-                                e );
-                        } catch ( ProfileNotFoundException e ) {
-                            LOG.error( "Error while sending incomplete survey mail ", e );
                         }
+                    } catch ( InvalidInputException e ) {
+                        LOG.error(
+                            "InvalidInputException caught in executeInternal() method of IncompleteSurveyReminderSender. Nested exception is ",
+                            e );
+                    } catch ( ProfileNotFoundException e ) {
+                        LOG.error( "Error while sending incomplete survey mail ", e );
                     }
-
                 }
             }
             LOG.info( "Completed IncompleteSurveyReminderSender" );
@@ -4658,7 +4698,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 .replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, surveyLink, survey.getCustomerFirstName(),
                     survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(), user.getEmailId(),
                     companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName() );
-            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT + agentName; 
             if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
                 mailSubject = mailContent.getMail_subject();
             }
@@ -4672,7 +4712,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             mailSubject = fileOperations.getContentFromFile(
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
 
-            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( agentName ) );
+            mailSubject = emailFormatHelper.replaceEmailBodyWithParams( mailSubject, Arrays.asList( paramOrderTakeSurveySubject.split( "," ) ) );
 
             mailBody = fileOperations.getContentFromFile(
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );

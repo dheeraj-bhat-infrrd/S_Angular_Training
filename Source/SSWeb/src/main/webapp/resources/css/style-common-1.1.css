@@ -588,12 +588,12 @@ input#find-pro-submit{
 	border-radius: 3px;
     margin-left: 0;
 }
-.ppl-share-social{
+/* .ppl-share-social{
 	position:absolute;
 	left: 10px;
     top: 93%;
 	
-}
+} */
 .pro-list-default-img {
 	background: url(../images/place-holder-individual.png) no-repeat center;
 	background-size: contain;
@@ -1431,6 +1431,14 @@ span.footer-ul a:hover {
 	color: #2a6496;
 }
 .verify-image{
-	height: 30px;
+	height: 20px;
+    width: 79px;
+}
+.verify-image-zillow{
+	height: 20px;
+    width: 65px;
+}
+.verify-image-ss{
+	height: 20px;
     width: 97px;
 }

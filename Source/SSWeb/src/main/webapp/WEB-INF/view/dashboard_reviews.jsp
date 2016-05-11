@@ -97,19 +97,30 @@
 					</div>
 					
 				</div> --%>
-				<c:if test="${feedback.source =='encompass'}">
-				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
-				</c:if>
-				<c:if test="${feedback.source =='DOTLOOP'}">
-				<div class='verified-badge  verify-image float-right' title='Click here to know more'></div>
-				</c:if>
-				<c:if test="${feedback.source =='Zillow'}">
-				<div class='zillow-badge  verify-image float-right'></div>
-				</c:if>
-				
+
+
+
+				<c:choose>
+					<c:when test="${feedback.source =='encompass'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
+					<c:when test="${feedback.source =='DOTLOOP'}">
+						<div class='verified-badge  verify-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
+					<c:when test="${feedback.source =='Zillow'}">
+						<div class='zillow-badge  verify-image-zillow float-right'></div>
+					</c:when>
+					<c:otherwise>
+						<div class='unverified-badge  verify-image-ss float-right'></div>
+					</c:otherwise>
+				</c:choose>
+
+
 				<div class=" ppl-header-left review-sm-screen ">
 
-
+				<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
 
 
 					<c:choose>
@@ -143,11 +154,16 @@
 								${feedback.customerFirstName} ${feedback.customerLastName}</span>
 						</c:otherwise>
 					</c:choose>
+					
+					
+					
 					<c:if test="${profilemasterid !=4}">
+					<c:if test="${not empty feedback.agentName }">
 						<span class="float-left " style="margin-left: 5px;">for<a
 							style="color: #236CAF; font-weight: 600 !important;"
 							href="${feedback.completeProfileUrl}" target="_blank">
 								${feedback.agentName}</a></span>
+					</c:if>
 					</c:if>
 
 						<c:choose>
@@ -163,8 +179,7 @@
 								</div>
 							</c:when>
 							<c:otherwise>
-								<div style="clear:both">
-									Completed transation in
+								<div style="clear:both"><spring:message code="label.completedTransaction.key"/>
                                        <c:choose>
 									<c:when test="${ not empty feedback.surveyTransactionDate} ">
 										<span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
@@ -191,18 +206,18 @@
 			
 			<%-- <div class="ppl-content">${feedback.review}</div> --%>
 			<c:choose>
-				<c:when test="${fn:length(feedback.review)>250}">
+				<c:when test="${fn:length(review)>250}">
 					<div class="ppl-content review-height">
-						<span class="review-complete-txt">${feedback.review}</span>
+						<span class="review-complete-txt">${review}</span>
 						<c:if test="${feedback.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
-						<span class="review-less-text">${fn:substring(feedback.review, 0, 250)}</span>
+						<span class="review-less-text">${fn:substring(review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<div class="ppl-content review-height">${feedback.review}</div>
+					<div class="ppl-content review-height">${review}</div>
 				</c:otherwise>
 			</c:choose>
 			
