@@ -56,10 +56,20 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
-	<script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/dropzone.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/countrySelect.css">
+	<!-- <script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script> -->
+	<script
+  src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit"
+  async defer
+></script>
+
+	
 </head>
 <body ng-app="SocialSurvey">
-
+<div id="toast-container" class="toast-container">
+		<span id="overlay-toast" class="overlay-toast"></span>
+	</div>
  
 <div ng-view></div>
 
@@ -73,6 +83,12 @@
  <script src="${initParam.resourcesPath}/resources/js/signup.js"></script> 
  <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/angular-recaptcha.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery.mask.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/countrySelect.js"></script>"
+
+
+
 
 </body>
 </html>

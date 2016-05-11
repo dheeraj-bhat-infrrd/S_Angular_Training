@@ -83,11 +83,7 @@ public class LoginController {
 		LOG.info("Method initIndexPage() called from LoginController");
 		return JspResolver.INDEX;
 	}
-	@RequestMapping(value = "/newregistration")
-	public String initRegistration(HttpServletResponse response) {
-		LOG.info("Method initRegistration() called from LoginController");
-		return JspResolver.NEWREGISTRATION;
-	}
+	
 	@RequestMapping(value = "/newaccountsignup")
 	public String initNewAccountSignUp(HttpServletResponse response) {
 		LOG.info("Method initNewAccountSignUp() called from LoginController");
