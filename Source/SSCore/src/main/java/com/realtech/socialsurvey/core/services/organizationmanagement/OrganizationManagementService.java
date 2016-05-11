@@ -1369,11 +1369,11 @@ public interface OrganizationManagementService
     public void forceDeleteDisabledAccount( long companyId, long userId );
 
 
-
     public List<AgentSettings> getAllAgentsFromMongo();
 
 
     void updateUserEncryptedIdOfSetting( AgentSettings agentSettings, String userEncryptedId );
+
 
     public void deactivatedAccountPurger();
 
@@ -1386,4 +1386,7 @@ public interface OrganizationManagementService
 
     public void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
         throws InvalidInputException;
+
+
+    public String generateProfileNameForCompany( String companyName, long iden ) throws InvalidInputException;
 }

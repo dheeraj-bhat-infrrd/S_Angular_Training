@@ -2,7 +2,12 @@ package com.realtech.socialsurvey.core.entities.api;
 
 public enum RegistrationStage
 {
-    INITIATE_REGISTRATION( "INIT", "Initiated Account Registration" );
+    INITIATE_REGISTRATION( "INIT", "Initiated account registration" ),
+    LINKEDIN_SETUP( "LIN", "LinkedIn setup" ),
+    USER_PROFESSIONAL_PROFILE( "UPP", "User professional profile" ),
+    USER_PROFESSIONAL_DETAILS( "UPD", "User professional details" ),
+    USER_COMPANY_PROFILE( "UCP", "User company profile" ),
+    USER_COMPANY_DETAILS( "UCD", "User company details" );
 
     private String code;
     private String description;

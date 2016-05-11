@@ -19,11 +19,14 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
+import com.realtech.socialsurvey.core.entities.api.Country;
 import com.realtech.socialsurvey.core.entities.api.PaymentPlan;
 import com.realtech.socialsurvey.core.entities.api.RegistrationStage;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -95,18 +98,43 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public CompanyProfile getCompanyProfileDetails( int userId )
+    public CompanyProfile getCompanyProfileDetails( int companyId ) throws InvalidInputException
     {
-        // TODO Auto-generated method stub
-        return null;
+        CompanyProfile companyProfile = new CompanyProfile();
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+        Company company = companyDao.findById( Company.class, (long) companyId );
+
+        companyProfile.setCompanyLogo( unitSettings.getLogo() );
+        companyProfile.setCompanyName( company.getCompany() );
+
+        VerticalsMaster verticalsMaster = verticalMastersDao
+            .findByColumn( VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, unitSettings.getVertical() )
+            .get( CommonConstants.INITIAL_INDEX );
+        companyProfile.setIndustry( verticalsMaster );
+
+        if ( unitSettings.getContact_details() != null ) {
+            companyProfile.setAddress( unitSettings.getContact_details().getAddress() );
+            companyProfile.setCity( unitSettings.getContact_details().getCity() );
+            companyProfile.setState( unitSettings.getContact_details().getState() );
+            companyProfile.setZip( unitSettings.getContact_details().getZipcode() );
+            if ( unitSettings.getContact_details().getContact_numbers() != null ) {
+                companyProfile.setOfficePhone( unitSettings.getContact_details().getContact_numbers().getPhone1() );
+            }
+            Country country = new Country();
+            country.setCountryCode( unitSettings.getContact_details().getCountryCode() );
+            country.setCountryName( unitSettings.getContact_details().getCountry() );
+            companyProfile.setCountry( country );
+        }
+        return companyProfile;
     }
 
 
     @Override
-    public void updateCompanyProfile( int companyId, CompanyProfile companyProfile )
+    public void updateCompanyProfile( int companyId, CompanyProfile companyProfile ) throws InvalidInputException
     {
-        // TODO Auto-generated method stub
-
+        Company company = companyDao.findById( Company.class, (long) companyId );
+        updateCompanyDetailsInMySql( company, companyProfile );
+        updateCompanyDetailsInMongo( company, companyProfile );
     }
 
 
@@ -127,10 +155,11 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public void updateStage( int parseInt, String stage )
+    public void updateStage( int companyId, String stage )
     {
-        // TODO Auto-generated method stub
-
+        Company company = companyDao.findById( Company.class, (long) companyId );
+        company.setRegistrationStage( stage );
+        companyDao.update( company );
     }
 
 
@@ -161,6 +190,65 @@ public class AccountServiceImpl implements AccountService
         }
         LOGGER.info( "AccountServiceImpl.getPaymentPlans completed successfully" );
         return paymentPlans;
+    }
+
+
+    private void updateCompanyDetailsInMongo( Company company, CompanyProfile companyProfile ) throws InvalidInputException
+    {
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( company.getCompanyId() );
+        ContactDetailsSettings contactDetails = unitSettings.getContact_details();
+        if ( contactDetails == null ) {
+            contactDetails = new ContactDetailsSettings();
+        }
+        contactDetails.setName( companyProfile.getCompanyName() );
+        contactDetails.setAddress( companyProfile.getAddress() );
+        contactDetails.setCity( companyProfile.getCity() );
+        contactDetails.setCountry( companyProfile.getCountry().getCountryName() );
+        contactDetails.setCountryCode( companyProfile.getCountry().getCountryCode() );
+        contactDetails.setState( companyProfile.getState() );
+        contactDetails.setZipcode( companyProfile.getZip() );
+
+        if ( contactDetails.getContact_numbers() == null ) {
+            contactDetails.setContact_numbers( new ContactNumberSettings() );
+        }
+        contactDetails.getContact_numbers().setWork( companyProfile.getOfficePhone().getCountryCode() + "-"
+            + companyProfile.getOfficePhone().getNumber() + "x" + companyProfile.getOfficePhone().getExtension() );
+        contactDetails.getContact_numbers().setPhone1( companyProfile.getOfficePhone() );
+
+        unitSettings.setContact_details( contactDetails );
+        unitSettings.setLogo( companyProfile.getCompanyLogo() );
+        unitSettings.setVertical( companyProfile.getIndustry().getVerticalName() );
+        String profileName = organizationManagementService.generateProfileNameForCompany( companyProfile.getCompanyName(),
+            company.getCompanyId() );
+        unitSettings.setProfileName( profileName );
+        unitSettings.setProfileUrl( CommonConstants.FILE_SEPARATOR + unitSettings.getProfileName() );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contactDetails, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_VERTICAL, unitSettings.getVertical(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
+            unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, unitSettings.getProfileName(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, unitSettings.getProfileUrl(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+    }
+
+
+    private void updateCompanyDetailsInMySql( Company company, CompanyProfile companyProfile )
+    {
+        company.setCompany( companyProfile.getCompanyName() );
+        company.setVerticalsMaster( companyProfile.getIndustry() );
+        companyDao.merge( company );
     }
 
 
@@ -223,65 +311,36 @@ public class AccountServiceImpl implements AccountService
 
         User user = new User();
         user.setEmailId( accountReg.getEmail() );
-        String contactNumber = accountReg.getPhone().getCountryCode() + "-" + accountReg.getPhone().getNumber() + "-"
+        String contactNumber = accountReg.getPhone().getCountryCode() + "-" + accountReg.getPhone().getNumber() + "x"
             + accountReg.getPhone().getExtension();
-        Map<String, String> organizationalDetails = getCompanyDetailsMap( null, accountReg.getCompanyName(), null, null, null,
-            null, null, null, null, contactNumber, null, null, "true" );
-        organizationManagementService.addOrganizationalDetails( user, company, organizationalDetails );
+        VerticalsMaster verticalsMaster = verticalMastersDao
+            .findByColumn( VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, "CUSTOM" )
+            .get( CommonConstants.INITIAL_INDEX );
+        Map<String, String> companyDetails = new HashMap<String, String>();
+        companyDetails.put( CommonConstants.COMPANY_NAME, accountReg.getCompanyName() );
+        companyDetails.put( CommonConstants.COMPANY_CONTACT_NUMBER, contactNumber );
+        companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO );
+        companyDetails.put( CommonConstants.VERTICAL, verticalsMaster.getVerticalName() );
+        organizationManagementService.addOrganizationalDetails( user, company, companyDetails );
 
-        updateCompanyDetailsInMongo( company.getCompanyId(), MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
-            CommonConstants.STATUS_INCOMPLETE_MONGO );
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( company.getCompanyId() );
+
+        if ( unitSettings.getContact_details() == null ) {
+            unitSettings.setContact_details( new ContactDetailsSettings() );
+        }
+        if ( unitSettings.getContact_details().getContact_numbers() == null ) {
+            unitSettings.getContact_details().setContact_numbers( new ContactNumberSettings() );
+        }
+        unitSettings.getContact_details().getContact_numbers().setPhone1( accountReg.getPhone() );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
+            CommonConstants.STATUS_INCOMPLETE_MONGO, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         LOGGER.debug( "Method addCompanyDetailsInMongo finished" );
-    }
-
-
-    private void updateCompanyDetailsInMongo( long comanyId, String key, Object value ) throws InvalidInputException
-    {
-        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( comanyId );
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( key, value, unitSettings,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-    }
-
-
-    private Map<String, String> getCompanyDetailsMap( String uniqueIdentifier, String companyName, String address1,
-        String address2, String country, String state, String city, String countryCode, String zipCode, String companyContactNo,
-        String logoName, String vertical, String strIsDirectRegistration )
-    {
-        Map<String, String> companyDetails = new HashMap<String, String>();
-        companyDetails.put( CommonConstants.UNIQUE_IDENTIFIER, uniqueIdentifier );
-        companyDetails.put( CommonConstants.COMPANY_NAME, companyName );
-        companyDetails.put( CommonConstants.ADDRESS, getCompleteAddress( address1, address2 ) );
-        companyDetails.put( CommonConstants.ADDRESS1, address1 );
-        if ( address2 != null ) {
-            companyDetails.put( CommonConstants.ADDRESS2, address2 );
-        }
-        companyDetails.put( CommonConstants.COUNTRY, country );
-        companyDetails.put( CommonConstants.STATE, state );
-        companyDetails.put( CommonConstants.CITY, city );
-        companyDetails.put( CommonConstants.COUNTRY_CODE, countryCode );
-        companyDetails.put( CommonConstants.ZIPCODE, zipCode );
-        companyDetails.put( CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo );
-        if ( logoName != null ) {
-            companyDetails.put( CommonConstants.LOGO_NAME, logoName );
-        }
-        companyDetails.put( CommonConstants.VERTICAL, vertical );
-
-        if ( strIsDirectRegistration.equalsIgnoreCase( "false" ) ) {
-            companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_INVOICE );
-        } else {
-            companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO );
-        }
-        return companyDetails;
-    }
-
-
-    private String getCompleteAddress( String address1, String address2 )
-    {
-        String address = address1;
-        if ( address1 != null && !address1.isEmpty() && address2 != null && !address2.isEmpty() ) {
-            address = address1 + " " + address2;
-        }
-        return address;
     }
 }
