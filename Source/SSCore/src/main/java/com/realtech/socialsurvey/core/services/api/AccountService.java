@@ -22,10 +22,10 @@ public interface AccountService
     public void updateCompanyProfile( int companyId, CompanyProfile companyProfile ) throws InvalidInputException;
 
 
-    public void deleteCompanyProfileImage( int companyId );
+    public void deleteCompanyProfileImage( int companyId ) throws InvalidInputException;
 
 
-    public void updateCompanyProfileImage( int companyId, String imageUrl );
+    public void updateCompanyProfileImage( int companyId, String imageUrl ) throws InvalidInputException;
 
 
     public void updateStage( int companyId, String stage );

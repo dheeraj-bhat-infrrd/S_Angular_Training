@@ -88,16 +88,19 @@ public class UserServiceImpl implements UserService
     @Override
     public void updateUserProfile( int userId, UserProfile userProfile ) throws SolrException, InvalidInputException
     {
+        LOGGER.info( "Method updateUserProfile started for userId: " + userId );
         User user = userDao.findById( User.class, (long) userId );
         updateUserDetailsInMySql( user, userProfile );
         updateUserDetailsInMongo( user, userProfile );
         updateUserDetailsInSolr( user, userProfile );
+        LOGGER.info( "Method updateUserProfile finished for userId: " + userId );
     }
 
 
     @Override
     public UserProfile getUserProfileDetails( int userId ) throws InvalidInputException
     {
+        LOGGER.info( "Method getUserProfileDetails started for userId: " + userId );
         UserProfile userProfile = new UserProfile();
         User user = userManagementService.getUserByUserId( userId );
         OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
@@ -118,23 +121,34 @@ public class UserServiceImpl implements UserService
                 }
             }
         }
+        LOGGER.info( "Method getUserProfileDetails finished for userId: " + userId );
         return userProfile;
     }
 
 
     @Override
-    public void deleteUserProfileImage( int userId )
+    public void deleteUserProfileImage( int userId ) throws InvalidInputException
     {
-        // TODO Auto-generated method stub
-
+        LOGGER.info( "Method deleteUserProfileImage started for userId: " + userId );
+        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userId );
+        agentSettings.setProfileImageUrl( null );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, agentSettings.getProfileImageUrl(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        LOGGER.info( "Method deleteUserProfileImage finished for userId: " + userId );
     }
 
 
     @Override
-    public void updateUserProfileImage( int userId, String imageUrl )
+    public void updateUserProfileImage( int userId, String imageUrl ) throws InvalidInputException
     {
-        // TODO Auto-generated method stub
-
+        LOGGER.info( "Method updateUserProfileImage started for userId: " + userId );
+        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userId );
+        agentSettings.setProfileImageUrl( imageUrl );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, agentSettings.getProfileImageUrl(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        LOGGER.info( "Method updateUserProfileImage finished for userId: " + userId );
     }
 
 
@@ -142,6 +156,7 @@ public class UserServiceImpl implements UserService
     @Transactional
     public void updateStage( int userId, String stage )
     {
+        LOGGER.info( "Method updateStage started for userId: " + userId + ", stage: " + stage );
         User user = userDao.findById( User.class, (long) userId );
         user.setRegistrationStage( stage );
         userDao.update( user );
@@ -150,6 +165,7 @@ public class UserServiceImpl implements UserService
             .findById( com.realtech.socialsurvey.core.entities.UserProfile.class, (long) userId );
         userProfile.setProfileCompletionStage( stage );
         userProfileDao.update( userProfile );
+        LOGGER.info( "Method updateStage finished for userId: " + userId + ", stage: " + stage );
     }
 
 
@@ -157,9 +173,11 @@ public class UserServiceImpl implements UserService
     public User addUser( String firstName, String lastName, String emailId, Company company )
         throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
+        LOGGER.info( "Method addUser started for emailId: " + emailId );
         User user = addUserDetailsInMySql( emailId, firstName, lastName, company );
         addUserDetailsInMongo( user );
         addUserDetailsInSolr( user );
+        LOGGER.info( "Method addUser finished for emailId: " + emailId );
         return user;
     }
 
@@ -167,6 +185,7 @@ public class UserServiceImpl implements UserService
     @Override
     public void sendRegistrationEmail( User user ) throws NonFatalException
     {
+        LOGGER.info( "Method sendRegistrationEmail started for user: " + user.getUserId() );
         //Send registration email to user
         userManagementService.inviteCorporateToRegister( user.getFirstName(), user.getLastName(), user.getEmailId(), false,
             null );
@@ -194,17 +213,21 @@ public class UserServiceImpl implements UserService
         } catch ( UndeliveredEmailException e ) {
             e.printStackTrace();
         }
+
+        LOGGER.info( "Method sendRegistrationEmail finished for user: " + user.getUserId() );
     }
 
 
     private void updateUserDetailsInSolr( User user, UserProfile userProfile ) throws SolrException, InvalidInputException
     {
+        LOGGER.info( "Method updateUserDetailsInSolr started for user: " + user.getUserId() );
         Map<String, Object> userMap = new HashMap<>();
         userMap.put( CommonConstants.USER_DISPLAY_NAME_SOLR,
             getFullName( userProfile.getFirstName(), userProfile.getLastName() ) );
         userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, userProfile.getFirstName() );
         userMap.put( CommonConstants.USER_LAST_NAME_SOLR, userProfile.getLastName() );
         solrSearchService.editUserInSolrWithMultipleValues( user.getUserId(), userMap );
+        LOGGER.info( "Method updateUserDetailsInSolr finished for user: " + user.getUserId() );
     }
 
 
@@ -220,6 +243,7 @@ public class UserServiceImpl implements UserService
 
     private void updateUserDetailsInMongo( User user, UserProfile userProfile ) throws InvalidInputException
     {
+        LOGGER.info( "Method updateUserDetailsInMongo started for user: " + user.getUserId() );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
 
         ContactDetailsSettings contactDetails = agentSettings.getContact_details();
@@ -276,20 +300,25 @@ public class UserServiceImpl implements UserService
 
         profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
             agentSettings, contactDetails );
+
+        LOGGER.info( "Method updateUserDetailsInMongo finished for user: " + user.getUserId() );
     }
 
 
     @Transactional
     private void updateUserDetailsInMySql( User user, UserProfile userProfile ) throws InvalidInputException
     {
+        LOGGER.info( "Method updateUserDetailsInMySql started for user: " + user.getUserId() );
         user.setFirstName( userProfile.getFirstName() );
         user.setLastName( userProfile.getLastName() );
         userDao.merge( user );
+        LOGGER.info( "Method updateUserDetailsInMySql finished for user: " + user.getUserId() );
     }
 
 
     private void addUserDetailsInSolr( User user ) throws InvalidInputException, SolrException
     {
+        LOGGER.info( "Method addUserDetailsInSolr started for user: " + user.getUserId() );
         try {
             solrSearchService.addUserToSolr( user );
         } catch ( SolrException exception ) {
@@ -298,22 +327,26 @@ public class UserServiceImpl implements UserService
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             throw exception;
         }
+        LOGGER.info( "Method addUserDetailsInSolr finished for user: " + user.getUserId() );
     }
 
 
     private void addUserDetailsInMongo( User user ) throws InvalidInputException, NoRecordsFetchedException
     {
+        LOGGER.info( "Method addUserDetailsInMongo started for user: " + user.getUserId() );
         userManagementService.insertAgentSettings( user );
         OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( user.getUserId() );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
             CommonConstants.STATUS_INCOMPLETE_MONGO, unitSettings,
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        LOGGER.info( "Method addUserDetailsInMongo finished for user: " + user.getUserId() );
     }
 
 
     @Transactional
     private User addUserDetailsInMySql( String email, String firstName, String lastName, Company company )
     {
+        LOGGER.info( "Method addUserDetailsInMySql started for email: " + email );
         User user = new User();
         user.setCompany( company );
         user.setLoginName( email );
@@ -352,6 +385,9 @@ public class UserServiceImpl implements UserService
         profile.setUser( user );
         profile.setProfileCompletionStage( RegistrationStage.INITIATE_REGISTRATION.getCode() );
         userProfileDao.save( profile );
+
+        LOGGER.info( "Method addUserDetailsInMySql finished for email: " + email );
+
         return user;
     }
 }
