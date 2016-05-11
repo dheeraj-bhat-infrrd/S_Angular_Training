@@ -120,9 +120,9 @@ public class UserController
     public ResponseEntity<?> updateStage( @PathVariable ( "userId") String userId, @PathVariable ( "stage") String stage )
     {
         try {
-            LOGGER.info( "updateStage started" );
+            LOGGER.info( "UserController.updateStage started" );
             userService.updateStage( Integer.parseInt( userId ), stage );
-            LOGGER.info( "updateStage completed successfully" );
+            LOGGER.info( "UserController.updateStage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -139,10 +139,10 @@ public class UserController
         @Valid @RequestBody UserProfileRequest userProfileRequest )
     {
         try {
-            LOGGER.info( "updateUserProfile started" );
+            LOGGER.info( "UserController.updateUserProfile started" );
             UserProfile userProfile = userProfileTransformer.transformApiRequestToDomainObject( userProfileRequest );
             userService.updateUserProfile( Integer.parseInt( userId ), userProfile );
-            LOGGER.info( "updateUserProfile completed successfully" );
+            LOGGER.info( "UserController.updateUserProfile completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -158,10 +158,10 @@ public class UserController
     public ResponseEntity<?> getUserProfile( @PathVariable ( "userId") String userId )
     {
         try {
-            LOGGER.info( "getUserProfile started" );
+            LOGGER.info( "UserController.getUserProfile started" );
             UserProfile userProfile = userService.getUserProfileDetails( Integer.parseInt( userId ) );
             UserProfileResponse userProfileResponse = userProfileTransformer.transformDomainObjectToApiResponse( userProfile );
-            LOGGER.info( "getUserProfile completed successfully" );
+            LOGGER.info( "UserController.getUserProfile completed successfully" );
             return new ResponseEntity<UserProfileResponse>( userProfileResponse, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -177,9 +177,9 @@ public class UserController
     public ResponseEntity<?> deleteUserProfileImage( @PathVariable ( "userId") String userId )
     {
         try {
-            LOGGER.info( "deleteUserProfileImage started" );
+            LOGGER.info( "UserController.deleteUserProfileImage started" );
             userService.deleteUserProfileImage( Integer.parseInt( userId ) );
-            LOGGER.info( "deleteUserProfileImage completed successfully" );
+            LOGGER.info( "UserController.deleteUserProfileImage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
@@ -196,9 +196,9 @@ public class UserController
         @RequestBody UserProfileRequest userProfileRequest )
     {
         try {
-            LOGGER.info( "updateUserProfileImage started" );
+            LOGGER.info( "UserController.updateUserProfileImage started" );
             userService.updateUserProfileImage( Integer.parseInt( userId ), userProfileRequest.getProfilePhotoUrl() );
-            LOGGER.info( "updateUserProfileImage completed successfully" );
+            LOGGER.info( "UserController.updateUserProfileImage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {

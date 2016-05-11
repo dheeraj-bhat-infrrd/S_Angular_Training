@@ -507,8 +507,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param organizationalDetails
      * @throws InvalidInputException
      */
+    @Override
     @SuppressWarnings ( "unused")
-    void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
+    public void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
         throws InvalidInputException
     {
         LOG.debug( "Method addOrganizationalDetails called." );

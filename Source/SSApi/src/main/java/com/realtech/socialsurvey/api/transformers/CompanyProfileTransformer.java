@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.api.models.request.CompanyProfileRequest;
 import com.realtech.socialsurvey.api.models.response.CompanyProfileResponse;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
 import com.realtech.socialsurvey.core.entities.api.Country;
-import com.realtech.socialsurvey.core.entities.api.Industry;
 import com.realtech.socialsurvey.core.entities.api.Phone;
 
 
@@ -32,10 +32,10 @@ public class CompanyProfileTransformer implements Transformer<CompanyProfileRequ
             }
 
             if ( request.getIndustry() != null ) {
-                Industry industry = new Industry();
-                industry.setId( request.getIndustry().getId() );
+                VerticalsMaster industry = new VerticalsMaster();
+                industry.setVerticalsMasterId( request.getIndustry().getId() );
                 industry.setPriorityOrder( request.getIndustry().getPriorityOrder() );
-                industry.setVertical( request.getIndustry().getVertical() );
+                industry.setVerticalName( request.getIndustry().getVertical() );
                 companyProfile.setIndustry( industry );
             }
 
@@ -71,9 +71,9 @@ public class CompanyProfileTransformer implements Transformer<CompanyProfileRequ
 
             if ( companyProfile.getIndustry() != null ) {
                 com.realtech.socialsurvey.api.models.Industry industry = new com.realtech.socialsurvey.api.models.Industry();
-                industry.setId( companyProfile.getIndustry().getId() );
+                industry.setId( companyProfile.getIndustry().getVerticalsMasterId() );
                 industry.setPriorityOrder( companyProfile.getIndustry().getPriorityOrder() );
-                industry.setVertical( companyProfile.getIndustry().getVertical() );
+                industry.setVertical( companyProfile.getIndustry().getVerticalName() );
                 response.setIndustry( industry );
             }
 
