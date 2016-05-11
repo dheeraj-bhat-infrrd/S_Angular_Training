@@ -874,6 +874,7 @@ public interface OrganizationManagementService
      */
     void deleteCompanyFromSolr( Company company ) throws InvalidInputException, SolrException;
 
+
     /**
      * @param company
      * @throws InvalidInputException
@@ -926,6 +927,7 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      */
     public void deactivateCompanyInMongo( Company company ) throws InvalidInputException;
+
 
     /**
      * @param user
@@ -1366,9 +1368,16 @@ public interface OrganizationManagementService
 
     public void forceDeleteDisabledAccount( long companyId, long userId );
 
+
     public void deactivatedAccountPurger();
+
 
     public void hierarchySettingsCorrector();
 
+
     public void imageProcessorStarter();
+
+
+    public void addOrganizationalDetails( User user, Company company, Map<String, String> organizationalDetails )
+        throws InvalidInputException;
 }
