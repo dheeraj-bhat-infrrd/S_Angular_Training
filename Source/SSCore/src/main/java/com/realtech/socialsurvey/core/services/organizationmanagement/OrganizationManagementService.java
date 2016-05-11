@@ -1369,6 +1369,12 @@ public interface OrganizationManagementService
     public void forceDeleteDisabledAccount( long companyId, long userId );
 
 
+
+    public List<AgentSettings> getAllAgentsFromMongo();
+
+
+    void updateUserEncryptedIdOfSetting( AgentSettings agentSettings, String userEncryptedId );
+
     public void deactivatedAccountPurger();
 
 

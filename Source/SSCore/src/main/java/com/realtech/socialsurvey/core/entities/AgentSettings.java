@@ -10,8 +10,19 @@ public class AgentSettings extends OrganizationUnitSettings {
 	private List<CompanyPositions> positions;
 	private CompanyProfileData companyProfileData;
 	private String surveyUrl;
+	private String userEncryptedId;
 
-	public String getSurveyUrl()
+	public String getUserEncryptedId()
+    {
+        return userEncryptedId;
+    }
+
+    public void setUserEncryptedId( String userEncryptedId )
+    {
+        this.userEncryptedId = userEncryptedId;
+    }
+
+    public String getSurveyUrl()
     {
         return surveyUrl;
     }
