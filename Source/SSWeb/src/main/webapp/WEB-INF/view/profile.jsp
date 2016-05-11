@@ -569,7 +569,6 @@
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
 </div>
-<script type="text/javascript" src="https://apis.google.com/js/client:plusone.js" async="async"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/date.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
