@@ -36,7 +36,7 @@ public class UserProfileTransformer implements Transformer<UserProfileRequest, U
                 phone.setCountryCode( request.getPhone2().getCountryCode() );
                 phone.setExtension( request.getPhone2().getExtension() );
                 phone.setNumber( request.getPhone2().getNumber() );
-                userProfile.setPhone1( phone );
+                userProfile.setPhone2( phone );
             }
         }
 
@@ -69,7 +69,7 @@ public class UserProfileTransformer implements Transformer<UserProfileRequest, U
                 phone.setCountryCode( userProfile.getPhone2().getCountryCode() );
                 phone.setExtension( userProfile.getPhone2().getExtension() );
                 phone.setNumber( userProfile.getPhone2().getNumber() );
-                response.setPhone1( phone );
+                response.setPhone2( phone );
             }
         }
 

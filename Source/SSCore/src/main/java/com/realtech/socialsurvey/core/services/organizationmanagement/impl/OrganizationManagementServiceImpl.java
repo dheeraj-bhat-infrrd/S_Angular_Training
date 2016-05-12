@@ -47,18 +47,81 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
-import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.RemovedUserDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
+import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.Event;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.RetriedTransaction;
+import com.realtech.socialsurvey.core.entities.StateLookup;
+import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadStatus;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.*;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
+import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.*;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -71,7 +134,6 @@ import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
-
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -206,7 +268,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     String paramOrderIncompleteSurveyReminder;
     @Value ( "${PARAM_ORDER_SURVEY_COMPLETION_UNPLEASANT_MAIL}")
     String paramOrderSurveyCompletionUnpleasantMail;
-    @Value( "${ACCOUNT_PERM_DELETE_SPAN}" )
+    @Value ( "${ACCOUNT_PERM_DELETE_SPAN}")
     String accountPermDeleteSpan;
 
     @Value ( "${CDN_PATH}")
@@ -712,7 +774,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @return
      * @throws InvalidInputException
      */
-    String generateProfileNameForCompany( String companyName, long iden ) throws InvalidInputException
+    @Override
+    public String generateProfileNameForCompany( String companyName, long iden ) throws InvalidInputException
     {
         LOG.debug( "Generating profile name for companyName:" + companyName + " and iden:" + iden );
         String profileName = null;
@@ -5393,8 +5456,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return unitSettings;
     }
-    
-    
+
+
     @Override
     public List<AgentSettings> getAllAgentsFromMongo()
     {
@@ -5405,7 +5468,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return unitSettings;
     }
 
-    
 
     @Transactional
     @Override
@@ -6906,9 +6968,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             disabledAccountDao.update( account );
         }
     }
-    
+
+
     @Override
-    public void updateUserEncryptedIdOfSetting(AgentSettings agentSettings , String userEncryptedId){
+    public void updateUserEncryptedIdOfSetting( AgentSettings agentSettings, String userEncryptedId )
+    {
         LOG.info( "Inside method updateUserEncryptedIdOfSetting for userEncryptedId : " + userEncryptedId );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_USER_ENCRYPTED_ID,
             userEncryptedId, agentSettings );
@@ -6917,7 +6981,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override
     @Transactional
-    public void deactivatedAccountPurger() {
+    public void deactivatedAccountPurger()
+    {
         try {
             // update last start time
             batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
@@ -6954,6 +7019,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
     }
+
 
     /*
      * Method to purge all the details of the company
@@ -6999,11 +7065,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public void hierarchySettingsCorrector() {
+    public void hierarchySettingsCorrector()
+    {
         try {
             // update last start time
             batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
-                CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR, CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR );
+                CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR,
+                CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR );
             // get a list of all the companies and find all the values set
             Set<Company> companyList = getAllCompanies();
             LOG.debug( "Got " + companyList.size() + " companies" );
@@ -7020,8 +7088,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         List<Region> regions = company.getRegions();
                         for ( Region region : regions ) {
                             // get region settings
-                            OrganizationUnitSettings regionSetting = getRegionSettings( region
-                                .getRegionId() );
+                            OrganizationUnitSettings regionSetting = getRegionSettings( region.getRegionId() );
                             processRegion( regionSetting, region );
                         }
 
@@ -7036,8 +7103,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Error in HierarchySettingsCorrector", e );
             try {
                 //update batch tracker with error message
-                batchTrackerService.updateErrorForBatchTrackerByBatchType( CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR,
-                    e.getMessage() );
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR, e.getMessage() );
                 //send report bug mail to admin
                 batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_HIERARCHY_SETTINGS_CORRECTOR,
                     System.currentTimeMillis(), e );
@@ -7154,8 +7221,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             List<Branch> branches = region.getBranches();
             for ( Branch branch : branches ) {
                 try {
-                    OrganizationUnitSettings branchSetting = getBranchSettingsDefault( branch
-                        .getBranchId() );
+                    OrganizationUnitSettings branchSetting = getBranchSettingsDefault( branch.getBranchId() );
                     processBranch( branchSetting, branch );
                 } catch ( NoRecordsFetchedException e ) {
                     LOG.error( "Could not get branches setting for " + branch.getBranch(), e );
@@ -7380,7 +7446,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public void imageProcessorStarter() {
+    public void imageProcessorStarter()
+    {
         try {
             // update last start time
             batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
@@ -7400,8 +7467,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
                             //send report bug mail to admin
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
-                                System.currentTimeMillis(), e );
+                            batchTrackerService.sendMailToAdminRegardingBatchError(
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7422,8 +7489,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
                             //send report bug mail to admin
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
-                                System.currentTimeMillis(), e );
+                            batchTrackerService.sendMailToAdminRegardingBatchError(
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7444,8 +7511,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
                             //send report bug mail to admin
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
-                                System.currentTimeMillis(), e );
+                            batchTrackerService.sendMailToAdminRegardingBatchError(
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7466,8 +7533,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
                             //send report bug mail to admin
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
-                                System.currentTimeMillis(), e );
+                            batchTrackerService.sendMailToAdminRegardingBatchError(
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7483,13 +7550,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
                             //send report bug mail to admin
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
-                                System.currentTimeMillis(), e );
+                            batchTrackerService.sendMailToAdminRegardingBatchError(
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7504,13 +7572,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
                             //send report bug mail to admin
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
-                                System.currentTimeMillis(), e );
+                            batchTrackerService.sendMailToAdminRegardingBatchError(
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7525,13 +7594,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                            CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
                             //send report bug mail to admin
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
-                                System.currentTimeMillis(), e );
+                            batchTrackerService.sendMailToAdminRegardingBatchError(
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7552,8 +7622,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
                             //send report bug mail to admin
-                            batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER,
-                                System.currentTimeMillis(), e );
+                            batchTrackerService.sendMailToAdminRegardingBatchError(
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7594,14 +7664,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-
     private Map<Long, String> getUnprocessedProfileImages( String collection )
     {
         LOG.debug( "Getting unprocessed profile images for collection " + collection );
         Map<Long, String> unprocessedProfileImages = null;
         try {
-            unprocessedProfileImages = getListOfUnprocessedImages( collection,
-                CommonConstants.IMAGE_TYPE_PROFILE );
+            unprocessedProfileImages = getListOfUnprocessedImages( collection, CommonConstants.IMAGE_TYPE_PROFILE );
             if ( unprocessedProfileImages == null ) {
                 LOG.debug( "No unprocessed profile images exist" );
             }
@@ -7622,8 +7690,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Collection can't be empty" );
         } else {
             try {
-                unprocessedLogoImages = getListOfUnprocessedImages( collection,
-                    CommonConstants.IMAGE_TYPE_LOGO );
+                unprocessedLogoImages = getListOfUnprocessedImages( collection, CommonConstants.IMAGE_TYPE_LOGO );
                 if ( unprocessedLogoImages == null ) {
                     LOG.debug( "No unprocessed logo images exist" );
                 }
@@ -7636,12 +7703,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    private void updateImage( long iden, String fileName, String collectionName, String imageType )
-        throws InvalidInputException
+    private void updateImage( long iden, String fileName, String collectionName, String imageType ) throws InvalidInputException
     {
         LOG.info( "Method updateImage started" );
-        updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true,
-            true );
+        updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true, true );
         LOG.info( "Method updateImage finished" );
     }
 
