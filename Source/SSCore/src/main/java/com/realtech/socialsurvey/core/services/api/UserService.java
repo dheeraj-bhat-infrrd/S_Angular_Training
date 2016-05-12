@@ -11,16 +11,16 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public interface UserService
 {
-    public void updateUserProfile( int userId, UserProfile userProfile );
+    public void updateUserProfile( int userId, UserProfile userProfile ) throws SolrException, InvalidInputException;
 
 
-    public UserProfile getUserProfileDetails( int userId );
+    public UserProfile getUserProfileDetails( int userId ) throws InvalidInputException;
 
 
-    public void deleteUserProfileImage( int userId );
+    public void deleteUserProfileImage( int userId ) throws InvalidInputException;
 
 
-    public void updateUserProfileImage( int userId, String imageUrl );
+    public void updateUserProfileImage( int userId, String imageUrl ) throws InvalidInputException;
 
 
     public void updateStage( int parseInt, String stage );

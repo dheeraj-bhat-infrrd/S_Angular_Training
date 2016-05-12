@@ -102,13 +102,13 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/details/{userId}", method = RequestMethod.GET)
+    @RequestMapping ( value = "/company/profile/details/{companyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get company profile details")
-    public ResponseEntity<?> getCompanyProfile( @PathVariable ( "userId") String userId )
+    public ResponseEntity<?> getCompanyProfile( @PathVariable ( "companyId") String companyId )
     {
         try {
             LOGGER.info( "AccountController.getCompanyProfile started" );
-            CompanyProfile companyProfile = accountService.getCompanyProfileDetails( Integer.parseInt( userId ) );
+            CompanyProfile companyProfile = accountService.getCompanyProfileDetails( Integer.parseInt( companyId ) );
             CompanyProfileResponse response = companyProfileTransformer.transformDomainObjectToApiResponse( companyProfile );
             LOGGER.info( "AccountController.getCompanyProfile completed successfully" );
             return new ResponseEntity<CompanyProfileResponse>( response, HttpStatus.OK );
