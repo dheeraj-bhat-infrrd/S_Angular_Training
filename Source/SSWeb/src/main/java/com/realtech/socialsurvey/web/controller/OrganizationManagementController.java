@@ -828,7 +828,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setUrl( encompassUrl );
 
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
-                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+                "com.realtech.socialsurvey.core.CaptchaAPIRequest.EncompassCrmInfo" );
 
             // set the updated settings value in session with plain password
             encompassCrmInfo.setCrm_password( cipherPassword );
@@ -874,7 +874,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setEmailAddressForReport( null );
             encompassCrmInfo.setGenerateReport( false );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
-                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+                "com.realtech.socialsurvey.core.CaptchaAPIRequest.EncompassCrmInfo" );
             organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_ENABLED,
                 eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
@@ -912,7 +912,7 @@ public class OrganizationManagementController
             EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
             encompassCrmInfo.setState( CommonConstants.ENCOMPASS_DRY_RUN_STATE );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
-                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+                "com.realtech.socialsurvey.core.CaptchaAPIRequest.EncompassCrmInfo" );
             organizationManagementService.logEvent( CommonConstants.ENCOMPASS_CONNECTION, CommonConstants.ACTION_DISABLED,
                 eventFiredBy, user.getCompany().getCompanyId(), 0, 0, 0 );
             message = messageUtils
@@ -959,7 +959,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setEmailAddressForReport( emailIdForReport );
             encompassCrmInfo.setGenerateReport( true );
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
-                "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+                "com.realtech.socialsurvey.core.CaptchaAPIRequest.EncompassCrmInfo" );
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_GENERATE_REPORT_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
@@ -2343,7 +2343,7 @@ public class OrganizationManagementController
                 }
 
                 organizationManagementService.updateCRMDetailsForAnyUnitSettings( unitSettings, collectionName, dotLoopCrmInfo,
-                    "com.realtech.socialsurvey.core.entities.DotLoopCrmInfo" );
+                    "com.realtech.socialsurvey.core.CaptchaAPIRequest.DotLoopCrmInfo" );
 
                 unitSettings.setCrm_info( dotLoopCrmInfo );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.DOTLOOP_CONNECTION_SUCCESSFUL,

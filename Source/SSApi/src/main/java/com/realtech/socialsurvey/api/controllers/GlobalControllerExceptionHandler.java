@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.api.controllers;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -26,6 +27,12 @@ public class GlobalControllerExceptionHandler {
 
 		Map<String, Object> result = createErrorResponse(validationException.getErrors());
 		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
+	}
+
+	@ExceptionHandler(InvalidInputException.class)
+	@ResponseBody
+	public ResponseEntity<String> handleInvalidInputException(InvalidInputException ie){
+		return new ResponseEntity<String>( ie.getMessage(), HttpStatus.BAD_REQUEST );
 	}
 
 	@ExceptionHandler(BadRequestException.class)
