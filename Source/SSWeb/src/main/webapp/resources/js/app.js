@@ -27,6 +27,11 @@ app.config(['$routeProvider', function ($routeProvider) {
     .when("/companydetail", {
         templateUrl: "../../resources/html/company-detail.html",
         controller: "companydetailController"
+    })
+    .when("/payment",{
+    	templateUrl:"../../resources/html/payment.html",
+    	controller:"paymentController"
+    	
     }).
     otherwise({
         redirect: '/accountsignup'
