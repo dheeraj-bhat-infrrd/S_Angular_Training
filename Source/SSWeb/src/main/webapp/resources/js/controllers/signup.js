@@ -143,5 +143,29 @@ app.controller('profiledetailController', ['$http', '$location', function ($http
     });
 }]);
 app.controller('companydetailController', ['$scope', '$http', '$location', function ($scope, $http, $loction) {
+    $scope.countrycode=='ax';
+   if( $scope.countrycode=='us'){
+    $scope.State='State';
+    $scope.ZIP='ZIP';
+   }else if( $scope.countrycode=='ca'){
+    $scope.State='Province';
+    $scope.ZIP='Postal Code';
+   }else{
+       $scope.State='State';
+    $scope.ZIP='ZIP';
+   }
     $("#country").countrySelect();
+    $('#reg-phone-office').intlTelInput({
+        utilsScript: "../resources/js/utils.js"
+    });
+    $('#reg-phone-office').mask(phoneFormat, {
+        'translation': {
+            d: {
+                pattern: /[0-9*]/
+            },
+            /*x:{
+	    	 pattern:/[A-Z*]/
+	     }*/
+        }
+    });
 }]);

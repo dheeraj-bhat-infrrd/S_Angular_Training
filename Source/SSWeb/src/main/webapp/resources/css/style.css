@@ -377,6 +377,12 @@
     padding: 0 10px;
     min-width: 170px;
 }
+.reg-comp-add{
+    height: 40px;
+    border-radius: 3px;
+    border: 1px solid #dcdcdc;
+    padding: 0 10px;
+}
 
 .reg-details{
 	width: 100%;
@@ -554,6 +560,87 @@
 .reg-error{
     height: 33px;
     margin-top: 20px;
+}
+.reg-right-center{
+	position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+}
+.reg-payment-wrapper{
+	
+}
+.reg-payment-container{
+	border: 1px solid #dcdcdc;
+    background-color: #dcdcdc;
+    border-radius: 5px;
+    width: 90%;
+    height: 300px;
+    margin: 30px auto;
+}
+.plan-card {
+    background-color: #2BA875;
+    position: relative;
+    border-radius: 10px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 2px 1px rgba(0,0,0,.2);
+    padding: 20px 0 15px 0;
+    width: 200px;
+    margin: auto;
+    height: 300px;
+
+}
+.price-info {
+    font-size: 8rem;
+    position: relative;
+    display: block;
+    font-weight: 900 !important;
+    margin-bottom: .5rem;
+    letter-spacing: -2px;
+    margin-left: -2.5rem;
+    font-family: 'Lato', 'Open Sans', Helvetica, Arial, sans-serif;
+    height:80px;
+}
+.price-info-sub {
+    display: block;
+    font-size: 13px;
+    line-height: 1rem;
+    padding: 5px 20px;
+    height: 30px;
+    opacity: .8;
+}
+.price-info .dollar {
+    position: relative;
+    top: -2.75rem;
+    font-weight: 400 !important;
+    font-size: 5rem;
+    letter-spacing: 0;
+}
+.price-info .cents {
+    position: absolute;
+    top: 4.25rem;
+    font-size: 1.75rem;
+    margin-left: 0.3rem !important;
+    letter-spacing: -1px;
+    font-weight: 700 !important;
+}
+.pay-button {
+    font-weight: 600 !important;
+}
+.reg-upgrade{
+	background-color: #326AAD;
+    height: 30px;
+    line-height: 30px;
+    width: 70px;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 10px;
+    font-family: 'opensanssemibold';
+    cursor: pointer;
+    border: none;
 }
 
 /* //drop down

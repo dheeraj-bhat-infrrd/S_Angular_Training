@@ -16,8 +16,10 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/dropzone.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/countrySelect.css">
+	<link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 	<!-- <script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script> -->
 	<script
   src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit"
@@ -48,6 +50,7 @@
 <script src="${initParam.resourcesPath}/resources/js/app.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/controllers/signup.js"></script> 
 <script src="${initParam.resourcesPath}/resources/js/services/login.js"></script>
+
 
 
 
