@@ -2,38 +2,36 @@ app.controller('linkedInController', ['$http', '$location', function ($http, $lo
     var vm = this;
     vm.title = 'AngularJS for SocialSurvey';
 }]);
-app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', ' loginService', function ($scope, $http, $location, vcRecaptchaService, loginService) {
-   $scope.activate = 0;
+app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'loginService', function ($scope, $http, $location, vcRecaptchaService, loginService) {
+	$scope.activate = 0;
     $scope.submitLogin = function (firstName, lastName, companyName, email) {
-
         if (vcRecaptchaService.getResponse() === "") { //if string is empty
             showError("Please resolve the captcha and submit!");
             $scope.activate = 0;
         } else {
-            
             var dataToSend = {
-                'fname': firstName,
-                'lname': lastName,
-                'cname': companyName,
+                'firstName': firstName,
+                'lastName': lastName,
+                'companyName': companyName,
                 'email': email,
-                'g-recaptcha-response': vcRecaptchaService.getResponse()
+                'phone': {
+                    "countryCode" : "1",
+                    "number" : "1234567890",
+                    "extension" : "12"
+                },
+                'captchaResponse': vcRecaptchaService.getResponse()
             }
-
         }
-
-
 
         loginService.signup(dataToSend)
             .then(function (response) {
-
+            	console.log(response);
+            	 $location.path('/linkedin').replace();
             }, function (error) {
-
+            	console.log(error);
+            	showError(error);
             });
     };
-
-
-
-
 
     console.log("this is your app's controller");
     $scope.response = null;
