@@ -19,4 +19,10 @@ public class ErrorCodes
     public static final String STATE_INVALID = "state.invalid";
     public static final String ZIP_INVALID = "zip.invalid";
     public static final String OFFICEPHONE_INVALID = "officePhone.invalid";
+
+    // captcha variable
+    public static final String REMOTE_ADDR_INVALID = "remoteaddr.invalid";
+    public static final String CAPTCHA_RESPONSE_INVALID = "captcharesponse.invalid";
+
+
 }
