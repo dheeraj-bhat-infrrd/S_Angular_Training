@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.api.builder;
 
 import com.realtech.socialsurvey.web.api.SSApiIntegration;
+import com.realtech.socialsurvey.web.api.errorhandler.SSApiErrorHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,6 +32,7 @@ public class SSApiIntergrationBuilder implements InitializingBean
     {
         LOG.info( "Initialising rest builder" );
         RestAdapter apiAdaptor = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.FULL )
+            .setErrorHandler( new SSApiErrorHandler() )
             .setEndpoint( apiEndPoint ).build();
         integrationApi = apiAdaptor.create( SSApiIntegration.class );
     }

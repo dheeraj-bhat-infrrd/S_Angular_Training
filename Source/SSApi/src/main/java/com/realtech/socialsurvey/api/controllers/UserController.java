@@ -207,4 +207,9 @@ public class UserController
             return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
         }
     }
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public ResponseEntity<String> helloWold(){
+        return new ResponseEntity<String>( "Hello World", HttpStatus.OK );
+    }
 }

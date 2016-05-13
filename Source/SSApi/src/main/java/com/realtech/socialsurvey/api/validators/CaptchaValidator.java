@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.api.validators;
 
 import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.models.request.CaptchaRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -10,6 +11,7 @@ import org.springframework.validation.Validator;
 /**
  * Validates the google no captcha input
  */
+@Component
 public class CaptchaValidator implements Validator
 {
     public boolean supports( Class<?> clazz )
