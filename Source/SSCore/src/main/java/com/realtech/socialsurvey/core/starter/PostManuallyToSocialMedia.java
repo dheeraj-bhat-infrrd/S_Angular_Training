@@ -23,10 +23,11 @@ public class PostManuallyToSocialMedia {
 	private String facebookScope = "publish_actions,user_posts,manage_pages";
 	private String serverBaseUrl = "https://socialsurvey.me";
 
-	public void postToFacebook(String rating, String customerDisplayName, String agentName, String completeProfileUrl, String feedback,
+	public void postToFacebook(String rating, String customerDisplayName, String agentName, String completeProfileUrl, String feedbackUrl, String feedback,
 			String facebookToken) {
-		String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName + " on Social Survey - view at "
-				+ completeProfileUrl + "\n Feedback : " + feedback;
+		//String message = rating + "-Star Survey Response from " + customerDisplayName + " for " + agentName + " on Social Survey - view at "
+		//		+ completeProfileUrl + "\n Feedback : " + feedback;
+		String message = rating + " Star Review on SocialSurvey \u2014 "+feedback + " by "+ customerDisplayName + " for " + agentName + "\n"+ feedbackUrl;
 		LOG.debug("Message to post: " + message);
 		Facebook facebook = getFacebookInstance();
 		facebook.setOAuthAccessToken(new AccessToken(facebookToken, null));
@@ -61,7 +62,7 @@ public class PostManuallyToSocialMedia {
 	
 	public static void main(String[] args){
 		PostManuallyToSocialMedia post = new PostManuallyToSocialMedia();
-		post.postToFacebook("5.0", "Don", "Nishit Kannan", "https://socialsurvey.me/pages/nishit-kannan", "Test Post", "");
+		post.postToFacebook("5.0", "ANITA R.", "Martin Blazy", "https://socialsurvey.me/pages/martin-blazy", "https://socialsurvey.me/pages/office/diamond/naperville-il", "Martin is a professional loan officer who is beyond knowledgeable and patient. He advocated for me until we got to the closing table. He is exceptional and an advocate for the buyer. I couldn't imagine going through this journey with anyone else. Should I buy another property, Martin is my loan guy.", "");
 	}
 
 }
