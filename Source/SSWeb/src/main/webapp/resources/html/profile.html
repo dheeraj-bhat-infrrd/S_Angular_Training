@@ -1,21 +1,20 @@
-
 <script src="../resources/js/dropzone.js"></script>
 
 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px;">
     <div class="reg-left-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <div class="reg-ss-logo"></div>
         <div><img src="../resources/images/step-1.png" class="stretch" alt="" /></div>
-        <form ng-submit="profileAuthentication(fname,lname,title)">
+        <form ng-submit="profileAuthentication()">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-create-account">Professional Profile</div>
                 <div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:30px;">Your Name *</div>
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <input class=" reg-name" type="text" placeholder="First Name" ng-model="fname" name="profilefirstname" required />
-                    <input class=" reg-name float-right" style="margin-left: 2%;" type="text" ng-model="lname" name="profilelastname" placeholder="Last Name" />
+                    <input class=" reg-name" type="text" placeholder="First Name" ng-model="userProfile.firstName" name="profilefirstname" required />
+                    <input class=" reg-name float-right" style="margin-left: 2%;" type="text" ng-model="userProfile.lastName" name="profilelastname" placeholder="Last Name" />
                 </div>
                 <div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Title *</div>
                 <div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <input class="reg-details" type="text" placeholder="Company Name" ng-model="title" name="title" required/>
+                    <input class="reg-details" type="text" placeholder="Company Name" ng-model="userProfile.title" name="title" required/>
                 </div>
                 
                       
