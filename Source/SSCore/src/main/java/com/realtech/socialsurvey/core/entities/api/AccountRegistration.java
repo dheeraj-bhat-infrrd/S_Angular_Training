@@ -9,6 +9,19 @@ public class AccountRegistration
     private Phone phone;
     private int userId;
     private int companyId;
+    private String captchaResponse;
+
+
+    public String getCaptchaResponse()
+    {
+        return captchaResponse;
+    }
+
+
+    public void setCaptchaResponse( String captchaResponse )
+    {
+        this.captchaResponse = captchaResponse;
+    }
 
 
     public int getUserId()

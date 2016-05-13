@@ -1,23 +1,25 @@
 package com.realtech.socialsurvey.web.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.core.entities.api.Phone;
 import com.realtech.socialsurvey.web.api.SSApiIntegration;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
-import com.realtech.socialsurvey.web.api.exception.SSAPIException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -26,14 +28,16 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class AccountController
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AccountController.class);
+    private static final Logger LOG = LoggerFactory.getLogger( AccountController.class );
 
     @Autowired
     private SSApiIntergrationBuilder apiBuilder;
 
-    @RequestMapping(value = "/registeraccount/initiateregistration", method = RequestMethod.POST)
+
+    @RequestMapping ( value = "/registeraccount/initiateregistration", method = RequestMethod.POST)
     @ResponseBody
-    public String initateAccountRegistration(HttpServletRequest request){
+    public String initateAccountRegistration( @RequestBody AccountRegistration account, HttpServletRequest request )
+    {
         LOG.info( "Registering user" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
@@ -41,17 +45,15 @@ public class AccountController
         // validate captcha
         CaptchaAPIRequest captchaRequest = new CaptchaAPIRequest();
         captchaRequest.setRemoteAddress( request.getRemoteAddr() );
-        captchaRequest.setCaptchaResponse( request.getParameter( "g-recaptcha-response" ) );
-
-        // TODO: Uncomment once captcha is fixed
-        // api.validateCaptcha( captchaRequest );
+        captchaRequest.setCaptchaResponse( account.getCaptchaResponse() );
+        api.validateCaptcha( captchaRequest );
 
         // initiate registration
         AccountRegistrationAPIRequest accountRequest = new AccountRegistrationAPIRequest();
         accountRequest.setFirstName( "Nishit" );
         accountRequest.setLastName( "Kannan" );
         accountRequest.setCompanyName( "Rare Mile" );
-        accountRequest.setEmail( "nishit+"+System.currentTimeMillis()+"@raremile.com" );
+        accountRequest.setEmail( "nishit+" + System.currentTimeMillis() + "@raremile.com" );
         Phone phone = new Phone();
         phone.setCountryCode( "+91" );
         phone.setNumber( "1234567890" );

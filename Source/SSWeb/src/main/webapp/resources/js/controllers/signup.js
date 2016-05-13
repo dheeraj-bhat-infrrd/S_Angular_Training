@@ -12,11 +12,11 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
         } else {
             
             var dataToSend = {
-                'fname': firstName,
-                'lname': lastName,
-                'cname': companyName,
+                'firstName': firstName,
+                'lastName': lastName,
+                'companyName': companyName,
                 'email': email,
-                'g-recaptcha-response': vcRecaptchaService.getResponse()
+                'captchaResponse': vcRecaptchaService.getResponse()
             }
 
         }
@@ -25,9 +25,9 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
 
         loginService.signup(dataToSend)
             .then(function (response) {
-
+            	console.log(response);
             }, function (error) {
-
+            	console.log(error);
             });
     };
 
