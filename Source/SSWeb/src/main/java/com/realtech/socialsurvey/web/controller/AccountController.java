@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
+import com.realtech.socialsurvey.core.entities.api.Phone;
 import com.realtech.socialsurvey.web.api.SSApiIntegration;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.exception.SSAPIException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -34,23 +36,31 @@ public class AccountController
     public String initateAccountRegistration(HttpServletRequest request){
         LOG.info( "Registering user" );
         String responseString = null;
-        LOG.debug( "First Name: "+ request.getParameter( "fname" ) );
-        LOG.debug( "last Name: "+ request.getParameter( "lname" ) );
-        LOG.debug( "Company Name: "+ request.getParameter( "cname" ) );
-        LOG.debug( "First Name: "+ request.getParameter( "fname" ) );
-        LOG.debug( "Email: "+ request.getParameter( "email" ) );
-        LOG.debug( "Captcha: "+ request.getParameter( "g-recaptcha-response" ) );
         SSApiIntegration api = apiBuilder.getIntegrationApi();
+
         // validate captcha
         CaptchaAPIRequest captchaRequest = new CaptchaAPIRequest();
         captchaRequest.setRemoteAddress( request.getRemoteAddr() );
         captchaRequest.setCaptchaResponse( request.getParameter( "g-recaptcha-response" ) );
-        try{
-            Response response = api.validateCaptcha( captchaRequest );
-            LOG.debug( "response from captcha api: "+response.getStatus() );
-        }catch(SSAPIException ex){
-            responseString = ex.getMessage();
-        }
+
+        // TODO: Uncomment once captcha is fixed
+        // api.validateCaptcha( captchaRequest );
+
+        // initiate registration
+        AccountRegistrationAPIRequest accountRequest = new AccountRegistrationAPIRequest();
+        accountRequest.setFirstName( "Nishit" );
+        accountRequest.setLastName( "Kannan" );
+        accountRequest.setCompanyName( "Rare Mile" );
+        accountRequest.setEmail( "nishit+"+System.currentTimeMillis()+"@raremile.com" );
+        Phone phone = new Phone();
+        phone.setCountryCode( "+91" );
+        phone.setNumber( "1234567890" );
+        phone.setExtension( "1234" );
+        accountRequest.setPhone( phone );
+
+        Response response = api.initateRegistration( accountRequest );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+
         return responseString;
     }
 }
