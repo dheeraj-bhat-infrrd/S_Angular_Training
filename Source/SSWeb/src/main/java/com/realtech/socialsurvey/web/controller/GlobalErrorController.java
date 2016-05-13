@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import com.realtech.socialsurvey.web.api.exception.SSAPIBadRequestException;
 import com.realtech.socialsurvey.web.api.exception.SSAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,14 @@ public class GlobalErrorController {
     @ResponseBody
     public String handleSSAPIException(SSAPIException ex){
         LOG.warn( "Returning ss api error message" );
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler(value = SSAPIBadRequestException.class)
+    @ResponseStatus( value = HttpStatus.BAD_REQUEST )
+    @ResponseBody
+    public String handleSSAPIBadRequestException(SSAPIBadRequestException ex){
+        LOG.warn( "Returning ss api bad request error message" );
         return ex.getMessage();
     }
 

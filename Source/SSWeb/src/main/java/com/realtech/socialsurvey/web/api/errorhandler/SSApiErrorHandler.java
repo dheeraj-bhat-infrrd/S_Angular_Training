@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.api.errorhandler;
 
+import com.realtech.socialsurvey.web.api.exception.SSAPIBadRequestException;
 import com.realtech.socialsurvey.web.api.exception.SSAPIException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
@@ -25,9 +26,12 @@ public class SSApiErrorHandler implements ErrorHandler
         Response response = retrofitError.getResponse();
         if(response != null){
             String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-            if(response.getStatus() == HttpStatus.SC_BAD_REQUEST || response.getStatus() == HttpStatus.SC_INTERNAL_SERVER_ERROR){
+            if(response.getStatus() == HttpStatus.SC_INTERNAL_SERVER_ERROR){
                 // Should have an error message
                 return new SSAPIException( responseString );
+            }else if(response.getStatus() == HttpStatus.SC_BAD_REQUEST){
+                // Should have an error message
+                return new SSAPIBadRequestException( responseString );
             }
         }
         return retrofitError;
