@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -30,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.api.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.api.UserProfile;
@@ -60,6 +62,7 @@ public class UserServiceImpl implements UserService
     private EmailServices emailServices;
     private Utils utils;
     private ProfileManagementService profileManagementService;
+    private GenericDao<UserEmailMapping, Long> userEmailMappingDao;
 
     @Value ( "${SALES_LEAD_EMAIL_ADDRESS}")
     private String salesLeadEmail;
@@ -70,7 +73,7 @@ public class UserServiceImpl implements UserService
         OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService,
         SolrSearchService solrSearchService, UserDao userDao, UserProfileDao userProfileDao,
         GenericDao<ProfilesMaster, Integer> profilesMasterDao, EmailServices emailServices, Utils utils,
-        ProfileManagementService profileManagementService )
+        ProfileManagementService profileManagementService, GenericDao<UserEmailMapping, Long> userEmailMappingDao )
     {
         this.organizationManagementService = organizationManagementService;
         this.organizationUnitSettingsDao = organizationUnitSettingsDao;
@@ -82,6 +85,7 @@ public class UserServiceImpl implements UserService
         this.emailServices = emailServices;
         this.utils = utils;
         this.profileManagementService = profileManagementService;
+        this.userEmailMappingDao = userEmailMappingDao;
     }
 
 
@@ -389,5 +393,25 @@ public class UserServiceImpl implements UserService
         LOGGER.info( "Method addUserDetailsInMySql finished for email: " + email );
 
         return user;
+    }
+
+
+    @Override
+    public boolean isUserExist( String emailId ) throws InvalidInputException
+    {
+        LOGGER.info( "Method to check if user exists called for username : " + emailId );
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter user name is null or empty" );
+        }
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.EMAIL_ID, emailId );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+
+        if ( ( userEmailMappings == null || userEmailMappings.isEmpty() ) && !userDao.isEmailAlreadyTaken( emailId ) ) {
+            return false;
+        }
+        LOGGER.info( "Method to check if user exists finished for username : " + emailId );
+        return true;
     }
 }

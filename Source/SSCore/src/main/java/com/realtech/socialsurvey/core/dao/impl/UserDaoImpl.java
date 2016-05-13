@@ -73,7 +73,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     @Override
     public long getUsersCountForCompany( Company company )
     {
-        LOG.info( "Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() started." );
+        LOG.info(
+            "Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() started." );
 
         Criteria criteria = getSession().createCriteria( User.class );
         try {
@@ -87,7 +88,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             throw new DatabaseException( "Exception caught in getUsersCountForCompany() ", hibernateException );
         }
 
-        LOG.info( "Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() finished." );
+        LOG.info(
+            "Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() finished." );
         return (long) criteria.setProjection( Projections.rowCount() ).uniqueResult();
     }
 
@@ -117,8 +119,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
         return (List<User>) criteria.list();
     }
-    
-    
+
+
     /**
      * Method to get a list of all the active users' IDs in a company
      * @param company
@@ -158,8 +160,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     @Override
     public User getActiveUser( String emailId ) throws NoRecordsFetchedException
     {
-        LOG.debug( "Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : "
-            + emailId );
+        LOG.debug(
+            "Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : " + emailId );
         Criteria criteria = getSession().createCriteria( User.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.LOGIN_NAME, emailId ) );
@@ -230,8 +232,8 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     @Override
     public User getActiveUserByEmailAndCompany( String emailId, Company company ) throws NoRecordsFetchedException
     {
-        LOG.debug( "Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : "
-            + emailId );
+        LOG.debug(
+            "Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : " + emailId );
         Criteria criteria = getSession().createCriteria( User.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.LOGIN_NAME, emailId ) );
@@ -341,12 +343,12 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             if ( batchSize > 0 ) {
                 criteria.setMaxResults( batchSize );
             }
-            criteria.add( Restrictions
-                .sqlRestriction( "USER_ID in (select up.USER_ID from USER_PROFILE up where PROFILES_MASTER_ID="
+            criteria.add(
+                Restrictions.sqlRestriction( "USER_ID in (select up.USER_ID from USER_PROFILE up where PROFILES_MASTER_ID="
                     + profileMasterId + " and STATUS=" + CommonConstants.STATUS_ACTIVE + ")" ) );
         } catch ( HibernateException e ) {
-            LOG.error(
-                "HibernateException caught in getUserIdsUnderCompanyBasedOnProfileMasterId(). Reason: " + e.getMessage(), e );
+            LOG.error( "HibernateException caught in getUserIdsUnderCompanyBasedOnProfileMasterId(). Reason: " + e.getMessage(),
+                e );
             throw new DatabaseException( "HibernateException caught in getUserIdsUnderCompanyBasedOnProfileMasterId().", e );
         }
         LOG.info( "Method to get all user ids under company id : " + companyId + " based on profile master id : "
@@ -430,6 +432,33 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         }
         LOG.info( "Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany() );
         return count;
+    }
+
+
+    @Override
+    public boolean isEmailAlreadyTaken( String emailId )
+    {
+        LOG.debug( "Method isEmailAlreadyTaken() called to check if any user present with the Email id : " + emailId );
+        Criteria criteria = getSession().createCriteria( User.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.LOGIN_NAME, emailId ) );
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
+            criteria.add( criterion );
+        } catch ( HibernateException hibernateException ) {
+            throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
+        }
+        @SuppressWarnings ( "unchecked") List<User> users = criteria.list();
+        if ( users == null || users.isEmpty() ) {
+            LOG.debug( "No active users found with the emaild id " + emailId );
+            return false;
+        }
+        LOG.debug( "Method isEmailAlreadyTaken() successful, user with the emailId " + emailId );
+
+        return true;
     }
 
 }
