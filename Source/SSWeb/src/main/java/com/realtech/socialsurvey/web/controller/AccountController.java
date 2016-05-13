@@ -50,16 +50,11 @@ public class AccountController
 
         // initiate registration
         AccountRegistrationAPIRequest accountRequest = new AccountRegistrationAPIRequest();
-        accountRequest.setFirstName( "Nishit" );
-        accountRequest.setLastName( "Kannan" );
-        accountRequest.setCompanyName( "Rare Mile" );
-        accountRequest.setEmail( "nishit+" + System.currentTimeMillis() + "@raremile.com" );
-        Phone phone = new Phone();
-        phone.setCountryCode( "+91" );
-        phone.setNumber( "1234567890" );
-        phone.setExtension( "1234" );
-        accountRequest.setPhone( phone );
-
+        accountRequest.setFirstName( account.getFirstName() );
+        accountRequest.setLastName( account.getLastName() );
+        accountRequest.setCompanyName( account.getCompanyName() );
+        accountRequest.setEmail( account.getEmail() );
+        accountRequest.setPhone( account.getPhone() );
         Response response = api.initateRegistration( accountRequest );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
 
