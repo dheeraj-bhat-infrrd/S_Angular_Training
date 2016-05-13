@@ -31,4 +31,7 @@ public interface UserService
 
 
     public void sendRegistrationEmail( User user ) throws NonFatalException;
+    
+    
+    public boolean isUserExist(String emailId) throws InvalidInputException;
 }

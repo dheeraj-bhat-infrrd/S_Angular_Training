@@ -47,5 +47,7 @@ public interface UserDao extends GenericDao<User, Long> {
      * @return
      */
     public Set<Long> getActiveUserIdsForCompany( Company company );
+    
+    public boolean isEmailAlreadyTaken(String emailId);
 
 }

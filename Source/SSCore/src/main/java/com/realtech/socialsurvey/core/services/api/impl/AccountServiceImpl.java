@@ -37,7 +37,6 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.realtech.socialsurvey.core.services.api.UserService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 
 @Service
@@ -50,7 +49,6 @@ public class AccountServiceImpl implements AccountService
     private GenericDao<VerticalsMaster, Integer> verticalMastersDao;
     private OrganizationManagementService organizationManagementService;
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-    private UserManagementService userManagementService;
     private UserService userService;
 
 
@@ -58,8 +56,7 @@ public class AccountServiceImpl implements AccountService
     public AccountServiceImpl( GenericDao<VerticalsMaster, Integer> industryDao,
         GenericDao<AccountsMaster, Integer> paymentPlanDao, CompanyDao companyDao,
         GenericDao<VerticalsMaster, Integer> verticalMastersDao, OrganizationManagementService organizationManagementService,
-        OrganizationUnitSettingsDao organizationUnitSettingsDao, UserManagementService userManagementService,
-        UserService userService )
+        OrganizationUnitSettingsDao organizationUnitSettingsDao, UserService userService )
     {
         this.industryDao = industryDao;
         this.paymentPlanDao = paymentPlanDao;
@@ -67,9 +64,7 @@ public class AccountServiceImpl implements AccountService
         this.verticalMastersDao = verticalMastersDao;
         this.organizationManagementService = organizationManagementService;
         this.organizationUnitSettingsDao = organizationUnitSettingsDao;
-        this.userManagementService = userManagementService;
         this.userService = userService;
-
     }
 
 
@@ -81,7 +76,7 @@ public class AccountServiceImpl implements AccountService
             + accountRegistration.getCompanyName() );
 
         // validate if the email address is not taken already.
-        if ( userManagementService.userExists( accountRegistration.getEmail() ) ) {
+        if ( userService.isUserExist( accountRegistration.getEmail() ) ) {
             throw new UserAlreadyExistsException( "User with User ID : " + accountRegistration.getEmail() + " already exists" );
         } else {
             // Create a company with registration stage as 1. Insert into mongo with status 'I'
