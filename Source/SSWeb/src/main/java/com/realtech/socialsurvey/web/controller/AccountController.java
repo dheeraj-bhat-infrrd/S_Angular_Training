@@ -28,28 +28,18 @@ public class AccountController
     @Autowired
     private SSApiIntergrationBuilder apiBuilder;
 
-    @RequestMapping(value = "/initiateregistration", method = RequestMethod.POST)
+    @RequestMapping(value = "/registeraccount/initiateregistration", method = RequestMethod.POST)
     @ResponseBody
     public String initateAccountRegistration(HttpServletRequest request){
         LOG.info( "Registering user" );
+
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         // validate captcha
         CaptchaAPIRequest captchaRequest = new CaptchaAPIRequest();
         captchaRequest.setRemoteAddress( request.getRemoteAddr() );
         captchaRequest.setCaptchaResponse( request.getParameter( "g-recaptcha-response" ) );
-        api.validateCaptcha( captchaRequest, new Callback<CaptchaAPIRequest>()
-        {
-            @Override public void success( CaptchaAPIRequest captchaAPIRequest, Response response )
-            {
-                LOG.debug( "Captcha successful" );
-            }
+        api.validateCaptcha( captchaRequest );
 
-            @Override public void failure( RetrofitError retrofitError )
-            {
-                LOG.warn( "Captcha failure" );
-            }
-        } );
-
-        return null;
+        return "{'status':'ok'}";
     }
 }

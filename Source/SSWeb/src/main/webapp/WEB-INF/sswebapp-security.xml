@@ -61,6 +61,9 @@
 		<!--  generate api key -->
 		<intercept-url pattern="/generateApiKey.do" access="permitAll" />
 
+		<!-- Registration urls -->
+		<intercept-url pattern="registeraccount/*.do" access="permitAll" />
+
 		<!-- Restricted Services -->
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
 
