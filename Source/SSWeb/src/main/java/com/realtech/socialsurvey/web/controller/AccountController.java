@@ -45,12 +45,10 @@ public class AccountController
         CaptchaAPIRequest captchaRequest = new CaptchaAPIRequest();
         captchaRequest.setRemoteAddress( request.getRemoteAddr() );
         captchaRequest.setCaptchaResponse( request.getParameter( "g-recaptcha-response" ) );
-        try{
-            Response response = api.validateCaptcha( captchaRequest );
-            LOG.debug( "response from captcha api: "+response.getStatus() );
-        }catch(SSAPIException ex){
-            responseString = ex.getMessage();
-        }
+
+        Response response = api.validateCaptcha( captchaRequest );
+        LOG.debug( "response from captcha api: "+response.getStatus() );
+
         return responseString;
     }
 }
