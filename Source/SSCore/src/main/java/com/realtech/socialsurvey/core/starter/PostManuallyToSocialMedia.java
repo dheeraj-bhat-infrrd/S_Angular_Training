@@ -62,7 +62,7 @@ public class PostManuallyToSocialMedia {
 	
 	public static void main(String[] args){
 		PostManuallyToSocialMedia post = new PostManuallyToSocialMedia();
-		post.postToFacebook("5.0", "ANITA R.", "Martin Blazy", "https://socialsurvey.me/pages/martin-blazy", "https://socialsurvey.me/pages/office/diamond/naperville-il", "Martin is a professional loan officer who is beyond knowledgeable and patient. He advocated for me until we got to the closing table. He is exceptional and an advocate for the buyer. I couldn't imagine going through this journey with anyone else. Should I buy another property, Martin is my loan guy.", "");
+		post.postToFacebook("5.0", "Alfred M.", "Leonard Pollard", "https://socialsurvey.me/pages/leonard-pollard", "https://socialsurvey.me/pages/office/diamond/naperville-il", "t was pleasure to work with you guys thankyou and keep it up.", "");
 	}
 
 }
