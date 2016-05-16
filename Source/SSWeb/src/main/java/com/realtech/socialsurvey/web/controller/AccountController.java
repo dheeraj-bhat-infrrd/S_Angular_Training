@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import com.realtech.socialsurvey.web.api.SSApiIntegration;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
+import com.realtech.socialsurvey.web.entities.PersonalProfile;
 import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
 
 import retrofit.client.Response;
@@ -69,6 +71,23 @@ public class AccountController
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.getUserProfile( userId );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/updateuserprofile", method = RequestMethod.PUT)
+    @ResponseBody
+    public String updateUserProfile( @QueryParam ( "userId") String userId, @QueryParam ( "stage") String stage,
+        @RequestBody PersonalProfile personalProfile )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.updateUserProfile( userId, personalProfile );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        if ( response.getStatus() == HttpStatus.SC_OK ) {
+            api.updateUserProfileStage( userId, stage );
+            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        }
         return responseString;
     }
 }
