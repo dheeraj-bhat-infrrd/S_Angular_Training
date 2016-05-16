@@ -1,16 +1,16 @@
-package com.realtech.socialsurvey.api.models.response;
+package com.realtech.socialsurvey.api.models;
 
-import com.realtech.socialsurvey.api.models.Country;
-import com.realtech.socialsurvey.api.models.Industry;
-import com.realtech.socialsurvey.api.models.Phone;
+import com.realtech.socialsurvey.core.entities.Location;
+import com.realtech.socialsurvey.core.entities.Phone;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 
 
-public class CompanyProfileResponse
+public class CompanyProfile
 {
     private String companyName;
     private String companyLogo;
-    private Industry industry;
-    private Country country;
+    private VerticalsMaster industry;
+    private Location location;
     private String address;
     private String city;
     private String state;
@@ -18,27 +18,27 @@ public class CompanyProfileResponse
     private Phone officePhone;
 
 
-    public Industry getIndustry()
+    public Location getLocation()
+    {
+        return location;
+    }
+
+
+    public void setLocation( Location location )
+    {
+        this.location = location;
+    }
+
+
+    public VerticalsMaster getIndustry()
     {
         return industry;
     }
 
 
-    public void setIndustry( Industry industry )
+    public void setIndustry( VerticalsMaster industry )
     {
         this.industry = industry;
-    }
-
-
-    public Country getCountry()
-    {
-        return country;
-    }
-
-
-    public void setCountry( Country country )
-    {
-        this.country = country;
     }
 
 

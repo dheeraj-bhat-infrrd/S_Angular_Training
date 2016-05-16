@@ -1,25 +1,27 @@
 package com.realtech.socialsurvey.core.services.api;
 
 import java.util.List;
+import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
+import com.realtech.socialsurvey.core.entities.PaymentPlan;
+import com.realtech.socialsurvey.core.entities.Phone;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
-import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
-import com.realtech.socialsurvey.core.entities.api.PaymentPlan;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 
 
 public interface AccountService
 {
-    public void saveAccountRegistrationDetailsAndSetDataInDO( AccountRegistration accountRegistration )
+    public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone )
         throws NonFatalException;
 
 
-    public CompanyProfile getCompanyProfileDetails( int companyId ) throws InvalidInputException;
+    public CompanyCompositeEntity getCompanyProfileDetails( int companyId ) throws InvalidInputException;
 
 
-    public void updateCompanyProfile( int companyId, CompanyProfile companyProfile ) throws InvalidInputException;
+    public void updateCompanyProfile( long compId, CompanyCompositeEntity companyProfile ) throws InvalidInputException;
 
 
     public void deleteCompanyProfileImage( int companyId ) throws InvalidInputException;

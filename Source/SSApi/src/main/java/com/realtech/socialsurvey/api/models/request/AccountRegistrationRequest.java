@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.api.models.request;
 
-import com.realtech.socialsurvey.api.models.Phone;
-
+import com.realtech.socialsurvey.core.entities.Phone;
 
 public class AccountRegistrationRequest
 {

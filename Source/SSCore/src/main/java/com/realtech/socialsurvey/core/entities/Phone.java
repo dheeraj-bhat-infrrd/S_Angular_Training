@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.api.models;
+package com.realtech.socialsurvey.core.entities;
 
 public class Phone
 {

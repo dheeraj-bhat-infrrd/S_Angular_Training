@@ -25,16 +25,12 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
-import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
-import com.realtech.socialsurvey.core.entities.WebAddressSettings;
-import com.realtech.socialsurvey.core.entities.api.RegistrationStage;
-import com.realtech.socialsurvey.core.entities.api.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -90,41 +86,25 @@ public class UserServiceImpl implements UserService
 
 
     @Override
-    public void updateUserProfile( int userId, UserProfile userProfile ) throws SolrException, InvalidInputException
+    public void updateUserProfile( long userId, UserCompositeEntity userProfile ) throws SolrException, InvalidInputException
     {
         LOGGER.info( "Method updateUserProfile started for userId: " + userId );
-        User user = userDao.findById( User.class, (long) userId );
-        updateUserDetailsInMySql( user, userProfile );
-        updateUserDetailsInMongo( user, userProfile );
-        updateUserDetailsInSolr( user, userProfile );
+        updateUserDetailsInMySql( userId, userProfile.getUser() );
+        updateUserDetailsInMongo( userId, userProfile.getAgentSettings() );
+        updateUserDetailsInSolr( userId, userProfile );
         LOGGER.info( "Method updateUserProfile finished for userId: " + userId );
     }
 
 
     @Override
-    public UserProfile getUserProfileDetails( int userId ) throws InvalidInputException
+    public UserCompositeEntity getUserProfileDetails( int userId ) throws InvalidInputException
     {
         LOGGER.info( "Method getUserProfileDetails started for userId: " + userId );
-        UserProfile userProfile = new UserProfile();
+        UserCompositeEntity userProfile = new UserCompositeEntity();
         User user = userManagementService.getUserByUserId( userId );
         OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
-        userProfile.setUserId( userId );
-        userProfile.setFirstName( user.getFirstName() );
-        userProfile.setLastName( user.getLastName() );
-        if ( agentSettings != null ) {
-            userProfile.setProfilePhotoUrl( agentSettings.getProfileImageUrl() );
-            if ( agentSettings.getContact_details() != null ) {
-                userProfile.setLocation( agentSettings.getContact_details().getLocation() );
-                userProfile.setTitle( agentSettings.getContact_details().getTitle() );
-                if ( agentSettings.getContact_details().getContact_numbers() != null ) {
-                    userProfile.setPhone1( agentSettings.getContact_details().getContact_numbers().getPhone1() );
-                    userProfile.setPhone2( agentSettings.getContact_details().getContact_numbers().getPhone2() );
-                }
-                if ( agentSettings.getContact_details().getWeb_addresses() != null ) {
-                    userProfile.setWebsite( agentSettings.getContact_details().getWeb_addresses().getWork() );
-                }
-            }
-        }
+        userProfile.setUser( user );
+        userProfile.setAgentSettings( (AgentSettings) agentSettings );
         LOGGER.info( "Method getUserProfileDetails finished for userId: " + userId );
         return userProfile;
     }
@@ -222,16 +202,17 @@ public class UserServiceImpl implements UserService
     }
 
 
-    private void updateUserDetailsInSolr( User user, UserProfile userProfile ) throws SolrException, InvalidInputException
+    private void updateUserDetailsInSolr( long userId, UserCompositeEntity userProfile )
+        throws SolrException, InvalidInputException
     {
-        LOGGER.info( "Method updateUserDetailsInSolr started for user: " + user.getUserId() );
+        LOGGER.info( "Method updateUserDetailsInSolr started for user: " + userId );
         Map<String, Object> userMap = new HashMap<>();
         userMap.put( CommonConstants.USER_DISPLAY_NAME_SOLR,
-            getFullName( userProfile.getFirstName(), userProfile.getLastName() ) );
-        userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, userProfile.getFirstName() );
-        userMap.put( CommonConstants.USER_LAST_NAME_SOLR, userProfile.getLastName() );
-        solrSearchService.editUserInSolrWithMultipleValues( user.getUserId(), userMap );
-        LOGGER.info( "Method updateUserDetailsInSolr finished for user: " + user.getUserId() );
+            getFullName( userProfile.getUser().getFirstName(), userProfile.getUser().getLastName() ) );
+        userMap.put( CommonConstants.USER_FIRST_NAME_SOLR, userProfile.getUser().getFirstName() );
+        userMap.put( CommonConstants.USER_LAST_NAME_SOLR, userProfile.getUser().getLastName() );
+        solrSearchService.editUserInSolrWithMultipleValues( userId, userMap );
+        LOGGER.info( "Method updateUserDetailsInSolr finished for user: " + userId );
     }
 
 
@@ -245,50 +226,36 @@ public class UserServiceImpl implements UserService
     }
 
 
-    private void updateUserDetailsInMongo( User user, UserProfile userProfile ) throws InvalidInputException
+    private void updateUserDetailsInMongo( long userId, AgentSettings agentSettings ) throws InvalidInputException
     {
-        LOGGER.info( "Method updateUserDetailsInMongo started for user: " + user.getUserId() );
-        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( user.getUserId() );
+        LOGGER.info( "Method updateUserDetailsInMongo started for user: " + userId );
 
-        ContactDetailsSettings contactDetails = agentSettings.getContact_details();
-        if ( contactDetails == null ) {
-            contactDetails = new ContactDetailsSettings();
-        }
-        contactDetails.setFirstName( userProfile.getFirstName() );
-        contactDetails.setLastName( userProfile.getLastName() );
-        contactDetails.setName( getFullName( userProfile.getFirstName(), userProfile.getLastName() ) );
-        contactDetails.setLocation( userProfile.getLocation() );
-        contactDetails.setTitle( userProfile.getTitle() );
-        if ( contactDetails.getContact_numbers() == null ) {
-            contactDetails.setContact_numbers( new ContactNumberSettings() );
-        }
-        contactDetails.getContact_numbers().setPhone1( userProfile.getPhone1() );
-        contactDetails.getContact_numbers().setPhone2( userProfile.getPhone2() );
-        if ( userProfile.getPhone1() != null ) {
-            contactDetails.getContact_numbers().setWork( userProfile.getPhone1().getCountryCode() + "-"
-                + userProfile.getPhone1().getNumber() + "x" + userProfile.getPhone1().getExtension() );
-        }
-        if ( userProfile.getPhone2() != null ) {
-            contactDetails.getContact_numbers().setPersonal( userProfile.getPhone2().getCountryCode() + "-"
-                + userProfile.getPhone2().getNumber() + "x" + userProfile.getPhone2().getExtension() );
-        }
+        if ( agentSettings != null && agentSettings.getContact_details() != null ) {
+            agentSettings.getContact_details().setName( getFullName( agentSettings.getContact_details().getFirstName(),
+                agentSettings.getContact_details().getLastName() ) );
+            if ( agentSettings.getContact_details().getContact_numbers() != null ) {
+                if ( agentSettings.getContact_details().getContact_numbers().getPhone1() != null ) {
+                    agentSettings.getContact_details().getContact_numbers()
+                        .setWork( agentSettings.getContact_details().getContact_numbers().getPhone1().getCountryCode() + "-"
+                            + agentSettings.getContact_details().getContact_numbers().getPhone1().getNumber() + "x"
+                            + agentSettings.getContact_details().getContact_numbers().getPhone1().getExtension() );
+                }
+                if ( agentSettings.getContact_details().getContact_numbers().getPhone2() != null ) {
+                    agentSettings.getContact_details().getContact_numbers()
+                        .setPersonal( agentSettings.getContact_details().getContact_numbers().getPhone2().getCountryCode() + "-"
+                            + agentSettings.getContact_details().getContact_numbers().getPhone2().getNumber() + "x"
+                            + agentSettings.getContact_details().getContact_numbers().getPhone2().getExtension() );
+                }
+            }
 
-        if ( contactDetails.getWeb_addresses() == null ) {
-            contactDetails.setWeb_addresses( new WebAddressSettings() );
+            if ( agentSettings.getContact_details().getMail_ids() != null ) {
+                String profileName = userManagementService.generateIndividualProfileName( userId,
+                    agentSettings.getContact_details().getName(), agentSettings.getContact_details().getMail_ids().getWork() );
+                agentSettings.setProfileName( profileName );
+                String profileUrl = utils.generateAgentProfileUrl( profileName );
+                agentSettings.setProfileUrl( profileUrl );
+            }
         }
-        contactDetails.getWeb_addresses().setWork( userProfile.getWebsite() );
-        if ( contactDetails.getMail_ids() == null ) {
-            contactDetails.setMail_ids( new MailIdSettings() );
-        }
-        contactDetails.getMail_ids().setWork( user.getEmailId() );
-
-        agentSettings.setContact_details( contactDetails );
-        agentSettings.setProfileImageUrl( userProfile.getProfilePhotoUrl() );
-        String profileName = userManagementService.generateIndividualProfileName( user.getUserId(), contactDetails.getName(),
-            user.getEmailId() );
-        agentSettings.setProfileName( profileName );
-        String profileUrl = utils.generateAgentProfileUrl( profileName );
-        agentSettings.setProfileUrl( profileUrl );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, agentSettings.getProfileUrl(), agentSettings,
@@ -303,20 +270,18 @@ public class UserServiceImpl implements UserService
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
 
         profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-            agentSettings, contactDetails );
+            agentSettings, agentSettings.getContact_details() );
 
-        LOGGER.info( "Method updateUserDetailsInMongo finished for user: " + user.getUserId() );
+        LOGGER.info( "Method updateUserDetailsInMongo finished for user: " + userId );
     }
 
 
     @Transactional
-    private void updateUserDetailsInMySql( User user, UserProfile userProfile ) throws InvalidInputException
+    private void updateUserDetailsInMySql( long userId, User userProfile ) throws InvalidInputException
     {
-        LOGGER.info( "Method updateUserDetailsInMySql started for user: " + user.getUserId() );
-        user.setFirstName( userProfile.getFirstName() );
-        user.setLastName( userProfile.getLastName() );
-        userDao.merge( user );
-        LOGGER.info( "Method updateUserDetailsInMySql finished for user: " + user.getUserId() );
+        LOGGER.info( "Method updateUserDetailsInMySql started for user: " + userId );
+        userDao.merge( userProfile );
+        LOGGER.info( "Method updateUserDetailsInMySql finished for user: " + userId );
     }
 
 

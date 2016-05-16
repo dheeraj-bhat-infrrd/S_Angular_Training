@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -17,21 +18,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.realtech.socialsurvey.api.models.CompanyProfile;
 import com.realtech.socialsurvey.api.models.request.AccountRegistrationRequest;
-import com.realtech.socialsurvey.api.models.request.CompanyProfileRequest;
-import com.realtech.socialsurvey.api.models.response.AccountRegistrationResponse;
-import com.realtech.socialsurvey.api.models.response.CompanyProfileResponse;
-import com.realtech.socialsurvey.api.transformers.AccountRegistrationTransformer;
 import com.realtech.socialsurvey.api.transformers.CompanyProfileTransformer;
-import com.realtech.socialsurvey.api.transformers.IndustryTransformer;
-import com.realtech.socialsurvey.api.transformers.PaymentPlanTransformer;
 import com.realtech.socialsurvey.api.validators.AccountRegistrationValidator;
 import com.realtech.socialsurvey.api.validators.CompanyProfileValidator;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.PaymentPlan;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
-import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
-import com.realtech.socialsurvey.core.entities.api.PaymentPlan;
 import com.realtech.socialsurvey.core.services.api.AccountService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
@@ -41,27 +40,22 @@ public class AccountController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( AccountController.class );
     private AccountRegistrationValidator accountRegistrationValidator;
-    private AccountRegistrationTransformer accountRegistrationTransformer;
     private AccountService accountService;
     private CompanyProfileTransformer companyProfileTransformer;
     private CompanyProfileValidator companyProfileValidator;
-    private IndustryTransformer industryTransformer;
-    private PaymentPlanTransformer paymentPlanTransformer;
+    private OrganizationManagementService organizationManagementService;
 
 
     @Autowired
-    public AccountController( AccountRegistrationValidator accountRegistrationValidator,
-        AccountRegistrationTransformer accountRegistrationTransformer, AccountService accountService,
+    public AccountController( AccountRegistrationValidator accountRegistrationValidator, AccountService accountService,
         CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator,
-        IndustryTransformer industryTransformer, PaymentPlanTransformer paymentPlanTransformer )
+        OrganizationManagementService organizationManagementService )
     {
         this.accountRegistrationValidator = accountRegistrationValidator;
-        this.accountRegistrationTransformer = accountRegistrationTransformer;
         this.accountService = accountService;
         this.companyProfileTransformer = companyProfileTransformer;
         this.companyProfileValidator = companyProfileValidator;
-        this.industryTransformer = industryTransformer;
-        this.paymentPlanTransformer = paymentPlanTransformer;
+        this.organizationManagementService = organizationManagementService;
     }
 
 
@@ -86,13 +80,14 @@ public class AccountController
     {
         try {
             LOGGER.info( "AccountController.initAccountRegsitration started" );
-            AccountRegistration accountRegistration = accountRegistrationTransformer
-                .transformApiRequestToDomainObject( accountRegistrationRequest );
-            accountService.saveAccountRegistrationDetailsAndSetDataInDO( accountRegistration );
-            AccountRegistrationResponse response = accountRegistrationTransformer
-                .transformDomainObjectToApiResponse( accountRegistration );
+            User user = new User();
+            user.setFirstName( accountRegistrationRequest.getFirstName() );
+            user.setLastName( accountRegistrationRequest.getLastName() );
+            user.setEmailId( accountRegistrationRequest.getEmail() );
+            Map<String, Long> ids = accountService.saveAccountRegistrationDetailsAndGetIdsInMap( user,
+                accountRegistrationRequest.getCompanyName(), accountRegistrationRequest.getPhone() );
             LOGGER.info( "AccountController.initAccountRegsitration completed successfully" );
-            return new ResponseEntity<AccountRegistrationResponse>( response, HttpStatus.OK );
+            return new ResponseEntity<Map<String, Long>>( ids, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug( "Exception thrown while initiating account registration: " + ex.getMessage() );
@@ -108,10 +103,10 @@ public class AccountController
     {
         try {
             LOGGER.info( "AccountController.getCompanyProfile started" );
-            CompanyProfile companyProfile = accountService.getCompanyProfileDetails( Integer.parseInt( companyId ) );
-            CompanyProfileResponse response = companyProfileTransformer.transformDomainObjectToApiResponse( companyProfile );
+            CompanyCompositeEntity companyProfile = accountService.getCompanyProfileDetails( Integer.parseInt( companyId ) );
+            CompanyProfile response = companyProfileTransformer.transformDomainObjectToApiResponse( companyProfile );
             LOGGER.info( "AccountController.getCompanyProfile completed successfully" );
-            return new ResponseEntity<CompanyProfileResponse>( response, HttpStatus.OK );
+            return new ResponseEntity<CompanyProfile>( response, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug( "Exception thrown while getting company profile details: " + ex.getMessage() );
@@ -124,13 +119,16 @@ public class AccountController
     @RequestMapping ( value = "/company/profile/update/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile details")
     public ResponseEntity<?> updateCompanyProfile( @PathVariable ( "companyId") String companyId,
-        @Valid @RequestBody CompanyProfileRequest companyProfileRequest )
+        @Valid @RequestBody CompanyProfile companyProfile )
     {
         try {
             LOGGER.info( "AccountController.updateCompanyProfile started" );
-            CompanyProfile companyProfile = companyProfileTransformer
-                .transformApiRequestToDomainObject( companyProfileRequest );
-            accountService.updateCompanyProfile( Integer.parseInt( companyId ), companyProfile );
+            long compId = Long.parseLong( companyId );
+            OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( compId );
+            Company company = organizationManagementService.getCompanyById( compId );
+            CompanyCompositeEntity companyProfileDetails = companyProfileTransformer
+                .transformApiRequestToDomainObject( companyProfile, company, unitSettings );
+            accountService.updateCompanyProfile( compId, companyProfileDetails );
             LOGGER.info( "AccountController.updateCompanyProfile completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
@@ -163,11 +161,11 @@ public class AccountController
     @RequestMapping ( value = "/company/profile/profileimage/update/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile image")
     public ResponseEntity<?> updateCompanyProfileImage( @PathVariable ( "companyId") String companyId,
-        @RequestBody CompanyProfileRequest companyProfileRequest )
+        @RequestBody CompanyProfile companyProfile )
     {
         try {
             LOGGER.info( "AccountController.updateCompanyProfileImage started" );
-            accountService.updateCompanyProfileImage( Integer.parseInt( companyId ), companyProfileRequest.getCompanyLogo() );
+            accountService.updateCompanyProfileImage( Integer.parseInt( companyId ), companyProfile.getCompanyLogo() );
             LOGGER.info( "AccountController.updateCompanyProfileImage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {
@@ -203,11 +201,9 @@ public class AccountController
     {
         try {
             LOGGER.info( "AccountController.getIndustries started" );
-            List<VerticalsMaster> industryDOs = accountService.getIndustries();
-            List<com.realtech.socialsurvey.api.models.Industry> industries = industryTransformer
-                .transformDomainObjectListToApiResponseList( industryDOs );
+            List<VerticalsMaster> industries = accountService.getIndustries();
             LOGGER.info( "AccountController.getIndustries completed successfully" );
-            return new ResponseEntity<List<com.realtech.socialsurvey.api.models.Industry>>( industries, HttpStatus.OK );
+            return new ResponseEntity<List<VerticalsMaster>>( industries, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug( "Exception thrown while getting industries drop down data: " + ex.getMessage() );
@@ -223,11 +219,9 @@ public class AccountController
     {
         try {
             LOGGER.info( "AccountController.getPaymentPlans started" );
-            List<PaymentPlan> planDOs = accountService.getPaymentPlans();
-            List<com.realtech.socialsurvey.api.models.PaymentPlan> plans = paymentPlanTransformer
-                .transformDomainObjectListToApiResponseList( planDOs );
+            List<PaymentPlan> plans = accountService.getPaymentPlans();
             LOGGER.info( "AccountController.getPaymentPlans completed successfully" );
-            return new ResponseEntity<List<com.realtech.socialsurvey.api.models.PaymentPlan>>( plans, HttpStatus.OK );
+            return new ResponseEntity<List<PaymentPlan>>( plans, HttpStatus.OK );
         } catch ( Exception ex ) {
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug( "Exception thrown while getting payment plans: " + ex.getMessage() );

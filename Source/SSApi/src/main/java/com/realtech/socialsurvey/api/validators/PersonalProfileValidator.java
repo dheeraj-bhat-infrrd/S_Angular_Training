@@ -7,11 +7,11 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.realtech.socialsurvey.api.exceptions.BadRequestException;
-import com.realtech.socialsurvey.api.models.request.UserProfileRequest;
+import com.realtech.socialsurvey.api.models.PersonalProfile;
 
 
 @Component
-public class UserProfileValidator implements Validator
+public class PersonalProfileValidator implements Validator
 {
     @Autowired
     private PhoneValidator phoneValidator;
@@ -19,13 +19,13 @@ public class UserProfileValidator implements Validator
 
     public boolean supports( Class<?> clazz )
     {
-        return UserProfileRequest.class.isAssignableFrom( clazz );
+        return PersonalProfile.class.isAssignableFrom( clazz );
     }
 
 
     public void validate( Object target, Errors errors )
     {
-        UserProfileRequest request = (UserProfileRequest) target;
+        PersonalProfile request = (PersonalProfile) target;
 
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "firstName", ErrorCodes.FIRSTNAME_INVALID,
             "firstName cannot be empty" );

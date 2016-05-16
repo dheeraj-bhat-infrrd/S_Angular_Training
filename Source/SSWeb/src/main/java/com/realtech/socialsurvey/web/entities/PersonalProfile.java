@@ -1,9 +1,8 @@
-package com.realtech.socialsurvey.api.models.request;
+package com.realtech.socialsurvey.web.entities;
 
-import com.realtech.socialsurvey.api.models.Phone;
+import com.realtech.socialsurvey.core.entities.Phone;
 
-
-public class UserProfileRequest
+public class PersonalProfile
 {
     private int userId;
     private String firstName;

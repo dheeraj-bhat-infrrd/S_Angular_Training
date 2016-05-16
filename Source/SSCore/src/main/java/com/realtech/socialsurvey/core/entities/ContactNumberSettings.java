@@ -2,8 +2,6 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
 
-import com.realtech.socialsurvey.core.entities.api.Phone;
-
 
 /**
  * Settings object for contact numbers of a profile

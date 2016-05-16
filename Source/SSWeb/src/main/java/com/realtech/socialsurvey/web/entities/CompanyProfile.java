@@ -1,5 +1,7 @@
-package com.realtech.socialsurvey.core.entities.api;
+package com.realtech.socialsurvey.web.entities;
 
+import com.realtech.socialsurvey.core.entities.Location;
+import com.realtech.socialsurvey.core.entities.Phone;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 
 
@@ -8,7 +10,7 @@ public class CompanyProfile
     private String companyName;
     private String companyLogo;
     private VerticalsMaster industry;
-    private Country country;
+    private Location locaton;
     private String address;
     private String city;
     private String state;
@@ -28,15 +30,15 @@ public class CompanyProfile
     }
 
 
-    public Country getCountry()
+    public Location getLocaton()
     {
-        return country;
+        return locaton;
     }
 
 
-    public void setCountry( Country country )
+    public void setLocaton( Location locaton )
     {
-        this.country = country;
+        this.locaton = locaton;
     }
 
 

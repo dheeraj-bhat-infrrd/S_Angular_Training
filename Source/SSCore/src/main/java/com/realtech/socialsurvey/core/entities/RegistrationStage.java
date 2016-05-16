@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.core.entities.api;
+package com.realtech.socialsurvey.core.entities;
 
 public enum RegistrationStage
 {
