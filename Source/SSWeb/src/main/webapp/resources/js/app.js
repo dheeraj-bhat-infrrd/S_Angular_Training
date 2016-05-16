@@ -18,7 +18,7 @@ app.config(['$routeProvider', function ($routeProvider) {
     })
     .when("/profiledetail", {
         templateUrl: "../../resources/html/profile-detail.html",
-       controller: "profiledetailController"
+       controller: "profileController"
     })
     .when("/company", {
         templateUrl: "../../resources/html/company.html",
@@ -26,7 +26,7 @@ app.config(['$routeProvider', function ($routeProvider) {
     })
     .when("/companydetail", {
         templateUrl: "../../resources/html/company-detail.html",
-        controller: "companydetailController"
+        controller: "companyController"
     })
     .when("/payment",{
     	templateUrl:"../../resources/html/payment.html",

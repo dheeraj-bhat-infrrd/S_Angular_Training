@@ -1,3 +1,14 @@
+var phoneRegEx = {
+        'translation': {
+            d: {
+                pattern: /[0-9*]/
+            },
+            /*x:{
+	    	 pattern:/[A-Z*]/
+	     }*/
+        }
+    };
+
 app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService', function ($scope, $http, $location, vcRecaptchaService, LoginService) {
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
@@ -46,16 +57,7 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
         utilsScript: "../resources/js/utils.js"
     });
     
-    $('#reg-phone').mask(phoneFormat, {
-        'translation': {
-            d: {
-                pattern: /[0-9*]/
-            },
-            /*x:{
-	    	 pattern:/[A-Z*]/
-	     }*/
-        }
-    });
+    $('#reg-phone').mask(phoneFormat, phoneRegEx);
     
     $scope.register = function () {
     	$location.path('/linkedin').replace();
@@ -70,53 +72,53 @@ app.controller('linkedInController', ['$http', '$location', function ($http, $lo
 
 
 app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', function ($scope, $http, $location, UserProfileService) {
-	$scope.userProfile = {};
+	if(angular.isUndefined($scope.userProfile) || $scope.userProfile == null || $scope.userProfile == {}){
+		UserProfileService.getUserProfile(1230).then(function(response){ 
+			$scope.userProfile = response.data;
+		}, function (error) {
+		    console.log(error);
+		    showError(error);
+		});
+	}
 	
-	UserProfileService.getUserProfile(1230).then(function(response){ 
-		$scope.userProfile = response.data;
-	}, function (error) {
-	    console.log(error);
-	    showError(error);
-	});
-	
-    var myDropzone = new Dropzone("div#my-awesome-dropzone", {
-        url: "/file/post"
-    });
+	var myDropzone = null;
+	if ( angular.isElement('#my-awesome-dropzone')) {
+	    myDropzone = new Dropzone("div#my-awesome-dropzone", {
+	        url: "/file/post"
+	    });
+	}
     
-    $scope.profileAuthentication = function () {
-        console.log($scope.userProfile);
+    $scope.saveProfile = function () {
+    	UserProfileService.updateUserProfile(1230, 'UPP', $scope.userProfile).then(function(response){ 
+    		$location.path('/profiledetail').replace();
+    	}, function (error) {
+    	    console.log(error);
+    	    showError(error);
+    	});
     };
-}]);
-
-app.controller('profiledetailController', ['$http', '$location', function ($http, $location) {
+    
+    $scope.saveProfileDetails = function () {
+    	$scope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	UserProfileService.updateUserProfile(1230, 'UPD', $scope.userProfile).then(function(response){ 
+    		$location.path('/company').replace();
+    	}, function (error) {
+    	    console.log(error);
+    	    showError(error);
+    	});
+    };
+    
     $('#reg-phone1').intlTelInput({
         utilsScript: "../resources/js/utils.js"
     });
-    $('#reg-phone1').mask(phoneFormat, {
-        'translation': {
-            d: {
-                pattern: /[0-9*]/
-            },
-            /*x:{
-	    	 pattern:/[A-Z*]/
-	     }*/
-        }
-    });
+    $('#reg-phone1').mask(phoneFormat,phoneRegEx);
+    
     $('#reg-phone2').intlTelInput({
         utilsScript: "../resources/js/utils.js"
     });
-    $('#reg-phone2').mask(phoneFormat, {
-        'translation': {
-            d: {
-                pattern: /[0-9*]/
-            },
-            /*x:{
-	    	 pattern:/[A-Z*]/
-	     }*/
-        }
-    });
+    $('#reg-phone2').mask(phoneFormat, phoneRegEx);
 }]);
-app.controller('companydetailController', ['$scope', '$http', '$location', function ($scope, $http, $loction) {
+
+app.controller('companyController', ['$scope', '$http', '$location', function ($scope, $http, $loction) {
     $scope.countrycode=='ax';
    if( $scope.countrycode=='us'){
     $scope.State='State';
@@ -132,14 +134,5 @@ app.controller('companydetailController', ['$scope', '$http', '$location', funct
     $('#reg-phone-office').intlTelInput({
         utilsScript: "../resources/js/utils.js"
     });
-    $('#reg-phone-office').mask(phoneFormat, {
-        'translation': {
-            d: {
-                pattern: /[0-9*]/
-            },
-            /*x:{
-	    	 pattern:/[A-Z*]/
-	     }*/
-        }
-    });
+    $('#reg-phone-office').mask(phoneFormat, phoneRegEx);
 }]);
