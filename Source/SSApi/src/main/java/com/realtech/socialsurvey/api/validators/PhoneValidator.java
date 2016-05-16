@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 
-import com.realtech.socialsurvey.api.models.Phone;
+import com.realtech.socialsurvey.core.entities.Phone;
 
 
 @Component

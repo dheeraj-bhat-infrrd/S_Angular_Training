@@ -7,7 +7,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.realtech.socialsurvey.api.exceptions.BadRequestException;
-import com.realtech.socialsurvey.api.models.request.CompanyProfileRequest;
+import com.realtech.socialsurvey.api.models.CompanyProfile;
 
 
 @Component
@@ -19,13 +19,13 @@ public class CompanyProfileValidator implements Validator
 
     public boolean supports( Class<?> clazz )
     {
-        return CompanyProfileRequest.class.isAssignableFrom( clazz );
+        return CompanyProfile.class.isAssignableFrom( clazz );
     }
 
 
     public void validate( Object target, Errors errors )
     {
-        CompanyProfileRequest request = (CompanyProfileRequest) target;
+        CompanyProfile request = (CompanyProfile) target;
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "companyName", ErrorCodes.COMPANYNAME_INVALID,
             "companyName cannot be empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "industry", ErrorCodes.INDUSTRY_INVALID,

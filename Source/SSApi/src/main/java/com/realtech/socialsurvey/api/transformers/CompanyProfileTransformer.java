@@ -2,87 +2,91 @@ package com.realtech.socialsurvey.api.transformers;
 
 import org.springframework.stereotype.Component;
 
-import com.realtech.socialsurvey.api.models.request.CompanyProfileRequest;
-import com.realtech.socialsurvey.api.models.response.CompanyProfileResponse;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
-import com.realtech.socialsurvey.core.entities.api.Country;
-import com.realtech.socialsurvey.core.entities.api.Phone;
+import com.realtech.socialsurvey.api.models.CompanyProfile;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.Country;
+import com.realtech.socialsurvey.core.entities.Location;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 
 
 @Component
-public class CompanyProfileTransformer implements Transformer<CompanyProfileRequest, CompanyProfile, CompanyProfileResponse>
+public class CompanyProfileTransformer implements Transformer<CompanyProfile, CompanyCompositeEntity, CompanyProfile>
 {
-    public CompanyProfile transformApiRequestToDomainObject( CompanyProfileRequest request )
+    public CompanyCompositeEntity transformApiRequestToDomainObject( CompanyProfile request, Object... objects )
     {
-        CompanyProfile companyProfile = new CompanyProfile();
+        CompanyCompositeEntity companyProfile = new CompanyCompositeEntity();
+        Company company = null;
+        OrganizationUnitSettings unitSettings = null;
         if ( request != null ) {
-            companyProfile.setAddress( request.getAddress() );
-            companyProfile.setCity( request.getCity() );
-            companyProfile.setCompanyLogo( request.getCompanyLogo() );
-            companyProfile.setCompanyName( request.getCompanyName() );
-            companyProfile.setState( request.getState() );
-            companyProfile.setZip( request.getZip() );
 
-            if ( request.getCountry() != null ) {
-                Country country = new Country();
-                country.setCountryCode( request.getCountry().getCountryCode() );
-                country.setCountryName( request.getCountry().getCountryName() );
-                companyProfile.setCountry( country );
+            if ( objects[0] != null && objects[0] instanceof Company ) {
+                company = (Company) objects[0];
+                company.setCompany( request.getCompanyName() );
+                company.setVerticalsMaster( request.getIndustry() );
+                companyProfile.setCompany( company );
             }
 
-            if ( request.getIndustry() != null ) {
-                VerticalsMaster industry = new VerticalsMaster();
-                industry.setVerticalsMasterId( request.getIndustry().getId() );
-                industry.setPriorityOrder( request.getIndustry().getPriorityOrder() );
-                industry.setVerticalName( request.getIndustry().getVertical() );
-                companyProfile.setIndustry( industry );
-            }
+            if ( objects[1] != null && objects[1] instanceof OrganizationUnitSettings ) {
+                unitSettings = (OrganizationUnitSettings) objects[1];
+                ContactDetailsSettings contactDetails = unitSettings.getContact_details();
+                if ( contactDetails == null ) {
+                    contactDetails = new ContactDetailsSettings();
+                }
+                contactDetails.setName( request.getCompanyName() );
+                contactDetails.setAddress( request.getAddress() );
+                contactDetails.setCity( request.getCity() );
+                contactDetails.setState( request.getState() );
+                contactDetails.setZipcode( request.getZip() );
+                if ( request.getLocation() != null && request.getLocation().getCountry() != null ) {
+                    contactDetails.setCountry( request.getLocation().getName() );
+                    contactDetails.setCountryCode( request.getLocation().getCountry().getCode() );
+                }
 
-            if ( request.getOfficePhone() != null ) {
-                Phone officePhone = new Phone();
-                officePhone.setCountryCode( request.getOfficePhone().getCountryCode() );
-                officePhone.setExtension( request.getOfficePhone().getExtension() );
-                officePhone.setNumber( request.getOfficePhone().getNumber() );
-                companyProfile.setOfficePhone( officePhone );
+                if ( contactDetails.getContact_numbers() == null ) {
+                    contactDetails.setContact_numbers( new ContactNumberSettings() );
+                }
+                contactDetails.getContact_numbers().setPhone1( request.getOfficePhone() );
+
+                unitSettings.setContact_details( contactDetails );
+                unitSettings.setLogo( request.getCompanyLogo() );
+                unitSettings.setVertical( request.getIndustry().getVerticalName() );
+                companyProfile.setCompanySettings( unitSettings );
             }
         }
         return companyProfile;
     }
 
 
-    public CompanyProfileResponse transformDomainObjectToApiResponse( CompanyProfile companyProfile )
+    public CompanyProfile transformDomainObjectToApiResponse( CompanyCompositeEntity companyProfile )
     {
-        CompanyProfileResponse response = new CompanyProfileResponse();
+        CompanyProfile response = new CompanyProfile();
         if ( companyProfile != null ) {
-            response.setAddress( companyProfile.getAddress() );
-            response.setCity( companyProfile.getCity() );
-            response.setCompanyLogo( companyProfile.getCompanyLogo() );
-            response.setCompanyName( companyProfile.getCompanyName() );
-            response.setState( companyProfile.getState() );
-            response.setZip( companyProfile.getZip() );
-
-            if ( companyProfile.getCountry() != null ) {
-                com.realtech.socialsurvey.api.models.Country country = new com.realtech.socialsurvey.api.models.Country();
-                country.setCountryCode( companyProfile.getCountry().getCountryCode() );
-                country.setCountryName( companyProfile.getCountry().getCountryName() );
-                response.setCountry( country );
+            if ( companyProfile.getCompany() != null ) {
+                response.setCompanyName( companyProfile.getCompany().getCompany() );
+                response.setIndustry( companyProfile.getCompany().getVerticalsMaster() );
             }
 
-            if ( companyProfile.getIndustry() != null ) {
-                com.realtech.socialsurvey.api.models.Industry industry = new com.realtech.socialsurvey.api.models.Industry();
-                industry.setId( companyProfile.getIndustry().getVerticalsMasterId() );
-                industry.setPriorityOrder( companyProfile.getIndustry().getPriorityOrder() );
-                industry.setVertical( companyProfile.getIndustry().getVerticalName() );
-                response.setIndustry( industry );
-            }
-
-            if ( companyProfile.getOfficePhone() != null ) {
-                com.realtech.socialsurvey.api.models.Phone officePhone = new com.realtech.socialsurvey.api.models.Phone();
-                officePhone.setCountryCode( companyProfile.getOfficePhone().getCountryCode() );
-                officePhone.setExtension( companyProfile.getOfficePhone().getExtension() );
-                officePhone.setNumber( companyProfile.getOfficePhone().getNumber() );
-                response.setOfficePhone( officePhone );
+            if ( companyProfile.getCompanySettings() != null ) {
+                response.setCompanyLogo( companyProfile.getCompanySettings().getLogo() );
+                if ( companyProfile.getCompanySettings().getContact_details() != null ) {
+                    response.setAddress( companyProfile.getCompanySettings().getContact_details().getAddress() );
+                    response.setCity( companyProfile.getCompanySettings().getContact_details().getCity() );
+                    response.setState( companyProfile.getCompanySettings().getContact_details().getState() );
+                    response.setZip( companyProfile.getCompanySettings().getContact_details().getZipcode() );
+                    if ( companyProfile.getCompanySettings().getContact_details().getContact_numbers() != null ) {
+                        response.setOfficePhone(
+                            companyProfile.getCompanySettings().getContact_details().getContact_numbers().getPhone1() );
+                    }
+                    Location location = new Location();
+                    Country country = new Country();
+                    country.setCode( companyProfile.getCompanySettings().getContact_details().getCountryCode() );
+                    location.setCountry( country );
+                    location.setName( companyProfile.getCompanySettings().getContact_details().getCountry() );
+                    response.setLocation( location );
+                }
             }
         }
         return response;

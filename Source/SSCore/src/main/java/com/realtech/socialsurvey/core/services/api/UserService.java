@@ -2,7 +2,7 @@ package com.realtech.socialsurvey.core.services.api;
 
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.api.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -11,10 +11,10 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public interface UserService
 {
-    public void updateUserProfile( int userId, UserProfile userProfile ) throws SolrException, InvalidInputException;
+    public void updateUserProfile( long userIdLong, UserCompositeEntity userProfile ) throws SolrException, InvalidInputException;
 
 
-    public UserProfile getUserProfileDetails( int userId ) throws InvalidInputException;
+    public UserCompositeEntity getUserProfileDetails( int userId ) throws InvalidInputException;
 
 
     public void deleteUserProfileImage( int userId ) throws InvalidInputException;
@@ -31,7 +31,7 @@ public interface UserService
 
 
     public void sendRegistrationEmail( User user ) throws NonFatalException;
-    
-    
-    public boolean isUserExist(String emailId) throws InvalidInputException;
+
+
+    public boolean isUserExist( String emailId ) throws InvalidInputException;
 }

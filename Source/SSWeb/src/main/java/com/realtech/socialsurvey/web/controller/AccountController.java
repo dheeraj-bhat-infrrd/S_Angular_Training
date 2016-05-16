@@ -7,17 +7,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
 import com.realtech.socialsurvey.web.api.SSApiIntegration;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
+import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
 
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
@@ -64,7 +63,7 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/getuserprofile", method = RequestMethod.GET)
     @ResponseBody
-    public String getUserProfile(@QueryParam ( "userId") String userId )
+    public String getUserProfile( @QueryParam ( "userId") String userId )
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();

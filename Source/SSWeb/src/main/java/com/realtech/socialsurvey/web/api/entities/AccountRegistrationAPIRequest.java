@@ -1,12 +1,14 @@
 package com.realtech.socialsurvey.web.api.entities;
 
-import com.realtech.socialsurvey.core.entities.api.Phone;
-
 import java.io.Serializable;
+
+import com.realtech.socialsurvey.core.entities.Phone;
 
 
 public class AccountRegistrationAPIRequest implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private String firstName;
     private String lastName;
     private String companyName;

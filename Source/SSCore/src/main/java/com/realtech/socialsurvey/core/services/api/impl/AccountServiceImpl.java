@@ -19,16 +19,15 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.PaymentPlan;
+import com.realtech.socialsurvey.core.entities.Phone;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.entities.api.AccountRegistration;
-import com.realtech.socialsurvey.core.entities.api.CompanyProfile;
-import com.realtech.socialsurvey.core.entities.api.Country;
-import com.realtech.socialsurvey.core.entities.api.PaymentPlan;
-import com.realtech.socialsurvey.core.entities.api.RegistrationStage;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -70,76 +69,55 @@ public class AccountServiceImpl implements AccountService
 
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public void saveAccountRegistrationDetailsAndSetDataInDO( AccountRegistration accountRegistration ) throws NonFatalException
+    public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone )
+        throws NonFatalException
     {
-        LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO started for company: "
-            + accountRegistration.getCompanyName() );
+        LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO started for company: " + companyName );
+        Map<String, Long> ids = new HashMap<String, Long>();
 
         // validate if the email address is not taken already.
-        if ( userService.isUserExist( accountRegistration.getEmail() ) ) {
-            throw new UserAlreadyExistsException( "User with User ID : " + accountRegistration.getEmail() + " already exists" );
+        if ( userService.isUserExist( user.getEmailId() ) ) {
+            throw new UserAlreadyExistsException( "User with User ID : " + user.getEmailId() + " already exists" );
         } else {
             // Create a company with registration stage as 1. Insert into mongo with status 'I'
-            Company company = addCompany( accountRegistration );
-            accountRegistration.setCompanyId( (int) company.getCompanyId() );
+            Company company = addCompany( user, companyName, phone );
+            ids.put( "companyId", company.getCompanyId() );
 
             // Create a user in user table with registration stage as 1 and status 1,user profile in UserProfile table with 'CA' (1), 
             //solr, mongo with status 'I'. Set the force password column to 1.
-            User user = userService.addUser( accountRegistration.getFirstName(), accountRegistration.getLastName(),
-                accountRegistration.getEmail(), company );
-            accountRegistration.setUserId( (int) user.getUserId() );
+            user = userService.addUser( user.getFirstName(), user.getLastName(), user.getEmailId(), company );
+            ids.put( "userId", user.getUserId() );
 
             // Send registration email to user, Send mail to sales lead, maybe to support
             userService.sendRegistrationEmail( user );
         }
-
-        LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO finished for company: "
-            + accountRegistration.getCompanyName() );
+        
+        LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO finished for company: " + companyName );
+        return ids;
     }
 
 
     @Override
-    public CompanyProfile getCompanyProfileDetails( int companyId ) throws InvalidInputException
+    public CompanyCompositeEntity getCompanyProfileDetails( int companyId ) throws InvalidInputException
     {
         LOGGER.info( "Method getCompanyProfileDetails started for company: " + companyId );
-        CompanyProfile companyProfile = new CompanyProfile();
+        CompanyCompositeEntity companyProfile = new CompanyCompositeEntity();
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
         Company company = companyDao.findById( Company.class, (long) companyId );
-
-        companyProfile.setCompanyLogo( unitSettings.getLogo() );
-        companyProfile.setCompanyName( company.getCompany() );
-
-        VerticalsMaster verticalsMaster = verticalMastersDao
-            .findByColumn( VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, unitSettings.getVertical() )
-            .get( CommonConstants.INITIAL_INDEX );
-        companyProfile.setIndustry( verticalsMaster );
-
-        if ( unitSettings.getContact_details() != null ) {
-            companyProfile.setAddress( unitSettings.getContact_details().getAddress() );
-            companyProfile.setCity( unitSettings.getContact_details().getCity() );
-            companyProfile.setState( unitSettings.getContact_details().getState() );
-            companyProfile.setZip( unitSettings.getContact_details().getZipcode() );
-            if ( unitSettings.getContact_details().getContact_numbers() != null ) {
-                companyProfile.setOfficePhone( unitSettings.getContact_details().getContact_numbers().getPhone1() );
-            }
-            Country country = new Country();
-            country.setCountryCode( unitSettings.getContact_details().getCountryCode() );
-            country.setCountryName( unitSettings.getContact_details().getCountry() );
-            companyProfile.setCountry( country );
-        }
+        companyProfile.setCompany( company );
+        companyProfile.setCompanySettings( unitSettings );
         LOGGER.info( "Method getCompanyProfileDetails finished for company: " + company.getCompany() );
         return companyProfile;
     }
 
 
     @Override
-    public void updateCompanyProfile( int companyId, CompanyProfile companyProfile ) throws InvalidInputException
+    public void updateCompanyProfile( long companyId, CompanyCompositeEntity companyProfile ) throws InvalidInputException
     {
-        LOGGER.info( "Method updateCompanyProfile started for company: " + companyProfile.getCompanyName() );
-        Company company = companyDao.findById( Company.class, (long) companyId );
-        updateCompanyDetailsInMySql( company, companyProfile );
-        updateCompanyDetailsInMongo( company, companyProfile );
-        LOGGER.info( "Method updateCompanyProfile finished for company: " + companyProfile.getCompanyName() );
+        LOGGER.info( "Method updateCompanyProfile started for company: " + companyId );
+        updateCompanyDetailsInMySql( companyId, companyProfile.getCompany() );
+        updateCompanyDetailsInMongo( companyId, companyProfile.getCompanySettings() );
+        LOGGER.info( "Method updateCompanyProfile finished for company: " + companyId );
     }
 
 
@@ -208,39 +186,27 @@ public class AccountServiceImpl implements AccountService
     }
 
 
-    private void updateCompanyDetailsInMongo( Company company, CompanyProfile companyProfile ) throws InvalidInputException
+    private void updateCompanyDetailsInMongo( long companyId, OrganizationUnitSettings unitSettings )
+        throws InvalidInputException
     {
-        LOGGER.info( "Method updateCompanyDetailsInMongo started for company: " + companyProfile.getCompanyName() );
-        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( company.getCompanyId() );
-        ContactDetailsSettings contactDetails = unitSettings.getContact_details();
-        if ( contactDetails == null ) {
-            contactDetails = new ContactDetailsSettings();
-        }
-        contactDetails.setName( companyProfile.getCompanyName() );
-        contactDetails.setAddress( companyProfile.getAddress() );
-        contactDetails.setCity( companyProfile.getCity() );
-        contactDetails.setCountry( companyProfile.getCountry().getCountryName() );
-        contactDetails.setCountryCode( companyProfile.getCountry().getCountryCode() );
-        contactDetails.setState( companyProfile.getState() );
-        contactDetails.setZipcode( companyProfile.getZip() );
+        LOGGER.info( "Method updateCompanyDetailsInMongo started for company: " + companyId );
 
-        if ( contactDetails.getContact_numbers() == null ) {
-            contactDetails.setContact_numbers( new ContactNumberSettings() );
+        if ( unitSettings != null && unitSettings.getContact_details() != null ) {
+            if ( unitSettings.getContact_details().getContact_numbers() != null
+                && unitSettings.getContact_details().getContact_numbers().getPhone1() != null ) {
+                unitSettings.getContact_details().getContact_numbers()
+                    .setWork( unitSettings.getContact_details().getContact_numbers().getPhone1().getCountryCode() + "-"
+                        + unitSettings.getContact_details().getContact_numbers().getPhone1().getNumber() + "x"
+                        + unitSettings.getContact_details().getContact_numbers().getPhone1().getExtension() );
+            }
+            String profileName = organizationManagementService
+                .generateProfileNameForCompany( unitSettings.getContact_details().getName(), companyId );
+            unitSettings.setProfileName( profileName );
+            unitSettings.setProfileUrl( CommonConstants.FILE_SEPARATOR + unitSettings.getProfileName() );
         }
-        contactDetails.getContact_numbers().setWork( companyProfile.getOfficePhone().getCountryCode() + "-"
-            + companyProfile.getOfficePhone().getNumber() + "x" + companyProfile.getOfficePhone().getExtension() );
-        contactDetails.getContact_numbers().setPhone1( companyProfile.getOfficePhone() );
-
-        unitSettings.setContact_details( contactDetails );
-        unitSettings.setLogo( companyProfile.getCompanyLogo() );
-        unitSettings.setVertical( companyProfile.getIndustry().getVerticalName() );
-        String profileName = organizationManagementService.generateProfileNameForCompany( companyProfile.getCompanyName(),
-            company.getCompanyId() );
-        unitSettings.setProfileName( profileName );
-        unitSettings.setProfileUrl( CommonConstants.FILE_SEPARATOR + unitSettings.getProfileName() );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contactDetails, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -258,17 +224,15 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, unitSettings.getProfileUrl(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-        LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyProfile.getCompanyName() );
+        LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyId );
     }
 
 
-    private void updateCompanyDetailsInMySql( Company company, CompanyProfile companyProfile )
+    private void updateCompanyDetailsInMySql( long companyId, Company companyProfile )
     {
-        LOGGER.info( "Method updateCompanyDetailsInMySql started for company: " + companyProfile.getCompanyName() );
-        company.setCompany( companyProfile.getCompanyName() );
-        company.setVerticalsMaster( companyProfile.getIndustry() );
-        companyDao.merge( company );
-        LOGGER.info( "Method updateCompanyDetailsInMySql finished for company: " + companyProfile.getCompanyName() );
+        LOGGER.info( "Method updateCompanyDetailsInMySql started for company: " + companyId );
+        companyDao.merge( companyProfile );
+        LOGGER.info( "Method updateCompanyDetailsInMySql finished for company: " + companyId );
     }
 
 
@@ -287,12 +251,12 @@ public class AccountServiceImpl implements AccountService
     }
 
 
-    private Company addCompany( AccountRegistration accountRegistration ) throws InvalidInputException
+    private Company addCompany( User user, String companyName, Phone phone ) throws InvalidInputException
     {
-        LOGGER.info( "Method addCompany started for company: " + accountRegistration.getCompanyName() );
-        Company company = addCompanyDetailsInMySql( accountRegistration.getCompanyName() );
-        addCompanyDetailsInMongo( accountRegistration, company );
-        LOGGER.info( "Method addCompany finished for company: " + accountRegistration.getCompanyName() );
+        LOGGER.info( "Method addCompany started for company: " + companyName );
+        Company company = addCompanyDetailsInMySql( companyName );
+        addCompanyDetailsInMongo( user, company, phone );
+        LOGGER.info( "Method addCompany finished for company: " + companyName );
         return company;
     }
 
@@ -325,19 +289,16 @@ public class AccountServiceImpl implements AccountService
     }
 
 
-    private void addCompanyDetailsInMongo( AccountRegistration accountReg, Company company ) throws InvalidInputException
+    private void addCompanyDetailsInMongo( User user, Company company, Phone phone ) throws InvalidInputException
     {
-        LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + accountReg.getCompanyName() );
+        LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
 
-        User user = new User();
-        user.setEmailId( accountReg.getEmail() );
-        String contactNumber = accountReg.getPhone().getCountryCode() + "-" + accountReg.getPhone().getNumber() + "x"
-            + accountReg.getPhone().getExtension();
+        String contactNumber = phone.getCountryCode() + "-" + phone.getNumber() + "x" + phone.getExtension();
         VerticalsMaster verticalsMaster = verticalMastersDao
             .findByColumn( VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, "CUSTOM" )
             .get( CommonConstants.INITIAL_INDEX );
         Map<String, String> companyDetails = new HashMap<String, String>();
-        companyDetails.put( CommonConstants.COMPANY_NAME, accountReg.getCompanyName() );
+        companyDetails.put( CommonConstants.COMPANY_NAME, company.getCompany() );
         companyDetails.put( CommonConstants.COMPANY_CONTACT_NUMBER, contactNumber );
         companyDetails.put( CommonConstants.BILLING_MODE_COLUMN, CommonConstants.BILLING_MODE_AUTO );
         companyDetails.put( CommonConstants.VERTICAL, verticalsMaster.getVerticalName() );
@@ -351,7 +312,7 @@ public class AccountServiceImpl implements AccountService
         if ( unitSettings.getContact_details().getContact_numbers() == null ) {
             unitSettings.getContact_details().setContact_numbers( new ContactNumberSettings() );
         }
-        unitSettings.getContact_details().getContact_numbers().setPhone1( accountReg.getPhone() );
+        unitSettings.getContact_details().getContact_numbers().setPhone1( phone );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
@@ -361,6 +322,6 @@ public class AccountServiceImpl implements AccountService
             CommonConstants.STATUS_INCOMPLETE_MONGO, unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-        LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + accountReg.getCompanyName() );
+        LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
     }
 }
