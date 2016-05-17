@@ -9,7 +9,7 @@ var phoneRegEx = {
         }
     };
 
-app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService', function ($scope, $http, $location, vcRecaptchaService, LoginService) {
+app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService','$rootScope', function ($scope, $http, $location, vcRecaptchaService, LoginService,$rootScope) {
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
 	$scope.response = null;
@@ -23,22 +23,22 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
             $scope.activate = 0;
         } else {
         	$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-        	console.log($scope.accountRegistration.phone);
         	$scope.accountRegistration.phone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
         }
         LoginService.signup($scope.accountRegistration)
             .then(function (response) {
             	$scope.accountRegisterIds = response.data;
+            	 $rootScope.userId=response.data.userId;
+            	 $rootScope.comanyId=response.data.companyId;
+            
             	$scope.register();
             }, function (error) {
-            	console.log(error);
             	showError(error);
             });
     };
 
     $scope.setResponse = function (response) {
         $scope.activate = 1;
-        console.info(response);
         $scope.response = response;
     };
     
@@ -65,9 +65,20 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
 }]);
 
 
-app.controller('linkedInController', ['$http', '$location', function ($http, $location) {
-    var vm = this;
-    vm.title = 'AngularJS for SocialSurvey';
+app.controller('linkedInController', ['$scope','$http', '$location','$rootScope','LinkedinService', function ($scope,$http, $location,$rootScope,LinkedinService) {
+	$scope.linkedin=function(){
+		console.log("!!!!!!!!!!"+$rootScope.userId);
+		var dataTosend={
+				"usedId":$rootScope.userId
+		};
+	LinkedinService.linkedin($rootScope.userId)
+	.then(function(response){
+		window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	},function(error){
+		
+	});
+	};
+	
 }]);
 
 

@@ -27,3 +27,12 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 		return $http.get('/registeraccount/getverticals.do');
 	}
 }]);
+
+app.service('LinkedinService',['$http',function($http){
+	this.linkedin=function(userId){
+		var url = $http.post('/registeraccount/agent/initlinkedinconnection.do',userId);
+		console.log(url);
+		return url;
+	}
+	
+}]);
