@@ -78,8 +78,8 @@ public class UserController
     }
 
 
-    @InitBinder ( "userProfileRequest")
-    public void signUp2Binder( WebDataBinder binder )
+    @InitBinder ( "personalProfile")
+    public void signUpPersonalProfileBinder( WebDataBinder binder )
     {
         binder.setValidator( personalProfileValidator );
     }
@@ -140,15 +140,15 @@ public class UserController
 
     @RequestMapping ( value = "/profile/update/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update user profile")
-    public ResponseEntity<?> updateUserProfile( @PathVariable ( "userId") String userId,
-        @Valid @RequestBody PersonalProfile userProfileRequest )
+    public ResponseEntity<?> updateUserProfile( @Valid @RequestBody PersonalProfile personalProfile,
+        @PathVariable ( "userId") String userId )
     {
         try {
             LOGGER.info( "UserController.updateUserProfile started" );
             long userIdLong = Long.parseLong( userId );
             User user = userManagementService.getUserByUserId( userIdLong );
             AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userIdLong );
-            UserCompositeEntity userProfile = personalProfileTransformer.transformApiRequestToDomainObject( userProfileRequest,
+            UserCompositeEntity userProfile = personalProfileTransformer.transformApiRequestToDomainObject( personalProfile,
                 user, agentSettings );
             userService.updateUserProfile( userIdLong, userProfile );
             LOGGER.info( "UserController.updateUserProfile completed successfully" );
@@ -202,11 +202,11 @@ public class UserController
     @RequestMapping ( value = "/profile/profileimage/update/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update user profile image")
     public ResponseEntity<?> updateUserProfileImage( @PathVariable ( "userId") String userId,
-        @RequestBody PersonalProfile userProfileRequest )
+        @RequestBody PersonalProfile personalProfile )
     {
         try {
             LOGGER.info( "UserController.updateUserProfileImage started" );
-            userService.updateUserProfileImage( Integer.parseInt( userId ), userProfileRequest.getProfilePhotoUrl() );
+            userService.updateUserProfileImage( Integer.parseInt( userId ), personalProfile.getProfilePhotoUrl() );
             LOGGER.info( "UserController.updateUserProfileImage completed successfully" );
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( Exception ex ) {

@@ -30,7 +30,7 @@ public class CompanyProfileValidator implements Validator
             "companyName cannot be empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "industry", ErrorCodes.INDUSTRY_INVALID,
             "industry cannot be empty" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "country", ErrorCodes.COUNTRY_INVALID, "country cannot be empty" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "location", ErrorCodes.COUNTRY_INVALID, "country cannot be empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", ErrorCodes.ADDRESS_INVALID, "address cannot be empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", ErrorCodes.CITY_INVALID, "city cannot be empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "state", ErrorCodes.STATE_INVALID, "state cannot be empty" );

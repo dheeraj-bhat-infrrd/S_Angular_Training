@@ -1,38 +1,33 @@
-
 <script src="../resources/js/dropzone.js"></script>
-
 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px;">
     <div class="reg-left-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <div class="reg-ss-logo"></div>
         <div><img src="../resources/images/step-2.png" class="stretch" alt="" /></div>
-        <form ng-submit="profileAuthentication(fname,lname,title)">
+        <form ng-submit="saveCompanyProfile()" name="companyForm">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-create-account">Company Profile</div>
-                
                 <div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Company Name *</div>
                 <div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <input class="reg-details" type="text" placeholder="Company Name" ng-model="industry" name="companyName" required/>
+                    <input class="reg-details" type="text" placeholder="Company Name" ng-model="companyProfile.companyName" name="companyName" required/>
                 </div>
                 <div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Industry *</div>
                 <div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <input class="reg-details" type="text" placeholder="Industry" ng-model="industry" name="companyName" required/>
+                	<select class="reg-details" name="industry" id="industry" required
+					      ng-options="option.verticalName for option in industries track by option.verticalsMasterId"
+					      ng-model="companyProfile.industry">
+			      	</select>
                 </div>
-                
-                      
                 <div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Logo</div>
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 30px;">
                     <!-- <form action="/upload-target" class="dropzone"></form> -->
                     <div id="my-awesome-dropzone" class="dropzone"></div>
                 </div>
-               
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
             <div class="reg-back">&lt;&lt;Back</div>
-               <div style="width: 120px;margin: auto;"> <button class="reg-next" type="submit">Next</button></div>
+               <div style="width: 120px;margin: auto;"> <button class="reg-next" type="submit" ng-class="{'regen':companyForm.$valid}">Next</button></div>
             </div>
         </form>
-         
-        
     </div>
     <div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
     <div style="margin-top:45%;">
@@ -42,5 +37,4 @@
      </div>
      <div class="reg-prof-img"> </div>
     </div>
-   
 </div>

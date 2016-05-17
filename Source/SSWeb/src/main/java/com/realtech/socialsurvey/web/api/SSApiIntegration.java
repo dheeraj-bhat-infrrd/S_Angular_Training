@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.api;
 
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
+import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
 
 import retrofit.client.Response;
@@ -27,9 +28,29 @@ public interface SSApiIntegration
 
 
     @PUT ( "/users/profile/update/{userId}")
-    Response updateUserProfile( @Path ( "userId") String userId, @Body PersonalProfile personalProfile );
+    Response updateUserProfile( @Body PersonalProfile personalProfile, @Path ( "userId") String userId );
 
 
     @PUT ( "/users/profile/stage/update/{userId}/{stage}")
     Response updateUserProfileStage( @Path ( "userId") String userId, @Path ( "stage") String stage );
+
+
+    @GET ( "/account/company/profile/details/{companyId}")
+    Response getCompanyProfile( @Path ( "companyId") String companyId );
+
+
+    @PUT ( "/account/company/profile/update/{companyId}")
+    Response updateCompanyProfile( @Body CompanyProfile companyProfile, @Path ( "companyId") String companyId );
+
+
+    @PUT ( "/account/company/profile/stage/update/{companyId}/{stage}")
+    Response updateCompanyProfileStage( @Path ( "companyId") String companyId, @Path ( "stage") String stage );
+
+
+    @GET ( "/account/company/profile/industries")
+    Response getVerticals();
+
+
+    @GET ( "/account/payment/plans")
+    Response getPaymentPlans();
 }
