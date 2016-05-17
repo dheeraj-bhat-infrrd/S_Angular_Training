@@ -3,6 +3,10 @@ package com.realtech.socialsurvey.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
+
+import com.google.gson.Gson;
+import com.realtech.socialsurvey.web.entities.AuthError;
+import com.realtech.socialsurvey.web.util.RequestUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,6 +191,21 @@ public class AccountController
     public String connectToLinkedIn( HttpServletRequest request )
     {
         LOG.info( "Connecting to linkedin" );
-        return null;
+        String response = null;
+        // the unit and id should be there in the response with in the redirect url
+        String unit = request.getParameter( "unit" );
+        String id = request.getParameter( "id" );
+        // check if there is error
+        String errorCode = request.getParameter( "error" );
+        if ( errorCode != null ) {
+            LOG.error( "Error code : " + errorCode );
+            AuthError error  = new AuthError();
+            error.setErrorCode( errorCode );
+            error.setReason( request.getParameter( "error_description" ) );
+            response = new Gson().toJson( error );
+        }else{
+
+        }
+        return response;
     }
 }
