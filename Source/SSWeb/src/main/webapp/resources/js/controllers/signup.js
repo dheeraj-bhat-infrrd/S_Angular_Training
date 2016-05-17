@@ -89,17 +89,12 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 	}
     
     $scope.saveProfile = function () {
-    	UserProfileService.updateUserProfile(1230, 'UPP', $scope.userProfile).then(function(response){ 
-    		$location.path('/profiledetail').replace();
-    	}, function (error) {
-    	    console.log(error);
-    	    showError(error);
-    	});
+    	$location.path('/profiledetail').replace();
     };
     
     $scope.saveProfileDetails = function () {
     	$scope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
-    	UserProfileService.updateUserProfile(1230, 'UPD', $scope.userProfile).then(function(response){ 
+    	UserProfileService.updateUserProfile(1230, 'UPP', $scope.userProfile).then(function(response){ 
     		$location.path('/company').replace();
     	}, function (error) {
     	    console.log(error);
@@ -118,21 +113,63 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     $('#reg-phone2').mask(phoneFormat, phoneRegEx);
 }]);
 
-app.controller('companyController', ['$scope', '$http', '$location', function ($scope, $http, $loction) {
-    $scope.countrycode=='ax';
-   if( $scope.countrycode=='us'){
-    $scope.State='State';
-    $scope.ZIP='ZIP';
-   }else if( $scope.countrycode=='ca'){
-    $scope.State='Province';
-    $scope.ZIP='Postal Code';
-   }else{
-       $scope.State='State';
-    $scope.ZIP='ZIP';
-   }
-    $("#country").countrySelect();
-    $('#reg-phone-office').intlTelInput({
-        utilsScript: "../resources/js/utils.js"
-    });
-    $('#reg-phone-office').mask(phoneFormat, phoneRegEx);
+app.controller('companyController', ['$scope', '$http', '$location', 'CompanyProfileService', function ($scope, $http, $location, CompanyProfileService) {
+	$scope.countrycode=='ax';
+	
+	if(angular.isUndefined($scope.companyProfile) || $scope.companyProfile == null || $scope.companyProfile == {}){
+		CompanyProfileService.getCompanyProfile(36).then(function(response){ 
+			$scope.companyProfile = response.data;
+		}, function (error) {
+		    console.log(error);
+		    showError(error);
+		});
+	}
+	
+	if(angular.isUndefined($scope.industries) || $scope.industries == null || $scope.industries == {}){
+		CompanyProfileService.getVerticals().then(function(response){ 
+			$scope.industries = response.data;
+		}, function (error) {
+		    console.log(error);
+		    showError(error);
+		});
+	}
+	
+	var myDropzone = null;
+	if ( angular.isElement('#my-awesome-dropzone')) {
+	    myDropzone = new Dropzone("div#my-awesome-dropzone", {
+	        url: "/file/post"
+	    });
+	}
+    
+    $scope.saveCompanyProfile = function () {
+		$location.path('/companydetail').replace();
+    };
+    
+    $scope.saveCompanyProfileDetails = function () {
+    	$scope.companyProfile.officePhone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	CompanyProfileService.updateCompanyProfile(36, 'CPP', $scope.companyProfile).then(function(response){ 
+    		$location.path('/payment').replace();
+    	}, function (error) {
+    	    console.log(error);
+    	    showError(error);
+    	});
+    };
+    
+	if( $scope.countrycode=='us'){
+		$scope.State='State';
+		$scope.ZIP='ZIP';
+	}else if( $scope.countrycode=='ca'){
+		$scope.State='Province';
+		$scope.ZIP='Postal Code';
+	}else{
+		$scope.State='State';
+		$scope.ZIP='ZIP';
+	}
+	    
+	$("#country").countrySelect();
+	
+	$('#reg-phone-office').intlTelInput({
+	    utilsScript: "../resources/js/utils.js"
+	});
+	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
 }]);

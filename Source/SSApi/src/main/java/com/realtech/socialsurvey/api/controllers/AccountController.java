@@ -66,7 +66,7 @@ public class AccountController
     }
 
 
-    @InitBinder ( "companyProfileRequest")
+    @InitBinder ( "companyProfile")
     public void signUpCompanyProfileBinder( WebDataBinder binder )
     {
         binder.setValidator( companyProfileValidator );
@@ -118,8 +118,8 @@ public class AccountController
 
     @RequestMapping ( value = "/company/profile/update/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update company profile details")
-    public ResponseEntity<?> updateCompanyProfile( @PathVariable ( "companyId") String companyId,
-        @Valid @RequestBody CompanyProfile companyProfile )
+    public ResponseEntity<?> updateCompanyProfile( @Valid @RequestBody CompanyProfile companyProfile,
+        @PathVariable ( "companyId") String companyId )
     {
         try {
             LOGGER.info( "AccountController.updateCompanyProfile started" );

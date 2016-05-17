@@ -1,25 +1,21 @@
-
 <script src="../resources/js/dropzone.js"></script>
-
 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px;">
     <div class="reg-left-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <div class="reg-ss-logo"></div>
         <div><img src="../resources/images/step-2.png" class="stretch" alt="" /></div>
-        <form ng-submit="profileAuthentication(fname,lname,title)">
+        <form ng-submit="saveCompanyProfileDetails()" name="companyProfileForm">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px;">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 reg-create-account">Company Details</div>
-                
                 <div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Country *
 					</div>
 					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<input class="reg-details" type="text" id="country">
-					<input type="hidden" id="country_code" ng-model="countrycode"/>
-					
+					<input type="hidden" id="country_code" ng-model="companyProfile.location.country.code" required/>
 					</div>
 					 <div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Address *
 					</div>
 					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<textarea class="reg-details"  rows="1" ></textarea>
+					<textarea class="reg-details"  rows="1" ng-model="companyProfile.address" required></textarea>
 					</div>
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
 					<div class="reg-req-field" style="width:44%;float:left">City *
@@ -30,34 +26,24 @@
 					</div>
 					</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					
-						<input class="reg-comp-add" style="width:44%" type="text" ng-model="city" 
+						<input class="reg-comp-add" style="width:44%" type="text" ng-model="companyProfile.city" 
 							name="firstName" required />
-					
-					
-						<input class="reg-comp-add" style="width:20%;margin-left:2%" ng-model="state"
+						<input class="reg-comp-add" style="width:20%;margin-left:2%" ng-model="companyProfile.state"
 							style="margin-left: 2%;" type="text" required />
-					
-					
-						<input class="reg-comp-add" style="width:30%;margin-left:2%" ng-model="zip"
+						<input class="reg-comp-add" style="width:30%;margin-left:2%" ng-model="companyProfile.zip"
 							style="margin-left: 2%;" type="text" required/>
-					
-
 				</div>
 				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Office Phone *
 					</div>
 					<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<input class="reg-details" type="tel" id="reg-phone-office" ng-model="phone"/>
+						<input class="reg-details" type="tel" id="reg-phone-office" ng-model="companyProfile.officePhone" required/>
 					</div>
-
 			</div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top:30px">
             <div class="reg-back">&lt;&lt;Back</div>
-               <div style="width: 120px;margin: auto;"> <button class="reg-next" type="submit">Next</button></div>
+               <div style="width: 120px;margin: auto;"> <button class="reg-next" type="submit" ng-class="{'regen':companyProfileForm.$valid}">Next</button></div>
             </div>
         </form>
-         
-        
     </div>
     <div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
     <div style="margin-top:45%;">
@@ -67,5 +53,4 @@
      </div>
      <div class="reg-prof-img"> </div>
     </div>
-   
 </div>
