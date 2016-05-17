@@ -3,15 +3,14 @@ package com.realtech.socialsurvey.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
+import com.realtech.socialsurvey.web.util.RequestUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.realtech.socialsurvey.web.api.SSApiIntegration;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
@@ -35,6 +34,18 @@ public class AccountController
     @Autowired
     private SSApiIntergrationBuilder apiBuilder;
 
+    @Autowired
+    private RequestUtils requestUtils;
+
+    // LinkedIn
+    @Value ( "${LINKED_IN_API_KEY}")
+    private String linkedInApiKey;
+    @Value ( "${LINKED_IN_REDIRECT_URI}")
+    private String linkedinRedirectUri;
+    @Value ( "${LINKED_IN_AUTH_URI}")
+    private String linkedinAuthUri;
+    @Value ( "${LINKED_IN_SCOPE}")
+    private String linkedinScope;
 
     @RequestMapping ( value = "/registeraccount/initiateregistration", method = RequestMethod.POST)
     @ResponseBody
@@ -89,5 +100,30 @@ public class AccountController
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }
         return responseString;
+    }
+
+    //TODO: To be moved from register account to more generic
+    @RequestMapping(value = "/registeraccount/{organizationunit}/initlinkedinconnection", method = RequestMethod.POST)
+    @ResponseBody
+    public String initiateLinkedInConnection(@RequestBody String userId, @PathVariable("organizationunit") String organizationunit, HttpServletRequest request){
+        LOG.debug( "Creating linkedin url" );
+        String serverBaseUrl = requestUtils.getRequestServerName( request );
+        StringBuilder linkedInAuth = new StringBuilder( linkedinAuthUri )
+            .append( "?response_type=" ).append( "code" )
+            .append( "&client_id=" ).append( linkedInApiKey )
+            .append( "&redirect_uri=" ).append( serverBaseUrl ).append( linkedinRedirectUri )
+            .append( "?unit=" ).append( organizationunit )
+            .append( "&id=" ).append( userId )
+            .append( "&state=" ).append( "SOCIALSURVEY" )
+            .append( "&scope=" ).append( linkedinScope );
+        return linkedInAuth.toString();
+    }
+
+    //TODO: To be moved from register account to more generic
+    @RequestMapping (value = "/registeraccount/connectlinkedin", method = RequestMethod.GET)
+    @ResponseBody
+    public String connectToLinkedIn(HttpServletRequest request){
+        LOG.info( "Connecting to linkedin" );
+        return null;
     }
 }
