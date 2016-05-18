@@ -79,6 +79,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_VERTICAL = "vertical";
 	public static final String KEY_PROFILE_STAGES = "profileStages";
 	public static final String KEY_MODIFIED_ON = "modifiedOn";
+	public static final String KEY_MODIFIED_BY = "modifiedBy";
+	public static final String KEY_CREATED_ON = "createdOn";
+	public static final String KEY_CREATED_BY = "createdBy";
 	public static final String KEY_DISCLAIMER = "disclaimer";
 	public static final String KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.facebookToken";
 	public static final String KEY_TWITTER_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.twitterToken";
@@ -203,6 +206,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
 		LOG.info("Updated the unit setting");
 	}
+
+    @Override
+    public void updateParticularKeyOrganizationUnitSettingsByIden(String keyToUpdate, Object updatedRecord, long iden,
+        String collectionName) {
+        LOG.info("Updating unit setting in " + collectionName + " with identifier " + iden + " for key: " + keyToUpdate + " wtih value: "
+            + updatedRecord);
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").is(iden));
+        Update update = new Update().set(keyToUpdate, updatedRecord);
+        LOG.debug("Updating the unit settings");
+        mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
+        LOG.info("Updated the unit setting");
+    }
 
 	@Override
 	public void updateParticularKeyAgentSettings(String keyToUpdate, Object updatedRecord, AgentSettings agentSettings) {
@@ -811,4 +827,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             + collectionName );
         return settings;
     }
+
+    @Override
+	public SocialMediaTokens fetchSocialMediaTokens(String collectionName, long iden)
+    {
+		LOG.info( "Getting social media tokens for id: "+iden+" for collection "+collectionName );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( "_id" );
+        SocialMediaTokens tokens = mongoTemplate.findOne( query, SocialMediaTokens.class, collectionName );
+        return tokens;
+	}
 }

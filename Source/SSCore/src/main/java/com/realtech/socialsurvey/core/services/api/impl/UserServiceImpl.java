@@ -25,7 +25,9 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Phone;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
@@ -97,7 +99,7 @@ public class UserServiceImpl implements UserService
 
 
     @Override
-    public UserCompositeEntity getUserProfileDetails( int userId ) throws InvalidInputException
+    public UserCompositeEntity getUserProfileDetails( long userId ) throws InvalidInputException
     {
         LOGGER.info( "Method getUserProfileDetails started for userId: " + userId );
         UserCompositeEntity userProfile = new UserCompositeEntity();
@@ -111,55 +113,83 @@ public class UserServiceImpl implements UserService
 
 
     @Override
-    public void deleteUserProfileImage( int userId ) throws InvalidInputException
+    public void deleteUserProfileImage( long userId ) throws InvalidInputException
     {
         LOGGER.info( "Method deleteUserProfileImage started for userId: " + userId );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userId );
         agentSettings.setProfileImageUrl( null );
+        agentSettings.setModifiedBy( String.valueOf( userId ) );
+        agentSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, agentSettings.getProfileImageUrl(), agentSettings,
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, agentSettings.getModifiedBy(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, agentSettings.getModifiedOn(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method deleteUserProfileImage finished for userId: " + userId );
     }
 
 
     @Override
-    public void updateUserProfileImage( int userId, String imageUrl ) throws InvalidInputException
+    public void updateUserProfileImage( long userId, String imageUrl ) throws InvalidInputException
     {
         LOGGER.info( "Method updateUserProfileImage started for userId: " + userId );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userId );
         agentSettings.setProfileImageUrl( imageUrl );
+        agentSettings.setModifiedBy( String.valueOf( userId ) );
+        agentSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, agentSettings.getProfileImageUrl(), agentSettings,
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, agentSettings.getModifiedBy(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, agentSettings.getModifiedOn(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method updateUserProfileImage finished for userId: " + userId );
     }
 
 
     @Override
     @Transactional
-    public void updateStage( int userId, String stage )
+    public void updateStage( long userId, String stage )
     {
         LOGGER.info( "Method updateStage started for userId: " + userId + ", stage: " + stage );
-        User user = userDao.findById( User.class, (long) userId );
+        User user = userDao.findById( User.class, userId );
         user.setRegistrationStage( stage );
+        user.setModifiedBy( String.valueOf( userId ) );
+        user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.update( user );
 
         com.realtech.socialsurvey.core.entities.UserProfile userProfile = userProfileDao
-            .findById( com.realtech.socialsurvey.core.entities.UserProfile.class, (long) userId );
+            .findById( com.realtech.socialsurvey.core.entities.UserProfile.class, userId );
         userProfile.setProfileCompletionStage( stage );
+        userProfile.setModifiedBy( String.valueOf( userId ) );
+        userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userProfileDao.update( userProfile );
         LOGGER.info( "Method updateStage finished for userId: " + userId + ", stage: " + stage );
     }
 
 
     @Override
-    public User addUser( String firstName, String lastName, String emailId, Company company )
+    public User addUser( String firstName, String lastName, String emailId, Phone phone, Company company )
         throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
         LOGGER.info( "Method addUser started for emailId: " + emailId );
         User user = addUserDetailsInMySql( emailId, firstName, lastName, company );
-        addUserDetailsInMongo( user );
+        addUserDetailsInMongo( user, phone );
         addUserDetailsInSolr( user );
         LOGGER.info( "Method addUser finished for emailId: " + emailId );
         return user;
@@ -257,6 +287,9 @@ public class UserServiceImpl implements UserService
             }
         }
 
+        agentSettings.setModifiedBy( String.valueOf( userId ) );
+        agentSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, agentSettings.getProfileUrl(), agentSettings,
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
@@ -269,6 +302,15 @@ public class UserServiceImpl implements UserService
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, agentSettings.getProfileImageUrl(), agentSettings,
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
 
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, agentSettings.getModifiedBy(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, agentSettings.getModifiedOn(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+
         profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
             agentSettings, agentSettings.getContact_details() );
 
@@ -280,6 +322,8 @@ public class UserServiceImpl implements UserService
     private void updateUserDetailsInMySql( long userId, User userProfile ) throws InvalidInputException
     {
         LOGGER.info( "Method updateUserDetailsInMySql started for user: " + userId );
+        userProfile.setModifiedBy( String.valueOf( userId ) );
+        userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.merge( userProfile );
         LOGGER.info( "Method updateUserDetailsInMySql finished for user: " + userId );
     }
@@ -300,14 +344,51 @@ public class UserServiceImpl implements UserService
     }
 
 
-    private void addUserDetailsInMongo( User user ) throws InvalidInputException, NoRecordsFetchedException
+    private void addUserDetailsInMongo( User user, Phone phone ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOGGER.info( "Method addUserDetailsInMongo started for user: " + user.getUserId() );
         userManagementService.insertAgentSettings( user );
-        OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+        AgentSettings agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+        if ( phone != null && agentSettings != null && agentSettings.getContact_details() != null ) {
+            if ( agentSettings.getContact_details().getContact_numbers() == null ) {
+                agentSettings.getContact_details().setContact_numbers( new ContactNumberSettings() );
+            }
+            agentSettings.getContact_details().getContact_numbers().setPhone1( phone );
+            agentSettings.getContact_details().getContact_numbers()
+                .setWork( agentSettings.getContact_details().getContact_numbers().getPhone1().getCountryCode() + "-"
+                    + agentSettings.getContact_details().getContact_numbers().getPhone1().getNumber() + "x"
+                    + agentSettings.getContact_details().getContact_numbers().getPhone1().getExtension() );
+        }
+
+        agentSettings.setCreatedBy( String.valueOf( user.getUserId() ) );
+        agentSettings.setModifiedBy( String.valueOf( user.getUserId() ) );
+        agentSettings.setModifiedOn( System.currentTimeMillis() );
+        agentSettings.setCreatedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
-            CommonConstants.STATUS_INCOMPLETE_MONGO, unitSettings,
+            CommonConstants.STATUS_INCOMPLETE_MONGO, agentSettings,
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, agentSettings.getContact_details(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CREATED_BY, agentSettings.getCreatedBy(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CREATED_ON, agentSettings.getCreatedOn(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, agentSettings.getModifiedBy(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, agentSettings.getModifiedOn(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method addUserDetailsInMongo finished for user: " + user.getUserId() );
     }
 

@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.entities;
 
 import com.realtech.socialsurvey.core.entities.Phone;
 
+
 public class PersonalProfile
 {
     private int userId;

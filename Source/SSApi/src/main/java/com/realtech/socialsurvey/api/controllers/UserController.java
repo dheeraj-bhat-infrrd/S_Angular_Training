@@ -30,8 +30,10 @@ import com.realtech.socialsurvey.api.validators.PersonalProfileValidator;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.api.UserService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
@@ -124,96 +126,61 @@ public class UserController
     @ApiOperation ( value = "Update stage")
     public ResponseEntity<?> updateStage( @PathVariable ( "userId") String userId, @PathVariable ( "stage") String stage )
     {
-        try {
-            LOGGER.info( "UserController.updateStage started" );
-            userService.updateStage( Integer.parseInt( userId ), stage );
-            LOGGER.info( "UserController.updateStage completed successfully" );
-            return new ResponseEntity<Void>( HttpStatus.OK );
-        } catch ( Exception ex ) {
-            if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while updating stage: " + ex.getMessage() );
-            }
-            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
-        }
+        LOGGER.info( "UserController.updateStage started" );
+        userService.updateStage( Long.parseLong( userId ), stage );
+        LOGGER.info( "UserController.updateStage completed successfully" );
+        return new ResponseEntity<Void>( HttpStatus.OK );
     }
 
 
     @RequestMapping ( value = "/profile/update/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update user profile")
     public ResponseEntity<?> updateUserProfile( @Valid @RequestBody PersonalProfile personalProfile,
-        @PathVariable ( "userId") String userId )
+        @PathVariable ( "userId") String userId ) throws InvalidInputException, SolrException
     {
-        try {
-            LOGGER.info( "UserController.updateUserProfile started" );
-            long userIdLong = Long.parseLong( userId );
-            User user = userManagementService.getUserByUserId( userIdLong );
-            AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userIdLong );
-            UserCompositeEntity userProfile = personalProfileTransformer.transformApiRequestToDomainObject( personalProfile,
-                user, agentSettings );
-            userService.updateUserProfile( userIdLong, userProfile );
-            LOGGER.info( "UserController.updateUserProfile completed successfully" );
-            return new ResponseEntity<Void>( HttpStatus.OK );
-        } catch ( Exception ex ) {
-            if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while updating user profile: " + ex.getMessage() );
-            }
-            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
-        }
+        LOGGER.info( "UserController.updateUserProfile started" );
+        long userIdLong = Long.parseLong( userId );
+        User user = userManagementService.getUserByUserId( userIdLong );
+        AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userIdLong );
+        UserCompositeEntity userProfile = personalProfileTransformer.transformApiRequestToDomainObject( personalProfile, user,
+            agentSettings );
+        userService.updateUserProfile( userIdLong, userProfile );
+        LOGGER.info( "UserController.updateUserProfile completed successfully" );
+        return new ResponseEntity<Void>( HttpStatus.OK );
     }
 
 
     @RequestMapping ( value = "/profile/details/{userId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get user profile")
-    public ResponseEntity<?> getUserProfile( @PathVariable ( "userId") String userId )
+    public ResponseEntity<?> getUserProfile( @PathVariable ( "userId") String userId ) throws InvalidInputException
     {
-        try {
-            LOGGER.info( "UserController.getUserProfile started" );
-            UserCompositeEntity userProfile = userService.getUserProfileDetails( Integer.parseInt( userId ) );
-            PersonalProfile userProfileResponse = personalProfileTransformer.transformDomainObjectToApiResponse( userProfile );
-            LOGGER.info( "UserController.getUserProfile completed successfully" );
-            return new ResponseEntity<PersonalProfile>( userProfileResponse, HttpStatus.OK );
-        } catch ( Exception ex ) {
-            if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while getting user profile: " + ex.getMessage() );
-            }
-            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
-        }
+        LOGGER.info( "UserController.getUserProfile started" );
+        UserCompositeEntity userProfile = userService.getUserProfileDetails( Long.parseLong( userId ) );
+        PersonalProfile userProfileResponse = personalProfileTransformer.transformDomainObjectToApiResponse( userProfile );
+        LOGGER.info( "UserController.getUserProfile completed successfully" );
+        return new ResponseEntity<PersonalProfile>( userProfileResponse, HttpStatus.OK );
     }
 
 
     @RequestMapping ( value = "/profile/profileimage/remove/{userId}", method = RequestMethod.DELETE)
     @ApiOperation ( value = "Delete user profile image")
-    public ResponseEntity<?> deleteUserProfileImage( @PathVariable ( "userId") String userId )
+    public ResponseEntity<?> deleteUserProfileImage( @PathVariable ( "userId") String userId ) throws InvalidInputException
     {
-        try {
-            LOGGER.info( "UserController.deleteUserProfileImage started" );
-            userService.deleteUserProfileImage( Integer.parseInt( userId ) );
-            LOGGER.info( "UserController.deleteUserProfileImage completed successfully" );
-            return new ResponseEntity<Void>( HttpStatus.OK );
-        } catch ( Exception ex ) {
-            if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while deleting user profile image: " + ex.getMessage() );
-            }
-            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
-        }
+        LOGGER.info( "UserController.deleteUserProfileImage started" );
+        userService.deleteUserProfileImage( Long.parseLong( userId ) );
+        LOGGER.info( "UserController.deleteUserProfileImage completed successfully" );
+        return new ResponseEntity<Void>( HttpStatus.OK );
     }
 
 
     @RequestMapping ( value = "/profile/profileimage/update/{userId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Update user profile image")
     public ResponseEntity<?> updateUserProfileImage( @PathVariable ( "userId") String userId,
-        @RequestBody PersonalProfile personalProfile )
+        @RequestBody PersonalProfile personalProfile ) throws InvalidInputException
     {
-        try {
-            LOGGER.info( "UserController.updateUserProfileImage started" );
-            userService.updateUserProfileImage( Integer.parseInt( userId ), personalProfile.getProfilePhotoUrl() );
-            LOGGER.info( "UserController.updateUserProfileImage completed successfully" );
-            return new ResponseEntity<Void>( HttpStatus.OK );
-        } catch ( Exception ex ) {
-            if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Exception thrown while updating user profile image: " + ex.getMessage() );
-            }
-            return new ResponseEntity<Void>( HttpStatus.BAD_REQUEST );
-        }
+        LOGGER.info( "UserController.updateUserProfileImage started" );
+        userService.updateUserProfileImage( Long.parseLong( userId ), personalProfile.getProfilePhotoUrl() );
+        LOGGER.info( "UserController.updateUserProfileImage completed successfully" );
+        return new ResponseEntity<Void>( HttpStatus.OK );
     }
 }

@@ -1,4 +1,8 @@
-var phoneRegEx = {
+app.controller('newSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService','$rootScope', function ($scope, $http, $location, vcRecaptchaService, LoginService,$rootScope) {
+	$rootScope.userId=userId;
+	$rootScope.comanyId=companyId;
+	
+	$scope.phoneRegEx = {
         'translation': {
             d: {
                 pattern: /[0-9*]/
@@ -8,6 +12,31 @@ var phoneRegEx = {
 	     }*/
         }
     };
+	
+	if(!angular.isUndefined($rootScope.userId) && !angular.isUndefined($rootScope.comanyId)){
+		$location.path('/linkedin').replace();
+	}
+	
+	$scope.getErrorMessage = function(data){
+		var errorMessage = '';
+		if(data.errors != null){
+			angular.forEach(data.errors, function(value, key) {
+				errorMessage = errorMessage + value + ", ";
+			}, errorMessage);
+			var lastspace = errorMessage.lastIndexOf(',');
+	        if (lastspace != -1) {
+				if (errorMessage.charAt(lastspace-1) == ',') {
+					lastspace = lastspace - 1;
+				}
+				errorMessage = errorMessage.substr(0, lastspace);
+	        }
+		}else{
+			errorMessage = data;
+		}
+		return errorMessage;
+	}
+}]);
+
 
 
 app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService','$rootScope', function ($scope, $http, $location, vcRecaptchaService, LoginService,$rootScope) {
@@ -19,10 +48,11 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
     $scope.accountRegisterIds = {};
     $scope.countryCode=$('.dial-country-code').html();
     console.log("Country code is"+$scope.accountRegistration.code);
-   
+
     
     $scope.submitLogin = function () {
-        if (vcRecaptchaService.getResponse() === "") { //if string is empty
+    	console.log(vcRecaptchaService.getResponse());
+        if (vcRecaptchaService.getResponse() == "") { //if string is empty
             showError("Please resolve the captcha and submit!");
             $scope.activate = 0;
         } else {
@@ -32,13 +62,12 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
         }
         LoginService.signup($scope.accountRegistration)
             .then(function (response) {
-            	$scope.accountRegisterIds = response.data;
-            	 $rootScope.userId=response.data.userId;
-            	 $rootScope.comanyId=response.data.companyId;
-            
-            	$scope.register();
+	        	 $rootScope.userId=response.data.userId;
+	        	 $rootScope.comanyId=response.data.companyId;
+	        	 $location.path('/linkedin').replace();
             }, function (error) {
-            	showError(error);
+            	console.log(error);
+            	showError($scope.getErrorMessage(error.data));
             });
     };
 
@@ -62,38 +91,33 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
         utilsScript: "../resources/js/utils.js"
     });
     
-    $('#reg-phone').mask(phoneFormat, phoneRegEx);
-    
-    $scope.register = function () {
-    	$location.path('/linkedin').replace();
-    };
+    $('#reg-phone').mask(phoneFormat, $scope.phoneRegEx);
 }]);
 
 
 app.controller('linkedInController', ['$scope','$http', '$location','$rootScope','LinkedinService', function ($scope,$http, $location,$rootScope,LinkedinService) {
-	$scope.linkedin=function(){
-		console.log("!!!!!!!!!!"+$rootScope.userId);
-		var dataTosend={
-				"usedId":$rootScope.userId
-		};
-	LinkedinService.linkedin($rootScope.userId)
-	.then(function(response){
-		window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
-	},function(error){
-		
-	});
-	};
 	
+	//$rootScope.userId = 1230;
+	
+	$scope.linkedin = function (){
+		LinkedinService.linkedin($rootScope.userId).then(function(response){
+			window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
+		},function(error){
+			console.log(error);
+		});
+	};
 }]);
 
 
-app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', function ($scope, $http, $location, UserProfileService) {
-	if(angular.isUndefined($scope.userProfile) || $scope.userProfile == null || $scope.userProfile == {}){
-		UserProfileService.getUserProfile(1230).then(function(response){ 
-			$scope.userProfile = response.data;
+app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
+	
+	//$rootScope.userId = 1230;
+	
+	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
+		UserProfileService.getUserProfile($rootScope.userId).then(function(response){ 
+			$rootScope.userProfile = response.data;
 		}, function (error) {
-		    console.log(error);
-		    showError(error);
+		    showError($scope.getErrorMessage(error.data));
 		});
 	}
 	
@@ -109,44 +133,43 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     };
     
     $scope.saveProfileDetails = function () {
-    	$scope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
-    	UserProfileService.updateUserProfile(1230, 'UPP', $scope.userProfile).then(function(response){ 
+    	$rootScope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response){ 
     		$location.path('/company').replace();
     	}, function (error) {
-    	    console.log(error);
-    	    showError(error);
+    	    showError($scope.getErrorMessage(error.data));
     	});
     };
     
     $('#reg-phone1').intlTelInput({
         utilsScript: "../resources/js/utils.js"
     });
-    $('#reg-phone1').mask(phoneFormat,phoneRegEx);
+    $('#reg-phone1').mask(phoneFormat,$scope.phoneRegEx);
     
     $('#reg-phone2').intlTelInput({
         utilsScript: "../resources/js/utils.js"
     });
-    $('#reg-phone2').mask(phoneFormat, phoneRegEx);
+    $('#reg-phone2').mask(phoneFormat, $scope.phoneRegEx);
 }]);
 
-app.controller('companyController', ['$scope', '$http', '$location', 'CompanyProfileService', function ($scope, $http, $location, CompanyProfileService) {
+app.controller('companyController', ['$scope', '$http', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $http, $location, CompanyProfileService, $rootScope) {
 	$scope.countrycode=='ax';
 	
-	if(angular.isUndefined($scope.companyProfile) || $scope.companyProfile == null || $scope.companyProfile == {}){
-		CompanyProfileService.getCompanyProfile(36).then(function(response){ 
-			$scope.companyProfile = response.data;
+	//$rootScope.comanyId=36;
+	
+	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
+		CompanyProfileService.getCompanyProfile($rootScope.comanyId).then(function(response){ 
+			$rootScope.companyProfile = response.data;
 		}, function (error) {
-		    console.log(error);
-		    showError(error);
+		    showError($scope.getErrorMessage(error.data));
 		});
 	}
 	
-	if(angular.isUndefined($scope.industries) || $scope.industries == null || $scope.industries == {}){
+	if(angular.isUndefined($rootScope.industries) || $rootScope.industries == null || $rootScope.industries == {}){
 		CompanyProfileService.getVerticals().then(function(response){ 
-			$scope.industries = response.data;
+			$rootScope.industries = response.data;
 		}, function (error) {
-		    console.log(error);
-		    showError(error);
+		    showError($scope.getErrorMessage(error.data));
 		});
 	}
 	
@@ -162,12 +185,11 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
     };
     
     $scope.saveCompanyProfileDetails = function () {
-    	$scope.companyProfile.officePhone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
-    	CompanyProfileService.updateCompanyProfile(36, 'CPP', $scope.companyProfile).then(function(response){ 
+    	$rootScope.companyProfile.officePhone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	CompanyProfileService.updateCompanyProfile($rootScope.comanyId, 'CPP', $rootScope.companyProfile).then(function(response){ 
     		$location.path('/payment').replace();
     	}, function (error) {
-    	    console.log(error);
-    	    showError(error);
+    	    showError($scope.getErrorMessage(error.data));
     	});
     };
     
@@ -187,5 +209,5 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
 	$('#reg-phone-office').intlTelInput({
 	    utilsScript: "../resources/js/utils.js"
 	});
-	$('#reg-phone-office').mask(phoneFormat, phoneRegEx);
+	$('#reg-phone-office').mask(phoneFormat, $scope.phoneRegEx);
 }]);

@@ -65,6 +65,16 @@ public interface SocialManagementService
     public SocialMediaTokens updateSocialMediaTokens( String collection, OrganizationUnitSettings unitSettings,
         SocialMediaTokens mediaTokens ) throws InvalidInputException;
 
+    /**
+     * Updates social media token for the given id
+     * @param collection
+     * @param iden
+     * @param mediaTokens
+     * @return
+     * @throws InvalidInputException
+     */
+    public SocialMediaTokens updateSocialMediaTokens( String collection, long iden,
+        SocialMediaTokens mediaTokens ) throws InvalidInputException;
 
     public SocialMediaTokens updateAgentSocialMediaTokens( AgentSettings agentSettings, SocialMediaTokens mediaTokens )
         throws InvalidInputException;
