@@ -17,18 +17,22 @@ app.controller('newSignupController', ['$scope', '$http', '$location', 'vcRecapt
 		$location.path('/linkedin').replace();
 	}
 	
-	$scope.getErrorMessage = function(errors){
+	$scope.getErrorMessage = function(data){
 		var errorMessage = '';
-		angular.forEach(errors, function(value, key) {
-			errorMessage = errorMessage + value + ", ";
-		}, errorMessage);
-		var lastspace = errorMessage.lastIndexOf(',');
-        if (lastspace != -1) {
-			if (errorMessage.charAt(lastspace-1) == ',') {
-				lastspace = lastspace - 1;
-			}
-			errorMessage = errorMessage.substr(0, lastspace);
-        }
+		if(data.errors != null){
+			angular.forEach(data.errors, function(value, key) {
+				errorMessage = errorMessage + value + ", ";
+			}, errorMessage);
+			var lastspace = errorMessage.lastIndexOf(',');
+	        if (lastspace != -1) {
+				if (errorMessage.charAt(lastspace-1) == ',') {
+					lastspace = lastspace - 1;
+				}
+				errorMessage = errorMessage.substr(0, lastspace);
+	        }
+		}else{
+			errorMessage = data;
+		}
 		return errorMessage;
 	}
 }]);
@@ -42,7 +46,8 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
     $scope.model = {key: '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'};
     
     $scope.submitLogin = function () {
-        if (vcRecaptchaService.getResponse() === "") { //if string is empty
+    	console.log(vcRecaptchaService.getResponse());
+        if (vcRecaptchaService.getResponse() == "") { //if string is empty
             showError("Please resolve the captcha and submit!");
             $scope.activate = 0;
         } else {
@@ -55,7 +60,8 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
 	        	 $rootScope.comanyId=response.data.companyId;
 	        	 $location.path('/linkedin').replace();
             }, function (error) {
-            	showError($scope.getErrorMessage(error.data.errors));
+            	console.log(error);
+            	showError($scope.getErrorMessage(error.data));
             });
     };
 
@@ -105,7 +111,7 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response){ 
 			$rootScope.userProfile = response.data;
 		}, function (error) {
-		    showError($scope.getErrorMessage(error.data.errors));
+		    showError($scope.getErrorMessage(error.data));
 		});
 	}
 	
@@ -125,7 +131,7 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     	UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response){ 
     		$location.path('/company').replace();
     	}, function (error) {
-    	    showError($scope.getErrorMessage(error.data.errors));
+    	    showError($scope.getErrorMessage(error.data));
     	});
     };
     
@@ -149,7 +155,7 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
 		CompanyProfileService.getCompanyProfile($rootScope.comanyId).then(function(response){ 
 			$rootScope.companyProfile = response.data;
 		}, function (error) {
-		    showError($scope.getErrorMessage(error.data.errors));
+		    showError($scope.getErrorMessage(error.data));
 		});
 	}
 	
@@ -157,7 +163,7 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
 		CompanyProfileService.getVerticals().then(function(response){ 
 			$rootScope.industries = response.data;
 		}, function (error) {
-		    showError($scope.getErrorMessage(error.data.errors));
+		    showError($scope.getErrorMessage(error.data));
 		});
 	}
 	
@@ -177,7 +183,7 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
     	CompanyProfileService.updateCompanyProfile($rootScope.comanyId, 'CPP', $rootScope.companyProfile).then(function(response){ 
     		$location.path('/payment').replace();
     	}, function (error) {
-    	    showError($scope.getErrorMessage(error.data.errors));
+    	    showError($scope.getErrorMessage(error.data));
     	});
     };
     

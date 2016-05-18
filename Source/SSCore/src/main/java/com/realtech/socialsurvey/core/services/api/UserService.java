@@ -16,16 +16,16 @@ public interface UserService
         throws SolrException, InvalidInputException;
 
 
-    public UserCompositeEntity getUserProfileDetails( int userId ) throws InvalidInputException;
+    public UserCompositeEntity getUserProfileDetails( long userId ) throws InvalidInputException;
 
 
-    public void deleteUserProfileImage( int userId ) throws InvalidInputException;
+    public void deleteUserProfileImage( long userId ) throws InvalidInputException;
 
 
-    public void updateUserProfileImage( int userId, String imageUrl ) throws InvalidInputException;
+    public void updateUserProfileImage( long userId, String imageUrl ) throws InvalidInputException;
 
 
-    public void updateStage( int parseInt, String stage );
+    public void updateStage( long userId, String stage );
 
 
     public User addUser( String firstName, String lastName, String emailId, Phone phone, Company company )

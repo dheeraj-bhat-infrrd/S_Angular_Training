@@ -31,11 +31,13 @@ import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.realtech.socialsurvey.core.services.api.UserService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
 @Service
@@ -70,7 +72,7 @@ public class AccountServiceImpl implements AccountService
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone )
-        throws NonFatalException
+        throws InvalidInputException, UserAlreadyExistsException, SolrException, NoRecordsFetchedException, NonFatalException
     {
         LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO started for company: " + companyName );
         Map<String, Long> ids = new HashMap<String, Long>();
@@ -98,12 +100,12 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public CompanyCompositeEntity getCompanyProfileDetails( int companyId ) throws InvalidInputException
+    public CompanyCompositeEntity getCompanyProfileDetails( long companyId ) throws InvalidInputException
     {
         LOGGER.info( "Method getCompanyProfileDetails started for company: " + companyId );
         CompanyCompositeEntity companyProfile = new CompanyCompositeEntity();
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
-        Company company = companyDao.findById( Company.class, (long) companyId );
+        Company company = companyDao.findById( Company.class, companyId );
         companyProfile.setCompany( company );
         companyProfile.setCompanySettings( unitSettings );
         LOGGER.info( "Method getCompanyProfileDetails finished for company: " + company.getCompany() );
@@ -122,7 +124,7 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public void deleteCompanyProfileImage( int companyId ) throws InvalidInputException
+    public void deleteCompanyProfileImage( long companyId ) throws InvalidInputException
     {
         LOGGER.info( "Method deleteCompanyProfileImage started for company: " + companyId );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
@@ -141,7 +143,7 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public void updateCompanyProfileImage( int companyId, String imageUrl ) throws InvalidInputException
+    public void updateCompanyProfileImage( long companyId, String imageUrl ) throws InvalidInputException
     {
         LOGGER.info( "Method updateCompanyProfileImage started for company: " + companyId );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
@@ -160,10 +162,10 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public void updateStage( int companyId, String stage )
+    public void updateStage( long companyId, String stage )
     {
         LOGGER.info( "Method updateStage started for company: " + companyId + ", stage: " + stage );
-        Company company = companyDao.findById( Company.class, (long) companyId );
+        Company company = companyDao.findById( Company.class, companyId );
         company.setRegistrationStage( stage );
         company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         companyDao.update( company );

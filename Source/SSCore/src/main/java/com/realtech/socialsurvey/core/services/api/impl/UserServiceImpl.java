@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService
 
 
     @Override
-    public UserCompositeEntity getUserProfileDetails( int userId ) throws InvalidInputException
+    public UserCompositeEntity getUserProfileDetails( long userId ) throws InvalidInputException
     {
         LOGGER.info( "Method getUserProfileDetails started for userId: " + userId );
         UserCompositeEntity userProfile = new UserCompositeEntity();
@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService
 
 
     @Override
-    public void deleteUserProfileImage( int userId ) throws InvalidInputException
+    public void deleteUserProfileImage( long userId ) throws InvalidInputException
     {
         LOGGER.info( "Method deleteUserProfileImage started for userId: " + userId );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userId );
@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService
 
 
     @Override
-    public void updateUserProfileImage( int userId, String imageUrl ) throws InvalidInputException
+    public void updateUserProfileImage( long userId, String imageUrl ) throws InvalidInputException
     {
         LOGGER.info( "Method updateUserProfileImage started for userId: " + userId );
         AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles( userId );
@@ -164,17 +164,17 @@ public class UserServiceImpl implements UserService
 
     @Override
     @Transactional
-    public void updateStage( int userId, String stage )
+    public void updateStage( long userId, String stage )
     {
         LOGGER.info( "Method updateStage started for userId: " + userId + ", stage: " + stage );
-        User user = userDao.findById( User.class, (long) userId );
+        User user = userDao.findById( User.class, userId );
         user.setRegistrationStage( stage );
         user.setModifiedBy( String.valueOf( userId ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.update( user );
 
         com.realtech.socialsurvey.core.entities.UserProfile userProfile = userProfileDao
-            .findById( com.realtech.socialsurvey.core.entities.UserProfile.class, (long) userId );
+            .findById( com.realtech.socialsurvey.core.entities.UserProfile.class, userId );
         userProfile.setProfileCompletionStage( stage );
         userProfile.setModifiedBy( String.valueOf( userId ) );
         userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
