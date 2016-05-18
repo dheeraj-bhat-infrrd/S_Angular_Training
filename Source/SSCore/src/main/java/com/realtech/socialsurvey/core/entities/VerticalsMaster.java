@@ -11,6 +11,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 /**
  * The persistent class for the verticals_master database table.
@@ -27,18 +29,23 @@ public class VerticalsMaster implements Serializable
     @Column ( name = "VERTICALS_MASTER_ID")
     private int verticalsMasterId;
 
+    @JsonIgnore
     @Column ( name = "CREATED_BY")
     private String createdBy;
 
+    @JsonIgnore
     @Column ( name = "CREATED_ON")
     private Timestamp createdOn;
 
+    @JsonIgnore
     @Column ( name = "MODIFIED_BY")
     private String modifiedBy;
 
+    @JsonIgnore
     @Column ( name = "MODIFIED_ON")
     private Timestamp modifiedOn;
 
+    @JsonIgnore
     private int status;
 
     @Column ( name = "VERTICAL_NAME")
@@ -48,14 +55,17 @@ public class VerticalsMaster implements Serializable
     private int priorityOrder;
 
     //bi-directional many-to-one association to VerticalCrmMapping
+    @JsonIgnore
     @OneToMany ( mappedBy = "verticalsMaster")
     private List<VerticalCrmMapping> verticalCrmMappings;
 
     //bi-directional many-to-one association to Survey
+    @JsonIgnore
     @OneToMany ( mappedBy = "verticalsMaster")
     private List<SurveyVerticalMapping> surveys;
 
     //bi-directional many-to-one association to Survey
+    @JsonIgnore
     @OneToMany ( mappedBy = "verticalsMaster")
     private List<Company> companies;
 
