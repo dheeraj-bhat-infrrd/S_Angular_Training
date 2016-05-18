@@ -66,26 +66,20 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
 
 
 app.controller('linkedInController', ['$scope','$http', '$location','$rootScope','LinkedinService', function ($scope,$http, $location,$rootScope,LinkedinService) {
-	$scope.linkedin=function(){
-		console.log("!!!!!!!!!!"+$rootScope.userId);
-		var dataTosend={
-				"usedId":$rootScope.userId
-		};
-	LinkedinService.linkedin($rootScope.userId)
-	.then(function(response){
-		window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
-	},function(error){
-		
-	});
+	$scope.linkedin = function (){
+		LinkedinService.linkedin($rootScope.userId).then(function(response){
+			window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
+		},function(error){
+			console.log(error);
+		});
 	};
-	
 }]);
 
 
-app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', function ($scope, $http, $location, UserProfileService) {
-	if(angular.isUndefined($scope.userProfile) || $scope.userProfile == null || $scope.userProfile == {}){
+app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
+	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
 		UserProfileService.getUserProfile(1230).then(function(response){ 
-			$scope.userProfile = response.data;
+			$rootScope.userProfile = response.data;
 		}, function (error) {
 		    console.log(error);
 		    showError(error);
@@ -104,8 +98,8 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     };
     
     $scope.saveProfileDetails = function () {
-    	$scope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
-    	UserProfileService.updateUserProfile(1230, 'UPP', $scope.userProfile).then(function(response){ 
+    	$rootScope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	UserProfileService.updateUserProfile(1230, 'UPP', $rootScope.userProfile).then(function(response){ 
     		$location.path('/company').replace();
     	}, function (error) {
     	    console.log(error);
@@ -124,21 +118,21 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     $('#reg-phone2').mask(phoneFormat, phoneRegEx);
 }]);
 
-app.controller('companyController', ['$scope', '$http', '$location', 'CompanyProfileService', function ($scope, $http, $location, CompanyProfileService) {
+app.controller('companyController', ['$scope', '$http', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $http, $location, CompanyProfileService, $rootScope) {
 	$scope.countrycode=='ax';
 	
-	if(angular.isUndefined($scope.companyProfile) || $scope.companyProfile == null || $scope.companyProfile == {}){
+	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
 		CompanyProfileService.getCompanyProfile(36).then(function(response){ 
-			$scope.companyProfile = response.data;
+			$rootScope.companyProfile = response.data;
 		}, function (error) {
 		    console.log(error);
 		    showError(error);
 		});
 	}
 	
-	if(angular.isUndefined($scope.industries) || $scope.industries == null || $scope.industries == {}){
+	if(angular.isUndefined($rootScope.industries) || $rootScope.industries == null || $rootScope.industries == {}){
 		CompanyProfileService.getVerticals().then(function(response){ 
-			$scope.industries = response.data;
+			$rootScope.industries = response.data;
 		}, function (error) {
 		    console.log(error);
 		    showError(error);
@@ -157,8 +151,8 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
     };
     
     $scope.saveCompanyProfileDetails = function () {
-    	$scope.companyProfile.officePhone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
-    	CompanyProfileService.updateCompanyProfile(36, 'CPP', $scope.companyProfile).then(function(response){ 
+    	$rootScope.companyProfile.officePhone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	CompanyProfileService.updateCompanyProfile(36, 'CPP', $rootScope.companyProfile).then(function(response){ 
     		$location.path('/payment').replace();
     	}, function (error) {
     	    console.log(error);

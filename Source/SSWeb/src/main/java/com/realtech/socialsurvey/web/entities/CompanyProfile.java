@@ -10,12 +10,24 @@ public class CompanyProfile
     private String companyName;
     private String companyLogo;
     private VerticalsMaster industry;
-    private Location locaton;
+    private Location location;
     private String address;
     private String city;
     private String state;
     private String zip;
     private Phone officePhone;
+
+
+    public Location getLocation()
+    {
+        return location;
+    }
+
+
+    public void setLocation( Location location )
+    {
+        this.location = location;
+    }
 
 
     public VerticalsMaster getIndustry()
@@ -27,18 +39,6 @@ public class CompanyProfile
     public void setIndustry( VerticalsMaster industry )
     {
         this.industry = industry;
-    }
-
-
-    public Location getLocaton()
-    {
-        return locaton;
-    }
-
-
-    public void setLocaton( Location locaton )
-    {
-        this.locaton = locaton;
     }
 
 
