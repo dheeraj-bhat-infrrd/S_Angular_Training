@@ -9,6 +9,7 @@ var phoneRegEx = {
         }
     };
 
+
 app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService','$rootScope', function ($scope, $http, $location, vcRecaptchaService, LoginService,$rootScope) {
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
@@ -16,6 +17,9 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
     $scope.widgetId = null;
     $scope.model = {key: '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'};
     $scope.accountRegisterIds = {};
+    $scope.countryCode=$('.dial-country-code').html();
+    console.log("Country code is"+$scope.accountRegistration.code);
+   
     
     $scope.submitLogin = function () {
         if (vcRecaptchaService.getResponse() === "") { //if string is empty
@@ -23,7 +27,8 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
             $scope.activate = 0;
         } else {
         	$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-        	$scope.accountRegistration.phone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+        	$scope.accountRegistration.phone = { "number" : "1234567890", "extension" : "12"};
+        	 $scope.accountRegistration.phone.countryCode=$('.dial-country-code').html();
         }
         LoginService.signup($scope.accountRegistration)
             .then(function (response) {
