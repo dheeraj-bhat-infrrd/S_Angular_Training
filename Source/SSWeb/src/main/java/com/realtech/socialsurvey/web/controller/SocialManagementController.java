@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.realtech.socialsurvey.web.common.TokenHandler;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -151,6 +152,9 @@ public class SocialManagementController
 
     @Autowired
     private EmailServices emailServices;
+
+    @Autowired
+    private TokenHandler tokenHandler;
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -1014,7 +1018,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
@@ -1041,7 +1045,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
@@ -1068,7 +1072,7 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
@@ -1096,7 +1100,7 @@ public class SocialManagementController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = updateLinkedInToken( accessToken, mediaTokens, profileLink );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink );
                 mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
 
@@ -1138,32 +1142,6 @@ public class SocialManagementController
         model.addAttribute( "socialNetwork", "linkedin" );
         LOG.info( "Method authenticateLinkedInAccess() finished from SocialManagementController" );
         return JspResolver.SOCIAL_AUTH_MESSAGE;
-    }
-
-
-    private SocialMediaTokens updateLinkedInToken( String accessToken, SocialMediaTokens mediaTokens, String profileLink )
-    {
-        LOG.debug( "Method updateLinkedInToken() called from SocialManagementController" );
-        if ( mediaTokens == null ) {
-            LOG.debug( "Media tokens do not exist. Creating them and adding the LinkedIn access token" );
-            mediaTokens = new SocialMediaTokens();
-            mediaTokens.setLinkedInToken( new LinkedInToken() );
-        } else {
-            if ( mediaTokens.getLinkedInToken() == null ) {
-                LOG.debug( "Updating the existing media tokens for LinkedIn" );
-                mediaTokens.setLinkedInToken( new LinkedInToken() );
-            }
-        }
-
-        mediaTokens.getLinkedInToken().setLinkedInAccessToken( accessToken );
-        if ( profileLink != null ) {
-            profileLink = profileLink.split( "&" )[0];
-            mediaTokens.getLinkedInToken().setLinkedInPageLink( profileLink );
-        }
-        mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn( System.currentTimeMillis() );
-
-        LOG.debug( "Method updateLinkedInToken() finished from SocialManagementController" );
-        return mediaTokens;
     }
 
 

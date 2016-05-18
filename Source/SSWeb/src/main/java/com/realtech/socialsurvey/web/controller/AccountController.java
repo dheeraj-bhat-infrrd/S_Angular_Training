@@ -1,37 +1,50 @@
 package com.realtech.socialsurvey.web.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
-
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.web.api.SSApiIntegration;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
+import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
+import com.realtech.socialsurvey.web.api.exception.SSAPIException;
+import com.realtech.socialsurvey.web.common.TokenHandler;
 import com.realtech.socialsurvey.web.entities.AuthError;
+import com.realtech.socialsurvey.web.entities.CompanyProfile;
+import com.realtech.socialsurvey.web.entities.PersonalProfile;
+import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.realtech.socialsurvey.web.api.SSApiIntegration;
-import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
-import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
-import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
-import com.realtech.socialsurvey.web.entities.CompanyProfile;
-import com.realtech.socialsurvey.web.entities.PersonalProfile;
-import com.realtech.socialsurvey.web.ui.entities.AccountRegistration;
-import com.realtech.socialsurvey.web.util.RequestUtils;
-
+import org.springframework.web.bind.annotation.*;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.QueryParam;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -49,11 +62,23 @@ public class AccountController
     @Autowired
     private RequestUtils requestUtils;
 
+    @Autowired
+    private TokenHandler tokenHandler;
+
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
+
+    @Autowired
+    private SocialManagementService socialManagementService;
+
     // LinkedIn
     @Value ( "${LINKED_IN_API_KEY}")
     private String linkedInApiKey;
 
-    @Value ( "${LINKED_IN_REDIRECT_URI}")
+    @Value ( "${LINKED_IN_API_SECRET}")
+    private String linkedInApiSecret;
+
+    @Value ( "${LINKED_IN_REDIRECT_URI_STATELESS}")
     private String linkedinRedirectUri;
 
     @Value ( "${LINKED_IN_AUTH_URI}")
@@ -61,6 +86,17 @@ public class AccountController
 
     @Value ( "${LINKED_IN_SCOPE}")
     private String linkedinScope;
+
+    @Value ( "${LINKED_IN_ACCESS_URI}")
+    private String linkedinAccessUri;
+
+    @Value ( "${LINKED_IN_PROFILE_URI}")
+    private String linkedinProfileUri;
+
+    private static final String AGENT_UNIT = "agent";
+    private static final String BRANCH_UNIT = "branch";
+    private static final String REGION_UNIT = "region";
+    private static final String COMPANY_UNIT = "company";
 
 
     @RequestMapping ( value = "/registeraccount/initiateregistration", method = RequestMethod.POST)
@@ -175,29 +211,31 @@ public class AccountController
     // TODO: To be moved from register account to more generic
     @RequestMapping ( value = "/registeraccount/{organizationunit}/initlinkedinconnection", method = RequestMethod.POST)
     @ResponseBody
-    public String initiateLinkedInConnection( @RequestBody String userId,
+    public String initiateLinkedInConnection( @RequestBody String id,
         @PathVariable ( "organizationunit") String organizationunit, HttpServletRequest request ) throws JsonProcessingException
     {
         LOG.debug( "Creating linkedin url" );
         String serverBaseUrl = requestUtils.getRequestServerName( request );
         StringBuilder linkedInAuth = new StringBuilder( linkedinAuthUri ).append( "?response_type=" ).append( "code" )
             .append( "&client_id=" ).append( linkedInApiKey ).append( "&redirect_uri=" ).append( serverBaseUrl )
-            .append( linkedinRedirectUri ).append( "?unit=" ).append( organizationunit ).append( "&id=" ).append( userId )
+            .append( linkedinRedirectUri ).append( "?unit=" ).append( organizationunit ).append( "&id=" ).append( id )
             .append( "&state=" ).append( "SOCIALSURVEY" ).append( "&scope=" ).append( linkedinScope );
         ObjectMapper mapper = new ObjectMapper();
         String jsonStr = mapper.writeValueAsString( linkedInAuth.toString() );
+        LOG.debug( "LinkedIn Auth URL: "+jsonStr );
         return jsonStr;
 	}
 
 	// TODO: To be moved from register account to more generic
 	@RequestMapping(value = "/registeraccount/connectlinkedin", method = RequestMethod.GET)
 	@ResponseBody
-	public String connectToLinkedIn(HttpServletRequest request) {
+	public String connectToLinkedIn(HttpServletRequest request) throws InvalidInputException{
         LOG.info( "Connecting to linkedin" );
         String response = null;
         // the unit and id should be there in the response with in the redirect url
         String unit = request.getParameter( "unit" );
-        String id = request.getParameter( "id" );
+        String sId = request.getParameter( "id" );
+        LOG.debug( "Unit: "+unit + " and id: "+sId );
         // check if there is error
         String errorCode = request.getParameter( "error" );
         if ( errorCode != null ) {
@@ -207,7 +245,59 @@ public class AccountController
             error.setReason( request.getParameter( "error_description" ) );
             response = new Gson().toJson( error );
         }else{
+            try {
+                if(sId != null && unit != null) {
+                    LOG.debug( "Authentication successful." );
+                    // Getting Oauth access token for LinkedIn
+                    String oauthCode = request.getParameter( "code" );
+                    List<NameValuePair> params = new ArrayList<NameValuePair>( 2 );
+                    params.add( new BasicNameValuePair( "grant_type", "authorization_code" ) );
+                    params.add( new BasicNameValuePair( "code", oauthCode ) );
+                    params.add( new BasicNameValuePair( "redirect_uri", requestUtils.getRequestServerName( request ) + linkedinRedirectUri ) );
+                    params.add( new BasicNameValuePair( "client_id", linkedInApiKey ) );
+                    params.add( new BasicNameValuePair( "client_secret", linkedInApiSecret ) );
 
+                    // fetching access token
+                    HttpClient httpclient = HttpClientBuilder.create().build();
+                    HttpPost httpPost = new HttpPost( linkedinAccessUri );
+                    httpPost.setEntity( new UrlEncodedFormEntity( params, "UTF-8" ) );
+                    String accessTokenStr = httpclient.execute( httpPost, new BasicResponseHandler() );
+                    Map<String, Object> map = new Gson().fromJson( accessTokenStr, new TypeToken<Map<String, String>>()
+                    {
+                    }.getType() );
+                    String accessToken = (String) map.get( "access_token" );
+
+                    // fetching LinkedIn profile url
+                    HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
+                    String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
+                    LinkedinUserProfileResponse profileData = new Gson().fromJson( basicProfileStr, LinkedinUserProfileResponse.class );
+                    String profileLink = profileData.getSiteStandardProfileRequest().getUrl();
+                    // get social media tokens
+                    SocialMediaTokens tokens = null;
+                    if(unit.equalsIgnoreCase( AGENT_UNIT )) {
+                        tokens = organizationManagementService.getAgentSocialMediaTokens( Long.parseLong( sId ) );
+                        tokens = tokenHandler.updateLinkedInToken( accessToken, tokens, profileLink );
+                        // update tokens
+                        socialManagementService.updateSocialMediaTokens( CommonConstants.AGENT_SETTINGS_COLLECTION, Long.parseLong( sId ), tokens );
+                        response = "ok";
+                    }else if(unit.equalsIgnoreCase( BRANCH_UNIT )) {
+                        //TODO: Handle branch LinkedIn Connection
+                        response = "ok";
+                    }else if(unit.equalsIgnoreCase( REGION_UNIT )) {
+                        //TODO: Handle region LinkedIn Connection
+                        response = "ok";
+                    }else if(unit.equalsIgnoreCase( COMPANY_UNIT )) {
+                        //TODO: Handle company LinkedIn Connection
+                        response = "ok";
+                    }
+                }else{
+                    LOG.error("Expecting id and unit from linkedin.");
+                    throw new SSAPIException( "Could not fetch LinkedIn profile. Could not pass parameters " );
+                }
+            }catch(IOException ioe){
+                LOG.error("Found exception while accessing profile data "+ioe.getMessage(), ioe);
+                throw new SSAPIException( "Could not fetch LinkedIn profile. Reason: "+ioe.getMessage() );
+            }
         }
         return response;
 	}
