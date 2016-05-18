@@ -9,28 +9,31 @@ import com.realtech.socialsurvey.core.entities.Phone;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
 public interface AccountService
 {
     public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone )
-        throws NonFatalException;
+        throws InvalidInputException, UserAlreadyExistsException, SolrException, NoRecordsFetchedException, NonFatalException;
 
 
-    public CompanyCompositeEntity getCompanyProfileDetails( int companyId ) throws InvalidInputException;
+    public CompanyCompositeEntity getCompanyProfileDetails( long companyId ) throws InvalidInputException;
 
 
     public void updateCompanyProfile( long compId, CompanyCompositeEntity companyProfile ) throws InvalidInputException;
 
 
-    public void deleteCompanyProfileImage( int companyId ) throws InvalidInputException;
+    public void deleteCompanyProfileImage( long companyId ) throws InvalidInputException;
 
 
-    public void updateCompanyProfileImage( int companyId, String imageUrl ) throws InvalidInputException;
+    public void updateCompanyProfileImage( long companyId, String imageUrl ) throws InvalidInputException;
 
 
-    public void updateStage( int companyId, String stage );
+    public void updateStage( long companyId, String stage );
 
 
     public List<VerticalsMaster> getIndustries();

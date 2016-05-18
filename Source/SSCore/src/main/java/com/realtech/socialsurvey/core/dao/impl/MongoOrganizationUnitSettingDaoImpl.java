@@ -79,6 +79,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_VERTICAL = "vertical";
 	public static final String KEY_PROFILE_STAGES = "profileStages";
 	public static final String KEY_MODIFIED_ON = "modifiedOn";
+	public static final String KEY_MODIFIED_BY = "modifiedBy";
+	public static final String KEY_CREATED_ON = "createdOn";
+	public static final String KEY_CREATED_BY = "createdBy";
 	public static final String KEY_DISCLAIMER = "disclaimer";
 	public static final String KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.facebookToken";
 	public static final String KEY_TWITTER_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.twitterToken";

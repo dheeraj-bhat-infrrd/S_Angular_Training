@@ -31,11 +31,13 @@ import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.realtech.socialsurvey.core.services.api.UserService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 
 @Service
@@ -70,7 +72,7 @@ public class AccountServiceImpl implements AccountService
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public Map<String, Long> saveAccountRegistrationDetailsAndGetIdsInMap( User user, String companyName, Phone phone )
-        throws NonFatalException
+        throws InvalidInputException, UserAlreadyExistsException, SolrException, NoRecordsFetchedException, NonFatalException
     {
         LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO started for company: " + companyName );
         Map<String, Long> ids = new HashMap<String, Long>();
@@ -85,25 +87,25 @@ public class AccountServiceImpl implements AccountService
 
             // Create a user in user table with registration stage as 1 and status 1,user profile in UserProfile table with 'CA' (1), 
             //solr, mongo with status 'I'. Set the force password column to 1.
-            user = userService.addUser( user.getFirstName(), user.getLastName(), user.getEmailId(), company );
+            user = userService.addUser( user.getFirstName(), user.getLastName(), user.getEmailId(), phone, company );
             ids.put( "userId", user.getUserId() );
 
             // Send registration email to user, Send mail to sales lead, maybe to support
             userService.sendRegistrationEmail( user );
         }
-        
+
         LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO finished for company: " + companyName );
         return ids;
     }
 
 
     @Override
-    public CompanyCompositeEntity getCompanyProfileDetails( int companyId ) throws InvalidInputException
+    public CompanyCompositeEntity getCompanyProfileDetails( long companyId ) throws InvalidInputException
     {
         LOGGER.info( "Method getCompanyProfileDetails started for company: " + companyId );
         CompanyCompositeEntity companyProfile = new CompanyCompositeEntity();
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
-        Company company = companyDao.findById( Company.class, (long) companyId );
+        Company company = companyDao.findById( Company.class, companyId );
         companyProfile.setCompany( company );
         companyProfile.setCompanySettings( unitSettings );
         LOGGER.info( "Method getCompanyProfileDetails finished for company: " + company.getCompany() );
@@ -122,35 +124,50 @@ public class AccountServiceImpl implements AccountService
 
 
     @Override
-    public void deleteCompanyProfileImage( int companyId ) throws InvalidInputException
+    public void deleteCompanyProfileImage( long companyId ) throws InvalidInputException
     {
         LOGGER.info( "Method deleteCompanyProfileImage started for company: " + companyId );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
         unitSettings.setLogo( null );
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method deleteCompanyProfileImage finished for company: " + companyId );
     }
 
 
     @Override
-    public void updateCompanyProfileImage( int companyId, String imageUrl ) throws InvalidInputException
+    public void updateCompanyProfileImage( long companyId, String imageUrl ) throws InvalidInputException
     {
         LOGGER.info( "Method updateCompanyProfileImage started for company: " + companyId );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
         unitSettings.setLogo( imageUrl );
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method updateCompanyProfileImage finished for company: " + companyId );
     }
 
 
     @Override
-    public void updateStage( int companyId, String stage )
+    public void updateStage( long companyId, String stage )
     {
         LOGGER.info( "Method updateStage started for company: " + companyId + ", stage: " + stage );
-        Company company = companyDao.findById( Company.class, (long) companyId );
+        Company company = companyDao.findById( Company.class, companyId );
         company.setRegistrationStage( stage );
+        company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         companyDao.update( company );
         LOGGER.info( "Method updateStage finished for company: " + companyId + ", stage: " + stage );
     }
@@ -205,6 +222,8 @@ public class AccountServiceImpl implements AccountService
             unitSettings.setProfileUrl( CommonConstants.FILE_SEPARATOR + unitSettings.getProfileName() );
         }
 
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -224,6 +243,10 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, unitSettings.getProfileUrl(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyId );
     }
 
@@ -231,6 +254,7 @@ public class AccountServiceImpl implements AccountService
     private void updateCompanyDetailsInMySql( long companyId, Company companyProfile )
     {
         LOGGER.info( "Method updateCompanyDetailsInMySql started for company: " + companyId );
+        companyProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         companyDao.merge( companyProfile );
         LOGGER.info( "Method updateCompanyDetailsInMySql finished for company: " + companyId );
     }
@@ -293,7 +317,10 @@ public class AccountServiceImpl implements AccountService
     {
         LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
 
-        String contactNumber = phone.getCountryCode() + "-" + phone.getNumber() + "x" + phone.getExtension();
+        String contactNumber = null;
+        if ( phone != null ) {
+            contactNumber = phone.getCountryCode() + "-" + phone.getNumber() + "x" + phone.getExtension();
+        }
         VerticalsMaster verticalsMaster = verticalMastersDao
             .findByColumn( VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, "CUSTOM" )
             .get( CommonConstants.INITIAL_INDEX );
@@ -313,6 +340,10 @@ public class AccountServiceImpl implements AccountService
             unitSettings.getContact_details().setContact_numbers( new ContactNumberSettings() );
         }
         unitSettings.getContact_details().getContact_numbers().setPhone1( phone );
+        unitSettings.setCreatedBy( CommonConstants.ACCOUNT_REGISTER );
+        unitSettings.setModifiedBy( CommonConstants.ACCOUNT_REGISTER );
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+        unitSettings.setCreatedOn( System.currentTimeMillis() );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
@@ -320,6 +351,22 @@ public class AccountServiceImpl implements AccountService
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
             CommonConstants.STATUS_INCOMPLETE_MONGO, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CREATED_ON, unitSettings.getCreatedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CREATED_BY, unitSettings.getCreatedBy(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );

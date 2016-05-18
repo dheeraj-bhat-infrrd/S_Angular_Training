@@ -585,7 +585,8 @@ public class UserManagementController
 
             try {
                 if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
-                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove, CommonConstants.STATUS_INACTIVE );
+                    userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove,
+                        CommonConstants.STATUS_INACTIVE );
                 } else {
                     statusMap.put( "status", CommonConstants.ERROR );
                 }
@@ -1140,6 +1141,12 @@ public class UserManagementController
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e );
             }
 
+            if ( user.getIsForcePassword() == 1 ) {
+                redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
+                redirectAttributes.addFlashAttribute( "companyId", companyId );
+                return "redirect:/newaccountsignup.do";
+            }
+
             LOG.debug( "Adding newly registered user to principal session" );
             sessionHelper.loginOnRegistration( emailId, password );
             LOG.debug( "Successfully added registered user to principal session" );
@@ -1650,22 +1657,21 @@ public class UserManagementController
         String lastName = request.getParameter( "lastName" );
         String emailId = request.getParameter( "emailId" );
 
-        if ( firstName != null  && firstName != "" ) {
+        if ( firstName != null && firstName != "" ) {
             firstName = replaceQuoteInString( firstName );
         }
 
-        if ( lastName != null  && lastName != "" ) {
+        if ( lastName != null && lastName != "" ) {
             lastName = replaceQuoteInString( lastName );
         }
 
-        
-        
+
         String fullName = firstName;
         if ( lastName != null && lastName != "" ) {
             fullName += " " + lastName;
         }
-        
-        
+
+
         try {
             long userId = 0;
             try {
@@ -1946,8 +1952,8 @@ public class UserManagementController
         }
         LOG.debug( "change password form parameters validated successfully" );
     }
-    
-    
+
+
     private String replaceQuoteInString( String str )
     {
         if ( str.contains( "\"" ) ) {
