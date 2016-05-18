@@ -127,8 +127,15 @@ public class AccountServiceImpl implements AccountService
         LOGGER.info( "Method deleteCompanyProfileImage started for company: " + companyId );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
         unitSettings.setLogo( null );
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method deleteCompanyProfileImage finished for company: " + companyId );
     }
 
@@ -139,8 +146,15 @@ public class AccountServiceImpl implements AccountService
         LOGGER.info( "Method updateCompanyProfileImage started for company: " + companyId );
         OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
         unitSettings.setLogo( imageUrl );
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             unitSettings.getLogo(), unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method updateCompanyProfileImage finished for company: " + companyId );
     }
 
@@ -151,6 +165,7 @@ public class AccountServiceImpl implements AccountService
         LOGGER.info( "Method updateStage started for company: " + companyId + ", stage: " + stage );
         Company company = companyDao.findById( Company.class, (long) companyId );
         company.setRegistrationStage( stage );
+        company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         companyDao.update( company );
         LOGGER.info( "Method updateStage finished for company: " + companyId + ", stage: " + stage );
     }
@@ -205,6 +220,8 @@ public class AccountServiceImpl implements AccountService
             unitSettings.setProfileUrl( CommonConstants.FILE_SEPARATOR + unitSettings.getProfileName() );
         }
 
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -224,6 +241,10 @@ public class AccountServiceImpl implements AccountService
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, unitSettings.getProfileUrl(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method updateCompanyDetailsInMongo finished for company: " + companyId );
     }
 
@@ -231,6 +252,7 @@ public class AccountServiceImpl implements AccountService
     private void updateCompanyDetailsInMySql( long companyId, Company companyProfile )
     {
         LOGGER.info( "Method updateCompanyDetailsInMySql started for company: " + companyId );
+        companyProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         companyDao.merge( companyProfile );
         LOGGER.info( "Method updateCompanyDetailsInMySql finished for company: " + companyId );
     }
@@ -316,6 +338,10 @@ public class AccountServiceImpl implements AccountService
             unitSettings.getContact_details().setContact_numbers( new ContactNumberSettings() );
         }
         unitSettings.getContact_details().getContact_numbers().setPhone1( phone );
+        unitSettings.setCreatedBy( CommonConstants.ACCOUNT_REGISTER );
+        unitSettings.setModifiedBy( CommonConstants.ACCOUNT_REGISTER );
+        unitSettings.setModifiedOn( System.currentTimeMillis() );
+        unitSettings.setCreatedOn( System.currentTimeMillis() );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, unitSettings.getContact_details(), unitSettings,
@@ -323,6 +349,22 @@ public class AccountServiceImpl implements AccountService
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
             CommonConstants.STATUS_INCOMPLETE_MONGO, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON, unitSettings.getModifiedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_BY, unitSettings.getModifiedBy(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CREATED_ON, unitSettings.getCreatedOn(), unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CREATED_BY, unitSettings.getCreatedBy(), unitSettings,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
