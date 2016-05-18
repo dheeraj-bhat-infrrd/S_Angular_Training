@@ -85,13 +85,13 @@ public class AccountServiceImpl implements AccountService
 
             // Create a user in user table with registration stage as 1 and status 1,user profile in UserProfile table with 'CA' (1), 
             //solr, mongo with status 'I'. Set the force password column to 1.
-            user = userService.addUser( user.getFirstName(), user.getLastName(), user.getEmailId(), company );
+            user = userService.addUser( user.getFirstName(), user.getLastName(), user.getEmailId(), phone, company );
             ids.put( "userId", user.getUserId() );
 
             // Send registration email to user, Send mail to sales lead, maybe to support
             userService.sendRegistrationEmail( user );
         }
-        
+
         LOGGER.info( "Method saveAccountRegistrationDetailsAndSetDataInDO finished for company: " + companyName );
         return ids;
     }
@@ -293,7 +293,10 @@ public class AccountServiceImpl implements AccountService
     {
         LOGGER.info( "Method addCompanyDetailsInMongo started for company: " + company.getCompany() );
 
-        String contactNumber = phone.getCountryCode() + "-" + phone.getNumber() + "x" + phone.getExtension();
+        String contactNumber = null;
+        if ( phone != null ) {
+            contactNumber = phone.getCountryCode() + "-" + phone.getNumber() + "x" + phone.getExtension();
+        }
         VerticalsMaster verticalsMaster = verticalMastersDao
             .findByColumn( VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, "CUSTOM" )
             .get( CommonConstants.INITIAL_INDEX );

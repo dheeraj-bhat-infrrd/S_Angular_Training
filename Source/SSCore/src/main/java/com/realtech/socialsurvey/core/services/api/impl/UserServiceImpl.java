@@ -25,7 +25,9 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Phone;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
@@ -154,12 +156,12 @@ public class UserServiceImpl implements UserService
 
 
     @Override
-    public User addUser( String firstName, String lastName, String emailId, Company company )
+    public User addUser( String firstName, String lastName, String emailId, Phone phone, Company company )
         throws InvalidInputException, SolrException, NoRecordsFetchedException
     {
         LOGGER.info( "Method addUser started for emailId: " + emailId );
         User user = addUserDetailsInMySql( emailId, firstName, lastName, company );
-        addUserDetailsInMongo( user );
+        addUserDetailsInMongo( user, phone );
         addUserDetailsInSolr( user );
         LOGGER.info( "Method addUser finished for emailId: " + emailId );
         return user;
@@ -300,14 +302,30 @@ public class UserServiceImpl implements UserService
     }
 
 
-    private void addUserDetailsInMongo( User user ) throws InvalidInputException, NoRecordsFetchedException
+    private void addUserDetailsInMongo( User user, Phone phone ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOGGER.info( "Method addUserDetailsInMongo started for user: " + user.getUserId() );
         userManagementService.insertAgentSettings( user );
-        OrganizationUnitSettings unitSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+        AgentSettings agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+        if ( phone != null && agentSettings != null && agentSettings.getContact_details() != null ) {
+            if ( agentSettings.getContact_details().getContact_numbers() == null ) {
+                agentSettings.getContact_details().setContact_numbers( new ContactNumberSettings() );
+            }
+            agentSettings.getContact_details().getContact_numbers().setPhone1( phone );
+            agentSettings.getContact_details().getContact_numbers()
+                .setWork( agentSettings.getContact_details().getContact_numbers().getPhone1().getCountryCode() + "-"
+                    + agentSettings.getContact_details().getContact_numbers().getPhone1().getNumber() + "x"
+                    + agentSettings.getContact_details().getContact_numbers().getPhone1().getExtension() );
+        }
+
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_STATUS,
-            CommonConstants.STATUS_INCOMPLETE_MONGO, unitSettings,
+            CommonConstants.STATUS_INCOMPLETE_MONGO, agentSettings,
             MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, agentSettings.getContact_details(), agentSettings,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
         LOGGER.info( "Method addUserDetailsInMongo finished for user: " + user.getUserId() );
     }
 
