@@ -5,13 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
@@ -78,6 +72,17 @@ public interface OrganizationUnitSettingsDao
      */
     public void updateParticularKeyOrganizationUnitSettings( String keyToUpdate, Object updatedRecord,
         OrganizationUnitSettings unitSettings, String collectionName );
+
+
+    /**
+     * Updates a particular key organization unit by id
+     * @param keyToUpdate
+     * @param updatedRecord
+     * @param iden
+     * @param collectionName
+     */
+    public void updateParticularKeyOrganizationUnitSettingsByIden(String keyToUpdate, Object updatedRecord, long iden,
+        String collectionName);
 
 
     /**
@@ -243,4 +248,12 @@ public interface OrganizationUnitSettingsDao
 
 
     public List<AgentSettings> getAllAgentSettings();
+
+    /**
+     * Gets social media tokens from the collection for given id
+     * @param collectionName
+     * @param iden
+     * @return
+     */
+    public SocialMediaTokens fetchSocialMediaTokens(String collectionName, long iden);
 }
