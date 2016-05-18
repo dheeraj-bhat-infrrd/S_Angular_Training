@@ -30,9 +30,6 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 
 app.service('LinkedinService',['$http',function($http){
 	this.linkedin=function(userId){
-		var url = $http.post('/registeraccount/agent/initlinkedinconnection.do',userId);
-		console.log(url);
-		return url;
+		return $http.post('/registeraccount/agent/initlinkedinconnection.do',userId);
 	}
-	
 }]);
