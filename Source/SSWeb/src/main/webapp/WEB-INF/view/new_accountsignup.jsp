@@ -25,17 +25,19 @@
   src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit"
   async defer
 ></script>
-
-	
 </head>
-<body ng-app="SocialSurvey">
+
+<script type="text/javascript">
+	var userId = eval('('+'${userId}'+')');
+	var companyId = eval('('+'${companyId}'+')');
+</script>
+<body ng-app="SocialSurvey" ng-controller="newSignupController">
 <div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
  
 <div ng-view></div>
 
-</div>
 </body>
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>

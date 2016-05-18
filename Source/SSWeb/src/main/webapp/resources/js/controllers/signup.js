@@ -9,6 +9,16 @@ var phoneRegEx = {
         }
     };
 
+
+app.controller('newSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService','$rootScope', function ($scope, $http, $location, vcRecaptchaService, LoginService,$rootScope) {
+	console.log("in new signup controller: "+userId+", "+companyId);
+	$rootScope.userId=userId;
+	$rootScope.comanyId=companyId;
+	console.log("in new signup controller: "+$rootScope.userId+", "+$rootScope.comanyId);
+	$location.path('/accountsignup').replace();
+}]);
+
+
 app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService','$rootScope', function ($scope, $http, $location, vcRecaptchaService, LoginService,$rootScope) {
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
