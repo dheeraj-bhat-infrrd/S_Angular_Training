@@ -575,7 +575,7 @@
 	border: 1px solid #dcdcdc;
     background-color: #dcdcdc;
     border-radius: 5px;
-    width: 90%;
+    width: 450px;
     height: 300px;
     margin: 30px auto;
 }
@@ -588,7 +588,7 @@
     text-shadow: 0 2px 1px rgba(0,0,0,.2);
     padding: 20px 0 15px 0;
     width: 200px;
-    margin: auto;
+    margin: 0 10px;
     height: 300px;
 
 }
@@ -641,7 +641,31 @@
     font-family: 'opensanssemibold';
     cursor: pointer;
     border: none;
+    margin-top:140px;
 }
+.plan-discription {
+    font-size: 18px;
+    font-weight: 600! important;
+    border-bottom: 1px solid;
+    padding: 20px 0 20px 10px;
+}
+.plan-discription-sub {
+    font-weight: 400!important;
+}
+.reg-Individual{
+font-size: 40px;
+    width: 180px;
+    margin: auto;
+    color: #fff;
+    opacity: .8;
+ }
+.reg-indiv-detail{
+    font-size: 25px;
+    width: 137px;
+    margin: auto;
+    color: #fff;
+    opacity: .6;
+} 
 
 /* //drop down
 .dropzone,
