@@ -12,6 +12,12 @@ app.service('UserProfileService', [ '$http', function($http) {
 	this.updateUserProfile = function(userId, stage, dataToSend) {
 		return $http.put('/registeraccount/updateuserprofile.do?userId='+userId+'&stage='+stage,JSON.stringify(dataToSend));
 	}
+	this.getUserStage = function(userId){
+		return $http.get('/registeraccount/getuserstage.do?userId='+userId);
+	}
+	this.updateUserStage = function(userId,stage){
+		return $http.put('/registeraccount/updateuserstage.do?userId='+userId+'&stage='+stage);
+	}
 }]);
 
 app.service('CompanyProfileService', [ '$http', function($http) {
@@ -25,6 +31,9 @@ app.service('CompanyProfileService', [ '$http', function($http) {
 	
 	this.getVerticals = function(){
 		return $http.get('/registeraccount/getverticals.do');
+	}
+	this.getCompanyStage = function(companyId){
+		return $http.get('/registeraccount/getcompanystage.do?companyId='+companyId);
 	}
 }]);
 
