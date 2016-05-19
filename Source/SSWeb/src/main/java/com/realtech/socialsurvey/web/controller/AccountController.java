@@ -218,7 +218,7 @@ public class AccountController
         String serverBaseUrl = requestUtils.getRequestServerName( request );
         StringBuilder linkedInAuth = new StringBuilder( linkedinAuthUri ).append( "?response_type=" ).append( "code" )
             .append( "&client_id=" ).append( linkedInApiKey ).append( "&redirect_uri=" ).append( serverBaseUrl )
-            .append( linkedinRedirectUri ).append( "?unit=" ).append( organizationunit ).append( "&id=" ).append( id )
+            .append( linkedinRedirectUri ).append( "?unit-id=" ).append( organizationunit ).append( "-" ).append( id )
             .append( "&state=" ).append( "SOCIALSURVEY" ).append( "&scope=" ).append( linkedinScope );
         ObjectMapper mapper = new ObjectMapper();
         String jsonStr = mapper.writeValueAsString( linkedInAuth.toString() );
@@ -233,8 +233,16 @@ public class AccountController
         LOG.info( "Connecting to linkedin" );
         String response = null;
         // the unit and id should be there in the response with in the redirect url
-        String unit = request.getParameter( "unit" );
-        String sId = request.getParameter( "id" );
+        String unit_id = request.getParameter( "unit-id" );
+        String unit = null;
+        String sId = null;
+        if(unit_id != null){
+            String[] params = unit_id.split( "-" );
+            if(params != null && params.length == 2){
+                unit = params[0];
+                sId = params[1];
+            }
+        }
         LOG.debug( "Unit: "+unit + " and id: "+sId );
         // check if there is error
         String errorCode = request.getParameter( "error" );
@@ -250,7 +258,7 @@ public class AccountController
                     LOG.debug( "Authentication successful." );
                     // Getting Oauth access token for LinkedIn
                     String oauthCode = request.getParameter( "code" );
-                    List<NameValuePair> params = new ArrayList<NameValuePair>( 2 );
+                    List<NameValuePair> params = new ArrayList<NameValuePair>( 5 );
                     params.add( new BasicNameValuePair( "grant_type", "authorization_code" ) );
                     params.add( new BasicNameValuePair( "code", oauthCode ) );
                     params.add( new BasicNameValuePair( "redirect_uri", requestUtils.getRequestServerName( request ) + linkedinRedirectUri ) );
