@@ -103,7 +103,9 @@ app.controller('linkedInController', ['$scope','$http', '$location','$rootScope'
 		LinkedinService.linkedin($rootScope.userId).then(function(response){
 			window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
 		},function(error){
-			console.log(error);
+			/*var win = window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
+
+			setTimeout(function () { win.close();}, 3000);*/
 		});
 	};
 }]);
