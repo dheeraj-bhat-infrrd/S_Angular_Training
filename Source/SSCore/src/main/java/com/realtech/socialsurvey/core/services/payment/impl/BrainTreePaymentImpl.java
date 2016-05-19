@@ -119,6 +119,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
     @Value ( "${PAYMENT_RETRY_DAYS}")
     private int retryDays;
 
+    @Value( "${MERCHANT_ACCOUNT}" )
+    private String merchantAccount;
+
     private static final Logger LOG = LoggerFactory.getLogger( BrainTreePaymentImpl.class );
 
     private static final DecimalFormat AMOUNT_FORMAT = new DecimalFormat( "###.##" );
@@ -434,7 +437,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             paymentToken = customer.getPaymentMethods().get( CommonConstants.INITIAL_INDEX ).getToken();
 
             // Make a subscription request
-            SubscriptionRequest request = new SubscriptionRequest().planId( planId ).paymentMethodToken( paymentToken );
+            SubscriptionRequest request = new SubscriptionRequest().planId( planId ).paymentMethodToken( paymentToken ).merchantAccountId( merchantAccount );
             Result<Subscription> result = null;
 
             try {

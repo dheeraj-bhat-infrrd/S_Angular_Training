@@ -53,4 +53,12 @@ public interface SSApiIntegration
 
     @GET ( "/account/payment/plans")
     Response getPaymentPlans();
+
+
+    @GET ( "/users/profile/stage/{userId}")
+    Response getUserStage( @Path ( "userId") String userId );
+
+
+    @GET ( "/account/company/profile/stage/{companyId}")
+    Response getCompanyStage( @Path ( "companyId") String companyId );
 }

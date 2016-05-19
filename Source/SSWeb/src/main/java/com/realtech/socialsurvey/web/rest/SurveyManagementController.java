@@ -14,6 +14,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
@@ -411,7 +415,7 @@ public class SurveyManagementController
             LOG.error( "Invalid agentId passed. Agent Id can not be null or empty." );
             return JspResolver.ERROR_PAGE;
         }
-        Long agentId = 0l;
+        long agentId = 0l;
         try {
             agentId = Long.parseLong( agentIdStr );
         } catch ( NumberFormatException e ) {
@@ -420,19 +424,28 @@ public class SurveyManagementController
         }
         String agentName = "";
         String agentEmail = "";
+        String profileImageUrl = "";
+        String logoUrl = "";
         try {
-            SolrDocument user = solrSearchService.getUserByUniqueId( agentId );
-            if ( user != null ) {
-                agentName = user.get( CommonConstants.USER_DISPLAY_NAME_SOLR ).toString();
-                agentEmail = user.get( CommonConstants.USER_EMAIL_ID_SOLR ).toString();
+            // get details from mongo
+            AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
+            if(agentSettings != null){
+                agentName = agentSettings.getContact_details().getName();
+                agentEmail = agentSettings.getContact_details().getMail_ids().getWork();
+                profileImageUrl = (agentSettings.getProfileImageUrlThumbnail() != null ? agentSettings.getProfileImageUrlThumbnail(): agentSettings.getProfileImageUrl());
+                // get the proper logo url based on settings for the organization
+                logoUrl = getLogoBasedOnSettingsForUser( agentId, agentSettings );
             }
-        } catch ( InvalidInputException | SolrException e ) {
-            LOG.error( "Error occured while fetching details of agent. Error is : " + e );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Error occurred while fetching details of agent. Error is : " + e );
             return JspResolver.ERROR_PAGE;
         }
+
         model.addAttribute( "agentId", agentId );
         model.addAttribute( "agentName", agentName );
         model.addAttribute( "agentEmail", agentEmail );
+        model.addAttribute( "profileImage", profileImageUrl );
+        model.addAttribute( "logo", logoUrl );
         LOG.info( "Method to start survey initiateSurvey() finished." );
         return JspResolver.SHOW_SURVEY_FORM;
     }
@@ -616,16 +629,11 @@ public class SurveyManagementController
                     surveyHandler.markSurveyAsStarted( surveyPreInitiation );
                
 
-                // fetching company logo
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-                //JIRA SS-1363 begin
-                /*if ( companySettings != null && companySettings.getLogoThumbnail() != null ) {
-                    surveyAndStage.put( "companyLogo", companySettings.getLogoThumbnail() );
-                }*/
-                if ( companySettings != null && companySettings.getLogo() != null ) {
-                    surveyAndStage.put( "companyLogo", companySettings.getLogo() );
-                }
-                //JIRA SS-1363 end
+                // fetching logo
+                AgentSettings agentSettings = organizationManagementService.getAgentSettings( agentId );
+                String logo = getLogoBasedOnSettingsForUser( agentId, agentSettings );
+                LOG.debug( "Logo to be displayed: "+logo );
+                surveyAndStage.put( "companyLogo", logo );
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in triggerSurveyWithUrl()." );
@@ -1978,6 +1986,40 @@ public class SurveyManagementController
             }
         }
         return phrase;
+    }
+
+    private String getLogoBasedOnSettingsForUser(long agentId, AgentSettings agentSettings){
+        LOG.debug( "Getting logo based on settings for user "+agentId );
+        String logoUrl = null;
+        try {
+            Map<String, Long> hierarchyMap = null;
+            Map<SettingsForApplication, OrganizationUnit> map = profileManagementService
+                .getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
+            hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+
+            long companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
+            long regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+            long branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+            if(map != null){
+                OrganizationUnit organizationUnit = map.get( SettingsForApplication.LOGO );
+                if ( organizationUnit == OrganizationUnit.COMPANY ) {
+                    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+                    logoUrl = companySettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.REGION ) {
+                    OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( regionId );
+                    logoUrl = regionSettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.BRANCH ) {
+                    OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+                    logoUrl = branchSettings.getLogo();
+                } else if ( organizationUnit == OrganizationUnit.AGENT ) {
+                    logoUrl = agentSettings.getLogo();
+                }
+            }
+        }catch (InvalidInputException | InvalidSettingsStateException | ProfileNotFoundException | NoRecordsFetchedException e){
+            LOG.warn( "Error while fetching logo url "+e.getMessage() );
+        }
+        LOG.debug( "Returning logo url: "+logoUrl );
+        return logoUrl;
     }
 
 }
