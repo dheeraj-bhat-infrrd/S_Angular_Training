@@ -529,6 +529,18 @@
     height: 100px;
     margin: auto;
 }
+.reg-side-welcome-img{
+	background:url(../images/sidebar-welcome.png)center no-repeat;
+	width: 303px;
+    height: 372px;
+    margin: auto;
+}
+.welcome-email{
+	background:url(../images/mail-icon.png)center no-repeat;
+	width: 50px;
+    height: 50px;
+    margin: auto;
+}
 .reg-import-linedin{
 	color: #fff;
     font-size: 25px;
@@ -580,7 +592,7 @@
     margin: 30px auto;
 }
 .plan-card {
-    background-color: #2BA875;
+   
     position: relative;
     border-radius: 10px;
     color: #fff;
@@ -606,7 +618,7 @@
 .price-info-sub {
     display: block;
     font-size: 13px;
-    line-height: 1rem;
+    line-height: 1.5rem;
     padding: 5px 20px;
     height: 30px;
     opacity: .8;
@@ -666,7 +678,25 @@ font-size: 40px;
     color: #fff;
     opacity: .6;
 } 
-
+.call-us{
+	font-size: 25px;
+    padding: 39px 0px;
+    display: block;
+}
+.contact-number{
+	padding: 20px 0;
+    font-size: 16px;
+    font-weight: 600 !important;
+}
+.reg-welcome{
+	border-top:1px solid #dcdcdc;
+	border-bottom:1px solid #dcdcdc;
+	    margin-top: 40px;
+}
+.reg-congrats{
+	    font-size: 18px;
+    font-weight: 600 !important;
+}
 /* //drop down
 .dropzone,
 .dropzone * {

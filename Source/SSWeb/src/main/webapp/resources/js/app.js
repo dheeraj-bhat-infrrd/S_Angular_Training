@@ -1,4 +1,6 @@
 var phoneFormat = '(ddd) ddd-dddd';
+var creditcardFormat ='dddd-dddd-dddd-dddd';
+var expiryDateFormat = 'dd/dd';
 
 
 var app = angular.module('SocialSurvey',['ngRoute','vcRecaptcha'])
@@ -36,6 +38,11 @@ app.config(['$routeProvider', function ($routeProvider) {
     .when("/payment",{
     	templateUrl:"../../resources/html/payment.html",
     	controller:"paymentController"
+    	
+    })
+    .when("/signupcomplete",{
+    	templateUrl:"../../resources/html/signupcomplete.html",
+    	controller:"signupcompleteController"
     	
     }).
     otherwise({
