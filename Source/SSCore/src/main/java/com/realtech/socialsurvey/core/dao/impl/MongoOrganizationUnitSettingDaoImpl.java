@@ -207,13 +207,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.info("Updated the unit setting");
 	}
 
+	// THIS METHOD TO BE USED WHERE COLLECTION HAS iden FIELD
     @Override
     public void updateParticularKeyOrganizationUnitSettingsByIden(String keyToUpdate, Object updatedRecord, long iden,
         String collectionName) {
         LOG.info("Updating unit setting in " + collectionName + " with identifier " + iden + " for key: " + keyToUpdate + " wtih value: "
             + updatedRecord);
         Query query = new Query();
-        query.addCriteria(Criteria.where("_id").is(iden));
+        query.addCriteria(Criteria.where(KEY_IDEN).is(iden));
         Update update = new Update().set(keyToUpdate, updatedRecord);
         LOG.debug("Updating the unit settings");
         mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);

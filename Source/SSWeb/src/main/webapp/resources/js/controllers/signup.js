@@ -143,6 +143,14 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     	});
     };
     
+    $scope.backOnProfile = function (){
+    	$location.path('/linkedin').replace();
+    }
+    
+    $scope.backOnProfileDetail = function (){
+    	$location.path('/profile').replace();
+    }
+    
     $('#reg-phone1').intlTelInput({
         utilsScript: "../resources/js/utils.js"
     });
@@ -194,6 +202,14 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
     	    showError($scope.getErrorMessage(error.data));
     	});
     };
+    
+    $scope.backOnCompany = function (){
+    	$location.path('/profiledetail').replace();
+    }
+    
+    $scope.backOnCompanyDetail = function (){
+    	$location.path('/company').replace();
+    }
     
 	if( $scope.countrycode=='us'){
 		$scope.State='State';
