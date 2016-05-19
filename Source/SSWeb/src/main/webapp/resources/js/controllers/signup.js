@@ -147,12 +147,6 @@ app.controller('profileController', ['$scope', '$location', 'UserProfileService'
 		});
 	}
 	
-	/*var myDropzone = null;
-	if ( angular.isElement('#my-awesome-dropzone')) {
-	    myDropzone = new Dropzone("div#my-awesome-dropzone", {
-	        url: "/file/post"
-	    });
-	}*/
 	$("div#profileImg").dropzone({ url: "/file/post" });
     
     $scope.saveProfile = function () {
@@ -205,14 +199,6 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 		    showError($scope.getErrorMessage(error.data));
 		});
 	}
-	
-	/*var myDropzone = null;
-	if ( angular.isElement('div#my-awesome-dropzone')) {
-	    myDropzone = new Dropzone("div#my-awesome-dropzone", {
-	        url: "/file/post"
-	    });
-	}
-    */
 	
 	$("div#logoDrop").dropzone({ url: "/file/post" });
     $scope.saveCompanyProfile = function () {
