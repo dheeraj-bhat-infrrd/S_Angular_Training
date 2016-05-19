@@ -15,16 +15,39 @@
 					<button class="reg-upgrade float-left" style="width:80px">
 						<i class="fa fa-arrow-down" aria-hidden="true"></i>Downgrade
 					</button>
-					<div class="plan-card cursor_pointer float-left">
+					<div class="plan-card cursor_pointer float-left" ng-show="plan==individual">
 						<h3 style="font-weight: 600 !important">Individual</h3>
 						<p>
 							<span class="price-info"><span class="dollar">$</span>39<span
 								class="cents">95</span> </span><br> <span class="price-info-sub">per
 								month<br>single user
-							</span><br> Start 30-day trial <span class=" pay-button"></span>
+							</span><br> 30-day trial <span class=" pay-button"></span>
 						</p>
 					</div>
-					<button class="reg-upgrade float-left">
+					<div class="plan-card cursor_pointer float-left" ng-show="plan==business">
+						<h3 style="font-weight: 600 !important">Business</h3>
+						<p>
+							<span class="price-info"><span class="dollar">$</span>29<span
+								class="cents">95</span> </span><br> <span class="price-info-sub">per
+								month per user<br>minimun 5 users
+							</span><br> 30-day trial <span class=" pay-button"></span>
+						</p>
+					</div>
+					
+					<div class="plan-card cursor_pointer float-left" ng-show="plan==callus">
+						<h3 style="font-weight: 600 !important">Enterprise</h3>
+						<span class="price-info call-us">Call for pricing</span> <span
+							class="price-info-sub">per month per users <br>minimum
+							100 users
+						</span>
+						<button class="btn pay-button">1-888-701-4512</button>
+
+					</div>
+
+
+
+
+					<button class="reg-upgrade float-left" ng-click="togglePlan()">
 						<i class="fa fa-arrow-up" aria-hidden="true"></i>Upgrade
 					</button>
 				</div>
