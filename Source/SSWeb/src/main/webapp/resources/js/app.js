@@ -1,6 +1,3 @@
-var phoneFormat = '(ddd) ddd-dddd';
-
-
 var app = angular.module('SocialSurvey',['ngRoute','vcRecaptcha'])
 .run(function($rootScope) {
     $rootScope.userId;
@@ -36,7 +33,6 @@ app.config(['$routeProvider', function ($routeProvider) {
     .when("/payment",{
     	templateUrl:"../../resources/html/payment.html",
     	controller:"paymentController"
-    	
     }).
     otherwise({
         redirect: '/accountsignup'

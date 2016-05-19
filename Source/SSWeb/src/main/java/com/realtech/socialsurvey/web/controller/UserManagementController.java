@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAssignment;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -472,7 +473,9 @@ public class UserManagementController
             usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
 
             model.addAttribute( "userslist", usersList );
-        } catch ( NonFatalException e ) {
+        } catch (
+
+        NonFatalException e ) {
             LOG.error( "NonFatalException in findusers. Reason : " + e.getMessage(), e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -1142,9 +1145,11 @@ public class UserManagementController
             }
 
             if ( user.getIsForcePassword() == 1 ) {
-                redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
-                redirectAttributes.addFlashAttribute( "companyId", companyId );
-                return "redirect:/newaccountsignup.do";
+                if ( !user.getRegistrationStage().equalsIgnoreCase( RegistrationStage.COMPLETE.getCode() ) ) {
+                    redirectAttributes.addFlashAttribute( "userId", user.getUserId() );
+                    redirectAttributes.addFlashAttribute( "companyId", companyId );
+                    return "redirect:/newaccountsignup.do";
+                }
             }
 
             LOG.debug( "Adding newly registered user to principal session" );
@@ -1204,7 +1209,9 @@ public class UserManagementController
 
             // update the last login time and number of logins
             userManagementService.updateUserLoginTimeAndNum( user );
-        } catch ( NonFatalException e ) {
+        } catch (
+
+        NonFatalException e ) {
             LOG.error( "NonFatalException while setting new Password. Reason : " + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
