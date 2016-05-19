@@ -1,7 +1,7 @@
 app.controller('newSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService','$rootScope', function ($scope, $http, $location, vcRecaptchaService, LoginService,$rootScope) {
-	$rootScope.userId=userId;
+	/*$rootScope.userId=userId;
 	$rootScope.comanyId=companyId;
-	
+	*/
 	$scope.phoneRegEx = {
         'translation': {
             d: {
@@ -38,12 +38,17 @@ app.controller('newSignupController', ['$scope', '$http', '$location', 'vcRecapt
 }]);
 
 
+
 app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRecaptchaService', 'LoginService','$rootScope', function ($scope, $http, $location, vcRecaptchaService, LoginService,$rootScope) {
 	$scope.activate = 0;
 	$scope.accountRegistration = {};
 	$scope.response = null;
     $scope.widgetId = null;
     $scope.model = {key: '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'};
+    $scope.accountRegisterIds = {};
+    $scope.countryCode=$('.dial-country-code').html();
+    console.log("Country code is"+$scope.accountRegistration.code);
+
     
     $scope.submitLogin = function () {
     	console.log(vcRecaptchaService.getResponse());
@@ -52,7 +57,8 @@ app.controller('accountSignupController', ['$scope', '$http', '$location', 'vcRe
             $scope.activate = 0;
         } else {
         	$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-        	$scope.accountRegistration.phone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+        	$scope.accountRegistration.phone = { "number" : "1234567890", "extension" : "12"};
+        	 $scope.accountRegistration.phone.countryCode=$('.dial-country-code').html();
         }
         LoginService.signup($scope.accountRegistration)
             .then(function (response) {
@@ -97,7 +103,9 @@ app.controller('linkedInController', ['$scope','$http', '$location','$rootScope'
 		LinkedinService.linkedin($rootScope.userId).then(function(response){
 			window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
 		},function(error){
-			console.log(error);
+			/*var win = window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
+
+			setTimeout(function () { win.close();}, 3000);*/
 		});
 	};
 }]);
@@ -105,7 +113,7 @@ app.controller('linkedInController', ['$scope','$http', '$location','$rootScope'
 
 app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
 	
-	//$rootScope.userId = 1230;
+	/*$rootScope.userId = 301;*/
 	
 	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response){ 
@@ -115,12 +123,13 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 		});
 	}
 	
-	var myDropzone = null;
+	/*var myDropzone = null;
 	if ( angular.isElement('#my-awesome-dropzone')) {
 	    myDropzone = new Dropzone("div#my-awesome-dropzone", {
 	        url: "/file/post"
 	    });
-	}
+	}*/
+	$("div#profileImg").dropzone({ url: "/file/post" });
     
     $scope.saveProfile = function () {
     	$location.path('/profiledetail').replace();
@@ -134,6 +143,14 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
     	    showError($scope.getErrorMessage(error.data));
     	});
     };
+    
+    $scope.backOnProfile = function (){
+    	$location.path('/linkedin').replace();
+    }
+    
+    $scope.backOnProfileDetail = function (){
+    	$location.path('/profile').replace();
+    }
     
     $('#reg-phone1').intlTelInput({
         utilsScript: "../resources/js/utils.js"
@@ -149,7 +166,7 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 app.controller('companyController', ['$scope', '$http', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $http, $location, CompanyProfileService, $rootScope) {
 	$scope.countrycode=='ax';
 	
-	//$rootScope.comanyId=36;
+	/*$rootScope.comanyId=196;*/
 	
 	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
 		CompanyProfileService.getCompanyProfile($rootScope.comanyId).then(function(response){ 
@@ -167,13 +184,15 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
 		});
 	}
 	
-	var myDropzone = null;
-	if ( angular.isElement('#my-awesome-dropzone')) {
+	/*var myDropzone = null;
+	if ( angular.isElement('div#my-awesome-dropzone')) {
 	    myDropzone = new Dropzone("div#my-awesome-dropzone", {
 	        url: "/file/post"
 	    });
 	}
-    
+    */
+	
+	$("div#logoDrop").dropzone({ url: "/file/post" });
     $scope.saveCompanyProfile = function () {
 		$location.path('/companydetail').replace();
     };
@@ -186,6 +205,14 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
     	    showError($scope.getErrorMessage(error.data));
     	});
     };
+    
+    $scope.backOnCompany = function (){
+    	$location.path('/profiledetail').replace();
+    }
+    
+    $scope.backOnCompanyDetail = function (){
+    	$location.path('/company').replace();
+    }
     
 	if( $scope.countrycode=='us'){
 		$scope.State='State';
@@ -204,4 +231,17 @@ app.controller('companyController', ['$scope', '$http', '$location', 'CompanyPro
 	    utilsScript: "../resources/js/utils.js"
 	});
 	$('#reg-phone-office').mask(phoneFormat, $scope.phoneRegEx);
+}]);
+
+app.controller('paymentController', ['$scope','$http', '$location','$rootScope','PaymentService', function ($scope,$http, $location,$rootScope,PaymentService) {
+	
+	$scope.plan=="individual";
+	$scope.togglePlan = function() {
+	    var plans = $scope.plan;
+	    if(plans=="individual"){
+	    	
+	    }
+	  };
+	
+	
 }]);

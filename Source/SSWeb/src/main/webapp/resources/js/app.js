@@ -1,5 +1,6 @@
 var phoneFormat = '(ddd) ddd-dddd';
 
+
 var app = angular.module('SocialSurvey',['ngRoute','vcRecaptcha'])
 .run(function($rootScope) {
     $rootScope.userId;

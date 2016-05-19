@@ -218,7 +218,8 @@
                 "class": "selected-flag"
             });
              var dialCode= $("<div>", {
-                "class": "dial-country-code"
+                "class": "dial-country-code ",
+                "ng-model":"accountRegistration.code"
             });
             selectedFlag.appendTo(this.flagsContainer);
              dialCode.appendTo(this.flagsContainer);
