@@ -65,7 +65,12 @@ public interface SSApiIntegration
     Response getCompanyStage( @Path ( "companyId") String companyId );
 
 
-    @POST ( "/account/company/profile/profileimage/update/{companyId}/{logoName")
+    @POST ( "/account/company/profile/profileimage/update/{companyId}/{logoName}")
     Response uploadCompanyLogo( @Path ( "companyId") String companyId, @Path ( "logoName") String logoName,
+        @Body MultipartFile fileLocal );
+    
+    
+    @POST ( "users/profile/profileimage/update/{userId}/{logoName}")
+    Response uploadUserProfileLogo( @Path ( "userId") String userId, @Path ( "logoName") String logoName,
         @Body MultipartFile fileLocal );
 }

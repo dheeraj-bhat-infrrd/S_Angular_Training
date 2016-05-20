@@ -1,10 +1,14 @@
-app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', function ($scope, $location, $rootScope, UserProfileService, CompanyProfileService) {
-	/*$rootScope.userId=userId;
+
+app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService','$window', function ($scope, $location, $rootScope, UserProfileService, CompanyProfileService,$window) {
+	$rootScope.userId=userId;
 	$rootScope.companyId=companyId;
-	*/
+	
 //	$rootScope.userId=1256;
 //	$rootScope.companyId=59;
-	
+	if($window.opener!=null){
+		ParentScope = $window.opener.ScopeToShare;
+		location.href = ParentScope.linkedinurl;
+	}
 	$scope.phoneRegEx = {
         'translation': {
             d: {
@@ -63,6 +67,8 @@ app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'Use
 		}
 		return errorMessage;
 	}
+	
+	
 }]);
 
 
@@ -72,6 +78,7 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
 	$scope.response = null;
     $scope.widgetId = null;
     $scope.model = {key: '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'};
+    
     
     $scope.submitLogin = function () {
     	console.log(vcRecaptchaService.getResponse());
@@ -119,12 +126,15 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
 
 app.controller('linkedInController', ['$scope','$location','$rootScope','LinkedinService', 'UserProfileService','$window', function ($scope, $location,$rootScope,LinkedinService,UserProfileService,$window) {
 	$window.ScopeToShare = $scope;
+	
+	
 	$scope.linkedin = function (){
-		window.open("/newaccountsignup.do#/signupcomplete" ,"Authorization Page", "width=800,height=600,scrollbars=yes");
+		
 		LinkedinService.linkedin($rootScope.userId).then(function(response){
 			/*window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");*/
 			
-		$scope.linkedin=response.data;
+		$scope.linkedinurl=response.data;
+		window.open("/newaccountsignup.do" ,"Authorization Page", "width=800,height=600,scrollbars=yes");
 				
 			
 		},function(error){
@@ -142,64 +152,38 @@ app.controller('linkedInController', ['$scope','$location','$rootScope','Linkedi
 		});
 	}
 }]);
+
+
 app.controller('signupcompleteController', ['$scope','$location','$rootScope','LinkedinService', 'UserProfileService','$window', function ($scope, $location,$rootScope,LinkedinService,UserProfileService,$window) {
+
+	// select parent Window
+	var parentWindow;
+	if (window.opener != null && !window.opener.closed) {
+		parentWindow = window.opener;
+	}
+	else {
+	}
 	
-			
-			
-				ParentScope = $window.opener.ScopeToShare;
-				location.href = ParentScope.linkedin;
-				
-			
-			
-			// select parent Window
-			var parentWindow;
-			if (window.opener != null && !window.opener.closed) {
-				parentWindow = window.opener;
-			}
-			else {
-			}
-			
-			// close on error
-			var error = "${error}";
-			if (parseInt(error) == 1) {
-				setTimeout(function() {
-					window.close();
-				}, 3000);
-			}
-			
-			// close on success
-			setTimeout(function() {
-				window.close();
-			}, 3000);
-		
+	// close on error
+	var error = "${error}";
+	if (parseInt(error) == 1) {
+		setTimeout(function() {
+			window.close();
+		}, 3000);
+	}
 	
-	
-	
-	
+	// close on success
+	setTimeout(function() {
+		window.close();
+	}, 3000);
 }]);
-
-
 
 
 app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
 	
 	/*$rootScope.userId = 301;*/
-	$scope.profileupload=function(){
-				var formData = new FormData();
-				formData.append("logo", $('#profileImg').prop("files")[0]);
-				formData.append("logo_name",
-						$('#profileImg').prop("files")[0].name);
-				
-				UserProfileService.logoupload($rootScope.userId,formData).then(function (response) {
-					showInfo(response);
-		           }, function (error) {
-		           	showError(response);
-		           });
-				
-			
-	};
-
 	
+
 	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response){ 
 			$rootScope.userProfile = response.data;
@@ -209,7 +193,7 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 		});
 	}
 	
-	$("div#profileImg").dropzone({ url: "/file/post" });
+	$("div#profileImg").dropzone({ url: "/registeraccount/uploaduserprofilelogo.do?userId="+$rootScope.userId });
 	
 	$scope.setPhone1 = function (){
 		$rootScope.userProfile.phone1.number = $('#reg-phone1').val();
@@ -257,15 +241,13 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 app.controller('companyController', ['$scope', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $location, CompanyProfileService, $rootScope) {
 	/*$scope.countrycode=='ax';*/
 	$scope.usa=true;
-	 $scope.canada=false;
-	 $scope.india=false;
+	$scope.canada=false;
+	$scope.india=false;
  
-	$rootScope.companyId=224;
-	
-
 	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
 		CompanyProfileService.getCompanyProfile($rootScope.companyId).then(function(response){ 
 			$rootScope.companyProfile = response.data;
+			$rootScope.companyProfile.companyLogo="https://s3-us-west-1.amazonaws.com/agent-survey/dev/userprofilepics/d-2557d5c87804f57d4ec4fcf4fa033b6fbb1647a4bc38eb7711739b065bba4614875598e911607fb42c8dc8a010b9dd4208eb71fd4f3f71c1e7b18c8b1b97c88a.jpg";
 		}, function (error) {
 		    showError($scope.getErrorMessage(error.data));
 		});
@@ -279,7 +261,13 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 		});
 	}
 	
-	$("div#logoDrop").dropzone({ url: "/registeraccount/uploadcompanylogo.do?companyId="+$rootScope.companyId });
+	$("div#logoDrop").dropzone({ url: "/registeraccount/uploadcompanylogo.do?companyId="+$rootScope.companyId,
+		maxFiles: 1,
+	    maxfilesexceeded: function(file) {
+	        this.removeAllFiles();
+	        this.addFile(file);
+	    }	
+	});
     $scope.saveCompanyProfile = function () {
 		$location.path('/companydetail').replace();
     };
@@ -301,8 +289,6 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
     	$location.path('/company').replace();
     }
     
-	
-	    
 	$("#country").countrySelect();
 	$scope.selectCountry=function(){
 		var country_code=$('#country_code').val();
@@ -321,7 +307,6 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 		 }
 	}
 	
-	
 	$('#reg-phone-office').intlTelInput({
 	    utilsScript: "../resources/js/utils.js"
 	});
@@ -338,6 +323,10 @@ app.controller('paymentController', ['$scope','$http', '$location','$rootScope',
 	$scope.back = function (){
     	$location.path('/companydetail').replace();
     }
+	
+	$scope.processPayment = function (){
+		$location.path('/signupcomplete').replace();
+	}
 	
 	$scope.upGrade = function() {
 	    if($scope.individual){
@@ -381,7 +370,3 @@ app.controller('paymentController', ['$scope','$http', '$location','$rootScope',
 $('#creditcard').mask(creditcardFormat, $scope.creditcardRegEx);
 $('#expiryDate').mask(expiryDateFormat, $scope.expiryRegEx);
 }]);
-
-
-
-	
