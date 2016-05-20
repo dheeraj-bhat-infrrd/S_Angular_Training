@@ -145,15 +145,10 @@ app.controller('linkedInController', ['$scope','$location','$rootScope','Linkedi
 app.controller('signupcompleteController', ['$scope','$location','$rootScope','LinkedinService', 'UserProfileService','$window', function ($scope, $location,$rootScope,LinkedinService,UserProfileService,$window) {
 	
 			
-			var waitMessage = "${message}";
 			
-				if($window.parent != null)
-				{
 				ParentScope = $window.opener.ScopeToShare;
 				location.href = ParentScope.linkedin;
-				}
-				else {
-				}
+				
 			
 			
 			// select parent Window
@@ -189,7 +184,20 @@ app.controller('signupcompleteController', ['$scope','$location','$rootScope','L
 app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
 	
 	/*$rootScope.userId = 301;*/
-
+	$scope.profileupload=function(){
+				var formData = new FormData();
+				formData.append("logo", $('#profileImg').prop("files")[0]);
+				formData.append("logo_name",
+						$('#profileImg').prop("files")[0].name);
+				
+				UserProfileService.logoupload($rootScope.userId,formData).then(function (response) {
+					showInfo(response);
+		           }, function (error) {
+		           	showError(response);
+		           });
+				
+			
+	};
 
 	
 	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
@@ -252,7 +260,7 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 	 $scope.canada=false;
 	 $scope.india=false;
  
-	/*$rootScope.companyId=196;*/
+	$rootScope.companyId=224;
 	
 
 	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
@@ -271,7 +279,7 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 		});
 	}
 	
-	$("div#logoDrop").dropzone({ url: "/file/post" });
+	$("div#logoDrop").dropzone({ url: "/registeraccount/uploadcompanylogo.do?companyId="+$rootScope.companyId });
     $scope.saveCompanyProfile = function () {
 		$location.path('/companydetail').replace();
     };
@@ -326,8 +334,12 @@ app.controller('paymentController', ['$scope','$http', '$location','$rootScope',
 	$scope.individual=true;
 	$scope.business=false;
 	$scope.enterprise=false;
+	
+	$scope.back = function (){
+    	$location.path('/companydetail').replace();
+    }
+	
 	$scope.upGrade = function() {
-	    
 	    if($scope.individual){
 	    	$scope.individual=false;
 	    	$scope.business=true;

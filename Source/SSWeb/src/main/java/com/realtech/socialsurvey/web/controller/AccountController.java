@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -256,6 +258,19 @@ public class AccountController
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.getCompanyStage( companyId );
+        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/uploadcompanylogo", method = RequestMethod.POST)
+    @ResponseBody
+    public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId,
+        MultipartHttpServletRequest fileLocal )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Response response = api.uploadCompanyLogo( companyId, null, fileLocal.getFile("") );
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
     }

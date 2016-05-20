@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.web.api;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
@@ -61,4 +63,9 @@ public interface SSApiIntegration
 
     @GET ( "/account/company/profile/stage/{companyId}")
     Response getCompanyStage( @Path ( "companyId") String companyId );
+
+
+    @POST ( "/account/company/profile/profileimage/update/{companyId}/{logoName")
+    Response uploadCompanyLogo( @Path ( "companyId") String companyId, @Path ( "logoName") String logoName,
+        @Body MultipartFile fileLocal );
 }
