@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.realtech.socialsurvey.api.models.PersonalProfile;
 import com.realtech.socialsurvey.api.models.request.LoginRequest;
@@ -27,6 +28,7 @@ import com.realtech.socialsurvey.api.models.response.AuthResponse;
 import com.realtech.socialsurvey.api.transformers.PersonalProfileTransformer;
 import com.realtech.socialsurvey.api.validators.LoginValidator;
 import com.realtech.socialsurvey.api.validators.PersonalProfileValidator;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserCompositeEntity;
@@ -34,6 +36,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.api.UserService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
@@ -48,6 +51,13 @@ public class UserController
     private PersonalProfileTransformer personalProfileTransformer;
     private UserService userService;
     private UserManagementService userManagementService;
+    private FileUploadService fileUploadService;
+
+    @Value ( "${CDN_PATH}")
+    private String endpoint;
+
+    @Value ( "${AMAZON_LOGO_BUCKET}")
+    private String logoBucket;
 
     @Value ( "http://localhost:8082")
     private String authUrl;
@@ -62,7 +72,7 @@ public class UserController
     @Autowired
     public UserController( RestOperations restTemplate, LoginValidator loginValidator,
         PersonalProfileValidator personalProfileValidator, PersonalProfileTransformer personalProfileTransformer,
-        UserService userService, UserManagementService userManagementService )
+        UserService userService, UserManagementService userManagementService, FileUploadService fileUploadService )
     {
         this.restTemplate = restTemplate;
         this.loginValidator = loginValidator;
@@ -70,6 +80,7 @@ public class UserController
         this.personalProfileTransformer = personalProfileTransformer;
         this.userService = userService;
         this.userManagementService = userManagementService;
+        this.fileUploadService = fileUploadService;
     }
 
 
@@ -173,13 +184,15 @@ public class UserController
     }
 
 
-    @RequestMapping ( value = "/profile/profileimage/update/{userId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/profile/profileimage/update/{userId}/{logoName}", method = RequestMethod.POST)
     @ApiOperation ( value = "Update user profile image")
     public ResponseEntity<?> updateUserProfileImage( @PathVariable ( "userId") String userId,
-        @RequestBody PersonalProfile personalProfile ) throws InvalidInputException
+        @PathVariable ( "logoName") String logoName, @RequestBody MultipartFile fileLocal ) throws InvalidInputException
     {
         LOGGER.info( "UserController.updateUserProfileImage started" );
-        userService.updateUserProfileImage( Long.parseLong( userId ), personalProfile.getProfilePhotoUrl() );
+        String logoUrl = fileUploadService.uploadLogo( fileLocal, logoName );
+        logoUrl = endpoint + CommonConstants.FILE_SEPARATOR + logoBucket + CommonConstants.FILE_SEPARATOR + logoName;
+        userService.updateUserProfileImage( Long.parseLong( userId ), logoUrl );
         LOGGER.info( "UserController.updateUserProfileImage completed successfully" );
         return new ResponseEntity<Void>( HttpStatus.OK );
     }

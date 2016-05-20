@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -265,13 +266,34 @@ public class AccountController
 
     @RequestMapping ( value = "/registeraccount/uploadcompanylogo", method = RequestMethod.POST)
     @ResponseBody
-    public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId,
-        MultipartHttpServletRequest fileLocal )
+    public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId, MultipartHttpServletRequest request )
     {
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
-        Response response = api.uploadCompanyLogo( companyId, null, fileLocal.getFile("") );
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        Iterator<String> itr = request.getFileNames();
+        while ( itr.hasNext() ) {
+            String uploadedFile = itr.next();
+            MultipartFile file = request.getFile( uploadedFile );
+            Response response = api.uploadCompanyLogo( companyId, file.getOriginalFilename(), file );
+            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        }
+        return responseString;
+    }
+
+
+    @RequestMapping ( value = "/registeraccount/uploaduserprofilelogo", method = RequestMethod.POST)
+    @ResponseBody
+    public String uploadUserProfileLogo( @QueryParam ( "userId") String userId, MultipartHttpServletRequest request )
+    {
+        String responseString = null;
+        SSApiIntegration api = apiBuilder.getIntegrationApi();
+        Iterator<String> itr = request.getFileNames();
+        while ( itr.hasNext() ) {
+            String uploadedFile = itr.next();
+            MultipartFile file = request.getFile( uploadedFile );
+            Response response = api.uploadUserProfileLogo( userId, file.getOriginalFilename(), file );
+            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        }
         return responseString;
     }
 
