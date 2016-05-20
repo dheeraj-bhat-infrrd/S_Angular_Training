@@ -326,8 +326,12 @@ app.controller('paymentController', ['$scope','$http', '$location','$rootScope',
 	$scope.individual=true;
 	$scope.business=false;
 	$scope.enterprise=false;
+	
+	$scope.back = function (){
+    	$location.path('/companydetail').replace();
+    }
+	
 	$scope.upGrade = function() {
-	    
 	    if($scope.individual){
 	    	$scope.individual=false;
 	    	$scope.business=true;
