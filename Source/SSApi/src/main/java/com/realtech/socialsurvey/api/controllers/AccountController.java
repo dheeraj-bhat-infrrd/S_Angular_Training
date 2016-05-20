@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -17,12 +18,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.realtech.socialsurvey.api.models.CompanyProfile;
 import com.realtech.socialsurvey.api.models.request.AccountRegistrationRequest;
 import com.realtech.socialsurvey.api.transformers.CompanyProfileTransformer;
 import com.realtech.socialsurvey.api.validators.AccountRegistrationValidator;
 import com.realtech.socialsurvey.api.validators.CompanyProfileValidator;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyCompositeEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -36,6 +39,7 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
@@ -49,18 +53,26 @@ public class AccountController
     private CompanyProfileTransformer companyProfileTransformer;
     private CompanyProfileValidator companyProfileValidator;
     private OrganizationManagementService organizationManagementService;
+    private FileUploadService fileUploadService;
+
+    @Value ( "${CDN_PATH}")
+    private String endpoint;
+
+    @Value ( "${AMAZON_LOGO_BUCKET}")
+    private String logoBucket;
 
 
     @Autowired
     public AccountController( AccountRegistrationValidator accountRegistrationValidator, AccountService accountService,
         CompanyProfileTransformer companyProfileTransformer, CompanyProfileValidator companyProfileValidator,
-        OrganizationManagementService organizationManagementService )
+        OrganizationManagementService organizationManagementService, FileUploadService fileUploadService )
     {
         this.accountRegistrationValidator = accountRegistrationValidator;
         this.accountService = accountService;
         this.companyProfileTransformer = companyProfileTransformer;
         this.companyProfileValidator = companyProfileValidator;
         this.organizationManagementService = organizationManagementService;
+        this.fileUploadService = fileUploadService;
     }
 
 
@@ -137,13 +149,15 @@ public class AccountController
     }
 
 
-    @RequestMapping ( value = "/company/profile/profileimage/update/{companyId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/company/profile/profileimage/update/{companyId}/{logoName}", method = RequestMethod.POST)
     @ApiOperation ( value = "Update company profile image")
     public ResponseEntity<?> updateCompanyProfileImage( @PathVariable ( "companyId") String companyId,
-        @RequestBody CompanyProfile companyProfile ) throws InvalidInputException
+        @PathVariable ( "logoName") String logoName, @RequestBody MultipartFile fileLocal ) throws InvalidInputException
     {
         LOGGER.info( "AccountController.updateCompanyProfileImage started" );
-        accountService.updateCompanyProfileImage( Long.parseLong( companyId ), companyProfile.getCompanyLogo() );
+        String logoUrl = fileUploadService.uploadLogo( fileLocal, logoName );
+        logoUrl = endpoint + CommonConstants.FILE_SEPARATOR + logoBucket + CommonConstants.FILE_SEPARATOR + logoName;
+        accountService.updateCompanyProfileImage( Long.parseLong( companyId ), logoUrl );
         LOGGER.info( "AccountController.updateCompanyProfileImage completed successfully" );
         return new ResponseEntity<Void>( HttpStatus.OK );
     }
