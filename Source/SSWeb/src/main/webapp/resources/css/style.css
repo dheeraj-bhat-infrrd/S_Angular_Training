@@ -568,6 +568,7 @@
 .reg-back{
 	color:#dcdcdc;
 	float:left;
+	cursor: pointer;
 }
 .reg-error{
     height: 33px;
