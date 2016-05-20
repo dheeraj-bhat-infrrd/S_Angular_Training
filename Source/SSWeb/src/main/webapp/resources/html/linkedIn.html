@@ -2,9 +2,10 @@
 	style="padding: 0px;">
 	<div class="reg-left-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
 		<div class="reg-ss-logo"></div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<div>
-				<img src="../resources/images/step-1.png" class="stretch" alt="" />
+			<div><img src="../resources/images/step-1.png" class="stretch" alt="" /></div>
+			<div id="err-nw-wrapper" class="err-nw-wrapper reg-error" >
+				<span class="err-new-close"></span>
+				<span id="err-nw-txt"></span>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
 				style="padding: 0px;">
@@ -32,9 +33,8 @@
 						have a LinkedIn profile.</div>
 				
 				<div style="width: 125; margin: 25px auto;">
-					<button class="reg-next regen" onclick="location.href='#/profile';">Next</button>
+					<button class="reg-next regen" ng-click="saveLinkedInStage()">Next</button>
 				</div>
-			</div>
 		</div>
 	</div>
 	<div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12">

@@ -183,4 +183,13 @@ public class UserController
         LOGGER.info( "UserController.updateUserProfileImage completed successfully" );
         return new ResponseEntity<Void>( HttpStatus.OK );
     }
+
+
+    @RequestMapping ( value = "/profile/stage/{userId}", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get user profile stage")
+    public ResponseEntity<?> getUserStage( @PathVariable ( "userId") String userId ) throws InvalidInputException
+    {
+        User user = userManagementService.getUserByUserId( Long.parseLong( userId ) );
+        return new ResponseEntity<String>( user.getRegistrationStage(), HttpStatus.OK );
+    }
 }

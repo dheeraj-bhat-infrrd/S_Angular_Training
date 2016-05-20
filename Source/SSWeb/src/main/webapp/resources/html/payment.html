@@ -1,21 +1,23 @@
-
 <script src="../resources/js/dropzone.js"></script>
-
 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
 	style="padding: 0px;">
 	<div class="reg-left-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
 		<div class="reg-ss-logo"></div>
-		<div>
-			<img src="../resources/images/step-3.png" class="stretch" alt="" />
+		<div><img src="../resources/images/step-3.png" class="stretch" alt="" /></div>
+		<div id="err-nw-wrapper" class="err-nw-wrapper reg-error" >
+			<span class="err-new-close"></span>
+			<span id="err-nw-txt"></span>
 		</div>
 		<div
 			class="reg-payment-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<div class="reg-payment-container ">
 				<div class="clearfix" style="width: 370px; margin: auto;">
-					<button class="reg-upgrade float-left" style="width:80px">
+					<button class="reg-upgrade float-left" style="width: 80px"
+						ng-click="downGrade()" ng-show="business||enterprise">
 						<i class="fa fa-arrow-down" aria-hidden="true"></i>Downgrade
 					</button>
-					<div class="plan-card cursor_pointer float-left" ng-show="plan==individual">
+					<div class="plan-card cursor_pointer float-left"
+						ng-show="individual" style="background-color: #2BA875; margin-left: 90px;">
 						<h3 style="font-weight: 600 !important">Individual</h3>
 						<p>
 							<span class="price-info"><span class="dollar">$</span>39<span
@@ -24,7 +26,8 @@
 							</span><br> 30-day trial <span class=" pay-button"></span>
 						</p>
 					</div>
-					<div class="plan-card cursor_pointer float-left" ng-show="plan==business">
+					<div class="plan-card cursor_pointer float-left" ng-show="business"
+						style="background-color: #4C84C7;">
 						<h3 style="font-weight: 600 !important">Business</h3>
 						<p>
 							<span class="price-info"><span class="dollar">$</span>29<span
@@ -33,99 +36,178 @@
 							</span><br> 30-day trial <span class=" pay-button"></span>
 						</p>
 					</div>
-					
-					<div class="plan-card cursor_pointer float-left" ng-show="plan==callus">
+
+					<div class="plan-card cursor_pointer float-left"
+						ng-show="enterprise" style="background-color: #7E54B2;">
 						<h3 style="font-weight: 600 !important">Enterprise</h3>
-						<span class="price-info call-us">Call for pricing</span> <span
+						<span class="call-us">Call for pricing</span> <span
 							class="price-info-sub">per month per users <br>minimum
 							100 users
 						</span>
-						<button class="btn pay-button">1-888-701-4512</button>
+						<div class="contact-number">1-888-701-4512</div>
 
 					</div>
 
 
 
 
-					<button class="reg-upgrade float-left" ng-click="togglePlan()">
+					<button class="reg-upgrade float-left" ng-click="upGrade()"
+						ng-show="individual||business">
 						<i class="fa fa-arrow-up" aria-hidden="true"></i>Upgrade
 					</button>
 				</div>
 			</div>
-			
-			
-			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Card
-				Number *</div>
-			<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
-				<input class="reg-details" type="text" placeholder="" required
-					ng-model="accountRegistration.companyName" />
-			</div>
-			<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6"
-				style="margin-top: 30px;">Expiry *</div>
-			<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6"
-				style="margin-top: 30px;">CVV *</div>
-			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-				<input class=" reg-name" type="text" placeholder="MM/YY"
-					ng-model="firstName" required /> <input
-					class=" reg-name float-right" ng-model="lastName"
-					style="margin-left: 2%;" type="text" placeholder="" required />
-			</div>
-			</div>
-			
-			
-			
 
-			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<div style="margin:20px;">
-				<span><input type="checkbox" name="authorize"/></span>At the end of my free 30 day trial period,I authorize
-					SocialSurvey to debit my credit card for the monthly subscription
-					fees,under the terms and conditions agreed to be me with
-					SocialSurvey.
+
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="individual||business">
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Card
+					Number *</div>
+				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<input class="reg-details"  id="creditcard" placeholder="" required
+						 />
+				</div>
+				<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6"
+					style="margin-top: 30px;">Expiry *</div>
+				<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6"
+					style="margin-top: 30px;">CVV *</div>
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<input class=" reg-name" id="expiryDate" placeholder="MM/YY"
+						 required /> <input
+						class=" reg-name float-right" 
+						style="margin-left: 2%;" type="password" placeholder="" required />
+				</div>
 			</div>
-				<p style="margin:20px;">For verification purpose, we will temporarily authorize your
-					card for $1.00.Your card will not br charged for the first 30days.</p>
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="enterprise">
+				
+				<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6"
+					style="margin-top: 30px;">Name *</div>
+				<div class="reg-req-field col-lg-6 col-md-6 col-sm-6 col-xs-6"
+					style="margin-top: 30px;">Email *</div>
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<input class=" reg-name" type="text" placeholder=""
+						 required /> <input
+						class=" reg-name float-right" 
+						style="margin-left: 2%;" type="text" placeholder="email@example.com" required />
+				</div>
+				<div class="reg-req-field col-lg-12 col-md-12 col-sm-12 col-xs-12">Message *</div>
+				<div class=" col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<textarea class="reg-details" style="height:100px;padding:10px;" placeholder="Lets us know how we can help." required
+						></textarea>
+				</div>
+			</div>
+
+
+
+
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="individual||business">
+				<div style="margin: 20px;">
+					<span style="margin-right: 5px;"><input type="checkbox" name="authorize" /></span>At the end
+					of my free 30 day trial period,I authorize SocialSurvey to debit my
+					credit card for the monthly subscription fees,under the terms and
+					conditions agreed to be me with SocialSurvey.
+				</div>
+				<p style="margin: 20px;">For verification purpose, we will
+					temporarily authorize your card for $1.00.Your card will not br
+					charged for the first 30days.</p>
 			</div>
 		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix">
-            <div class="reg-back">&lt;&lt;Back</div>
-               <div style="width: 120px;margin: auto;"> <button class="reg-next" type="submit" >Next</button></div>
-            </div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" class="clearfix" style="margin-top:20px;">
+			<div class="reg-back">&lt;&lt;Back</div>
+			<div style="width: 120px; margin: auto;">
+				<button class="reg-next" type="submit">Next</button>
+			</div>
+		</div>
 
 	</div>
-	<div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12">
+	<div class="reg-right-container col-lg-6 col-md-6 col-sm-12 col-xs-12" >
 		<div class="reg-right-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div ng-show="individual">
 			<div class="reg-Individual">Individual</div>
 			<div class="reg-indiv-detail">Plan Details</div>
-		
-		<!-- <div class="reg-prof-img"></div> -->
 
+			<div class="reg-right-description " style="width: 80%">
+				<div class="plan-discription">
+					Single user account: <span class="plan-discription-sub">for
+						independent professionals.</span>
+				</div>
+				<div id="single-user">
+					<ul>
+						<li><span>Survey builder wizard with multiple question
+								types and unlimited questions</span></li>
+						<li><span>Social media syndication of your featured
+								reviews</span></li>
+						<li><span>Support for market specific review sites
+								such as Zillow, Yelp, LendingTree and Realtor.com</span></li>
+						<li><span>Customizable email templates and workflows
+								to maximize survey completion rate</span></li>
+						<li><span>Personal review page with search engine
+								optimized star rating</span></li>
+						<li><span>SocialSurvey profile widget with star rating
+								and featured reviews</span></li>
+						<li><span>Inclusion in our searchable directory of
+								professionals</span></li>
+						<li><span>Customer support via ticket system</span></li>
+					</ul>
+				</div>
+			</div>
+			</div>
+			
+			<div ng-show="business">
+			<div class="reg-Individual">Business</div>
+			<div class="reg-indiv-detail">Plan Details</div>
 
-		<div class="reg-right-description " style="width:80%">
-			<div class="plan-discription">
-				Single user account: <span class="plan-discription-sub">for
-					independent professionals.</span>
+				<div class="reg-right-description " style="width: 80%">
+					<div class="plan-discription">
+						Small offices &amp; growing business: <span
+							class="plan-discription-sub">with team management.</span>
+					</div>
+					<div id="business">
+						<ul>
+							<li><span class="bold-li">Business includes
+									everything in Individual, and:</span></li>
+							<li><span>Point-of-sale transaction integrated survey
+									automation with Verified Customer badge</span></li>
+							<li><span>Organizational units for managing complex
+									hierarchies</span></li>
+							<li><span>User permission management</span></li>
+							<li><span>Custom user level score-cards, reports and
+									workflows</span></li>
+							<li><span>Company level complaint resolution workflow</span></li>
+							<li><span>Support for compliance and licensing
+									requirements</span></li>
+							<li id="enterprise-pln-tab"><span>Customer support
+									via phone, email or ticket</span></li>
+						</ul>
+					</div>
+				</div>
 			</div>
-			<div id="single-user">
-				<ul>
-					<li><span>Survey builder wizard with multiple question
-							types and unlimited questions</span></li>
-					<li><span>Social media syndication of your featured
-							reviews</span></li>
-					<li><span>Support for market specific review sites such
-							as Zillow, Yelp, LendingTree and Realtor.com</span></li>
-					<li><span>Customizable email templates and workflows
-							to maximize survey completion rate</span></li>
-					<li><span>Personal review page with search engine
-							optimized star rating</span></li>
-					<li><span>SocialSurvey profile widget with star rating
-							and featured reviews</span></li>
-					<li><span>Inclusion in our searchable directory of
-							professionals</span></li>
-					<li><span>Customer support via ticket system</span></li>
-				</ul>
+
+			<div ng-show="enterprise">
+				<div class="reg-Individual">Enterprise</div>
+				<div class="reg-indiv-detail">Plan Details</div>
+
+				<div class="reg-right-description " style="width: 80%">
+					<div class="plan-discription">
+						Large organizations: <span class="plan-discription-sub">with
+							enhanced customization</span>
+					</div>
+					<div id="enterprise">
+						<ul>
+							<li><span class="bold-li">Enterprise includes
+									everything in Individual, Business, and:</span></li>
+							<li><span>Social media monitoring for keyword based
+									compliance alerts</span></li>
+							<li><span>Dedicated Success Manager to ensure you
+									reach your goals</span></li>
+							<li><span>SocialSurvey REST API service for CRM and
+									custom integration</span></li>
+							<li><span>Early access to beta features</span></li>
+							<li><span>Private training webinars and tutorials</span></li>
+							<li><span>Priority support via phone, email or ticket</span></li>
+						</ul>
+					</div>
+				</div>
 			</div>
-		</div>
 		</div>
 
 	</div>
