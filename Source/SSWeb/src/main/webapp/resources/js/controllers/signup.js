@@ -5,10 +5,7 @@ app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'Use
 	
 //	$rootScope.userId=1256;
 //	$rootScope.companyId=59;
-	if($window.opener!=null){
-		ParentScope = $window.opener.ScopeToShare;
-		location.href = ParentScope.linkedinurl;
-	}
+	
 	$scope.phoneRegEx = {
         'translation': {
             d: {
@@ -45,6 +42,10 @@ app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'Use
 		}, function (error){
 			showError($scope.getErrorMessage(error.data));
 		});
+	}else if($window.opener!=null){
+		ParentScope = $window.opener.ScopeToShare;
+		location.href = ParentScope.linkedinurl;
+		$location.path('/linkedinloader').replace();
 	}else{
 		$location.path('/accountsignup').replace();
 	}
@@ -67,8 +68,6 @@ app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'Use
 		}
 		return errorMessage;
 	}
-	
-	
 }]);
 
 
@@ -127,20 +126,12 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
 app.controller('linkedInController', ['$scope','$location','$rootScope','LinkedinService', 'UserProfileService','$window', function ($scope, $location,$rootScope,LinkedinService,UserProfileService,$window) {
 	$window.ScopeToShare = $scope;
 	
-	
 	$scope.linkedin = function (){
-		
 		LinkedinService.linkedin($rootScope.userId).then(function(response){
-			/*window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");*/
-			
 		$scope.linkedinurl=response.data;
 		window.open("/newaccountsignup.do" ,"Authorization Page", "width=800,height=600,scrollbars=yes");
-				
-			
 		},function(error){
 			showError($scope.getErrorMessage(error.data));
-			/*var win = window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
-			setTimeout(function () { win.close();}, 3000);*/
 		});
 	};
 	

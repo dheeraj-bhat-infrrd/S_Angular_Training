@@ -42,7 +42,11 @@ app.config(['$routeProvider', function ($routeProvider) {
     .when("/signupcomplete",{
     	templateUrl:"../../resources/html/signupcomplete.html",
     	controller:"signupcompleteController"
-    }).
+    })
+    .when("/linkedinloader",{
+    	templateUrl:"../../resources/html/linkedinloader.html",
+    })
+    .
     otherwise({
         redirect: '/accountsignup'
     });
