@@ -697,6 +697,12 @@ font-size: 40px;
 	    font-size: 18px;
     font-weight: 600 !important;
 }
+.reg-check-mail{
+	width: 70%;
+    margin: 15px;
+    font-size: 18px;
+    font-weight: 600 !important;
+}
 /* //drop down
 .dropzone,
 .dropzone * {
