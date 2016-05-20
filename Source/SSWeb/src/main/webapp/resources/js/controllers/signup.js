@@ -137,7 +137,12 @@ app.controller('linkedInController', ['$scope','$location','$rootScope','Linkedi
 }]);
 
 
-app.controller('profileController', ['$scope', '$location', 'UserProfileService', '$rootScope', function ($scope, $location, UserProfileService, $rootScope) {
+
+app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
+	
+	/*$rootScope.userId = 301;*/
+
+
 	
 	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response){ 
@@ -184,6 +189,10 @@ app.controller('profileController', ['$scope', '$location', 'UserProfileService'
 app.controller('companyController', ['$scope', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $location, CompanyProfileService, $rootScope) {
 	$scope.countrycode=='ax';
 	
+
+	/*$rootScope.comanyId=196;*/
+	
+
 	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
 		CompanyProfileService.getCompanyProfile($rootScope.companyId).then(function(response){ 
 			$rootScope.companyProfile = response.data;
@@ -241,11 +250,54 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 	$('#reg-phone-office').mask($scope.phoneFormat, $scope.phoneRegEx);
 }]);
 
-app.controller('paymentController', ['$scope','$http', '$location','$rootScope','PaymentService', function ($scope,$http, $location,$rootScope,PaymentService) {
-	$scope.plan=="individual";
-	$scope.togglePlan = function() {
-	    var plans = $scope.plan;
-	    if(plans=="individual"){
+
+app.controller('paymentController', ['$scope','$http', '$location','$rootScope', function ($scope,$http, $location,$rootScope) {
+	
+	$scope.individual=true;
+	$scope.business=false;
+	$scope.enterprise=false;
+	$scope.upGrade = function() {
+	    
+	    if($scope.individual){
+	    	$scope.individual=false;
+	    	$scope.business=true;
+	    	$scope.enterprise=false;
+	    }else if($scope.business){
+	    	$scope.individual=false;
+	    	$scope.business=false;
+	    	$scope.enterprise=true;
 	    }
-	};
+	  };
+	  $scope.downGrade = function() {
+		    
+		     if($scope.business){
+		    	$scope.individual=true;
+		    	$scope.business=false;
+		    	$scope.enterprise=false;
+		    }else if($scope.enterprise){
+		    	$scope.individual=false;
+		    	$scope.business=true;
+		    	$scope.enterprise=false;
+		    }
+		  };
+		  $scope.creditcardRegEx = {
+			        'translation': {
+			            d: {
+			                pattern: /[0-9*]/
+			            }
+			           
+			        }
+			    };
+		  $scope.expiryRegEx = {
+			        'translation': {
+			            d: {
+			                pattern: /[0-9*]/
+			            }
+			           
+			        }
+			    };
+$('#creditcard').mask(creditcardFormat, $scope.creditcardRegEx);
+$('#expiryDate').mask(expiryDateFormat, $scope.expiryRegEx);
 }]);
+
+	
