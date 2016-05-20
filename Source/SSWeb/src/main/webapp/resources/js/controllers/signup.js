@@ -260,7 +260,7 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 	 $scope.canada=false;
 	 $scope.india=false;
  
-	/*$rootScope.companyId=196;*/
+	$rootScope.companyId=224;
 	
 
 	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
@@ -279,7 +279,7 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 		});
 	}
 	
-	$("div#logoDrop").dropzone({ url: "/file/post" });
+	$("div#logoDrop").dropzone({ url: "/registeraccount/uploadcompanylogo.do?companyId="+$rootScope.companyId });
     $scope.saveCompanyProfile = function () {
 		$location.path('/companydetail').replace();
     };
