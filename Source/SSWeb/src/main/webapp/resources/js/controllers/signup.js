@@ -1,7 +1,7 @@
 app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'UserProfileService', 'CompanyProfileService', function ($scope, $location, $rootScope, UserProfileService, CompanyProfileService) {
-	$rootScope.userId=userId;
+	/*$rootScope.userId=userId;
 	$rootScope.companyId=companyId;
-	
+	*/
 //	$rootScope.userId=1256;
 //	$rootScope.companyId=59;
 	
@@ -117,11 +117,16 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
 }]);
 
 
-app.controller('linkedInController', ['$scope','$location','$rootScope','LinkedinService', 'UserProfileService', function ($scope, $location,$rootScope,LinkedinService,UserProfileService) {
-	
+app.controller('linkedInController', ['$scope','$location','$rootScope','LinkedinService', 'UserProfileService','$window', function ($scope, $location,$rootScope,LinkedinService,UserProfileService,$window) {
+	$window.ScopeToShare = $scope;
 	$scope.linkedin = function (){
+		window.open("/newaccountsignup.do#/signupcomplete" ,"Authorization Page", "width=800,height=600,scrollbars=yes");
 		LinkedinService.linkedin($rootScope.userId).then(function(response){
-			window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
+			/*window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");*/
+			
+		$scope.linkedin=response.data;
+				
+			
 		},function(error){
 			showError($scope.getErrorMessage(error.data));
 			/*var win = window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
@@ -137,6 +142,47 @@ app.controller('linkedInController', ['$scope','$location','$rootScope','Linkedi
 		});
 	}
 }]);
+app.controller('signupcompleteController', ['$scope','$location','$rootScope','LinkedinService', 'UserProfileService','$window', function ($scope, $location,$rootScope,LinkedinService,UserProfileService,$window) {
+	
+			
+			var waitMessage = "${message}";
+			
+				if($window.parent != null)
+				{
+				ParentScope = $window.opener.ScopeToShare;
+				location.href = ParentScope.linkedin;
+				}
+				else {
+				}
+			
+			
+			// select parent Window
+			var parentWindow;
+			if (window.opener != null && !window.opener.closed) {
+				parentWindow = window.opener;
+			}
+			else {
+			}
+			
+			// close on error
+			var error = "${error}";
+			if (parseInt(error) == 1) {
+				setTimeout(function() {
+					window.close();
+				}, 3000);
+			}
+			
+			// close on success
+			setTimeout(function() {
+				window.close();
+			}, 3000);
+		
+	
+	
+	
+	
+}]);
+
 
 
 
@@ -201,10 +247,12 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 }]);
 
 app.controller('companyController', ['$scope', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $location, CompanyProfileService, $rootScope) {
-	$scope.countrycode=='ax';
-	
-
-	/*$rootScope.comanyId=196;*/
+	/*$scope.countrycode=='ax';*/
+	$scope.usa=true;
+	 $scope.canada=false;
+	 $scope.india=false;
+ 
+	/*$rootScope.companyId=196;*/
 	
 
 	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
@@ -229,7 +277,7 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
     };
     
     $scope.saveCompanyProfileDetails = function () {
-    	$rootScope.companyProfile.officePhone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	/*$rootScope.companyProfile.officePhone = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};*/
     	CompanyProfileService.updateCompanyProfile($rootScope.companyId, 'CPP', $rootScope.companyProfile).then(function(response){ 
     		$location.path('/payment').replace();
     	}, function (error) {
@@ -245,18 +293,26 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
     	$location.path('/company').replace();
     }
     
-	if( $scope.countrycode=='us'){
-		$scope.State='State';
-		$scope.ZIP='ZIP';
-	}else if( $scope.countrycode=='ca'){
-		$scope.State='Province';
-		$scope.ZIP='Postal Code';
-	}else{
-		$scope.State='State';
-		$scope.ZIP='ZIP';
-	}
+	
 	    
 	$("#country").countrySelect();
+	$scope.selectCountry=function(){
+		var country_code=$('#country_code').val();
+		 if(country_code =="ca"){
+			 $scope.canada=true;
+			 $scope.india=false;
+			 $scope.usa=false;
+		 }else if(country_code =="in"){
+			 $scope.india=true;
+			 $scope.canada=false;
+			 $scope.usa=false;
+		 }else{
+			 $scope.usa=true;
+			 $scope.india=false;
+			 $scope.canada=false;
+		 }
+	}
+	
 	
 	$('#reg-phone-office').intlTelInput({
 	    utilsScript: "../resources/js/utils.js"
@@ -313,5 +369,7 @@ app.controller('paymentController', ['$scope','$http', '$location','$rootScope',
 $('#creditcard').mask(creditcardFormat, $scope.creditcardRegEx);
 $('#expiryDate').mask(expiryDateFormat, $scope.expiryRegEx);
 }]);
+
+
 
 	
