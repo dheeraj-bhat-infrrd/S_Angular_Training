@@ -18,6 +18,9 @@ app.service('UserProfileService', [ '$http', function($http) {
 	this.updateUserStage = function(userId,stage){
 		return $http.put('/registeraccount/updateuserstage.do?userId='+userId+'&stage='+stage);
 	}
+	this.logoupload=function(userId,formData){
+		return $http.post('/registeraccount/uploadcompanylogo',JSON.stringify(formData));
+	}
 }]);
 
 app.service('CompanyProfileService', [ '$http', function($http) {
