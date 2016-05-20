@@ -41,6 +41,8 @@ app.controller('newSignupController', ['$scope', '$location', '$rootScope', 'Use
 		}, function (error){
 			showError($scope.getErrorMessage(error.data));
 		});
+	}else{
+		$location.path('/accountsignup').replace();
 	}
 	
 	$scope.getErrorMessage = function(data){
@@ -70,8 +72,6 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
 	$scope.response = null;
     $scope.widgetId = null;
     $scope.model = {key: '6Le2wQYTAAAAAAacBUn0Dia5zMMyHfMXhoOh5A7K'};
-    $scope.accountRegisterIds = {};
-    $scope.countryCode=$('.dial-country-code').html();
     
     $scope.submitLogin = function () {
     	console.log(vcRecaptchaService.getResponse());
@@ -80,16 +80,17 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
             $scope.activate = 0;
         } else {
         	$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-        	$scope.accountRegistration.phone = { "number" : "1234567890", "extension" : "12"};
-        	$scope.accountRegistration.phone.countryCode=$('.dial-country-code').html();
+        	$scope.accountRegistration.phone.number = $('#reg-phone').val();
+        	$scope.accountRegistration.phone.countryCode = $('.dial-country-code').html();
+        	
+        	LoginService.signup($scope.accountRegistration).then(function (response) {
+           	 $rootScope.userId=response.data.userId;
+           	 $rootScope.companyId=response.data.companyId;
+           	 $location.path('/linkedin').replace();
+           }, function (error) {
+           	showError($scope.getErrorMessage(error.data));
+           });
         }
-        LoginService.signup($scope.accountRegistration).then(function (response) {
-        	 $rootScope.userId=response.data.userId;
-        	 $rootScope.companyId=response.data.companyId;
-        	 $location.path('/linkedin').replace();
-        }, function (error) {
-        	showError($scope.getErrorMessage(error.data));
-        });
     };
 
     $scope.setResponse = function (response) {
@@ -122,6 +123,7 @@ app.controller('linkedInController', ['$scope','$location','$rootScope','Linkedi
 		LinkedinService.linkedin($rootScope.userId).then(function(response){
 			window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
 		},function(error){
+			showError($scope.getErrorMessage(error.data));
 			/*var win = window.open(response.data, "Authorization Page", "width=800,height=600,scrollbars=yes");
 			setTimeout(function () { win.close();}, 3000);*/
 		});
@@ -147,19 +149,31 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response){ 
 			$rootScope.userProfile = response.data;
+			$('#reg-phone1').val($rootScope.userProfile.phone1.number);
 		}, function (error) {
 		    showError($scope.getErrorMessage(error.data));
 		});
 	}
 	
 	$("div#profileImg").dropzone({ url: "/file/post" });
+	
+	$scope.setPhone1 = function (){
+		$rootScope.userProfile.phone1.number = $('#reg-phone1').val();
+    	$rootScope.userProfile.phone1.countryCode = $('.dial-country-code').html();
+	}
+	
+	$scope.setPhone2 = function (){
+		$rootScope.userProfile.phone2.number = $('#reg-phone2').val();
+    	$rootScope.userProfile.phone2.countryCode = $('.dial-country-code').html();
+	}
     
     $scope.saveProfile = function () {
     	$location.path('/profiledetail').replace();
     };
     
     $scope.saveProfileDetails = function () {
-    	$rootScope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	//$rootScope.userProfile.phone1 = {"countryCode" : "1", "number" : "1234567890", "extension" : "12"};
+    	console.log($rootScope.userProfile);
     	UserProfileService.updateUserProfile($rootScope.userId, 'UPP', $rootScope.userProfile).then(function(response){ 
     		$location.path('/company').replace();
     	}, function (error) {
