@@ -86,8 +86,12 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
         } else {
         	showOverlay();
         	$scope.accountRegistration.captchaResponse = vcRecaptchaService.getResponse();
-        	$scope.accountRegistration.phone.number = $('#reg-phone').val();
-        	$scope.accountRegistration.phone.countryCode = $('.dial-country-code').html();
+        	if($('#reg-phone').val()!= ""){
+        		$scope.accountRegistration.phone.number = $('#reg-phone').val();
+        		$rootScope.phone=$scope.accountRegistration.phone.number;
+            	$scope.accountRegistration.phone.countryCode = $('.dial-country-code').html();
+        	}
+        	
         	
         	LoginService.signup($scope.accountRegistration).then(function (response) {
            	 $rootScope.userId=response.data.userId;
@@ -106,7 +110,6 @@ app.controller('accountSignupController', ['$scope', '$location', 'vcRecaptchaSe
     };
     
     $scope.setWidgetId = function (widgetId) {
-        console.info('Created widget ID: %s', widgetId);
         $scope.widgetId = widgetId;
     };
     
@@ -173,13 +176,13 @@ app.controller('signupcompleteController', ['$scope','$location','$rootScope','L
 
 app.controller('profileController', ['$scope', '$http', '$location', 'UserProfileService', '$rootScope', function ($scope, $http, $location, UserProfileService, $rootScope) {
 	
-	/*$rootScope.userId = 301;*/
+	/*$rootScope.userId = 196;*/
 	
 
 	if(angular.isUndefined($rootScope.userProfile) || $rootScope.userProfile == null || $rootScope.userProfile == {}){
 		UserProfileService.getUserProfile($rootScope.userId).then(function(response){ 
 			$rootScope.userProfile = response.data;
-			$('#reg-phone1').val($rootScope.userProfile.phone1.number);
+			
 		}, function (error) {
 		    showError($scope.getErrorMessage(error.data));
 		});
@@ -196,9 +199,18 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 		$rootScope.userProfile.phone2.number = $('#reg-phone2').val();
     	$rootScope.userProfile.phone2.countryCode = $('.dial-country-code').html();
 	}
+	/*$scope.getPhone1 = function(){
+		if($rootScope.phone!=""||$rootScope.phone!= undefined){
+    		$scope.userProfile.phone1.number= $rootScope.phone;
+    		$('#reg-phone1').val($rootScope.userProfile.phone1.number);
+    		console.log($('#reg-phone1').val());
+    	}
+	}*/
     
     $scope.saveProfile = function () {
+    	
     	$location.path('/profiledetail').replace();
+    	/*$('#reg-phone1').val($rootScope.userProfile.phone1.number);*/
     };
     
     $scope.saveProfileDetails = function () {
@@ -234,6 +246,7 @@ app.controller('profileController', ['$scope', '$http', '$location', 'UserProfil
 
 app.controller('companyController', ['$scope', '$location', 'CompanyProfileService', '$rootScope', function ($scope, $location, CompanyProfileService, $rootScope) {
 	/*$scope.countrycode=='ax';*/
+	$rootScope.companyId=251;
 	$scope.usa=true;
 	$scope.canada=false;
 	$scope.india=false;
@@ -241,7 +254,7 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 	if(angular.isUndefined($rootScope.companyProfile) || $rootScope.companyProfile == null || $rootScope.companyProfile == {}){
 		CompanyProfileService.getCompanyProfile($rootScope.companyId).then(function(response){ 
 			$rootScope.companyProfile = response.data;
-			$rootScope.companyProfile.companyLogo="https://s3-us-west-1.amazonaws.com/agent-survey/dev/userprofilepics/d-2557d5c87804f57d4ec4fcf4fa033b6fbb1647a4bc38eb7711739b065bba4614875598e911607fb42c8dc8a010b9dd4208eb71fd4f3f71c1e7b18c8b1b97c88a.jpg";
+			
 		}, function (error) {
 		    showError($scope.getErrorMessage(error.data));
 		});
@@ -249,7 +262,28 @@ app.controller('companyController', ['$scope', '$location', 'CompanyProfileServi
 	
 	if(angular.isUndefined($rootScope.industries) || $rootScope.industries == null || $rootScope.industries == {}){
 		CompanyProfileService.getVerticals().then(function(response){ 
-			$rootScope.industries = response.data;
+			//$rootScope.data = response.data;
+			$rootScope.data = [{ 	"verticalsMasterId": -1, 	"verticalName": "CUSTOM", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 1, 	"verticalName": "Mortgage", 	"priorityOrder": 1 }, { 	"verticalsMasterId": 2, 	"verticalName": "Real Estate", 	"priorityOrder": 2 }, { 	"verticalsMasterId": 3, 	"verticalName": "Accounting", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 4, 	"verticalName": "Aviation", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 5, 	"verticalName": "Alternative Medicine", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 6, 	"verticalName": "Apparel & Fashion", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 7, 	"verticalName": "Architecture & Planning", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 8, 	"verticalName": "Arts & Crafts", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 9, 	"verticalName": "Automotive", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 10, 	"verticalName": "Banking", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 11, 	"verticalName": "Broadcast Media", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 12, 	"verticalName": "Business Suppliers & Equipment", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 13, 	"verticalName": "Capital Markets", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 14, 	"verticalName": "Civic and Social Organization", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 15, 	"verticalName": "Civil Engineering", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 16, 	"verticalName": "Commercial Real Estate", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 17, 	"verticalName": "Computer Technology", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 18, 	"verticalName": "Construction", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 19, 	"verticalName": "Consumer Electronics", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 20, 	"verticalName": "Consumer Goods", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 21, 	"verticalName": "Consumer Services", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 22, 	"verticalName": "Cosmetics", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 23, 	"verticalName": "Defence & Space", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 24, 	"verticalName": "Design", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 25, 	"verticalName": "Education", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 26, 	"verticalName": "Electrical/Electronic Manufacturing", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 27, 	"verticalName": "Entertainment", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 28, 	"verticalName": "Environmental Services", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 29, 	"verticalName": "Events Services", 	"priorityOrder": 4 }, { 	"verticalsMasterId": 30, 	"verticalName": "Executive Office", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 31, 	"verticalName": "Facilities Services", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 32, 	"verticalName": "Farming", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 33, 	"verticalName": "Financial Services", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 34, 	"verticalName": "Fine Art", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 35, 	"verticalName": "Fishery", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 36, 	"verticalName": "Food & Beverages", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 37, 	"verticalName": "Food Production", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 38, 	"verticalName": "Fund-Raising", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 39, 	"verticalName": "Furniture", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 40, 	"verticalName": "Gambling & Casinos", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 41, 	"verticalName": "Graphic Design", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 42, 	"verticalName": "Health, Wellness & Fitness", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 43, 	"verticalName": "Higher Education", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 44, 	"verticalName": "Hospital & Health Care", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 45, 	"verticalName": "Hospitality", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 46, 	"verticalName": "Human Resources", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 47, 	"verticalName": "Import & Export", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 48, 	"verticalName": "Individual & Family Services", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 49, 	"verticalName": "Industrial Automation", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 50, 	"verticalName": "Information Services", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 51, 	"verticalName": "Information Technology & Services", 	"priorityOrder": 5 }, { 	"verticalsMasterId": 52, 	"verticalName": "Insurance", 	"priorityOrder": 3 }, { 	"verticalsMasterId": 53, 	"verticalName": "Internet", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 54, 	"verticalName": "Investment Banking", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 55, 	"verticalName": "Investment Management", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 56, 	"verticalName": "Law Enforcement", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 57, 	"verticalName": "Law Practice", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 58, 	"verticalName": "Legal Services", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 59, 	"verticalName": "Legislative Office", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 60, 	"verticalName": "Leisure, Travel & Tourism", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 61, 	"verticalName": "Logistics and Supply Chain", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 62, 	"verticalName": "Machinery", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 63, 	"verticalName": "Management Consulting", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 64, 	"verticalName": "Maritime", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 65, 	"verticalName": "Market Research", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 66, 	"verticalName": "Marketing & Advertisement", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 67, 	"verticalName": "Mechanical & Industrial Engineering", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 68, 	"verticalName": "Media Production", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 69, 	"verticalName": "Medical Devices", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 70, 	"verticalName": "Medical Practice", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 71, 	"verticalName": "Mental Health Care", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 72, 	"verticalName": "Military", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 73, 	"verticalName": "Mining & Metals", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 74, 	"verticalName": "Museums & Institutions", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 75, 	"verticalName": "Music", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 76, 	"verticalName": "Non-Profit Organization", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 77, 	"verticalName": "Oil & Energy", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 78, 	"verticalName": "Online Media", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 79, 	"verticalName": "Outsourcing/Offshoring", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 80, 	"verticalName": "Package/Freight Delivery", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 81, 	"verticalName": "Packaging & Containers", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 82, 	"verticalName": "Paper & Forest Products", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 83, 	"verticalName": "Performing Arts", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 84, 	"verticalName": "Pharmaceuticals", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 85, 	"verticalName": "Philanthropy", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 86, 	"verticalName": "Photography", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 87, 	"verticalName": "Plastics", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 88, 	"verticalName": "Political Organization", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 89, 	"verticalName": "Primary/Secondary Education", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 90, 	"verticalName": "Printing", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 91, 	"verticalName": "Professional Training & Coaching", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 92, 	"verticalName": "Program Development", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 93, 	"verticalName": "Public Relations & Communications", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 94, 	"verticalName": "Publishing", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 95, 	"verticalName": "Recreational Facilities & Services", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 96, 	"verticalName": "Religious Institutions", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 97, 	"verticalName": "Renewables & Environment", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 98, 	"verticalName": "Research", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 99, 	"verticalName": "Restaurants", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 100, 	"verticalName": "Retail", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 101, 	"verticalName": "Security & Investigations", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 102, 	"verticalName": "Sporting Goods", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 103, 	"verticalName": "Sports", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 104, 	"verticalName": "Staffing & Recruiting", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 105, 	"verticalName": "Telecommunications", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 106, 	"verticalName": "Think Tanks", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 107, 	"verticalName": "Translation And Localization", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 108, 	"verticalName": "Transportation/Trucking/Railroad", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 109, 	"verticalName": "Venture Capital & Private Equity", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 110, 	"verticalName": "Veterinary", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 111, 	"verticalName": "Warehousing", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 112, 	"verticalName": "Wholesale", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 113, 	"verticalName": "Wine And Spirits", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 114, 	"verticalName": "Wireless", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 115, 	"verticalName": "Writing and Editing", 	"priorityOrder": 0 }, { 	"verticalsMasterId": 116, 	"verticalName": "Other", 	"priorityOrder": 0 }];
+			var custom = { "verticalsMasterId": -1, "verticalName": "CUSTOM", "priorityOrder": 0 };
+			$rootScope.data.splice(custom, 1);
+			
+			$rootScope.industries=[];
+			var verticals=[];
+			var priority=[];
+			for (i in $rootScope.data)
+			{
+			  if($rootScope.data[i].priorityOrder!=0){
+					priority.push($rootScope.data[i]);
+				}else{
+					verticals.push($rootScope.data[i]);
+				}
+			}
+			priority.sort(function(obj1, obj2) {
+				return obj1.priorityOrder - obj2.priorityOrder;
+			});
+			priority.push({ divider: true});
+			$rootScope.industries=priority.concat(verticals);
+			$scope.ddSelectOptions=$rootScope.industries;
 		}, function (error) {
 		    showError($scope.getErrorMessage(error.data));
 		});
